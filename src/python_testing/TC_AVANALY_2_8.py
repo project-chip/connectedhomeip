@@ -60,11 +60,22 @@ class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
     def steps_TC_AVANALY_2_8(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH sets TrackingEnabled attribute to True. Verify success response."),
+            TestStep(
+                2, "TH sets TrackingEnabled attribute to True. Verify success response."
+            ),
             TestStep(3, "Simulate detection of an entity (e.g., Person)."),
-            TestStep(4, "TH receives PerceivedContext event. Save IdentifiedContextID as id1."),
-            TestStep(5, "Simulate the entity moving and being detected again (e.g., across zones)."),
-            TestStep(6, "TH receives PerceivedContext event. Verify IdentifiedContextID is equal to id1."),
+            TestStep(
+                4,
+                "TH receives PerceivedContext event. Save IdentifiedContextID as id1.",
+            ),
+            TestStep(
+                5,
+                "Simulate the entity moving and being detected again (e.g., across zones).",
+            ),
+            TestStep(
+                6,
+                "TH receives PerceivedContext event. Verify IdentifiedContextID is equal to id1.",
+            ),
         ]
 
     def pics_TC_AVANALY_2_8(self) -> list[str]:
@@ -83,20 +94,40 @@ class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
         self.step(1)  # Already done, immediately go to step 2
 
         await self.read_avanaly_features(endpoint)
-        supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
-        asserts.assert_greater_equal(len(supported_contexts), 1, "SupportedAmbientContexts must not be empty")
+        supported_contexts = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.SupportedAmbientContexts
+        )
+        asserts.assert_greater_equal(
+            len(supported_contexts), 1, "SupportedAmbientContexts must not be empty"
+        )
 
         self.step(2)
         # Enable tracking
-        result = await self.write_single_attribute(attributes.TrackingEnabled(True), endpoint_id=endpoint)
-        asserts.assert_equal(result, Status.Success, "Writing TrackingEnabled to True failed")
+        result = await self.write_single_attribute(
+            attributes.TrackingEnabled(True), endpoint_id=endpoint
+        )
+        asserts.assert_equal(
+            result, Status.Success, "Writing TrackingEnabled to True failed"
+        )
+        tracking_enabled = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.TrackingEnabled
+        )
+        asserts.assert_true(
+            tracking_enabled, "TrackingEnabled must be True after write"
+        )
 
         # Also ensure at least one context trigger is enabled
         if self.has_feature_perzonedetect:
-            trigger = cluster.Structs.ContextTriggerStruct(context=supported_contexts[0], zoneIDs=NullValue)
+            trigger = cluster.Structs.ContextTriggerStruct(
+                context=supported_contexts[0], zoneIDs=NullValue
+            )
         else:
-            trigger = cluster.Structs.ContextTriggerStruct(context=supported_contexts[0])
-        await self.send_enable_context_triggers_cmd(endpoint, context_triggers=[trigger])
+            trigger = cluster.Structs.ContextTriggerStruct(
+                context=supported_contexts[0]
+            )
+        await self.send_enable_context_triggers_cmd(
+            endpoint, context_triggers=[trigger]
+        )
 
         # Set up event subscription handler
         event_callback = EventSubscriptionHandler(expected_cluster=cluster)
@@ -105,12 +136,18 @@ class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
         self.step(3)
         context_to_detect = supported_contexts[0]
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({
-                "Name": "AvAnalysisPerceivedContext",
-                "NewContexts": [
-                    {"NamespaceId": context_to_detect.namespaceID, "Tag": context_to_detect.tag, "IdentifiedContextId": 42}
-                ]
-            })
+            self.write_to_app_pipe(
+                {
+                    "Name": "AvAnalysisPerceivedContext",
+                    "NewContexts": [
+                        {
+                            "NamespaceId": context_to_detect.namespaceID,
+                            "Tag": context_to_detect.tag,
+                            "IdentifiedContextId": 42,
+                        }
+                    ],
+                }
+            )
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg="Simulate detection of a tracked entity (e.g., Person) on the DUT. Press Enter once detected."
@@ -119,11 +156,20 @@ class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
         self.step(4)
         id1 = None
         if self.matter_test_config.pipe_name or not self.is_ci:
-            event1 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
+            event1 = event_callback.wait_for_event_report(
+                cluster.Events.PerceivedContext, timeout_sec=30
+            )
             log.info("PerceivedContext event 1: %s", event1)
             asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
-            asserts.assert_is_not_none(event1.newIdentifiedContexts, "newIdentifiedContexts must be present in event 1")
-            asserts.assert_greater_equal(len(event1.newIdentifiedContexts), 1, "Expected at least 1 TrackedContext entry")
+            asserts.assert_is_not_none(
+                event1.newIdentifiedContexts,
+                "newIdentifiedContexts must be present in event 1",
+            )
+            asserts.assert_greater_equal(
+                len(event1.newIdentifiedContexts),
+                1,
+                "Expected at least 1 TrackedContext entry",
+            )
             id1 = event1.newIdentifiedContexts[0].identifiedContextID
             log.info("Saved IdentifiedContextID id1: %s", id1)
             asserts.assert_is_not_none(id1, "IdentifiedContextID must not be None")
@@ -133,12 +179,18 @@ class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
 
         self.step(5)
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({
-                "Name": "AvAnalysisPerceivedContext",
-                "NewContexts": [
-                    {"NamespaceId": context_to_detect.namespaceID, "Tag": context_to_detect.tag, "IdentifiedContextId": id1}
-                ]
-            })
+            self.write_to_app_pipe(
+                {
+                    "Name": "AvAnalysisPerceivedContext",
+                    "NewContexts": [
+                        {
+                            "NamespaceId": context_to_detect.namespaceID,
+                            "Tag": context_to_detect.tag,
+                            "IdentifiedContextId": id1,
+                        }
+                    ],
+                }
+            )
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg="Simulate the entity moving and being detected again (e.g., across zones). Press Enter once detected."
@@ -146,22 +198,39 @@ class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
 
         self.step(6)
         if self.matter_test_config.pipe_name or not self.is_ci:
-            event2 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
+            event2 = event_callback.wait_for_event_report(
+                cluster.Events.PerceivedContext, timeout_sec=30
+            )
             log.info("PerceivedContext event 2: %s", event2)
             asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
-            tracked_list = event2.newIdentifiedContexts or event2.currentIdentifiedContexts
-            asserts.assert_is_not_none(tracked_list, "Tracked contexts list must not be None")
-            matching_ids = [tc.identifiedContextID for tc in tracked_list if tc.identifiedContextID == id1]
-            asserts.assert_greater_equal(len(matching_ids), 1,
-                                         f"IdentifiedContextID {id1} not found in second PerceivedContext event: {tracked_list}")
+            tracked_list = (
+                event2.newIdentifiedContexts or event2.currentIdentifiedContexts
+            )
+            asserts.assert_is_not_none(
+                tracked_list, "Tracked contexts list must not be None"
+            )
+            matching_ids = [
+                tc.identifiedContextID
+                for tc in tracked_list
+                if tc.identifiedContextID == id1
+            ]
+            asserts.assert_greater_equal(
+                len(matching_ids),
+                1,
+                f"IdentifiedContextID {id1} not found in second PerceivedContext event: {tracked_list}",
+            )
         else:
             log.info("CI mode: skipping blocking event wait in Step 6")
 
         # Cleanup: reset TrackingEnabled, end session, and disable context triggers
         if self.matter_test_config.pipe_name:
             self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
-        await self.write_single_attribute(attributes.TrackingEnabled(False), endpoint_id=endpoint)
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        await self.write_single_attribute(
+            attributes.TrackingEnabled(False), endpoint_id=endpoint
+        )
+        await self.send_disable_context_triggers_cmd(
+            endpoint, context_triggers=NullValue
+        )
 
 
 if __name__ == "__main__":

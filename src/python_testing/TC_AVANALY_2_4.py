@@ -58,13 +58,34 @@ class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
     def steps_TC_AVANALY_2_4(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH sends EnableContextTriggers command without an analysis stream established. Verify INVALID_IN_STATE error."),
-            TestStep(3, "TH sends EstablishAnalysisStream command with a valid NodeID. Verify success response."),
-            TestStep(4, "TH reads SupportedAmbientContexts attribute. Save as supported_contexts."),
-            TestStep(5, "TH sends EnableContextTriggers command with valid subset of supported_contexts. Verify success."),
-            TestStep(6, "TH reads ActiveAmbientContextTriggers attribute. Verify it matches the provided list."),
-            TestStep(7, "TH sends DisableContextTriggers command with ContextTriggers set to null. Verify success."),
-            TestStep(8, "TH reads ActiveAmbientContextTriggers attribute. Verify it is empty."),
+            TestStep(
+                2,
+                "TH sends EnableContextTriggers command without an analysis stream established. Verify INVALID_IN_STATE error.",
+            ),
+            TestStep(
+                3,
+                "TH sends EstablishAnalysisStream command with a valid NodeID. Verify success response.",
+            ),
+            TestStep(
+                4,
+                "TH reads SupportedAmbientContexts attribute. Save as supported_contexts.",
+            ),
+            TestStep(
+                5,
+                "TH sends EnableContextTriggers command with valid subset of supported_contexts. Verify success.",
+            ),
+            TestStep(
+                6,
+                "TH reads ActiveAmbientContextTriggers attribute. Verify it matches the provided list.",
+            ),
+            TestStep(
+                7,
+                "TH sends DisableContextTriggers command with ContextTriggers set to null. Verify success.",
+            ),
+            TestStep(
+                8,
+                "TH reads ActiveAmbientContextTriggers attribute. Verify it is empty.",
+            ),
         ]
 
     def pics_TC_AVANALY_2_4(self) -> list[str]:
@@ -82,8 +103,12 @@ class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
         self.step(1)  # Already done, immediately go to step 2
 
         await self.read_avanaly_features(endpoint)
-        log.info("Features - LCLCONDETECT: %s, REMCONDETECT: %s, PERZONEDETECT: %s",
-                 self.has_feature_lclcondetect, self.has_feature_remcondetect, self.has_feature_perzonedetect)
+        log.info(
+            "Features - LCLCONDETECT: %s, REMCONDETECT: %s, PERZONEDETECT: %s",
+            self.has_feature_lclcondetect,
+            self.has_feature_remcondetect,
+            self.has_feature_perzonedetect,
+        )
 
         if not self.has_feature_remcondetect:
             log.info("REMCONDETECT not supported, skipping TC-AVANALY-2.4")
@@ -100,44 +125,83 @@ class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
         # TH sends EnableContextTriggers command before establishing analysis stream
         # Expect INVALID_IN_STATE because no stream is active
         try:
-            await self.send_enable_context_triggers_cmd(endpoint, context_triggers=NullValue)
-            asserts.fail("EnableContextTriggers should fail with INVALID_IN_STATE when no stream is active")
+            await self.send_enable_context_triggers_cmd(
+                endpoint, context_triggers=NullValue
+            )
+            asserts.fail(
+                "EnableContextTriggers should fail with INVALID_IN_STATE when no stream is active"
+            )
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState,
-                                 f"Expected INVALID_IN_STATE status, received {e.status}")
+            asserts.assert_equal(
+                e.status,
+                Status.InvalidInState,
+                f"Expected INVALID_IN_STATE status, received {e.status}",
+            )
 
         self.step(3)
         # Establish analysis stream with TH node id or valid NodeID
         node_id = self.dut_node_id
         resp = await self.send_establish_analysis_stream_cmd(endpoint, node_id=node_id)
         log.info("EstablishAnalysisStream response: %s", resp)
+        asserts.assert_is_not_none(resp, "Expected EstablishAnalysisStreamResponse")
+        stream_id = getattr(resp, "analysisStreamID", None)
+        asserts.assert_is_not_none(
+            stream_id, "EstablishAnalysisStreamResponse must contain analysisStreamID"
+        )
 
         self.step(4)
-        supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
-        asserts.assert_greater_equal(len(supported_contexts), 1, "SupportedAmbientContexts must not be empty")
+        supported_contexts = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.SupportedAmbientContexts
+        )
+        asserts.assert_greater_equal(
+            len(supported_contexts), 1, "SupportedAmbientContexts must not be empty"
+        )
 
         self.step(5)
         valid_subset = [supported_contexts[0]]
         if self.has_feature_perzonedetect:
-            triggers = [cluster.Structs.ContextTriggerStruct(context=sc, zoneIDs=NullValue) for sc in valid_subset]
+            triggers = [
+                cluster.Structs.ContextTriggerStruct(context=sc, zoneIDs=NullValue)
+                for sc in valid_subset
+            ]
         else:
-            triggers = [cluster.Structs.ContextTriggerStruct(context=sc) for sc in valid_subset]
+            triggers = [
+                cluster.Structs.ContextTriggerStruct(context=sc) for sc in valid_subset
+            ]
 
         await self.send_enable_context_triggers_cmd(endpoint, context_triggers=triggers)
 
         self.step(6)
-        active_triggers = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
+        active_triggers = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.ActiveAmbientContextTriggers
+        )
         active_tags = {(t.context.namespaceID, t.context.tag) for t in active_triggers}
-        asserts.assert_in((valid_subset[0].namespaceID, valid_subset[0].tag), active_tags,
-                          "Enabled context not found in ActiveAmbientContextTriggers")
+        asserts.assert_in(
+            (valid_subset[0].namespaceID, valid_subset[0].tag),
+            active_tags,
+            "Enabled context not found in ActiveAmbientContextTriggers",
+        )
 
         self.step(7)
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        await self.send_disable_context_triggers_cmd(
+            endpoint, context_triggers=NullValue
+        )
 
         self.step(8)
-        active_triggers = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
-        asserts.assert_equal(len(active_triggers), 0,
-                             "ActiveAmbientContextTriggers should be empty after null disable")
+        active_triggers = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.ActiveAmbientContextTriggers
+        )
+        asserts.assert_equal(
+            len(active_triggers),
+            0,
+            "ActiveAmbientContextTriggers should be empty after null disable",
+        )
+
+        # Cleanup: remove established analysis stream
+        if stream_id is not None:
+            await self.send_remove_analysis_stream_cmd(
+                endpoint, analysis_stream_id=stream_id
+            )
 
 
 if __name__ == "__main__":

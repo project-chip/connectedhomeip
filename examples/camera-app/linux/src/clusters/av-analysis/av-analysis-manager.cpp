@@ -38,14 +38,17 @@ void AvAnalysisManager::ShutdownApp() {}
  */
 CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs)
 {
-    if (mCameraDevice != nullptr)
+    if (aZoneIDs.empty())
     {
-        for (uint16_t zoneId : aZoneIDs)
+        return CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(mCameraDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    for (uint16_t zoneId : aZoneIDs)
+    {
+        if (!mCameraDevice->GetCameraHALInterface().IsValidAnalysisZone(zoneId))
         {
-            if (!mCameraDevice->GetCameraHALInterface().IsValidAnalysisZone(zoneId))
-            {
-                return CHIP_ERROR_NOT_FOUND;
-            }
+            return CHIP_ERROR_NOT_FOUND;
         }
     }
     return CHIP_NO_ERROR;

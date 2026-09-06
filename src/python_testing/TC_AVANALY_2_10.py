@@ -58,9 +58,15 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase):
     def steps_TC_AVANALY_2_10(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH enables context trigger for clip generation. Verify success response."),
+            TestStep(
+                2,
+                "TH enables context trigger for clip generation. Verify success response.",
+            ),
             TestStep(3, "Simulate ambient context detection on the DUT."),
-            TestStep(4, "Check PushAV cluster for clip generation event or metadata. Verify clip session was initiated."),
+            TestStep(
+                4,
+                "Check PushAV cluster for clip generation event or metadata. Verify clip session was initiated.",
+            ),
         ]
 
     def pics_TC_AVANALY_2_10(self) -> list[str]:
@@ -78,55 +84,85 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase):
         self.step(1)  # Already done, immediately go to step 2
 
         await self.read_avanaly_features(endpoint)
-        supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
-        asserts.assert_greater_equal(len(supported_contexts), 1, "SupportedAmbientContexts must not be empty")
+        supported_contexts = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.SupportedAmbientContexts
+        )
+        asserts.assert_greater_equal(
+            len(supported_contexts), 1, "SupportedAmbientContexts must not be empty"
+        )
 
         # Check if PushAvStreamTransport cluster is present on this endpoint
         has_push_av = False
         push_av_cluster = Clusters.Objects.PushAvStreamTransport
         try:
             attribute_list = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=push_av_cluster, attribute=push_av_cluster.Attributes.AttributeList
+                endpoint=endpoint,
+                cluster=push_av_cluster,
+                attribute=push_av_cluster.Attributes.AttributeList,
             )
             has_push_av = attribute_list is not None
         except Exception as e:
-            log.info("PushAvStreamTransport cluster not present or not accessible: %s", e)
+            log.info(
+                "PushAvStreamTransport cluster not present or not accessible: %s", e
+            )
             has_push_av = False
 
         self.step(2)
         # Enable context trigger for the supported ambient context
         if self.has_feature_perzonedetect:
-            trigger = cluster.Structs.ContextTriggerStruct(context=supported_contexts[0], zoneIDs=NullValue)
+            trigger = cluster.Structs.ContextTriggerStruct(
+                context=supported_contexts[0], zoneIDs=NullValue
+            )
         else:
-            trigger = cluster.Structs.ContextTriggerStruct(context=supported_contexts[0])
+            trigger = cluster.Structs.ContextTriggerStruct(
+                context=supported_contexts[0]
+            )
 
-        await self.send_enable_context_triggers_cmd(endpoint, context_triggers=[trigger])
+        await self.send_enable_context_triggers_cmd(
+            endpoint, context_triggers=[trigger]
+        )
 
         # Set up event subscription handler if PushAV is available
         push_av_event_cb = None
         if has_push_av:
-            push_av_event_cb = EventSubscriptionHandler(expected_cluster=push_av_cluster)
-            await push_av_event_cb.start(self.default_controller, self.dut_node_id, endpoint)
+            push_av_event_cb = EventSubscriptionHandler(
+                expected_cluster=push_av_cluster
+            )
+            await push_av_event_cb.start(
+                self.default_controller, self.dut_node_id, endpoint
+            )
 
         self.step(3)
         if not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg="Simulate ambient context detection on the DUT to trigger clip recording. Press Enter once initiated."
             )
+        else:
+            log.info("CI mode: skipping physical ambient context detection simulation")
 
         self.step(4)
         if not self.is_ci and has_push_av:
-            try:
-                event_data = push_av_event_cb.wait_for_event_report(push_av_cluster.Events.PushTransportBegin, timeout_sec=15)
-                log.info("PushTransportBegin event received: %s", event_data)
-                asserts.assert_is_not_none(event_data, "Expected PushTransportBegin event indicating clip initiation")
-            except Exception as e:
-                log.warning("PushTransportBegin event wait completed with: %s", e)
+            event_data = push_av_event_cb.wait_for_event_report(
+                push_av_cluster.Events.PushTransportBegin, timeout_sec=15
+            )
+            log.info("PushTransportBegin event received: %s", event_data)
+            asserts.assert_is_not_none(
+                event_data,
+                "Expected PushTransportBegin event indicating clip initiation",
+            )
+        elif not has_push_av:
+            log.info("PushAvStreamTransport cluster not present on endpoint")
         else:
-            log.info("CI mode or PushAV not present: step 4 verified")
+            log.info(
+                "CI mode: skipping PushTransportBegin event wait (simulated clip recording not available in CI)"
+            )
 
         # Cleanup
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        if push_av_event_cb:
+            push_av_event_cb.cancel()
+        await self.send_disable_context_triggers_cmd(
+            endpoint, context_triggers=NullValue
+        )
 
 
 if __name__ == "__main__":

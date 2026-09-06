@@ -60,9 +60,15 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Simulate entity detection in Zone 1."),
-            TestStep(3, "TH receives PerceivedContext event. Verify CurrentZone is Zone 1, PreviousZone is Null."),
+            TestStep(
+                3,
+                "TH receives PerceivedContext event. Verify CurrentZone is Zone 1, PreviousZone is Null.",
+            ),
             TestStep(4, "Simulate entity moving from Zone 1 to Zone 2."),
-            TestStep(5, "TH receives PerceivedContext event. Verify CurrentZone is Zone 2, PreviousZone is Zone 1."),
+            TestStep(
+                5,
+                "TH receives PerceivedContext event. Verify CurrentZone is Zone 2, PreviousZone is Zone 1.",
+            ),
         ]
 
     def pics_TC_AVANALY_2_9(self) -> list[str]:
@@ -89,8 +95,12 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
             self.skip_step(5)
             return
 
-        supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
-        asserts.assert_greater_equal(len(supported_contexts), 1, "SupportedAmbientContexts must not be empty")
+        supported_contexts = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.SupportedAmbientContexts
+        )
+        asserts.assert_greater_equal(
+            len(supported_contexts), 1, "SupportedAmbientContexts must not be empty"
+        )
 
         # Discover or define Zone 1 and Zone 2 in Zone Management
         zone_1_id = 1
@@ -98,7 +108,9 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
         zone_cluster = Clusters.Objects.ZoneManagement
         try:
             existing_zones = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=zone_cluster, attribute=zone_cluster.Attributes.Zones
+                endpoint=endpoint,
+                cluster=zone_cluster,
+                attribute=zone_cluster.Attributes.Zones,
             )
             if len(existing_zones) >= 2:
                 zone_1_id = existing_zones[0].zoneID
@@ -112,8 +124,18 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
         log.info("Using Zone 1 ID: %d, Zone 2 ID: %d", zone_1_id, zone_2_id)
 
         # Enable TrackingEnabled and enable context triggers for all zones
-        await self.write_single_attribute(attributes.TrackingEnabled(True), endpoint_id=endpoint)
-        await self.send_enable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        await self.write_single_attribute(
+            attributes.TrackingEnabled(True), endpoint_id=endpoint
+        )
+        tracking_enabled = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.TrackingEnabled
+        )
+        asserts.assert_true(
+            tracking_enabled, "TrackingEnabled must be True after write"
+        )
+        await self.send_enable_context_triggers_cmd(
+            endpoint, context_triggers=NullValue
+        )
 
         # Set up event subscription handler
         event_callback = EventSubscriptionHandler(expected_cluster=cluster)
@@ -122,18 +144,20 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
         self.step(2)
         context_to_detect = supported_contexts[0]
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({
-                "Name": "AvAnalysisPerceivedContext",
-                "NewContexts": [
-                    {
-                        "NamespaceId": context_to_detect.namespaceID,
-                        "Tag": context_to_detect.tag,
-                        "IdentifiedContextId": 10,
-                        "CurrentZone": zone_1_id,
-                        "PreviousZone": None,
-                    }
-                ]
-            })
+            self.write_to_app_pipe(
+                {
+                    "Name": "AvAnalysisPerceivedContext",
+                    "NewContexts": [
+                        {
+                            "NamespaceId": context_to_detect.namespaceID,
+                            "Tag": context_to_detect.tag,
+                            "IdentifiedContextId": 10,
+                            "CurrentZone": zone_1_id,
+                            "PreviousZone": None,
+                        }
+                    ],
+                }
+            )
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate entity detection in Zone 1 (zoneID={zone_1_id}) on the DUT. Press Enter once initiated."
@@ -141,31 +165,44 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
 
         self.step(3)
         if self.matter_test_config.pipe_name or not self.is_ci:
-            event1 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
+            event1 = event_callback.wait_for_event_report(
+                cluster.Events.PerceivedContext, timeout_sec=30
+            )
             log.info("PerceivedContext event 1: %s", event1)
             asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
-            asserts.assert_is_not_none(event1.newIdentifiedContexts, "newIdentifiedContexts must be present in event 1")
+            asserts.assert_is_not_none(
+                event1.newIdentifiedContexts,
+                "newIdentifiedContexts must be present in event 1",
+            )
             tc1 = event1.newIdentifiedContexts[0]
-            asserts.assert_equal(tc1.currentZone, zone_1_id, f"Expected currentZone {zone_1_id}, got {tc1.currentZone}")
-            asserts.assert_true(tc1.previousZone is None or tc1.previousZone is NullValue,
-                                f"Expected previousZone to be Null, got {tc1.previousZone}")
+            asserts.assert_equal(
+                tc1.currentZone,
+                zone_1_id,
+                f"Expected currentZone {zone_1_id}, got {tc1.currentZone}",
+            )
+            asserts.assert_true(
+                tc1.previousZone is None or tc1.previousZone is NullValue,
+                f"Expected previousZone to be Null, got {tc1.previousZone}",
+            )
         else:
             log.info("CI mode: skipping blocking event wait in Step 3")
 
         self.step(4)
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({
-                "Name": "AvAnalysisPerceivedContext",
-                "NewContexts": [
-                    {
-                        "NamespaceId": context_to_detect.namespaceID,
-                        "Tag": context_to_detect.tag,
-                        "IdentifiedContextId": 10,
-                        "CurrentZone": zone_2_id,
-                        "PreviousZone": zone_1_id,
-                    }
-                ]
-            })
+            self.write_to_app_pipe(
+                {
+                    "Name": "AvAnalysisPerceivedContext",
+                    "NewContexts": [
+                        {
+                            "NamespaceId": context_to_detect.namespaceID,
+                            "Tag": context_to_detect.tag,
+                            "IdentifiedContextId": 10,
+                            "CurrentZone": zone_2_id,
+                            "PreviousZone": zone_1_id,
+                        }
+                    ],
+                }
+            )
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate entity moving from Zone 1 (zoneID={zone_1_id}) to Zone 2 (zoneID={zone_2_id}) on the DUT. Press Enter once initiated."
@@ -173,22 +210,40 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
 
         self.step(5)
         if self.matter_test_config.pipe_name or not self.is_ci:
-            event2 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
+            event2 = event_callback.wait_for_event_report(
+                cluster.Events.PerceivedContext, timeout_sec=30
+            )
             log.info("PerceivedContext event 2: %s", event2)
             asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
-            tracked_list = event2.newIdentifiedContexts or event2.currentIdentifiedContexts
-            asserts.assert_is_not_none(tracked_list, "TrackedContexts must be present in event 2")
+            tracked_list = (
+                event2.newIdentifiedContexts or event2.currentIdentifiedContexts
+            )
+            asserts.assert_is_not_none(
+                tracked_list, "TrackedContexts must be present in event 2"
+            )
             tc2 = tracked_list[0]
-            asserts.assert_equal(tc2.currentZone, zone_2_id, f"Expected currentZone {zone_2_id}, got {tc2.currentZone}")
-            asserts.assert_equal(tc2.previousZone, zone_1_id, f"Expected previousZone {zone_1_id}, got {tc2.previousZone}")
+            asserts.assert_equal(
+                tc2.currentZone,
+                zone_2_id,
+                f"Expected currentZone {zone_2_id}, got {tc2.currentZone}",
+            )
+            asserts.assert_equal(
+                tc2.previousZone,
+                zone_1_id,
+                f"Expected previousZone {zone_1_id}, got {tc2.previousZone}",
+            )
         else:
             log.info("CI mode: skipping blocking event wait in Step 5")
 
         # Cleanup
         if self.matter_test_config.pipe_name:
             self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
-        await self.write_single_attribute(attributes.TrackingEnabled(False), endpoint_id=endpoint)
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        await self.write_single_attribute(
+            attributes.TrackingEnabled(False), endpoint_id=endpoint
+        )
+        await self.send_disable_context_triggers_cmd(
+            endpoint, context_triggers=NullValue
+        )
 
 
 if __name__ == "__main__":

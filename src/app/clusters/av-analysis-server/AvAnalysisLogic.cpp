@@ -42,9 +42,8 @@ AvAnalysisServerLogic::AvAnalysisServerLogic(
     EndpointId aEndpointId, BitFlags<Feature> aFeatures,
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
     DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount) :
-    mEndpointId(aEndpointId),
-    mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts), mMaxAnalysisStreamCount(aMaxAnalysisStreamCount),
-    mMaxZones(aMaxZones)
+    mEndpointId(aEndpointId), mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts),
+    mMaxAnalysisStreamCount(aMaxAnalysisStreamCount), mMaxZones(aMaxZones)
 {}
 
 AvAnalysisServerLogic::~AvAnalysisServerLogic()
@@ -666,8 +665,9 @@ AvAnalysisServerLogic::ProcessEnableContextTriggers(const AvAnalysis::Commands::
                     {
                         zoneIDs.push_back(zone_iter.GetValue());
                     }
-                    if (mDelegate != nullptr)
+                    if (!zoneIDs.empty())
                     {
+                        VerifyOrReturnError(mDelegate != nullptr, Status::Failure);
                         err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
                         VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
                     }
@@ -1094,6 +1094,7 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
     // Validate the information received - are the zoneIDs known (if provided)
     if (!aZoneList.IsNull())
     {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(mDelegate->VerifyZoneIDsAreValid(aZoneList.Value()));
     }
 

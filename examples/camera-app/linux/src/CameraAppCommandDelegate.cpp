@@ -17,6 +17,7 @@
  */
 
 #include "CameraAppCommandDelegate.h"
+#include <lib/support/SafeInt.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -124,18 +125,30 @@ static AvAnalysis::Structs::TrackedContext::Type ParseTrackedContext(const Json:
     AvAnalysis::Structs::TrackedContext::Type tc;
     if (ctxVal.isMember("NamespaceId") || ctxVal.isMember("namespaceID"))
     {
-        const auto & ns                  = ctxVal.isMember("NamespaceId") ? ctxVal["NamespaceId"] : ctxVal["namespaceID"];
-        tc.identifiedContext.namespaceID = static_cast<uint8_t>(ns.asUInt());
+        const auto & ns = ctxVal.isMember("NamespaceId") ? ctxVal["NamespaceId"] : ctxVal["namespaceID"];
+        uint32_t val    = ns.asUInt();
+        if (chip::CanCastTo<uint8_t>(val))
+        {
+            tc.identifiedContext.namespaceID = static_cast<uint8_t>(val);
+        }
     }
     if (ctxVal.isMember("Tag") || ctxVal.isMember("tag"))
     {
-        const auto & tag         = ctxVal.isMember("Tag") ? ctxVal["Tag"] : ctxVal["tag"];
-        tc.identifiedContext.tag = static_cast<uint16_t>(tag.asUInt());
+        const auto & tag = ctxVal.isMember("Tag") ? ctxVal["Tag"] : ctxVal["tag"];
+        uint32_t val     = tag.asUInt();
+        if (chip::CanCastTo<uint16_t>(val))
+        {
+            tc.identifiedContext.tag = static_cast<uint16_t>(val);
+        }
     }
     if (ctxVal.isMember("IdentifiedContextId") || ctxVal.isMember("identifiedContextID"))
     {
         const auto & idVal = ctxVal.isMember("IdentifiedContextId") ? ctxVal["IdentifiedContextId"] : ctxVal["identifiedContextID"];
-        tc.identifiedContextID = static_cast<uint16_t>(idVal.asUInt());
+        uint32_t val       = idVal.asUInt();
+        if (chip::CanCastTo<uint16_t>(val))
+        {
+            tc.identifiedContextID = static_cast<uint16_t>(val);
+        }
     }
     if (ctxVal.isMember("CurrentZone") || ctxVal.isMember("currentZone"))
     {

@@ -59,13 +59,31 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
     def steps_TC_AVANALY_2_14(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH creates a remote zone in Zone Management cluster with a valid NodeId. Save as remote_zone_id."),
-            TestStep(3, "TH establishes an analysis stream to the same remote camera NodeId. Verify success response."),
+            TestStep(
+                2,
+                "TH creates a remote zone in Zone Management cluster with a valid NodeId. Save as remote_zone_id.",
+            ),
+            TestStep(
+                3,
+                "TH establishes an analysis stream to the same remote camera NodeId. Verify success response.",
+            ),
             TestStep(4, "Simulate detection of an ambient context in remote_zone_id."),
-            TestStep(5, "TH receives AnalysisSessionStart event. Verify SourceNodeId matches remote camera NodeId."),
-            TestStep(6, "Verify TriggeredZones contains remote_zone_id in AnalysisSessionStart event."),
-            TestStep(7, "TH receives PerceivedContext event. Verify SourceNodeId matches remote camera NodeId."),
-            TestStep(8, "TH receives AnalysisSessionEnd event. Verify SourceNodeId matches remote camera NodeId."),
+            TestStep(
+                5,
+                "TH receives AnalysisSessionStart event. Verify SourceNodeId matches remote camera NodeId.",
+            ),
+            TestStep(
+                6,
+                "Verify TriggeredZones contains remote_zone_id in AnalysisSessionStart event.",
+            ),
+            TestStep(
+                7,
+                "TH receives PerceivedContext event. Verify SourceNodeId matches remote camera NodeId.",
+            ),
+            TestStep(
+                8,
+                "TH receives AnalysisSessionEnd event. Verify SourceNodeId matches remote camera NodeId.",
+            ),
         ]
 
     def pics_TC_AVANALY_2_14(self) -> list[str]:
@@ -88,14 +106,20 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
         if hasattr(zone_cluster.Bitmaps.Feature, "kRemoteZones"):
             try:
                 zone_feature_map = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=zone_cluster, attribute=zone_cluster.Attributes.FeatureMap
+                    endpoint=endpoint,
+                    cluster=zone_cluster,
+                    attribute=zone_cluster.Attributes.FeatureMap,
                 )
-                has_remote_zones = (zone_feature_map & zone_cluster.Bitmaps.Feature.kRemoteZones) != 0
+                has_remote_zones = (
+                    zone_feature_map & zone_cluster.Bitmaps.Feature.kRemoteZones
+                ) != 0
             except Exception as e:
                 log.info("ZoneManagement cluster query exception: %s", e)
 
         if not has_remote_zones:
-            log.info("RemoteZones feature not supported on ZoneManagement, skipping TC-AVANALY-2.14")
+            log.info(
+                "RemoteZones feature not supported on ZoneManagement, skipping TC-AVANALY-2.14"
+            )
             self.skip_step(2)
             self.skip_step(3)
             self.skip_step(4)
@@ -109,15 +133,34 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
 
         self.step(2)
         remote_zone_id = 1
-        log.info("Remote NodeId: %d, Remote Zone ID: %d", remote_node_id, remote_zone_id)
+        try:
+            zones = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=zone_cluster,
+                attribute=zone_cluster.Attributes.Zones,
+            )
+            if zones:
+                remote_zone_id = zones[0].zoneID
+        except Exception as e:
+            log.info("ZoneManagement read Zones attribute: %s", e)
+        log.info(
+            "Remote NodeId: %d, Remote Zone ID: %d", remote_node_id, remote_zone_id
+        )
 
         self.step(3)
-        resp = await self.send_establish_analysis_stream_cmd(endpoint, node_id=remote_node_id)
+        resp = await self.send_establish_analysis_stream_cmd(
+            endpoint, node_id=remote_node_id
+        )
         log.info("EstablishAnalysisStreamResponse: %s", resp)
+        stream_id = getattr(resp, "analysisStreamID", None)
 
-        supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, cluster.Attributes.SupportedAmbientContexts)
+        supported_contexts = await self.read_avanaly_attribute_expect_success(
+            endpoint, cluster.Attributes.SupportedAmbientContexts
+        )
         if supported_contexts:
-            await self.send_enable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+            await self.send_enable_context_triggers_cmd(
+                endpoint, context_triggers=NullValue
+            )
 
         # Set up event subscription handler
         event_callback = EventSubscriptionHandler(expected_cluster=cluster)
@@ -125,11 +168,13 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
 
         self.step(4)
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({
-                "Name": "AvAnalysisSessionStart",
-                "ZoneIds": [remote_zone_id],
-                "SourceNodeId": remote_node_id,
-            })
+            self.write_to_app_pipe(
+                {
+                    "Name": "AvAnalysisSessionStart",
+                    "ZoneIds": [remote_zone_id],
+                    "SourceNodeId": remote_node_id,
+                }
+            )
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate detection of an ambient context in remote zone {remote_zone_id} for node {remote_node_id}. Press Enter once initiated."
@@ -137,16 +182,33 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
 
         self.step(5)
         if self.matter_test_config.pipe_name or not self.is_ci:
-            start_event = event_callback.wait_for_event_report(cluster.Events.AnalysisSessionStart, timeout_sec=30)
+            start_event = event_callback.wait_for_event_report(
+                cluster.Events.AnalysisSessionStart, timeout_sec=30
+            )
             log.info("AnalysisSessionStart event: %s", start_event)
-            asserts.assert_is_not_none(start_event, "Expected AnalysisSessionStart event")
-            if start_event.sourceNodeId is not None:
-                asserts.assert_equal(start_event.sourceNodeId, remote_node_id, "SourceNodeId mismatch in AnalysisSessionStart")
+            asserts.assert_is_not_none(
+                start_event, "Expected AnalysisSessionStart event"
+            )
+            asserts.assert_is_not_none(
+                start_event.sourceNodeId,
+                "SourceNodeId must not be None in AnalysisSessionStart",
+            )
+            asserts.assert_equal(
+                start_event.sourceNodeId,
+                remote_node_id,
+                "SourceNodeId mismatch in AnalysisSessionStart",
+            )
 
             self.step(6)
-            if start_event.triggeredZones is not None:
-                asserts.assert_in(remote_zone_id, start_event.triggeredZones,
-                                  f"Remote zone {remote_zone_id} not found in triggeredZones {start_event.triggeredZones}")
+            asserts.assert_is_not_none(
+                start_event.triggeredZones,
+                "TriggeredZones must not be None in AnalysisSessionStart",
+            )
+            asserts.assert_in(
+                remote_zone_id,
+                start_event.triggeredZones,
+                f"Remote zone {remote_zone_id} not found in triggeredZones {start_event.triggeredZones}",
+            )
         else:
             log.info("CI mode: skipping blocking event wait in Steps 5 & 6")
             self.step(6)
@@ -155,43 +217,75 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
         if self.matter_test_config.pipe_name:
             context_to_send = supported_contexts[0] if supported_contexts else None
             if context_to_send is not None:
-                self.write_to_app_pipe({
-                    "Name": "AvAnalysisPerceivedContext",
-                    "NewContexts": [
-                        {
-                            "NamespaceId": context_to_send.namespaceID,
-                            "Tag": context_to_send.tag,
-                            "IdentifiedContextId": 1,
-                        }
-                    ],
-                    "SourceNodeId": remote_node_id,
-                })
+                self.write_to_app_pipe(
+                    {
+                        "Name": "AvAnalysisPerceivedContext",
+                        "NewContexts": [
+                            {
+                                "NamespaceId": context_to_send.namespaceID,
+                                "Tag": context_to_send.tag,
+                                "IdentifiedContextId": 1,
+                            }
+                        ],
+                        "SourceNodeId": remote_node_id,
+                    }
+                )
         if self.matter_test_config.pipe_name or not self.is_ci:
-            perceived_event = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
+            perceived_event = event_callback.wait_for_event_report(
+                cluster.Events.PerceivedContext, timeout_sec=30
+            )
             log.info("PerceivedContext event: %s", perceived_event)
-            asserts.assert_is_not_none(perceived_event, "Expected PerceivedContext event")
-            if perceived_event.sourceNodeId is not None:
-                asserts.assert_equal(perceived_event.sourceNodeId, remote_node_id, "SourceNodeId mismatch in PerceivedContext")
+            asserts.assert_is_not_none(
+                perceived_event, "Expected PerceivedContext event"
+            )
+            asserts.assert_is_not_none(
+                perceived_event.sourceNodeId,
+                "SourceNodeId must not be None in PerceivedContext",
+            )
+            asserts.assert_equal(
+                perceived_event.sourceNodeId,
+                remote_node_id,
+                "SourceNodeId mismatch in PerceivedContext",
+            )
         else:
             log.info("CI mode: skipping blocking event wait in Step 7")
 
         self.step(8)
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({
-                "Name": "AvAnalysisSessionEnd",
-                "SourceNodeId": remote_node_id,
-            })
+            self.write_to_app_pipe(
+                {
+                    "Name": "AvAnalysisSessionEnd",
+                    "SourceNodeId": remote_node_id,
+                }
+            )
         if self.matter_test_config.pipe_name or not self.is_ci:
-            end_event = event_callback.wait_for_event_report(cluster.Events.AnalysisSessionEnd, timeout_sec=30)
+            end_event = event_callback.wait_for_event_report(
+                cluster.Events.AnalysisSessionEnd, timeout_sec=30
+            )
             log.info("AnalysisSessionEnd event: %s", end_event)
             asserts.assert_is_not_none(end_event, "Expected AnalysisSessionEnd event")
-            if end_event.sourceNodeId is not None:
-                asserts.assert_equal(end_event.sourceNodeId, remote_node_id, "SourceNodeId mismatch in AnalysisSessionEnd")
+            asserts.assert_is_not_none(
+                end_event.sourceNodeId,
+                "SourceNodeId must not be None in AnalysisSessionEnd",
+            )
+            asserts.assert_equal(
+                end_event.sourceNodeId,
+                remote_node_id,
+                "SourceNodeId mismatch in AnalysisSessionEnd",
+            )
         else:
             log.info("CI mode: skipping blocking event wait in Step 8")
 
         # Cleanup
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        if event_callback:
+            event_callback.cancel()
+        if stream_id is not None:
+            await self.send_remove_analysis_stream_cmd(
+                endpoint, analysis_stream_id=stream_id
+            )
+        await self.send_disable_context_triggers_cmd(
+            endpoint, context_triggers=NullValue
+        )
 
 
 if __name__ == "__main__":
