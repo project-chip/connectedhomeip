@@ -32,12 +32,10 @@ import logging
 import queue
 import threading
 import time
-from datetime import datetime, timezone
-from enum import Enum
-from typing import Any, Iterable, Optional
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from enum import Enum
 from typing import Any
 
 from mobly import asserts
@@ -653,6 +651,7 @@ class AttributeSubscriptionHandler:
                 str += f"{attr_val.attribute.__name__}={val_str}, "
         str += "]"
         logging.info(f"{str}")
+
     def await_first_value_asserting_no_forbidden(
         self,
         target_value: Any,

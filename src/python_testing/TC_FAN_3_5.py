@@ -49,10 +49,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import operator
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from mobly import asserts
 
@@ -504,13 +504,12 @@ class TC_FAN_3_5(MatterBaseTest):
                     f"[FC] PercentSetting attribute value ({percent_setting}) is not equal to the expected value ({percent_setting_expected})"
                 )
                 break
-            else:
-                # If we reach here, it means the expected PercentSetting
-                # attribute value was never reached
-                if i == 100:
-                    asserts.fail(
-                        f"[FC] The expected PercentSetting attribute value ({percent_setting_expected}) was never reached, the last reported value is ({percent_setting})."
-                    )
+            # If we reach here, it means the expected PercentSetting
+            # attribute value was never reached
+            if i == 100:
+                asserts.fail(
+                    f"[FC] The expected PercentSetting attribute value ({percent_setting_expected}) was never reached, the last reported value is ({percent_setting})."
+                )
 
             logging.info(f"[FC] percent_setting_from_queue: {self.percent_setting_from_queue}")
 
@@ -883,10 +882,10 @@ class TC_FAN_3_5(MatterBaseTest):
         self,
         step: Clusters.FanControl.Commands.Step,
         percent_setting_expected: int,
-        fan_mode_expected: Optional[Any] = None,
-        speed_setting_expected: Optional[int] = None,
-        percent_current_expected: Optional[Any] = None,
-        speed_current_expected: Optional[int] = None
+        fan_mode_expected: Any | None = None,
+        speed_setting_expected: int | None = None,
+        percent_current_expected: Any | None = None,
+        speed_current_expected: int | None = None
     ) -> None:
         """Sends a Step command and verifies the resulting attribute values match expectations.
 
@@ -954,7 +953,7 @@ class TC_FAN_3_5(MatterBaseTest):
         cmd = cluster.Commands
         sd_enum = cluster.Enums.StepDirectionEnum
         self.timeout_sec: float = 1
-        self.percent_setting_per_step: Optional[int] = None
+        self.percent_setting_per_step: int | None = None
         self.percent_setting_max = 100
 
         # *** STEP 1 ***

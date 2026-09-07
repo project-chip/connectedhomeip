@@ -1867,7 +1867,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     @property
     def dut_node_id(self) -> int:
-        """Returns the primary DUT (Device Under Test) node ID."""
+        """Returns the primary DUT(Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
 
     @property
@@ -1891,12 +1891,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Get a declared PIXIT value by name.
 
         Retrieves the value from user_params. If not found, optional PIXITs may
-        fall back to the default specified in the @pixit decorator; required
-        PIXITs do not use decorator defaults (setup validation must supply them).
+        fall back to the default specified in the @ pixit decorator; required
+        PIXITs do not use decorator defaults(setup validation must supply them).
         Otherwise falls back to the ``default`` argument of this method.
 
         Args:
-            name: The PIXIT parameter name (as declared in @pixit).
+            name: The PIXIT parameter name(as declared in @pixit).
             default: Fallback default if no value is found and no decorator default exists.
 
         Returns:
@@ -2046,7 +2046,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def get_defined_test_steps(self, test: str) -> list[TestStep] | None:
         """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
 
-        Checks for an explicit steps_* method first. If none exists, falls back to
+        Checks for an explicit steps_ * method first. If none exists, falls back to
         extracting steps from self.step() calls in the test method's source code.
 
         Returns None if no steps are defined by either mechanism.
