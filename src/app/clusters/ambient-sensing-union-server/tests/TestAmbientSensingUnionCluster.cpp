@@ -234,8 +234,8 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteUnionNameSameValueNoOp)
     constexpr char kTestName[] = "TestUnion";
 
     auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(AmbientSensingUnionCluster::Config{ kTestEndpointId }
-                                                                    .WithUnionName(CharSpan::fromCharString(kTestName))
-                                                                    .WithDelegate(&mDelegate));
+                                                                       .WithUnionName(CharSpan::fromCharString(kTestName))
+                                                                       .WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->SetUnionName(CharSpan::fromCharString(kTestName)), CHIP_NO_ERROR);
@@ -528,7 +528,8 @@ TEST_F(TestAmbientSensingUnionCluster, TestMixedContributors)
 TEST_F(TestAmbientSensingUnionCluster, TestMaxContributorsBoundary)
 {
 
-    auto cluster = std::make_unique<AmbientSensingUnionClusterT<AmbientSensingUnionCluster::kMaxContributors>>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
+    auto cluster = std::make_unique<AmbientSensingUnionClusterT<AmbientSensingUnionCluster::kMaxContributors>>(
+        AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     for (uint16_t i = 0; i < 100; i++)
@@ -991,8 +992,8 @@ TEST_F(TestAmbientSensingUnionCluster, TestFullWorkflow)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(AmbientSensingUnionCluster::Config{ kTestEndpointId }
-                                                                    .WithUnionName(CharSpan::fromCharString("SmartHomeUnion"))
-                                                                    .WithDelegate(&mDelegate));
+                                                                       .WithUnionName(CharSpan::fromCharString("SmartHomeUnion"))
+                                                                       .WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     // 1. Initial state
@@ -1045,8 +1046,8 @@ TEST_F(TestAmbientSensingUnionCluster, TestConfigurationChaining)
 {
 
     auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(AmbientSensingUnionCluster::Config{ kTestEndpointId }
-                                                                    .WithUnionName(CharSpan::fromCharString("ChainedConfig"))
-                                                                    .WithDelegate(&mDelegate));
+                                                                       .WithUnionName(CharSpan::fromCharString("ChainedConfig"))
+                                                                       .WithDelegate(&mDelegate));
 
     EXPECT_TRUE(cluster->GetUnionName().data_equal(CharSpan::fromCharString("ChainedConfig")));
 
