@@ -41,6 +41,7 @@ class InterceptingWebRTCClient : public DefaultAvAnalysisWebRTCClient
 public:
     using DefaultAvAnalysisWebRTCClient::CurrentRequest;
     using DefaultAvAnalysisWebRTCClient::HandleServerListReport;
+    using DefaultAvAnalysisWebRTCClient::Request;
 
     // Drives the request into the provider-check phase, as OnDeviceConnected would after CASE
     void EnterProviderCheck() { CurrentRequest().Advance(Request::Phase::kCheckingProvider); }
@@ -530,6 +531,25 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CameraErrorStatusIsPropagatedVerbatim)
     EXPECT_EQ(mCallback.mLastStatus, Status::ResourceExhausted);
     EXPECT_EQ(mPeerDelegate.mSessionsAssigned, 0);
     EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ACameraErrorIsDeliveredOnlyWhenTheExchangeCloses)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    // The error arrives while the sender is still alive: recorded, not yet delivered
+    mClient.OnError(static_cast<CommandSender *>(nullptr), StatusIB(Status::ResourceExhausted).ToChipError());
+    EXPECT_EQ(mClient.CurrentRequest().GetPhase(), InterceptingWebRTCClient::Request::Phase::kFailed);
+    EXPECT_EQ(mCallback.mInitiatedCount, 0);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 0);
+
+    // The exchange closes: the recorded status is delivered and the offer abandoned
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::ResourceExhausted);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUnansweredExchangeFailsTheRequest)

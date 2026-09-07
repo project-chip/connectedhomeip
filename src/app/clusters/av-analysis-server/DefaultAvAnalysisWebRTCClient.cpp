@@ -422,21 +422,22 @@ void DefaultAvAnalysisWebRTCClient::OnError(const CommandSender * apCommandSende
     VerifyOrReturn(mRequest.WasInvokedBy(apCommandSender),
                    ChipLogError(Zcl, "AvAnalysisWebRTCClient: error for an interaction already finished with"));
 
-    // A camera status response
+    // A camera status response, or Failure for a transport error such as a timeout. Recorded only:
+    // the sender is still alive here, so completion waits for OnDone
     Status status = Status::Failure;
     if (aError.IsIMStatus())
     {
         status = StatusIB(aError).mStatus;
     }
-    FinishRequest(status, mRequest.WebRTCSessionId());
+    mRequest.Fail(status);
 }
 
 void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
 {
     const bool isOurs = mRequest.WasInvokedBy(apCommandSender);
 
-    // OnDone needs to destroy the sender, and doing it before delivering any
-    // completion leaves the client free to accept a request started from that completion.
+    // The one place a CommandSender may be destroyed, and every command outcome is delivered from
+    // here, so the client is free to accept a request started from the completion.
     if (mCommandSender.get() == apCommandSender)
     {
         mCommandSender.reset();
@@ -446,20 +447,24 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
 
     const uint16_t webRTCSessionId = mRequest.WebRTCSessionId();
 
-    if (mRequest.GetCommandType() == Request::CommandType::kProvideICECandidates ||
-        mRequest.GetCommandType() == Request::CommandType::kEndSession)
+    if (mRequest.InPhase(Request::Phase::kFailed))
     {
-        // Status-only commands: unanswered (OnError already finished the request, making this a
-        // no-op, or the exchange timed out) is a failure
-        FinishRequest(mRequest.InPhase(Request::Phase::kResponded) ? Status::Success : Status::Failure, webRTCSessionId);
+        FinishRequest(mRequest.FailureStatus(), webRTCSessionId);
         return;
     }
 
-    // The exchange ended without the offer being responded to (OnError already finished the request,
-    // making this a no-op, or the exchange timed out with nothing delivered at all)
+    // Still kInvoking: the camera's response was rejected by OnResponse, so the command has no
+    // usable outcome
     if (!mRequest.InPhase(Request::Phase::kResponded))
     {
         FinishRequest(Status::Failure, webRTCSessionId);
+        return;
+    }
+
+    if (mRequest.GetCommandType() == Request::CommandType::kProvideICECandidates ||
+        mRequest.GetCommandType() == Request::CommandType::kEndSession)
+    {
+        FinishRequest(Status::Success, webRTCSessionId);
         return;
     }
 

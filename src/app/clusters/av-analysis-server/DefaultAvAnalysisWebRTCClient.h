@@ -184,6 +184,7 @@ protected:
             kCreatingOffer,    // Awaiting the application's SDP offer
             kInvoking,         // Command sent, awaiting the camera's response
             kResponded,        // Camera responded successfully; completion awaits the exchange closing (OnDone)
+            kFailed,           // Command failed (camera error status or transport error); completion awaits OnDone
         };
 
         enum class CommandType : uint8_t
@@ -203,7 +204,8 @@ protected:
         bool OfferRequested() const
         {
             return mCommandType == CommandType::kProvideOffer &&
-                (mPhase == Phase::kCreatingOffer || mPhase == Phase::kInvoking || mPhase == Phase::kResponded);
+                (mPhase == Phase::kCreatingOffer || mPhase == Phase::kInvoking || mPhase == Phase::kResponded ||
+                 mPhase == Phase::kFailed);
         }
         const ScopedNodeId & CameraNode() const { return mCameraNode; }
         EndpointId WebRTCEndpoint() const { return mWebRTCEndpoint; }
@@ -282,6 +284,14 @@ protected:
         void SetProviderFound(bool aFound) { mProviderFound = aFound; }
         bool ProviderFound() const { return mProviderFound; }
 
+        // Records the command's failure; completion is delivered once the exchange closes
+        void Fail(Protocols::InteractionModel::Status aStatus)
+        {
+            mFailureStatus = aStatus;
+            mPhase         = Phase::kFailed;
+        }
+        Protocols::InteractionModel::Status FailureStatus() const { return mFailureStatus; }
+
         void Reset() { *this = Request{}; }
 
     private:
@@ -297,11 +307,12 @@ protected:
         }
 
         // Request machinery
-        Phase mPhase                                 = Phase::kIdle;
-        CommandType mCommandType                     = CommandType::kProvideOffer;
-        AvAnalysisWebRTCClient::Callback * mCallback = nullptr;
-        CommandSender * mInvokedSender               = nullptr;
-        bool mProviderFound                          = false;
+        Phase mPhase                                       = Phase::kIdle;
+        CommandType mCommandType                           = CommandType::kProvideOffer;
+        AvAnalysisWebRTCClient::Callback * mCallback       = nullptr;
+        CommandSender * mInvokedSender                     = nullptr;
+        bool mProviderFound                                = false;
+        Protocols::InteractionModel::Status mFailureStatus = Protocols::InteractionModel::Status::Failure;
 
         // Sending the command
         SessionHolder mSessionHolder;
