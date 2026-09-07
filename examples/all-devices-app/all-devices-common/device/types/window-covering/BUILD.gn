@@ -32,7 +32,7 @@ source_set("window-covering") {
   ]
 }
 
-source_set("logging") {
+source_set("simulated") {
   sources = [
     "impl/SimulatedWindowCovering.cpp",
     "impl/SimulatedWindowCovering.h",

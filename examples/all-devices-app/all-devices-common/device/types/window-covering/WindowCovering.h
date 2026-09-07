@@ -18,14 +18,12 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/window-covering-server/WindowCoveringCluster.h>
+#include <credentials/GroupDataProvider.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip {
-namespace Credentials {
-class GroupDataProvider;
-} // namespace Credentials
 
 namespace app {
 
@@ -60,7 +58,6 @@ protected:
 
     virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
 
-    TimerDelegate & mTimerDelegate;
     const Clusters::WindowCovering::OptionalAttributeSet mOptionalAttributes;
     const Context mContext;
     const BitFlags<Clusters::WindowCovering::Feature> mFeatures;
