@@ -3859,15 +3859,13 @@ TEST_F(TestChipCryptoPAL, TestX509Disabled_CertParsingUnavailable)
     uint8_t dnBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
     MutableByteSpan dn(dnBuf);
 
-    EXPECT_EQ(VerifyAttestationCertificateFormat(sTestCert_PAA_FFF1_Cert, AttestationCertType::kPAA),
-              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(VerifyAttestationCertificateFormat(sTestCert_PAA_FFF1_Cert, AttestationCertType::kPAA), CHIP_ERROR_NOT_IMPLEMENTED);
     EXPECT_EQ(ValidateCertificateChain(sTestCert_PAA_FFF1_Cert.data(), sTestCert_PAA_FFF1_Cert.size(),
                                        sTestCert_PAI_FFF1_8000_Cert.data(), sTestCert_PAI_FFF1_8000_Cert.size(),
                                        sTestCert_DAC_FFF1_8000_0000_Cert.data(), sTestCert_DAC_FFF1_8000_0000_Cert.size(),
                                        chainValidationResult),
               CHIP_ERROR_NOT_IMPLEMENTED);
-    EXPECT_EQ(IsCertificateValidAtIssuance(sTestCert_DAC_FFF1_8000_0000_Cert, sTestCert_PAA_FFF1_Cert),
-              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(IsCertificateValidAtIssuance(sTestCert_DAC_FFF1_8000_0000_Cert, sTestCert_PAA_FFF1_Cert), CHIP_ERROR_NOT_IMPLEMENTED);
     EXPECT_EQ(IsCertificateValidAtCurrentTime(sTestCert_PAA_FFF1_Cert), CHIP_ERROR_NOT_IMPLEMENTED);
     EXPECT_EQ(ExtractPubkeyFromX509Cert(sTestCert_PAA_FFF1_Cert, publicKey), CHIP_ERROR_NOT_IMPLEMENTED);
     EXPECT_EQ(ExtractSKIDFromX509Cert(sTestCert_PAA_FFF1_Cert, skidOut), CHIP_ERROR_NOT_IMPLEMENTED);
@@ -3879,9 +3877,9 @@ TEST_F(TestChipCryptoPAL, TestX509Disabled_CertParsingUnavailable)
     EXPECT_EQ(ExtractIssuerFromX509Cert(sTestCert_PAA_FFF1_Cert, dn), CHIP_ERROR_NOT_IMPLEMENTED);
     EXPECT_EQ(VerifyCertificateSigningRequest(sTestCert_PAA_FFF1_Cert.data(), sTestCert_PAA_FFF1_Cert.size(), publicKey),
               CHIP_ERROR_NOT_IMPLEMENTED);
-    EXPECT_EQ(ReplaceCertIfResignedCertFound(sTestCert_PAI_FFF1_8000_Cert, candidateCerts, MATTER_ARRAY_SIZE(candidateCerts),
-                                               outCert),
-              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(
+        ReplaceCertIfResignedCertFound(sTestCert_PAI_FFF1_8000_Cert, candidateCerts, MATTER_ARRAY_SIZE(candidateCerts), outCert),
+        CHIP_ERROR_NOT_IMPLEMENTED);
     EXPECT_EQ(ExtractVIDPIDFromX509Cert(sTestCert_PAI_FFF1_8000_Cert, vidpid), CHIP_ERROR_NOT_IMPLEMENTED);
 }
 
