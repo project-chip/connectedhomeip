@@ -358,7 +358,7 @@ class TC_FAN_3_5(MatterBaseTest):
         cluster = Clusters.FanControl
         attr = cluster.Attributes
 
-        if hasattr(self, 'subscriptions') and self.subscriptions is not None:
+        if self.subscriptions is not None:
             for sub in self.subscriptions:
                 sub.cancel()
 
