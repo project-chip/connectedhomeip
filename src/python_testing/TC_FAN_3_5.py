@@ -477,6 +477,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # The minimum PercentSetting increment per step is 1. The loop is written to handle that case, but it
         # won't necessarily run 100 iterations, only as many can fit within the 0–100 PercentSetting range.
         # Example: if each step increases PercentSetting by 10, the loop will run 10 iterations.
+        percent_setting_last = None
         for i in range(101):
             # Send the Step command
             await self.send_step_command(step)
