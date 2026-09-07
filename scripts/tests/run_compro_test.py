@@ -18,8 +18,8 @@
 
 """Run a Commissioning Proxy (CP) certification test against mocked BLE / Wi-Fi transports.
 
-The COMPRO tests need three actors, `run_python_test.py` can only model a
-single application. So this file manages the following:
+The COMPRO tests need three actors, which `run_python_test.py` cannot
+accommodate. So this file manages the following:
 
     ns-eth-tool-N    the test script itself (TH), reaching the proxy over IP
     ns-<proxy>-N     the commissioning proxy, on-network from the start
@@ -35,10 +35,9 @@ The proxy's own commissioning uses the framework's `--discriminator` /
 does. Hence the same test script runs unchanged against hardware. Everything
 specific to the mocked topology is supplied by this script.
 
-Each test's `CI TEST ARGUMENTS` block provides the test harness information
-about accessing the CP including whether the framework commissions the proxy
-before the test body or the test does it itself, (as 2.6 does).
-A command-line option overrides the block, otherwise a default value is used.
+Each test's `CI TEST ARGUMENTS` block is the authority for how the harness
+reaches the proxy. A command-line option overrides it, otherwise a default here
+applies.
 
 The block's `app`, `app-args` and `factory-reset` are for `run_python_test.py`
 and are not used: this script launches two applications and builds their
@@ -55,7 +54,7 @@ Example:
 
     scripts/tests/run_compro_test.py \\
         --proxy-app examples/all-devices-app/posix/out/host-both-on/all-devices-app \\
-        --ed-app out/linux-x64-light/chip-lighting-app \\
+        --ed-app out/linux-x64-all-clusters/chip-all-clusters-app \\
         --script src/python_testing/TC_COMPRO_2_4.py \\
         --proxy-transport wifipaf
 """
@@ -208,13 +207,9 @@ def proxy_app_args(transport: str, endpoint: int, proxy_ble: bool) -> list[str]:
 
 
 def proxy_build_transports(proxy_app: str) -> set[str]:
-    """Transports the proxy application was built with.
+    """Transports the proxy application was built with, read from its --help.
 
-    The Transport attribute is derived from the build, not from which adapters
-    or interfaces exist, and the tests scan on that whole bitmap. Asking a
-    multiple-transport build to run a single-transport leg therefore exercises a
-    transport the run never set up. The application only offers the options for
-    the transports it was built with.
+    The application only offers the options for the transports it was built with.
     """
     help_text = subprocess.run([proxy_app, "--help"], capture_output=True, text=True).stdout
     transports = set()
@@ -265,12 +260,10 @@ def check_transport_matches_build(proxy_app: str, transport: str, proxy_ble: boo
 def declared_test_params(script: str) -> dict[str, int]:
     """Parameters the test declares in its CI arguments block for reaching the proxy.
 
-    The test file is the authority for the discriminator, passcode and endpoint it
-    expects, and for the end device identifiers it passes as string arguments: a
-    hardware run through `run_python_test.py` takes them from the same block, so
-    reading them here keeps the runs on one set of values. Anything the block does
-    not name falls back to this script's defaults, and an explicit command-line
-    option overrides both.
+    The test file is the authority for the discriminator, passcode and endpoint,
+    and for the end device identifiers it passes as string arguments. Anything the
+    block does not name falls back to this script's defaults; a command-line option
+    overrides both.
     """
     params: dict[str, int] = {}
     flags = {"--discriminator": "discriminator", "--passcode": "passcode", "--endpoint": "endpoint"}

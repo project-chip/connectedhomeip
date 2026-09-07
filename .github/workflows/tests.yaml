@@ -518,17 +518,12 @@ jobs:
                 # understand.
                 TSAN_OPTIONS: report_bugs=0
               run: |
-                  # These drive three actors (test harness, proxy, end device) rather than
-                  # the single app run_test_suite.py models, so they have their own runner.
-                  # They share /tmp and the mock system bus, so they run one at a time.
-                  # The end device is chip-all-clusters-app: it is already built for the
-                  # commissioning steps above, and its ChipLinuxAppInit starts Wi-Fi
-                  # management, which all-devices-app's --wifi does not. All transports are
-                  # exercised with the end device advertising over BLE and Wi-Fi PAF
-                  # simultaneously.
-                  # The tests are listed in test_metadata.yaml under dedicated_runner,
-                  # which is also what keeps them out of the default python test run.
-                  # Reading the list from there stops the two drifting apart.
+                  # These tests need three actors (test harness, commissioning proxy,
+                  # end device), so they have their own runner as run_python_test.py
+                  # cannot accommodate this. The tests are run serially because they
+                  # share /tmp and the mock system bus. The end device uses
+                  # all-clusters rather than all-devices, whose --wifi never starts
+                  # Wi-Fi management.
                   tests=$(out/venv/bin/python3 -c "import yaml; print(' '.join(t['name'].removesuffix('.py') for t in yaml.safe_load(open('src/python_testing/test_metadata.yaml'))['dedicated_runner'] if t['runner'] == 'scripts/tests/run_compro_test.py'))")
                   if [ -z "$tests" ]; then
                       echo "No dedicated_runner tests for run_compro_test.py in test_metadata.yaml"
