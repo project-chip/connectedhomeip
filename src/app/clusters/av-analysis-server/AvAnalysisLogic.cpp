@@ -1062,10 +1062,9 @@ CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, Opt
 {
     if (!aUseSpecificSessionId)
     {
-        while (std::any_of(mActiveSessions.begin(), mActiveSessions.end(),
-                           [this](const ActiveAmbientContextSession & session) {
-                               return session.GetSessionId() == mNextAnalysisSessionID;
-                           }))
+        while (std::any_of(mActiveSessions.begin(), mActiveSessions.end(), [this](const ActiveAmbientContextSession & session) {
+            return session.GetSessionId() == mNextAnalysisSessionID;
+        }))
         {
             mNextAnalysisSessionID++;
         }
