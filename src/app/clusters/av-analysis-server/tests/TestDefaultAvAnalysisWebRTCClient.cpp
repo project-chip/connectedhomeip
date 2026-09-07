@@ -201,7 +201,25 @@ public:
     {
         mSessionsAssigned++;
         mLastAssigned = aWebRTCSessionId;
+
+        // The contract: the request that produced the offer is over
+        if (mClient != nullptr)
+        {
+            mRequestInFlightAtAssign = mClient->CurrentRequest().InFlight();
+            if (mSendCandidatesOnAssign)
+            {
+                Globals::Structs::ICECandidateStruct::Type candidate;
+                candidate.candidate = "candidate:1 1 UDP 2122252543 192.168.1.10 5000 typ host"_span;
+                mSendResultAtAssign = mClient->SendICECandidates(
+                    aWebRTCSessionId, Span<const Globals::Structs::ICECandidateStruct::Type>(&candidate, 1));
+            }
+        }
     }
+
+    InterceptingWebRTCClient * mClient = nullptr;
+    bool mRequestInFlightAtAssign      = true;
+    bool mSendCandidatesOnAssign       = false;
+    CHIP_ERROR mSendResultAtAssign     = CHIP_ERROR_INTERNAL;
     void OnOfferAbandoned() override { mOffersAbandoned++; }
     void OnSessionClosed(uint16_t aWebRTCSessionId) override
     {
@@ -265,6 +283,7 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     void SetUp() override
     {
         ASSERT_EQ(mClient.Init(&mCASESessionManager, &mPeerDelegate, &mRequestorCluster, kMaxSessions), CHIP_NO_ERROR);
+        mPeerDelegate.mClient = &mClient;
     }
 
     // Drives a request up to the application's turn: CASE up, provider present, offer asked for
@@ -499,6 +518,24 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, OfferedSessionIsEstablishedAndRegister
 
     // Tracked: ending this session is now a legitimate request
     EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, SessionAssignmentFollowsTheCompletedRequest)
+{
+    // The application flushes its candidates the moment it learns the session id
+    mPeerDelegate.mSendCandidatesOnAssign = true;
+    EstablishSessionWithId(55);
+
+    // By then the offer request was over and its callback delivered, so the send was accepted
+    ASSERT_EQ(mPeerDelegate.mSessionsAssigned, 1);
+    EXPECT_FALSE(mPeerDelegate.mRequestInFlightAtAssign);
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mPeerDelegate.mSendResultAtAssign, CHIP_NO_ERROR);
+    EXPECT_EQ(mClient.mConnectRequests, 2); // the offer, then the candidates
+
+    // The candidate send is the request now in flight
+    ASSERT_EQ(mClient.SendPendingICECandidates(), CHIP_NO_ERROR);
+    EXPECT_EQ(mClient.mSentIceSessionId, 55);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, OfferPayloadFollowsTheNormalFlow)

@@ -478,6 +478,10 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
     }
 
     FinishRequest(Status::Success, webRTCSessionId);
+
+    // Last, once the request is over and the callback knows the session: the application binds the
+    // peer connection it created for this offer to the assigned id
+    mPeerDelegate->OnSessionAssigned(webRTCSessionId);
 }
 
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessionId)
@@ -510,9 +514,6 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
     session.videoStreamID  = mRequest.ResponseVideoStreamId();
     session.audioStreamID.SetNull();
     mRequestorCluster->UpsertSession(session);
-
-    // The application binds the peer connection it created for this offer to the assigned id
-    mPeerDelegate->OnSessionAssigned(aWebRTCSessionId);
     return CHIP_NO_ERROR;
 }
 
