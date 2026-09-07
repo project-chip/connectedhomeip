@@ -77710,17 +77710,17 @@ public:
         __auto_type * params = [[MTRDeviceEnergyManagementClusterPowerRangeAdjustRequestParams alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
 #if MTR_ENABLE_PROVISIONAL
-        if (mRequest.minPower.IsNull()) {
-            params.minPower = nil;
-        } else {
+        if (mRequest.minPower.HasValue()) {
             params.minPower = [NSNumber numberWithLongLong:mRequest.minPower.Value()];
+        } else {
+            params.minPower = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        if (mRequest.maxPower.IsNull()) {
-            params.maxPower = nil;
-        } else {
+        if (mRequest.maxPower.HasValue()) {
             params.maxPower = [NSNumber numberWithLongLong:mRequest.maxPower.Value()];
+        } else {
+            params.maxPower = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL

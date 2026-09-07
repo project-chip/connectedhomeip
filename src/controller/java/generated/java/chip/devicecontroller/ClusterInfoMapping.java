@@ -29412,10 +29412,10 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> deviceEnergyManagementpowerRangeAdjustRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo deviceEnergyManagementpowerRangeAdjustRequestminPowerCommandParameterInfo = new CommandParameterInfo("minPower", Long.class, Long.class);
+    CommandParameterInfo deviceEnergyManagementpowerRangeAdjustRequestminPowerCommandParameterInfo = new CommandParameterInfo("minPower", Optional.class, Long.class);
     deviceEnergyManagementpowerRangeAdjustRequestCommandParams.put("minPower",deviceEnergyManagementpowerRangeAdjustRequestminPowerCommandParameterInfo);
 
-    CommandParameterInfo deviceEnergyManagementpowerRangeAdjustRequestmaxPowerCommandParameterInfo = new CommandParameterInfo("maxPower", Long.class, Long.class);
+    CommandParameterInfo deviceEnergyManagementpowerRangeAdjustRequestmaxPowerCommandParameterInfo = new CommandParameterInfo("maxPower", Optional.class, Long.class);
     deviceEnergyManagementpowerRangeAdjustRequestCommandParams.put("maxPower",deviceEnergyManagementpowerRangeAdjustRequestmaxPowerCommandParameterInfo);
 
     CommandParameterInfo deviceEnergyManagementpowerRangeAdjustRequestdurationCommandParameterInfo = new CommandParameterInfo("duration", Long.class, Long.class);
@@ -29427,9 +29427,9 @@ public class ClusterInfoMapping {
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.DeviceEnergyManagementCluster) cluster)
         .powerRangeAdjustRequest((DefaultClusterCallback) callback
-        , (Long)
+        , (Optional<Long>)
         commandArguments.get("minPower")
-        , (Long)
+        , (Optional<Long>)
         commandArguments.get("maxPower")
         , (Long)
         commandArguments.get("duration")

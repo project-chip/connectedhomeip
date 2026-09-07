@@ -25133,14 +25133,14 @@ class DeviceEnergyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="minPower", Tag=0, Type=typing.Union[Nullable, int]),
-                        ClusterObjectFieldDescriptor(Label="maxPower", Tag=1, Type=typing.Union[Nullable, int]),
+                        ClusterObjectFieldDescriptor(Label="minPower", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="maxPower", Tag=1, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="duration", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="cause", Tag=3, Type=DeviceEnergyManagement.Enums.AdjustmentCauseEnum),
                     ])
 
-            minPower: typing.Union[Nullable, int] = NullValue
-            maxPower: typing.Union[Nullable, int] = NullValue
+            minPower: typing.Optional[int] = None
+            maxPower: typing.Optional[int] = None
             duration: uint = 0
             cause: DeviceEnergyManagement.Enums.AdjustmentCauseEnum = 0
 
