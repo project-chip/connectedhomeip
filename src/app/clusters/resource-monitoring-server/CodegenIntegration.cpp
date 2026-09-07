@@ -26,7 +26,6 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/static-cluster-config/ActivatedCarbonFilterMonitoring.h>
 #include <app/static-cluster-config/HepaFilterMonitoring.h>
-#include <app/static-cluster-config/WaterTankLevelMonitoring.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
