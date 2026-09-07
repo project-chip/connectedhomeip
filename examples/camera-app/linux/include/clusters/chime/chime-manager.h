@@ -33,15 +33,15 @@ public:
     CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name) override;
     CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
 
-    chip::Protocols::InteractionModel::Status PlayChimeSound() override;
+    chip::Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
 
 private:
     using ChimeSoundStructType = chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type;
 
     const ChimeSoundStructType mChimeSounds[3] = {
-        ChimeSoundStructType{ .chimeID = 0, .name = chip::CharSpan::fromCharString("Basic Door Chime") },
-        ChimeSoundStructType{ .chimeID = 1, .name = chip::CharSpan::fromCharString("Enhanced Door Chime") },
-        ChimeSoundStructType{ .chimeID = 2, .name = chip::CharSpan::fromCharString("Star Wars Door Chime") },
+        ChimeSoundStructType{ .chimeID = 0, .name = "Basic Door Chime"_span },
+        ChimeSoundStructType{ .chimeID = 1, .name = "Enhanced Door Chime"_span },
+        ChimeSoundStructType{ .chimeID = 2, .name = "Star Wars Door Chime"_span },
     };
 };
 

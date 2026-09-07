@@ -83,7 +83,7 @@ CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
     ifs.open(mStorageFilePath, std::ifstream::in);
     if (!ifs.good())
     {
-        CommitConfig();
+        SuccessOrExit(err = CommitConfig());
         ifs.open(mStorageFilePath, std::ifstream::in);
     }
     VerifyOrExit(ifs.is_open(), err = CHIP_ERROR_OPEN_FAILED);
@@ -308,11 +308,8 @@ CATValues PersistentStorage::GetCommissionerCATs()
     err           = SyncGetKeyValue(kCommissionerCATsKey, serializedCATs, size);
     if (err == CHIP_NO_ERROR && size == chip::CATValues::kSerializedLength)
     {
-        err = cats.Deserialize(serializedCATs);
-        if (err == CHIP_NO_ERROR)
-        {
-            return cats;
-        }
+        cats.Deserialize(serializedCATs);
+        return cats;
     }
     return chip::kUndefinedCATs;
 }
@@ -320,7 +317,7 @@ CATValues PersistentStorage::GetCommissionerCATs()
 CHIP_ERROR PersistentStorage::SetCommissionerCATs(const CATValues & cats)
 {
     chip::CATValues::Serialized serializedCATs;
-    ReturnErrorOnFailure(cats.Serialize(serializedCATs));
+    cats.Serialize(serializedCATs);
 
     return SyncSetKeyValue(kCommissionerCATsKey, serializedCATs, sizeof(serializedCATs));
 }

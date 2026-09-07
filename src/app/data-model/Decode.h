@@ -25,7 +25,10 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
+#include <lib/support/attribute-storage-null-handling.h>
 #include <protocols/interaction_model/Constants.h>
+
+#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -56,15 +59,19 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
-    ReturnErrorOnFailure(reader.Get(x));
-    x = Clusters::EnsureKnownEnumValue(x);
+    std::underlying_type_t<X> val;
+    ReturnErrorOnFailure(reader.Get(val));
+    x = Clusters::EnsureKnownEnumValue(static_cast<X>(val));
     return CHIP_NO_ERROR;
 }
 
 template <typename X>
 CHIP_ERROR Decode(TLV::TLVReader & reader, BitFlags<X> & x)
 {
-    return reader.Get(x);
+    typename BitFlags<X>::IntegerType val;
+    ReturnErrorOnFailure(reader.Get(val));
+    x.SetRaw(val);
+    return CHIP_NO_ERROR;
 }
 
 //

@@ -112,7 +112,7 @@ void DeviceSubscription::OnReportEnd()
     if (mChangeDetected)
     {
 #if defined(PW_RPC_ENABLED)
-        AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
+        TEMPORARY_RETURN_IGNORED AdminCommissioningAttributeChanged(mCurrentAdministratorCommissioningAttributes);
 #else
         ChipLogError(NotSpecified, "Cannot forward Administrator Commissioning Attribute to fabric bridge: RPC not enabled");
 #endif
@@ -137,7 +137,7 @@ void DeviceSubscription::OnError(CHIP_ERROR error)
         reachabilityChanged.has_id       = true;
         reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
         reachabilityChanged.reachability = false;
-        DeviceReachableChanged(reachabilityChanged);
+        TEMPORARY_RETURN_IGNORED DeviceReachableChanged(reachabilityChanged);
     }
 #endif
     ChipLogProgress(NotSpecified, "Error subscribing: %" CHIP_ERROR_FORMAT, error.Format());
@@ -222,7 +222,7 @@ void DeviceSubscription::OnDeviceConnectionFailure(const ScopedNodeId & peerId, 
         reachabilityChanged.has_id       = true;
         reachabilityChanged.id           = mCurrentAdministratorCommissioningAttributes.id;
         reachabilityChanged.reachability = false;
-        DeviceReachableChanged(reachabilityChanged);
+        TEMPORARY_RETURN_IGNORED DeviceReachableChanged(reachabilityChanged);
     }
 #endif
 

@@ -10,12 +10,17 @@ runs:
         # maximize-runner-disk
         # Directories to prune to free up space. Candidates:
         #   1.6G  /usr/share/dotnet
-        #   1.1G  /usr/local/lib/android/sdk/platforms
-        #   1000M /usr/local/lib/android/sdk/build-tools
-        #   8.9G  /usr/local/lib/android/sdk
+        #   8.9G  /usr/local/lib/android
+        #   1.5G  /opt/ghc
+        #   4.0G  /usr/share/swift
         # This list can be amended later to change the trade-off between the amount of
         # disk space freed up, and how long it takes to do so (deleting many files is slow).
-        prune=(/usr/share/dotnet /usr/local/lib/android/sdk/platforms /usr/local/lib/android/sdk/build-tools)
+        # We prune:
+        #   - /usr/share/dotnet: Not used by any workflow in this repository.
+        #   - /usr/local/lib/android: Android builds run in docker containers containing their own SDK.
+        #   - /opt/ghc: Haskell (GHC) is not used.
+        #   - /usr/share/swift: Swift compiles only run on macOS runners.
+        prune=(/usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift)
 
         if [[ "$UID" -eq 0 && -d /__w ]]; then
           root=/runner-root-volume

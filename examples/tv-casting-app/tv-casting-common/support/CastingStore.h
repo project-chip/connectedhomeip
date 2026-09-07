@@ -19,6 +19,7 @@
 #pragma once
 
 #include "core/CastingPlayer.h"
+#include <list>
 
 namespace matter {
 namespace casting {
@@ -40,9 +41,9 @@ public:
     CHIP_ERROR AddOrUpdate(core::CastingPlayer castingPlayer);
 
     /**
-     * @brief Reads and returns a vector of all CastingPlayers found in the cache
+     * @brief Reads and returns a list of all CastingPlayers found in the cache
      */
-    std::vector<core::CastingPlayer> ReadAll();
+    std::list<core::CastingPlayer> ReadAll();
 
     /**
      * @brief If castingPlayer is found in the cache, this will delete it. If it is not found, this method is a no-op
@@ -65,9 +66,9 @@ private:
     static CastingStore * _CastingStore;
 
     /**
-     * @brief Writes the vector of CastingPlayers to the cache. This method will overwrite any pre-existing cached data.
+     * @brief Writes the list of CastingPlayers to the cache. This method will overwrite any pre-existing cached data.
      */
-    CHIP_ERROR WriteAll(std::vector<core::CastingPlayer> castingPlayers);
+    CHIP_ERROR WriteAll(std::list<core::CastingPlayer> castingPlayers);
 
     enum CastingStoreTLVTag
     {
@@ -102,7 +103,7 @@ private:
         kContextTagMaxNum = UINT8_MAX
     };
 
-    constexpr static size_t kCastingStoreDataMaxBytes               = 1024 * 100; // 100 KBs
+    constexpr static size_t kCastingStoreDataMaxBytes               = static_cast<size_t>(1024) * 100; // 100 KBs
     constexpr static char * kCastingStoreDataKey                    = (char *) "com.matter.casting.CastingStore";
     constexpr static uint32_t kCurrentCastingStoreDataVersion       = 1;
     constexpr static uint32_t kSupportedCastingStoreDataVersions[1] = { 1 };

@@ -68,6 +68,7 @@ public:
     static const Key kConfigKey_ConfigurationVersion;
     static const Key kConfigKey_VendorId;
     static const Key kConfigKey_ProductId;
+    static const Key kConfigKey_DeviceName;
 
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_RebootCount;

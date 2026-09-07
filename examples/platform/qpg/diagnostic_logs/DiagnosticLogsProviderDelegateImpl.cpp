@@ -20,7 +20,7 @@
 
 #include <app/server/Server.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::DiagnosticLogs;

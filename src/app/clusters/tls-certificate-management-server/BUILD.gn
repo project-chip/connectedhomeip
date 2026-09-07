@@ -17,6 +17,7 @@ source_set("certificate-table") {
   public = [
     "CertificateTable.h",
     "CertificateTableImpl.h",
+    "IncrementingIdHelper.h",
   ]
 
   deps = [ "${chip_root}/src/app" ]
@@ -26,6 +27,18 @@ source_set("certificate-table") {
   public_deps = [ "${chip_root}/src/app/storage:fabric-table" ]
 }
 
-group("tls-certificate-management-server") {
-  deps = [ ":certificate-table" ]
+source_set("tls-certificate-management-server") {
+  sources = [
+    "TLSCertificateManagementCluster.cpp",
+    "TLSCertificateManagementCluster.h",
+  ]
+
+  deps = [
+    ":certificate-table",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/server-cluster:server-cluster",
+    "${chip_root}/src/credentials",
+    "${chip_root}/zzz_generated/app-common/clusters:all-headers",
+    "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
+  ]
 }

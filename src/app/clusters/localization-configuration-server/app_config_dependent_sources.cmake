@@ -16,5 +16,5 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/localization-configuration-server.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )

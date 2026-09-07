@@ -176,43 +176,87 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
     const chip::Inet::IPAddress * ipAddresses = player->GetIPAddresses();
     if (ipAddresses != nullptr)
     {
-        chip::JniReferences::GetInstance().CreateArrayList(jIpAddressList);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(jIpAddressList);
         for (size_t i = 0; i < player->GetNumIPs() && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
         {
             char addrCString[chip::Inet::IPAddress::kMaxStringLength];
             ipAddresses[i].ToString(addrCString, chip::Inet::IPAddress::kMaxStringLength);
-            jstring jIPAddressStr = env->NewStringUTF(addrCString);
+            jstring jIPAddressStr = nullptr;
+            CHIP_ERROR err        = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(addrCString),
+                                                                                 reinterpret_cast<jobject &>(jIPAddressStr));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() failed to create jIPAddressStr");
+                continue;
+            }
 
             jclass jIPAddressClass = env->FindClass("java/net/InetAddress");
             jmethodID jGetByNameMid =
                 env->GetStaticMethodID(jIPAddressClass, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
             jobject jIPAddress = env->CallStaticObjectMethod(jIPAddressClass, jGetByNameMid, jIPAddressStr);
 
-            chip::JniReferences::GetInstance().AddToList(jIpAddressList, jIPAddress);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(jIpAddressList, jIPAddress);
         }
     }
 
     // Create a new instance of the MatterCastingPlayer Java class
     jobject jMatterCastingPlayer = nullptr;
-    jMatterCastingPlayer = env->NewObject(matterCastingPlayerJavaClass, constructor, static_cast<jboolean>(player->IsConnected()),
-                                          env->NewStringUTF(player->GetId()), env->NewStringUTF(player->GetHostName()),
-                                          env->NewStringUTF(player->GetDeviceName()), env->NewStringUTF(player->GetInstanceName()),
-                                          jIpAddressList, (jint) (player->GetPort()), (jint) (player->GetProductId()),
-                                          (jint) (player->GetVendorId()), (jlong) (player->GetDeviceType()),
-                                          static_cast<jboolean>(player->GetSupportsCommissionerGeneratedPasscode()));
+    jstring jId                  = nullptr;
+    jstring jHostName            = nullptr;
+    jstring jDeviceName          = nullptr;
+    jstring jInstanceName        = nullptr;
+
+    CHIP_ERROR idErr       = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetId()),
+                                                                          reinterpret_cast<jobject &>(jId));
+    CHIP_ERROR hostErr     = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetHostName()),
+                                                                          reinterpret_cast<jobject &>(jHostName));
+    CHIP_ERROR deviceErr   = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetDeviceName()),
+                                                                          reinterpret_cast<jobject &>(jDeviceName));
+    CHIP_ERROR instanceErr = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(player->GetInstanceName()),
+                                                                          reinterpret_cast<jobject &>(jInstanceName));
+
+    if (idErr != CHIP_NO_ERROR || hostErr != CHIP_NO_ERROR || deviceErr != CHIP_NO_ERROR || instanceErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() failed to create string fields");
+        return nullptr;
+    }
+
+    jMatterCastingPlayer = env->NewObject(
+        matterCastingPlayerJavaClass, constructor, static_cast<jboolean>(player->IsConnected()), jId, jHostName, jDeviceName,
+        jInstanceName, jIpAddressList, (jint) (player->GetPort()), (jint) (player->GetProductId()), (jint) (player->GetVendorId()),
+        (jlong) (player->GetDeviceType()), static_cast<jboolean>(player->GetSupportsCommissionerGeneratedPasscode()));
     if (jMatterCastingPlayer == nullptr)
     {
         ChipLogError(AppServer, "convertCastingPlayerFromCppToJava(): Could not create MatterCastingPlayer Java object");
         env->ExceptionClear();
         return jMatterCastingPlayer;
     }
-    // Set the value of the _cppCastingPlayer field in the Java object to the C++ CastingPlayer pointer.
-    jfieldID longFieldId = env->GetFieldID(matterCastingPlayerJavaClass, "_cppCastingPlayer", "J");
-    env->SetLongField(jMatterCastingPlayer, longFieldId, reinterpret_cast<jlong>(player.get()));
+
+    jmethodID setNativeCastingPlayerId = env->GetMethodID(matterCastingPlayerJavaClass, "setNativeCastingPlayer", "(J)V");
+    VerifyOrReturnValue(
+        setNativeCastingPlayerId != nullptr, nullptr,
+        ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() could not get setNativeCastingPlayer method ID"));
+
+    // Store a heap-allocated handle containing a weak_ptr so the Java long field never
+    // holds a dangling raw pointer if the C++ CastingPlayer is destroyed.
+    // Note: Each call allocates a new CastingPlayerHandle. During discovery, repeated callbacks
+    // for the same player create short-lived wrappers collected by GC after stopDiscovery().
+    // A CastingPlayer* -> Java GlobalRef cache would avoid this but requires explicit
+    // eviction on player removal; not warranted at home-network scale.
+    auto handle = std::unique_ptr<CastingPlayerHandle>(new CastingPlayerHandle{ player });
+    env->CallVoidMethod(jMatterCastingPlayer, setNativeCastingPlayerId, reinterpret_cast<jlong>(handle.get()));
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() setNativeCastingPlayer threw");
+        env->ExceptionClear();
+        return jMatterCastingPlayer; // unique_ptr destructor frees the handle
+    }
+    handle.release();
+
     return jMatterCastingPlayer;
 }
 
-core::CastingPlayer * convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerObject)
+matter::casting::memory::Strong<core::CastingPlayer> convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerObject)
 {
     ChipLogProgress(AppServer, "convertCastingPlayerFromJavaToCpp() called");
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -229,8 +273,13 @@ core::CastingPlayer * convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerOb
     jfieldID _cppCastingPlayerFieldId = env->GetFieldID(castingPlayerClass, "_cppCastingPlayer", "J");
     VerifyOrReturnValue(_cppCastingPlayerFieldId != nullptr, nullptr,
                         ChipLogError(AppServer, "convertCastingPlayerFromJavaToCpp _cppCastingPlayerFieldId == nullptr"));
-    jlong _cppCastingPlayerValue = env->GetLongField(jCastingPlayerObject, _cppCastingPlayerFieldId);
-    return reinterpret_cast<core::CastingPlayer *>(_cppCastingPlayerValue);
+    auto * handle = reinterpret_cast<CastingPlayerHandle *>(env->GetLongField(jCastingPlayerObject, _cppCastingPlayerFieldId));
+    VerifyOrReturnValue(handle != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertCastingPlayerFromJavaToCpp() handle == nullptr"));
+    auto player = handle->player.lock();
+    VerifyOrReturnValue(player != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertCastingPlayerFromJavaToCpp() CastingPlayer no longer exists"));
+    return player;
 }
 
 jobject convertClusterFromCppToJava(matter::casting::memory::Strong<core::BaseCluster> cluster, const char * className)
@@ -448,6 +497,8 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     jfieldID commissionerPasscodeReadyField = env->GetFieldID(idOptionsClass, "commissionerPasscodeReady", "Z");
     jfieldID cancelPasscodeField            = env->GetFieldID(idOptionsClass, "cancelPasscode", "Z");
     jfieldID targetAppInfosField            = env->GetFieldID(idOptionsClass, "targetAppInfos", "Ljava/util/List;");
+    jfieldID passcodeLengthField            = env->GetFieldID(idOptionsClass, "passcodeLength", "I");
+    jfieldID instanceNameField              = env->GetFieldID(idOptionsClass, "instanceName", "Ljava/lang/String;");
     VerifyOrReturnValue(
         noPasscodeField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() noPasscodeField not found!"));
@@ -467,6 +518,12 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     VerifyOrReturnValue(
         targetAppInfosField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() targetAppInfosField not found!"));
+    VerifyOrReturnValue(
+        passcodeLengthField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() passcodeLengthField not found!"));
+    VerifyOrReturnValue(
+        instanceNameField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() instanceNameField not found!"));
 
     matter::casting::core::IdentificationDeclarationOptions * cppIdOptions =
         new matter::casting::core::IdentificationDeclarationOptions();
@@ -476,6 +533,15 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     cppIdOptions->mCommissionerPasscode      = env->GetBooleanField(jIdOptions, commissionerPasscodeField);
     cppIdOptions->mCommissionerPasscodeReady = env->GetBooleanField(jIdOptions, commissionerPasscodeReadyField);
     cppIdOptions->mCancelPasscode            = env->GetBooleanField(jIdOptions, cancelPasscodeField);
+    cppIdOptions->mPasscodeLength            = static_cast<uint8_t>(env->GetIntField(jIdOptions, passcodeLengthField));
+
+    jstring jInstanceName = (jstring) env->GetObjectField(jIdOptions, instanceNameField);
+    if (jInstanceName != nullptr)
+    {
+        const char * instanceNameCStr = env->GetStringUTFChars(jInstanceName, nullptr);
+        chip::Platform::CopyString(cppIdOptions->mCommissioneeInstanceName, instanceNameCStr);
+        env->ReleaseStringUTFChars(jInstanceName, instanceNameCStr);
+    }
 
     jobject targetAppInfosList = env->GetObjectField(jIdOptions, targetAppInfosField);
     VerifyOrReturnValue(
@@ -529,7 +595,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
                                                                          jCommissionerDeclarationClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
 
-    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZ)V");
+    jmethodID jCommissionerDeclarationConstructor = env->GetMethodID(jCommissionerDeclarationClass, "<init>", "(IZZZZZZI)V");
     if (jCommissionerDeclarationConstructor == nullptr)
     {
         ChipLogError(AppServer,
@@ -541,7 +607,7 @@ convertCommissionerDeclarationFromCppToJava(const chip::Protocols::UserDirectedC
     return env->NewObject(jCommissionerDeclarationClass, jCommissionerDeclarationConstructor,
                           static_cast<jint>(cppCd.GetErrorCode()), cppCd.GetNeedsPasscode(), cppCd.GetNoAppsFound(),
                           cppCd.GetPasscodeDialogDisplayed(), cppCd.GetCommissionerPasscode(), cppCd.GetQRCodeDisplayed(),
-                          cppCd.GetCancelPasscode());
+                          cppCd.GetCancelPasscode(), cppCd.GetPasscodeLength());
 }
 
 }; // namespace support

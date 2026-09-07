@@ -1,0 +1,15 @@
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+{{! Only generate if: no filter set, or filter set and manufacturerCode present }}
+{{#if (or (not manufacturerCodeOnly) manufacturerCode)}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandDecl"}}
+{{#if (isSupported cluster command=command)}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion;
+{{/if}}
+{{/inline}}
+{{> commandDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/if}}
+{{/zcl_commands}}

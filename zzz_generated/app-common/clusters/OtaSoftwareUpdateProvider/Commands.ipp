@@ -91,7 +91,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace QueryImage.
+} // namespace QueryImage
 namespace QueryImageResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -154,7 +154,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace QueryImageResponse.
+} // namespace QueryImageResponse
 namespace ApplyUpdateRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -187,7 +187,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ApplyUpdateRequest.
+} // namespace ApplyUpdateRequest
 namespace ApplyUpdateResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -220,7 +220,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ApplyUpdateResponse.
+} // namespace ApplyUpdateResponse
 namespace NotifyUpdateApplied {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -253,7 +253,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace NotifyUpdateApplied.
+} // namespace NotifyUpdateApplied
 } // namespace Commands
 } // namespace OtaSoftwareUpdateProvider
 } // namespace Clusters

@@ -26,7 +26,7 @@ from multiprocessing.managers import BaseManager
 from hello_test import HelloTest
 
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.matter_testing import get_test_info, run_tests
+from matter.testing.runner import get_test_info, run_tests
 
 try:
     from matter.yamltests.hooks import TestRunnerHooks
@@ -121,9 +121,8 @@ def one_test(test_name):
     config = MatterTestConfig(tests=[test_name], dut_node_ids=[0x12344321], storage_path='admin_storage.json')
 
     # TH can use get_test_info to get a list of steps and a description
-    list = get_test_info(HelloTest, config)
     print(f'Test info for test {test_name}')
-    print(list)
+    print(get_test_info(HelloTest, config))
 
     run_in_process(test_name, config)
 

@@ -94,6 +94,7 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override;
+    CHIP_ERROR GetManufacturingDateSuffix(MutableCharSpan & vendorInfoSpan) override;
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish) override;

@@ -50,12 +50,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ICACCSRRequest.
+} // namespace ICACCSRRequest
 namespace ICACCSRResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatusCode), statusCode);
     encoder.Encode(to_underlying(Fields::kIcaccsr), icaccsr);
     return encoder.Finalize();
 }
@@ -70,7 +71,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kIcaccsr))
+        if (__context_tag == to_underlying(Fields::kStatusCode))
+        {
+            err = DataModel::Decode(reader, statusCode);
+        }
+        else if (__context_tag == to_underlying(Fields::kIcaccsr))
         {
             err = DataModel::Decode(reader, icaccsr);
         }
@@ -78,7 +83,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ICACCSRResponse.
+} // namespace ICACCSRResponse
 namespace AddICAC {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -106,7 +111,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AddICAC.
+} // namespace AddICAC
 namespace ICACResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -134,7 +139,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ICACResponse.
+} // namespace ICACResponse
 namespace OpenJointCommissioningWindow {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -182,7 +187,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace OpenJointCommissioningWindow.
+} // namespace OpenJointCommissioningWindow
 namespace TransferAnchorRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -204,7 +209,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace TransferAnchorRequest.
+} // namespace TransferAnchorRequest
 namespace TransferAnchorResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -232,7 +237,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace TransferAnchorResponse.
+} // namespace TransferAnchorResponse
 namespace TransferAnchorComplete {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -254,7 +259,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace TransferAnchorComplete.
+} // namespace TransferAnchorComplete
 namespace AnnounceJointFabricAdministrator {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -282,7 +287,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AnnounceJointFabricAdministrator.
+} // namespace AnnounceJointFabricAdministrator
 } // namespace Commands
 } // namespace JointFabricAdministrator
 } // namespace Clusters

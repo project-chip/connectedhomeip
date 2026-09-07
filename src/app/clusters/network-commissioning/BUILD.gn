@@ -51,14 +51,13 @@ source_set("network-commissioning") {
   sources = [
     "NetworkCommissioningCluster.cpp",
     "NetworkCommissioningCluster.h",
-    "NetworkCommissioningLogic.cpp",
-    "NetworkCommissioningLogic.h",
   ]
 
   public_deps = [
     ":thread-response-encoding",
     ":wifi-response-encoding",
     "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/clusters/general-commissioning-server:bread-crumb-tracker",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",

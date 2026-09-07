@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/config.h>
+#include <clusters/MediaPlayback/Metadata.h>
 #include <cstdint>
 #include <jni.h>
 #include <json/json.h>
@@ -108,64 +109,87 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueE
     });
 }
 
+CHIP_ERROR AppMediaPlaybackManager::HandleGetAvailableCommands(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        ReturnErrorOnFailure(encoder.Encode(Commands::Play::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Pause::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Stop::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Next::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Previous::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Rewind::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::FastForward::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Seek::Id));
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR AppMediaPlaybackManager::HandleGetContentInfo(AttributeValueEncoder & aEncoder)
+{
+    Structs::ContentInfoStruct::Type contentInfo;
+    contentInfo.contentType = MediaType::kTVShow;
+    contentInfo.title       = chip::MakeOptional(chip::app::DataModel::MakeNullable("Example Show"_span));
+    return aEncoder.Encode(contentInfo);
+}
+
 void AppMediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0));
 }
 
 void AppMediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0));
 }
 
 void AppMediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0));
 }
 
 void AppMediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                                 const chip::Optional<bool> & audioAdvanceUnmuted)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0));
 }
 
 void AppMediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0));
 }
 
 void AppMediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                            const chip::Optional<bool> & audioAdvanceUnmuted)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0));
 }
 
 void AppMediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                                  const uint64_t & deltaPositionMilliseconds)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds));
 }
 
 void AppMediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                                 const uint64_t & deltaPositionMilliseconds)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds));
 }
 
 void AppMediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                          const uint64_t & positionMilliseconds)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds));
 }
 
 void AppMediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0));
 }
 
 void AppMediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0));
 }
 
 bool AppMediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)
@@ -275,7 +299,7 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
 
 uint32_t AppMediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return kEndpointFeatureMap;
     }
@@ -287,9 +311,9 @@ uint32_t AppMediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 
 uint16_t AppMediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
 {
-    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return kClusterRevision;
+        return chip::app::Clusters::MediaPlayback::kRevision;
     }
 
     uint16_t clusterRevision = 0;

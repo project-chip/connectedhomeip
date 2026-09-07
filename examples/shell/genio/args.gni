@@ -25,6 +25,6 @@ pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
 chip_enable_ble = false
 chip_config_network_layer_ble = false
 
-chip_enable_openthread = false
+chip_enable_thread = false
 chip_openthread_ftd = false
 chip_build_libshell = true

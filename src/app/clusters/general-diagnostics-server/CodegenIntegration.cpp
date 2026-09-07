@@ -15,12 +15,15 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -36,68 +39,99 @@ static_assert((GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.
 
 namespace {
 
-// Determine if the configurable version of the general diagnostics cluster with additonal command options is needed
+// Determine if the configurable version of the general diagnostics cluster with additional command options is needed
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
+LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gDiagnosticsServer;
 #else
-LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
+LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gDiagnosticsServer;
 #endif
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+        InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
+        VerifyOrDie(interactionModel != nullptr);
+
+#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
+        const GeneralDiagnosticsFunctionsConfig functionsConfig
+        {
+            /*
+            Only consider real time if time sync cluster is actually enabled. If it's not
+            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+            */
+#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
+            .enablePosixTime = true,
+#else
+            .enablePosixTime       = false,
+#endif
+#if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
+            .enablePayloadSnapshot = true,
+#else
+            .enablePayloadSnapshot = false,
+#endif
+        };
+        gDiagnosticsServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
+                                  GeneralDiagnosticsCluster::Context{
+                                      .deviceLoadStatusProvider = *interactionModel,
+                                      .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+                                      .testEventTriggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate(),
+                                  },
+                                  functionsConfig);
+#else
+        gDiagnosticsServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
+                                  GeneralDiagnosticsCluster::Context{
+                                      .deviceLoadStatusProvider = *interactionModel,
+                                      .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+                                      .testEventTriggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate(),
+                                  });
+#endif
+        return gDiagnosticsServer.Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gDiagnosticsServer.IsConstructed(), nullptr);
+        return &gDiagnosticsServer.Cluster();
+    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gDiagnosticsServer.Destroy(); }
+};
 
 } // namespace
 
-void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
+void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == kRootEndpointId);
+    IntegrationDelegate integrationDelegate;
 
-    GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
-        GeneralDiagnosticsCluster::OptionalAttributeSet()
-            .Set<TotalOperationalHours::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, TotalOperationalHours::Id))
-            .Set<BootReason::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, BootReason::Id))
-            .Set<ActiveHardwareFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveHardwareFaults::Id))
-            .Set<ActiveRadioFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveRadioFaults::Id))
-            .Set<ActiveNetworkFaults::Id>(emberAfContainsAttribute(endpointId, GeneralDiagnostics::Id, ActiveNetworkFaults::Id));
-
-#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-    const GeneralDiagnosticsFunctionsConfig functionsConfig
-    {
-        /*
-        Only consider real time if time sync cluster is actually enabled. If it's not
-        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-        */
-#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
-        .enablePosixTime = true,
-#else
-        .enablePosixTime      = false,
-#endif
-#if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        .enablePayloadSnaphot = true,
-#else
-        .enablePayloadSnaphot = false,
-#endif
-    };
-    gServer.Create(optionalAttributeSet, functionsConfig);
-#else
-    gServer.Create(optionalAttributeSet);
-#endif
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register GeneralDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralDiagnostics::Id,
+            .fixedClusterInstanceCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
+        },
+        integrationDelegate);
 }
 
-void MatterGeneralDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister GeneralDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-    gServer.Destroy();
+    IntegrationDelegate integrationDelegate;
+
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralDiagnostics::Id,
+            .fixedClusterInstanceCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+        },
+        integrationDelegate, shutdownType);
 }
 
 void MatterGeneralDiagnosticsPluginServerInitCallback() {}
@@ -107,36 +141,36 @@ void MatterGeneralDiagnosticsPluginServerShutdownCallback() {}
 namespace chip::app::Clusters::GeneralDiagnostics {
 void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnDeviceReboot(bootReason);
+        gDiagnosticsServer.Cluster().OnDeviceReboot(bootReason);
     }
 }
 
 void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
                                       const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnHardwareFaultsDetect(previous, current);
+        gDiagnosticsServer.Cluster().OnHardwareFaultsDetect(previous, current);
     }
 }
 
 void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
                                    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnRadioFaultsDetect(previous, current);
+        gDiagnosticsServer.Cluster().OnRadioFaultsDetect(previous, current);
     }
 }
 
 void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnNetworkFaultsDetect(previous, current);
+        gDiagnosticsServer.Cluster().OnNetworkFaultsDetect(previous, current);
     }
 }
 } // namespace chip::app::Clusters::GeneralDiagnostics

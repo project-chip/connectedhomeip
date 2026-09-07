@@ -53,6 +53,7 @@
 #define _CHIP_BLE_BLE_H
 #include "BleLayer.h"
 
+#include <cstddef>
 #include <cstring>
 #include <utility>
 
@@ -87,18 +88,9 @@ public:
 
     BLEEndPoint * Get(size_t i) const
     {
-        static union
-        {
-            uint8_t Pool[sizeof(BLEEndPoint) * BLE_LAYER_NUM_BLE_ENDPOINTS];
-            BLEEndPoint::AlignT ForceAlignment;
-        } sEndPointPool;
-
-        if (i < BLE_LAYER_NUM_BLE_ENDPOINTS)
-        {
-            return reinterpret_cast<BLEEndPoint *>(sEndPointPool.Pool + (sizeof(BLEEndPoint) * i));
-        }
-
-        return nullptr;
+        alignas(BLEEndPoint) static std::byte sStorage[sizeof(BLEEndPoint) * BLE_LAYER_NUM_BLE_ENDPOINTS];
+        VerifyOrReturnValue(i < BLE_LAYER_NUM_BLE_ENDPOINTS, nullptr);
+        return reinterpret_cast<BLEEndPoint *>(sStorage) + i;
     }
 
     BLEEndPoint * Find(BLE_CONNECTION_OBJECT c) const
@@ -422,8 +414,6 @@ CHIP_ERROR BleLayer::NewBleConnectionByDiscriminators(const Span<const SetupDisc
 
 CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)
 {
-    *retEndPoint = nullptr;
-
     if (mState != kState_Initialized)
     {
         return CHIP_ERROR_INCORRECT_STATE;
@@ -434,16 +424,17 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    *retEndPoint = sBLEEndPointPool.GetFree();
-    if (*retEndPoint == nullptr)
+    auto endPoint = sBLEEndPointPool.GetFree();
+    if (endPoint == nullptr)
     {
         ChipLogError(Ble, "%s endpoint pool FULL", "Ble");
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
 
-    (*retEndPoint)->Init(this, connObj, role, autoClose);
-    (*retEndPoint)->mBleTransport = mBleTransport;
+    TEMPORARY_RETURN_IGNORED endPoint->Init(this, connObj, role, autoClose);
+    endPoint->mBleTransport = mBleTransport;
 
+    *retEndPoint = endPoint;
     return CHIP_NO_ERROR;
 }
 

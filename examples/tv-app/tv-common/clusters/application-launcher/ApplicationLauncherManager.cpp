@@ -21,7 +21,6 @@
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
-using namespace chip::Uint8;
 
 CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncoder & aEncoder)
 {
@@ -43,9 +42,9 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
     // TODO: Insert code here
     LauncherResponseType response;
     const char * buf = "data";
-    response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
+    response.data.SetValue(ByteSpan::fromCharString(buf));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
@@ -56,9 +55,9 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
     // TODO: Insert code here
     LauncherResponseType response;
     const char * buf = "data";
-    response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
+    response.data.SetValue(ByteSpan::fromCharString(buf));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
@@ -69,7 +68,7 @@ void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherRes
     // TODO: Insert code here
     LauncherResponseType response;
     const char * buf = "data";
-    response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
+    response.data.SetValue(ByteSpan::fromCharString(buf));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }

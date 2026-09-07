@@ -66,9 +66,7 @@ CHIP_ERROR pychip_P256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_le
     size_t signatureLength = out_signature.Capacity();
 
     VerifyOrReturnError(mSignMsgFunct(mPyContext, msg, msg_length, out_signature.Bytes(), &signatureLength), CHIP_ERROR_INTERNAL);
-    out_signature.SetLength(signatureLength);
-
-    return CHIP_NO_ERROR;
+    return out_signature.SetLength(signatureLength);
 }
 
 CHIP_ERROR pychip_P256Keypair::ECDH_derive_secret(const Crypto::P256PublicKey & remote_public_key,
@@ -80,9 +78,7 @@ CHIP_ERROR pychip_P256Keypair::ECDH_derive_secret(const Crypto::P256PublicKey & 
 
     VerifyOrReturnError(mDeriveSecretFunct(mPyContext, remote_public_key.ConstBytes(), out_secret.Bytes(), &secretLength),
                         CHIP_ERROR_INTERNAL);
-    out_secret.SetLength(secretLength);
-
-    return CHIP_NO_ERROR;
+    return out_secret.SetLength(secretLength);
 }
 
 void pychip_P256Keypair::UpdatePubkey(const FixedByteSpan<kP256_PublicKey_Length> & aPublicKey)

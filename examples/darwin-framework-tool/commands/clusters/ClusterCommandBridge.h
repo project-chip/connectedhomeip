@@ -79,9 +79,9 @@ public:
                                          if (error != nil) {
                                              mError = error;
                                              LogNSError("Error", error);
-                                             RemoteDataModelLogger::LogCommandErrorAsJSON(endpoint, cluster, command, error);
+                                             TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogCommandErrorAsJSON(endpoint, cluster, command, error);
                                          } else {
-                                             RemoteDataModelLogger::LogCommandAsJSON(endpoint, cluster, command, values);
+                                             TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogCommandAsJSON(endpoint, cluster, command, values);
                                          }
                                          if (responsesNeeded == 0) {
                                              SetCommandExitStatus(mError);

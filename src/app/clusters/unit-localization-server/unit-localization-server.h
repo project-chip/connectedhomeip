@@ -16,49 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/data-model/List.h>
-#include <cstdint>
-#include <lib/core/CHIPError.h>
+// Note: This file exists for backwards compatibility only.
+// New code should directly use UnitLocalizationCluster.h instead.
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace UnitLocalization {
-
-inline constexpr uint16_t kClusterRevision              = 2;
-inline constexpr uint8_t kMinSupportedLocalizationUnits = 2;
-inline constexpr uint8_t kMaxSupportedLocalizationUnits = 3;
-
-class UnitLocalizationServer : public AttributeAccessInterface
-{
-public:
-    // Register for the UnitLocalization cluster on all endpoints.
-    CHIP_ERROR Init();
-    static UnitLocalizationServer & Instance();
-
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    CHIP_ERROR SetSupportedTemperatureUnits(DataModel::List<TempUnitEnum> & units);
-    const DataModel::List<TempUnitEnum> & GetSupportedTemperatureUnits(void) { return mSupportedTemperatureUnits; }
-    TempUnitEnum GetTemperatureUnit(void) { return mTemperatureUnit; }
-    CHIP_ERROR SetTemperatureUnit(TempUnitEnum unit);
-
-private:
-    UnitLocalizationServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UnitLocalization::Id) {}
-
-    static UnitLocalizationServer mInstance;
-    DataModel::List<TempUnitEnum> mSupportedTemperatureUnits{ DataModel::List<TempUnitEnum>(mUnitsBuffer) };
-    TempUnitEnum mUnitsBuffer[kMaxSupportedLocalizationUnits] = { TempUnitEnum::kFahrenheit, TempUnitEnum::kCelsius,
-                                                                  TempUnitEnum::kKelvin };
-    TempUnitEnum mTemperatureUnit                             = TempUnitEnum::kCelsius;
-};
-
-} // namespace UnitLocalization
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+#pragma once
+#include <app/clusters/unit-localization-server/CodegenIntegration.h>

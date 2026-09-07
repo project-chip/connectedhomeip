@@ -76,3 +76,5 @@ YAML schema
 |&emsp; dataVersion |list,int|Y|
 |&emsp; busyWaitMs |int||
 |&emsp; wait |str||
+|&emsp; minRevision |int|Y|
+|&emsp; maxRevision |int|Y|

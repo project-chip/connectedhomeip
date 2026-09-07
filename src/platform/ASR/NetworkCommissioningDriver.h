@@ -56,9 +56,10 @@ public:
         item.security.SetRaw(mpScanResults[mIternum].security);
         item.ssidLen = static_cast<uint8_t>(
             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
-        item.channel  = mpScanResults[mIternum].channel;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpScanResults[mIternum].ap_power;
+        item.channel         = mpScanResults[mIternum].channel;
+        item.wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        item.signal.strength = mpScanResults[mIternum].ap_power;
         memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
 

@@ -33,7 +33,8 @@ namespace NetworkCommissioning {
 NetworkIterator * LinuxEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
-    ConnectivityUtils::GetEthInterfaceName(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName));
+    TEMPORARY_RETURN_IGNORED ConnectivityUtils::GetEthInterfaceName(SafePointerCast<char *>(ret->interfaceName),
+                                                                    sizeof(ret->interfaceName));
     ret->interfaceNameLen = static_cast<uint8_t>(strnlen(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName)));
     return ret;
 }

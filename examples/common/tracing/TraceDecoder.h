@@ -38,7 +38,7 @@ public:
     void SetOptions(TraceDecoderOptions options) { mOptions = options; }
 
     // TraceStream Interface
-    void StartEvent(const std::string & label) override { ReadString(label.c_str()); }
+    void StartEvent(const std::string & label) override { TEMPORARY_RETURN_IGNORED ReadString(label.c_str()); }
 
     void AddField(const std::string & tag, const std::string & data) override
     {

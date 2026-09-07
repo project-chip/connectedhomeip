@@ -18,6 +18,7 @@
 
 #include <lib/core/OTAImageHeader.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
 namespace chip {
@@ -46,15 +47,17 @@ private:
     CHIP_ERROR ProcessHeader(ByteSpan & aBlock);
     CHIP_ERROR InitFlashStream(size_t offset);
     CHIP_ERROR RestoreBytes(ByteSpan & aBlock);
+    static void ResumeWatchdogHandler(System::Layer * systemLayer, void * context);
 
     OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
     uint8_t mBuffer[kBufferSize];
 
     // Define non-volatile storage keys for DownloadedBytes and ImageDigest.
-    static constexpr char kDownloadedBytes[] = "DownloadedBytes";
-    static constexpr char kImageDigest[]     = "ImageDigest";
-    uint64_t downloadedBytesRestored         = 0;
+    static constexpr char kDownloadedBytes[]           = "DownloadedBytes";
+    static constexpr char kImageDigest[]               = "ImageDigest";
+    static constexpr uint16_t kResumeWatchdogTimeoutMs = 6000;
+    uint64_t downloadedBytesRestored                   = 0;
 };
 
 } // namespace DeviceLayer

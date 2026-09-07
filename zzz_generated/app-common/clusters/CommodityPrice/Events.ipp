@@ -60,7 +60,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace PriceChange.
+} // namespace PriceChange
 } // namespace Events
 } // namespace CommodityPrice
 } // namespace Clusters

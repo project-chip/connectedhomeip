@@ -23,11 +23,20 @@ namespace chip {
 namespace bdx {
 namespace {
 
-constexpr uint32_t kMaxBdxBlockSize               = 1024;
+constexpr uint16_t kMaxBdxBlockSize               = CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE;
 constexpr System::Clock::Timeout kBdxPollInterval = System::Clock::Milliseconds32(50);
 constexpr System::Clock::Timeout kBdxTimeout      = System::Clock::Seconds16(5 * 60);
 
+// Max block size for the next transfer; set from bdx.cpp when Python passes a value.
+// Resets to default kMaxBdxBlockSize after PrepareForTransfer is called.
+static uint16_t gMaxBdxBlockSize = kMaxBdxBlockSize;
+
 } // namespace
+
+void SetControllerBdxMaxBlockSizeForNextTransfer(uint16_t maxBlockSize)
+{
+    gMaxBdxBlockSize = maxBlockSize;
+}
 
 void BdxTransfer::SetDelegate(BdxTransfer::Delegate * delegate)
 {
@@ -94,7 +103,7 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         {
             ByteSpan data(event.blockdata.Data, event.blockdata.Length);
             mDelegate->DataReceived(this, data);
-            mTransfer.PrepareBlockAck();
+            TEMPORARY_RETURN_IGNORED mTransfer.PrepareBlockAck();
         }
         else
         {
@@ -102,7 +111,7 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         }
         break;
     case TransferSession::OutputEventType::kMsgToSend:
-        SendMessage(event);
+        TEMPORARY_RETURN_IGNORED SendMessage(event);
         if (event.msgTypeData.HasMessageType(MessageType::BlockAckEOF))
         {
             // TODO: Ending the session here means the StandaloneAck for the BlockAckEOF message hasn't been received.
@@ -114,10 +123,10 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         break;
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
         mDataTransferredCount = std::min<size_t>(mDataTransferredCount + event.bytesToSkip.BytesToSkip, mDataCount);
-        SendBlock();
+        TEMPORARY_RETURN_IGNORED SendBlock();
         break;
     case TransferSession::OutputEventType::kQueryReceived:
-        SendBlock();
+        TEMPORARY_RETURN_IGNORED SendBlock();
         break;
     case TransferSession::OutputEventType::kAckReceived:
     case TransferSession::OutputEventType::kAcceptReceived:
@@ -204,7 +213,8 @@ CHIP_ERROR BdxTransfer::OnMessageReceived(chip::Messaging::ExchangeContext * exc
             role  = TransferRole::kSender;
         }
         ReturnLogErrorOnFailure(
-            Responder::PrepareForTransfer(mSystemLayer, role, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
+            Responder::PrepareForTransfer(mSystemLayer, role, flags, gMaxBdxBlockSize, kBdxTimeout, kBdxPollInterval));
+        gMaxBdxBlockSize = kMaxBdxBlockSize; // consume the one-shot override
     }
 
     return Responder::OnMessageReceived(exchangeContext, payloadHeader, std::move(payload));

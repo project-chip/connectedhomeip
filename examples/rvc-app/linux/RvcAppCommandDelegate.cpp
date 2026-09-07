@@ -303,5 +303,6 @@ void RvcAppCommandDelegate::OnEventCommandReceived(const char * json)
     }
 
     handler->SetRvcDevice(mRvcDevice);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(RvcAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(RvcAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

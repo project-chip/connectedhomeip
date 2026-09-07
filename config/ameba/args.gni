@@ -33,6 +33,24 @@ chip_inet_config_enable_udp_endpoint = true
 
 chip_config_network_layer_ble = true
 
+# Ameba/Realtek overrides various things in c-headers that are C++ standard items. Generally
+# these get pulled via LWIP and end up overriding things like true/false/isalpha by macros.
+#
+# This results in errors in libraries used by these clusters, like:
+#
+# INFO    In file included from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib_rtl8721d.h:25,
+# INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib.h:39,
+# INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/network/include/lwipopts.h:17,
+# INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/opt.h:51,
+# INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/errno.h:40,
+# INFO                     from ../../../config/ameba/third_party/connectedhomeip/third_party/uriparser/repo/src/UriMemory.c:56:
+# INFO    /__w/connectedhomeip/connectedhomeip/.environment/cipd/packages/arm/arm-none-eabi/include/ctype.h:14:5: error: expected identifier or '(' before 'int'
+# INFO       14 | int isalpha (int __c);
+# INFO          |     ^~~~~~~
+# INFO    /opt/ameba/ambd_sdk_with_chip_non_NDA/component/soc/realtek/amebad/swlib/string/strproc.h:26:30: error: expected ')' before '>=' token
+# INFO       26 | #define isupper(c)      (((c)>='A')&&((c)<='Z'))
+chip_enable_push_av_stream_transport = false
+
 custom_toolchain = "//third_party/connectedhomeip/config/ameba/toolchain:ameba"
 
 pw_build_PIP_CONSTRAINTS =

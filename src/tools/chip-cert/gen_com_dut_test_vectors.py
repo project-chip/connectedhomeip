@@ -684,6 +684,22 @@ CD_STRUCT_TEST_CASES = [
         "error_flag": 'different-origin',
         "is_success_case": 'true',
     },
+    {
+        "description": 'CD certification type is provisional (signed by test key)',
+        "test_folder": "provisional_cd",
+        "error_flag": 'provisional-cd',
+        # This is currently success by default when the SDK supports test keys. This should be moved to
+        # default failure after a sufficient notice period.
+        # https://github.com/project-chip/connectedhomeip/issues/42460
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'CD certification type is official (signed by test key)',
+        "test_folder": "official_cd",
+        "error_flag": 'official-cd',
+        # This is an error because it is an official CD signed by a test key.
+        "is_success_case": 'false',
+    },
 ]
 
 
@@ -712,7 +728,7 @@ class DevCertBuilder:
         self.valid_from = valid_from
 
         if not os.path.exists(self.chipcert):
-            raise Exception('Path not found: %s' % self.chipcert)
+            raise Exception(f'Path not found: {self.chipcert}')
 
         if not os.path.exists(test_case_out_dir):
             os.mkdir(test_case_out_dir)
@@ -731,8 +747,8 @@ class DevCertBuilder:
         """Creates the PEM and DER certs and keyfiles"""
         error_type_flag = ' -I -E ' + self.error_type
         subject_name = self.custom_cn_attribute
-        vid_flag = ' -V 0x{:X}'.format(self.vid)
-        pid_flag = ' -P 0x{:X}'.format(self.pid)
+        vid_flag = f' -V 0x{self.vid:X}'
+        pid_flag = f' -P 0x{self.pid:X}'
         if (len(self.valid_from) == 0):
             validity_flags = ' -l 4294967295 '
         else:
@@ -822,7 +838,7 @@ def generate_test_case_vector_json(test_case_out_dir: str, test_cert: str, test_
         der_key_filename = os.path.join(test_case_out_dir, "dac-Key.der")
         add_raw_ec_keypair_to_dict_from_der(der_key_filename, json_dict)
 
-    with open(output_json_filename, "wt+") as outfile:
+    with open(output_json_filename, "w+") as outfile:
         json.dump(json_dict, outfile, indent=4)
         outfile.write('\n')
 
@@ -851,7 +867,7 @@ def main():
     chipcert = args.chipcertdir + 'chip-cert'
 
     if not os.path.exists(chipcert):
-        raise Exception('Path not found: %s' % chipcert)
+        raise Exception(f'Path not found: {chipcert}')
 
     cd_cert = args.cdpath + 'Cert.pem'
     cd_key = args.cdpath + 'Key.pem'
@@ -908,8 +924,8 @@ def main():
             builder.make_certs_and_keys()
 
             # Generate Certification Declaration (CD)
-            vid_flag = ' -V 0x{:X}'.format(vid)
-            pid_flag = ' -p 0x{:X}'.format(pid)
+            vid_flag = f' -V 0x{vid:X}'
+            pid_flag = f' -p 0x{pid:X}'
             cmd = chipcert + ' gen-cd -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
                 ' -f 1 ' + vid_flag + pid_flag + ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
             subprocess.run(cmd, shell=True)
@@ -1000,14 +1016,14 @@ def main():
         builder.make_certs_and_keys()
 
         # Generate Certification Declaration (CD)
-        vid_flag = ' -V 0x{:X}'.format(vid)
-        pid_flag = ' -p 0x{:X}'.format(pid)
+        vid_flag = f' -V 0x{vid:X}'
+        pid_flag = f' -p 0x{pid:X}'
 
         dac_origin_flag = ' '
         if origin_vid:
-            dac_origin_flag += ' -o 0x{:X}'.format(origin_vid)
+            dac_origin_flag += f' -o 0x{origin_vid:X}'
         if origin_pid:
-            dac_origin_flag += ' -r 0x{:X}'.format(origin_pid)
+            dac_origin_flag += f' -r 0x{origin_pid:X}'
 
         if test_case["error_flag"] == 'authorized-paa-list-count0' or test_case["error_flag"] == 'authorized-paa-list-count1-valid'\
                 or test_case["error_flag"] == 'authorized-paa-list-count2-valid'\
@@ -1018,9 +1034,16 @@ def main():
         else:
             authorized_paa_flag = ''
 
+        if test_case["error_flag"] == 'provisional-cd':
+            certification_type = 1
+        elif test_case["error_flag"] == 'official-cd':
+            certification_type = 2
+        else:
+            certification_type = 0
+
         cmd = chipcert + ' gen-cd -I -E ' + test_case["error_flag"] + ' -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + \
             test_case_out_dir + '/cd.der' + ' -f 1 ' + vid_flag + pid_flag + dac_origin_flag + authorized_paa_flag + \
-            ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
+            ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t ' + str(certification_type)
         subprocess.run(cmd, shell=True)
 
         # Generate Test Case Data Container in JSON Format
@@ -1058,8 +1081,8 @@ def main():
     builder.make_certs_and_keys()
 
     # Generate Certification Declaration (CD)
-    vid_flag = ' -V 0x{:X}'.format(vid)
-    pid_flag = ' -p 0x{:X}'.format(pid)
+    vid_flag = f' -V 0x{vid:X}'
+    pid_flag = f' -p 0x{pid:X}'
     cmd = chipcert + ' gen-cd -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
         ' -f 1 ' + vid_flag + pid_flag + ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
     subprocess.run(cmd, shell=True)

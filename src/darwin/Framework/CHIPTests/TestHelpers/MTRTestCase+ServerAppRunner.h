@@ -21,6 +21,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRTestCaseServerApp : NSObject
+
+/**
+ * Terminate the running app.  Useful for simulating a peer that stops responding
+ * partway through an interaction.  The app is also terminated automatically at
+ * the end of the test, so calling this is optional; calling it more than once, or
+ * after the app has already exited, is harmless.
+ */
+- (void)terminate;
 @end
 
 @interface MTRTestCase (ServerAppRunner)
@@ -55,6 +63,14 @@ NS_ASSUME_NONNULL_BEGIN
                                                       arguments:(NSArray<NSString *> *)arguments
                                                      controller:(MTRDeviceController *)controller
                                                         payload:(NSString *)payload
+                                                         nodeID:(NSNumber *)nodeID;
+/**
+ * Same thing, but will decide on a commissioning payload itself instead of
+ * making the caller provide one.
+ */
+- (nullable MTRTestCaseServerApp *)startCommissionedAppWithName:(NSString *)name
+                                                      arguments:(NSArray<NSString *> *)arguments
+                                                     controller:(MTRDeviceController *)controller
                                                          nodeID:(NSNumber *)nodeID;
 
 /**

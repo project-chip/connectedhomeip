@@ -507,3 +507,9 @@ tests:
                     type: int32u
                     minValue: 19500
                     maxValue: 20500
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: lit-icd
+      app: lit-icd

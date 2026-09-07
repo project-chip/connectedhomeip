@@ -19,6 +19,12 @@
 #include "DeviceInstanceInfoProviderImpl.h"
 #include <lib/support/BytesToHex.h>
 
+// Include the implementation of the GenericDeviceInstanceInfoProvider class in the file in case of using a custom
+// factory data provider.
+#if defined(CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
+#include <platform/internal/GenericDeviceInstanceInfoProvider.ipp>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 

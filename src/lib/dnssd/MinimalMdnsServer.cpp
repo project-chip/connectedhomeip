@@ -17,6 +17,7 @@
 #include "MinimalMdnsServer.h"
 
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 
 #ifndef CHIP_MINMDNS_DEFAULT_POLICY
 #define CHIP_MINMDNS_DEFAULT_POLICY 0
@@ -38,6 +39,7 @@ namespace chip {
 namespace Dnssd {
 
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 using chip::Platform::UniquePtr;
 
 GlobalMinimalMdnsServer::GlobalMinimalMdnsServer()

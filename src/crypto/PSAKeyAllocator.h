@@ -25,6 +25,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TypeTraits.h>
 
+#include <psa/crypto.h>
+
 namespace chip {
 namespace Crypto {
 

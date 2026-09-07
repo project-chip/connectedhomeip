@@ -1,0 +1,34 @@
+{{> header}}
+// This file is generated from codedriven-init-shutdown.cpp.zapt
+
+#include <app/util/generic-callbacks.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <zap-generated/CodeDrivenCallback.h>
+
+using namespace chip;
+
+void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId  clusterId) {
+    switch (clusterId)
+    {
+    {{#all_user_clusters side='server'}}
+    {{#if (isInConfigList name "CodeDrivenClusters")}}
+    case app::Clusters::{{asUpperCamelCase name}}::Id:
+        Matter{{asUpperCamelCase name}}ClusterInitCallback(endpoint);
+        break;
+    {{/if}}
+    {{/all_user_clusters}}
+    }
+}
+
+void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId, MatterClusterShutdownType shutdownType) {
+    switch (clusterId)
+    {
+    {{#all_user_clusters side='server'}}
+    {{#if (isInConfigList name "CodeDrivenClusters")}}
+    case app::Clusters::{{asUpperCamelCase name}}::Id:
+        Matter{{asUpperCamelCase name}}ClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    {{/if}}
+    {{/all_user_clusters}}
+    }
+}

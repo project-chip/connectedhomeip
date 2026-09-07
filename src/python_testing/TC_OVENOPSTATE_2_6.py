@@ -25,7 +25,6 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/ovenopstate_2_6_fifo
 #     script-args: >
 #       --endpoint 1
-#       --int-arg PIXIT.WAITTIME.REBOOT:5
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -42,7 +41,9 @@
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_OVENOPSTATE_2_6(MatterBaseTest, TC_OPSTATE_BASE):

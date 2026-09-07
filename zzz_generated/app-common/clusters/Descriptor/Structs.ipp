@@ -62,50 +62,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace DeviceTypeStruct
-
-namespace SemanticTagStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kMfgCode), mfgCode);
-    encoder.Encode(to_underlying(Fields::kNamespaceID), namespaceID);
-    encoder.Encode(to_underlying(Fields::kTag), tag);
-    encoder.Encode(to_underlying(Fields::kLabel), label);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        uint8_t __context_tag = 0;
-        CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        if (__context_tag == to_underlying(Fields::kMfgCode))
-        {
-            err = DataModel::Decode(reader, mfgCode);
-        }
-        else if (__context_tag == to_underlying(Fields::kNamespaceID))
-        {
-            err = DataModel::Decode(reader, namespaceID);
-        }
-        else if (__context_tag == to_underlying(Fields::kTag))
-        {
-            err = DataModel::Decode(reader, tag);
-        }
-        else if (__context_tag == to_underlying(Fields::kLabel))
-        {
-            err = DataModel::Decode(reader, label);
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace SemanticTagStruct
 } // namespace Structs
 } // namespace Descriptor
 } // namespace Clusters

@@ -29,13 +29,11 @@ namespace Internal {
 class ESP32Utils
 {
 public:
-    static CHIP_ERROR IsAPEnabled(bool & apEnabled);
     static CHIP_ERROR IsStationEnabled(bool & staEnabled);
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
     static CHIP_ERROR StartWiFiLayer(void);
     static CHIP_ERROR EnableStationMode(void);
-    static CHIP_ERROR SetAPMode(bool enabled);
     static int OrderScanResultsByRSSI(const void * _res1, const void * _res2);
     static const char * WiFiModeToStr(wifi_mode_t wifiMode);
     static struct netif * GetNetif(const char * ifKey);
@@ -53,7 +51,6 @@ public:
     static bool FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
     static constexpr char kDefaultWiFiStationNetifKey[] = "WIFI_STA_DEF";
-    static constexpr char kDefaultWiFiAPNetifKey[]      = "WIFI_AP_DEF";
     static constexpr char kDefaultEthernetNetifKey[]    = "ETH_DEF";
 };
 

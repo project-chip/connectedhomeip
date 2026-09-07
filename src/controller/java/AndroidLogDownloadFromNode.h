@@ -50,6 +50,12 @@ public:
                                           app::Clusters::DiagnosticLogs::IntentEnum intent, uint16_t timeout,
                                           jobject jCallbackObject);
 
+    // mFileDesignator spans into this object's own mFileDesignatorBuffer, so a copy would alias the
+    // source's. Forbid copying explicitly, pinning the invariant to the buffer rather than to the
+    // Callback members.
+    AndroidLogDownloadFromNode(const AndroidLogDownloadFromNode &)             = delete;
+    AndroidLogDownloadFromNode & operator=(const AndroidLogDownloadFromNode &) = delete;
+
 private:
     AndroidLogDownloadFromNode(DeviceController * controller, NodeId remoteNodeId, app::Clusters::DiagnosticLogs::IntentEnum intent,
                                uint16_t timeout, jobject javaCallback);

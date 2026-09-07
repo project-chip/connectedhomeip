@@ -36,17 +36,15 @@
 # === END CI TEST ARGUMENTS ===
 
 import copy
-import logging
-from typing import Type, Union
 
 from mobly import asserts  # type: ignore
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 ROOT_NODE_ENDPOINT_ID = 0
 UNIT_TESTING_ENDPOINT_ID = 1
@@ -57,13 +55,11 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
     async def get_dut_acl(self, ctrl):
         sub = await ctrl.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[(ROOT_NODE_ENDPOINT_ID, Clusters.AccessControl.Attributes.Acl)],
             fabricFiltered=True
         )
-        acl_list = sub[ROOT_NODE_ENDPOINT_ID][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
-
-        return acl_list
+        return sub[ROOT_NODE_ENDPOINT_ID][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
     async def write_acl(self, ctrl, acl):
         result = await ctrl.WriteAttribute(
@@ -90,9 +86,9 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.write_acl(self.TH1, self.dut_acl_original)
 
     @staticmethod
-    def verify_attribute_exists(res: Union[Clusters.Attribute.SubscriptionTransaction, dict],
-                                cluster:  Type[Clusters.ClusterObjects.Cluster],
-                                attribute: Type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
+    def verify_attribute_exists(res: Clusters.Attribute.SubscriptionTransaction | dict,
+                                cluster:  type[Clusters.ClusterObjects.Cluster],
+                                attribute: type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
                                 ep: int = ROOT_NODE_ENDPOINT_ID):
         '''
         This method can be used with the Response of Read Request and Subscribe Requests.
@@ -104,10 +100,9 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         else:
             attrs = res
 
-        asserts.assert_true(ep in attrs, "Must have read endpoint %s data" % ep)
-        asserts.assert_true(cluster in attrs[ep], "Must have read %s cluster data" % cluster.__name__)
-        asserts.assert_true(attribute in attrs[ep][cluster],
-                            "Must have read back attribute %s" % attribute.__name__)
+        asserts.assert_true(ep in attrs, f"Must have read endpoint {ep} data")
+        asserts.assert_true(cluster in attrs[ep], f"Must have read {cluster.__name__} cluster data")
+        asserts.assert_true(attribute in attrs[ep][cluster], f"Must have read back attribute {attribute.__name__}")
 
     @staticmethod
     def assert_event_exists(res, cluster, event, ep=ROOT_NODE_ENDPOINT_ID):
@@ -122,7 +117,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
                 and isinstance(e.Data, event)
                 for e in res_events
             ),
-            "Must have read back event %s at endpoint %s" % (event.__name__, ep)
+            f"Must have read back event {event.__name__} at endpoint {ep}"
         )
 
     @staticmethod
@@ -136,6 +131,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
+        super().setup_class()
 
         self.print_step("precondition", "Commissioning - already done")
 
@@ -172,7 +168,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.restore_acls_to_th1_only()
 
         read_step1a = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[AttrViewPrivilegePath],
         )
         asserts.assert_equal(Status.UnsupportedAccess,
@@ -191,17 +187,12 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
             subject=self.TH2_nodeid
         )
 
-        read_step1b = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[AttrViewPrivilegePath],
-        )
-
-        # Verify Valid Attribute was read
-        self.verify_attribute_exists(
-            res=read_step1b,
+        # read_single_attribute_check_success asserts existence and validates against subscription cache.
+        await self.read_single_attribute_check_success(
             cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.VendorID
-        )
+            attribute=Clusters.BasicInformation.Attributes.VendorID,
+            dev_ctrl=self.TH2,
+            endpoint=ROOT_NODE_ENDPOINT_ID)
 
         ####################### Step2: Attribute does not exist; View privilege required to read. ######################################################
         #
@@ -225,7 +216,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.restore_acls_to_th1_only()
 
         read_step2a = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=TestPaths,
         )
         asserts.assert_equal(Status.UnsupportedAccess,
@@ -249,7 +240,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step2_granted = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=TestPaths,
         )
 
@@ -279,7 +270,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.restore_acls_to_th1_only()
 
         read_step3a = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[AttrNeedsAdminAndItExistsPath],
         )
         asserts.assert_equal(Status.UnsupportedAccess,
@@ -299,7 +290,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step3b = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[AttrNeedsAdminAndItExistsPath],
         )
         asserts.assert_equal(Status.UnsupportedAccess,
@@ -320,7 +311,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step3c = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[AttrNeedsAdminAndItExistsPath],
         )
 
@@ -351,7 +342,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.restore_acls_to_th1_only()
 
         read_step4a = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=TestPaths,
         )
 
@@ -376,7 +367,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step4b = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=TestPaths,
         )
         asserts.assert_equal(Status.UnsupportedEndpoint,
@@ -400,7 +391,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step4c = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=TestPaths,
         )
 
@@ -428,7 +419,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.restore_acls_to_th1_only()
 
         read_step5a = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[AttrWriteOnlyExistsPath],
         )
         asserts.assert_equal(Status.UnsupportedAccess,
@@ -448,7 +439,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step5b = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[AttrWriteOnlyExistsPath],
         )
 
@@ -476,7 +467,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.restore_acls_to_th1_only()
 
         read_step1a = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[EventViewPrivilegePath],
         )
 
@@ -499,7 +490,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step1b = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[EventViewPrivilegePath],
         )
 
@@ -527,7 +518,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         UnsupportedClusterPath = (ROOT_NODE_ENDPOINT_ID + 1, basicInformationStartUpEvent)
 
         read_step2a = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[UnsupportedEndpointPath, UnsupportedClusterPath],
         )
 
@@ -550,7 +541,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step2b = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[UnsupportedEndpointPath, UnsupportedClusterPath],
         )
 
@@ -580,7 +571,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.restore_acls_to_th1_only()
 
         read_step3a = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[EventNeedsAdminAndItExistsPath],
         )
 
@@ -603,7 +594,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step3b = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[EventNeedsAdminAndItExistsPath],
         )
 
@@ -627,7 +618,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step3c = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[EventNeedsAdminAndItExistsPath],
         )
 
@@ -655,7 +646,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         UnsupportedClusterPath = (ROOT_NODE_ENDPOINT_ID + 1, aclChangedEvent)
 
         read_step4a = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[UnsupportedEndpointPath, UnsupportedClusterPath],
         )
 
@@ -678,7 +669,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step4b = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[UnsupportedEndpointPath, UnsupportedClusterPath],
         )
 
@@ -706,7 +697,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         read_step4c = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[UnsupportedEndpointPath, UnsupportedClusterPath],
         )
 
@@ -746,7 +737,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         with asserts.assert_raises(ChipStackError) as cm:
             await self.TH2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[validAclAttrPath],
                 keepSubscriptions=False,
                 reportInterval=(1, 5),
@@ -770,7 +761,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         with asserts.assert_raises(ChipStackError) as cm:
             await self.TH2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[UnsupportedClusterAclAttrPath],
                 keepSubscriptions=False,
                 reportInterval=(1, 5),
@@ -801,7 +792,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         with asserts.assert_raises(ChipStackError) as cm:
             await self.TH2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[UnsupportedClusterAclAttrPath],
                 keepSubscriptions=False,
                 reportInterval=(1, 5),
@@ -828,7 +819,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         with asserts.assert_raises(ChipStackError) as cm:
             await self.TH2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[validAclAttrPath,
                             UnsupportedEndpointAclAttrPath,
                             UnsupportedClusterAclAttrPath],
@@ -865,7 +856,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         sub_step5 = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[validBasicInformationVendorIDPath,
                         UnsupportedEndpointAclAttrPath,
                         UnsupportedClusterAclAttrPath],
@@ -913,7 +904,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         sub_step6 = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[validAclAttrPath,
                         UnsupportedEndpointAclAttrPath,
                         UnsupportedClusterAclAttrPath],
@@ -964,7 +955,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         with asserts.assert_raises(ChipStackError) as cm:
             await self.TH2.ReadEvent(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 events=[validAclEventPath,
                         unsupportedEndpointAclEventPath,
                         unsupportedClusterAclEventPath],
@@ -1002,7 +993,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         sub_step8 = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[validBasicInfoEventPath,
                     unsupportedEndpointAclEventPath,
                     unsupportedClusterAclEventPath],
@@ -1050,7 +1041,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
 
         sub_step9 = await self.TH2.ReadEvent(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             events=[validAclEventPath,
                     unsupportedEndpointAclEventPath,
                     unsupportedClusterAclEventPath],

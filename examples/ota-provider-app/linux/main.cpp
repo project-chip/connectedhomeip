@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "OtaProviderAppCommandDelegate.h"
 #include <app/clusters/ota-provider/CodegenIntegration.h>
 #include <app/clusters/ota-provider/DefaultOTAProviderUserConsent.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
@@ -57,8 +58,11 @@ constexpr uint16_t kOptionUserConsentState          = 'u';
 constexpr uint16_t kOptionIgnoreQueryImage          = 'x';
 constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
 constexpr uint16_t kOptionPollInterval              = 'P';
+// Long-only option (no short form): identifier chosen above the printable-char range.
+constexpr uint16_t kOptionPersistQueryImageStatus = 0x1000;
 
-OTAProviderExample gOtaProvider;
+NamedPipeCommands sChipNamedPipeCommands;
+OtaProviderAppCommandDelegate sOtaProviderAppCommandDelegate;
 chip::ota::DefaultOTAProviderUserConsent gUserConsentProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
@@ -75,6 +79,7 @@ static uint32_t gIgnoreQueryImageCount               = 0;
 static uint32_t gIgnoreApplyUpdateCount              = 0;
 static uint32_t gPollInterval                        = 0;
 static std::optional<uint16_t> gMaxBDXBlockSize      = std::nullopt;
+static bool gPersistQueryImageStatus                 = false;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -108,7 +113,7 @@ static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
     }
     else
     {
-        for (auto iter : devSofVerModValue)
+        for (const auto & iter : devSofVerModValue)
         {
             OTAProviderExample::DeviceSoftwareVersionModel candidate;
             candidate.vendorId        = static_cast<chip::VendorId>(iter.get("vendorId", 1).asUInt());
@@ -193,10 +198,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionIgnoreQueryImage:
-        gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionIgnoreApplyUpdate:
-        gIgnoreApplyUpdateCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gIgnoreApplyUpdateCount = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionUpdateAction:
         if (strcmp(aValue, "proceed") == 0)
@@ -218,10 +223,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionDelayedQueryActionTimeSec:
-        gDelayedQueryActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gDelayedQueryActionTimeSec = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionDelayedApplyActionTimeSec:
-        gDelayedApplyActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gDelayedApplyActionTimeSec = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionUserConsentState:
         if (strcmp(aValue, "granted") == 0)
@@ -246,10 +251,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gUserConsentNeeded = true;
         break;
     case kOptionPollInterval:
-        gPollInterval = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gPollInterval = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionMaxBDXBlockSize: {
-        auto blockSize = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
+        auto blockSize = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         if (blockSize == 0)
         {
             PrintArgError("%s: ERROR: Invalid maxBDXBlockSize parameter: %s\n", aProgram, aValue);
@@ -261,6 +266,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     }
+    case kOptionPersistQueryImageStatus:
+        gPersistQueryImageStatus = true;
+        break;
 
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -285,6 +293,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "ignoreApplyUpdate", chip::ArgParser::kArgumentRequired, kOptionIgnoreApplyUpdate },
     { "pollInterval", chip::ArgParser::kArgumentRequired, kOptionPollInterval },
     { "maxBDXBlockSize", chip::ArgParser::kArgumentRequired, kOptionMaxBDXBlockSize },
+    { "persistQueryImageStatus", chip::ArgParser::kNoArgument, kOptionPersistQueryImageStatus },
     {},
 };
 
@@ -328,7 +337,12 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -y, --ignoreApplyUpdate <ignore count>\n"
                              "        The number of times to ignore the ApplyUpdateRequest Command and not send a response.\n"
                              "  -P, --pollInterval <time in milliseconds>\n"
-                             "        Poll interval for the BDX transfer \n" };
+                             "        Poll interval for the BDX transfer \n"
+                             "  --persistQueryImageStatus\n"
+                             "        If supplied, the value of --queryImageStatus (and its DelayedActionTime) is\n"
+                             "        used for EVERY QueryImageResponse instead of reverting to updateAvailable after\n"
+                             "        the first response. Lets busy/updateNotAvailable be served on all queries\n"
+                             "        without restarting the provider.\n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
@@ -336,7 +350,7 @@ void ApplicationInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    BdxOtaSender * bdxOtaSender = gOtaProvider.GetBdxOtaSender();
+    BdxOtaSender * bdxOtaSender = GetOtaProviderExample().GetBdxOtaSender();
     VerifyOrReturn(bdxOtaSender != nullptr);
     err = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
                                                                                                         bdxOtaSender);
@@ -350,40 +364,41 @@ void ApplicationInit()
 
     if (gOtaFilepath != nullptr)
     {
-        gOtaProvider.SetOTAFilePath(gOtaFilepath);
+        GetOtaProviderExample().SetOTAFilePath(gOtaFilepath);
     }
 
     if (gImageUri != nullptr)
     {
-        gOtaProvider.SetImageUri(gImageUri);
+        GetOtaProviderExample().SetImageUri(gImageUri);
     }
 
-    gOtaProvider.SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
-    gOtaProvider.SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
-    gOtaProvider.SetQueryImageStatus(gQueryImageStatus);
-    gOtaProvider.SetApplyUpdateAction(gOptionUpdateAction);
-    gOtaProvider.SetDelayedQueryActionTimeSec(gDelayedQueryActionTimeSec);
-    gOtaProvider.SetDelayedApplyActionTimeSec(gDelayedApplyActionTimeSec);
+    GetOtaProviderExample().SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
+    GetOtaProviderExample().SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
+    GetOtaProviderExample().SetQueryImageStatus(gQueryImageStatus);
+    GetOtaProviderExample().SetPersistQueryImageStatus(gPersistQueryImageStatus);
+    GetOtaProviderExample().SetApplyUpdateAction(gOptionUpdateAction);
+    GetOtaProviderExample().SetDelayedQueryActionTimeSec(gDelayedQueryActionTimeSec);
+    GetOtaProviderExample().SetDelayedApplyActionTimeSec(gDelayedApplyActionTimeSec);
 
     if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
     {
         gUserConsentProvider.SetGlobalUserConsentState(gUserConsentState);
-        gOtaProvider.SetUserConsentDelegate(&gUserConsentProvider);
+        GetOtaProviderExample().SetUserConsentDelegate(&gUserConsentProvider);
     }
 
     if (gUserConsentNeeded)
     {
-        gOtaProvider.SetUserConsentNeeded(true);
+        GetOtaProviderExample().SetUserConsentNeeded(true);
     }
 
     if (gPollInterval != 0)
     {
-        gOtaProvider.SetPollInterval(gPollInterval);
+        GetOtaProviderExample().SetPollInterval(gPollInterval);
     }
 
     if (gMaxBDXBlockSize)
     {
-        gOtaProvider.SetMaxBDXBlockSize(*gMaxBDXBlockSize);
+        GetOtaProviderExample().SetMaxBDXBlockSize(*gMaxBDXBlockSize);
     }
 
     ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
@@ -393,7 +408,7 @@ void ApplicationInit()
         // Parse JSON file and load the ota candidates
         std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates;
         ParseJsonFileAndPopulateCandidates(gOtaImageListFilepath, candidates);
-        gOtaProvider.SetOTACandidates(candidates);
+        GetOtaProviderExample().SetOTACandidates(candidates);
     }
 
     if ((gOtaFilepath == nullptr) && (gOtaImageListFilepath == nullptr))
@@ -402,14 +417,54 @@ void ApplicationInit()
         chipDie();
     }
 
-    chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
+    chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &GetOtaProviderExample());
+
+    std::string path     = LinuxDeviceOptions::GetInstance().app_pipe;
+    std::string path_out = LinuxDeviceOptions::GetInstance().app_pipe_out;
+
+    if ((!path.empty()) and (!path_out.empty()) and
+        (sChipNamedPipeCommands.Start(path, path_out, &sOtaProviderAppCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
+        LogErrorOnFailure(sChipNamedPipeCommands.Stop());
+    }
+    else
+    {
+        sOtaProviderAppCommandDelegate.SetPipes(&sChipNamedPipeCommands);
+    }
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    SuccessOrDie(sChipNamedPipeCommands.Stop());
+}
+
+namespace {
+class OtaProviderAppMainLoopImplementation : public AppMainLoopImplementation
+{
+public:
+    void RunMainLoop() override { chip::DeviceLayer::PlatformMgr().RunEventLoop(); }
+    void SignalSafeStopMainLoop() override
+    {
+        CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
+            ChipLogDetail(SoftwareUpdate, "Scheduling BdxOtaSender to ABORT TRANSFER");
+
+            GetOtaProviderExample().GetBdxOtaSender()->AbortTransfer();
+
+            SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
+        });
+        SuccessOrDie(err);
+
+        chip::Server::GetInstance().GenerateShutDownEvent();
+    }
+};
+} // namespace
 
 int main(int argc, char * argv[])
 {
+    OtaProviderAppMainLoopImplementation ml_impl{};
+
     VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
-    ChipLinuxAppMainLoop();
+    ChipLinuxAppMainLoop(&ml_impl);
     return 0;
 }

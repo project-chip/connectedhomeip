@@ -23,6 +23,10 @@ namespace FabricRestrictionReviewUpdate {
 inline constexpr EventId Id = 0x00000002;
 } // namespace FabricRestrictionReviewUpdate
 
+namespace AuxiliaryAccessUpdated {
+inline constexpr EventId Id = 0x00000003;
+} // namespace AuxiliaryAccessUpdated
+
 } // namespace Events
 } // namespace AccessControl
 } // namespace Clusters

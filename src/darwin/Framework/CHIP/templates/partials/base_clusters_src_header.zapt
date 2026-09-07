@@ -1,0 +1,48 @@
+{{> header excludeZapComment=true}}
+
+#import <Foundation/Foundation.h>
+
+#import "{{#if baseClusterHeader}}{{baseClusterHeader}}{{else}}MTRBaseClusters_Internal.h{{/if}}"
+#import "MTRBaseDevice_Internal.h"
+#import "MTRCallbackBridgeBase.h"
+#import "MTRCluster_Internal.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
+#import "MTRCommandPayloadsObjc.h"
+#import "MTRDevice_Internal.h"
+#import "MTRLogging_Internal.h"
+#import "MTRStructsObjc.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
+#import "MTRDefines_Internal.h"
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/im-client-callbacks.h>
+#include <controller/CHIPCluster.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#include <type_traits>
+
+using chip::Callback::Callback;
+using chip::Callback::Cancelable;
+using namespace chip::app::Clusters;
+using chip::Messaging::ExchangeManager;
+using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
+
+typedef void (*DefaultSuccessCallbackType)(void *);
+
+class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback>
+{
+public:
+    MTRDefaultSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<DefaultSuccessCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context) {
+        DispatchSuccess(context, nil);
+    }
+};
+
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.

@@ -30,9 +30,6 @@
 
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 
-extern "C" {
-#include "addons_cli.h"
-}
 #endif
 
 #define MATTER_CLI_LOG(message) (chip::Shell::streamer_printf(chip::Shell::streamer_get(), message))
@@ -96,9 +93,6 @@ void chip::Zephyr::App::AppCLIZephyr::RegisterDefaultCommands(void)
 #if CHIP_ENABLE_OPENTHREAD
     cmd_otcli_init();
 #endif // CHIP_ENABLE_OPENTHREAD
-#if (CHIP_ENABLE_OPENTHREAD)
-    otAppCliAddonsInit(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance());
-#endif
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif /* CHIP_SHELL_ENABLE_CMD_SERVER */

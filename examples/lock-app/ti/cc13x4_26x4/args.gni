@@ -39,7 +39,7 @@ chip_openthread_ftd = true
 #NOTE: LwIP is no longer supported, these options must stay the same
 chip_system_config_use_openthread_inet_endpoints = true
 chip_with_lwip = false
-chip_enable_openthread = true
+chip_enable_thread = true
 chip_inet_config_enable_tcp_endpoint = false
 
 ot_ti_lib_dir = ""

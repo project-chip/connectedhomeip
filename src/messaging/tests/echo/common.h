@@ -33,7 +33,7 @@
 
 inline constexpr size_t kMaxTcpActiveConnectionCount = 4;
 inline constexpr size_t kMaxTcpPendingPackets        = 4;
-inline constexpr size_t kNetworkSleepTimeMsecs       = (100 * 1000);
+inline constexpr size_t kNetworkSleepTimeMsecs       = (static_cast<size_t>(100) * 1000);
 
 extern chip::FabricTable gFabricTable;
 extern chip::SessionManager gSessionManager;

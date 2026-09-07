@@ -78,6 +78,11 @@ void ScriptDevicePairingDelegate::SetCommissioningStatusUpdateCallback(
     mOnCommissioningStatusUpdateCallback = callback;
 }
 
+void ScriptDevicePairingDelegate::SetCommissioningStageStartCallback(DevicePairingDelegate_OnCommissioningStageStartFunct callback)
+{
+    mOnCommissioningStageStartCallback = callback;
+}
+
 void ScriptDevicePairingDelegate::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     switch (status)
@@ -141,6 +146,19 @@ void ScriptDevicePairingDelegate::OnCommissioningStatusUpdate(PeerId peerId, Com
     }
 }
 
+void ScriptDevicePairingDelegate::OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting)
+{
+    ChipLogProgress(Zcl, "ScriptDevicePairingDelegate::OnCommissioningStageStart");
+
+    ChipLogProgress(Zcl, "nodeId=" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    ChipLogProgress(Zcl, "stageStarting=%s (%d)", StageToString(stageStarting), stageStarting);
+
+    if (mOnCommissioningStageStartCallback != nullptr)
+    {
+        mOnCommissioningStageStartCallback(peerId.GetNodeId(), StageToString(stageStarting));
+    }
+}
+
 void ScriptDevicePairingDelegate::OnOpenCommissioningWindow(NodeId deviceId, CHIP_ERROR status, SetupPayload payload)
 {
     if (mOnWindowOpenCompleteCallback != nullptr)
@@ -148,8 +166,8 @@ void ScriptDevicePairingDelegate::OnOpenCommissioningWindow(NodeId deviceId, CHI
         std::string setupManualCode;
         std::string setupQRCode;
 
-        ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(setupManualCode);
-        QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(setupQRCode);
+        TEMPORARY_RETURN_IGNORED ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(setupManualCode);
+        TEMPORARY_RETURN_IGNORED QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(setupQRCode);
         ChipLogProgress(Zcl, "SetupManualCode = %s", setupManualCode.c_str());
         ChipLogProgress(Zcl, "SetupQRCode = %s", setupQRCode.c_str());
         mOnWindowOpenCompleteCallback(deviceId, payload.setUpPINCode, setupManualCode.c_str(), setupQRCode.c_str(),

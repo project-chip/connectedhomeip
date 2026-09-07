@@ -1,0 +1,80 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <app/clusters/descriptor/DescriptorCluster.h>
+#include <app/util/basic-types.h>
+#include <clusters/Descriptor/Structs.h>
+#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
+#include <device/api/Interface.h>
+
+#include <string>
+
+namespace chip::app {
+
+/// A device is a entity that maintains some cluster functionality.
+///
+/// This implementation assumes that a device is registered on a single
+/// endpoint.
+class SingleEndpoint : public DeviceInterface
+{
+public:
+    virtual ~SingleEndpoint() = default;
+
+    /// Implements DeviceInterface::Register by allocating an endpoint via allocator.
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override
+    {
+        return Register(allocator.Allocate(), provider, composition);
+    }
+
+    EndpointId GetEndpointId() const { return mEndpointId; }
+
+    /// Subclasses implement this to perform single-endpoint registration on a specific endpoint ID.
+    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                EndpointComposition composition = {}) = 0;
+
+protected:
+    /// The caller creating a SingleEndpoint MUST ensure that the underlying data for the Span of
+    /// deviceTypes remains valid for the entire lifetime of the SingleEndpoint object instance.
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry> deviceTypes) : DeviceInterface(deviceTypes) {}
+
+    /// Internal registration function for common device clusters and endpoint registration.
+    /// Device subclasses are expected to, and must only call this as part of their own device specific Register()
+    /// functions. This allows creation of common and device-specific clusters to be done together and
+    /// also to complete endpoint registration.
+    CHIP_ERROR RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                  EndpointComposition composition = {}) override;
+
+    /// make this visible to not have the overload below error out. Should not be used directly.
+    using DeviceInterface::UnregisterDescriptor;
+
+    /// Internal function to unregister a single endpoint device. This will destroy the clusters part of
+    /// this class, and must be called in a subclass' device-specific Unregister() function. This allows
+    /// for the destruction of the general SingleEndpoint clusters and device-specific clusters from
+    /// the subclass, as well as removal of the device endpoint from the provider to happen together.
+    void UnregisterDescriptor(CodeDrivenDataModelProvider & provider);
+
+    /// A default value of kInvalidEndpointId is used for the endpoint ID. When this is the value of the endpoint ID,
+    /// it signifies that endpoint registration (and cluster creation) has not yet been completed. The endpoint
+    /// ID will be set after a call to RegisterDescriptor() has been made.
+    EndpointId mEndpointId = kInvalidEndpointId;
+};
+
+} // namespace chip::app

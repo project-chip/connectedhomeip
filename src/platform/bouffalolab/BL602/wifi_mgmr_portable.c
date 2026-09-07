@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <lwip/tcpip.h>
+
 #include <FreeRTOS.h>
 #include <aos/yloop.h>
 #include <bl60x_wifi_driver/wifi_mgmr.h>
@@ -17,6 +19,7 @@
 #include <wpa_supplicant/src/common/wpa_common.h>
 #include <wpa_supplicant/src/rsn_supp/wpa_i.h>
 
+#include <hal_wifi.h>
 #include <wifi_mgmr_portable.h>
 
 extern struct wpa_sm gWpaSm;
@@ -52,7 +55,7 @@ int wifi_mgmr_get_scan_ap_num(void)
     return count;
 }
 
-void wifi_mgmr_get_scan_result(wifi_mgmr_ap_item_t * result, int * num, uint8_t scan_type, char * ssid)
+void wifi_mgmr_get_scan_result(wifi_mgmr_ap_item_t * result, int * num, int ssid_len, char * ssid)
 {
     int i, count, iter;
 
@@ -63,9 +66,10 @@ void wifi_mgmr_get_scan_result(wifi_mgmr_ap_item_t * result, int * num, uint8_t 
     {
         if (wifiMgmr.scan_items[i].is_used && (!wifi_mgmr_scan_item_is_timeout(&wifiMgmr, &wifiMgmr.scan_items[i])))
         {
-            if (scan_type)
+            if (ssid_len)
             {
-                if (memcmp(ssid, wifiMgmr.scan_items[i].ssid, wifiMgmr.scan_items[i].ssid_len) != 0)
+                if (wifiMgmr.scan_items[i].ssid_len != ssid_len ||
+                    memcmp(ssid, wifiMgmr.scan_items[i].ssid, wifiMgmr.scan_items[i].ssid_len) != 0)
                 {
                     continue;
                 }
@@ -83,31 +87,6 @@ void wifi_mgmr_get_scan_result(wifi_mgmr_ap_item_t * result, int * num, uint8_t 
     }
 
     *num = iter;
-}
-
-int wifi_mgmr_get_scan_result_filter(wifi_mgmr_ap_item_t * result, char * ssid)
-{
-    int i, count;
-
-    count = sizeof(wifiMgmr.scan_items) / sizeof(wifiMgmr.scan_items[0]);
-    for (i = 0; i < count; i++)
-    {
-        if (wifiMgmr.scan_items[i].is_used && (!wifi_mgmr_scan_item_is_timeout(&wifiMgmr, &wifiMgmr.scan_items[i])) &&
-            !strncmp(ssid, wifiMgmr.scan_items[i].ssid, wifiMgmr.scan_items[i].ssid_len))
-        {
-            memcpy(result->ssid, wifiMgmr.scan_items[i].ssid, wifiMgmr.scan_items[i].ssid_len);
-            result->ssid[wifiMgmr.scan_items[i].ssid_len] = 0;
-            result->ssid_tail[0]                          = 0;
-            result->ssid_len                              = wifiMgmr.scan_items[i].ssid_len;
-            memcpy(result->bssid, wifiMgmr.scan_items[i].bssid, 6);
-            result->channel = wifiMgmr.scan_items[i].channel;
-            result->auth    = wifiMgmr.scan_items[i].auth;
-            result->rssi    = wifiMgmr.scan_items[i].rssi;
-            return 0;
-        }
-    }
-
-    return -1;
 }
 
 int wifi_mgmr_profile_ssid_get(uint8_t * ssid)
@@ -163,17 +142,19 @@ static void wifi_event_handler_raw(input_event_t * event, void * private_data)
     wifi_event_handler(event->code);
 }
 
+err_t dhcp_server_stop(struct netif * netif)
+{
+    return 0;
+}
+void dhcpd_start(struct netif * netif, int start, int limit) {}
+
 void wifi_start_firmware_task(void)
 {
-#define WIFI_STACK_SIZE 1552
-    static StackType_t wifi_fw_stack[WIFI_STACK_SIZE];
-    static StaticTask_t wifi_fw_task;
+    LOCK_TCPIP_CORE();
+    netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);
+    UNLOCK_TCPIP_CORE();
 
     aos_register_event_filter(EV_WIFI, wifi_event_handler_raw, NULL);
-    netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);
-
-    bl_pm_init();
-    xTaskCreateStatic(wifi_main, (char *) "fw", WIFI_STACK_SIZE, NULL, 30, wifi_fw_stack, &wifi_fw_task);
-
+    hal_wifi_start_firmware_task();
     aos_post_event(EV_WIFI, CODE_WIFI_ON_INIT_DONE, 0);
 }

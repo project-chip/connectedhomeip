@@ -50,7 +50,7 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     encoder.Encode(to_underlying(Fields::kPort), port);
     encoder.Encode(to_underlying(Fields::kCaid), caid);
     encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
-    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kReferenceCount), referenceCount);
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -89,9 +89,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ccdid);
         }
-        else if (__context_tag == to_underlying(Fields::kStatus))
+        else if (__context_tag == to_underlying(Fields::kReferenceCount))
         {
-            err = DataModel::Decode(reader, status);
+            err = DataModel::Decode(reader, referenceCount);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {

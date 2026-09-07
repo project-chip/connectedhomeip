@@ -35,6 +35,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
@@ -60,10 +61,10 @@ class TestClusterCommandHandler : public chip::app::CommandHandlerInterface
 public:
     TestClusterCommandHandler() : chip::app::CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
-        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+        EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     }
 
-    ~TestClusterCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+    ~TestClusterCommandHandler() { EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this)); }
 
     void OverrideAcceptedCommands() { mOverrideAcceptedCommands = true; }
     void ClaimNoCommands() { mClaimNoCommands = true; }
@@ -101,8 +102,6 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
 
                 ctx.mCommandHandler.AddResponse(ctx.mRequestPath, dataResponse);
             }
-
-            return CHIP_NO_ERROR;
         });
 }
 
@@ -156,7 +155,7 @@ protected:
     void InitDataModelForTesting() override {}
 };
 
-class TestServerCommandDispatch : public chip::Test::AppContext
+class TestServerCommandDispatch : public chip::Testing::AppContext
 {
 public:
     void SetUp()
@@ -210,8 +209,8 @@ TEST_F(TestServerCommandDispatch, TestNoHandler)
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -284,7 +283,7 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     // All our endpoints have the same number of clusters, so just pick one.
     //
     DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters1)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, aEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, aEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -315,8 +314,8 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -353,8 +352,8 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
         ChipLogError(NotSpecified, "TEST FAILURE: %" CHIP_ERROR_FORMAT, aError.Format());
     };
 
-    chip::Controller::ReadAttribute<Clusters::UnitTesting::Attributes::AcceptedCommandList::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, readSuccessCb, readFailureCb);
+    EXPECT_SUCCESS(chip::Controller::ReadAttribute<Clusters::UnitTesting::Attributes::AcceptedCommandList::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, readSuccessCb, readFailureCb));
 
     DrainAndServiceIO();
 

@@ -20,7 +20,7 @@
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <stdlib.h>
 
@@ -440,6 +440,9 @@ protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
                                             const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
 
+    // Defaults to true for now. Should be set to false after a notification period.
+    // https://github.com/project-chip/connectedhomeip/issues/42460 to track.
+    static constexpr bool kEnableCdTestKeysForProvisionalCds = true;
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;

@@ -89,11 +89,11 @@ void AttributeValueEncoder::EnsureListEnded()
     // fails, because that would mean that we've corrupted our data, and since
     // mEncodeState.mAllowPartialData is true nothing will clean up for us here.
     auto * attributeDataWriter = mAttributeReportIBsBuilder.GetAttributeReport().GetAttributeData().GetWriter();
-    VerifyOrDie(attributeDataWriter->UnreserveBuffer(kEndOfListByteCount + kEndOfAttributeReportIBByteCount) == CHIP_NO_ERROR);
-    VerifyOrDie(attributeDataWriter->EndContainer(kAttributeDataIBType) == CHIP_NO_ERROR);
+    SuccessOrDie(attributeDataWriter->UnreserveBuffer(kEndOfListByteCount + kEndOfAttributeReportIBByteCount));
+    SuccessOrDie(attributeDataWriter->EndContainer(kAttributeDataIBType));
 
     AttributeReportBuilder builder;
-    VerifyOrDie(builder.FinishAttribute(mAttributeReportIBsBuilder) == CHIP_NO_ERROR);
+    SuccessOrDie(builder.FinishAttribute(mAttributeReportIBsBuilder));
 
     if (!mEncodedAtLeastOneListItem)
     {

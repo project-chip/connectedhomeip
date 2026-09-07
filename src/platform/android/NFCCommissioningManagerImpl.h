@@ -25,7 +25,7 @@
 
 #include <jni.h>
 
-#include <nfc/NfcApplicationDelegate.h>
+#include <transport/raw/NfcApplicationDelegate.h>
 
 #include <platform/internal/NFCCommissioningManager.h>
 
@@ -63,6 +63,8 @@ private:
 
     CHIP_ERROR _Init();
     void _Shutdown();
+    Nfc::NFCReaderTransport * _GetNFCReaderTransport() const { return nullptr; }
+    void _SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport) {}
 
     // ===== Members for internal use by the following friends.
 

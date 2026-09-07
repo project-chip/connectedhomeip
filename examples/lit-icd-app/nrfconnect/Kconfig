@@ -24,7 +24,7 @@ config STATE_LEDS
 	  'n' does not disable the LED indicating the state of the simulated bolt.
 
 # Sample configuration used for Thread networking
-if NET_L2_OPENTHREAD
+if OPENTHREAD
 
 choice OPENTHREAD_NORDIC_LIBRARY_CONFIGURATION
 	default OPENTHREAD_NORDIC_LIBRARY_MTD
@@ -34,7 +34,7 @@ choice OPENTHREAD_DEVICE_TYPE
 	default OPENTHREAD_MTD
 endchoice
 
-endif # NET_L2_OPENTHREAD
+endif # OPENTHREAD
 
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"

@@ -29,8 +29,8 @@ class Object;
 class PlatformEventing
 {
 public:
-    static CHIP_ERROR ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge);
-    static CHIP_ERROR StartTimer(System::Layer & aLayer, System::Clock::Timeout aTimeout);
+    static CriticalFailure ScheduleLambdaBridge(System::Layer & aLayer, LambdaBridge && bridge);
+    static CriticalFailure StartTimer(System::Layer & aLayer, System::Clock::Timeout aTimeout);
 };
 
 } // namespace System

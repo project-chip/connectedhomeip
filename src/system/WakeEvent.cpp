@@ -23,7 +23,7 @@
 
 #include <system/SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
 #include <system/WakeEvent.h>
 
@@ -58,7 +58,7 @@ inline int SetNonBlockingMode(int fd)
 }
 } // anonymous namespace
 
-CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
+CHIP_ERROR WakeEvent::Open()
 {
     enum
     {
@@ -79,16 +79,11 @@ CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
     mReadFD  = fds[FD_READ];
     mWriteFD = fds[FD_WRITE];
 
-    ReturnErrorOnFailure(systemLayer.StartWatchingSocket(mReadFD, &mReadWatch));
-    ReturnErrorOnFailure(systemLayer.SetCallback(mReadWatch, Confirm, reinterpret_cast<intptr_t>(this)));
-    ReturnErrorOnFailure(systemLayer.RequestCallbackOnPendingRead(mReadWatch));
-
     return CHIP_NO_ERROR;
 }
 
-void WakeEvent::Close(LayerSockets & systemLayer)
+void WakeEvent::Close()
 {
-    systemLayer.StopWatchingSocket(&mReadWatch);
     VerifyOrDie(::close(mReadFD) == 0);
     VerifyOrDie(::close(mWriteFD) == 0);
     mReadFD  = -1;
@@ -162,7 +157,7 @@ ssize_t WriteEvent(int eventFd)
 
 } // namespace
 
-CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
+CHIP_ERROR WakeEvent::Open()
 {
     mReadFD = ::eventfd(0, 0);
     if (mReadFD == -1)
@@ -170,16 +165,11 @@ CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
         return CHIP_ERROR_POSIX(errno);
     }
 
-    ReturnErrorOnFailure(systemLayer.StartWatchingSocket(mReadFD, &mReadWatch));
-    ReturnErrorOnFailure(systemLayer.SetCallback(mReadWatch, Confirm, reinterpret_cast<intptr_t>(this)));
-    ReturnErrorOnFailure(systemLayer.RequestCallbackOnPendingRead(mReadWatch));
-
     return CHIP_NO_ERROR;
 }
 
-void WakeEvent::Close(LayerSockets & systemLayer)
+void WakeEvent::Close()
 {
-    systemLayer.StopWatchingSocket(&mReadWatch);
     VerifyOrDie(::close(mReadFD) == 0);
     mReadFD = -1;
 }
@@ -207,4 +197,4 @@ CHIP_ERROR WakeEvent::Notify() const
 } // namespace System
 } // namespace chip
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV

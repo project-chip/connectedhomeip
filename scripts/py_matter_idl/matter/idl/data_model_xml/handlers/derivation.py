@@ -13,16 +13,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
 import dataclasses
 import logging
-from typing import Iterable, Optional, Protocol, TypeVar
+from collections.abc import Iterable
+from typing import Protocol, TypeVar
 
 from matter.idl.matter_idl_types import Attribute, AttributeQuality, Bitmap, Cluster, Command, Enum, Event, Idl, Struct
 
 from .context import Context, IdlPostProcessor
 from .parsing import NormalizeName
 
-LOGGER = logging.getLogger('data-model-xml-data-parsing')
+LOGGER = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
@@ -34,7 +36,7 @@ class HasName(Protocol):
 NAMED = TypeVar('NAMED', bound=HasName)
 
 
-def get_item_with_name(items: Iterable[NAMED], name: str) -> Optional[NAMED]:
+def get_item_with_name(items: Iterable[NAMED], name: str) -> NAMED | None:
     """Find an item with the given name.
 
     Returns none if that item does not exist
@@ -85,7 +87,7 @@ def merge_attribute_into(a: Attribute, cluster: Cluster):
     """Pushes an attribute from a base cluster into an already
        parsed cluster.
     """
-    existing: Optional[Attribute] = None
+    existing: Attribute | None = None
     for existing_a in cluster.attributes:
         if existing_a.definition.name == a.definition.name:
             existing = existing_a
@@ -169,7 +171,7 @@ class AddBaseInfoPostProcessor(IdlPostProcessor):
     def FinalizeProcessing(self, idl: Idl):
         # attempt to find the base. It may be in the "names without ID" however it may also be inside
         # existing clusters (e.g. Basic Information)
-        base: Optional[Cluster] = None
+        base: Cluster | None = None
         if self.source_name in self.context.abstract_base_clusters:
             base = self.context.abstract_base_clusters[self.source_name]
         else:

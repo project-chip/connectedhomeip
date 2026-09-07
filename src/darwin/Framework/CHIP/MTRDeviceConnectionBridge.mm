@@ -38,3 +38,19 @@ void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, const chip::
     object->mCompletionHandler(nil, chip::NullOptional, [MTRError errorForCHIPErrorCode:failureInfo.error], retryDelay);
     object->Release();
 }
+
+void MTRDeviceConnectionBridge::Connect(chip::Controller::DeviceController * controller, chip::NodeId deviceID, MTRSessionParameters parameters)
+{
+    chip::TransportPayloadCapability transportPayloadCapability;
+    if (parameters & MTRSessionParametersSupportsLargePayloads) {
+        transportPayloadCapability = chip::TransportPayloadCapability::kLargePayload;
+    } else {
+        transportPayloadCapability = chip::TransportPayloadCapability::kMRPPayload;
+    }
+
+    CHIP_ERROR err = controller->GetConnectedDevice(deviceID, &mOnConnected, &mOnConnectFailed, transportPayloadCapability);
+    if (err != CHIP_NO_ERROR) {
+        mCompletionHandler(nil, chip::NullOptional, [MTRError errorForCHIPErrorCode:err], nil);
+        Release();
+    }
+}

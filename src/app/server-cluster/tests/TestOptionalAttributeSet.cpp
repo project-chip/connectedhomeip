@@ -85,5 +85,41 @@ TEST(TestOptionalAttributeSet, TestEmptyOptionalAttributeSet)
     // supported.Set<2>();
 }
 
+TEST(TestOptionalAttributeSet, TestBitInitAndRestrictions)
+{
+    {
+        using Supported = OptionalAttributeSet<>;
+        Supported supported(0xFF);
+
+        // No bits can be set because no bits are supported
+        EXPECT_FALSE(supported.IsSet(1));
+        EXPECT_FALSE(supported.IsSet(2));
+    }
+
+    {
+        using Supported = OptionalAttributeSet<1>;
+        Supported supported(0xFF);
+
+        // Only bit 1 can be set
+        EXPECT_TRUE(supported.IsSet(1));
+        EXPECT_FALSE(supported.IsSet(2));
+    }
+
+    {
+        using Supported = OptionalAttributeSet<1, 3, 5>;
+        Supported supported(0x9);
+
+        // Only bits 1, 3, and 5 can be set. However, the constructor
+        // explicitly sets 0xD == 0b1101, so bit 3 is set (and bit 2
+        // and bit 0 are not allowed to be set).
+        EXPECT_FALSE(supported.IsSet(0));
+        EXPECT_FALSE(supported.IsSet(1));
+        EXPECT_FALSE(supported.IsSet(2));
+        EXPECT_TRUE(supported.IsSet(3));
+        EXPECT_FALSE(supported.IsSet(4));
+        EXPECT_FALSE(supported.IsSet(5));
+    }
+}
+
 } // namespace
 } // namespace chip::app

@@ -96,6 +96,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
+    if (!AmebaConfig::ConfigValueExists(AmebaConfig::kConfigKey_ConfigurationVersion))
+    {
+        ReturnErrorOnFailure(StoreConfigurationVersion(1));
+    }
+
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<AmebaConfig>::Init();
     SuccessOrExit(err);
@@ -151,6 +156,16 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     return err;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetConfigurationVersion(uint32_t & configurationVersion)
+{
+    return ReadConfigValue(AmebaConfig::kConfigKey_ConfigurationVersion, configurationVersion);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreConfigurationVersion(uint32_t configurationVersion)
+{
+    return WriteConfigValue(AmebaConfig::kConfigKey_ConfigurationVersion, configurationVersion);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     CHIP_ERROR err;
@@ -192,7 +207,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)

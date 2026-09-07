@@ -26,7 +26,10 @@
 
 #pragma once
 
-#include <app/util/attribute-storage.h>
+#include <cstddef>
+#include <cstdint>
+
+#include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace app {
@@ -40,10 +43,15 @@ static constexpr size_t kPresetNameSize = 64;
 struct PresetStructWithOwnedMembers : protected Structs::PresetStruct::Type
 {
 public:
-    PresetStructWithOwnedMembers() = default;
+    PresetStructWithOwnedMembers()  = default;
+    ~PresetStructWithOwnedMembers() = default;
+    PresetStructWithOwnedMembers(const PresetStructWithOwnedMembers & other);
     PresetStructWithOwnedMembers(const Structs::PresetStruct::Type & other);
+    PresetStructWithOwnedMembers(PresetStructWithOwnedMembers && other);
+
     PresetStructWithOwnedMembers & operator=(const Structs::PresetStruct::Type & other);
     PresetStructWithOwnedMembers & operator=(const PresetStructWithOwnedMembers & other);
+    PresetStructWithOwnedMembers & operator=(PresetStructWithOwnedMembers && other);
 
     void SetPresetScenario(PresetScenarioEnum enumValue);
     CHIP_ERROR SetPresetHandle(const DataModel::Nullable<ByteSpan> & newPresetHandle);

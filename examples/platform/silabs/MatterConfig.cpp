@@ -18,32 +18,36 @@
  */
 
 #include "AppConfig.h"
+#if !defined(SL_MATTER_CUSTOM_APPTASK) || !SL_MATTER_CUSTOM_APPTASK
 #include "BaseApplication.h"
+#endif // !SL_MATTER_CUSTOM_APPTASK
 #include <MatterConfig.h>
 #include <cmsis_os2.h>
 
 #include <mbedtls/platform.h>
 
-#ifdef SL_WIFI
-#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
-#include <platform/silabs/wifi/WifiInterface.h>
-
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
-#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+#include "sl_sleeptimer.h"
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
 
-// TODO: We shouldn't need any platform specific includes in this file
-#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
-#include <platform/silabs/SiWx917/SiWxPlatformInterface.h>
-#endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
-#endif // SL_WIFI
+#include "em_burtc.h"
+#include "em_cmu.h"
+#include "em_emu.h"
+#endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-#if PW_RPC_ENABLED
-#include "Rpc.h"
+#include <sl_component_catalog.h>
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+#include <sl_watchdog_manager.h>
+#endif // SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
+#include "pigweed_rpc/Rpc.h"
 #endif
 
 #ifdef ENABLE_CHIP_SHELL
-#include "MatterShell.h"
+#include "shell/MatterShell.h"
 #endif
 
 #ifdef HEAP_MONITORING
@@ -59,9 +63,11 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include <app/InteractionModelEngine.h>
-#include <app/TimerDelegates.h>
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <data-model-providers/codegen/Instance.h>
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <headers/ProvisionManager.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include "SilabsTestEventTriggerDelegate.h" // nogncheck
@@ -79,6 +85,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <performance_test_commands.h>
 #endif
 
+#if SILABS_LOG_OUT_UART
+#include "uart.h"
+#endif // SILABS_LOG_OUT_UART
+
 #include <AppTask.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -86,8 +96,9 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <app/clusters/network-commissioning/network-commissioning.h>
-
+#endif
 /**********************************************************
  * Defines
  *********************************************************/
@@ -100,7 +111,17 @@ using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
 
 #ifdef SL_WIFI
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::SlWiFiDriver> sWifiNetworkDriver(kRootEndpointId);
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #endif /* SL_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -116,9 +137,11 @@ Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::SlWiFiDr
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 
 Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(kRootEndpointId);
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 // ================================================================================
 // Matter Networking Callbacks
 // ================================================================================
@@ -137,7 +160,7 @@ void UnlockOpenThreadTask(void)
 // ================================================================================
 CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 {
-    ChipLogProgress(DeviceLayer, "Initializing OpenThread stack");
+
     ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
@@ -154,9 +177,10 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
 
-    sThreadNetworkDriver.Init();
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
+#endif
 
-    ChipLogProgress(DeviceLayer, "Starting OpenThread task");
     return ThreadStackMgrImpl().StartThreadTask();
 }
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -171,12 +195,7 @@ constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
                                            .cb_size    = 0U,
                                            .stack_mem  = NULL,
                                            .stack_size = kMainTaskStackSize,
-#ifdef SLI_SI91X_MCU_INTERFACE
-                                           .priority = osPriorityRealtime4
-#else
-                                           .priority = osPriorityRealtime5 // Must be above BLE Link Layer priority
-#endif // SLI_SI91X_MCU_INTERFACE
-};
+                                           .priority   = osPriorityRealtime7 };
 osThreadId_t sMainTaskHandle;
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -186,19 +205,18 @@ void ApplicationStart(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
-    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(&Provision::Manager::GetInstance().GetStorage());
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    ChipLogProgress(DeviceLayer, "Starting App Task");
     err = AppTask::GetAppTask().StartAppTask();
     if (err != CHIP_NO_ERROR)
         appError(err);
 
+#if SILABS_LOG_OUT_UART
+    sendLogImmediately(false);
+#endif                                                       // SILABS_LOG_OUT_UART
     VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
     sMainTaskHandle = nullptr;
 }
@@ -206,9 +224,17 @@ void ApplicationStart(void * unused)
 
 void SilabsMatterConfig::AppInit()
 {
-    GetPlatform().Init();
+#ifdef SL_WIFI
+    // Init Chip memory management before the stack for Wi-Fi platforms
+    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
+    // and set the allocation functions inside sl_ot_create_instance, which is called earlier by sl_system_init.
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+#endif // SL_WIFI
+
+    TEMPORARY_RETURN_IGNORED GetPlatform().Init();
+
     sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
-    ChipLogProgress(DeviceLayer, "Starting scheduler");
     VerifyOrDie(sMainTaskHandle); // We can't proceed if the Main Task creation failed.
 
 // Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
@@ -225,12 +251,10 @@ void SilabsMatterConfig::AppInit()
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     using namespace chip::DeviceLayer::Silabs;
+    CHIP_ERROR err;
+    SILABS_LOG("=====%s starting=====", appName);
 
-    ChipLogProgress(DeviceLayer, "==================================================");
-    ChipLogProgress(DeviceLayer, "%s starting", appName);
-    ChipLogProgress(DeviceLayer, "==================================================");
-
-#if PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
     chip::rpc::Init();
 #endif
 
@@ -241,30 +265,36 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     //==============================================
     // Init Matter Stack
     //==============================================
-    ChipLogProgress(DeviceLayer, "Init CHIP Stack");
 
 #ifdef SL_WIFI
-    // Init Chip memory management before the stack
-    // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
-    // and set the allocation functions inside sl_ot_create_instance, which is called earlier by sl_system_init.
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-    ReturnErrorOnFailure(chip::Platform::MemoryInit());
-    ReturnErrorOnFailure(WifiInterface::GetInstance().InitWiFiStack());
+    err = WifiInterface::GetInstance().InitWiFiStack();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Init WiFi Stack: %" CHIP_ERROR_FORMAT, err.Format()));
+    // Needs to be done post InitWifiStack for 917.
+    // TODO move it in InitWiFiStack
+    TEMPORARY_RETURN_IGNORED GetPlatform().NvmInit();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    ReturnErrorOnFailure(WifiSleepManager::GetInstance().Init(&WifiInterface::GetInstance(), &WifiInterface::GetInstance()));
+    err = WifiSleepManager::GetInstance().Init(&WifiInterface::GetInstance(), &WifiInterface::GetInstance());
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Init WiFi Sleep Manager: %" CHIP_ERROR_FORMAT, err.Format()));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
-    ReturnErrorOnFailure(PlatformMgr().InitChipStack());
-
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
-
+    err = PlatformMgr().InitChipStack();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Init Chip Stack: %" CHIP_ERROR_FORMAT, err.Format()));
+#if CONFIG_NETWORK_LAYER_BLE
+    err = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Set BLE Device Name: %" CHIP_ERROR_FORMAT, err.Format()));
+#endif
     // Provision Manager
     Provision::Manager & provision = Provision::Manager::GetInstance();
     ReturnErrorOnFailure(provision.Init());
     SetDeviceInstanceInfoProvider(&provision.GetStorage());
     SetCommissionableDataProvider(&provision.GetStorage());
+    SetDeviceAttestationCredentialsProvider(&provision.GetStorage());
     ChipLogProgress(DeviceLayer, "Provision mode %s", provision.IsProvisionRequired() ? "ENABLED" : "disabled");
 
     // Create initParams with SDK example defaults here
@@ -280,13 +310,17 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
-#endif
-#ifdef SL_WIFI
+#endif // CHIP_ENABLE_OPENTHREAD
+#if !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL && defined(SL_WIFI)
     // This must be initialized after InitWiFiStack and InitChipStack which enable communication between the TA an M4
     // This is required for TA nvm access used by the sWifiNetworkDriver.
     ReturnErrorOnFailure(sWifiNetworkDriver.Init());
-#endif
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL && defined(SL_WIFI)
 
+    // Verify if the platform is updated by reading the NVM3 config value. This needs to be done after the wifi network driver
+    // initialization, as the 917 nvm is accessed through the TA, and the communication between the M4 and the TA is available at
+    // this point. For thread devices, this needs to be after InitChipStack.
+    ReturnErrorOnFailure(GetPlatform().VerifyIfUpdated());
     // Stop Matter event handling while setting up resources
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
@@ -302,7 +336,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
-    sTestEventTriggerDelegate.Init(&provision.GetStorage());
+    TEMPORARY_RETURN_IGNORED sTestEventTriggerDelegate.Init(&provision.GetStorage());
 
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
@@ -310,22 +344,45 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #if CHIP_CRYPTO_PLATFORM && !(defined(SLI_SI91X_MCU_INTERFACE))
     // When building with EFR32 crypto, use the opaque key store
     // instead of the default (insecure) one.
-    gOperationalKeystore.Init();
+    TEMPORARY_RETURN_IGNORED gOperationalKeystore.Init();
     initParams.operationalKeystore = &gOperationalKeystore;
 #endif
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
+
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+    // App is using code-driven data model - initialize it
+    CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider);
+    if (dmErr == CHIP_NO_ERROR)
+    {
+        initParams.dataModelProvider = AppTask::GetDataModelProvider();
+        SILABS_LOG("Using code-driven data model");
+    }
+    else
+    {
+        SILABS_LOG("Code-driven data model init failed: %" CHIP_ERROR_FORMAT, dmErr.Format());
+        return dmErr;
+    }
+#else
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    initParams.appDelegate       = &BaseApplication::sAppDelegate;
+#endif
+
+#if !defined(SL_MATTER_CUSTOM_APPTASK) || !SL_MATTER_CUSTOM_APPTASK
+    initParams.appDelegate = &BaseApplication::sAppDelegate;
+#endif // !SL_MATTER_CUSTOM_APPTASK
+    // This is needed by localization configuration cluster so we set it before the initialization
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     // Init Matter Server and Start Event Loop
-    CHIP_ERROR err = chip::Server::GetInstance().Init(initParams);
+    err = chip::Server::GetInstance().Init(initParams);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    ReturnErrorOnFailure(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Init Matter Server: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    SILABS_LOG("Starting Platform Manager Event Loop");
     ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());
 
 #ifdef ENABLE_CHIP_SHELL
@@ -335,15 +392,73 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     return CHIP_NO_ERROR;
 }
 
+#if defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+void OnEM4Trigger(uint32_t duration)
+{
+    CMU_ClockSelectSet(cmuClock_EM4GRPACLK, cmuSelect_ULFRCO);
+    CMU_ClockEnable(cmuClock_BURTC, true);
+    CMU_ClockEnable(cmuClock_BURAM, true);
+
+    BURTC_Init_TypeDef burtcInit = BURTC_INIT_DEFAULT;
+    burtcInit.compare0Top        = true; // reset counter when counter reaches compare value
+    burtcInit.em4comp            = true; // BURTC compare interrupt wakes from EM4 (causes reset)
+    BURTC_Init(&burtcInit);
+
+    BURTC_CounterReset();
+    BURTC_CompareSet(0, duration);
+
+    BURTC_Enable(true);
+    EMU_EM4Init_TypeDef em4Init = EMU_EM4INIT_DEFAULT;
+    EMU_EM4Init(&em4Init);
+    BURTC_CounterReset();
+
+    BURTC_IntClear(BURTC_IF_COMP);
+    BURTC_IntEnable(BURTC_IEN_COMP); // compare match
+    NVIC_EnableIRQ(BURTC_IRQn);
+    EMU_EnterEM4();
+}
+
+#endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
+
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+void sl_watchdog_manager_user_idle_hook(void)
+#else
 extern "C" void vApplicationIdleHook(void)
-{
-#if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    SiWxPlatformInterface::sl_si91x_btn_event_handler();
-#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
 #endif
+{
+#if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+    GetPlatform().SleepButtonActionHandler();
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
+#endif // ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+
+#ifndef SL_MATTER_EM4_THRESHOLD_PERCENTAGE
+#define SL_MATTER_EM4_THRESHOLD_PERCENTAGE 90
+#endif
+
+static_assert(SL_MATTER_EM4_THRESHOLD_PERCENTAGE > 0 && SL_MATTER_EM4_THRESHOLD_PERCENTAGE < 100,
+              "SL_MATTER_EM4_THRESHOLD_PERCENTAGE must be between 1 and 99");
+
+extern "C" void sl_matter_em4_check(uint32_t expected_idle_time_ms)
+{
+    if (chip::ICDConfigurationData::GetInstance().GetICDMode() == chip::ICDConfigurationData::ICDMode::LIT)
+    {
+        uint32_t idleDuration_seconds = chip::ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration().count();
+        uint32_t threshold_ms         = idleDuration_seconds * SL_MATTER_EM4_THRESHOLD_PERCENTAGE * 10;
+        // Since the sleep timer will never match the actual idle time (hardware latency, etc), we set a threshold
+        // Multiply by 10 to converts seconds into milliseconds (e.g. 90% of 1000sec in ms is 1000*90*10 = 900000ms)
+        if (expected_idle_time_ms >= threshold_ms)
+        {
+            OnEM4Trigger(expected_idle_time_ms);
+        }
+    }
+}
+#endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER

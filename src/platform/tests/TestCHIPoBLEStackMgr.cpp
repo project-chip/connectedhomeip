@@ -22,6 +22,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
 
@@ -35,17 +36,17 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t)
 
 TEST(TestCHIPoBLEStackManager, TestCHIPoBLEStackManager)
 {
-    chip::Platform::MemoryInit();
+    EXPECT_SUCCESS(chip::Platform::MemoryInit());
 
-    chip::DeviceLayer::PlatformMgrImpl().InitChipStack();
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgrImpl().InitChipStack());
 
-    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("CHIP0001");
+    EXPECT_SUCCESS(chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("CHIP0001"));
 
-    chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(1, false);
+    EXPECT_SUCCESS(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(1, false));
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    EXPECT_SUCCESS(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
 
     ChipLogProgress(DeviceLayer, "Start Chip Over Ble stack Done");
 

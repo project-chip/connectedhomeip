@@ -109,4 +109,29 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
     }
     return new ContentLaunchResponse(ContentLaunchResponse.STATUS_SUCCESS, "Example data in Java");
   }
+
+  @Override
+  public ContentLaunchResponse contentReplicationRequest() {
+    Log.d(TAG, "contentReplicationRequest at " + endpoint);
+    return new ContentLaunchResponse(ContentLaunchResponse.STATUS_SUCCESS, "Replication data");
+  }
+
+  @Override
+  public ContentLaunchResponse playPreset(int presetID) {
+    Log.d(TAG, "playPreset: presetID=" + presetID + " at " + endpoint);
+    return new ContentLaunchResponse(
+        ContentLaunchResponse.STATUS_SUCCESS, "Playing preset " + presetID);
+  }
+
+  @Override
+  public boolean getMovable() {
+    return true;
+  }
+
+  @Override
+  public ContentLaunchPreset[] getPresets() {
+    return new ContentLaunchPreset[] {
+      new ContentLaunchPreset(1, "Morning News"), new ContentLaunchPreset(2, "Evening Playlist"),
+    };
+  }
 }

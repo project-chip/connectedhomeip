@@ -127,7 +127,8 @@ void LightingAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
     if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
     {
         Server::GetInstance().GenerateShutDownEvent();
-        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t) { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
     }
     else
     {
@@ -213,7 +214,7 @@ void LightingAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
     char timeChar[50];
     if (std::strftime(timeChar, sizeof(timeChar), "%c", std::localtime(&result)))
     {
-        softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
+        softwareFault.faultRecording.SetValue(ByteSpan::fromCharString(timeChar));
     }
 
     Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
@@ -228,5 +229,6 @@ void LightingAppCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(LightingAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(LightingAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

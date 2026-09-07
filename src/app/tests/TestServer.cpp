@@ -19,6 +19,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/server/Server.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
@@ -43,30 +44,34 @@ public:
     }
 };
 
-class TestEventHandler
+class TestFactoryResetEventHandler
 {
 public:
     ChipDeviceEvent mEvent{};
 
     static void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
     {
-        reinterpret_cast<TestEventHandler *>(arg)->mEvent = *event;
+        if (event->Type == DeviceEventType::kFactoryReset)
+        {
+            reinterpret_cast<TestFactoryResetEventHandler *>(arg)->mEvent = *event;
+        }
     }
 };
 
 TEST_F(TestServer, TestFactoryResetEvent)
 {
-    TestEventHandler handler;
-    PlatformMgr().AddEventHandler(TestEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler));
+    TestFactoryResetEventHandler handler;
+    EXPECT_SUCCESS(PlatformMgr().AddEventHandler(TestFactoryResetEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler)));
 
     Server::GetInstance().ScheduleFactoryReset();
 
-    PlatformMgr().ScheduleWork([](intptr_t) -> void { PlatformMgr().StopEventLoopTask(); });
+    CHIP_ERROR initResult = PlatformMgr().ScheduleWork([](intptr_t) -> void { EXPECT_SUCCESS(PlatformMgr().StopEventLoopTask()); });
+    EXPECT_SUCCESS(initResult);
     PlatformMgr().RunEventLoop();
 
     EXPECT_EQ(handler.mEvent.Type, DeviceEventType::kFactoryReset);
 
-    PlatformMgr().RemoveEventHandler(TestEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler));
+    PlatformMgr().RemoveEventHandler(TestFactoryResetEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler));
 }
 
 } // namespace server

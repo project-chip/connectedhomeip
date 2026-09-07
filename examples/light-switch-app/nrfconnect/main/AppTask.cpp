@@ -43,8 +43,12 @@
 #include <platform/nrfconnect/wifi/NrfWiFiDriver.h>
 #endif
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#ifdef CONFIG_OPENTHREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
 #endif
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR
@@ -111,10 +115,23 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#ifdef CONFIG_OPENTHREAD
 app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
     sThreadNetworkDriver(0 /*endpointId*/);
 #endif
+
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+
 } // namespace
 
 namespace LedConsts {
@@ -157,7 +174,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-#if defined(CONFIG_NET_L2_OPENTHREAD)
+#if defined(CONFIG_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -176,7 +193,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    sThreadNetworkDriver.Init();
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 #elif defined(CONFIG_CHIP_WIFI)
     sWiFiCommissioningInstance.Init();
 #else
@@ -247,8 +264,22 @@ CHIP_ERROR AppTask::Init()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     initParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    // Set up OpenThread configuration when OpenThread is included
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams{};
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
+
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 
@@ -262,16 +293,13 @@ CHIP_ERROR AppTask::Init()
     }
 #endif
 
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point
     // to avoid data races between the main and the CHIP threads.
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -493,13 +521,13 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCOnboardingPayloadMgr().StopTagEmulation();
+            TEMPORARY_RETURN_IGNORED NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
         break;
-#if defined(CONFIG_NET_L2_OPENTHREAD)
+#if defined(CONFIG_OPENTHREAD)
     case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
         InitBasicOTARequestor();

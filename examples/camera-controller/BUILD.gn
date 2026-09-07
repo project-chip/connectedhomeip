@@ -26,14 +26,6 @@ assert(chip_build_tools)
 config("config") {
   cflags = [ "-Wno-shadow" ]
 
-  if (is_clang) {
-    # libdatachannel has a lot of these like:
-    #   ...... libdatachannel/repo/include/rtc/h265nalunit.hpp:40:60: error: implicit conversion loses integer precision: 'int'
-    #   to 'uint8_t' (aka 'unsigned char') [-Werror,-Wimplicit-int-conversion]
-    #   40 |         uint8_t nuhLayerId() const { return ((_first & 0x1) << 5) | ((_second & 0b1111'1000) >> 3); }
-    cflags += [ "-Wno-implicit-int-conversion" ]
-  }
-
   include_dirs = [
     ".",
     "${chip_root}/examples/common",
@@ -111,7 +103,6 @@ static_library("camera-controller-utils") {
 
   public_deps = [
     "${chip_root}/examples/common/tracing:commandline",
-    "${chip_root}/src/app:required-privileges",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/controller/data_model",

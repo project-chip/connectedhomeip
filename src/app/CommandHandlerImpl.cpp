@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <app/CommandHandlerImpl.h>
+#include <crypto/RandUtils.h>
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
@@ -28,16 +29,46 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <protocols/secure_channel/Constants.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
+
+namespace {
+constexpr size_t kMaxTargetedEndpoints =
+    std::max<size_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE, CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC);
+
+void RecordTargetedEndpoint(Span<EndpointId> & endpoints, size_t & count, EndpointId endpointId)
+{
+    for (size_t i = 0; i < count; ++i)
+    {
+        if (endpoints[i] == endpointId)
+        {
+            return;
+        }
+    }
+    if (count < endpoints.size())
+    {
+        endpoints[count++] = endpointId;
+    }
+    else
+    {
+        // This branch should not be reachable in practice:
+        // - For unicast invokes, the number of distinct targeted endpoints cannot exceed the max paths per invoke.
+        // - For groupcast invokes, the number of distinct targeted endpoints is bounded by the number of endpoints in the group.
+        ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
+                     static_cast<unsigned int>(endpoints.size()));
+    }
+}
+} // anonymous namespace
 
 CommandHandlerImpl::CommandHandlerImpl(Callback * apCallback) : mpCallback(apCallback), mSuppressResponse(false) {}
 
@@ -146,7 +177,7 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    auto context = GetExchangeContext();
+    auto context = TryGetExchangeContextWhenAsync();
     // If we have no exchange or it has no session, we won't be able to send a
     // response anyway, so it doesn't matter how we encode it, but we have unit
     // tests that have a kinda-broken CommandHandler with no session... just use
@@ -172,6 +203,15 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 
+// Encodes response command data using non-virtual EncodableResponsePayload descriptors.
+// Adapts the payload to EncodableToTLV to share framing and session setup logic without duplication.
+CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                                  const EncodableResponsePayload & aPayload)
+{
+    EncodableResponsePayload::Adapter adapter(aPayload);
+    return TryAddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
+}
+
 CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                                const DataModel::EncodableToTLV & aEncodable)
 {
@@ -179,6 +219,25 @@ CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequ
     VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
     return TryAddingResponse(
         [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable); });
+}
+
+CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                               const EncodableResponsePayload & aPayload)
+{
+    // Return early when response should not be sent out.
+    VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
+    return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aPayload); });
+}
+
+void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                     const EncodableResponsePayload & aPayload)
+{
+    CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aPayload);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Adding response failed: %" CHIP_ERROR_FORMAT ". Returning failure instead.", err.Format());
+        AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+    }
 }
 
 CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage)
@@ -205,7 +264,7 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
     // any further validation, we do need to read and populate the registry to help
     // in building the InvokeResponse.
 
-    VerifyOrReturnError(commandCount <= MaxPathsPerInvoke(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(commandCount > 0 && commandCount <= MaxPathsPerInvoke(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // If there is more than one CommandDataIB, spec states that CommandRef must be provided.
     commandRefExpected = commandCount > 1;
@@ -260,7 +319,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     reader.Init(std::move(payload));
     VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
     VerifyOrDie(mpResponder);
     if (mpResponder->GetGroupId().HasValue())
@@ -272,6 +331,8 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
+    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
+    VerifyOrReturnError(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::TimedRequestMismatch);
 
     {
@@ -291,6 +352,36 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         mReserveSpaceForMoreChunkMessages = true;
     }
 
+    if (delayReportData.has_value())
+    {
+        EndpointId targetedEndpoints[kMaxTargetedEndpoints];
+        Span<EndpointId> endpointsSpan(targetedEndpoints);
+
+        // Trigger report deferral BEFORE dispatching any commands.
+        // When command handlers execute, they may synchronously modify attributes, calling SetDirty()
+        // and notifying the ReportScheduler via OnBecameReportable(). If report deferral is not applied
+        // beforehand, the scheduler evaluates next timeout as 0 ms, synchronously transitions the node
+        // to TimerFired(), and marks EngineRunScheduled = true. Once EngineRunScheduled is set,
+        // subsequent deferral calls cannot prevent the reporting engine from immediately sending the report
+        // on the next event loop iteration. Triggering report deferral here ensures the deferral window is
+        // active before any attribute mutations occur.
+        if (IsGroupRequest())
+        {
+            VerifyOrReturnError(PopulateGroupTargetedEndpoints(invokeRequests, endpointsSpan) == CHIP_NO_ERROR,
+                                Status::InvalidAction);
+        }
+        else
+        {
+            VerifyOrReturnError(PopulateTargetedEndpoints(invokeRequests, endpointsSpan) == CHIP_NO_ERROR, Status::InvalidAction);
+        }
+
+        if (!endpointsSpan.empty())
+        {
+            TriggerDelayReport(delayReportData.value(), endpointsSpan);
+        }
+    }
+
+    invokeRequests.GetReader(&invokeRequestsReader);
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), Status::InvalidAction);
@@ -318,13 +409,13 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
+
     return Status::Success;
 }
 
 void CommandHandlerImpl::Close()
 {
-    mSuppressResponse = false;
-    mpResponder       = nullptr;
+    mpResponder = nullptr;
     MoveToState(State::AwaitingDestruction);
 
     // We must finish all async work before we can shut down a CommandHandlerImpl. The actual CommandHandlerImpl MUST finish their
@@ -409,34 +500,121 @@ constexpr uint8_t sNoFields[] = {
 };
 } // anonymous namespace
 
+Status CommandHandlerImpl::ValidateCommandCanBeDispatched(const ConcreteCommandPath & aConcretePath)
+{
+    Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
+    DataModel::InvokeRequest request(aConcretePath, subjectDescriptor);
+    request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
+    return mpCallback->ValidateCommandCanBeDispatched(request);
+}
+
+Status CommandHandlerImpl::ValidateUnicastCommand(CommandDataIB::Parser & aCommandElement, ConcreteCommandPath & aOutPath)
+{
+    CommandPathIB::Parser commandPath;
+    VerifyOrReturnError(aCommandElement.GetPath(&commandPath) == CHIP_NO_ERROR, Status::InvalidAction);
+    VerifyOrReturnError(commandPath.GetConcreteCommandPath(aOutPath) == CHIP_NO_ERROR, Status::InvalidAction);
+    return ValidateCommandCanBeDispatched(aOutPath);
+}
+
+CHIP_ERROR CommandHandlerImpl::PopulateTargetedEndpoints(InvokeRequests::Parser aInvokeRequests,
+                                                         Span<EndpointId> & aTargetedEndpoints)
+{
+    size_t count = 0;
+    TLV::TLVReader preCheckReader;
+    aInvokeRequests.GetReader(&preCheckReader);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    while (CHIP_NO_ERROR == (err = preCheckReader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == preCheckReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        CommandDataIB::Parser commandData;
+        ReturnErrorOnFailure(commandData.Init(preCheckReader));
+
+        ConcreteCommandPath concretePath(0, 0, 0);
+        if (ValidateUnicastCommand(commandData, concretePath) == Status::Success)
+        {
+            RecordTargetedEndpoint(aTargetedEndpoints, count, concretePath.mEndpointId);
+        }
+    }
+
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    // If no valid commands were found, count will be 0 (aTargetedEndpoints.empty() == true).
+    // We do not treat this as a message-level error because individual command failures
+    // (such as UnsupportedEndpoint or UnsupportedAccess) must be processed during the dispatch
+    // loop in ProcessCommandDataIB to return proper CommandStatusIB error responses to the client.
+    aTargetedEndpoints.reduce_size(count);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandHandlerImpl::PopulateGroupTargetedEndpoints(InvokeRequests::Parser aInvokeRequests,
+                                                              Span<EndpointId> & aTargetedEndpoints)
+{
+    VerifyOrReturnError(mpResponder && mpResponder->GetGroupId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    GroupId groupId                                    = mpResponder->GetGroupId().Value();
+    FabricIndex fabric                                 = GetAccessingFabricIndex();
+    Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+    VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    size_t count   = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader preCheckReader;
+    aInvokeRequests.GetReader(&preCheckReader);
+
+    while (CHIP_NO_ERROR == (err = preCheckReader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == preCheckReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        CommandDataIB::Parser commandData;
+        ReturnErrorOnFailure(commandData.Init(preCheckReader));
+
+        CommandPathIB::Parser commandPath;
+        ReturnErrorOnFailure(commandData.GetPath(&commandPath));
+        ClusterId clusterId;
+        CommandId commandId;
+        ReturnErrorOnFailure(commandPath.GetGroupCommandPath(&clusterId, &commandId));
+
+        Credentials::GroupDataProvider::GroupEndpoint mapping;
+        AutoRelease iterator(groupDataProvider->IterateEndpoints(fabric));
+        VerifyOrReturnError(!iterator.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+        while (iterator->Next(mapping))
+        {
+            if (groupId == mapping.group_id)
+            {
+                const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
+                if (ValidateCommandCanBeDispatched(concretePath) == Status::Success)
+                {
+                    RecordTargetedEndpoint(aTargetedEndpoints, count, concretePath.mEndpointId);
+                }
+            }
+        }
+    }
+
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    aTargetedEndpoints.reduce_size(count);
+    return CHIP_NO_ERROR;
+}
+
 Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandPathIB::Parser commandPath;
     ConcreteCommandPath concretePath(0, 0, 0);
     TLV::TLVReader commandDataReader;
 
     // NOTE: errors may occur before the concrete command path is even fully decoded.
-
-    err = aCommandElement.GetPath(&commandPath);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
-
-    err = commandPath.GetConcreteCommandPath(concretePath);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
-
+    Status preCheckStatus = ValidateUnicastCommand(aCommandElement, concretePath);
+    if (preCheckStatus != Status::Success)
     {
-        Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-        DataModel::InvokeRequest request;
-
-        request.path              = concretePath;
-        request.subjectDescriptor = &subjectDescriptor;
-        request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
-
-        Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
-        if (preCheckStatus != Status::Success)
-        {
-            return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
-        }
+        return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
     }
 
     err = aCommandElement.GetFields(&commandDataReader);
@@ -453,6 +631,7 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         ChipLogDetail(DataManagement, "Received command for Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         SuccessOrExit(err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor()));
+
         mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
         DataModelCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
     }
@@ -480,7 +659,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-    Credentials::GroupDataProvider::EndpointIterator * iterator;
 
     err = aCommandElement.GetPath(&commandPath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
@@ -512,8 +690,8 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     // always have an accessing fabric, by definition.
 
     // Find which endpoints can process the command, and dispatch to them.
-    iterator = groupDataProvider->IterateEndpoints(fabric);
-    VerifyOrReturnError(iterator != nullptr, Status::Failure);
+    AutoRelease iterator(groupDataProvider->IterateEndpoints(fabric));
+    VerifyOrReturnError(!iterator.IsNull(), Status::Failure);
 
     while (iterator->Next(mapping))
     {
@@ -527,26 +705,20 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                       mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
-
+        // Groupcast Testing
+        auto & testing = Groupcast::GetTesting();
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
         {
-            Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
-            DataModel::InvokeRequest request;
+            testing.SetGroupID(groupId);
+            testing.SetEndpointID(mapping.endpoint_id);
+            testing.SetClusterID(clusterId);
+            testing.SetElementID(static_cast<uint32_t>(commandId));
+        }
 
-            request.path              = concretePath;
-            request.subjectDescriptor = &subjectDescriptor;
-            request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
-
-            // SPEC-DIVERGENCE: The spec mandates only one ACL check after the existence check for non-concrete paths (Group
-            // Commands). However, calling ValidateCommandCanBeDispatched here introduces an additional ACL check before the
-            // existence check, because that function also performs an early access check (it is shared with the concrete path
-            // case). This results in two ACL checks for group commands. In practice, this divergence is not observable if all
-            // commands require at least Operate privilege.
-            Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
-            if (preCheckStatus != Status::Success)
-            {
-                // Command failed for a specific path, but keep trying the rest of the paths.
-                continue;
-            }
+        if (ValidateCommandCanBeDispatched(concretePath) != Status::Success)
+        {
+            // Command failed for a specific path, but keep trying the rest of the paths.
+            continue;
         }
 
         if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
@@ -564,7 +736,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             continue;
         }
     }
-    iterator->Release();
     return Status::Success;
 }
 
@@ -919,7 +1090,13 @@ void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommand
 
 Messaging::ExchangeContext * CommandHandlerImpl::GetExchangeContext() const
 {
-    VerifyOrDie(mpResponder);
+    VerifyOrReturnValue((mpResponder != nullptr) && !mGoneAsync, nullptr);
+    return mpResponder->GetExchangeContext();
+}
+
+Messaging::ExchangeContext * CommandHandlerImpl::TryGetExchangeContextWhenAsync() const
+{
+    VerifyOrReturnValue(mpResponder, nullptr);
     return mpResponder->GetExchangeContext();
 }
 
@@ -980,7 +1157,7 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     VerifyOrDieWithMsg(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, DataManagement,
                        "TH Failure: Failed 'invokeRequestMessage.Init(reader)'");
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
 
     VerifyOrDieWithMsg(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, DataManagement,
@@ -989,6 +1166,9 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Mandatory TimedRequest field missing");
     VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Mandatory InvokeRequests field missing");
+    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
+    VerifyOrDieWithMsg(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, DataManagement,
+                       "DUT Failure: Failed to read DelayReportData");
     VerifyOrDieWithMsg(mTimedRequest == isTimedInvoke, DataManagement,
                        "DUT Failure: TimedRequest value in message mismatches action");
 
@@ -1050,6 +1230,19 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: InvokeRequestMessage TLV is not properly terminated");
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
+
+void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData,
+                                            Span<const EndpointId> aTargetedEndpoints)
+{
+    VerifyOrReturn(mpCallback != nullptr);
+
+    uint32_t delayMs = aDelayReportData.delayMinMs;
+    if (aDelayReportData.delayJitterWindowMs > 0)
+    {
+        delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
+    }
+    mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs), aTargetedEndpoints);
+}
 
 } // namespace app
 } // namespace chip

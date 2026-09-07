@@ -66,7 +66,7 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                            uint16_t pairingHint, const char * pairingInstruction) override
+                                            uint16_t pairingHint, const char * pairingInstruction, uint8_t passcodeLength) override
     {
         return;
     }
@@ -79,7 +79,8 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                               uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction) override
+                                               uint32_t passcode, uint8_t passcodeLength, uint16_t pairingHint,
+                                               const char * pairingInstruction) override
     {
         return;
     }
@@ -131,10 +132,11 @@ class MyPasscodeService : public PasscodeService
         }
     }
 
-    uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
+    PasscodeInfo GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
     {
         // TODO: randomly generate this value
-        return 12345678;
+        ChipLogDetail(AppServer, "GetCommissionerPasscode: returning a passcode");
+        return { 12345678, 8 };
     }
 
     void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
@@ -254,9 +256,9 @@ class MyPostCommissioningListener : public PostCommissioningListener
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
         auto rotatingIdSpan           = CharSpan{ mRotatingId.data(), mRotatingId.size() };
-        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
-                                                             rotatingIdSpan, mPasscode, bindings, OnSuccessResponse,
-                                                             OnFailureResponse);
+        TEMPORARY_RETURN_IGNORED ContentAppPlatform::GetInstance().ManageClientAccess(
+            *mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId, rotatingIdSpan, mPasscode, bindings,
+            OnSuccessResponse, OnFailureResponse);
         clearContext();
     }
 
@@ -368,15 +370,19 @@ DECLARE_DYNAMIC_ATTRIBUTE(ApplicationLauncher::Attributes::CatalogList::Id, ARRA
 
 // Declare Account Login cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(accountLoginAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+DECLARE_DYNAMIC_ATTRIBUTE(AccountLogin::Attributes::OAuthLoggedIn::Id, BOOLEAN, 1, 0),   /* OAuthLoggedIn */
+    DECLARE_DYNAMIC_ATTRIBUTE(AccountLogin::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Content Launcher cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(contentLauncherAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::AcceptHeader::Id, ARRAY, kDescriptorAttributeArraySize,
                           0), /* accept header list */
     DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::SupportedStreamingProtocols::Id, BITMAP32, 1,
-                              0),                                                           /* streaming protocols */
-    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
+                              0),                                                       /* streaming protocols */
+    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::Movable::Id, BOOLEAN, 1, 0), /* movable */
+    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::Presets::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* presets */
+    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::FeatureMap::Id, BITMAP32, 4, 0),                       /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Media Playback cluster attributes
@@ -388,7 +394,10 @@ DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::CurrentState::Id, ENUM8, 1,
     DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::PlaybackSpeed::Id, SINGLE, 1, 0),   /* playback speed */
     DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::SeekRangeEnd::Id, INT64U, 1, 0),    /* seek range end */
     DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::SeekRangeStart::Id, INT64U, 1, 0),  /* seek range start */
-    DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::FeatureMap::Id, BITMAP32, 4, 0),    /* FeatureMap */
+    DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::AvailableCommands::Id, ARRAY, kDescriptorAttributeArraySize,
+                              0),                                                         /* available commands */
+    DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::ContentInfo::Id, STRUCT, 1, 0),  /* content info */
+    DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Target Navigator cluster attributes
@@ -427,20 +436,25 @@ constexpr CommandId accountLoginIncomingCommands[] = {
     app::Clusters::AccountLogin::Commands::GetSetupPIN::Id,
     app::Clusters::AccountLogin::Commands::Login::Id,
     app::Clusters::AccountLogin::Commands::Logout::Id,
+    app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id,
     kInvalidCommandId,
 };
 constexpr CommandId accountLoginOutgoingCommands[] = {
     app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Id,
+    app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Id,
     kInvalidCommandId,
 };
 // TODO: Sort out when the optional commands here should be listed.
 constexpr CommandId contentLauncherIncomingCommands[] = {
     app::Clusters::ContentLauncher::Commands::LaunchContent::Id,
     app::Clusters::ContentLauncher::Commands::LaunchURL::Id,
+    app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id,
+    app::Clusters::ContentLauncher::Commands::PlayPreset::Id,
     kInvalidCommandId,
 };
 constexpr CommandId contentLauncherOutgoingCommands[] = {
     app::Clusters::ContentLauncher::Commands::LauncherResponse::Id,
+    app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::Id,
     kInvalidCommandId,
 };
 // TODO: Sort out when the optional commands here should be listed.
@@ -672,6 +686,16 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
                                                     make_default_supported_clusters());
         mContentApps.emplace_back(std::move(ptr));
     }
+    else if (vendorId == 4242 && productId == 1)
+    {
+        // OAuth-only app: PIN login is disabled, and OAuthLoggedIn flips to true a
+        // few seconds after GetDeviceAuthURI is called, with no further client
+        // action needed. See OAuthAccountLoginManager.
+        auto ptr =
+            std::make_unique<ContentAppImpl>("Vendor5", vendorId, "oauthAppId", productId, "Version5",
+                                             std::make_unique<OAuthAccountLoginManager>(), make_default_supported_clusters());
+        mContentApps.emplace_back(std::move(ptr));
+    }
     else
     {
         auto ptr = std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2", "20202021",
@@ -714,8 +738,8 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
 
         std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
 
-        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                    &pairingCommand->mOnDeviceConnectionFailureCallback);
+        TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                             &pairingCommand->mOnDeviceConnectionFailureCallback);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 }

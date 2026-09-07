@@ -16,12 +16,14 @@ ARG BUILD_VERSION
 
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
 FROM ghcr.io/project-chip/chip-build-vscode:${BUILD_VERSION}
-LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
+LABEL org.opencontainers.image.source="https://github.com/project-chip/connectedhomeip"
 
 # This Dockerfile contains things useful for an interactive development environment
 ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
+ARG WORKSPACE_ROOT=/workspaces/connectedhomeip
+ARG LOCAL_WORKSPACE_ROOT
 ENV LANG=en_US.utf8
 
 
@@ -30,14 +32,28 @@ ENV LANG=en_US.utf8
 RUN apt-get update \
     && apt-get install -y locales \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
-    && apt-get -fy install vim emacs sudo \
-    apt-utils dialog zsh \
-    lsb-release \
-    bash-completion \
-    valgrind \
-    docker.io \
-    iputils-ping \
-    icecc \
+    && apt-get -fy install \
+        apt-utils \
+        bash-completion \
+        dialog \
+        docker.io \
+        emacs \
+        fish \
+        gnupg2 \
+        icecc \
+        iputils-ping \
+        lsb-release \
+        nano \
+        openssh-client \
+        ripgrep \
+        sudo \
+        time \
+        valgrind \
+        vim \
+        zsh \
+        # emacs pulls in libgccjit0 -> libgcc-14-dev without libstdc++-14-dev which causes clang++ to fail \
+        # See-Also: https://bugs.launchpad.net/ubuntu/+source/llvm-defaults/+bug/2077130 \
+        libstdc++-14-dev \
     && :
 
 RUN (getent passwd $USER_UID && userdel -f $(getent passwd $USER_UID | cut -d: -f1) || true) \
@@ -45,7 +61,7 @@ RUN (getent passwd $USER_UID && userdel -f $(getent passwd $USER_UID | cut -d: -
     && (getent passwd $USERNAME && userdel -f $USERNAME || true) \
     && (getent group $USERNAME && groupdel -f $USERNAME || true) \
     && groupadd -g $USER_GID $USERNAME \
-    && useradd --no-log-init -s /bin/bash -u $USER_UID -g $USER_GID -G docker,sudo -m $USERNAME \
+    && useradd --no-log-init -s /bin/bash -u $USER_UID -g $USER_GID -G docker,sudo,dialout -m $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     && :
@@ -58,6 +74,7 @@ RUN mkdir -p /opt/android/sdk \
     && chown -R $USERNAME:$USERNAME \
     $ANDROID_HOME \
     $IDF_TOOLS_PATH \
+    $ZEPHYR_BASE/.. `# Assume $ZEPHYR_BASE is inside the west workspace` \
     && find $AMEBA_PATH \
     -name "inc_lp" -print0      -or \
     -name "inc_hp" -print0      -or \
@@ -75,6 +92,12 @@ RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
     && echo TIZEN_SDK_DATA_PATH=/home/$USERNAME/tizen-sdk-data >> $TIZEN_SDK_ROOT/sdk.info \
     && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
     && : # last line
+
+RUN if [ -n "${LOCAL_WORKSPACE_ROOT}" ]; then \
+    true \
+    && mkdir -p "$(dirname "${LOCAL_WORKSPACE_ROOT}")" \
+    && ln -sf "${WORKSPACE_ROOT}" "${LOCAL_WORKSPACE_ROOT}" \
+    ; fi
 
 ENV TIZEN_ROOTFS=/tizen_rootfs
 

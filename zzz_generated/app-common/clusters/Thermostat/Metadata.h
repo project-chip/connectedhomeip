@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-inline constexpr uint32_t kRevision = 9;
+inline constexpr uint32_t kRevision = 11;
 
 namespace Attributes {
 
@@ -344,7 +344,7 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RemoveThermostatSuggestion
 namespace AtomicRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AtomicRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+                                                                Access::Privilege::kOperate);
 } // namespace AtomicRequest
 
 } // namespace Commands

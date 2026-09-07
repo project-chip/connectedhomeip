@@ -21,11 +21,19 @@ address0 = 0x3FE000
 size0 = 0x1000
 ```
 
-To enable matter factory data feature, please append `-mfd` option at end of
-target name. Take BL602 Wi-Fi Matter Light as example.
+To enable matter factory data feature for BL61X `bouffalo_sdk` CMake builds, use
+`CONFIG_MFD=y`. This is enabled by default in the BL61X example Makefiles.
 
+```shell
+make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y CONFIG_MFD=y
+make -C examples/contact-sensor-app/bouffalolab CONFIG_MFD=y
 ```
-./scripts/build/build_examples.py --target bouffalolab-bl602dk-light-littlefs-mfd build
+
+For `build_examples.py` targets, append `-mfd` to the target name. Take BL602
+Wi-Fi Matter Light as example.
+
+```shell
+./scripts/build/build_examples.py --target bouffalolab-bl602dk-light-wifi-littlefs-mfd build
 ```
 
 ## Factory data
@@ -331,7 +339,7 @@ is using to program firmware, and also for factory data and factory decryption
 key.
 
 ```shell
-/out/bouffalolab-bl616dk-light-wifi-mfd/chip-bl616-lighting-example.flash.py --port <serial port>  --mfd out/test-cert/<mfd bin file>
+out/bouffalolab-bl616dk-light-wifi-littlefs-mfd/chip-bl616-lighting-example.flash.py --port <serial port> --mfd out/test-cert/<mfd bin file>
 ```
 
 > If `MFD` file has cipher text data, please append

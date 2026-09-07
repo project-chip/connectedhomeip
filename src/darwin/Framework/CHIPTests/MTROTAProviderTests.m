@@ -36,8 +36,9 @@
 #endif
 
 // TODO: Disable test005_DoBDXTransferAllowUpdateRequest,
-// test006_DoBDXTransferWithTwoOTARequesters and
-// test007_DoBDXTransferIncrementalOtaUpdate until PR #26040 is merged.
+// test006_DoBDXTransferWithTwoOTARequesters,
+// test007_DoBDXTransferIncrementalOtaUpdate and
+// test009_TestOTAMetrics until PR #26040 is merged.
 // Currently the poll interval causes delays in the BDX transfer and
 // results in the test taking a long time.
 #ifdef ENABLE_REAL_OTA_UPDATE_TESTS
@@ -63,6 +64,9 @@ static NSString * kOnboardingPayload3 = @"MT:-24J0IRV01L10648G00"; // Discrimina
 
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
+#ifdef ENABLE_REAL_OTA_UPDATE_TESTS
+static const uint16_t kTestProductId = 0x8001u;
+#endif // ENABLE_REAL_OTA_UPDATE_TESTS
 static const uint16_t kOTAProviderEndpointId = 0;
 
 static MTRDeviceController * sController = nil;
@@ -136,7 +140,7 @@ typedef void (^BDXTransferBeginHandler)(NSNumber * nodeID, MTRDeviceController *
     NSNumber * offset, MTRStatusCompletion completion);
 typedef void (^BDXQueryHandler)(NSNumber * nodeID, MTRDeviceController * controller, NSNumber * blockSize, NSNumber * blockIndex,
     NSNumber * bytesToSkip, BlockQueryCompletion completion);
-typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error);
+typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error);
 
 @interface MTROTAProviderDelegateImpl : NSObject <MTROTAProviderDelegate>
 @property (nonatomic, nullable) QueryImageHandler queryImageHandler;
@@ -228,10 +232,11 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
 
 - (void)handleBDXTransferSessionEndForNodeID:(NSNumber *)nodeID
                                   controller:(MTRDeviceController *)controller
+                                     metrics:(MTRMetrics *)metrics
                                        error:(NSError * _Nullable)error
 {
     if (self.transferEndHandler) {
-        self.transferEndHandler(nodeID, controller, error);
+        self.transferEndHandler(nodeID, controller, metrics, error);
     } else {
         XCTFail(@"Unexpected end of BDX transfer");
     }
@@ -441,7 +446,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
             [self.bdxQueryExpectation fulfill];
         }
     };
-    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
+    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
         XCTAssertEqualObjects(nodeID, nodeID);
         XCTAssertEqual(controller, sController);
         XCTAssertNil(error);
@@ -783,12 +788,16 @@ static BOOL sStackInitRan = NO;
         NSNumber * offset, MTRStatusCompletion outerCompletion) {
         sOTAProviderDelegate.transferBeginHandler = nil;
         // Now that we've begun a transfer, we expect to be told when it ends, even if it's due to an error
-        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
+        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
             [transferEndExpectation fulfill];
             sOTAProviderDelegate.transferEndHandler = nil;
             XCTAssertEqualObjects(nodeID, @(kDeviceId1));
             XCTAssertIdentical(controller, sController);
-            XCTAssertNotNil(error); // we cancelled the transfer, so there should be an error
+            // We cancelled the transfer with a specific error, so the transfer-end callback should
+            // report that actual error rather than a generic one.
+            XCTAssertNotNil(error);
+            XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+            XCTAssertEqual(error.code, MTRErrorCodeCancelled);
         };
 
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
@@ -815,8 +824,9 @@ static BOOL sStackInitRan = NO;
                                       softwareVersionString:kUpdatedSoftwareVersionString_5
                                                  completion:innerCompletion];
 
-            // Cancel the transfer with device1
-            [sOTAProviderDelegate respondErrorWithCompletion:outerCompletion];
+            // Cancel the transfer with device1, using a specific error so we can verify it is the
+            // error reported to the transfer-end callback (rather than a generic error).
+            [sOTAProviderDelegate respondErrorWithCode:MTRErrorCodeCancelled completion:outerCompletion];
         };
 
         announceResponseExpectation2 = [self announceProviderToDevice:device2];
@@ -841,6 +851,92 @@ static BOOL sStackInitRan = NO;
                  enforceOrder:YES];
 
     [self waitForExpectations:@[ announceResponseExpectation1, announceResponseExpectation2 ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test003b_ReceiveQueryImageRequestThenTimeOutBDXTransfer
+{
+    // In this test we do the following:
+    //
+    // 1) Shorten the BDX transfer timeout via a user default so the exchange response timeout
+    //    fires quickly instead of after the 5 minute production default.
+    // 2) Advertise ourselves to the device and, when it queries, claim to have an image.
+    // 3) When the device tries to start a BDX transfer, terminate the requestor app so it stops
+    //    responding, then accept the transfer.
+    // 4) Since the peer is gone, the messages we send never get a response, so our exchange
+    //    response timeout fires and the transfer-end callback must report MTRErrorCodeTimeout.
+    NSString * const bdxTimeoutDefaultsKey = @"BDXTransferTimeoutInSeconds";
+    const NSInteger bdxTimeoutInSeconds = 3;
+    [[NSUserDefaults standardUserDefaults] setInteger:bdxTimeoutInSeconds forKey:bdxTimeoutDefaultsKey];
+    // Ensure the override is always cleared, even if an assertion below fails, so it can't leak
+    // into later tests.
+    [self addTeardownBlock:^() {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:bdxTimeoutDefaultsKey];
+    }];
+
+    __auto_type * downloadFilePath =
+        [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", [MTROTAProviderTests nextUniqueIndex]];
+    MTRTestCaseServerApp * requestorApp = [self startCommissionedAppWithName:@"ota-requestor"
+                                                                   arguments:@[ @"--otaDownloadPath", downloadFilePath, @"--autoApplyImage" ]
+                                                                  controller:sController
+                                                                     payload:kOnboardingPayload1
+                                                                      nodeID:@(kDeviceId1)];
+    XCTAssertNotNil(requestorApp);
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+
+    XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
+    XCTestExpectation * transferBeginExpectation = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called"];
+    XCTestExpectation * transferEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
+
+    NSString * fakeImageURI = @"No such image, really";
+
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        sOTAProviderDelegate.queryImageHandler = nil;
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertIdentical(controller, sController);
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                    uri:fakeImageURI
+                                            updateToken:[sOTAProviderDelegate generateUpdateToken]
+                                        softwareVersion:kUpdatedSoftwareVersion_5
+                                  softwareVersionString:kUpdatedSoftwareVersionString_5
+                                             completion:completion];
+        [queryExpectation fulfill];
+    };
+
+    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
+        NSNumber * offset, MTRStatusCompletion completion) {
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertIdentical(controller, sController);
+
+        // Now that we've begun a transfer, we expect to be told when it ends.
+        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
+            sOTAProviderDelegate.transferEndHandler = nil;
+            XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+            XCTAssertIdentical(controller, sController);
+            // The peer stopped responding, so the transfer must end with a timeout error reported
+            // to the transfer-end callback (rather than a generic error).
+            XCTAssertNotNil(error);
+            XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+            XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+            [transferEndExpectation fulfill];
+        };
+
+        // Terminate the requestor so it stops responding, then accept the transfer.  Since the peer
+        // is gone, the messages we send will never get a response and our (shortened) exchange
+        // response timeout will fire.
+        [requestorApp terminate];
+        [sOTAProviderDelegate respondSuccess:completion];
+        [transferBeginExpectation fulfill];
+    };
+
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+
+    // Wait long enough for commissioning/announce plus the shortened BDX timeout to fire.
+    [self waitForExpectations:@[ queryExpectation, transferBeginExpectation, transferEndExpectation ]
+                      timeout:(kTimeoutInSeconds + bdxTimeoutInSeconds + 30)
+                 enforceOrder:YES];
+    [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test004_DoBDXTransferDenyUpdateRequest
@@ -904,7 +1000,7 @@ static BOOL sStackInitRan = NO;
     [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
 }
 
-// TODO: Enable tests 005, 006 and 007 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer
+// TODO: Enable tests 005, 006, 007 and 009 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer
 // and results in the tests taking a long time. With PR #26040 we eliminate the poll interval completely and hence the tests can run
 // in a short time.
 #ifdef ENABLE_REAL_OTA_UPDATE_TESTS
@@ -1128,7 +1224,7 @@ static BOOL sStackInitRan = NO;
             [bdxQueryExpectation1 fulfill];
         }
     };
-    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
+    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
         XCTAssertEqual(controller, sController);
         XCTAssertNil(error);
@@ -1207,7 +1303,7 @@ static BOOL sStackInitRan = NO;
             }
         };
         sOTAProviderDelegate.transferEndHandler
-            = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
+            = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
                   XCTAssertEqualObjects(nodeID, @(kDeviceId2));
                   XCTAssertEqual(controller, sController);
                   XCTAssertNil(error);
@@ -1578,6 +1674,89 @@ static BOOL sStackInitRan = NO;
         [self waitForExpectations:@[ writeExpectation ] timeout:kTimeoutInSeconds];
     }
 }
+
+#ifdef ENABLE_REAL_OTA_UPDATE_TESTS
+- (void)test009_TestOTAMetrics
+{
+    NSString * otaRawImagePath = [self createRawImageWithVersion:kUpdatedSoftwareVersion_5];
+    NSString * otaImagePath = [otaRawImagePath stringByReplacingOccurrencesOfString:@"raw-image" withString:@"image"];
+
+    // Check whether the ota raw image exists at otaRawImagePath
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath]);
+
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * gotDeviceCachePrimed = [self expectationWithDescription:@"Device cache primed for the first time"];
+    delegate.onDeviceCachePrimed = ^{
+        [gotDeviceCachePrimed fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ gotDeviceCachePrimed ] timeout:60];
+
+    __auto_type * checker =
+        [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:otaRawImagePath
+                                           otaImageDownloadFilePath:runner.downloadFilePath
+                                                             nodeID:@(kDeviceId1)
+                                                    softwareVersion:kUpdatedSoftwareVersion_5
+                                              softwareVersionString:kUpdatedSoftwareVersionString_5
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionProceed
+                                                           testcase:self];
+
+    BDXTransferEndHandler existingTransferEndHandler = sOTAProviderDelegate.transferEndHandler;
+    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
+        XCTAssertNil(error);
+
+        NSError * fileError = nil;
+        NSDictionary * fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:otaImagePath error:&fileError];
+        XCTAssertNil(fileError);
+
+        __auto_type getValue = ^uint32_t(NSString * dataKey, NSString * valueKey) {
+            MTRMetricData * data = [metrics metricDataForKey:dataKey];
+            id value = [data valueForKey:valueKey];
+            XCTAssertNotNil(value);
+            return [value unsignedIntValue];
+        };
+
+        XCTAssertEqual(getValue(@"dwnfw__ota__device_vendor_id_event", @"value"), kTestVendorId);
+        XCTAssertEqual(getValue(@"dwnfw__ota__device_product_id_event", @"value"), kTestProductId);
+        XCTAssertEqual(getValue(@"dwnfw__ota__transfer_offset_event", @"value"), 0);
+        XCTAssertEqual(getValue(@"dwnfw__ota__num_bytes_processed_event", @"value"), [fileAttributes fileSize]);
+        XCTAssertEqual(getValue(@"dwnfw__ota__device_uses_thread_bool_event", @"value"), 0);
+
+        XCTAssertEqual(getValue(@"dwnfw__ota__transfer_end", @"errorCode"), 0);
+        XCTAssertNotEqual(getValue(@"dwnfw__ota__transfer_end", @"duration"), 0);
+
+        existingTransferEndHandler(nodeID, controller, metrics, error);
+    };
+
+    // Advertise ourselves as an OTA provider.
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+
+    // Make sure we get our callbacks in order.  Give it a bit more time, because
+    // we want to allow time for the BDX download.
+    [self waitForExpectations:@[
+        checker.queryExpectation, checker.bdxBeginExpectation, checker.bdxQueryExpectation, checker.bdxEndExpectation
+    ]
+                      timeout:(kTimeoutWithUpdateInSeconds) enforceOrder:YES];
+
+    // Nothing really defines the ordering of bdxEndExpectation and
+    // applyUpdateRequestExpectation with respect to each other.
+    [self waitForExpectations:@[ checker.applyUpdateRequestExpectation, checker.notifyUpdateAppliedExpectation ]
+                      timeout:kTimeoutInSeconds
+                 enforceOrder:YES];
+
+    // Nothing defines the ordering of announceResponseExpectation with respect
+    // to _any_ of the above expectations.
+    [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
+}
+#endif // ENABLE_REAL_OTA_UPDATE_TESTS
 
 - (void)test999_TearDown
 {

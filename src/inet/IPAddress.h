@@ -54,7 +54,7 @@
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <openthread/icmp6.h>
 #include <openthread/ip6.h>
-#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT || CHIP_DEVICE_LAYER_TARGET_ZEPHYR
 // Currently to use openthread endpoint in nRFConnect, we must fetch defines from zephyr's net
 // OpenThread header. It will be removed once the Zephyr version is updated to 4.2.0.
 #include <zephyr/net/openthread.h>
@@ -170,6 +170,7 @@ public:
 #endif
     static constexpr uint16_t kMaxStringLength = OT_IP6_ADDRESS_STRING_SIZE;
 #endif
+    static constexpr uint16_t kMaxAddressWithInterfaceLength = kMaxStringLength + 1 + Inet::InterfaceId::kMaxIfNameLength;
 
     IPAddress() = default;
 
@@ -371,6 +372,7 @@ public:
      * @return  The argument \c buf if no formatting error, or zero otherwise.
      */
     char * ToString(char * buf, uint32_t bufSize) const;
+    char * ToString(char * buf, uint32_t bufSize, const Inet::InterfaceId & interfaceId) const;
 
     /**
      * A version of ToString that writes to a literal and deduces how much space
@@ -380,6 +382,12 @@ public:
     inline char * ToString(char (&buf)[N]) const
     {
         return ToString(buf, N);
+    }
+
+    template <uint32_t N>
+    inline char * ToString(char (&buf)[N], const Inet::InterfaceId & interfaceId) const
+    {
+        return ToString(buf, N, interfaceId);
     }
 
     /**
@@ -428,7 +436,7 @@ public:
      * @retval true  The presentation format is valid
      * @retval false Otherwise
      */
-    static bool FromString(const char * str, IPAddress & addrOutput, class InterfaceId & ifaceOutput);
+    static bool FromString(const char * str, IPAddress & addrOutput, Inet::InterfaceId & ifaceOutput);
 
     /**
      * @brief   Emit the IP address in standard network representation.
@@ -686,11 +694,15 @@ public:
     static IPAddress MakeIPv6PrefixMulticast(uint8_t aScope, uint8_t aPrefixLength, const uint64_t & aPrefix, uint32_t aGroupId);
 
     /**
-     * @brief   Construct an IPv4 broadcast address.
+     * @brief   Construct the well-known IPv6 multicast address ff05::fa.
+     *
+     * @details
+     *  Returns the site-local scoped well-known multicast address
+     *  with group identifier 0xFA, used for Matter groupcast messaging.
      *
      * @return  The constructed IP address.
      */
-    static IPAddress MakeIPv4Broadcast();
+    static IPAddress MakeIPv6MatterIANAMulticastAddr();
 
     /**
      * @brief   The distinguished unspecified IP address object.

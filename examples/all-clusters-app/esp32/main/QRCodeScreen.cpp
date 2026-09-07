@@ -44,8 +44,7 @@
 
 #include <string>
 
-// TODO need sensible library tag when put in library
-extern const char TAG[];
+static constexpr char TAG[] = "QRCodeScreen";
 
 namespace {
 

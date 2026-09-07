@@ -25,6 +25,18 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlAuxiliaryTypeEnum val)
+{
+    using EnumType = AccessControl::AccessControlAuxiliaryTypeEnum;
+    switch (val)
+    {
+    case EnumType::kSystem:
+    case EnumType::kGroupcast:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryAuthModeEnum val)
 {
     using EnumType = AccessControl::AccessControlEntryAuthModeEnum;

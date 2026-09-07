@@ -169,6 +169,8 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
                  LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kCancelPasscodeTag), mCancelPasscode)),
                  LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kPasscodeLengthTag), GetPasscodeLength())),
+                 LogErrorOnFailure(err));
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Finalize()), LogErrorOnFailure(err));
@@ -226,6 +228,9 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
         case kCancelPasscodeTag:
             err = reader.Get(mCancelPasscode);
             break;
+        case kPasscodeLengthTag:
+            err = reader.Get(mPasscodeLength);
+            break;
         }
     }
 
@@ -264,12 +269,12 @@ void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAdd
                     "UserDirectedCommissioningClient::OnMessageReceived() CommissionerDeclaration DataLength() = %" PRIu32,
                     static_cast<uint32_t>(msg->DataLength()));
 
-    uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
-    size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
-    msg->Read(udcPayload, udcPayloadLength);
+    uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes] = {};
+    size_t udcPayloadLength                                            = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
+    ReturnOnFailure(msg->Read(udcPayload, udcPayloadLength));
 
     CommissionerDeclaration cd;
-    cd.ReadPayload(udcPayload, sizeof(udcPayload));
+    ReturnOnFailure(cd.ReadPayload(udcPayload, udcPayloadLength));
     cd.DebugLog();
 
     // Call the registered mCommissionerDeclarationHandler, if any.

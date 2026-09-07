@@ -24,7 +24,7 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-class WindowCoveringManager : public Delegate
+class WindowCoveringManager : public WindowCoveringDelegate
 {
 public:
     void Init(chip::EndpointId endpoint);

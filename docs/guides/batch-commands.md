@@ -35,8 +35,8 @@ Note:
 
 ## Testing
 
-Using `chip-repl`, you are able to send batch commands using `SendBatchCommands`
-in `ChipDeviceController`.
+Using `matter-repl`, you are able to send batch commands using
+`SendBatchCommands` in `ChipDeviceController`.
 
 Note: `chip-tool` does NOT support sending batch commands.
 

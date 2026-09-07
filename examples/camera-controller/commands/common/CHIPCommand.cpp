@@ -25,7 +25,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <platform/LockTracker.h>
 
@@ -326,7 +326,7 @@ std::string CHIPCommand::GetIdentity()
             // normalize name since it is used in persistent storage
 
             char s[24];
-            sprintf(s, "%lx", fabricId);
+            sprintf(s, "%" PRIx64, fabricId);
 
             name = s;
         }

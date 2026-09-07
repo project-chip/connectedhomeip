@@ -31,7 +31,7 @@ namespace WindowCovering {
 /** @brief
  *    Defines methods for implementing application-specific logic for the WindowCovering Cluster.
  */
-class ChefDelegate : public Delegate
+class ChefDelegate : public WindowCoveringDelegate
 {
 public:
     /**

@@ -23,6 +23,9 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#if CHIP_OP_KEYSTORE_ELE
+#include "EleManagerImpl.h"
+#endif
 
 namespace chip {
 
@@ -75,7 +78,7 @@ public:
         mStorage = nullptr;
     }
 
-    bool HasPendingOpKeypair() const override { return (mPendingKeypair != nullptr); }
+    bool HasPendingOpKeypair() const override;
 
     bool HasOpKeypairForFabric(FabricIndex fabricIndex) const override;
     CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override;
@@ -113,6 +116,11 @@ protected:
     // If overridding NewOpKeypairForFabric method in a subclass, set this to true in
     // `NewOpKeypairForFabric` if the mPendingKeypair should not be deleted when no longer in use.
     bool mIsExternallyOwnedKeypair = false;
+
+#if CHIP_OP_KEYSTORE_ELE
+private:
+    std::shared_ptr<Credentials::ele::EleManagerKeystore> mEleManager = Credentials::ele::EleManagerKeystore::getInstance();
+#endif
 };
 
 } // namespace chip

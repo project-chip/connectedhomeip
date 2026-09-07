@@ -69,6 +69,20 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
 
 CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
 {
+    // If the top-level payload is concatenated, we recurse with the subpayloads
+    //  which will have `isConcatenated` as `false`.
+    if (payload.isConcatenated) {
+        bool firstPayload = true;
+        for (MTRSetupPayload * subPayload in payload.subPayloads) {
+            if (!firstPayload) {
+                NSLog(@"----------");
+            }
+            ReturnErrorOnFailure(Print(subPayload));
+            firstPayload = false;
+        }
+        return CHIP_NO_ERROR;
+    }
+
     NSLog(@"Version:       %@", payload.version);
     NSLog(@"VendorID:      %@", payload.vendorID);
     NSLog(@"ProductID:     %@", payload.productID);
@@ -84,16 +98,22 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
                 [humanFlags appendString:@"SoftAP"];
             }
             if (value & MTRDiscoveryCapabilitiesBLE) {
-                if (!humanFlags) {
+                if ([humanFlags length]) {
                     [humanFlags appendString:@", "];
                 }
                 [humanFlags appendString:@"BLE"];
             }
             if (value & MTRDiscoveryCapabilitiesOnNetwork) {
-                if (!humanFlags) {
+                if ([humanFlags length]) {
                     [humanFlags appendString:@", "];
                 }
                 [humanFlags appendString:@"ON NETWORK"];
+            }
+            if (value & MTRDiscoveryCapabilitiesNFC) {
+                if ([humanFlags length]) {
+                    [humanFlags appendString:@", "];
+                }
+                [humanFlags appendString:@"NFC"];
             }
 
             NSLog(@"Capabilities:  0x%02lX (%@)", static_cast<long>(value), humanFlags);

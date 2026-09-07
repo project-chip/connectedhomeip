@@ -117,6 +117,15 @@ declare -a args=(
     )
 }
 
+# Size-optimized Release builds: exclude legacy chip-tool sources,
+# disable tracing, and enable aggressive dead-code elimination.
+[[ $CONFIGURATION == Release* ]] && {
+    args+=(
+        'optimize_apk_size=true'
+        'is_debug=false'
+    )
+}
+
 # search current (or $2) and its parent directories until
 #  a name match is found, which is output on stdout
 find_in_ancestors() {

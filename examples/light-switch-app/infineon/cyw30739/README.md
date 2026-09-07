@@ -51,8 +51,8 @@ location if you followed the
 refer to the Installation Guide for the default location for different operating
 systems.
 
-If you need to install the ModusToolbox™ tools package in a custom location, you
-must set the environment variable `CY_TOOLS_PATHS` to the
+If you need to install the ModusToolbox™ tools package in a custom location,
+you must set the environment variable `CY_TOOLS_PATHS` to the
 `/path/to/ModusToolbox/tools_x.x` to specify the location of tools.
 
 ```bash

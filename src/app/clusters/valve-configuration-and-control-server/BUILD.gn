@@ -11,5 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("valve-configuration-and-control-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("valve-configuration-and-control-server") {
+  sources = [
+    "TimeSyncTracker.h",
+    "ValveConfigurationAndControlCluster.cpp",
+    "ValveConfigurationAndControlCluster.h",
+    "valve-configuration-and-control-delegate.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/cluster-building-blocks",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/ValveConfigurationAndControl",
+  ]
 }

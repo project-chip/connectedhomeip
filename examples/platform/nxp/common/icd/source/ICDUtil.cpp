@@ -20,11 +20,18 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #ifndef CONFIG_APP_FREERTOS_OS
-#include <platform/nxp/zephyr/ota/OTAImageProcessorImpl.h>
+#include <platform/Zephyr/OTAImageProcessorImpl.h>
 #else
 #include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 #endif /* CONFIG_APP_FREERTOS_OS */
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR */
+
+#if CONFIG_NXP_USE_POWER_DOWN
+#include "PWR_Interface.h"
+#include <app/icd/server/ICDConfigurationData.h>
+
+chip::NXP::App::NxpICDObserver chip::NXP::App::NxpICDObserver::sICDObserver;
+#endif // CONFIG_NXP_USE_POWER_DOWN
 
 chip::NXP::App::ICDUtil chip::NXP::App::ICDUtil::sICDUtil;
 
@@ -47,3 +54,46 @@ CHIP_ERROR chip::NXP::App::ICDUtil::OnSubscriptionRequested(chip::app::ReadHandl
 #endif
     return CHIP_NO_ERROR;
 }
+
+#if CONFIG_NXP_USE_POWER_DOWN
+chip::NXP::App::NxpICDObserver::~NxpICDObserver()
+{
+    // Ensure low-power constraints are released
+    OnEnterActiveMode();
+}
+
+void chip::NXP::App::NxpICDObserver::OnEnterIdleMode()
+{
+    // In Idle Mode remove the DeepSleep constraint and let the device go into
+    // PowerDown if the polling period exceeds CONFIG_NXP_POWER_DOWN_POLL_THRESHOLD
+    System::Clock::Milliseconds32 slowPollInterval = chip::ICDConfigurationData::GetInstance().GetSlowPollingInterval();
+    if ((slowPollInterval >= chip::System::Clock::Seconds32(CONFIG_NXP_POWER_DOWN_POLL_THRESHOLD)) && (mLPState != PowerDown))
+    {
+        ::PWR_SetLowPowerModeConstraint(PWR_PowerDown);
+        ::PWR_ReleaseLowPowerModeConstraint(PWR_DeepSleep);
+        mLPState = PowerDown;
+    }
+}
+
+void chip::NXP::App::NxpICDObserver::OnEnterActiveMode()
+{
+    // In Active Mode add a DeepSleep constraint to prevent the device from
+    // going all the way to PowerDown state
+    if (mLPState != DeepSleep)
+    {
+        ::PWR_SetLowPowerModeConstraint(PWR_DeepSleep);
+        ::PWR_ReleaseLowPowerModeConstraint(PWR_PowerDown);
+        mLPState = DeepSleep;
+    }
+}
+
+void chip::NXP::App::NxpICDObserver::OnTransitionToIdle()
+{
+    // Do nothing.
+}
+
+void chip::NXP::App::NxpICDObserver::OnICDModeChange()
+{
+    // Do nothing.
+}
+#endif // CONFIG_NXP_USE_POWER_DOWN

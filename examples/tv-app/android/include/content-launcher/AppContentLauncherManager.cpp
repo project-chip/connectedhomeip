@@ -17,9 +17,12 @@
  */
 
 #include "AppContentLauncherManager.h"
+
 #include "../../java/ContentAppAttributeDelegate.h"
 #include <app/util/config.h>
+#include <clusters/ContentLauncher/Metadata.h>
 #include <json/json.h>
+#include <lib/support/Span.h>
 
 #include <list>
 #include <string>
@@ -28,6 +31,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
+using namespace chip::literals;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate,
@@ -66,9 +70,9 @@ void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<Launch
 
     LaunchResponseType response;
     // TODO: Insert code here
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.data   = chip::MakeOptional("exampleData"_span);
     response.status = ContentLauncher::StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
@@ -81,9 +85,9 @@ void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResp
 
     // TODO: Insert code here
     LaunchResponseType response;
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("Success"));
+    response.data   = chip::MakeOptional("Success"_span);
     response.status = ContentLauncher::StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
@@ -157,6 +161,31 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     return mSupportedStreamingProtocols;
 }
 
+bool AppContentLauncherManager::HandleGetMovable()
+{
+    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetMovable");
+    return true;
+}
+
+CHIP_ERROR AppContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
+{
+    using namespace chip::literals;
+    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetPresets");
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset1;
+        preset1.presetID   = 1;
+        preset1.presetName = "Morning News"_span;
+        ReturnErrorOnFailure(encoder.Encode(preset1));
+
+        chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset2;
+        preset2.presetID   = 2;
+        preset2.presetName = "Evening Playlist"_span;
+        ReturnErrorOnFailure(encoder.Encode(preset2));
+
+        return CHIP_NO_ERROR;
+    });
+}
+
 uint32_t AppContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
@@ -173,7 +202,7 @@ uint16_t AppContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return kClusterRevision;
+        return chip::app::Clusters::ContentLauncher::kRevision;
     }
 
     uint16_t clusterRevision = 0;

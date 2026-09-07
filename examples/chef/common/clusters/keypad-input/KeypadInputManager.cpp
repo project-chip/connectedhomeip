@@ -61,7 +61,7 @@ void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType
         break;
     }
 
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 uint32_t KeypadInputManager::GetFeatureMap(chip::EndpointId endpoint)

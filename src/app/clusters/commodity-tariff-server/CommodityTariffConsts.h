@@ -22,7 +22,7 @@
 #include <cstdint>
 namespace CommodityTariffConsts {
 static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
-static constexpr size_t kDefaultListAttrMaxLength        = 128u;
+static constexpr size_t kDefaultListAttrMaxLength        = 672u;
 constexpr uint16_t kMaxCurrencyValue                     = 999; // From spec
 
 static constexpr size_t kTariffInfoMaxLabelLength      = kDefaultStringValuesMaxBufLength;
@@ -30,7 +30,7 @@ static constexpr size_t kTariffInfoMaxProviderLength   = kDefaultStringValuesMax
 static constexpr size_t kTariffComponentMaxLabelLength = kDefaultStringValuesMaxBufLength;
 
 static constexpr size_t kDayEntriesAttrMaxLength       = kDefaultListAttrMaxLength;
-static constexpr size_t kDayPatternsAttrMaxLength      = kDefaultListAttrMaxLength;
+static constexpr size_t kDayPatternsAttrMaxLength      = 28;
 static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLength;
 static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
 
@@ -43,4 +43,5 @@ static constexpr size_t kDayPatternItemMaxDayEntryIDs       = kDayStructItemMaxD
 static constexpr size_t kTariffPeriodItemMaxIDs             = 20;
 static constexpr uint16_t kDayEntryDurationLimit            = 1500;
 static constexpr uint8_t kFullWeekMask                      = 0x7f;
+static constexpr uint8_t kFeaturesCount                     = 7;
 } // namespace CommodityTariffConsts

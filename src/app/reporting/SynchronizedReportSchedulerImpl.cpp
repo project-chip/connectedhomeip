@@ -84,6 +84,19 @@ bool SynchronizedReportSchedulerImpl::IsReportScheduled(ReadHandler * ReadHandle
     return mTimerDelegate->IsTimerActive(this);
 }
 
+void SynchronizedReportSchedulerImpl::RescheduleAllReports()
+{
+    VerifyOrReturn(mNodesPool.Allocated());
+    Timestamp now   = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    Timeout timeout = Milliseconds32(0);
+    CHIP_ERROR err  = CalculateNextReportTimeout(timeout, nullptr, now);
+    LogErrorOnFailure(err);
+    if (err == CHIP_NO_ERROR)
+    {
+        LogErrorOnFailure(ScheduleReport(timeout, nullptr, now));
+    }
+}
+
 CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMaxInterval(const Timestamp & now)
 {
     VerifyOrReturnError(mNodesPool.Allocated(), CHIP_ERROR_INVALID_LIST_LENGTH);
@@ -211,12 +224,12 @@ void SynchronizedReportSchedulerImpl::TimerFired()
         // from the monotonic timer), and we don't know which handler was the one that should be reportable.
         Timeout timeout = Milliseconds32(0);
         ReturnOnFailure(CalculateNextReportTimeout(timeout, nullptr, now));
-        ScheduleReport(timeout, nullptr, now);
+        TEMPORARY_RETURN_IGNORED ScheduleReport(timeout, nullptr, now);
     }
     else
     {
         // If we have a reportable handler, we can schedule an engine run
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 }
 

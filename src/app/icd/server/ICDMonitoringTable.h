@@ -50,7 +50,7 @@ static constexpr size_t MaxICDMonitoringEntrySize()
 
 inline constexpr size_t kICDMonitoringBufferSize = MaxICDMonitoringEntrySize();
 
-struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
+struct ICDMonitoringEntry : public PersistableData<kICDMonitoringBufferSize>
 {
     ICDMonitoringEntry(FabricIndex fabric = kUndefinedFabricIndex, NodeId nodeId = kUndefinedNodeId)
     {

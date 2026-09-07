@@ -26,8 +26,6 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
-#include <app/util/attribute-storage-null-handling.h>
-#include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVReader.h>
@@ -36,6 +34,7 @@
 #include <lib/core/TLVWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/odd-sized-integers.h>
 
 #include <limits>
 #include <optional>
@@ -62,19 +61,19 @@ public:
 
         TLV::TLVType outer;
 
-        VerifyOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer) == CHIP_NO_ERROR);
-        VerifyOrDie(DataModel::Encode(writer, kTag, value) == CHIP_NO_ERROR);
-        VerifyOrDie(writer.EndContainer(outer) == CHIP_NO_ERROR);
+        SuccessOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
+        SuccessOrDie(DataModel::Encode(writer, kTag, value));
+        SuccessOrDie(writer.EndContainer(outer));
 
-        VerifyOrDie(writer.Finalize() == CHIP_NO_ERROR);
+        SuccessOrDie(writer.Finalize());
         size_t fill = writer.GetLengthWritten();
 
         TLV::TLVReader reader;
         reader.Init(mBuffer, fill);
-        VerifyOrDie(reader.Next() == CHIP_NO_ERROR);
+        SuccessOrDie(reader.Next());
         VerifyOrDie(reader.GetTag() == TLV::AnonymousTag());
-        VerifyOrDie(reader.EnterContainer(outer) == CHIP_NO_ERROR);
-        VerifyOrDie(reader.Next() == CHIP_NO_ERROR);
+        SuccessOrDie(reader.EnterContainer(outer));
+        SuccessOrDie(reader.Next());
         VerifyOrDie(reader.GetTag() == kTag);
 
         return reader;

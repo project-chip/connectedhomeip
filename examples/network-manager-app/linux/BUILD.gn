@@ -15,11 +15,15 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+declare_args() {
+  # Enable OpenWrt ubus integration
+  matter_enable_ubus = false
+}
+
 executable("matter-network-manager-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
-    "tbrm.cpp",
   ]
 
   deps = [
@@ -28,7 +32,30 @@ executable("matter-network-manager-app") {
     "${chip_root}/src/lib",
   ]
 
+  libs = []
+  defines = []
   include_dirs = [ "include" ]
+
+  if (matter_enable_ubus) {
+    defines += [ "MATTER_ENABLE_UBUS=1" ]
+    sources += [
+      "ThreadBROpenThreadUbus.cpp",
+      "ThreadBROpenThreadUbus.h",
+      "UboxUtils.cpp",
+      "UboxUtils.h",
+      "UbusManager.cpp",
+      "UbusManager.h",
+      "UloopHandler.cpp",
+      "UloopHandler.h",
+    ]
+    libs += [
+      "ubox",
+      "ubus",
+    ]
+  } else {
+    sources += [ "ThreadBRFake.h" ]
+  }
+
   output_dir = root_out_dir
 }
 

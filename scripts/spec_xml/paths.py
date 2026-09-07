@@ -15,23 +15,23 @@
 # limitations under the License.
 
 import os
+from pathlib import Path
 
 
-def get_chip_root():
+def get_chip_root() -> Path:
     """
     Returns the CHIP root directory, trying the environment variable first
     and falling back if necessary.
     """
     chip_root = os.getenv('PW_PROJECT_ROOT')
     if chip_root:
-        return chip_root
-    else:
-        try:
-            return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-        except Exception as e:
-            raise EnvironmentError(
-                "Unable to determine CHIP root directory. Please ensure the environment is activated."
-            ) from e
+        return Path(chip_root)
+    try:
+        return next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+    except Exception as e:
+        raise OSError(
+            "Unable to determine CHIP root directory. Please ensure the environment is activated."
+        ) from e
 
 
 def get_data_model_path():

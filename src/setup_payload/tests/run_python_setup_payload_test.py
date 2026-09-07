@@ -39,8 +39,7 @@ def payload_param_dict():
 
 def remove_escape_sequence(data):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-    result = ansi_escape.sub('', data)
-    return result
+    return ansi_escape.sub('', data)
 
 
 def chip_tool_parse_setup_payload(chip_tool, payload):

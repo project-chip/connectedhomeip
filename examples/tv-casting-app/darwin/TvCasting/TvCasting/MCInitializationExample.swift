@@ -67,6 +67,10 @@ class MCAppParametersDataSource : NSObject, MCDataSource
         return commissionableData
     }
     
+    func castingAppDidReceiveRequestForDeviceInstanceInfoProvider(_ sender: Any) -> (any MCDeviceInstanceInfoProvider)? {
+        return SampleDeviceInstanceInfoProvider()
+    }
+    
     // dummy DAC values for demonstration only
     let kDevelopmentDAC_Cert_FFF1_8001: Data = Data(base64Encoded: "MIIB5zCCAY6gAwIBAgIIac3xDenlTtEwCgYIKoZIzj0EAwIwPTElMCMGA1UEAwwcTWF0dGVyIERldiBQQUkgMHhGRkYxIG5vIFBJRDEUMBIGCisGAQQBgqJ8AgEMBEZGRjEwIBcNMjIwMjA1MDAwMDAwWhgPOTk5OTEyMzEyMzU5NTlaMFMxJTAjBgNVBAMMHE1hdHRlciBEZXYgREFDIDB4RkZGMS8weDgwMDExFDASBgorBgEEAYKifAIBDARGRkYxMRQwEgYKKwYBBAGConwCAgwEODAwMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABEY6xpNCkQoOVYj8b/Vrtj5i7M7LFI99TrA+5VJgFBV2fRalxmP3k+SRIyYLgpenzX58/HsxaznZjpDSk3dzjoKjYDBeMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMB0GA1UdDgQWBBSI3eezADgpMs/3NMBGJIEPRBaKbzAfBgNVHSMEGDAWgBRjVA5H9kscONE4hKRi0WwZXY/7PDAKBggqhkjOPQQDAgNHADBEAiABJ6J7S0RhDuL83E0reIVWNmC8D3bxchntagjfsrPBzQIga1ngr0Xz6yqFuRnTVzFSjGAoxBUjlUXhCOTlTnCXE1M=")!;
     
@@ -117,6 +121,23 @@ class MCAppParametersDataSource : NSObject, MCDataSource
         return MCCryptoUtils.ecdsaAsn1SignatureToRaw(withFeLengthBytes: 32,
                                                     asn1Signature: asn1SignatureData!,
                                                          outRawSignature: &outRawSignature.pointee)
+    }
+}
+
+// Sample implementation of MCDeviceInstanceInfoProvider (pull-based).
+// The platform queries these methods at runtime whenever it needs a value.
+// Return nil from any method to fall back to compile-time defaults.
+class SampleDeviceInstanceInfoProvider: NSObject, MCDeviceInstanceInfoProvider {
+    func vendorName() -> String? {
+        return "Test Vendor"
+    }
+
+    func productName() -> String? {
+        return "Test Casting App"
+    }
+
+    func deviceName() -> String? {
+        return "My Casting App"
     }
 }
 

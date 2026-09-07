@@ -29,7 +29,7 @@ import sys
 def LoadBuildConfigs(paths):
     build_configs = []
     for path in paths:
-        with open(path, 'r') as file:
+        with open(path) as file:
             build_configs.append(json.load(file))
     return build_configs
 
@@ -42,8 +42,8 @@ def ParseGnList(value):
             "\"", "").replace(" ", "").split(",")
         if not gn_list[0]:
             return []
-        else:
-            return gn_list
+        return gn_list
+    return None
 
 
 def GetAllDependentJars(deps_configs_data):

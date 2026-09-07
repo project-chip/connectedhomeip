@@ -17,18 +17,22 @@
 
 #include "EventHandlerLibShell.h"
 #include "AppTask.h"
+#include "RefrigeratorConfig.h"
 #include "lib/shell/Engine.h"
 #include "lib/shell/commands/Help.h"
 
 #include "app/server/Server.h"
 #include "platform/CHIPDeviceLayer.h"
+#include <clusters/RefrigeratorAlarm/Events.h>
 #include <lib/support/CodeUtils.h>
 
-constexpr uint8_t kRefEndpointId = 1;
+constexpr chip::EndpointId kRefEndpointId = REFRIGERATOR_ENDPOINT;
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::RefrigeratorAlarm;
+using chip::Protocols::InteractionModel::Status;
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
@@ -88,6 +92,30 @@ CHIP_ERROR AlarmHelpHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR EventRefrigeratorAlarmCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return AlarmHelpHandler(argc, argv);
+    }
+    return sShellRefrigeratorEventAlarmDoorSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR RefrigeratorAlarmSuppressHandler(int argc, char ** argv)
+{
+    if (argc != 0)
+    {
+        ChipLogError(Shell, "Invalid arguments");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
+    data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kMask;
+    data->doorState                   = static_cast<RefrigeratorAlarm::AlarmBitmap>(0);
+
+    return DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
+}
+
 CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 {
 
@@ -112,12 +140,10 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
     int value = std::stoi(argv[0]); // Safe to use now, as we validated the input earlier
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
-    data->eventId                     = RefrigeratorAlarm::Events::Notify::Id;
-    data->doorState                   = static_cast<AlarmBitmap>(value);
+    data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kState;
+    data->doorState                   = static_cast<RefrigeratorAlarm::AlarmBitmap>(value);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 /**
@@ -127,9 +153,13 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 
 CHIP_ERROR RegisterRefrigeratorEvents()
 {
+    // Supported is a fixed attribute: it is loaded from the ZAP default (kDoorOpen) when the
+    // code-driven RefrigeratorAlarm cluster is created. No runtime SetSupportedValue here.
+
     static const shell_command_t sRefrigeratorSubCommands[] = {
         { &RefrigeratorHelpHandler, "help", "Usage: refrigeratoralarm <subcommand>" },
-        { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" }
+        { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" },
+        { &EventRefrigeratorAlarmCommandHandler, "alarm", "Usage: refrigeratoralarm alarm <subcommand>" }
     };
 
     static const shell_command_t sRefrigeratorEventSubCommands[] = {
@@ -138,7 +168,8 @@ CHIP_ERROR RegisterRefrigeratorEvents()
     };
 
     static const shell_command_t sRefrigeratorEventAlarmDoorSubCommands[] = {
-        { &AlarmHelpHandler, "help", "Usage : Refrigerator event to change door state" }
+        { &AlarmHelpHandler, "help", "Usage : refrigeratoralarm alarm <subcommand>" },
+        { &RefrigeratorAlarmSuppressHandler, "suppress", "Suppress the refrigerator alarm" }
     };
 
     static const shell_command_t sRefrigeratorCommand = { &RefrigeratorCommandHandler, "refrigeratoralarm",
@@ -160,11 +191,42 @@ void EventWorkerFunction(intptr_t context)
     VerifyOrReturn(reinterpret_cast<void *>(context) != nullptr, ChipLogError(Shell, "EventWorkerFunction - Invalid work data"));
     EventData * data = reinterpret_cast<EventData *>(context);
 
-    switch (data->eventId)
+    switch (data->eventState)
     {
-    case RefrigeratorAlarm::Events::Notify::Id: {
+    // "suppress" clears the Mask attribute (disables all enabled alarms). AlarmBase also trims
+    // State when Mask shrinks.
+    case RefrigeratorAlarm::Events::Notify::Fields::kMask: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
-        RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, alarmData->doorState);
+        BitMask<AlarmMap> mask(alarmData->doorState);
+        if (RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, mask) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to set refrigerator alarm mask value");
+        }
+        break;
+    }
+
+    // "door-state-change" simulates a State update. AlarmBase requires every set bit in State to
+    // be enabled in Mask and Supported, so a door-open (non-zero) update sets Mask first. This
+    // also re-enables monitoring after "suppress" left Mask at zero. A door-close (zero) update
+    // only clears State so Mask stays enabled, unlike "suppress".
+    case RefrigeratorAlarm::Events::Notify::Fields::kState: {
+        RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
+        BitMask<AlarmMap> doorState(alarmData->doorState);
+        if (doorState.Raw() != 0)
+        {
+            if (RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, doorState) != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set refrigerator alarm mask value");
+            }
+            else if (RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, doorState) != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set refrigerator alarm state value");
+            }
+        }
+        else if (RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, doorState) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to set refrigerator alarm state value");
+        }
         break;
     }
 

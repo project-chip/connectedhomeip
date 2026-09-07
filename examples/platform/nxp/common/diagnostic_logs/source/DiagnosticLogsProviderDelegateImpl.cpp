@@ -71,7 +71,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     VerifyOrReturnError(diagData, CHIP_ERROR_NO_MEMORY);
 
     err = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), diagData, diagSize);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, err);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err, free(diagData));
 
     MutableByteSpan * mutableSpan = reinterpret_cast<MutableByteSpan *>(calloc(1, sizeof(MutableByteSpan)));
     VerifyOrReturnValue(mutableSpan, CHIP_ERROR_NO_MEMORY, free(diagData));

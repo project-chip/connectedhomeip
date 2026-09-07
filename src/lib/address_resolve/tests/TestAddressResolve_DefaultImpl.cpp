@@ -20,6 +20,8 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/IPAddressSorter.h>
 #include <lib/support/StringBuilder.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemLayerImpl.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -349,9 +351,7 @@ TEST(TestAddressResolveDefaultImpl, TestNextActionKeepSearchingByReturingRemaini
 {
     AddressResolve::NodeLookupHandle handle;
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     /// now = 0
     auto now     = System::SystemClock().GetMonotonicTimestamp();
@@ -378,17 +378,13 @@ TEST(TestAddressResolveDefaultImpl, TestNextActionKeepSearchingByReturingRemaini
     now = clock.GetMonotonicTimestamp();
 
     EXPECT_EQ(handle.NextEventTimeout(now), request.GetMaxLookupTime() - 110_ms64);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST(TestAddressResolveDefaultImpl, TestNextActionConsumesTimeoutWhenResultsAreFound)
 {
     AddressResolve::NodeLookupHandle handle;
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     ResolveResult lowResult;
     lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(1));
@@ -413,17 +409,13 @@ TEST(TestAddressResolveDefaultImpl, TestNextActionConsumesTimeoutWhenResultsAreF
 
     // timeout should be consumed now, as we have a result
     EXPECT_EQ(handle.NextEventTimeout(now), 0_ms64);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST(TestAddressResolveDefaultImpl, TestTimeoutGetsClearedWhenResultsAreNotFoundAndMaxLookupTimeIsSurpassed)
 {
     AddressResolve::NodeLookupHandle handle;
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     /// now = 0
     auto now     = System::SystemClock().GetMonotonicTimestamp();
@@ -442,17 +434,13 @@ TEST(TestAddressResolveDefaultImpl, TestTimeoutGetsClearedWhenResultsAreNotFound
 
     // timeout should be cleared
     EXPECT_EQ(handle.NextEventTimeout(now), 0_ms64);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST(TestAddressResolveDefaultImpl, TestKeepsSearchingWhenConsumedTImeIsLessThanMinLookupTime)
 {
     AddressResolve::NodeLookupHandle handle;
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     /// now = 0
     auto now     = System::SystemClock().GetMonotonicTimestamp();
@@ -471,17 +459,13 @@ TEST(TestAddressResolveDefaultImpl, TestKeepsSearchingWhenConsumedTImeIsLessThan
 
     // should keep searching
     EXPECT_EQ(handle.NextAction(now).Type(), chip::AddressResolve::Impl::NodeLookupResult::kKeepSearching);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST(TestAddressResolveDefaultImpl, TestReturnsFoundResultAfterMinLookupTimeIsReached)
 {
     AddressResolve::NodeLookupHandle handle;
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     ResolveResult lowResult;
     lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(1));
@@ -508,17 +492,13 @@ TEST(TestAddressResolveDefaultImpl, TestReturnsFoundResultAfterMinLookupTimeIsRe
     EXPECT_EQ(action.Type(), chip::AddressResolve::Impl::NodeLookupResult::kLookupSuccess);
     // and return the result
     EXPECT_EQ(action.ResolveResult().address, lowResult.address);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST(TestAddressResolveDefaultImpl, TestGivesUpAfterMaxLookupTimeIsReachedWithoutResults)
 {
     AddressResolve::NodeLookupHandle handle;
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     /// now = 0
     auto now     = System::SystemClock().GetMonotonicTimestamp();
@@ -540,8 +520,6 @@ TEST(TestAddressResolveDefaultImpl, TestGivesUpAfterMaxLookupTimeIsReachedWithou
     EXPECT_EQ(action.Type(), chip::AddressResolve::Impl::NodeLookupResult::kLookupError);
     // and report timeout error
     EXPECT_EQ(action.ErrorResult(), CHIP_ERROR_TIMEOUT);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 class MockResolver : public chip::Dnssd::Resolver
@@ -573,18 +551,21 @@ public:
 class TestAddressResolveDefaultImplWithSystemLayer : public ::testing::Test
 {
 public:
-    void SetUp() { mSystemLayer.Init(); }
+    void SetUp() { EXPECT_SUCCESS(mSystemLayer.Init()); }
 
     void TearDown() { mSystemLayer.Shutdown(); }
 
     class MockSystemLayer : public chip::System::LayerImpl
     {
     public:
-        CHIP_ERROR StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete, void * aAppState) override
+        // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
+        CriticalFailure StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete,
+                                   void * aAppState) override
         {
             return mStartTimerCallback ? mStartTimerCallback.value()(aDelay, aComplete, aAppState) : CHIP_NO_ERROR;
         }
-        CHIP_ERROR ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
+        // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
+        CriticalFailure ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
         {
             return mScheduleWorkCallback ? mScheduleWorkCallback.value()(aComplete, aAppState) : CHIP_NO_ERROR;
         }
@@ -658,9 +639,7 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, TriesNextRes
 
     ASSERT_EQ(r, CHIP_NO_ERROR);
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     AddressResolve::NodeLookupHandle handle;
     auto request = NodeLookupRequest(chip::PeerId(1, 2));
@@ -699,8 +678,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, TriesNextRes
     ASSERT_EQ(r, CHIP_NO_ERROR);
     ASSERT_EQ(expectedPeerId.GetNodeId(), NodeId{ 2 });
     ASSERT_EQ(expectedResult.address, GetAddressWithLowScore(static_cast<uint16_t>(1)));
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLookupCallsOnNodeAddressResolutionFailed)
@@ -712,9 +689,7 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLo
 
     ASSERT_EQ(r, CHIP_NO_ERROR);
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     AddressResolve::NodeLookupHandle handle;
     auto request = NodeLookupRequest(chip::PeerId(1, 2));
@@ -738,7 +713,7 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLo
     }
 
     // push some NodeLookup handle into Resolver's internal list
-    resolver.LookupNode(request, handle);
+    EXPECT_SUCCESS(resolver.LookupNode(request, handle));
 
     // set up a failure listener
     CHIP_ERROR expectedError = CHIP_NO_ERROR;
@@ -752,8 +727,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLo
 
     EXPECT_EQ(r, CHIP_NO_ERROR);
     EXPECT_EQ(expectedError, CHIP_ERROR_CANCELLED);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, LooksUpFailsAndCallsFailureListenerWhenSystemStartTimerFails)
@@ -765,9 +738,7 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, LooksUpFails
 
     ASSERT_EQ(r, CHIP_NO_ERROR);
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     AddressResolve::NodeLookupHandle handle;
     auto request = NodeLookupRequest(chip::PeerId(1, 2));
@@ -790,8 +761,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, LooksUpFails
     EXPECT_EQ(r, CHIP_NO_ERROR);
     EXPECT_EQ(expectedError, CHIP_ERROR_CANCELLED);
     EXPECT_EQ(expectedTimerError, CHIP_ERROR_CANCELLED);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener,
@@ -804,9 +773,7 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener,
 
     ASSERT_EQ(r, CHIP_NO_ERROR);
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     AddressResolve::NodeLookupHandle successfulHandle;
     auto successfulRequest = NodeLookupRequest(chip::PeerId(1, 2));
@@ -866,8 +833,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener,
     EXPECT_EQ(expectedResult.address, GetAddressWithLowScore());
     EXPECT_EQ(expectedFailedPeerId.GetNodeId(), NodeId{ 3 });
     EXPECT_EQ(expectedError, CHIP_ERROR_TIMEOUT);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, ResolverShutsDownAndClearsAllPendingLookups)
@@ -877,9 +842,7 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, ResolverShut
 
     ASSERT_EQ(r, CHIP_NO_ERROR);
 
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    System::Clock::Internal::RAIIMockClock clock;
 
     AddressResolve::NodeLookupHandle handle;
     auto request = NodeLookupRequest(chip::PeerId(1, 2));
@@ -900,8 +863,6 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, ResolverShut
     resolver.Shutdown();
 
     EXPECT_EQ(expectedError, CHIP_ERROR_SHUT_DOWN);
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 } // namespace

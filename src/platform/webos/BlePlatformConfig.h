@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,13 +27,15 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-struct BluezConnection;
+class WbsConnection;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
 
 // ==================== Platform Adaptations ====================
+#define BLE_CONNECTION_OBJECT chip::DeviceLayer::Internal::WbsConnection *
 #define BLE_CONNECTION_UNINITIALIZED nullptr
+
 // ========== Platform-specific Configuration Overrides =========
 
 /* none so far */

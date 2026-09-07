@@ -18,9 +18,10 @@
 
 #include "ToCertificateString.h"
 
+#include <cstdio>
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 namespace {
 constexpr const uint8_t kChipRawPrefix[] = { 0x15, 0x30, 0x01 };

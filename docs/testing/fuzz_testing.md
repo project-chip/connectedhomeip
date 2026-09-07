@@ -22,7 +22,7 @@ test. Each fuzzer function is defined using
 
 The Fuzzer must be located in a Test Folder : `src/some_directory/tests/`
 
-```
+```cpp
 #include <cstddef>
 #include <cstdint>
 
@@ -39,7 +39,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
 
     return 0;
 }
-
 ```
 
 See
@@ -104,11 +103,11 @@ for an example of a simple fuzz test.
         ```
 
 -   Build all fuzzers
-    ```
+    ```shell
     ./scripts/build/build_examples.py --target <host>-<compiler>-tests-asan-libfuzzer-clang build
     ```
     e.g.
-    ```
+    ```shell
     ./scripts/build/build_examples.py --target darwin-arm64-tests-asan-libfuzzer-clang build
     ```
     \*\* Make sure to put the right host and compiler
@@ -257,20 +256,41 @@ FUZZ_TEST(PayloadDecoder, RunDecodeFuzz).WithDomains(Arbitrary<std::vector<std::
         FUZZ_TEST(FuzzChipCert, ConvertX509CertToChipCertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isDerFile)));
     ```
 
+-   **Caution**: attach `.WithSeeds()` to an input domain _inside_
+    `.WithDomains(...)`. FuzzTest also allows chaining `.WithSeeds()` on the
+    FUZZ_TEST registration itself (after `.WithDomains(...)`), but seeds
+    provided that way are silently dropped in libFuzzer compatibility mode,
+    which is how OSS-Fuzz runs these tests; only domain-attached seeds are
+    delivered there.
+-   To give a multi-parameter property function _whole-input_ seeds (tuples that
+    pin all parameters together, e.g. so a message sequence stays paired with
+    the setup that makes it meaningful), wrap all the parameter domains in a
+    single `TupleOf(...)` and attach `.WithSeeds()` to it: `.WithDomains()`
+    accepts one tuple domain in place of the individual parameter domains. An
+    example from the Stack is
+    `FUZZ_TEST(FuzzBdxTransferSessionPW, BdxSessionSequenceDoesNotCrash)`:
+
+    ```cpp
+    FUZZ_TEST(MySuite, MyFuzzTest)
+        .WithDomains(TupleOf(Arbitrary<bool>(), Arbitrary<uint16_t>(),
+                             Arbitrary<std::vector<uint8_t>>())
+                         .WithSeeds(WholeInputSeeds()));
+    ```
+
 ### Running FuzzTests
 
 There are several ways to run the tests:
 
 1.  Unit-test mode (where the inputs are only fuzzed for a second):
 
-```bash
+```shell
 ./fuzz-chip-cert-pw
 ```
 
 2.  Continuous fuzzing mode; we need to first list the tests, then specify the
     FuzzTestCase to run:
 
-```bash
+```console
 $ ./fuzz-chip-cert-pw --list_fuzz_tests
 [.] Sanitizer coverage enabled. Counter map size: 11134, Cmp map size: 262144
 [*] Fuzz test: ChipCert.ChipCertFuzzer
@@ -281,20 +301,19 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 
 3. Running all Tests in a TestSuite for a specific time, e.g for 10 minutes
 
-```bash
-#both Fuzz Tests will be run for 10 minutes each
+```shell
+# both Fuzz Tests will be run for 10 minutes each
 ./fuzz-chip-cert-pw --fuzz_for=10m
 ```
 
 4. For Help
 
-```bash
+```shell
 # FuzzTest related help
 ./fuzz-chip-cert-pw --helpfull
 
 # gtest related help
 ./fuzz-chip-cert-pw --help
-
 ```
 
 ### Coverage Report Generation

@@ -65,7 +65,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ValveStateChanged.
+} // namespace ValveStateChanged
 namespace ValveFault {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -96,7 +96,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ValveFault.
+} // namespace ValveFault
 } // namespace Events
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters

@@ -128,7 +128,7 @@ CHIP_ERROR Instance::SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & 
     }
 
     const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (sizeof(mPointOfDeliveryBuf) < len)
+    if (sizeof(mMeterSerialNumberBuf) < len)
     {
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
@@ -155,7 +155,7 @@ CHIP_ERROR Instance::SetProtocolVersion(const DataModel::Nullable<CharSpan> & ne
     }
 
     const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (sizeof(mPointOfDeliveryBuf) < len)
+    if (sizeof(mProtocolVersionBuf) < len)
     {
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }

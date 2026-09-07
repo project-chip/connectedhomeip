@@ -87,8 +87,10 @@ CHIP_ERROR AppTask::AppInit()
     // Register DEM & Electrical Sensor Test Event Trigger
     if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
     {
-        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sEnergyReportingTestEventTriggerHandler);
-        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(
+            &sEnergyReportingTestEventTriggerHandler);
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(
+            &sDeviceEnergyManagementTestEventTriggerHandler);
     }
 #endif
 
@@ -99,9 +101,9 @@ CHIP_ERROR AppTask::AppInit()
     GetDishwasherManager()->UpdateOperationState(state);
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().WriteDemoUI((GetDishwasherManager()->GetOperationalState() == OperationalStateEnum::kRunning));
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
@@ -110,7 +112,7 @@ CHIP_ERROR AppTask::AppInit()
     {
         GetLCD().ShowQRCode(true);
     }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 #endif
 
     return err;
@@ -192,7 +194,7 @@ void AppTask::ActionInitiated(OperationalStateEnum action)
     }
     else if (action == OperationalStateEnum::kStopped)
     {
-        SILABS_LOG("Stoping dishwasher");
+        SILABS_LOG("Stopping dishwasher");
     }
     else if (action == OperationalStateEnum::kPaused)
     {
@@ -220,7 +222,7 @@ void AppTask::ActionInitiated(OperationalStateEnum action)
 
 void AppTask::ActionCompleted()
 {
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI((GetDishwasherManager()->GetOperationalState() == OperationalStateEnum::kRunning));
 #endif
 }

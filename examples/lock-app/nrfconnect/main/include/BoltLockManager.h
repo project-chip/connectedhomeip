@@ -21,7 +21,7 @@
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <lib/core/ClusterEnums.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 #include <zephyr/kernel.h>
 

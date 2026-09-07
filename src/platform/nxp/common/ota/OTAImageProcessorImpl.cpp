@@ -44,7 +44,7 @@ CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
     VerifyOrReturnError(downloader != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mDownloader = downloader;
 
-    OtaHookInit();
+    TEMPORARY_RETURN_IGNORED OtaHookInit();
 
     return CHIP_NO_ERROR;
 }
@@ -57,30 +57,30 @@ void OTAImageProcessorImpl::Clear()
     mParams.downloadedBytes = 0;
     mCurrentProcessor       = nullptr;
 
-    ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED ReleaseBlock();
 }
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -98,7 +98,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -114,7 +114,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mAccumulator.Init(sizeof(OTATlvHeader));
-    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
@@ -124,7 +124,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
     mParams.totalFileBytes = header.mPayloadSize;
     mHeaderParser.Clear();
-    ChipLogError(SoftwareUpdate, "Processed header successfully");
+    ChipLogDetail(SoftwareUpdate, "Processed header successfully");
 
     return CHIP_NO_ERROR;
 }
@@ -262,7 +262,16 @@ void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %" CHIP_ERROR_FORMAT, status.Format());
+        if (status == CHIP_ERROR_OTA_PROCESSOR_START_IMAGE)
+        {
+            ChipLogError(SoftwareUpdate,
+                         "Image update canceled. Failed to process OTA block: CHIP_ERROR_OTA_PROCESSOR_START_IMAGE");
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %" CHIP_ERROR_FORMAT,
+                         status.Format());
+        }
         GetRequestorInstance()->CancelImageUpdate();
     }
 }
@@ -275,8 +284,8 @@ void OTAImageProcessorImpl::AbortAllProcessors()
     {
         if (pair.second->WasSelected())
         {
-            pair.second->AbortAction();
-            pair.second->Clear();
+            TEMPORARY_RETURN_IGNORED pair.second->AbortAction();
+            TEMPORARY_RETURN_IGNORED pair.second->Clear();
             pair.second->SetWasSelected(false);
         }
     }
@@ -293,10 +302,41 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
     return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
 }
 
+CHIP_ERROR OTAImageProcessorImpl::HandleImageStatus()
+{
+    OtaImgState_t otaResult = OTA_GetImgState();
+    switch (otaResult)
+    {
+    case OtaImgState_None:
+    case OtaImgState_Permanent:
+        ChipLogProgress(SoftwareUpdate, "Image state: Default state, current image made permanent");
+        break;
+    case OtaImgState_Acquiring:
+        ChipLogProgress(SoftwareUpdate, "Image state: Acquisition of new firmware is ongoing");
+        break;
+    case OtaImgState_CandidateRdy:
+        ChipLogProgress(SoftwareUpdate, "Image state: Candidate ready");
+        break;
+    case OtaImgState_RunCandidate:
+        ChipLogProgress(SoftwareUpdate, "Image state: Running candidate");
+        break;
+    case OtaImgState_Fail:
+        ChipLogError(SoftwareUpdate, "Image state: FAIL");
+        return CHIP_ERROR_INTERNAL;
+    default:
+        ChipLogError(SoftwareUpdate, "Image state: UNKNOWN");
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
     uint32_t currentVersion;
     uint32_t targetVersion;
+
+    VerifyOrReturnError(HandleImageStatus() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL);
@@ -324,7 +364,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            TEMPORARY_RETURN_IGNORED ReleaseBlock();
         }
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)
@@ -351,7 +391,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 }
 
 void OTAImageProcessorImpl::Cleanup()
@@ -394,20 +434,20 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     for (auto const & pair : imageProcessor->mProcessorMap)
     {
-        pair.second->Clear();
+        TEMPORARY_RETURN_IGNORED pair.second->Clear();
         pair.second->SetWasSelected(false);
     }
 
     imageProcessor->mAccumulator.Clear();
 
-    ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
+    TEMPORARY_RETURN_IGNORED ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
     PlatformMgr().HandleServerShuttingDown();
     /*
      * Set the necessary information to inform the SSBL/bootloader that a new image
      * is available and trigger the actual device reboot after some time, to take
      * into account queued actions, e.g. sending events to a subscription.
      */
-    SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(imageProcessor->mDelayBeforeRebootSec * 1000 + CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
         [](chip::System::Layer *, void *) { OtaHookReset(); }, nullptr);
 }
@@ -426,10 +466,10 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 void OTAImageProcessorImpl::FetchNextData(uint32_t context)
 {
     auto * imageProcessor = &OTAImageProcessorImpl::GetDefaultInstance();
-    SystemLayer().ScheduleLambda([imageProcessor] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([imageProcessor] {
         if (imageProcessor->mDownloader)
         {
-            imageProcessor->mDownloader->FetchNextData();
+            TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
         }
     });
 }

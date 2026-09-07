@@ -1,0 +1,20 @@
+{{#if (or (not (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name)))
+          (not (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatCommandNameRemapping parent.name name))))}}
+{{#if (isSupported (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name) isForCommandPayload=true)}}
+
+@implementation MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping parent.name name}}Params
+{{#zcl_command_arguments}}
+{{#if (isSupported (compatClusterNameRemapping ../parent.name) command=(compatCommandNameRemapping ../parent.name ../name) commandField=(asStructPropertyName label))}}
+@dynamic {{asStructPropertyName label}};
+{{/if}}
+{{/zcl_command_arguments}}
+
+{{#if (isStrEqual source "client")}}
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
+{{else if (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name))}}
+@dynamic timedInvokeTimeoutMs;
+{{/if}}
+@end
+{{/if}}
+{{/if}}

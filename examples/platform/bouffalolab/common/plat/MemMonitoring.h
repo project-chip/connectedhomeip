@@ -18,7 +18,7 @@
 
 #pragma once
 
-#ifdef HEAP_MONITORING
+#if HEAP_MONITORING
 #include "FreeRTOS.h"
 
 #define MONITORING_STACK_SIZE_byte 1280

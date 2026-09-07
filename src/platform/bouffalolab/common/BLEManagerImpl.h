@@ -22,9 +22,13 @@
 
 #include <ble/Ble.h>
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/conn.h>
-#include <bluetooth/gatt.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#include <bluetooth.h>
+#include <conn.h>
+#include <gatt.h>
+#pragma GCC diagnostic pop
 
 namespace chip {
 namespace DeviceLayer {

@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 #include "lib/support/CHIPMemString.h"
-#include "lib/support/ScopedBuffer.h"
+#include "lib/support/ScopedMemoryBuffer.h"
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Base64.h>
 #include <lib/support/jsontlv/TlvJson.h>

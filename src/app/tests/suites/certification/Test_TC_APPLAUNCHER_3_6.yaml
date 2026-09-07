@@ -41,3 +41,9 @@ tests:
       PICS: APPLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "CurrentApp"
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

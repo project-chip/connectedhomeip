@@ -217,40 +217,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace MeasurementAccuracyStruct
 
-namespace ApplicationStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kCatalogVendorID), catalogVendorID);
-    encoder.Encode(to_underlying(Fields::kApplicationID), applicationID);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        uint8_t __context_tag = 0;
-        CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        if (__context_tag == to_underlying(Fields::kCatalogVendorID))
-        {
-            err = DataModel::Decode(reader, catalogVendorID);
-        }
-        else if (__context_tag == to_underlying(Fields::kApplicationID))
-        {
-            err = DataModel::Decode(reader, applicationID);
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace ApplicationStruct
-
 namespace ErrorStateStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -740,6 +706,50 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace PowerThresholdStruct
 
+namespace SemanticTagStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kMfgCode), mfgCode);
+    encoder.Encode(to_underlying(Fields::kNamespaceID), namespaceID);
+    encoder.Encode(to_underlying(Fields::kTag), tag);
+    encoder.Encode(to_underlying(Fields::kLabel), label);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kMfgCode))
+        {
+            err = DataModel::Decode(reader, mfgCode);
+        }
+        else if (__context_tag == to_underlying(Fields::kNamespaceID))
+        {
+            err = DataModel::Decode(reader, namespaceID);
+        }
+        else if (__context_tag == to_underlying(Fields::kTag))
+        {
+            err = DataModel::Decode(reader, tag);
+        }
+        else if (__context_tag == to_underlying(Fields::kLabel))
+        {
+            err = DataModel::Decode(reader, label);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace SemanticTagStruct
+
 namespace TestGlobalStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -846,6 +856,8 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
+    encoder.Encode(to_underlying(Fields::kVideoStreams), videoStreams);
+    encoder.Encode(to_underlying(Fields::kAudioStreams), audioStreams);
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -891,6 +903,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {
             err = DataModel::Decode(reader, metadataEnabled);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreams))
+        {
+            err = DataModel::Decode(reader, videoStreams);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreams))
+        {
+            err = DataModel::Decode(reader, audioStreams);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {

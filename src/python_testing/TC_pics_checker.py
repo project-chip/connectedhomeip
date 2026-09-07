@@ -19,15 +19,19 @@ import math
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Attribute import AsyncReadTransaction
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from matter.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
-from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
-                                            UnknownProblemLocation)
+from matter.testing.pics import (BASE_PICS_CODES_DERIVED, accepted_cmd_pics_str, attribute_pics_str, base_pics_facts_to_pics_codes,
+                                 derive_base_pics_facts_from_device_wildcard, event_pics_str, feature_pics_str,
+                                 generated_cmd_pics_str)
+from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
+                                            FeaturePathLocation, UnknownProblemLocation)
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
+class TC_PICS_Checker(BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -67,7 +71,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                 continue
             pics = pics_mapper(self.xml_clusters[cluster_id].pics, element_id)
 
-            if cluster_id not in self.endpoint.keys():
+            if cluster_id not in self.endpoint:
                 # This cluster is not on this endpoint
                 required = False
             elif element_id in self.endpoint[cluster_id][attribute_id_of_element_list]:
@@ -92,13 +96,23 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                 TestStep(5, "For every cluster present in the spec, for every server → client command in the cluster: If the cluster is present on the endpoint and the command id is present in the generated commands list, ensure the PICS code for the generated command is present in the PICS file. Otherwise, ensure the generated command PICS code is not present in the PICS file.", "PICS exactly match for all generated commands in all clusters."),
                 TestStep(6, "For every cluster present in the spec, for every feature in the cluster: If the cluster is present on the endpoint and the feature is marked in the feature map, ensure the PICS code for the feature is present in the PICS file. Otherwise, ensure the feature PICS code is not present in the PICS file.", "PICS exactly match for all features in all clusters."),
                 TestStep(7, "Ensure that the PICS_SDK_CI_ONLY PICS does not appear in the PICS file", "CI PICS is not present"),
-                TestStep(8, "If any of the checks failed, fail the test")]
+                TestStep(8, "If the device has a root node device type on this endpoint, ensure the MCORE.ROLE.COMMISSIONEE PICS code is set",
+                         "PICS is set if root node is present"),
+                TestStep(9, "When endpoint is 0: if the device has any onboarding payload (MCORE.DD.QR or MCORE.DD.NFC), it has the manual pairing code PICS set (MCORE.DD.MANUAL_PC). Skipped on other endpoints since DD PICS codes are conventionally declared only in EP0's PICS slice.",
+                         "Manual pairing code PICS is set if QR or NFC is set on EP0; skipped elsewhere."),
+                TestStep(10, "When endpoint is 0: for every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Skipped on other endpoints since Base/MCORE codes are conventionally declared only in EP0's PICS slice.",
+                         "Base/MCORE PICS exactly match the device on EP0; skipped elsewhere."),
+                TestStep(11, "For every event the spec marks MANDATORY for clusters on this endpoint (excluding OTA clusters, which appear to have no PICS codes today), ensure the corresponding event PICS code (cluster.S.E<id>) is marked in the PICS file.",
+                         "Event PICS match spec conformance for clusters on this endpoint."),
+                TestStep(12, "If any of the checks failed, fail the test")]
 
     def test_TC_IDM_10_4(self):
         # wildcard read is done in setup_class
         self.step(1)
-        self.endpoint_id = self.get_endpoint(default=None)
-        asserts.assert_not_equal(self.endpoint_id, None, "An explicit endpoint is required for this test, please use --endpoint")
+        asserts.assert_not_equal(self.matter_test_config.endpoint, None,
+                                 "An explicit endpoint is required for this test, please use --endpoint")
+        self.endpoint_id = self.get_endpoint()
+
         self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True
 
@@ -183,6 +197,66 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
             self.success = False
 
         self.step(8)
+        # If there is a root node exposed on this endpoint, COMMISSIONEE must be marked
+        device_types = [dt.deviceType for dt in self.endpoints[self.endpoint_id]
+                        [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        # TODO: Getting this from an in-code reference would be good. See https://github.com/project-chip/matter-test-scripts/issues/689
+        root_node_device_type_id = 0x0016
+        if root_node_device_type_id in device_types and not self.check_pics('MCORE.ROLE.COMMISSIONEE'):
+            self.record_error("PICS check", location=UnknownProblemLocation(),
+                              problem="Root node found on endpoint, but MCORE.ROLE.COMMISSIONEE pics is not marked")
+            self.success = False
+
+        self.step(9)
+        # DD PICS codes are device-wide but conventionally only declared in EP0's PICS slice.
+        # Skip on other endpoints to avoid false-positives on PICS files that correctly omit
+        # MCORE.DD from non-EP0 endpoint slices.
+        if self.endpoint_id == 0:
+            # If the device supports a QR code or NFC code, it must also support a manual code per spec 5.7.6
+            # The only way a commissionable device can opt not to have these is if it is an in-field upgrade,
+            # in which case, there is no packaged onboarding code of any type. Subsequent codes generated from
+            # opening a commissioning window are tested as a part of the administrator commissioning test.
+            if (self.check_pics('MCORE.DD.QR') or self.check_pics('MCORE.DD.NFC')) and not self.check_pics('MCORE.DD.MANUAL_PC'):
+                self.record_error("PICS check", location=UnknownProblemLocation(),
+                                  problem="Devices that support onboarding payloads must support a manual code")
+                self.success = False
+        else:
+            self.mark_current_step_skipped()
+
+        # Derive base facts once for Steps 10 and 11. Helper is wildcard-only,
+        # so it's safe to run regardless of --endpoint.
+        wildcard = AsyncReadTransaction.ReadResponse(
+            attributes=self.endpoints, events=[], tlvAttributes=self.endpoints_tlv)
+        base_facts, base_problems = derive_base_pics_facts_from_device_wildcard(wildcard, self.xml_clusters)
+        for problem in base_problems:
+            self.problems.append(problem)
+        derived_codes = base_pics_facts_to_pics_codes(base_facts)
+
+        self.step(10)
+        # Base/MCORE codes are device-wide but conventionally only declared
+        # in EP0's PICS slice. Skip on other endpoints
+        # so we don't false-positive on PICS files that correctly omit MCORE
+        # from non-EP0 endpoint slices.
+        if self.endpoint_id == 0:
+            derived_codes = base_pics_facts_to_pics_codes(base_facts)
+            for code in BASE_PICS_CODES_DERIVED:
+                location = UnknownProblemLocation()
+                self._check_and_record_errors(location, code in derived_codes, code)
+        else:
+            self.mark_current_step_skipped()
+
+        self.step(11)
+        endpoint_events = base_facts.mandatory_events_by_cluster.get(self.endpoint_id, {})
+        for cluster_id, event_ids in endpoint_events.items():
+            if cluster_id in ota_ids:
+                continue
+            pics_base = self.xml_clusters[cluster_id].pics
+            for event_id in event_ids:
+                location = EventPathLocation(
+                    endpoint_id=self.endpoint_id, cluster_id=cluster_id, event_id=event_id)
+                self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
+
+        self.step(12)
         if not self.success:
             self.fail_current_test("At least one PICS error was found for this endpoint")
 

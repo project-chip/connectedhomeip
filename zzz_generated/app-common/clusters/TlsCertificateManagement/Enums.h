@@ -26,20 +26,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace TlsCertificateManagement {
-
-// Enum for StatusCodeEnum
-enum class StatusCodeEnum : uint8_t
-{
-    kCertificateAlreadyInstalled = 0x02,
-    kDuplicateKey                = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-} // namespace TlsCertificateManagement
+namespace TlsCertificateManagement {} // namespace TlsCertificateManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -23,9 +23,11 @@
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Defer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/LockTracker.h>
+#include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace {
@@ -83,7 +85,10 @@ void ICDManager::Init()
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
-    VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
+    SuccessOrDie(ICDNotifier::GetInstance().Subscribe(this));
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+    SuccessOrDie(DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this)));
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
@@ -91,6 +96,9 @@ void ICDManager::Init()
 
 void ICDManager::Shutdown()
 {
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     ICDNotifier::GetInstance().Unsubscribe(this);
 
     // cancel any running timer of the icd
@@ -100,6 +108,13 @@ void ICDManager::Shutdown()
 
     ICDConfigurationData::GetInstance().SetICDMode(ICDConfigurationData::ICDMode::SIT);
     mOperationalState = OperationalState::ActiveMode;
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+    mPendingActiveModeOnNetworkAttach = false;
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    mPendingCheckInType          = PendingCheckInType::kNone;
+    mPendingCheckInSubjectsCount = 0;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     mStateObserverPool.ReleaseAll();
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -136,9 +151,10 @@ uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-void ICDManager::SendCheckInMsgs()
+void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSubject)
 {
 #if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
+    VerifyOrDie(SupportsFeature(Feature::kCheckInProtocolSupport));
     VerifyOrDie(mStorage != nullptr);
     VerifyOrDie(mFabricTable != nullptr);
 
@@ -173,7 +189,13 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            if (!ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
+            if (specificSubject.HasValue() && !ShouldSendCheckInMessageForSpecificSubject(entry, specificSubject.Value()))
+            {
+                continue;
+            }
+
+            if (!specificSubject.HasValue() &&
+                !ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
             }
@@ -207,6 +229,24 @@ void ICDManager::SendCheckInMsgs()
         }
     }
 #endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
+}
+
+bool ICDManager::ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry,
+                                                            const Access::SubjectDescriptor & specificSubject)
+{
+    if (specificSubject.fabricIndex != entry.fabricIndex)
+    {
+        return false;
+    }
+
+    if (specificSubject.cats.CheckSubjectAgainstCATs(entry.monitoredSubject) || entry.monitoredSubject == specificSubject.subject)
+    {
+        ChipLogProgress(AppServer, "Proceed to send Check-In msg for specific subject: " ChipLogFormatX64,
+                        ChipLogValueX64(specificSubject.subject));
+        return true;
+    }
+
+    return false;
 }
 
 bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsgsBeSentFunction> & shouldCheckInMsgsBeSentFunction)
@@ -405,6 +445,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
     // Active mode can be re-triggered.
     VerifyOrReturn(mOperationalState != state || state == OperationalState::ActiveMode);
 
+    ICDConfigurationData & configData = ICDConfigurationData::GetInstance();
     if (state == OperationalState::IdleMode)
     {
         mOperationalState = OperationalState::IdleMode;
@@ -414,25 +455,28 @@ void ICDManager::UpdateOperationState(OperationalState state)
             std::bind(&ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction, this, std::placeholders::_1, std::placeholders::_2);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-        // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
-        // unless the device would need to send Check-In messages
-        if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero
+        // When the ActiveModeDuration is set to 0, the ICDManager does not need to periodically transition to active mode.
+        // Instead, It can stay in idle mode until a notification, Report or other network event automatically toggles the ICD into
+        // active mode. The following conditions will schedule a transition to Active Mode after the Idle Mode duration expires.
+        // - An ActiveModeDuration interval must be respected.
+        // - The device state indicates to shorten its idle duration and report faster to provide better responsiveness
+        // - Check-In messages must be sent
+        if (configData.GetActiveModeDuration() > kZero || configData.ShouldUseShortIdle()
 #if CHIP_CONFIG_ENABLE_ICD_CIP
             || CheckInMessagesWouldBeSent(sendCheckInMessagesOnActiveMode)
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
         )
         {
-            DeviceLayer::SystemLayer().StartTimer(ICDConfigurationData::GetInstance().GetIdleModeDuration(), OnIdleModeDone, this);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(configData.GetModeBasedIdleModeDuration(),
+                                                                           OnIdleModeDone, this);
         }
-
-        Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         // Going back to Idle, all Check-In messages are sent
         mICDSenderPool.ReleaseAll();
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-        CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
+        CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(configData.GetSlowPollingInterval());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to set Slow Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
@@ -449,16 +493,16 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState                 = OperationalState::ActiveMode;
-            Milliseconds32 activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
+            Milliseconds32 activeModeDuration = configData.GetActiveModeDuration();
 
             if (activeModeDuration == kZero && !mKeepActiveFlags.HasAny())
             {
                 // Network Activity triggered the active mode and activeModeDuration is 0.
                 // Stay active for at least Active Mode Threshold.
-                activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
+                activeModeDuration = configData.GetActiveModeThreshold();
             }
 
-            DeviceLayer::SystemLayer().StartTimer(activeModeDuration, OnActiveModeDone, this);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(activeModeDuration, OnActiveModeDone, this);
 
             Milliseconds32 activeModeJitterInterval = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
             // TODO(#33074): Edge case when we transition to IdleMode with this condition being true
@@ -469,27 +513,23 @@ void ICDManager::UpdateOperationState(OperationalState state)
             // Reset this flag when we enter ActiveMode to avoid having a feedback loop that keeps us indefinitly in
             // ActiveMode.
             mTransitionToIdleCalled = false;
-            DeviceLayer::SystemLayer().StartTimer(activeModeJitterInterval, OnTransitionToIdle, this);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(activeModeJitterInterval, OnTransitionToIdle, this);
 
-            CHIP_ERROR err =
-                DeviceLayer::ConnectivityMgr().SetPollingInterval(ICDConfigurationData::GetInstance().GetFastPollingInterval());
+            CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(configData.GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-            if (SupportsFeature(Feature::kCheckInProtocolSupport))
-            {
-                SendCheckInMsgs();
-            }
+            SendCheckInMsgs();
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
             postObserverEvent(ObserverEventType::EnterActiveMode);
         }
         else
         {
-            ExtendActiveMode(ICDConfigurationData::GetInstance().GetActiveModeThreshold());
+            ExtendActiveMode(configData.GetActiveModeThreshold());
         }
     }
 }
@@ -514,6 +554,15 @@ void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
 void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
     ICDManager * pICDManager = reinterpret_cast<ICDManager *>(appState);
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
+    {
+        ChipLogProgress(AppServer,
+                        "ICDManager: Thread network not attached on periodic idle wake-up. Deferring ActiveMode until attached.");
+        pICDManager->mPendingActiveModeOnNetworkAttach = true;
+        return;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     pICDManager->UpdateOperationState(OperationalState::ActiveMode);
 }
 
@@ -637,6 +686,15 @@ void ICDManager::OnSITModeRequestWithdrawal()
 
 void ICDManager::OnNetworkActivity()
 {
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
+    {
+        ChipLogProgress(AppServer,
+                        "ICDManager: Thread network not attached on network activity. Deferring ActiveMode until attached.");
+        mPendingActiveModeOnNetworkAttach = true;
+        return;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
@@ -658,19 +716,160 @@ void ICDManager::OnSubscriptionReport()
     // Since we only mark them dirty when we enter ActiveMode, it is not necessary to update the operational state a second time.
     // Doing so will only add an ActiveModeThreshold to the active time which we don't want to do here.
     VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
+    {
+        ChipLogProgress(AppServer,
+                        "ICDManager: Thread network not attached on subscription report. Deferring ActiveMode until attached.");
+        mPendingActiveModeOnNetworkAttach = true;
+        return;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&                                         \
+    CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+bool ICDManager::Contains(Span<const Access::SubjectDescriptor> list, const Access::SubjectDescriptor & value)
+{
+    for (const auto & item : list)
+    {
+        if (item.fabricIndex == value.fabricIndex && item.authMode == value.authMode && item.subject == value.subject &&
+            item.cats == value.cats && item.isCommissioning == value.isCommissioning)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ICDManager::AppendPendingCheckInSubject(const Access::SubjectDescriptor & subject)
+{
+    // If broadcast Check-In is already pending, it notifies all clients on all fabrics, so targeted queuing is superseded.
+    VerifyOrReturn(mPendingCheckInType != PendingCheckInType::kBroadcast);
+
+    // If subject is already pending, no need to add again
+    VerifyOrReturn(
+        !Contains(Span<const Access::SubjectDescriptor>(mPendingCheckInSubjects.data(), mPendingCheckInSubjectsCount), subject));
+
+    if (mPendingCheckInSubjectsCount < mPendingCheckInSubjects.size())
+    {
+        mPendingCheckInSubjects[mPendingCheckInSubjectsCount++] = subject;
+        mPendingCheckInType                                     = PendingCheckInType::kTargeted;
+        return;
+    }
+
+    // Capacity exceeded: upgrade to broadcast Check-In so no client registration is dropped.
+    ChipLogProgress(AppServer, "ICDManager: Pending check-in table full. Upgrading to broadcast Check-In.");
+    mPendingCheckInType          = PendingCheckInType::kBroadcast;
+    mPendingCheckInSubjectsCount = 0;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&
+       // CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+void ICDManager::OnSendCheckIn(Optional<Access::SubjectDescriptor> specificSubject)
+{
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
+    {
+        ChipLogProgress(AppServer, "ICDManager: Thread network not attached on send check-in. Deferring until attached.");
+        if (specificSubject.HasValue())
+        {
+            AppendPendingCheckInSubject(specificSubject.Value());
+        }
+        else
+        {
+            mPendingCheckInType          = PendingCheckInType::kBroadcast;
+            mPendingCheckInSubjectsCount = 0;
+        }
+        return;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    SendCheckInMsgs(specificSubject);
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+void ICDManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    reinterpret_cast<ICDManager *>(arg)->HandlePlatformEvent(event);
+}
+
+void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    const bool threadNewConnectionEstablished = (event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange &&
+                                                 event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established);
+    const bool threadRoleChanged =
+        (event->Type == DeviceLayer::DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged);
+    const bool threadEstablished =
+        (threadNewConnectionEstablished || threadRoleChanged) && DeviceLayer::ConnectivityMgr().IsThreadAttached();
+#else
+    const bool threadEstablished = false;
+#endif
+
+    // Early return if Thread connectivity is not established
+    VerifyOrReturn(threadEstablished);
+
+    const bool wasPendingActiveMode   = mPendingActiveModeOnNetworkAttach;
+    mPendingActiveModeOnNetworkAttach = false;
+
+#if !(CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT)
+    if (wasPendingActiveMode || mOperationalState == OperationalState::ActiveMode)
+    {
+        ChipLogProgress(AppServer, "ICDManager: Thread network connectivity established. Triggering/Extending ActiveMode.");
+        UpdateOperationState(OperationalState::ActiveMode);
+    }
+#else
+    // Early return if there is no pending action
+    VerifyOrReturn(wasPendingActiveMode || mOperationalState == OperationalState::ActiveMode ||
+                   mPendingCheckInType != PendingCheckInType::kNone);
+
+    auto deferCleanup = MakeDefer([this] {
+        mPendingCheckInType          = PendingCheckInType::kNone;
+        mPendingCheckInSubjectsCount = 0;
+    });
+
+    const bool wasInIdleMode = (mOperationalState == OperationalState::IdleMode);
+
+    // Trigger or extend ActiveMode
+    ChipLogProgress(AppServer, "ICDManager: Thread network connectivity established. Triggering/Extending ActiveMode.");
+    UpdateOperationState(OperationalState::ActiveMode);
+
+    // If the device transitioned from IdleMode to ActiveMode, UpdateOperationState() already executed SendCheckInMsgs()
+    // (broadcast Check-In to all fabrics), which subsumes both targeted and broadcast check-in requests.
+    VerifyOrReturn(!wasInIdleMode);
+
+    // If the device was already in ActiveMode, UpdateOperationState() only extended active duration, so replay pending check-ins.
+    if (mPendingCheckInType == PendingCheckInType::kTargeted)
+    {
+        for (size_t i = 0; i < mPendingCheckInSubjectsCount; ++i)
+        {
+            ChipLogProgress(AppServer, "ICDManager: Replaying deferred Check-In message for specific subject: " ChipLogFormatX64,
+                            ChipLogValueX64(mPendingCheckInSubjects[i].subject));
+            SendCheckInMsgs(MakeOptional(mPendingCheckInSubjects[i]));
+        }
+    }
+    else if (mPendingCheckInType == PendingCheckInType::kBroadcast)
+    {
+        ChipLogProgress(AppServer, "ICDManager: Replaying deferred broadcast Check-In message.");
+        SendCheckInMsgs(NullOptional);
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+
 void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
 {
-    DeviceLayer::SystemLayer().ExtendTimerTo(extendDuration, OnActiveModeDone, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ExtendTimerTo(extendDuration, OnActiveModeDone, this);
 
     Milliseconds32 activeModeJitterThreshold = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
     activeModeJitterThreshold = (extendDuration >= activeModeJitterThreshold) ? extendDuration - activeModeJitterThreshold : kZero;
 
     if (!mTransitionToIdleCalled)
     {
-        DeviceLayer::SystemLayer().ExtendTimerTo(activeModeJitterThreshold, OnTransitionToIdle, this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ExtendTimerTo(activeModeJitterThreshold, OnTransitionToIdle, this);
     }
 }
 

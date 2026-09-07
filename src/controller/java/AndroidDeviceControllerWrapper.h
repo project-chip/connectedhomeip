@@ -110,12 +110,16 @@ public:
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
     void OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted,
                                      CHIP_ERROR error) override;
+    void OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stage) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
     void OnScanNetworksSuccess(
         const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
     void OnScanNetworksFailure(CHIP_ERROR error) override;
     void OnICDRegistrationInfoRequired() override;
     void OnICDRegistrationComplete(chip::ScopedNodeId icdNodeId, uint32_t icdCounter) override;
+
+    CHIP_ERROR WiFiCredentialsNeeded(chip::EndpointId endpoint) override;
+    CHIP_ERROR ThreadCredentialsNeeded(chip::EndpointId endpoint) override;
 
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
@@ -211,11 +215,24 @@ public:
 
     CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
 
+    CHIP_ERROR SetThreadCredentialsNeededListener(jobject listener);
+    CHIP_ERROR SetWiFiCredentialsNeededListener(jobject listener);
+
     void StartDnssd();
 
     void StopDnssd();
 
 private:
+    struct CredentialsNeededCallbackContext
+    {
+        chip::JniGlobalReference listenerObject;
+        jmethodID listenerMethod  = nullptr;
+        chip::EndpointId endpoint = 0;
+        bool isWiFi               = false;
+    };
+
+    static void HandleCredentialsNeededCallback(intptr_t context);
+
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;
@@ -247,6 +264,14 @@ private:
     const char * password              = nullptr;
     jbyteArray operationalDatasetBytes = nullptr;
     jbyte * operationalDataset         = nullptr;
+
+    // Java object containing the ThreadCredentialsNeeded Listener
+    chip::JniGlobalReference mThreadCredentialsNeededListenerObject;
+    jmethodID mThreadCredentialsNeededListener = nullptr;
+
+    // Java object containing the WiFiCredentialsNeeded Listener
+    chip::JniGlobalReference mWiFiCredentialsNeededListenerObject;
+    jmethodID mWiFiCredentialsNeededListener = nullptr;
 
     std::vector<uint8_t> mNocCertificate;
     std::vector<uint8_t> mIcacCertificate;

@@ -26,6 +26,7 @@
 
 #include "SessionManager.h"
 
+#include <algorithm>
 #include <inttypes.h>
 #include <string.h>
 
@@ -48,6 +49,7 @@
 #include <transport/SecureMessageCodec.h>
 #include <transport/TracingStructs.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 
@@ -128,6 +130,9 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mConnClosedCb   = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
+    // Ensure MessageStats struct is at default state on Init
+    mMessageStats = MessageStats();
+
     return CHIP_NO_ERROR;
 }
 
@@ -167,7 +172,7 @@ void SessionManager::Shutdown()
  */
 void SessionManager::FabricRemoved(FabricIndex fabricIndex)
 {
-    gGroupPeerTable->FabricRemoved(fabricIndex);
+    TEMPORARY_RETURN_IGNORED gGroupPeerTable->FabricRemoved(fabricIndex);
 }
 
 CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
@@ -175,6 +180,9 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 {
     MATTER_TRACE_SCOPE("PrepareMessage", "SessionManager");
 
+    VerifyOrReturnError(!message->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    bool headerEncoded = false;
     PacketHeader packetHeader;
     bool isControlMsg = IsControlMessage(payloadHeader);
     if (isControlMsg)
@@ -184,7 +192,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     if (sessionHandle->AllowsLargePayload())
     {
-        VerifyOrReturnError(message->TotalLength() <= kMaxLargeAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
+        uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+        size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
+        size_t limit        = std::min(remoteLimit, kMaxLargeAppMessageLen);
+        VerifyOrReturnError(message->TotalLength() <= limit, CHIP_ERROR_MESSAGE_TOO_LONG);
     }
     else
     {
@@ -211,8 +222,9 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
         packetHeader.SetMessageCounter(mGroupClientCounter.GetCounter(isControlMsg));
-        mGroupClientCounter.IncrementCounter(isControlMsg);
+        TEMPORARY_RETURN_IGNORED mGroupClientCounter.IncrementCounter(isControlMsg);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
+        packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
         sourceNodeId = fabric->GetNodeId();
         packetHeader.SetSourceNodeId(sourceNodeId);
 
@@ -221,24 +233,88 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_INTERNAL;
         }
 
-        destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
-
-        // Trace before any encryption
-        MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kGroupMessage, &payloadHeader, &packetHeader,
-                                chip::ByteSpan(message->Start(), message->TotalLength()));
-
-        CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
+        Credentials::GroupDataProvider::GroupInfo info;
+        ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
+        destination_address = (info.UsePerGroupAddress())
+            ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
 
         Crypto::SymmetricKeyContext * keyContext =
             groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
         VerifyOrReturnError(nullptr != keyContext, CHIP_ERROR_INTERNAL);
+        AutoRelease<Crypto::SymmetricKeyContext> keyContextOwner(keyContext);
 
         packetHeader.SetSessionId(keyContext->GetKeyHash());
+        CryptoContext cryptoContext(keyContext);
+
+        // Trace before any encryption
+        MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kGroupMessage, &payloadHeader, &packetHeader,
+                                chip::ByteSpan(message->Start(), message->TotalLength()),
+                                /* messageTotalSize = */
+                                (packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() +
+                                 packetHeader.MICTagLength()));
+        CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
+
         CryptoContext::NonceStorage nonce;
-        CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), sourceNodeId);
-        CHIP_ERROR err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), nonce, payloadHeader, packetHeader, message);
-        keyContext->Release();
+        ReturnErrorOnFailure(
+            CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), sourceNodeId));
+        CHIP_ERROR err = SecureMessageCodec::Encrypt(cryptoContext, nonce, payloadHeader, packetHeader, message);
         ReturnErrorOnFailure(err);
+
+        // Encode header now so we can privacy encrypt it
+        ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
+        headerEncoded = true;
+
+        // Begin privacy encrypt for appropriate header fields
+
+        // Since we are not using chained buffers, the message data length should be equal to the total length
+        VerifyOrReturnError(message->TotalLength() == message->DataLength(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+        uint8_t * data     = message->Start();
+        size_t len         = message->TotalLength();
+        uint16_t footerLen = packetHeader.MICTagLength();
+        VerifyOrReturnError(footerLen <= len, CHIP_ERROR_INTERNAL);
+
+        uint16_t taglen = 0;
+        MessageAuthenticationCode mac;
+        ReturnErrorOnFailure(mac.Decode(packetHeader, &data[len - footerLen], footerLen, &taglen));
+        VerifyOrReturnError(taglen == footerLen, CHIP_ERROR_INTERNAL);
+
+        // Pointer to the start of the privacy header within the message buffer.
+        // The privacy header contains fields that need to be privacy-encrypted (e.g. Session ID, Message Counter).
+        uint8_t * privacyHeader = packetHeader.PrivacyHeader(message->Start());
+        size_t privacyLength    = packetHeader.PrivacyHeaderLength();
+
+        // We must ensure that:
+        // 1. The privacy header starts within the message buffer.
+        // 2. The privacy header lies entirely within the encoded packet header bounds (to prevent encrypting payload).
+        // 3. The packet header lies entirely within the valid message buffer bounds.
+        //
+        // (privacyHeader + privacyLength): Pointer to the end of the privacy header.
+        // (message->Start() + packetHeader.EncodeSizeBytes()): Pointer to the end of the packet header.
+        // (message->Start() + message->TotalLength()): Pointer to the end of the valid message data in the buffer.
+        uint8_t * privacyHeaderEnd = (privacyHeader + privacyLength);
+        uint8_t * headerEnd        = (message->Start() + packetHeader.EncodeSizeBytes());
+        uint8_t * messageEnd       = (message->Start() + message->TotalLength());
+
+        // Other fields such as message flags and session ID should exist in the header BEFORE the privacy fields,
+        // so the start of the privacy header must be strictly after the message start
+        VerifyOrReturnError(privacyHeader > message->Start(), CHIP_ERROR_INTERNAL);
+
+        // When the message extensions (MX) security flag is set, this indicates that there will be a message extensions
+        // portion of the header (with a non-zero length). This portion of the header exists after the privacy header end.
+        // If the flag is not set, the end of the privacy header should be the end of the header itself.
+        bool mxEnabled = packetHeader.GetSecurityFlags() & to_underlying(Header::SecFlagValues::kMsgExtensionFlag);
+        if (mxEnabled)
+        {
+            VerifyOrReturnError(privacyHeaderEnd < headerEnd, CHIP_ERROR_INTERNAL);
+        }
+        else
+        {
+            VerifyOrReturnError(privacyHeaderEnd == headerEnd, CHIP_ERROR_INTERNAL);
+        }
+
+        VerifyOrReturnError(headerEnd < messageEnd, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(cryptoContext.PrivacyEncrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac));
 
 #if CHIP_PROGRESS_LOGGING
         destination = NodeIdFromGroupId(groupSession->GetGroupId());
@@ -261,18 +337,22 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             .SetSessionId(session->GetPeerSessionId()) //
             .SetSessionType(Header::SessionType::kUnicastSession);
 
-        destination_address = session->GetPeerAddress();
+        destination_address           = session->GetPeerAddress();
+        CryptoContext & cryptoContext = session->GetCryptoContext();
 
         // Trace before any encryption
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kSecureSession, &payloadHeader, &packetHeader,
-                                chip::ByteSpan(message->Start(), message->TotalLength()));
+                                chip::ByteSpan(message->Start(), message->TotalLength()),
+                                /* totalMessageSize = */
+                                (packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() +
+                                 packetHeader.MICTagLength()));
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         CryptoContext::NonceStorage nonce;
         sourceNodeId = session->GetLocalScopedNodeId().GetNodeId();
-        CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, sourceNodeId);
+        ReturnErrorOnFailure(CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, sourceNodeId));
 
-        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session->GetCryptoContext(), nonce, payloadHeader, packetHeader, message));
+        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(cryptoContext, nonce, payloadHeader, packetHeader, message));
 
 #if CHIP_PROGRESS_LOGGING
         destination = session->GetPeerNodeId();
@@ -301,7 +381,9 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
         // Trace after all headers are settled.
         MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
-                                chip::ByteSpan(message->Start(), message->TotalLength()));
+                                chip::ByteSpan(message->Start(), message->TotalLength()),
+                                /* messageTotalSize = */ packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() +
+                                    message->TotalLength());
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
@@ -324,7 +406,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         return CHIP_ERROR_INTERNAL;
     }
 
-    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
+    if (!headerEncoded)
+    {
+        ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
+    }
 
 #if CHIP_PROGRESS_LOGGING
     CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
@@ -387,6 +472,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
 
+    CountMessagesSent(sessionHandle, payloadHeader);
     return CHIP_NO_ERROR;
 }
 
@@ -406,8 +492,14 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         const FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
         VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        auto * groups = Credentials::GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
-        multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        Credentials::GroupDataProvider::GroupInfo info;
+        ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
+        multicastAddress = (info.UsePerGroupAddress())
+            ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
         destination      = &multicastAddress;
     }
     break;
@@ -445,10 +537,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         while (interfaceIt.Next())
         {
-            char name[Inet::InterfaceId::kMaxIfNameLength];
-            interfaceIt.GetInterfaceName(name, Inet::InterfaceId::kMaxIfNameLength);
             if (interfaceIt.SupportsMulticast() && interfaceIt.IsUp())
             {
+                char name[Inet::InterfaceId::kMaxIfNameLength];
+                TEMPORARY_RETURN_IGNORED interfaceIt.GetInterfaceName(name, Inet::InterfaceId::kMaxIfNameLength);
                 interfaceId = interfaceIt.GetInterfaceId();
                 if (CHIP_NO_ERROR == interfaceId.GetLinkLocalAddr(&addr))
                 {
@@ -659,68 +751,54 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void SessionManager::HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn)
+void SessionManager::HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn)
 {
     char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
 
-    VerifyOrReturn(conn != nullptr);
-    conn->mPeerAddr.ToString(peerAddrBuf);
+    conn.mPeerAddr.ToString(peerAddrBuf);
     ChipLogProgress(Inet, "Received TCP connection request from %s.", peerAddrBuf);
 
-    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn->mAppState;
+    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn.mAppState;
     if (appTCPConnCbCtxt != nullptr && appTCPConnCbCtxt->connReceivedCb != nullptr)
     {
         appTCPConnCbCtxt->connReceivedCb(conn);
     }
 }
 
-void SessionManager::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+void SessionManager::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr)
 {
-    VerifyOrReturn(conn != nullptr);
+    VerifyOrReturn(!conn.IsNull());
 
     Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn->mAppState;
-    if (appTCPConnCbCtxt == nullptr)
-    {
-        TCPDisconnect(conn, /* shouldAbort = */ true);
-        return;
-    }
-
-    if (appTCPConnCbCtxt->connCompleteCb != nullptr)
+    bool callbackHandled                                       = false;
+    if (appTCPConnCbCtxt != nullptr && appTCPConnCbCtxt->connCompleteCb != nullptr)
     {
         appTCPConnCbCtxt->connCompleteCb(conn, conErr);
+        callbackHandled = true;
     }
-    else
+
+    if ((mConnDelegate == nullptr || !mConnDelegate->OnTCPConnectionAttemptComplete(conn, conErr)) && !callbackHandled)
     {
         char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
         conn->mPeerAddr.ToString(peerAddrBuf);
 
-        ChipLogProgress(Inet, "TCP Connection established with peer %s, but no registered handler. Disconnecting.", peerAddrBuf);
-
-        // Close the connection
-        TCPDisconnect(conn, /* shouldAbort = */ true);
+        ChipLogProgress(Inet, "TCP Connection established with peer %s, but no registered handler.", peerAddrBuf);
     }
 }
 
-void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
 {
-    VerifyOrReturn(conn != nullptr);
-
-    MarkSecureSessionOverTCPForEviction(conn, conErr);
-
-    // TODO: A mechanism to mark an unauthenticated session as unusable when
-    // the underlying connection is broken. Issue #32323
-
-    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn->mAppState;
-    VerifyOrReturn(appTCPConnCbCtxt != nullptr);
-
-    if (appTCPConnCbCtxt->connClosedCb != nullptr)
+    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn.mAppState;
+    if (appTCPConnCbCtxt != nullptr && appTCPConnCbCtxt->connClosedCb != nullptr)
     {
         appTCPConnCbCtxt->connClosedCb(conn, conErr);
     }
+    MarkSecureSessionOverTCPForEviction(conn, conErr);
+    mUnauthenticatedSessions.MarkSessionOverTCPForEviction(conn);
 }
 
 CHIP_ERROR SessionManager::TCPConnect(const PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
-                                      Transport::ActiveTCPConnectionState ** peerConnState)
+                                      Transport::ActiveTCPConnectionHandle & peerConnState)
 {
     char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
     peerAddress.ToString(peerAddrBuf);
@@ -734,32 +812,6 @@ CHIP_ERROR SessionManager::TCPConnect(const PeerAddress & peerAddress, Transport
 
     return CHIP_ERROR_INCORRECT_STATE;
 }
-
-CHIP_ERROR SessionManager::TCPDisconnect(const PeerAddress & peerAddress)
-{
-    if (mTransportMgr != nullptr)
-    {
-        char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
-        peerAddress.ToString(peerAddrBuf);
-        ChipLogProgress(Inet, "Disconnecting TCP connection from peer at %s.", peerAddrBuf);
-        mTransportMgr->TCPDisconnect(peerAddress);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void SessionManager::TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort)
-{
-    if (mTransportMgr != nullptr && conn != nullptr)
-    {
-        char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
-        conn->mPeerAddr.ToString(peerAddrBuf);
-        ChipLogProgress(Inet, "Disconnecting TCP connection from peer at %s.", peerAddrBuf);
-        mTransportMgr->TCPDisconnect(conn, shouldAbort);
-
-        MarkSecureSessionOverTCPForEviction(conn, CHIP_NO_ERROR);
-    }
-}
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partialPacketHeader,
@@ -769,7 +821,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
     MATTER_TRACE_SCOPE("Unauthenticated Message Dispatch", "SessionManager");
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    if (peerAddress.GetTransportType() == Transport::Type::kTcp && ctxt->conn == nullptr)
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp && ctxt->conn.IsNull())
     {
         ChipLogError(Inet, "Connection object is missing for received message.");
         return;
@@ -782,6 +834,9 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
         ChipLogError(Inet, "Dropping unauthenticated message with privacy flag set");
         return;
     }
+
+    // Capture length before consuming headers.
+    [[maybe_unused]] size_t messageTotalSize = msg->TotalLength();
 
     PacketHeader packetHeader;
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
@@ -830,8 +885,8 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
     // Associate the unauthenticated session with the connection, if not done already.
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
-        Transport::ActiveTCPConnectionState * sessionConn = unsecuredSession->GetTCPConnection();
-        if (sessionConn == nullptr)
+        Transport::ActiveTCPConnectionHandle sessionConn = unsecuredSession->GetTCPConnection();
+        if (sessionConn.IsNull())
         {
             unsecuredSession->SetTCPConnection(ctxt->conn);
         }
@@ -839,7 +894,8 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
         {
             if (sessionConn != ctxt->conn)
             {
-                ChipLogError(Inet, "Data received over wrong connection %p. Dropping it!", ctxt->conn);
+                ChipLogError(Inet, "Unauthenticated data received over TCP connection %p instead of %p. Dropping it!",
+                             static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
                 return;
             }
         }
@@ -871,9 +927,11 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
     if (mCB != nullptr)
     {
         MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
-                                    unsecuredSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()));
+                                    unsecuredSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()),
+                                    messageTotalSize);
 
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, unsecuredSession, peerAddress, msg->Start(), msg->TotalLength());
+        CountMessagesReceived(session, payloadHeader);
         mCB->OnMessageReceived(packetHeader, payloadHeader, session, isDuplicate, std::move(msg));
     }
     else
@@ -891,7 +949,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    if (peerAddress.GetTransportType() == Transport::Type::kTcp && ctxt->conn == nullptr)
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp && ctxt->conn.IsNull())
     {
         ChipLogError(Inet, "Connection object is missing for received message.");
         return;
@@ -917,8 +975,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     // Associate the secure session with the connection, if not done already.
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
-        Transport::ActiveTCPConnectionState * sessionConn = secureSession->GetTCPConnection();
-        if (sessionConn == nullptr)
+        auto sessionConn = secureSession->GetTCPConnection();
+        if (sessionConn.IsNull())
         {
             secureSession->SetTCPConnection(ctxt->conn);
         }
@@ -926,12 +984,15 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         {
             if (sessionConn != ctxt->conn)
             {
-                ChipLogError(Inet, "Data received over wrong connection %p. Dropping it!", ctxt->conn);
+                ChipLogError(Inet, "Unicast data received over TCP connection %p instead of %p. Dropping it!",
+                             static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
                 return;
             }
         }
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Capture length before consuming headers.
+    [[maybe_unused]] size_t messageTotalSize = msg->TotalLength();
 
     PayloadHeader payloadHeader;
 
@@ -970,10 +1031,11 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     CryptoContext::NonceStorage nonce;
     // PASE Sessions use the undefined node ID of all zeroes, since there is no node ID to use
     // and the key is short-lived and always different for each PASE session.
-    CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(),
-                              secureSession->GetSecureSessionType() == SecureSession::Type::kCASE ? secureSession->GetPeerNodeId()
-                                                                                                  : kUndefinedNodeId);
-    if (SecureMessageCodec::Decrypt(secureSession->GetCryptoContext(), nonce, payloadHeader, packetHeader, msg) != CHIP_NO_ERROR)
+    CHIP_ERROR nonceResult = CryptoContext::BuildNonce(
+        nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(),
+        secureSession->GetSecureSessionType() == SecureSession::Type::kCASE ? secureSession->GetPeerNodeId() : kUndefinedNodeId);
+    if ((nonceResult != CHIP_NO_ERROR) ||
+        SecureMessageCodec::Decrypt(secureSession->GetCryptoContext(), nonce, payloadHeader, packetHeader, msg) != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding");
         return;
@@ -1013,7 +1075,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     if (mCB != nullptr)
     {
         MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kSecureUnicast, &payloadHeader, &packetHeader,
-                                    secureSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()));
+                                    secureSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()),
+                                    messageTotalSize);
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, secureSession, peerAddress, msg->Start(), msg->TotalLength());
 
         // Always recompute whether a message is for a commissioning session based on the latest knowledge of
@@ -1023,6 +1086,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
             secureSession->SetCaseCommissioningSessionStatus(secureSession->GetFabricIndex() ==
                                                              mFabricTable->GetPendingNewFabricIndex());
         }
+
+        CountMessagesReceived(session.Value(), payloadHeader);
         mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), isDuplicate, std::move(msg));
     }
     else
@@ -1059,6 +1124,11 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
         // Perform privacy deobfuscation, if applicable.
         uint8_t * privacyHeader = partialPacketHeader.PrivacyHeader(msgCopy->Start());
         size_t privacyLength    = partialPacketHeader.PrivacyHeaderLength();
+
+        // Bounds check: we decrypt in place a privacy header located inside the packet.
+        // Validate that we are still within the packet as the length is based on header flags.
+        VerifyOrReturnValue((privacyHeader + privacyLength) <= (msgCopy->Start() + msgCopy->TotalLength()), false);
+
         if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, partialPacketHeader, mac))
         {
             return false;
@@ -1079,9 +1149,11 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
     }
 
     CryptoContext::NonceStorage nonce;
-    CryptoContext::BuildNonce(nonce, packetHeaderCopy.GetSecurityFlags(), packetHeaderCopy.GetMessageCounter(),
-                              packetHeaderCopy.GetSourceNodeId().Value());
-    decrypted = (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(context, nonce, payloadHeader, packetHeaderCopy, msgCopy));
+    CHIP_ERROR nonceResult =
+        CryptoContext::BuildNonce(nonce, packetHeaderCopy.GetSecurityFlags(), packetHeaderCopy.GetMessageCounter(),
+                                  packetHeaderCopy.GetSourceNodeId().Value());
+    decrypted = (nonceResult == CHIP_NO_ERROR) &&
+        (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(context, nonce, payloadHeader, packetHeaderCopy, msgCopy));
 
     return decrypted;
 }
@@ -1090,6 +1162,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
                                                 const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("Group Message Dispatch", "SessionManager");
+
+    VerifyOrReturn(!msg->HasChainedBuffer());
+
+    // Capture length before consuming headers.
+    [[maybe_unused]] size_t messageTotalSize = msg->TotalLength();
 
     PayloadHeader payloadHeader;
     PacketHeader packetHeaderCopy; /// Packet header decoded per group key, with privacy decrypted fields
@@ -1124,7 +1201,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
     // Extract MIC from the end of the message.
     uint8_t * data     = msg->Start();
-    size_t len         = msg->DataLength();
+    size_t len         = msg->TotalLength();
     uint16_t footerLen = partialPacketHeader.MICTagLength();
     VerifyOrReturn(footerLen <= len);
 
@@ -1133,9 +1210,17 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     ReturnOnFailure(mac.Decode(partialPacketHeader, &data[len - footerLen], footerLen, &taglen));
     VerifyOrReturn(taglen == footerLen);
 
-    bool decrypted = false;
+    // Groupcast Testing
+    auto & testing = chip::Groupcast::GetTesting();
+
+    bool decrypted                    = false;
+    bool hasAnyKeysForFabricUnderTest = false;
     while (!decrypted && iter->Next(groupContext))
     {
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+        {
+            hasAnyKeysForFabricUnderTest = true;
+        }
         CryptoContext context(groupContext.keyContext);
         msgCopy = msg.CloneData();
         if (msgCopy.IsNull())
@@ -1147,23 +1232,30 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         bool privacy = partialPacketHeader.HasPrivacyFlag();
         decrypted =
             GroupKeyDecryptAttempt(partialPacketHeader, packetHeaderCopy, payloadHeader, privacy, msgCopy, mac, groupContext);
-
-#if CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
-        if (privacy && !decrypted)
-        {
-            // Try processing the P=1 message again without privacy as a work-around for invalid early-SVE2 nodes.
-            msgCopy = msg.CloneData();
-            if (msgCopy.IsNull())
-            {
-                ChipLogError(Inet, "Failed to clone Groupcast message buffer. Discarding.");
-                return;
-            }
-            decrypted =
-                GroupKeyDecryptAttempt(partialPacketHeader, packetHeaderCopy, payloadHeader, false, msgCopy, mac, groupContext);
-        }
-#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
     iter.Release();
+
+    if (testing.IsEnabled())
+    {
+        if (decrypted)
+        {
+            // We have a valid groupContext from the loop
+            if (testing.IsFabricUnderTest(groupContext.fabric_index))
+            {
+                testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
+            }
+        }
+        else
+        {
+            // FAILURE CASE: No valid groupContext or decryption failed. This can happen
+            // for example, when there is an empty group key map. This means GroupSessions
+            // cannot be iterated over to populate groupContext, and the fabric index cannot be
+            // explicitly checked here.
+            testing.SetTestResult(hasAnyKeysForFabricUnderTest ? chip::Groupcast::Testing::Result::kFailedAuth
+                                                               : chip::Groupcast::Testing::Result::kNoAvailableKey);
+            testing.NotifyDelegate();
+        }
+    }
 
     if (!decrypted)
     {
@@ -1218,6 +1310,18 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
         if (err != CHIP_NO_ERROR)
         {
+            if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+            {
+                if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
+                {
+                    testing.SetTestResult(chip::Groupcast::Testing::Result::kMessageReplay);
+                }
+                else
+                {
+                    testing.SetTestResult(chip::Groupcast::Testing::Result::kGeneralError);
+                }
+                testing.NotifyDelegate();
+            }
             // Exit now, since Group Messages don't have acks or responses of any kind.
             ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
             return;
@@ -1225,6 +1329,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     }
     else
     {
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+        {
+            testing.SetTestResult(chip::Groupcast::Testing::Result::kGeneralError);
+            testing.NotifyDelegate();
+        }
         ChipLogError(Inet,
                      "Group Counter Tables full or invalid NodeId/FabricIndex after decryption of message, dropping everything");
         return;
@@ -1239,11 +1348,15 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
                                                      packetHeaderCopy.GetSourceNodeId().Value());
 
         MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kGroupMessage, &payloadHeader, &packetHeaderCopy,
-                                    &groupSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()));
+                                    &groupSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()),
+                                    messageTotalSize);
 
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeaderCopy, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
-        mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, SessionHandle(groupSession),
-                               SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
+        SessionHandle session(groupSession);
+
+        CountMessagesReceived(session, payloadHeader);
+        mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, session, SessionMessageDelegate::DuplicateMessage::No,
+                               std::move(msg));
     }
     else
     {
@@ -1274,7 +1387,7 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                 // Set up a TCP transport based session as standby
                 if ((tcpSession == nullptr || tcpSession->GetLastPeerActivityTime() < session->GetLastPeerActivityTime()) &&
-                    session->GetTCPConnection() != nullptr)
+                    !session->GetTCPConnection().IsNull())
                 {
                     tcpSession = session;
                 }
@@ -1318,24 +1431,30 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
 {
     // Mark the corresponding secure sessions for eviction
     mSecureSessions.ForEachSession([&](auto session) {
-        if (session->IsActiveSession() && session->GetTCPConnection() == conn)
+        if (session->GetTCPConnection() == conn)
         {
-            SessionHandle handle(*session);
-            // Notify the SessionConnection delegate of the connection
-            // closure.
-            if (mConnDelegate != nullptr)
+            bool isActive = session->IsActiveSession();
+
+            if (isActive)
             {
-                mConnDelegate->OnTCPConnectionClosed(handle, conErr);
+                // Notify the SessionConnection delegate of the connection
+                // closure before session eviction detaches holders and
+                // releases exchanges.
+                if (mConnDelegate != nullptr)
+                {
+                    SessionHandle handle(*session);
+                    mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
+                }
             }
 
-            // Dis-associate the connection from session by setting it to a
-            // nullptr.
-            session->SetTCPConnection(nullptr);
-            // Mark session for eviction.
+            // Explicitly release the TCP connection handle to ensure the transport resource is reclaimed immediately.
+            session->ReleaseTCPConnection();
+
+            // Mark session for eviction regardless of its current state (Active, Defunct, or Establishing).
             session->MarkForEviction();
         }
 
@@ -1355,6 +1474,24 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
         return Loop::Continue;
     });
     return CHIP_NO_ERROR;
+}
+
+// Session handle parameter included here for future counting usage.
+void SessionManager::CountMessagesReceived(const SessionHandle &, const PayloadHeader & payloadHeader)
+{
+    if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
+    {
+        mMessageStats.interactionModelMessagesReceived++;
+    }
+}
+
+// Session handle parameter included here for future counting usage.
+void SessionManager::CountMessagesSent(const SessionHandle &, const PayloadHeader & payloadHeader)
+{
+    if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
+    {
+        mMessageStats.interactionModelMessagesSent++;
+    }
 }
 
 } // namespace chip

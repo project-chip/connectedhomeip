@@ -18,6 +18,7 @@
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <iterator>
 #include <lib/core/Global.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -274,17 +275,15 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kAesKeyHandle)));
         ByteSpan aesBuf;
         ReturnErrorOnFailure(reader.Get(aesBuf));
-        VerifyOrReturnError(aesBuf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
-        memcpy(clientInfo.aes_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), aesBuf.data(),
-               sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        VerifyOrReturnError(aesBuf.size() == Crypto::Aes128KeyHandle::Size(), CHIP_ERROR_INTERNAL);
+        memcpy(clientInfo.aes_key_handle.OpaqueBytes().data(), aesBuf.data(), Crypto::Aes128KeyHandle::Size());
 
         // Hmac key handle
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kHmacKeyHandle)));
         ByteSpan hmacBuf;
         ReturnErrorOnFailure(reader.Get(hmacBuf));
-        VerifyOrReturnError(hmacBuf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
-        memcpy(clientInfo.hmac_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), hmacBuf.data(),
-               sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        VerifyOrReturnError(hmacBuf.size() == Crypto::Hmac128KeyHandle::Size(), CHIP_ERROR_INTERNAL);
+        memcpy(clientInfo.hmac_key_handle.OpaqueBytes().data(), hmacBuf.data(), Crypto::Hmac128KeyHandle::Size());
 
         // ClientType
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kClientType)));
@@ -340,10 +339,8 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kStartICDCounter), clientInfo.start_icd_counter));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kOffset), clientInfo.offset));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kMonitoredSubject), clientInfo.monitored_subject));
-        ByteSpan aesBuf(clientInfo.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kAesKeyHandle), aesBuf));
-        ByteSpan hmacBuf(clientInfo.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kHmacKeyHandle), hmacBuf));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kAesKeyHandle), clientInfo.aes_key_handle.OpaqueBytes()));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kHmacKeyHandle), clientInfo.hmac_key_handle.OpaqueBytes()));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kClientType), clientInfo.client_type));
         ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));
     }
@@ -527,19 +524,17 @@ CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & paylo
 {
     uint8_t appDataBuffer[kAppDataLength];
     MutableByteSpan appData(appDataBuffer);
-    auto * iterator = IterateICDClientInfo();
-    VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
+    AutoRelease iterator(IterateICDClientInfo());
+    VerifyOrReturnError(!iterator.IsNull(), CHIP_ERROR_NO_MEMORY);
     while (iterator->Next(clientInfo))
     {
         CHIP_ERROR err = chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(
             clientInfo.aes_key_handle, clientInfo.hmac_key_handle, payload, counter, appData);
         if (CHIP_NO_ERROR == err)
         {
-            iterator->Release();
             return CHIP_NO_ERROR;
         }
     }
-    iterator->Release();
     return CHIP_ERROR_NOT_FOUND;
 }
 

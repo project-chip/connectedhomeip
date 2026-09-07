@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <cstdint>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -56,17 +57,21 @@ struct IsOneOf<T>
 class AttributeSet
 {
 public:
-    AttributeSet()                                       = default;
-    AttributeSet(const AttributeSet & other)             = default;
-    AttributeSet(AttributeSet && other)                  = default;
-    AttributeSet & operator=(const AttributeSet & other) = default;
-    AttributeSet & operator=(AttributeSet && other)      = default;
+    constexpr explicit AttributeSet(uint32_t initialValue) : mSetBits(initialValue) {}
+
+    constexpr AttributeSet()                                       = default;
+    constexpr AttributeSet(const AttributeSet & other)             = default;
+    constexpr AttributeSet(AttributeSet && other)                  = default;
+    constexpr AttributeSet & operator=(const AttributeSet & other) = default;
+    constexpr AttributeSet & operator=(AttributeSet && other)      = default;
 
     // Checks if an attribute ID is set.
     //
     // NOTE: this does NOT validate that the ID is < 32 because all the Set functions
-    //       generally are asserted on this (forceset as well as subclasses).
-    //       This MUST be called with id < 32.
+    //       generally are asserted on this (forceset as well as subclasses) and the
+    //       initial value contructor uses a uint32_t bitmask as well.
+    //
+    // This MUST be called with id < 32.
     constexpr bool IsSet(AttributeId id) const { return (mSetBits & (1u << id)) != 0; }
 
     /// Exposes a "force attribute bit set" without extra validation,
@@ -79,6 +84,8 @@ public:
         static_assert(id < 32, "Attribute ID must be settable");
         return Set(id, true);
     }
+
+    constexpr uint32_t Raw() const { return mSetBits; }
 
 protected:
     constexpr AttributeSet & Set(AttributeId id, bool value = true)
@@ -135,8 +142,9 @@ template <AttributeId... OptionalAttributeIds>
 class OptionalAttributeSet : public AttributeSet
 {
 public:
-    OptionalAttributeSet(const AttributeSet & initialValue) : AttributeSet(initialValue) {}
-    OptionalAttributeSet() = default;
+    constexpr explicit OptionalAttributeSet(uint32_t initialValue) : AttributeSet(initialValue & All()) {}
+    constexpr OptionalAttributeSet(const AttributeSet & initialValue) : AttributeSet(initialValue) {}
+    constexpr OptionalAttributeSet() = default;
 
     template <uint32_t ATTRIBUTE_ID>
     constexpr OptionalAttributeSet & Set(bool value = true)
@@ -145,6 +153,18 @@ public:
         static_assert(Internal::IsOneOf<ATTRIBUTE_ID, OptionalAttributeIds...>::value, "attribute MUST be optional");
         (void) AttributeSet::Set(ATTRIBUTE_ID, value);
         return *this;
+    }
+
+    static constexpr uint32_t All()
+    {
+        if constexpr (sizeof...(OptionalAttributeIds) == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return ((1U << OptionalAttributeIds) | ...);
+        }
     }
 };
 

@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster FlowMeasurement (cluster code: 1028/0x04404)
+// Identifier constant values for cluster FlowMeasurement (cluster code: 1028/0x0404)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

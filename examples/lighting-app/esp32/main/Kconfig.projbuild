@@ -27,7 +27,10 @@ menu "Demo"
         default DEVICE_TYPE_ESP32_S3_DEVKITM if IDF_TARGET_ESP32S3
         default DEVICE_TYPE_ESP32_C2_DEVKITM if IDF_TARGET_ESP32C2
         default DEVICE_TYPE_ESP32_C6_DEVKITC if IDF_TARGET_ESP32C6
+        default DEVICE_TYPE_ESP32_S31_DEVKITC if IDF_TARGET_ESP32S31
         default DEVICE_TYPE_ESP32_H2_DEVKITC if IDF_TARGET_ESP32H2
+        default DEVICE_TYPE_ESP32_H21_DEVKITC if IDF_TARGET_ESP32H21
+        default DEVICE_TYPE_ESP32_H4_DEVKITC if IDF_TARGET_ESP32H4
         help
             Specifies the type of ESP32 device.
 
@@ -49,55 +52,29 @@ menu "Demo"
         config DEVICE_TYPE_ESP32_S3_DEVKITM
             bool "ESP32S3-DevKitM"
             depends on IDF_TARGET_ESP32S3
-        config DEVICE_TYPE_ESP32H2_DEVKITC
+        config DEVICE_TYPE_ESP32_H2_DEVKITC
             bool "ESP32H2-DevKitC"
             depends on IDF_TARGET_ESP32H2
+        config DEVICE_TYPE_ESP32_H21_DEVKITC
+            bool "ESP32H21-DevKitC"
+            depends on IDF_TARGET_ESP32H21
+        config DEVICE_TYPE_ESP32_H4_DEVKITC
+            bool "ESP32H4-DevKitC"
+            depends on IDF_TARGET_ESP32H4
         config DEVICE_TYPE_ESP32_C2_DEVKITM
             bool "ESP32C2-DevKitM"
             depends on IDF_TARGET_ESP32C2
         config DEVICE_TYPE_ESP32_C6_DEVKITC
             bool "ESP32C6-DevKitC"
             depends on IDF_TARGET_ESP32C6
+        config DEVICE_TYPE_ESP32_S31_DEVKITC
+            bool "ESP32S31-DevKitC"
+            depends on IDF_TARGET_ESP32S31
     endchoice
 
     config CHIP_PROJECT_CONFIG
         string "CHIP Project Configuration file"
         default "main/include/CHIPProjectConfig.h"
-
-    choice LED_TYPE
-        prompt "LED type"
-        default LED_TYPE_RMT if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_S3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C6_DEVKITC
-        default LED_TYPE_GPIO
-        help
-            Defines the default LED type used in the example
-
-        config LED_TYPE_GPIO
-            bool "GPIO"
-        config LED_TYPE_RMT
-            bool "RMT - Addressable LED"
-    endchoice
-
-    config LED_RMT_CHANNEL
-        depends on LED_TYPE_RMT
-        int "RMT Channel"
-        range 0 7
-        default 0
-        help
-            Set the RMT peripheral channel.
-            ESP32 RMT channel from 0 to 7
-            ESP32-S3 RMT channel from 0 to 3
-            ESP32-C3 RMT channel from 0 to 1
-
-    config LED_GPIO
-        int "LED GPIO number"
-        range 0 48
-        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
-        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC
-        default 48 if DEVICE_TYPE_ESP32_S3_DEVKITM
-        default 5 if DEVICE_TYPE_M5STACK
-        default 5
-        help
-            GPIO number (IOxx) to blink on and off or the RMT signal for the addressable LED.
 
     choice
       prompt "Rendezvous Mode"
@@ -122,7 +99,7 @@ menu "Demo"
         int
         range 0 5
         default 0 if DEVICE_TYPE_ESP32_DEVKITC
-        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C6_DEVKITC
+        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_H2_DEVKITC || DEVICE_TYPE_ESP32_H21_DEVKITC || DEVICE_TYPE_ESP32_H4_DEVKITC || DEVICE_TYPE_ESP32_C6_DEVKITC || DEVICE_TYPE_ESP32_S31_DEVKITC
         default 3 if DEVICE_TYPE_M5STACK
         default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
 
@@ -184,4 +161,15 @@ depends on ENABLE_PW_RPC
             GPIO number for UART TX pin. See UART documentation for more information
             about available pin numbers for UART.
 
+endmenu
+
+menu "Platform Diagnostics"
+
+    config END_USER_BUFFER_SIZE
+        int "Set buffer size for end user diagnostic data"
+        depends on CHIP_ENABLE_ESP_DIAGNOSTICS
+        default 4096
+        help
+            Defines the buffer size (in bytes) for storing diagnostic data related to end user activity.
+            This buffer will hold logs and traces relevant to user interactions with the Matter protocol.
 endmenu

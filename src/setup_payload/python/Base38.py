@@ -27,8 +27,8 @@ MAX_BYTES_IN_CHUNK = 3
 MAX_ENCODED_BYTES_IN_CHUNK = 5
 
 
-def encode(bytes):
-    total_bytes = len(bytes)
+def encode(data):
+    total_bytes = len(data)
     qrcode = ''
 
     for i in range(0, total_bytes, MAX_BYTES_IN_CHUNK):
@@ -39,7 +39,7 @@ def encode(bytes):
 
         value = 0
         for j in range(i, i + bytes_in_chunk):
-            value = value + (bytes[j] << (8 * (j - i)))
+            value = value + (data[j] << (8 * (j - i)))
 
         base38_chars_needed = BASE38_CHARS_NEEDED_IN_CHUNK[bytes_in_chunk - 1]
         while base38_chars_needed > 0:

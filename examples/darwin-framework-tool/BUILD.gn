@@ -178,7 +178,6 @@ executable("darwin-framework-tool") {
     "${chip_root}/src/include/",
     "${chip_root}/src/protocols/",
     "${chip_root}/src/protocols/interaction_model",
-    "${chip_root}/third_party/nlassert/repo/include/",
     "${chip_root}/third_party/nlio/repo/include/",
     "${chip_root}/zzz_generated/app-common/",
     "${root_gen_dir}/include",

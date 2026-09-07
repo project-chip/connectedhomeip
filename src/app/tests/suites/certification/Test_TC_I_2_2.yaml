@@ -77,7 +77,7 @@ tests:
       response:
           constraints:
               minValue: 51
-              maxValue: 69
+              maxValue: 60
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"

@@ -64,7 +64,7 @@ jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved)
 
     ChipLogProgress(AppServer, "JNI_OnLoad() called");
 
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     // Save a reference to the JVM.  Will need this to call back into Java.
     JniReferences::GetInstance().SetJavaVm(jvm, "chip/appserver/ChipAppServer");
@@ -108,7 +108,7 @@ void AndroidAppServerJNI_OnUnload(JavaVM * jvm, void * reserved)
     // If the IO thread has been started, shut it down and wait for it to exit.
     if (sIOThread != PTHREAD_NULL)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
         chip::DeviceLayer::StackUnlock unlock;
         pthread_join(sIOThread, NULL);

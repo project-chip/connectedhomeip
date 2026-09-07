@@ -36,48 +36,69 @@ void SwitchEventHandler::OnSwitchLatched(EndpointId endpointId, uint8_t newPosit
 {
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d", __func__, endpointId, newPosition);
 
-    Clusters::SwitchServer::Instance().OnSwitchLatch(endpointId, newPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnSwitchLatch(newPosition);
 }
 
 void SwitchEventHandler::OnInitialPress(EndpointId endpointId, uint8_t newPosition)
 {
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d", __func__, endpointId, newPosition);
 
-    Clusters::SwitchServer::Instance().OnInitialPress(endpointId, newPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
 }
 
 void SwitchEventHandler::OnLongPress(EndpointId endpointId, uint8_t newPosition)
 {
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d", __func__, endpointId, newPosition);
 
-    Clusters::SwitchServer::Instance().OnLongPress(endpointId, newPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnLongPress(newPosition);
 }
 
 void SwitchEventHandler::OnShortRelease(EndpointId endpointId, uint8_t previousPosition)
 {
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, previousPosition=%d", __func__, endpointId, previousPosition);
 
-    Clusters::SwitchServer::Instance().OnShortRelease(endpointId, previousPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
 }
 
 void SwitchEventHandler::OnLongRelease(EndpointId endpointId, uint8_t previousPosition)
 {
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, previousPosition=%d", __func__, endpointId, previousPosition);
 
-    Clusters::SwitchServer::Instance().OnLongRelease(endpointId, previousPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnLongRelease(previousPosition);
 }
 
 void SwitchEventHandler::OnMultiPressOngoing(EndpointId endpointId, uint8_t newPosition, uint8_t count)
 {
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d, count=%d", __func__, endpointId, newPosition, count);
 
-    Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpointId, newPosition, count);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressOngoing(newPosition, count);
 }
 
 void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uint8_t count)
 {
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, previousPosition=%d, count=%d", __func__, endpointId, previousPosition, count);
 
-    Clusters::SwitchServer::Instance().OnMultiPressComplete(endpointId, previousPosition, count);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressComplete(previousPosition, count);
 }
 #endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0

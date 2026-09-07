@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -44,9 +44,8 @@ public:
     // UDPEndPoint overrides.
     InterfaceId GetBoundInterface() const override;
     uint16_t GetBoundPort() const override;
-    void Free() override;
     void HandleDataReceived(System::PacketBufferHandle && msg);
-    void SetNativeParams(void * params);
+    void SetNativeParams(void * params) override;
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
 

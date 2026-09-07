@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Binding (cluster code: 30/0x041E)
+// Identifier constant values for cluster Binding (cluster code: 30/0x001E)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

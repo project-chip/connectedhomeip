@@ -32,8 +32,10 @@ chip_test_suite("tests") {
     "${chip_root}/src/access:provider-impl",
     "${chip_root}/src/app/data-model-provider:data-model-provider",
     "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
     "${dir_pw_unit_test}",
   ]
 

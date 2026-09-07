@@ -14,7 +14,7 @@ namespace CameraAvSettingsUserLevelManagement {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 14;
+inline constexpr uint32_t kAttributesCount = 15;
 
 namespace MPTZPosition {
 inline constexpr AttributeId Id = 0x00000000;
@@ -51,6 +51,10 @@ inline constexpr AttributeId Id = 0x00000007;
 namespace PanMax {
 inline constexpr AttributeId Id = 0x00000008;
 } // namespace PanMax
+
+namespace MovementState {
+inline constexpr AttributeId Id = 0x00000009;
+} // namespace MovementState
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

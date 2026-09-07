@@ -26,7 +26,7 @@
 #include <utility>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 namespace internal {
 uint16_t SizeForType(EmberAfAttributeType type)
 {
@@ -246,5 +246,5 @@ const MockClusterConfig * MockNodeConfig::clusterByIds(EndpointId endpointId, Cl
     return endpoint->clusterById(clusterId, outClusterIndex);
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

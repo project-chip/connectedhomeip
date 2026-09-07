@@ -19,7 +19,9 @@ import argparse
 import ast
 import logging
 import re
-from typing import Any, Dict, List, Mapping, MutableMapping, Optional, Pattern, Sequence, Tuple, Union
+from collections.abc import Mapping, MutableMapping, Sequence
+from re import Pattern
+from typing import Any
 
 import humanfriendly  # type: ignore
 import memdf.util.nd as nd
@@ -51,7 +53,7 @@ import memdf.util.pretty
 #               the value contains a key 'group', whose value is the group
 #               to be used for configuration keys with the given prefix.
 #
-ConfigDescription = Mapping[Union[str, Tuple[int, str]], Mapping[str, Any]]
+ConfigDescription = Mapping[str | tuple[int, str], Mapping[str, Any]]
 
 
 class Config:
@@ -109,11 +111,11 @@ class Config:
     _GROUP_MAP = 2
 
     @staticmethod
-    def group_def(s: str) -> Tuple[int, str]:
+    def group_def(s: str) -> tuple[int, str]:
         return (Config._GROUP_DEF, s)
 
     @staticmethod
-    def group_map(s: str) -> Tuple[int, str]:
+    def group_map(s: str) -> tuple[int, str]:
         return (Config._GROUP_MAP, s)
 
     def init_config(self, desc: ConfigDescription) -> 'Config':
@@ -171,7 +173,7 @@ class Config:
             if postprocess := info.get('postprocess'):
                 self.postprocess_args[key] = (postprocess, info)
 
-            group: Optional[str] = info.get('group')
+            group: str | None = info.get('group')
             if group is None and (e := key.find('.')) > 0:
                 group = key[0:e]
             group = self.group_alias.get(group, group)
@@ -197,7 +199,7 @@ class Config:
         # Read config file(s).
         config_parser = argparse.ArgumentParser(add_help=False,
                                                 allow_abbrev=False)
-        config_arg: Dict[str, Any] = {
+        config_arg: dict[str, Any] = {
             'metavar': 'FILE',
             'default': [],
             'action': 'append',
@@ -246,31 +248,31 @@ class Config:
 
     def read_config_file(self, filename: str) -> 'Config':
         """Read a configuration file."""
-        with open(filename, 'r') as fp:
+        with open(filename) as fp:
             d = ast.literal_eval(fp.read())
             nd.update(self.d, d)
         return self
 
     @staticmethod
-    def transpose_dictlist(src: Dict[str, List[str]]) -> Dict[str, str]:
-        d: Dict[str, str] = {}
+    def transpose_dictlist(src: dict[str, list[str]]) -> dict[str, str]:
+        d: dict[str, str] = {}
         for k, vlist in src.items():
             for v in vlist:
                 d[v] = k
         return d
 
-    def getl_re(self, key: nd.Key) -> Optional[Pattern]:
+    def getl_re(self, key: nd.Key) -> Pattern | None:
         """Get a cached compiled regular expression for a config value list."""
         regex_key: nd.Key = ['cache', 're'] + key
-        regex: Optional[Pattern] = self.getl(regex_key)
+        regex: Pattern | None = self.getl(regex_key)
         if not regex:
-            branches: Optional[Sequence[str]] = self.getl(key)
+            branches: Sequence[str] | None = self.getl(key)
             if branches:
                 regex = re.compile('|'.join(branches))
             self.putl(regex_key, regex)
         return regex
 
-    def get_re(self, key: str) -> Optional[Pattern]:
+    def get_re(self, key: str) -> Pattern | None:
         return self.getl_re(key.split('.'))
 
 

@@ -18,6 +18,7 @@
 #include "IcdUatButton.h"
 
 #include "driver/gpio.h"
+#include "driver/rtc_io.h"
 #include "esp_attr.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"

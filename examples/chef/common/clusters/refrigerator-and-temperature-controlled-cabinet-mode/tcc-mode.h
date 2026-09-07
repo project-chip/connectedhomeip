@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,13 +44,12 @@ private:
     ModeTagStructType modeTagsTccRapidFreeze[1] = { { .value = to_underlying(ModeTag::kRapidFreeze) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
-                                                 .mode     = ModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTccNormal) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Rapid Cool"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Normal"_span, .mode = ModeNormal, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTccNormal) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Rapid Cool"_span,
                                                  .mode     = ModeRapidCool,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTccRapidCool) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Rapid Freeze"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Rapid Freeze"_span,
                                                  .mode     = ModeRapidFreeze,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsTccRapidFreeze) },
     };
@@ -73,11 +72,3 @@ void Shutdown();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-chip::Protocols::InteractionModel::Status
-chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                        const EmberAfAttributeMetadata * attributeMetadata,
-                                                                        uint8_t * buffer, uint16_t maxReadLength);
-
-chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(
-    chip::EndpointId endpointId, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);

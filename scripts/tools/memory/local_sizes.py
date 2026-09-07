@@ -17,11 +17,11 @@
 """
 This Python script analyzes the memory usage of a compiled binary and generates
 a JSON report. It collects memory usage details and outputs them in a structured
-JSON format. 
+JSON format.
 
-While similar to scripts/tools/memory/gh_sizes.py, this version extracts memory 
+While similar to scripts/tools/memory/gh_sizes.py, this version extracts memory
 information directly from a binary built from the current working directory
-(rather than a GitHub workflow) and uses the tip of the current branch instead of 
+(rather than a GitHub workflow) and uses the tip of the current branch instead of
 targeting a specific commit.
 
 Usage: local_sizes.py ‹platform› ‹config› ‹target› ‹binary› [‹output›] [‹option›…]
@@ -70,6 +70,8 @@ import memdf.select
 import memdf.util
 from memdf import Config, DFs, SectionDF
 
+log = logging.getLogger(__name__)
+
 PLATFORM_CONFIG_DIR = pathlib.Path('scripts/tools/memory/platform')
 
 
@@ -80,7 +82,7 @@ def main(argv):
         _, platform, config_name, target_name, binary, *args = argv
     except ValueError:
         program = pathlib.Path(argv[0])
-        logging.error(
+        log.error(
             """
             Usage: %s platform config target binary [output] [options]
 
@@ -124,7 +126,7 @@ def main(argv):
         if config_file.is_file():
             config.read_config_file(config_file)
         else:
-            logging.warning('Missing config file: %s', config_file)
+            log.warning("Missing config file: '%s'", config_file)
         config.parse([argv[0]] + args)
 
         config.put('output.metadata.platform', platform)

@@ -21,17 +21,14 @@
 
 #include "demo-ui.h"
 #include "lcd.h"
+#include <platform/PlatformError.h>
 
 #include "dmd.h"
 #include "glib.h"
 
-#if (SLI_SI91X_MCU_INTERFACE)
+#if defined(SLI_SI91X_MCU_INTERFACE) && (SLI_SI91X_MCU_INTERFACE)
 #include "sl_memlcd.h"
 #endif
-
-#ifdef QR_CODE_ENABLED
-#include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
 
 #include "sl_board_control.h"
 
@@ -41,10 +38,12 @@
 #define QR_CODE_BORDER_SIZE 0
 #define SL_BOARD_ENABLE_DISPLAY_PIN 0
 
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
+#include "qrcodegen.h"
+
 static uint8_t qrCode[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
 static uint8_t workBuffer[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 
 CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
 {
@@ -66,14 +65,14 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     }
 
     /* Enable the memory lcd */
-#if (SLI_SI91X_MCU_INTERFACE)
+#if defined(SLI_SI91X_MCU_INTERFACE) && (SLI_SI91X_MCU_INTERFACE)
     sl_memlcd_display_enable();
 #else
     status = sl_board_enable_display();
     if (status != SL_STATUS_OK)
     {
-        SILABS_LOG("Board Display enable fail %d", status);
-        err = CHIP_ERROR_INTERNAL;
+        SILABS_LOG("Board Display enable fail %lx", status);
+        err = MATTER_PLATFORM_ERROR(status);
     }
 #endif
 
@@ -81,16 +80,16 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     status = DMD_init(0);
     if (DMD_OK != status)
     {
-        SILABS_LOG("DMD init failed %d", status);
-        err = CHIP_ERROR_INTERNAL;
+        SILABS_LOG("DMD init failed %lx", status);
+        err = MATTER_PLATFORM_ERROR(status);
     }
 
     /* Initialize the glib context */
     status = GLIB_contextInit(&glibContext);
     if (GLIB_OK != status)
     {
-        SILABS_LOG("Glib context init failed %d", status);
-        err = CHIP_ERROR_INTERNAL;
+        SILABS_LOG("Glib context init failed %lx", status);
+        err = MATTER_PLATFORM_ERROR(status);
     }
 
     glibContext.backgroundColor = White;
@@ -98,8 +97,8 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     status                      = GLIB_clear(&glibContext);
     if (GLIB_OK != status)
     {
-        SILABS_LOG("Glib clear failed %d", status);
-        err = CHIP_ERROR_INTERNAL;
+        SILABS_LOG("Glib clear failed %lx", status);
+        err = MATTER_PLATFORM_ERROR(status);
     }
     demoUIInit(&glibContext);
 
@@ -172,7 +171,7 @@ void SilabsLCD::WriteStatus()
         memcpy(str, mStatus.networkName, sizeof(str));
     }
 
-#if SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
     GLIB_drawStringOnLine(&glibContext, "SSID : ", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
     GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
 #else
@@ -223,7 +222,7 @@ void SilabsLCD::SetScreen(Screen_e screen)
     case StatusScreen:
         WriteStatus();
         break;
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
     case QRCodeScreen:
         WriteQRCode();
         break;
@@ -236,7 +235,7 @@ void SilabsLCD::SetScreen(Screen_e screen)
 
 void SilabsLCD::CycleScreens(void)
 {
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
     if (mCurrentScreen < QRCodeScreen)
 #else
     if (mCurrentScreen < StatusScreen)
@@ -257,7 +256,7 @@ void SilabsLCD::SetStatus(DisplayStatus_t & status)
     mStatus = status;
 }
 
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 void SilabsLCD::WriteQRCode()
 {
     if (!qrcodegen_encodeText((const char *) mQRCodeBuffer, workBuffer, qrCode, qrcodegen_Ecc_LOW, QR_CODE_VERSION, QR_CODE_VERSION,
@@ -317,4 +316,4 @@ void SilabsLCD::LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
         }
     }
 }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED

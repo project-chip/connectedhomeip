@@ -23,7 +23,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 
 #include "commands/example/ExampleOperationalCredentialsIssuer.h"
@@ -179,7 +179,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
                           err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-        serializedKey.SetLength(keySize);
+        err = (err == CHIP_NO_ERROR) ? serializedKey.SetLength(keySize) : err;
     }
 
     if (err != CHIP_NO_ERROR)
@@ -205,7 +205,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
                           err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-        serializedKey.SetLength(keySize);
+        err = (err == CHIP_NO_ERROR) ? serializedKey.SetLength(keySize) : err;
     }
 
     if (err != CHIP_NO_ERROR)
@@ -232,7 +232,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsAnchorIntermediateIssuerKeypairStorage, key,
                           err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-        serializedKey.SetLength(keySize);
+        err = (err == CHIP_NO_ERROR) ? serializedKey.SetLength(keySize) : err;
     }
 
     if (err != CHIP_NO_ERROR)
@@ -417,7 +417,7 @@ ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElemen
     ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
 
     ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
-    reader.ExitContainer(containerType);
+    ReturnErrorOnFailure(reader.ExitContainer(containerType));
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));

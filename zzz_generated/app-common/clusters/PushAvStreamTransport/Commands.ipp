@@ -56,7 +56,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AllocatePushTransport.
+} // namespace AllocatePushTransport
 namespace AllocatePushTransportResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -85,7 +85,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AllocatePushTransportResponse.
+} // namespace AllocatePushTransportResponse
 namespace DeallocatePushTransport {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -113,7 +113,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace DeallocatePushTransport.
+} // namespace DeallocatePushTransport
 namespace ModifyPushTransport {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -146,7 +146,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ModifyPushTransport.
+} // namespace ModifyPushTransport
 namespace SetTransportStatus {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -179,7 +179,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetTransportStatus.
+} // namespace SetTransportStatus
 namespace ManuallyTriggerTransport {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -222,7 +222,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ManuallyTriggerTransport.
+} // namespace ManuallyTriggerTransport
 namespace FindTransport {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -250,7 +250,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace FindTransport.
+} // namespace FindTransport
 namespace FindTransportResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -279,7 +279,45 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace FindTransportResponse.
+} // namespace FindTransportResponse
+namespace UpdateMotionZoneOptions {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kConnectionID), connectionID);
+    encoder.Encode(to_underlying(Fields::kMotionZones), motionZones);
+    encoder.Encode(to_underlying(Fields::kMotionSensitivity), motionSensitivity);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kConnectionID))
+        {
+            err = DataModel::Decode(reader, connectionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kMotionZones))
+        {
+            err = DataModel::Decode(reader, motionZones);
+        }
+        else if (__context_tag == to_underlying(Fields::kMotionSensitivity))
+        {
+            err = DataModel::Decode(reader, motionSensitivity);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace UpdateMotionZoneOptions
 } // namespace Commands
 } // namespace PushAvStreamTransport
 } // namespace Clusters

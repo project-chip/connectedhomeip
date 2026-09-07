@@ -60,15 +60,6 @@ factoryData __attribute__((section(".factory_data_struct"))) __attribute__((used
 #endif
     {};
 
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
-    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
-    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
-    return keypair.Deserialize(serialized_keypair);
-}
-
 CHIP_ERROR FactoryDataProvider::Init()
 {
     return CHIP_NO_ERROR;
@@ -184,7 +175,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     memcpy(pubKeySpan.data(), dacPublicKey.Bytes(), dacPublicKey.Length());
     pubKeySpan.reduce_size(dacPublicKey.Length());
 
-    ReturnErrorOnFailure(LoadKeypairFromRaw(privKeySpan, pubKeySpan, keypair));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(privKeySpan, pubKeySpan));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);

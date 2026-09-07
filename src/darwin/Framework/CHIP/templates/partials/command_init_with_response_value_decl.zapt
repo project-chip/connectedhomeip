@@ -1,0 +1,16 @@
+{{#if (and (isStrEqual source "server")
+           includeInitWithResponseValue)}}
+
+/**
+ * Initialize an MTR{{cluster}}Cluster{{command}}Params with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error{{#if deprecationMessage}} {{availability cluster command=command deprecationMessage=deprecationMessage minimalRelease="3C23F160-13CE-4397-BC65-122B61E4D691"}}{{/if}};
+{{/if}}

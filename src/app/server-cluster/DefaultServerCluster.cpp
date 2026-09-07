@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "ServerClusterInterface.h"
 #include <app/server-cluster/DefaultServerCluster.h>
 
 #include <access/Privilege.h>
@@ -34,19 +35,19 @@ using namespace chip::app::DataModel;
 
 constexpr std::array<AttributeEntry, 5> kGlobalAttributeEntries{ {
     {
-        Globals::Attributes::ClusterRevision::Id,
-        BitFlags<AttributeQualityFlags>(),
-        Access::Privilege::kView,
-        std::nullopt,
-    },
-    {
         Globals::Attributes::FeatureMap::Id,
         BitFlags<AttributeQualityFlags>(),
         Access::Privilege::kView,
         std::nullopt,
     },
     {
-        Globals::Attributes::AttributeList::Id,
+        Globals::Attributes::ClusterRevision::Id,
+        BitFlags<AttributeQualityFlags>(),
+        Access::Privilege::kView,
+        std::nullopt,
+    },
+    {
+        Globals::Attributes::GeneratedCommandList::Id,
         BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
         Access::Privilege::kView,
         std::nullopt,
@@ -58,7 +59,7 @@ constexpr std::array<AttributeEntry, 5> kGlobalAttributeEntries{ {
         std::nullopt,
     },
     {
-        Globals::Attributes::GeneratedCommandList::Id,
+        Globals::Attributes::AttributeList::Id,
         BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
         Access::Privilege::kView,
         std::nullopt,
@@ -71,8 +72,6 @@ Span<const DataModel::AttributeEntry> DefaultServerCluster::GlobalAttributes()
 {
     return { kGlobalAttributeEntries.data(), kGlobalAttributeEntries.size() };
 }
-
-DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
 
 CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder)
 {
@@ -93,17 +92,17 @@ CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void DefaultServerCluster::Shutdown()
+void DefaultServerCluster::Shutdown(ClusterShutdownType)
 {
     mContext = nullptr;
 }
 
-void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
+void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId, DataModel::AttributeChangeType type)
 {
     IncreaseDataVersion();
 
     VerifyOrReturn(mContext != nullptr);
-    mContext->interactionContext.dataModelChangeListener.MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
+    mContext->provider.NotifyAttributeChanged({ mPath.mEndpointId, mPath.mClusterId, attributeId }, type);
 }
 
 BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags(const ConcreteClusterPath &) const
@@ -134,11 +133,12 @@ CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & p
 }
 
 DataModel::ActionReturnStatus DefaultServerCluster::NotifyAttributeChangedIfSuccess(AttributeId attributeId,
-                                                                                    DataModel::ActionReturnStatus status)
+                                                                                    DataModel::ActionReturnStatus status,
+                                                                                    DataModel::AttributeChangeType type)
 {
-    if (status.IsSuccess())
+    if (status.IsSuccess() && !status.IsNoOpSuccess())
     {
-        NotifyAttributeChanged(attributeId);
+        NotifyAttributeChanged(attributeId, type);
     }
     return status;
 }

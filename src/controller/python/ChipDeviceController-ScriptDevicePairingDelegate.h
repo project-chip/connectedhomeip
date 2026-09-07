@@ -47,6 +47,7 @@ typedef void (*DevicePairingDelegate_OnCommissioningFailureFunct)(
 typedef void (*DevicePairingDelegate_OnCommissioningStatusUpdateFunct)(PeerId peerId,
                                                                        chip::Controller::CommissioningStage stageCompleted,
                                                                        CHIP_ERROR err);
+typedef void (*DevicePairingDelegate_OnCommissioningStageStartFunct)(NodeId nodeId, const char * stage);
 typedef void (*DevicePairingDelegate_OnFabricCheckFunct)(NodeId nodeId);
 }
 
@@ -58,6 +59,7 @@ public:
     void SetKeyExchangeCallback(DevicePairingDelegate_OnPairingCompleteFunct callback);
     void SetCommissioningCompleteCallback(DevicePairingDelegate_OnCommissioningCompleteFunct callback);
     void SetCommissioningStatusUpdateCallback(DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+    void SetCommissioningStageStartCallback(DevicePairingDelegate_OnCommissioningStageStartFunct callback);
     void SetCommissioningSuccessCallback(DevicePairingDelegate_OnCommissioningSuccessFunct callback);
     void SetCommissioningFailureCallback(DevicePairingDelegate_OnCommissioningFailureFunct callback);
     void SetCommissioningWindowOpenCallback(DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
@@ -69,6 +71,7 @@ public:
     void OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
                                 Optional<Credentials::AttestationVerificationResult> additionalErrorInfo) override;
     void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) override;
+    void OnCommissioningStageStart(PeerId peerId, CommissioningStage stage) override;
     void OnICDRegistrationComplete(ScopedNodeId deviceId, uint32_t icdCounter) override;
     void OnICDStayActiveComplete(ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
     void OnFabricCheck(NodeId matchingNodeId) override;
@@ -85,6 +88,7 @@ private:
     DevicePairingDelegate_OnCommissioningSuccessFunct mOnCommissioningSuccessCallback           = nullptr;
     DevicePairingDelegate_OnCommissioningFailureFunct mOnCommissioningFailureCallback           = nullptr;
     DevicePairingDelegate_OnCommissioningStatusUpdateFunct mOnCommissioningStatusUpdateCallback = nullptr;
+    DevicePairingDelegate_OnCommissioningStageStartFunct mOnCommissioningStageStartCallback     = nullptr;
     DevicePairingDelegate_OnFabricCheckFunct mOnFabricCheckCallback                             = nullptr;
     Callback::Callback<Controller::OnOpenCommissioningWindow> mOpenWindowCallback;
     Controller::CommissioningWindowOpener * mWindowOpener = nullptr;

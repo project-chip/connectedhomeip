@@ -27,7 +27,47 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
-namespace Structs {} // namespace Structs
+namespace Structs {
+
+namespace SFrameStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kCipherSuite), cipherSuite);
+    encoder.Encode(to_underlying(Fields::kBaseKey), baseKey);
+    encoder.Encode(to_underlying(Fields::kKid), kid);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kCipherSuite))
+        {
+            err = DataModel::Decode(reader, cipherSuite);
+        }
+        else if (__context_tag == to_underlying(Fields::kBaseKey))
+        {
+            err = DataModel::Decode(reader, baseKey);
+        }
+        else if (__context_tag == to_underlying(Fields::kKid))
+        {
+            err = DataModel::Decode(reader, kid);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace SFrameStruct
+} // namespace Structs
 } // namespace WebRTCTransportProvider
 } // namespace Clusters
 } // namespace app

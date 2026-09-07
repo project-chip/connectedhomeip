@@ -43,7 +43,10 @@ public:
     void operator()() const { mLambdaProxy(mLambdaBody); }
 
 private:
-    using LambdaStorage = std::aligned_storage_t<CHIP_CONFIG_LAMBDA_EVENT_SIZE, CHIP_CONFIG_LAMBDA_EVENT_ALIGN>;
+    struct LambdaStorage
+    {
+        alignas(CHIP_CONFIG_LAMBDA_EVENT_ALIGN) unsigned char data[CHIP_CONFIG_LAMBDA_EVENT_SIZE];
+    };
     void (*mLambdaProxy)(const LambdaStorage & body);
     LambdaStorage mLambdaBody;
 };

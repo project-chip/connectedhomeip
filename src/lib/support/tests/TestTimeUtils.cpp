@@ -1041,3 +1041,19 @@ TEST(TestTimeUtils, TestChipEpochTimeEdgeConditions)
     EXPECT_EQ(UnixEpochToChipEpochTime(kUnix2000Jan1 - 1, chip_epoch_time_sec), false);
 #endif
 }
+
+TEST(TestTimeUtils, TestSecondsToMilliseconds)
+{
+    // Typical / regression values.
+    EXPECT_EQ(SecondsToMilliseconds(0u), UINT64_C(0));
+    EXPECT_EQ(SecondsToMilliseconds(1u), UINT64_C(1000));
+    EXPECT_EQ(SecondsToMilliseconds(1000u), UINT64_C(1000000));
+
+    // Overflow guard: the product must be evaluated in 64 bits. Because
+    // kMillisecondsPerSecond is an int, `seconds * kMillisecondsPerSecond` is computed
+    // in 32-bit (unsigned) arithmetic and wraps once seconds * 1000 exceeds UINT32_MAX,
+    // i.e. for seconds >= 4294968 (~49.7 days), before the widening to uint64_t.
+    EXPECT_EQ(SecondsToMilliseconds(4294968u), UINT64_C(4294968000)); // smallest overflowing input
+    EXPECT_EQ(SecondsToMilliseconds(5000000u), UINT64_C(5000000000)); // round value past the boundary
+    EXPECT_EQ(SecondsToMilliseconds(UINT32_MAX), UINT64_C(4294967295000));
+}

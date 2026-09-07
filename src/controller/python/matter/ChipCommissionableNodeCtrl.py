@@ -23,7 +23,6 @@
 """Chip Commissionable Node Controller interface
 """
 
-from __future__ import absolute_import, print_function
 
 from ctypes import CDLL, POINTER, c_void_p, pointer
 from typing import Any
@@ -46,7 +45,7 @@ def _singleton(cls):
 
 
 @_singleton
-class ChipCommissionableNodeController(object):
+class ChipCommissionableNodeController:
     def __init__(self, chipStack: ChipStack):
         self.commissionableNodeCtrl = None
         self._ChipStack = chipStack

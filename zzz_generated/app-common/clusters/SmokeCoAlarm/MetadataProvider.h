@@ -49,6 +49,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::SmokeCoAlarm
             return SmokeSensitivityLevel::kMetadataEntry;
         case ExpiryDate::Id:
             return ExpiryDate::kMetadataEntry;
+        case Unmounted::Id:
+            return Unmounted::kMetadataEntry;
         default:
             return std::nullopt;
         }

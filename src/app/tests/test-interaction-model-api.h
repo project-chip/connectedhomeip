@@ -66,7 +66,7 @@
     }
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 constexpr EndpointId kTestEndpointId            = 1;
 constexpr EndpointId kTestDeniedEndpointId      = 66;
@@ -83,7 +83,7 @@ constexpr chip::DataVersion kRejectedDataVersion = 1;
 extern uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
 extern size_t attributeDataTLVLen;
 
-} // namespace Test
+} // namespace Testing
 namespace app {
 
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
@@ -106,6 +106,9 @@ class TestImCustomDataModel : public CodegenDataModelProvider
 public:
     static TestImCustomDataModel & Instance();
 
+    // No-op: mock provider has no persistent storage delegate, so skip the real
+    // CodegenDataModelProvider::Startup() which requires one.
+    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override { return CHIP_NO_ERROR; }
     CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

@@ -15,15 +15,10 @@
 #    limitations under the License.
 
 
-import logging
-import typing
-
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-
-logger = logging.getLogger(__name__)
 
 
 class EWATERHTRBase:
@@ -38,8 +33,8 @@ class EWATERHTRBase:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
-    async def send_boost_command(self, duration: int, one_shot: typing.Optional[bool] = None, emergency_boost: typing.Optional[bool] = None,
-                                 temporary_setpoint: typing.Optional[int] = None, target_percentage: typing.Optional[int] = None, target_reheat: typing.Optional[int] = None,
+    async def send_boost_command(self, duration: int, one_shot: bool | None = None, emergency_boost: bool | None = None,
+                                 temporary_setpoint: int | None = None, target_percentage: int | None = None, target_reheat: int | None = None,
                                  endpoint: int = None, timedRequestTimeoutMs: int = 3000,
                                  expected_status: Status = Status.Success):
         try:

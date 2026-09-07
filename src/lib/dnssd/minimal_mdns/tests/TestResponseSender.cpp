@@ -23,19 +23,21 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
-#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
+#include <lib/dnssd/wire/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/RecordData.h>
+#include <lib/dnssd/wire/RecordWriter.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 namespace {
 
 using namespace chip;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 using namespace mdns::Minimal::test;
 
 struct CommonTestElements
@@ -79,6 +81,7 @@ struct CommonTestElements
         host(FlatAllocatedQName::Build(hostNameStorage, tag, "host")),
         txt(FlatAllocatedQName::Build(txtStorage, tag, "L1=something", "L2=other")), server()
     {
+        packetInfo.Clear();
         queryResponder.Init();
         header.SetQueryCount(1);
     }
@@ -104,7 +107,7 @@ TEST_F(TestResponseSender, SrvAnyResponseToInstance)
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
     common.server.AddExpectedRecord(&common.srvRecord);
-    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration()));
 
     EXPECT_TRUE(common.server.GetSendCalled());
     EXPECT_TRUE(common.server.GetHeaderFound());
@@ -126,7 +129,7 @@ TEST_F(TestResponseSender, SrvTxtAnyResponseToInstance)
     // We requested ANY on the host name, expect both back.
     common.server.AddExpectedRecord(&common.srvRecord);
     common.server.AddExpectedRecord(&common.txtRecord);
-    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration()));
 
     EXPECT_TRUE(common.server.GetSendCalled());
     EXPECT_TRUE(common.server.GetHeaderFound());
@@ -151,7 +154,7 @@ TEST_F(TestResponseSender, PtrSrvTxtAnyResponseToServiceName)
     common.server.AddExpectedRecord(&common.srvRecord);
     common.server.AddExpectedRecord(&common.txtRecord);
 
-    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration()));
 
     EXPECT_TRUE(common.server.GetSendCalled());
     EXPECT_TRUE(common.server.GetHeaderFound());
@@ -175,7 +178,7 @@ TEST_F(TestResponseSender, PtrSrvTxtAnyResponseToInstance)
     common.server.AddExpectedRecord(&common.srvRecord);
     common.server.AddExpectedRecord(&common.txtRecord);
 
-    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration()));
 
     EXPECT_TRUE(common.server.GetSendCalled());
     EXPECT_TRUE(common.server.GetHeaderFound());
@@ -198,7 +201,7 @@ TEST_F(TestResponseSender, PtrSrvTxtSrvResponseToInstance)
     // We didn't set the txt as an additional on the srv name so expect only srv.
     common.server.AddExpectedRecord(&common.srvRecord);
 
-    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration()));
 
     EXPECT_TRUE(common.server.GetSendCalled());
     EXPECT_TRUE(common.server.GetHeaderFound());
@@ -222,7 +225,7 @@ TEST_F(TestResponseSender, PtrSrvTxtAnyResponseToServiceListing)
     PtrResourceRecord serviceRecord = PtrResourceRecord(common.dnsSd, common.ptrRecord.GetName());
     common.server.AddExpectedRecord(&serviceRecord);
 
-    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration()));
 
     EXPECT_TRUE(common.server.GetSendCalled());
     EXPECT_TRUE(common.server.GetHeaderFound());
@@ -236,15 +239,15 @@ TEST_F(TestResponseSender, NoQueryResponder)
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
     common.recordWriter.WriteQName(common.dnsSd);
-    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration()));
     EXPECT_FALSE(common.server.GetSendCalled());
 
     common.recordWriter.WriteQName(common.service);
-    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration()));
     EXPECT_FALSE(common.server.GetSendCalled());
 
     common.recordWriter.WriteQName(common.instance);
-    responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common.packetInfo, ResponseConfiguration()));
     EXPECT_FALSE(common.server.GetSendCalled());
 }
 
@@ -269,7 +272,7 @@ TEST_F(TestResponseSender, AddManyQueryResponders)
     }
 
     // removing the only copy should clear out everything
-    responseSender.RemoveQueryResponder(&q1);
+    EXPECT_SUCCESS(responseSender.RemoveQueryResponder(&q1));
     EXPECT_FALSE(responseSender.HasQueryResponders());
 
     // At least 7 should be supported:
@@ -310,7 +313,7 @@ TEST_F(TestResponseSender, PtrSrvTxtMultipleRespondersToInstance)
     common1->server.AddExpectedRecord(&common2->srvRecord);
     common1->server.AddExpectedRecord(&common2->txtRecord);
 
-    responseSender.Respond(1, queryData, &common1->packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common1->packetInfo, ResponseConfiguration()));
 
     EXPECT_TRUE(common1->server.GetSendCalled());
     EXPECT_TRUE(common1->server.GetHeaderFound());
@@ -343,7 +346,7 @@ TEST_F(TestResponseSender, PtrSrvTxtMultipleRespondersToServiceListing)
     PtrResourceRecord serviceRecord2 = PtrResourceRecord(common2->dnsSd, common2->ptrRecord.GetName());
     common1->server.AddExpectedRecord(&serviceRecord2);
 
-    responseSender.Respond(1, queryData, &common1->packetInfo, ResponseConfiguration());
+    EXPECT_SUCCESS(responseSender.Respond(1, queryData, &common1->packetInfo, ResponseConfiguration()));
 
     EXPECT_TRUE(common1->server.GetSendCalled());
 

@@ -110,7 +110,7 @@ SyncedDevice * DeviceManager::FindDeviceByNode(NodeId nodeId)
 void DeviceManager::RemoveSyncedDevice(chip::ScopedNodeId scopedNodeId)
 {
 #if defined(PW_RPC_ENABLED)
-    RemoveSynchronizedDevice(scopedNodeId);
+    TEMPORARY_RETURN_IGNORED RemoveSynchronizedDevice(scopedNodeId);
 #endif
 
     NodeId nodeId         = scopedNodeId.GetNodeId();

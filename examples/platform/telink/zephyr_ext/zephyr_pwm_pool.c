@@ -19,6 +19,9 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(pwm_pool, CONFIG_CHIP_APP_LOG_LEVEL);
+
 /* Auxiliary data to support blink & breath */
 struct pwm_pool_aux_data
 {
@@ -94,8 +97,7 @@ static void pwm_pool_aux_update(const struct pwm_pool_data * pwm_pool)
             {
                 pwm_pool_aux[i].t_event       = t_now;
                 pwm_pool_aux[i].current_state = !pwm_pool_aux[i].current_state;
-                (void) pwm_set_dt(&pwm_pool->out[i], pwm_pool->out[i].period,
-                                  pwm_pool_aux[i].current_state ? pwm_pool->out[i].period : 0);
+                pwm_set_dt(&pwm_pool->out[i], pwm_pool->out[i].period, pwm_pool_aux[i].current_state ? pwm_pool->out[i].period : 0);
             }
         }
         else if (pwm_pool_aux[i].state == PWM_BREATH)
@@ -131,7 +133,7 @@ static void pwm_pool_aux_update(const struct pwm_pool_data * pwm_pool)
                         pwm_pool_aux[i].current_state             = true;
                     }
                 }
-                (void) pwm_set_dt(&pwm_pool->out[i], pwm_pool->out[i].period, pwm_pool_aux[i].mode.breath.current_pulse);
+                pwm_set_dt(&pwm_pool->out[i], pwm_pool->out[i].period, pwm_pool_aux[i].mode.breath.current_pulse);
             }
         }
     }
@@ -143,7 +145,11 @@ static void pwm_pool_event_work(struct k_work * item)
     struct pwm_pool_data * pwm_pool = CONTAINER_OF(k_work_delayable_from_work(item), struct pwm_pool_data, work);
 
     pwm_pool_aux_update(pwm_pool);
-    (void) k_work_reschedule(&pwm_pool->work, pwm_pool_aux_timeout(pwm_pool));
+    int err = k_work_reschedule(&pwm_pool->work, pwm_pool_aux_timeout(pwm_pool));
+    if (err < 0)
+    {
+        LOG_ERR("k_work_reschedule err: %d", err);
+    }
 }
 
 /* Public APIs */

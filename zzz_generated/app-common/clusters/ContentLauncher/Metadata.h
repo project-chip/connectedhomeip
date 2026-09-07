@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace ContentLauncher {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -31,6 +31,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedStreamingProt
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace SupportedStreamingProtocols
+namespace Movable {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Movable::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace Movable
+namespace Presets {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Presets::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace Presets
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };
@@ -47,10 +56,23 @@ namespace LaunchURL {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(LaunchURL::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace LaunchURL
+namespace ContentReplicationRequest {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ContentReplicationRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
+} // namespace ContentReplicationRequest
+namespace PlayPreset {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PlayPreset::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
+} // namespace PlayPreset
 
 } // namespace Commands
 
-namespace Events {} // namespace Events
+namespace Events {
+namespace ContentReplication {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ContentReplication
+
+} // namespace Events
 } // namespace ContentLauncher
 } // namespace Clusters
 } // namespace app

@@ -44,19 +44,16 @@ namespace DeviceLayer {
 class FactoryDataProviderImpl : public FactoryDataProvider
 {
 public:
-    static FactoryDataProviderImpl sInstance;
-
     FactoryDataProviderImpl();
     ~FactoryDataProviderImpl(){};
 
     CHIP_ERROR Init(void);
-    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
 
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
-    CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
-
+#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
     CHIP_ERROR EncryptFactoryData(uint8_t * FactoryDataBuff);
+#endif
     CHIP_ERROR DecryptFactoryData(uint8_t * FactoryDataBuff);
 
     CHIP_ERROR Validate();
@@ -71,8 +68,10 @@ private:
     CHIP_ERROR EncryptDecryptFactoryData(uint8_t * FactoryDataBuff, ElsOperation operation);
     uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
 
+#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
     CHIP_ERROR ELS_ExportBlob(uint8_t * data, size_t * dataLen);
     CHIP_ERROR ELS_SaveAesKeyBlob();
+#endif
 
     CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);
     CHIP_ERROR DecryptAndCheckFactoryData(void);

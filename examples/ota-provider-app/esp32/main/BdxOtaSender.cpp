@@ -130,7 +130,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         if (blockBuf.IsNull())
         {
             // TODO: AbortTransfer() needs to support GeneralStatusCode failures as well as BDX specific errors.
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kUnknown));
             return;
         }
 
@@ -141,14 +141,14 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
                                              mNumBytesSent))
             {
                 ChipLogError(BDX, "onBlockQuery Callback failed");
-                mTransfer.AbortTransfer(StatusCode::kUnknown);
+                LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kUnknown));
                 return;
             }
         }
         else
         {
             ChipLogError(BDX, "onBlockQuery Callback not set");
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kUnknown));
             return;
         }
 
@@ -158,7 +158,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         if (CHIP_NO_ERROR != mTransfer.PrepareBlock(blockData))
         {
             ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kUnknown));
         }
         break;
     }

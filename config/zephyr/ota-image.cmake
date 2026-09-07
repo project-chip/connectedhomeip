@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2021 Project CHIP Authors
+#   Copyright (c) 2021-2026 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ function(chip_ota_image TARGET_NAME)
         )
     endif()
 
-    separate_arguments(OTA_EXTRA_ARGS NATIVE_COMMAND "${CHIP_OTA_IMAGE_EXTRA_ARGS}")
+    separate_arguments(OTA_EXTRA_ARGS NATIVE_COMMAND "${CONFIG_CHIP_OTA_IMAGE_EXTRA_ARGS}")
 
     list(APPEND OTA_ARGS ${OTA_EXTRA_ARGS})
     list(APPEND OTA_ARGS ${ARG_INPUT_FILES})

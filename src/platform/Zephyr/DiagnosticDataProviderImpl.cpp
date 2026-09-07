@@ -60,6 +60,7 @@ namespace DeviceLayer {
 
 namespace {
 
+#if defined(CONFIG_THREAD_MONITOR)
 static void GetThreadInfo(const struct k_thread * thread, void * user_data)
 {
     size_t unusedStackSize;
@@ -91,6 +92,7 @@ static void GetThreadInfo(const struct k_thread * thread, void * user_data)
     threadMetrics->Next    = *threadMetricsListHead;
     *threadMetricsListHead = threadMetrics;
 }
+#endif // CONFIG_THREAD_MONITOR
 
 BootReasonType DetermineBootReason()
 {
@@ -294,7 +296,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     {
         NetworkInterface * ifp = new NetworkInterface();
 
-        interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
+        TEMPORARY_RETURN_IGNORED interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
         ifp->name = CharSpan::fromCharString(ifp->Name);
         Inet::InterfaceType interfaceType;
         if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)

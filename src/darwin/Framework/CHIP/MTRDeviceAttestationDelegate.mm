@@ -25,16 +25,24 @@ using namespace chip::Crypto;
 
 @implementation MTRDeviceAttestationDeviceInfo
 
-- (instancetype)initWithDACCertificate:(MTRCertificateDERBytes)dacCertificate
-                     dacPAICertificate:(MTRCertificateDERBytes)dacPAICertificate
-                certificateDeclaration:(NSData *)certificateDeclaration
-              basicInformationVendorID:(NSNumber *)basicInformationVendorID
-             basicInformationProductID:(NSNumber *)basicInformationProductID
+- (instancetype)initWithAttestationChallenge:(NSData *)attestationChallenge
+                            attestationNonce:(NSData *)attestationNonce
+                                 elementsTLV:(MTRTLVBytes)elementsTLV
+                           elementsSignature:(NSData *)elementsSignature
+                              dacCertificate:(MTRCertificateDERBytes)dacCertificate
+                           dacPAICertificate:(MTRCertificateDERBytes)dacPAICertificate
+                    certificationDeclaration:(nullable NSData *)certificationDeclaration
+                    basicInformationVendorID:(NSNumber *)basicInformationVendorID
+                   basicInformationProductID:(NSNumber *)basicInformationProductID
 {
     if (self = [super init]) {
+        _attestationChallenge = [attestationChallenge copy];
+        _attestationNonce = [attestationNonce copy];
+        _elementsTLV = [elementsTLV copy];
+        _elementsSignature = [elementsSignature copy];
         _dacCertificate = [dacCertificate copy];
         _dacPAICertificate = [dacPAICertificate copy];
-        _certificateDeclaration = [certificateDeclaration copy];
+        _certificationDeclaration = [certificationDeclaration copy];
         _basicInformationVendorID = [basicInformationVendorID copy];
         _basicInformationProductID = [basicInformationProductID copy];
 
@@ -45,6 +53,11 @@ using namespace chip::Crypto;
         }
     }
     return self;
+}
+
+- (nullable NSData *)certificateDeclaration
+{
+    return _certificationDeclaration;
 }
 
 @end

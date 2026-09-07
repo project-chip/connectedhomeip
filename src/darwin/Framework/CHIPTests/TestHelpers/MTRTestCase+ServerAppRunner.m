@@ -19,6 +19,8 @@
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestControllerDelegate.h"
 
+#include <signal.h>
+
 static unsigned sAppRunnerIndex = 1;
 static const uint16_t kPairingTimeoutInSeconds = 30;
 
@@ -37,6 +39,36 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif // HAVE_NSTASK
 
 @implementation MTRTestCaseServerApp
+
+- (void)terminate
+{
+#if HAVE_NSTASK
+    NSTask * task = self.task;
+    if (task == nil || !task.isRunning) {
+        return;
+    }
+
+    [task terminate]; // Sends SIGTERM
+
+    // Wait up to 10 seconds for graceful shutdown, then force-kill, mirroring
+    // TerminateTask in MTRTestCase.mm, so a stuck child can't hang the test run.
+    BOOL terminated = NO;
+    for (int i = 0; i < 100; i++) {
+        if (![task isRunning]) {
+            terminated = YES;
+            break;
+        }
+        [NSThread sleepForTimeInterval:0.1];
+    }
+
+    if (!terminated) {
+        kill(task.processIdentifier, SIGKILL);
+    }
+
+    [task waitUntilExit];
+#endif // HAVE_NSTASK
+}
+
 @end
 
 @implementation MTRTestCase (ServerAppRunner)
@@ -156,6 +188,12 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif // HAVE_NSTASK
 }
 
+- (nullable MTRTestCaseServerApp *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments controller:(MTRDeviceController *)controller nodeID:(NSNumber *)nodeID
+{
+    NSString * payloadString = [self.class _payloadWithRandomDiscriminatorAndPasscode];
+    return [self startCommissionedAppWithName:name arguments:arguments controller:controller payload:payloadString nodeID:nodeID];
+}
+
 + (MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload nodeID:(NSNumber *)nodeID
 {
     MTRDeviceController * controller = [self createControllerOnTestFabric];
@@ -169,6 +207,28 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 }
 
 + (MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments nodeID:(NSNumber *)nodeID
+{
+    NSString * payloadString = [self _payloadWithRandomDiscriminatorAndPasscode];
+    return [self startCommissionedAppWithName:name arguments:arguments payload:payloadString nodeID:nodeID];
+}
+
+- (BOOL)restartApp:(MTRTestCaseServerApp *)app additionalArguments:(NSArray<NSString *> *)additionalArguments
+{
+#if !HAVE_NSTASK
+    XCTFail("Unable to restart server app when we do not have NSTask");
+    return NO;
+#else
+    app.task = [self relaunchTask:app.task additionalArguments:additionalArguments];
+    return YES;
+#endif // HAVE_NSTASK
+}
+
++ (unsigned)nextUniqueIndex
+{
+    return sAppRunnerIndex;
+}
+
++ (NSString *)_payloadWithRandomDiscriminatorAndPasscode
 {
     NSNumber * passcode = [MTRSetupPayload generateRandomSetupPasscode];
     XCTAssertNotNil(passcode);
@@ -194,24 +254,7 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 
     NSString * payloadString = [payload qrCodeString];
     XCTAssertNotNil(payloadString);
-
-    return [self startCommissionedAppWithName:name arguments:arguments payload:payloadString nodeID:nodeID];
-}
-
-- (BOOL)restartApp:(MTRTestCaseServerApp *)app additionalArguments:(NSArray<NSString *> *)additionalArguments
-{
-#if !HAVE_NSTASK
-    XCTFail("Unable to restart server app when we do not have NSTask");
-    return NO;
-#else
-    app.task = [self relaunchTask:app.task additionalArguments:additionalArguments];
-    return YES;
-#endif // HAVE_NSTASK
-}
-
-+ (unsigned)nextUniqueIndex
-{
-    return sAppRunnerIndex;
+    return payloadString;
 }
 
 @end

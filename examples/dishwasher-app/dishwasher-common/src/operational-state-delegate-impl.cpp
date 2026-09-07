@@ -114,16 +114,22 @@ void OperationalState::Shutdown()
     }
 }
 
-void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(endpointId == 1u); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
 
     gOperationalStateDelegate           = new OperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;
     gOperationalStateInstance           = new Instance(gOperationalStateDelegate, operationalStateEndpoint);
 
-    gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    TEMPORARY_RETURN_IGNORED gOperationalStateInstance->SetOperationalState(
+        to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
-    gOperationalStateInstance->Init();
+    TEMPORARY_RETURN_IGNORED gOperationalStateInstance->Init();
+}
+
+void MatterOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    OperationalState::Shutdown();
 }

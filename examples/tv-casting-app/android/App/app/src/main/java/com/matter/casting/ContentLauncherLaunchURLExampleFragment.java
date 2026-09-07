@@ -28,7 +28,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import chip.devicecontroller.ChipClusters;
-import com.R;
+import com.chip.casting.R;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.core.Endpoint;
 import java.util.Optional;
@@ -126,6 +126,12 @@ public class ContentLauncherLaunchURLExampleFragment extends Fragment {
               },
               contentUrl,
               Optional.of(contentDisplayString),
+              Optional.empty(),
+              Optional.empty(),
+              Optional.empty(),
+              Optional.empty(),
+              Optional.empty(),
+              Optional.empty(),
               Optional.empty());
         };
     return inflater.inflate(R.layout.fragment_matter_content_launcher_launch_url, container, false);

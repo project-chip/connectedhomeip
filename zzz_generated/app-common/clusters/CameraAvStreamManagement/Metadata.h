@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -37,10 +37,10 @@ namespace NightVisionUsesInfrared {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NightVisionUsesInfrared::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace NightVisionUsesInfrared
-namespace MinViewport {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinViewport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace MinViewportResolution {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MinViewportResolution::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace MinViewport
+} // namespace MinViewportResolution
 namespace RateDistortionTradeOffPoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(RateDistortionTradeOffPoints::Id,
@@ -203,6 +203,11 @@ namespace StatusLightBrightness {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(StatusLightBrightness::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kManage, Access::Privilege::kManage);
 } // namespace StatusLightBrightness
+namespace ImageRotationDiscreteAngles {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ImageRotationDiscreteAngles::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kManage,
+                                                          Access::Privilege::kManage);
+} // namespace ImageRotationDiscreteAngles
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     MaxContentBufferSize::kMetadataEntry,
     MaxNetworkBandwidth::kMetadataEntry,

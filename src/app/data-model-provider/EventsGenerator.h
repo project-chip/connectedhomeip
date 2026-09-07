@@ -25,6 +25,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
 
 #include <optional>
 
@@ -35,44 +36,40 @@ namespace DataModel {
 class EventsGenerator;
 
 namespace internal {
-template <typename T>
+/**
+ * Non-templated EventLoggingDelegate subclass binding an untyped event data pointer with a type-erased encoding callback.
+ * Avoids generating separate vtables, RTTI metadata, and virtual destructors per event type.
+ *
+ * @note aEncodeFn MUST be non-null. Internal construction via EncodeTypedEventPayload guarantees a valid callback function.
+ */
 class SimpleEventPayloadWriter : public EventLoggingDelegate
 {
 public:
-    SimpleEventPayloadWriter(const T & aEventData) : mEventData(aEventData){};
-    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
-    {
-        return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
-    }
+    using EncodeFn = CHIP_ERROR (*)(const void * data, chip::TLV::TLVWriter & writer);
+
+    SimpleEventPayloadWriter(const void * aData, EncodeFn aEncodeFn) : mEventData(aData), mEncodeFn(aEncodeFn) {}
+
+    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override { return mEncodeFn(mEventData, aWriter); }
 
 private:
-    const T & mEventData;
+    const void * mEventData;
+    EncodeFn mEncodeFn;
 };
+
+/**
+ * Type-erased TLV encoding helper for typed event payload structures.
+ *
+ * @note `data` MUST be non-null. Internal construction via GenerateEvent guarantees a valid pointer.
+ *       Omitting redundant runtime null checks avoids per-event-type template Flash code growth.
+ */
+template <typename T>
+inline CHIP_ERROR EncodeTypedEventPayload(const void * data, chip::TLV::TLVWriter & writer)
+{
+    return DataModel::Encode(writer, TLV::ContextTag(EventDataIB::Tag::kData), *static_cast<const T *>(data));
+}
 
 std::optional<EventNumber> GenerateEvent(const EventOptions & eventOptions, EventsGenerator & generator,
                                          EventLoggingDelegate & delegate, bool isFabricSensitiveEvent);
-
-template <typename G, typename T>
-std::optional<EventNumber> GenerateEvent(G & generator, const T & aEventData, EndpointId aEndpoint)
-{
-    internal::SimpleEventPayloadWriter<T> eventPayloadWriter(aEventData);
-
-    constexpr bool isFabricScoped = DataModel::IsFabricScoped<T>::value;
-
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    if constexpr (isFabricScoped)
-    {
-        fabricIndex = aEventData.GetFabricIndex();
-    }
-
-    EventOptions eventOptions;
-
-    eventOptions.mPath        = ConcreteEventPath(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    eventOptions.mPriority    = aEventData.GetPriorityLevel();
-    eventOptions.mFabricIndex = fabricIndex;
-
-    return GenerateEvent(eventOptions, generator, eventPayloadWriter, isFabricScoped);
-}
 
 } // namespace internal
 
@@ -85,6 +82,16 @@ class EventsGenerator
 public:
     virtual ~EventsGenerator() = default;
 
+    /// Scnedule event delivery to happen immediately (and synchronously).
+    ///
+    /// Use when it is imperative that some events are to be delivered because
+    /// they will not be delivered soon after (e.g. device shutdown events or
+    /// fabric removal events).
+    ///
+    /// This can be done either for a specific fabric, identified by the provided
+    /// FabricIndex, or across all fabrics if no FabricIndex is provided.
+    virtual void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) = 0;
+
     /// Generates the given event.
     ///
     /// Events are generally expected to be sent to subscribed clients and also
@@ -93,13 +100,21 @@ public:
     virtual CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
                                      EventNumber & generatedEventNumber) = 0;
 
+    /// Returns the monotonic startup timestamp used by the event system.
+    ///
+    /// This timestamp represents the "time 0" for system-time event timestamps.
+    /// Returns zero if the event system has not been initialized yet.
+    virtual System::Clock::Milliseconds64 GetMonotonicStartupTime() const = 0;
+
     // Convenience methods for event logging using cluster-object structures
     //
     // On error, these log and return nullopt.
     template <typename T>
     std::optional<EventNumber> GenerateEvent(const T & eventData, EndpointId endpointId)
     {
-        return internal::GenerateEvent(*this, eventData, endpointId);
+        internal::SimpleEventPayloadWriter eventPayloadWriter(&eventData, &internal::EncodeTypedEventPayload<T>);
+        constexpr bool isFabricSensitiveEvent = DataModel::IsFabricScoped<T>::value;
+        return internal::GenerateEvent({ endpointId, eventData }, *this, eventPayloadWriter, isFabricSensitiveEvent);
     }
 };
 

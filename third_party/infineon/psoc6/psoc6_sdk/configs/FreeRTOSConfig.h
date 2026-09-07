@@ -76,7 +76,7 @@ extern uint32_t SystemCoreClock;
 /* Hook function related definitions. */
 #define configUSE_IDLE_HOOK 0
 
-#ifdef ENABLE_HSM_DEVICE_ATTESTATION
+#ifdef CHIP_TRUSTM_DA
 #define configUSE_TICK_HOOK 1
 #else
 #define configUSE_TICK_HOOK 0
@@ -97,12 +97,17 @@ extern uint32_t SystemCoreClock;
 /* Co-routine related definitions. */
 #define configUSE_CO_ROUTINES 0
 #define configMAX_CO_ROUTINE_PRIORITIES 2
-
 /* Software timer related definitions. */
 #define configUSE_TIMERS 1
 #define configTIMER_TASK_PRIORITY 2
+/* Increased for OPTIGA Trust M shielded connection (mbedTLS AES-CCM in timer task). */
+#ifdef CHIP_TRUSTM_DA
+#define configTIMER_QUEUE_LENGTH 32
+#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 20)
+#else
 #define configTIMER_QUEUE_LENGTH 10
 #define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 6)
+#endif
 
 /* Queue Creation Fix to not use static queue */
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_QUEUE 0

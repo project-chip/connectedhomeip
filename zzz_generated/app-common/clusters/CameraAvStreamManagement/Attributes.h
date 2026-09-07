@@ -91,7 +91,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NightVisionUsesInfrared
-namespace MinViewport {
+namespace MinViewportResolution {
 struct TypeInfo
 {
     using Type             = chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type;
@@ -99,10 +99,10 @@ struct TypeInfo
     using DecodableArgType = const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MinViewport::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinViewportResolution::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace MinViewport
+} // namespace MinViewportResolution
 namespace RateDistortionTradeOffPoints {
 struct TypeInfo
 {
@@ -548,6 +548,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StatusLightBrightness
+namespace ImageRotationDiscreteAngles {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ImageRotationDiscreteAngles::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ImageRotationDiscreteAngles
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -591,7 +603,7 @@ struct TypeInfo
         Attributes::MaxEncodedPixelRate::TypeInfo::DecodableType maxEncodedPixelRate     = static_cast<uint32_t>(0);
         Attributes::VideoSensorParams::TypeInfo::DecodableType videoSensorParams;
         Attributes::NightVisionUsesInfrared::TypeInfo::DecodableType nightVisionUsesInfrared = static_cast<bool>(0);
-        Attributes::MinViewport::TypeInfo::DecodableType minViewport;
+        Attributes::MinViewportResolution::TypeInfo::DecodableType minViewportResolution;
         Attributes::RateDistortionTradeOffPoints::TypeInfo::DecodableType rateDistortionTradeOffPoints;
         Attributes::MaxContentBufferSize::TypeInfo::DecodableType maxContentBufferSize = static_cast<uint32_t>(0);
         Attributes::MicrophoneCapabilities::TypeInfo::DecodableType microphoneCapabilities;
@@ -633,6 +645,7 @@ struct TypeInfo
         Attributes::StatusLightEnabled::TypeInfo::DecodableType statusLightEnabled                       = static_cast<bool>(0);
         Attributes::StatusLightBrightness::TypeInfo::DecodableType statusLightBrightness =
             static_cast<chip::app::Clusters::Globals::ThreeLevelAutoEnum>(0);
+        Attributes::ImageRotationDiscreteAngles::TypeInfo::DecodableType imageRotationDiscreteAngles = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

@@ -20,14 +20,13 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
 #       --featureSet 0xa
-#       --application evse
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -49,9 +48,11 @@ from TC_DEMTestBase import DEMTestBase
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
@@ -63,13 +64,12 @@ class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_3(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S.F03",  # Depends on F03(StartTimeAdjustment)
         ]
-        return pics
 
     def steps_TC_DEM_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -146,12 +146,10 @@ class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_DEM_2_3(self):
 
-        logging.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
+        log.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
 
         self.step("1")
         # Commission DUT - already done

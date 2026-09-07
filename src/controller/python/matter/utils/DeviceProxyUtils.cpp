@@ -82,7 +82,7 @@ uint32_t pychip_DeviceProxy_ComputeRoundTripTimeout(DeviceProxy * device, uint32
  */
 PyChipError pychip_DeviceProxy_GetRemoteSessionParameters(DeviceProxy * device, void * sessionParametersStructPointer)
 {
-    VerifyOrReturnError(device != nullptr || sessionParametersStructPointer, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr && sessionParametersStructPointer, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
     auto * deviceProxy = static_cast<DeviceProxy *>(device);
     VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_INCORRECT_STATE));

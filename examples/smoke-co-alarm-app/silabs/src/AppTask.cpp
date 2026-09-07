@@ -42,6 +42,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 
@@ -69,16 +70,16 @@ CHIP_ERROR AppTask::AppInit()
     // Register Smoke & Co Test Event Trigger
     if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
     {
-        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
     }
 
     sAlarmLED.Init(LIGHT_LED);
     sAlarmLED.Set(false);
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().WriteDemoUI(false);
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
@@ -87,7 +88,7 @@ CHIP_ERROR AppTask::AppInit()
     {
         GetLCD().ShowQRCode(true);
     }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 #endif
 
     return err;

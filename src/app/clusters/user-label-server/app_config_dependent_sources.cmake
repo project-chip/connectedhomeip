@@ -16,5 +16,5 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/user-label-server.cpp"
+   "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )

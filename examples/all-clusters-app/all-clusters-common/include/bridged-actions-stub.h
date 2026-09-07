@@ -34,9 +34,9 @@ class ActionsDelegateImpl : public Delegate
 {
 private:
     std::vector<ActionStructStorage> kActionList = {
-        ActionStructStorage(0, CharSpan::fromCharString("TurnOnLight"), ActionTypeEnum::kScene, 0, 0, ActionStateEnum::kInactive),
-        ActionStructStorage(1, CharSpan::fromCharString("TurnOffLight"), ActionTypeEnum::kScene, 1, 0, ActionStateEnum::kInactive),
-        ActionStructStorage(2, CharSpan::fromCharString("ToggleLight"), ActionTypeEnum::kScene, 2, 0, ActionStateEnum::kInactive)
+        ActionStructStorage(0, "TurnOnLight"_span, ActionTypeEnum::kScene, 0, 0, ActionStateEnum::kInactive),
+        ActionStructStorage(1, "TurnOffLight"_span, ActionTypeEnum::kScene, 1, 0, ActionStateEnum::kInactive),
+        ActionStructStorage(2, "ToggleLight"_span, ActionTypeEnum::kScene, 2, 0, ActionStateEnum::kInactive)
     };
 
     std::vector<EndpointId> firstEpList  = { 1 };
@@ -44,11 +44,11 @@ private:
     std::vector<EndpointId> thirdEpList  = { 1, 2, 3 };
 
     std::vector<EndpointListStorage> kEndpointList = {
-        EndpointListStorage(0, CharSpan::fromCharString("On"), EndpointListTypeEnum::kOther,
+        EndpointListStorage(0, "On"_span, EndpointListTypeEnum::kOther,
                             DataModel::List<const EndpointId>(firstEpList.data(), firstEpList.size())),
-        EndpointListStorage(1, CharSpan::fromCharString("Off"), EndpointListTypeEnum::kOther,
+        EndpointListStorage(1, "Off"_span, EndpointListTypeEnum::kOther,
                             DataModel::List<const EndpointId>(secondEpList.data(), secondEpList.size())),
-        EndpointListStorage(2, CharSpan::fromCharString("Toggle"), EndpointListTypeEnum::kOther,
+        EndpointListStorage(2, "Toggle"_span, EndpointListTypeEnum::kOther,
                             DataModel::List<const EndpointId>(thirdEpList.data(), thirdEpList.size()))
     };
 

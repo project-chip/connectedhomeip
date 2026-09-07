@@ -34,7 +34,7 @@ constexpr uint32_t kIpv6MtuSize = 1280;
 
 TlvVectorWriter::TlvVectorWriter(std::vector<uint8_t> & buffer) : mVectorBuffer(buffer)
 {
-    Init(mVectorBuffer);
+    TEMPORARY_RETURN_IGNORED Init(mVectorBuffer);
 }
 
 TlvVectorWriter::~TlvVectorWriter() = default;

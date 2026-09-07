@@ -21,14 +21,13 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
 #       --featureSet 0x01
-#       --application evse
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -44,21 +43,22 @@
 
 """Define Matter test case TC_DEM_2_2."""
 
-
+import asyncio
 import datetime
 import logging
 import sys
-import time
 
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
@@ -70,14 +70,13 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_2(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S.F00",  # Depends on Feature 00 (PowerAdjustment)
         ]
-        return pics
 
     def steps_TC_DEM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -96,7 +95,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             TestStep("6", "TH sends command PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E00(PowerAdjustStart) sent"),
             TestStep("6a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x04 (PowerAdjustActive)"),
+                     "Value has to be 0x03 (PowerAdjustActive)"),
             TestStep("6b", "TH reads from the DUT the PowerAdjustmentCapability",
                      "Value has to include Cause=LocalOptimizationAdjustment."),
             TestStep("7", "TH sends command CancelPowerAdjustRequest",
@@ -122,15 +121,15 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             TestStep("14", "TH sends command PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=GridOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and no event sent"),
             TestStep("14a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x04 (PowerAdjustActive)"),
+                     "Value has to be 0x03 (PowerAdjustActive)"),
             TestStep("14b", "TH reads from the DUT the PowerAdjustmentCapability",
                      "Value has to include Cause=GridOptimizationAdjustment."),
             TestStep("15", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00) and no event sent"),
             TestStep("15a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x04 (PowerAdjustActive)"),
+                     "Value has to be 0x03 (PowerAdjustActive)"),
             TestStep("15b", "TH reads from the DUT the OptOutState",
-                     "Value has to be 0x02 (LocalOptOut)"),
+                     "Value has to be 0x01 (LocalOptOut)"),
             TestStep("16", "TH sends command PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Grid Optimization Test Event",
@@ -150,7 +149,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             TestStep("19", "TH sends command PowerAdjustRequest with Power=PowerAdjustmentCapability[0].MaxPower, Duration=PowerAdjustmentCapability[0].MinDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and event DEM.S.E00(PowerAdjustStart) sent"),
             TestStep("19a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x04 (PowerAdjustActive)"),
+                     "Value has to be 0x03 (PowerAdjustActive)"),
             TestStep("19b", "TH reads from the DUT the PowerAdjustmentCapability",
                      "Value has to include Cause=LocalOptimizationAdjustment."),
             TestStep("20", "Wait 10 seconds",
@@ -163,7 +162,9 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_DEM_2_2(self):
@@ -176,14 +177,15 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         # Commission DUT - already done
 
         self.step("2")
-        await self.validate_feature_map([Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment], [])
+        await self.validate_feature_map([Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment],
+                                        [Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerRangeAdjustment])
 
         self.step("3")
         # Subscribe to Events and when they are sent push them to a queue for checking later
         events_callback = EventSubscriptionHandler(expected_cluster=Clusters.DeviceEnergyManagement)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
-                                    self.get_endpoint(default=1))
+                                    self.get_endpoint())
 
         self.step("4")
         await self.check_test_event_triggers_enabled()
@@ -197,7 +199,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         self.step("5b")
         powerAdjustCapabilityStruct = await self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")
         asserts.assert_greater_equal(len(powerAdjustCapabilityStruct.powerAdjustCapability), 1)
-        logging.info(powerAdjustCapabilityStruct)
+        log.info(powerAdjustCapabilityStruct)
         asserts.assert_equal(powerAdjustCapabilityStruct.cause,
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kNoAdjustment)
 
@@ -214,7 +216,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
             max_duration = max(max_duration, entry.maxDuration)
 
         result = f"min_power {min_power} max_power {max_power} min_duration {min_duration} max_duration {max_duration}"
-        logging.info(result)
+        log.info(result)
 
         self.step("5c")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
@@ -365,7 +367,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
 
         self.step("20")
-        time.sleep(10)
+        await asyncio.sleep(10)
 
         # Allow a little tolerance checking the duration returned in the event as CI tests can run "slower"
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerAdjustEnd)

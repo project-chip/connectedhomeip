@@ -28,6 +28,9 @@ extern "C" {
 
 /* Only for flash init, to be move to sdk framework */
 #include "nvs_port.h"
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
+#include <zephyr/fs/nvs.h>
+#endif
 #if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
 #include "fwk_nvs_stats.h"
 #endif /* CHIP_DEVICE_CONFIG_KVS_WEAR_STATS */
@@ -365,31 +368,40 @@ bool NXPConfig::ConfigValueExists(Key key)
     return err;
 }
 
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
+CHIP_ERROR NXPConfig::FactoryResetEraseSettings(void)
+{
+    void * storage = nullptr;
+    int status     = settings_storage_get(&storage);
+
+    if (status == 0)
+    {
+        status = nvs_clear(static_cast<nvs_fs *>(storage));
+    }
+    if (status)
+    {
+        ChipLogError(DeviceLayer, "Factory reset failed: %d", status);
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
+#endif
+
 CHIP_ERROR NXPConfig::FactoryResetConfig(void)
 {
-    DeleteSubtreeEntry entry{ /* success */ 0 };
+    DeleteSubtreeEntry entry_string{ /* success */ 0 };
+    DeleteSubtreeEntry entry_int{ /* success */ 0 };
+
     // Clear CHIP_DEVICE_STRING_SETTINGS_KEY/* keys
-    int result = settings_load_subtree_direct(CHIP_DEVICE_STRING_SETTINGS_KEY, DeleteSubtreeCallback, &entry);
+    int err_string = settings_load_subtree_direct(CHIP_DEVICE_STRING_SETTINGS_KEY, DeleteSubtreeCallback, &entry_string);
+    // Clear CHIP_DEVICE_INTEGER_SETTINGS_KEY/* keys
+    int err_int = settings_load_subtree_direct(CHIP_DEVICE_INTEGER_SETTINGS_KEY, DeleteSubtreeCallback, &entry_int);
 
-    if (result == 0)
+    if (err_string != 0 || err_int != 0 || entry_string.result != 0 || entry_int.result != 0)
     {
-        result = entry.result;
-    }
-
-    char key_name[SETTINGS_MAX_NAME_LEN + 1];
-    for (Key key = kMinConfigKey_ChipConfig; key <= kMaxConfigKey_ChipConfig; key++)
-    {
-        sprintf(key_name, CHIP_DEVICE_INTEGER_SETTINGS_KEY "/%04x", key);
-        if (settings_delete(key_name) != 0)
-            return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    }
-
-    // Clear RebootCount, TotalOperationalHours, UpTime counters during factory reset
-    for (Key key = kMinConfigKey_ChipCounter; key <= (kMinConfigKey_ChipCounter + 3); key++)
-    {
-        sprintf(key_name, CHIP_DEVICE_INTEGER_SETTINGS_KEY "/%04x", key);
-        if (settings_delete(key_name) != 0)
-            return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        ChipLogError(DeviceLayer, "FactoryResetConfig failed: load_string=%d load_int=%d del_string=%d del_int=%d", err_string,
+                     err_int, entry_string.result, entry_int.result);
+        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
     return CHIP_NO_ERROR;
 }
@@ -397,7 +409,7 @@ CHIP_ERROR NXPConfig::FactoryResetConfig(void)
 bool NXPConfig::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the valid CHIP Config PDM key range.
-    return (key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVS);
+    return (key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_App);
 }
 
 void NXPConfig::RunConfigUnitTest(void) {}

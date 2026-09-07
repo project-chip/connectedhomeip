@@ -25,7 +25,10 @@ if (wifi_soc) {
 # Seperate import since the matter_support_root is defined in the ef32_sdk.gni / SiWx917_sdk.gni
 import("${matter_support_root}/provision/args.gni")
 source_set("storage") {
-  sources = [ "ProvisionStorageCustom.cpp" ]
+  sources = [
+    "ProvisionStorageCommon.cpp",
+    "ProvisionStorageCustom.cpp",
+  ]
 
   if (use_provision_flash_storage) {
     sources += [ "ProvisionStorageFlash.cpp" ]
@@ -35,16 +38,32 @@ source_set("storage") {
 
   if (wifi_soc) {
     if (sl_si91x_crypto_flavor == "psa") {
-      libs = [ "${sl_provision_root}/libs/libProvisionPSA_si917.a" ]
+      if (is_clang) {
+        libs = [ "${sl_provision_root}/libs/libProvisionPSA-si917-clang.a" ]
+      } else {
+        libs = [ "${sl_provision_root}/libs/libProvisionPSA-si917.a" ]
+      }
+    } else if (is_clang) {
+      libs = [ "${sl_provision_root}/libs/libProvision-si917-clang.a" ]
     } else {
-      libs = [ "${sl_provision_root}/libs/libProvision_si917.a" ]
+      libs = [ "${sl_provision_root}/libs/libProvision-si917.a" ]
     }
   } else {
     if (use_provision_flash_storage) {
-      libs =
-          [ "${sl_provision_root}/libs/libProvisionFlash_${silabs_family}.a" ]
+      if (is_clang) {
+        libs = [ "${sl_provision_root}/libs/libProvisionFlash-${silabs_family}-clang.a" ]
+      } else {
+        libs =
+            [ "${sl_provision_root}/libs/libProvisionFlash-${silabs_family}.a" ]
+      }
     } else {
-      libs = [ "${sl_provision_root}/libs/libProvision_${silabs_family}.a" ]
+      if (is_clang) {
+        libs = [
+          "${sl_provision_root}/libs/libProvision-${silabs_family}-clang.a",
+        ]
+      } else {
+        libs = [ "${sl_provision_root}/libs/libProvision-${silabs_family}.a" ]
+      }
     }
   }
 

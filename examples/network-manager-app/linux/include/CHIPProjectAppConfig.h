@@ -25,5 +25,9 @@
 // Sufficient space for ArlReviewEvent of several fabrics.
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE (32 * 1024)
 
+#ifndef MATTER_ENABLE_UBUS
+#define MATTER_ENABLE_UBUS 0
+#endif
+
 // Inherit defaults from config/standalone/CHIPProjectConfig.h
 #include <CHIPProjectConfig.h>

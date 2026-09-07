@@ -35,6 +35,7 @@
 #include <inttypes.h>
 #include <limits.h>
 #include <memory>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -67,6 +68,54 @@
 
 using chip::ASN1::OID;
 
+// Only enable ML-DSA when the OpenSSL headers expose both algorithms used by Matter.
+#if !defined(OPENSSL_IS_BORINGSSL) && defined(EVP_PKEY_ML_DSA_44) && defined(EVP_PKEY_ML_DSA_65)
+#define CHIP_CERT_ML_DSA_AVAILABLE 1
+#else
+#define CHIP_CERT_ML_DSA_AVAILABLE 0
+#endif
+
+inline bool IsMLDSAKey(const EVP_PKEY * key)
+{
+#if CHIP_CERT_ML_DSA_AVAILABLE
+    return EVP_PKEY_is_a(key, "ML-DSA-44") || EVP_PKEY_is_a(key, "ML-DSA-65");
+#else
+    (void) key;
+    return false;
+#endif
+}
+
+// Relative security strength of the algorithms allowed in an attestation chain. The values are
+// ordered so they can be compared: a certificate must not carry a key stronger than the key
+// that signs it, since a weaker issuer cannot protect a stronger key below it.
+enum class KeyStrength : uint8_t
+{
+    kEcdsaP256 = 1,
+    kMlDsa44   = 2,
+    kMlDsa65   = 3,
+};
+
+inline KeyStrength GetKeyStrength(const EVP_PKEY * key)
+{
+#if CHIP_CERT_ML_DSA_AVAILABLE
+    if (EVP_PKEY_is_a(key, "ML-DSA-65"))
+    {
+        return KeyStrength::kMlDsa65;
+    }
+    if (EVP_PKEY_is_a(key, "ML-DSA-44"))
+    {
+        return KeyStrength::kMlDsa44;
+    }
+#else
+    (void) key;
+#endif
+    return KeyStrength::kEcdsaP256;
+}
+
+// ML-DSA signed attestation certificates exceed the 600-byte limit that applies
+// to ECDSA-only chains. ML-DSA-65 is the largest algorithm supported here.
+inline constexpr uint32_t kMaxPQCDERCertLength = chip::Credentials::kMaxDERCertLengthMlDsa65;
+
 #ifndef CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
 #define CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES CHIP_CONFIG_TEST
 #endif
@@ -76,7 +125,7 @@ using chip::ASN1::OID;
 #endif
 
 #define COPYRIGHT_STRING                                                                                                           \
-    "Copyright (c) 2021-2022 Project CHIP Authors. "                                                                               \
+    "Copyright (c) 2021-2025 Project CHIP Authors. "                                                                               \
     "Copyright (c) 2019 Google LLC. "                                                                                              \
     "Copyright (c) 2013-2017 Nest Labs, Inc. "                                                                                     \
     "All rights reserved.\n"
@@ -219,10 +268,7 @@ public:
     }
     uint8_t GetSignatureAlgorithmTLVEnum()
     {
-        return (mEnabled && mFlags.Has(CertErrorFlags::kSigAlgo)) ? 0x02
-                                                                  : GetOIDEnum(chip::ASN1::
-
-                                                                                   kOID_SigAlgo_ECDSAWithSHA256);
+        return (mEnabled && mFlags.Has(CertErrorFlags::kSigAlgo)) ? 0x02 : GetOIDEnum(chip::ASN1::kOID_SigAlgo_ECDSAWithSHA256);
     }
     bool IsSubjectVIDMismatch() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectVIDMismatch)); }
     bool IsSubjectPIDMismatch() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectPIDMismatch)); }
@@ -429,6 +475,7 @@ extern bool Cmd_ValidateAttCert(int argc, char * argv[]);
 extern bool Cmd_ValidateCert(int argc, char * argv[]);
 extern bool Cmd_PrintCert(int argc, char * argv[]);
 extern bool Cmd_PrintCD(int argc, char * argv[]);
+extern bool Cmd_PrintTLV(int argc, char * argv[]);
 extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
 extern bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)> & cert);
@@ -454,6 +501,7 @@ extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_
                         X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig, X509_EXTENSION * cdpExt);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
+extern bool GenerateKeyPair_MLDSA(std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key, const char * algorithm);
 extern bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,
                     bool ignorErrorIfUnsupportedCurve = false);
 extern bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
@@ -464,7 +512,8 @@ extern bool X509ToChipCert(X509 * cert, chip::MutableByteSpan & chipCert);
 extern bool InitOpenSSL();
 extern bool Base64Encode(const uint8_t * inData, uint32_t inDataLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen);
 extern bool Base64Decode(const uint8_t * inData, uint32_t inDataLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen);
-extern bool IsBase64String(const char * str, uint32_t strLen);
+extern bool IsBase64String(const char * str, size_t strLen);
+extern bool IsHexString(const uint8_t * s, size_t strLen);
 extern bool ContainsPEMMarker(const char * marker, const uint8_t * data, uint32_t dataLen);
 extern bool ParseDateTime(const char * str, struct tm & date);
 extern bool ReadFileIntoMem(const char * fileName, uint8_t * data, uint32_t & dataLen);
@@ -493,7 +542,7 @@ extern int gNIDChipAttAttrPID;
  *
  *  @param[in]  aStatus     A boolean status to be evaluated.
  */
-#define VerifyTrueOrExit(aStatus) nlEXPECT(aStatus, exit)
+#define VerifyTrueOrExit(aStatus) VerifyOrExit(aStatus, {})
 
 /**
  *  @def ReportOpenSSLErrorAndExit(aFunct, ACTION)

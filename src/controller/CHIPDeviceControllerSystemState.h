@@ -36,6 +36,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/bdx/BdxTransferServer.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -58,6 +59,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 #include <transport/raw/NFC.h>
 #endif
+#include <transport/raw/ProxyTransport.h>
+
+#include <type_traits>
 
 namespace chip {
 
@@ -72,29 +76,82 @@ inline constexpr size_t kMaxDeviceTransportTcpActiveConnectionCount = CHIP_CONFI
 inline constexpr size_t kMaxDeviceTransportTcpPendingPackets = CHIP_CONFIG_MAX_TCP_PENDING_PACKETS;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-using DeviceTransportMgr =
-    TransportMgr<Transport::UDP /* IPv6 */
+using DeviceTransportMgr = TransportMgr<
+    Transport::UDP /* UDP over IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
-                 ,
-                 Transport::UDP /* IPv4 */
+    ,
+    Transport::UDP /* UDP over IPv4 */
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                 ,
-                 Transport::BLE<kMaxDeviceTransportBlePendingPackets> /* BLE */
+    ,
+    Transport::BLE<kMaxDeviceTransportBlePendingPackets> /* BLE */
 #endif
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                 ,
-                 Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets>
+    ,
+    Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets> /* TCP over IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+    ,
+    Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets> /* TCP over IPv4 */
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                 ,
-                 Transport::WiFiPAF<kMaxDeviceTransportWiFiPAFPendingPackets> /* WiFiPAF */
+    ,
+    Transport::WiFiPAF<kMaxDeviceTransportWiFiPAFPendingPackets> /* WiFiPAF */
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-                 ,
-                 Transport::NFC /* NFC */
+    ,
+    Transport::NFC /* NFC */
 #endif
-                 >;
+    ,
+    Transport::Proxy<> /* Proxy: tunnels commissioning packets via ProxyMessageRequest */
+    >;
+
+/**
+ * Compute the zero-based index of Transport::Proxy<> inside DeviceTransportMgr.
+ * Must stay in sync with the DeviceTransportMgr type alias above.
+ */
+constexpr size_t kDeviceProxyTransportIndex = 1 /* IPv6 UDP */
+#if INET_CONFIG_ENABLE_IPV4
+    + 1 /* IPv4 UDP */
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+    + 1 /* BLE */
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    + 1 /* IPv6 TCP */
+#if INET_CONFIG_ENABLE_IPV4
+    + 1 /* IPv4 TCP */
+#endif
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    + 1 /* WiFiPAF */
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    + 1 /* NFC */
+#endif
+    ; /* Proxy<> is last */
+
+/**
+ * Compile-time check that the hand-maintained index above still names Proxy<>.  Without
+ * it, adding or gating a transport in DeviceTransportMgr silently makes
+ * GetDeviceProxyTransport() return a different transport.
+ */
+static_assert(
+    std::is_same_v<std::remove_reference_t<
+                       decltype(std::declval<DeviceTransportMgr &>().GetTransport().GetImplAtIndex<kDeviceProxyTransportIndex>())>,
+                   Transport::Proxy<>>,
+    "kDeviceProxyTransportIndex is out of sync with DeviceTransportMgr");
+
+/**
+ * Return the ProxyTransportBase embedded in the DeviceTransportMgr, or nullptr when there is
+ * no transport manager.  DeviceController::GetTransportMgr() returns nullptr once the system
+ * state is gone, so callers holding a controller across shutdown can land here with nullptr.
+ */
+inline Transport::ProxyTransportBase * GetDeviceProxyTransport(DeviceTransportMgr * mgr)
+{
+    VerifyOrReturnValue(mgr != nullptr, nullptr);
+    return &mgr->GetTransport().GetImplAtIndex<kDeviceProxyTransportIndex>();
+}
 
 namespace Controller {
 
@@ -140,7 +197,7 @@ struct DeviceControllerSystemStateParams
     SessionSetupPool * sessionSetupPool                                           = nullptr;
     CASEClientPool * caseClientPool                                               = nullptr;
     FabricTable::Delegate * fabricTableDelegate                                   = nullptr;
-    chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate          = nullptr;
+    TimerDelegate * timerDelegate                                                 = nullptr;
     chip::app::reporting::ReportScheduler * reportScheduler                       = nullptr;
 };
 
@@ -275,7 +332,7 @@ private:
     SessionSetupPool * mSessionSetupPool                                           = nullptr;
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
-    app::reporting::ReportScheduler::TimerDelegate * mTimerDelegate                = nullptr;
+    TimerDelegate * mTimerDelegate                                                 = nullptr;
     app::reporting::ReportScheduler * mReportScheduler                             = nullptr;
     Crypto::SessionKeystore * mSessionKeystore                                     = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;

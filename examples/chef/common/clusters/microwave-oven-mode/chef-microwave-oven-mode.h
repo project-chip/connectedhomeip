@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,12 +41,10 @@ private:
     ModeTagStructType ModeTagsDefrost[1] = { { .value = to_underlying(ModeTag::kDefrost) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
-                                                 .mode     = ModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsNormal) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Defrost"),
-                                                 .mode     = ModeDefrost,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsDefrost) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Normal"_span, .mode = ModeNormal, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Defrost"_span, .mode = ModeDefrost, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsDefrost) },
     };
 
 public:
@@ -70,6 +68,8 @@ public:
 } // namespace chip
 
 namespace ChefMicrowaveOvenMode {
+void InitMicrowaveOvenModeForEndpoint(chip::EndpointId endpointId);
+void ShutdownMicrowaveOvenModeForEndpoint(chip::EndpointId endpointId);
 void InitChefMicrowaveOvenModeCluster();
 chip::app::Clusters::ModeBase::Instance * GetInstance(chip::EndpointId endpointId);
 } // namespace ChefMicrowaveOvenMode

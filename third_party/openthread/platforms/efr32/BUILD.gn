@@ -30,6 +30,9 @@ config("openthread_efr32_config") {
 
   include_dirs = [
     "${sl_ot_efr32_root}",
+    "${efr32_sdk_root}/openthread/platform-abstraction/efr32",
+    "${efr32_sdk_root}/openthread/platform-abstraction/",
+    "${efr32_sdk_root}/openthread/config",
     "${chip_root}/examples/platform/efr32",
     "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}",
     "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/config",
@@ -62,19 +65,24 @@ source_set("libopenthread-efr32") {
     "${sl_ot_efr32_root}/alarm.c",
     "${sl_ot_efr32_root}/crypto.c",
     "${sl_ot_efr32_root}/entropy.c",
-    "${sl_ot_efr32_root}/flash.c",
     "${sl_ot_efr32_root}/ieee802154-packet-utils.cpp",
     "${sl_ot_efr32_root}/misc.c",
     "${sl_ot_efr32_root}/radio_coex.c",
+    "${sl_ot_efr32_root}/radio_csl.cpp",
+    "${sl_ot_efr32_root}/radio_energy_scan.cpp",
     "${sl_ot_efr32_root}/radio_extension.c",
-    "${sl_ot_efr32_root}/radio_power_manager.c",
+    "${sl_ot_efr32_root}/radio_instance.cpp",
+    "${sl_ot_efr32_root}/radio_interface.cpp",
+    "${sl_ot_efr32_root}/radio_power_manager.cpp",
+    "${sl_ot_efr32_root}/radio_security.cpp",
+    "${sl_ot_efr32_root}/settings.cpp",
     "${sl_ot_efr32_root}/sl_gp_interface.c",
     "${sl_ot_efr32_root}/sleep.c",
     "${sl_ot_efr32_root}/soft_source_match_table.c",
     "${sl_ot_efr32_root}/system.c",
 
     # Temporary file until the files in the SI SDK is fixed
-    "${matter_support_root}/sdk-copies/protocol/openthread/platform-abstraction/efr32/radio.c",
+    "${matter_support_root}/sdk-copies/openthread/platform-abstraction/efr32/radio.cpp",
   ]
 
   include_dirs = [ "${openthread_root}/examples/platforms/utils" ]

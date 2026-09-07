@@ -35,6 +35,13 @@
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -48,9 +55,9 @@ namespace Internal {
 
 #if !CHIP_SYSTEM_CONFIG_USE_LIBEV
 namespace {
-System::LayerSocketsLoop & SystemLayerSocketsLoop()
+System::LayerSelectLoop & SystemLayerSelectLoop()
 {
-    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+    return static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer());
 }
 } // anonymous namespace
 #endif
@@ -58,6 +65,12 @@ System::LayerSocketsLoop & SystemLayerSocketsLoop()
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
+#if CHIP_CRYPTO_PSA
+    // Initialize the PSA crypto backend before the base class, which sets up
+    // entropy/DRBG that already require PSA. Mirrors the Zephyr platform managers.
+    VerifyOrReturnError(psa_crypto_init() == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+#endif
+
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 
@@ -135,7 +148,7 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThr
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
-    // Let System::LayerSocketsLoop.PrepareEvents() handle timers.
+    // Let System::LayerSelectLoop.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
@@ -170,7 +183,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDev
 #else
     mChipEventQueue.Push(*event);
 
-    SystemLayerSocketsLoop().Signal(); // Trigger wake select on CHIP thread
+    SystemLayerSelectLoop().Signal(); // Trigger wake select on CHIP thread
     return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
@@ -214,20 +227,20 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 
     Impl()->LockChipStack();
 
-    SystemLayerSocketsLoop().EventLoopBegins();
+    SystemLayerSelectLoop().EventLoopBegins();
     do
     {
-        SystemLayerSocketsLoop().PrepareEvents();
+        SystemLayerSelectLoop().PrepareEvents();
 
         Impl()->UnlockChipStack();
-        SystemLayerSocketsLoop().WaitForEvents();
+        SystemLayerSelectLoop().WaitForEvents();
         Impl()->LockChipStack();
 
-        SystemLayerSocketsLoop().HandleEvents();
+        SystemLayerSelectLoop().HandleEvents();
 
         ProcessDeviceEvents();
     } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
-    SystemLayerSocketsLoop().EventLoopEnds();
+    SystemLayerSelectLoop().EventLoopEnds();
 
     Impl()->UnlockChipStack();
 
@@ -352,7 +365,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
         // System::Layer.
         //
         Impl()->LockChipStack();
-        SystemLayerSocketsLoop().Signal();
+        SystemLayerSelectLoop().Signal();
         Impl()->UnlockChipStack();
 
         pthread_mutex_lock(&mStateLock);

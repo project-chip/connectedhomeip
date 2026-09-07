@@ -1,0 +1,78 @@
+@implementation MTR{{cluster}}Cluster{{command}}Params ({{categoryName}})
+
+{{#if (isStrEqual source "server")}}
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &)decodableStruct
+{
+  if (!(self = [super init])) {
+    return nil;
+  }
+
+  CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+  if (err == CHIP_NO_ERROR) {
+    return self;
+  }
+
+  LogAndConvertDecodingError(err, nil);
+  return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &)decodableStruct
+{
+  {{#zcl_command_arguments}}
+  {
+    {{>decode_value target=(concat "self." (asStructPropertyName label)) source=(concat "decodableStruct." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="return err;" depth=0}}
+  }
+  {{/zcl_command_arguments}}
+  return CHIP_NO_ERROR;
+}
+{{/if}}
+
+{{#if (isStrEqual source "client")}}
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+  chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type encodableStruct;
+  ListFreer listFreer;
+  {{#zcl_command_arguments}}
+  {
+    {{>encode_value target=(concat "encodableStruct." (asLowerCamelCase label)) source=(concat "self." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+  }
+  {{/zcl_command_arguments}}
+
+  auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+  if (buffer.IsNull()) {
+    return CHIP_ERROR_NO_MEMORY;
+  }
+
+  chip::System::PacketBufferTLVWriter writer;
+  // Commands never need chained buffers, since they cannot be chunked.
+  writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+  ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+  ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+  reader.Init(std::move(buffer));
+  return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+  chip::System::PacketBufferTLVReader reader;
+  CHIP_ERROR err = [self _encodeToTLVReader:reader];
+  if (err != CHIP_NO_ERROR) {
+    if (error) {
+      *error = [MTRError errorForCHIPErrorCode:err];
+    }
+    return nil;
+  }
+
+  auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+  if (decodedObj == nil) {
+    if (error) {
+      *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+    }
+  }
+  return decodedObj;
+}
+{{/if}}
+@end

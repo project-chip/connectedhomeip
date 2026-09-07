@@ -14,7 +14,7 @@ namespace GeneralDiagnostics {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 14;
+inline constexpr uint32_t kAttributesCount = 15;
 
 namespace NetworkInterfaces {
 inline constexpr AttributeId Id = 0x00000000;
@@ -51,6 +51,10 @@ inline constexpr AttributeId Id = 0x00000007;
 namespace TestEventTriggersEnabled {
 inline constexpr AttributeId Id = 0x00000008;
 } // namespace TestEventTriggersEnabled
+
+namespace DeviceLoadStatus {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace DeviceLoadStatus
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

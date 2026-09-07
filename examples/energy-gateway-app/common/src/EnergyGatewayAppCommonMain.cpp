@@ -17,14 +17,16 @@
  */
 
 #include "EnergyGatewayAppCommonMain.h"
-#include "CommodityMeteringInstance.h"
+#include "CommodityMeteringMain.h"
 #include "CommodityPriceMain.h"
+#include "CommodityTariffMain.h"
 #include "ElectricalGridConditionsMain.h"
 #include "MeterIdentificationInstance.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -71,12 +73,15 @@ void ElectricalEnergyTariffInit()
 {
     EndpointId kElectricalEnergyTariffEndpointId = 1;
 
+    VerifyOrDie(CommodityMeteringInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
     VerifyOrDie(CommodityPriceInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
+    VerifyOrDie(CommodityTariffInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
     VerifyOrDie(ElectricalGridConditionsInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
 
     // set the descriptor TagList to include "ElectricalEnergy" and "Current" (to indicate the ActiveTariff)
-    SetTagList(kElectricalEnergyTariffEndpointId,
-               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(electricalEnergyTariffTagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(
+        kElectricalEnergyTariffEndpointId,
+        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(electricalEnergyTariffTagList));
 }
 
 void ElectricalEnergyTariffShutdown()

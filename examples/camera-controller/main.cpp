@@ -40,7 +40,7 @@ namespace {
 
 void StopSignalHandler(int signum)
 {
-    DeviceLayer::SystemLayer().ScheduleLambda([]() { StopInteractiveEventLoop(); });
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([]() { StopInteractiveEventLoop(); });
 }
 
 } // namespace

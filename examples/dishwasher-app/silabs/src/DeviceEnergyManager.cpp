@@ -93,7 +93,7 @@ CHIP_ERROR DeviceEnergyManagementInit()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceEnergyManagementShutdown()
+void DeviceEnergyManagementShutdown()
 {
     /* Do this in the order Instance first, then delegate
      * Ensure we call the Instance->Shutdown to free attribute & command handlers first
@@ -108,7 +108,6 @@ CHIP_ERROR DeviceEnergyManagementShutdown()
     {
         gDEMDelegate.reset();
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceEnergyManager::Init()

@@ -35,7 +35,7 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
         {
             uint16_t identifyTime;
             if (Protocols::InteractionModel::Status::Success ==
-                Identify::Attributes::IdentifyTime::Get(attributePath.mEndpointId, &identifyTime))
+                Identify::Attributes::IdentifyTime::GetDefault(attributePath.mEndpointId, &identifyTime))
             {
                 ChipLogProgress(Zcl, "IdentifyTime %u", identifyTime);
                 return;

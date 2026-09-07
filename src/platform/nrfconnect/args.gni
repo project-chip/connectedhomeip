@@ -17,4 +17,8 @@ declare_args() {
 
   # Enable factory data support
   chip_enable_factory_data = false
+
+  # Use KMU to store cryptographic materials.
+  # This requires a dedicated platform-specific crypto implementation.
+  chip_use_cracen_kmu = false
 }

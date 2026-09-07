@@ -33,11 +33,12 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Defer.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
@@ -219,7 +220,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         params.SetCountryCode(copiedCode);
     }
 
-    wrapper->UpdateCommissioningParameters(params);
+    TEMPORARY_RETURN_IGNORED wrapper->UpdateCommissioningParameters(params);
 
     CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
     if (err != CHIP_NO_ERROR)
@@ -279,7 +280,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     if (rootCertificate != nullptr && nodeOperationalCertificate != nullptr && keypairDelegate != nullptr)
     {
         CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
-        nativeKeypairBridge->SetDelegate(keypairDelegate);
+        TEMPORARY_RETURN_IGNORED nativeKeypairBridge->SetDelegate(keypairDelegate);
         *errInfoOnFailure = nativeKeypairBridge->Initialize(Crypto::ECPKeyTarget::ECDSA);
         if (*errInfoOnFailure != CHIP_NO_ERROR)
         {
@@ -380,7 +381,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(
         &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), ipkSpan, compressedFabricIdSpan);
 
-    getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
+    TEMPORARY_RETURN_IGNORED getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
 
     auto engine       = chip::app::InteractionModelEngine::GetInstance();
     *errInfoOnFailure = wrapper->mCheckInDelegate.Init(getICDClientStorage(), engine);
@@ -400,6 +401,14 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 void AndroidDeviceControllerWrapper::Shutdown()
 {
     VerifyOrReturn(mIsInitialized);
+
+    // Listener objects are JNI global refs and must be released during teardown.
+    // JniGlobalReference handles a missing JNIEnv internally and safely no-ops.
+    mThreadCredentialsNeededListenerObject.Reset();
+    mWiFiCredentialsNeededListenerObject.Reset();
+    mThreadCredentialsNeededListener = nullptr;
+    mWiFiCredentialsNeededListener   = nullptr;
+
     getICDClientStorage()->Shutdown();
     mController->Shutdown();
     DeviceControllerFactory::GetInstance().Shutdown();
@@ -428,6 +437,56 @@ void AndroidDeviceControllerWrapper::Shutdown()
         mAttestationTrustStoreBridge = nullptr;
     }
     mIsInitialized = false;
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SetThreadCredentialsNeededListener(jobject listener)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    // Allow clearing the listener.
+    if (listener == nullptr)
+    {
+        mThreadCredentialsNeededListenerObject.Reset();
+        mThreadCredentialsNeededListener = nullptr;
+        return CHIP_NO_ERROR;
+    }
+
+    jmethodID method;
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, listener, "onThreadCredentialsNeeded", "(I)V", &method);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    mThreadCredentialsNeededListenerObject.Reset();
+    ReturnErrorOnFailure(mThreadCredentialsNeededListenerObject.Init(listener));
+    mThreadCredentialsNeededListener = method;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SetWiFiCredentialsNeededListener(jobject listener)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    // Allow clearing the listener.
+    if (listener == nullptr)
+    {
+        mWiFiCredentialsNeededListenerObject.Reset();
+        mWiFiCredentialsNeededListener = nullptr;
+        return CHIP_NO_ERROR;
+    }
+
+    jmethodID method;
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, listener, "onWiFiCredentialsNeeded", "(I)V", &method);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    mWiFiCredentialsNeededListenerObject.Reset();
+    ReturnErrorOnFailure(mWiFiCredentialsNeededListenerObject.Init(listener));
+    mWiFiCredentialsNeededListener = method;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,
@@ -578,14 +637,22 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     if (jSymmetricKey != nullptr)
     {
         JniByteArray jniSymmetricKey(env, jSymmetricKey);
-        VerifyOrReturnError(jniSymmetricKey.size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(mICDSymmetricKey, jniSymmetricKey.data(), sizeof(mICDSymmetricKey));
+        if (jniSymmetricKey.size() > 0)
+        {
+            VerifyOrReturnError(jniSymmetricKey.size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
+            memcpy(mICDSymmetricKey, jniSymmetricKey.data(), sizeof(mICDSymmetricKey));
+            params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
+        }
+        else
+        {
+            ChipLogDetail(Controller, "Skip ICD Symmetric Key.");
+        }
     }
     else
     {
-        chip::Crypto::DRBG_get_bytes(mICDSymmetricKey, sizeof(mICDSymmetricKey));
+        ReturnErrorOnFailure(chip::Crypto::DRBG_get_bytes(mICDSymmetricKey, sizeof(mICDSymmetricKey)));
+        params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
     }
-    params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
 
     chip::app::Clusters::IcdManagement::ClientTypeEnum clientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
     if (jClientType != nullptr)
@@ -820,6 +887,22 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
                         jStageCompleted.jniValue(), static_cast<jlong>(error.AsInteger()));
 }
 
+void AndroidDeviceControllerWrapper::OnCommissioningStageStart(PeerId peerId, chip::Controller::CommissioningStage stage)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
+    jmethodID onCommissioningStageStartMethod;
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningStageStart",
+                                                             "(JLjava/lang/String;)V", &onCommissioningStageStartMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    UtfString jStage(env, StageToString(stage));
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onCommissioningStageStartMethod, static_cast<jlong>(peerId.GetNodeId()),
+                        jStage.jniValue());
+}
+
 void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
 {
     // calls: onReadCommissioningInfo(int vendorId, int productId, int wifiEndpointId, int threadEndpointId)
@@ -833,7 +916,8 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
     // For ICD
     mUserActiveModeTriggerHint = info.icd.userActiveModeTriggerHint;
     memset(mUserActiveModeTriggerInstructionBuffer, 0x00, kUserActiveModeTriggerInstructionBufferLen);
-    CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction, mUserActiveModeTriggerInstruction);
+    TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction,
+                                                           mUserActiveModeTriggerInstruction);
 
     ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
                     info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
@@ -865,30 +949,30 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     std::string NetworkingStatusClassName     = "java/lang/Integer";
     std::string NetworkingStatusCtorSignature = "(I)V";
     jint jniNetworkingStatus                  = static_cast<jint>(dataResponse.networkingStatus);
-    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(NetworkingStatusClassName, NetworkingStatusCtorSignature,
-                                                               jniNetworkingStatus, NetworkingStatus);
+    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+        NetworkingStatusClassName, NetworkingStatusCtorSignature, jniNetworkingStatus, NetworkingStatus);
     jobject DebugText;
     if (!dataResponse.debugText.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, DebugText);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, DebugText);
     }
     else
     {
         jobject DebugTextInsideOptional;
         DebugTextInsideOptional =
             env->NewStringUTF(std::string(dataResponse.debugText.Value().data(), dataResponse.debugText.Value().size()).c_str());
-        chip::JniReferences::GetInstance().CreateOptional(DebugTextInsideOptional, DebugText);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(DebugTextInsideOptional, DebugText);
     }
     jobject WiFiScanResults;
     if (!dataResponse.wiFiScanResults.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, WiFiScanResults);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, WiFiScanResults);
     }
     else
     {
         // TODO: use this
         jobject WiFiScanResultsInsideOptional;
-        chip::JniReferences::GetInstance().CreateArrayList(WiFiScanResultsInsideOptional);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(WiFiScanResultsInsideOptional);
 
         auto iter_WiFiScanResultsInsideOptional = dataResponse.wiFiScanResults.Value().begin();
         while (iter_WiFiScanResultsInsideOptional.Next())
@@ -898,7 +982,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             std::string newElement_securityClassName     = "java/lang/Integer";
             std::string newElement_securityCtorSignature = "(I)V";
             jint jniNewElementSecurity                   = static_cast<jint>(entry.security.Raw());
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 newElement_securityClassName, newElement_securityCtorSignature, jniNewElementSecurity, newElement_security);
             jobject newElement_ssid;
             jbyteArray newElement_ssidByteArray = env->NewByteArray(static_cast<jsize>(entry.ssid.size()));
@@ -912,14 +996,16 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             newElement_bssid = newElement_bssidByteArray;
             jobject newElement_channel;
             jint jniChannel = static_cast<jint>(entry.channel);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniChannel, newElement_channel);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                                                jniChannel, newElement_channel);
             jobject newElement_wiFiBand;
             jint jniWiFiBand = static_cast<jint>(entry.wiFiBand);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniWiFiBand,
-                                                                       newElement_wiFiBand);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                                                jniWiFiBand, newElement_wiFiBand);
             jobject newElement_rssi;
             jint jniRssi = static_cast<jint>(entry.rssi);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniRssi, newElement_rssi);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                                                jniRssi, newElement_rssi);
 
             jclass wiFiInterfaceScanResultStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/WiFiScanResult",
@@ -941,19 +1027,19 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             jobject newElement =
                 env->NewObject(wiFiInterfaceScanResultStructClass, wiFiInterfaceScanResultStructCtor, newElement_security,
                                newElement_ssid, newElement_bssid, newElement_channel, newElement_wiFiBand, newElement_rssi);
-            chip::JniReferences::GetInstance().AddToList(WiFiScanResultsInsideOptional, newElement);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(WiFiScanResultsInsideOptional, newElement);
         }
-        chip::JniReferences::GetInstance().CreateOptional(WiFiScanResultsInsideOptional, WiFiScanResults);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(WiFiScanResultsInsideOptional, WiFiScanResults);
     }
     jobject ThreadScanResults;
     if (!dataResponse.threadScanResults.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, ThreadScanResults);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, ThreadScanResults);
     }
     else
     {
         jobject ThreadScanResultsInsideOptional;
-        chip::JniReferences::GetInstance().CreateArrayList(ThreadScanResultsInsideOptional);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(ThreadScanResultsInsideOptional);
 
         auto iter_ThreadScanResultsInsideOptional = dataResponse.threadScanResults.Value().begin();
         while (iter_ThreadScanResultsInsideOptional.Next())
@@ -961,19 +1047,22 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             auto & entry = iter_ThreadScanResultsInsideOptional.GetValue();
             jobject newElement_panId;
             jint jniPanId = static_cast<jint>(entry.panId);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniPanId, newElement_panId);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                                                jniPanId, newElement_panId);
             jobject newElement_extendedPanId;
             jlong jniExtendedPanId = static_cast<jlong>(entry.extendedPanId);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", jniExtendedPanId,
-                                                                        newElement_extendedPanId);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                "java/lang/Long", "(J)V", jniExtendedPanId, newElement_extendedPanId);
             jobject newElement_networkName;
             newElement_networkName = env->NewStringUTF(std::string(entry.networkName.data(), entry.networkName.size()).c_str());
             jobject newElement_channel;
             jint jniChannel = static_cast<jint>(entry.channel);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniChannel, newElement_channel);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                                                jniChannel, newElement_channel);
             jobject newElement_version;
             jint jniVersion = static_cast<jint>(entry.version);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniVersion, newElement_version);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                                                jniVersion, newElement_version);
             jobject newElement_extendedAddress;
             jbyteArray newElement_extendedAddressByteArray = env->NewByteArray(static_cast<jsize>(entry.extendedAddress.size()));
             env->SetByteArrayRegion(newElement_extendedAddressByteArray, 0, static_cast<jsize>(entry.extendedAddress.size()),
@@ -981,10 +1070,12 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             newElement_extendedAddress = newElement_extendedAddressByteArray;
             jobject newElement_rssi;
             jint jniRssi = static_cast<jint>(entry.rssi);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniRssi, newElement_rssi);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                                                jniRssi, newElement_rssi);
             jobject newElement_lqi;
             jint jniLqi = static_cast<jint>(entry.lqi);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniLqi, newElement_lqi);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniLqi,
+                                                                                                newElement_lqi);
 
             jclass threadInterfaceScanResultStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ThreadScanResult",
@@ -1008,9 +1099,10 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
                 env->NewObject(threadInterfaceScanResultStructClass, threadInterfaceScanResultStructCtor, newElement_panId,
                                newElement_extendedPanId, newElement_networkName, newElement_channel, newElement_version,
                                newElement_extendedAddress, newElement_rssi, newElement_lqi);
-            chip::JniReferences::GetInstance().AddToList(ThreadScanResultsInsideOptional, newElement);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(ThreadScanResultsInsideOptional, newElement);
         }
-        chip::JniReferences::GetInstance().CreateOptional(ThreadScanResultsInsideOptional, ThreadScanResults);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(ThreadScanResultsInsideOptional,
+                                                                                   ThreadScanResults);
     }
 
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), javaMethod, NetworkingStatus, DebugText, WiFiScanResults, ThreadScanResults);
@@ -1106,6 +1198,126 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::ScopedNodeI
 
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationCompleteMethod, static_cast<jlong>(err.AsInteger()),
                         icdDeviceInfoObj);
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointId endpoint)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    if (!mWiFiCredentialsNeededListenerObject.HasValidObjectRef() || mWiFiCredentialsNeededListener == nullptr)
+    {
+        ChipLogError(Controller, "No listener registered for WiFiCredentialsNeeded");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    auto * context = chip::Platform::New<CredentialsNeededCallbackContext>();
+    VerifyOrReturnError(context != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    CHIP_ERROR err = context->listenerObject.Init(mWiFiCredentialsNeededListenerObject.ObjectRef());
+    if (err != CHIP_NO_ERROR)
+    {
+        chip::Platform::Delete(context);
+        return err;
+    }
+    context->listenerMethod = mWiFiCredentialsNeededListener;
+    context->endpoint       = endpoint;
+    context->isWiFi         = true;
+
+    err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
+    if (err != CHIP_NO_ERROR)
+    {
+        chip::Platform::Delete(context);
+    }
+    ReturnErrorOnFailure(err);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::EndpointId endpoint)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    if (!mThreadCredentialsNeededListenerObject.HasValidObjectRef() || mThreadCredentialsNeededListener == nullptr)
+    {
+        ChipLogError(Controller, "No listener registered for ThreadCredentialsNeeded");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    auto * context = chip::Platform::New<CredentialsNeededCallbackContext>();
+    VerifyOrReturnError(context != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    CHIP_ERROR err = context->listenerObject.Init(mThreadCredentialsNeededListenerObject.ObjectRef());
+    if (err != CHIP_NO_ERROR)
+    {
+        chip::Platform::Delete(context);
+        return err;
+    }
+    context->listenerMethod = mThreadCredentialsNeededListener;
+    context->endpoint       = endpoint;
+    context->isWiFi         = false;
+
+    err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleCredentialsNeededCallback, reinterpret_cast<intptr_t>(context));
+    if (err != CHIP_NO_ERROR)
+    {
+        chip::Platform::Delete(context);
+    }
+    ReturnErrorOnFailure(err);
+
+    return CHIP_NO_ERROR;
+}
+
+void AndroidDeviceControllerWrapper::HandleCredentialsNeededCallback(intptr_t context)
+{
+    auto * callbackContext = reinterpret_cast<CredentialsNeededCallbackContext *>(context);
+    VerifyOrReturn(callbackContext != nullptr);
+
+    auto contextCleanup = ::MakeDefer([callbackContext]() {
+        callbackContext->listenerObject.Reset();
+        chip::Platform::Delete(callbackContext);
+    });
+
+    const EndpointId endpoint       = callbackContext->endpoint;
+    const bool isWiFi               = callbackContext->isWiFi;
+    const jmethodID listenerMethod  = callbackContext->listenerMethod;
+    jobject listenerGlobalObjectRef = callbackContext->listenerObject.ObjectRef();
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Controller, "Could not get JNIEnv for current thread");
+        return;
+    }
+
+    if (listenerGlobalObjectRef == nullptr || listenerMethod == nullptr)
+    {
+        ChipLogError(Controller, "No listener registered for %sCredentialsNeeded", isWiFi ? "WiFi" : "Thread");
+        return;
+    }
+
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        jobject listenerObject = env->NewLocalRef(listenerGlobalObjectRef);
+        if (listenerObject == nullptr)
+        {
+            ChipLogError(Controller, "Failed to create local listener reference");
+            return;
+        }
+
+        env->CallVoidMethod(listenerObject, listenerMethod, static_cast<jint>(endpoint));
+
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Controller, "Java exception in %sCredentialsNeeded listener", isWiFi ? "WiFi" : "Thread");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+
+        env->DeleteLocalRef(listenerObject);
+    }
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)

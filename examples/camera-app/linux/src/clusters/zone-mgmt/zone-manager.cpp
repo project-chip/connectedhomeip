@@ -17,6 +17,7 @@
  */
 
 #include "camera-device-interface.h"
+#include "camera-device.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -115,6 +116,20 @@ Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
     }
 }
 
+bool ZoneManager::IsValidAnalysisZone(uint16_t zoneId)
+{
+    // Find an iterator to the item with the matching ID
+    auto it = std::find_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
+                           [zoneId](const TwoDCartZone & zone) { return zone.zoneId == zoneId; });
+
+    // If an item with the zoneID was found, ensure it is not a privacy zone
+    if (it != mTwoDCartZones.end())
+    {
+        return (it->zone.use != ZoneUseEnum::kPrivacy);
+    }
+    return false;
+}
+
 CHIP_ERROR ZoneManager::LoadZones(std::vector<ZoneInformationStorage> & aZones)
 {
     aZones.clear();
@@ -158,6 +173,24 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
 
     for (auto trigCtxtIter = zoneManager->mTriggerContexts.begin(); trigCtxtIter != zoneManager->mTriggerContexts.end();)
     {
+        if (trigCtxtIter->triggerState == TriggerState::InBlindDuration)
+        {
+            trigCtxtIter->remainingBlindDuration--;
+
+            if (trigCtxtIter->remainingBlindDuration > 0)
+            {
+                trigCtxtIter++;
+            }
+            else
+            {
+                // Remove the trigger context after the expiry of the
+                // blindDuration
+                trigCtxtIter = zoneManager->mTriggerContexts.erase(trigCtxtIter);
+            }
+
+            continue;
+        }
+
         // Advance time since initial trigger by the timer timeout period
         trigCtxtIter->timeSinceInitialTrigger += kTimerPeriod;
 
@@ -168,8 +201,8 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
                             trigCtxtIter->triggerCtrl.zoneID);
             zoneManager->GetZoneMgmtServer()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
                                                                        ZoneEventStoppedReasonEnum::kActionStopped);
+            // Set the triggerState to BlindDuration
             trigCtxtIter->triggerState = TriggerState::InBlindDuration;
-            trigCtxtIter               = zoneManager->mTriggerContexts.erase(trigCtxtIter);
         }
         else if (trigCtxtIter->timeSinceInitialTrigger > trigCtxtIter->triggerCtrl.maxDuration)
         {
@@ -178,8 +211,8 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
                             trigCtxtIter->triggerCtrl.zoneID);
             zoneManager->GetZoneMgmtServer()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
                                                                        ZoneEventStoppedReasonEnum::kTimeout);
+            // Set the triggerState to BlindDuration
             trigCtxtIter->triggerState = TriggerState::InBlindDuration;
-            trigCtxtIter               = zoneManager->mTriggerContexts.erase(trigCtxtIter);
         }
         else
         {
@@ -189,7 +222,8 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
     if (!zoneManager->mTriggerContexts.empty())
     {
         // Start the timer again if there are active triggers
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout, zoneManager);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout,
+                                                                       zoneManager);
     }
 }
 
@@ -217,14 +251,20 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
         trigCtxt.triggerDetectedDuration     = trigger.Value().initialDuration;
         trigCtxt.prevTriggerDetectedDuration = trigCtxt.triggerDetectedDuration;
         trigCtxt.triggerCtrl                 = trigger.Value();
+        trigCtxt.remainingBlindDuration      = trigger.Value().blindDuration;
         trigCtxt.triggerCount                = 1;
         mTriggerContexts.push_back(trigCtxt);
 
         // Schedule the periodic timer
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout, this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout,
+                                                                       this);
     }
     else
     {
+        // Nothing to do for zone if it is in blindDuration
+        VerifyOrReturn(foundTrigCtxt->triggerState != TriggerState::InBlindDuration,
+                       ChipLogProgress(Camera, "Ignoring ZoneTriggered event for zone in BlindDuration"));
+
         // Zone has already been triggered at least once.
         foundTrigCtxt->triggerCount++;
         // Spec logic for advancing triggerDetectedDuration

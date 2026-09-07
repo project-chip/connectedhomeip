@@ -28,8 +28,8 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/clusters/wifi-network-diagnostics-server",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols",

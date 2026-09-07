@@ -310,7 +310,7 @@ tests:
           5)EpochKey1: null 6)EpochStartTime1: null 7)EpochKey2:
           d2d1d2d3d4d5d6d7d8d9dadbdcdddedf 8)EpochStartTime2:
           18446744073709551614 Note: EpochKey1 and EpochStartTime1 are null when
-          EpochKey2 and EpochStartTime2 are not null"
+          EpochKey2 and EpochStartTime2 are not null "
       PICS: GRPKEY.S.C00.Rsp
       command: "KeySetWrite"
       arguments:

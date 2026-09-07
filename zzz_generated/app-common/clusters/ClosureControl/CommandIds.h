@@ -13,7 +13,7 @@ namespace ClosureControl {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 3;
+inline constexpr uint32_t kAcceptedCommandsCount = 4;
 
 // Total number of server to client commands supported by the cluster (response commands)
 inline constexpr uint32_t kGeneratedCommandsCount = 0;
@@ -29,6 +29,10 @@ inline constexpr CommandId Id = 0x00000001;
 namespace Calibrate {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace Calibrate
+
+namespace GroupedMoveTo {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace GroupedMoveTo
 
 } // namespace Commands
 } // namespace ClosureControl

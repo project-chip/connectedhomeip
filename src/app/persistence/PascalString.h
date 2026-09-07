@@ -107,7 +107,6 @@ public:
 
     /// Returns the content of the pascal string.
     /// Uses the prefix size information
-    Span<T> Content() { return { mData + PREFIX_LEN, GetContentLength() }; }
     Span<const T> Content() const { return { mData + PREFIX_LEN, GetContentLength() }; }
 
     /// Accesses the "PASCAL" string (i.e. valid data including the string prefix)

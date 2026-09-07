@@ -28,6 +28,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <system/RAIIMockClock.h>
 #include <transport/SecureSessionTable.h>
 
 namespace {
@@ -67,9 +68,8 @@ public:
 TEST_F(TestPeerConnections, TestBasicFunctionality)
 {
     SecureSessionTable connections;
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    System::Clock::Internal::RAIIMockClock clock;
     clock.SetMonotonic(100_ms64);
     CATValues peerCATs;
     Optional<SessionHandle> sessions[CHIP_CONFIG_SECURE_SESSION_POOL_SIZE];
@@ -111,15 +111,13 @@ TEST_F(TestPeerConnections, TestBasicFunctionality)
     }
 
     // #endif
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 TEST_F(TestPeerConnections, TestFindByKeyId)
 {
     SecureSessionTable connections;
-    System::Clock::Internal::MockClock clock;
-    System::Clock::ClockBase * realClock = &System::SystemClock();
-    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    System::Clock::Internal::RAIIMockClock clock;
 
     // First node, peer session id 1, local session id 2
     auto optionalSession = connections.CreateNewSecureSessionForTest(SecureSession::Type::kCASE, 2, kLocalNodeId, kCasePeer1NodeId,
@@ -136,8 +134,6 @@ TEST_F(TestPeerConnections, TestFindByKeyId)
 
     EXPECT_FALSE(connections.FindSecureSessionByLocalKey(3).HasValue());
     EXPECT_TRUE(connections.FindSecureSessionByLocalKey(4).HasValue());
-
-    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 struct ExpiredCallInfo

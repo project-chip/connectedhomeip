@@ -26,7 +26,10 @@ executable("lit-icd-app") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "..",
+  ]
 
   cflags = [ "-Wconversion" ]
 

@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace SmokeCoAlarm {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -73,6 +73,10 @@ namespace ExpiryDate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ExpiryDate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ExpiryDate
+namespace Unmounted {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Unmounted::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace Unmounted
 constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
     ExpressedState::kMetadataEntry,     BatteryAlert::kMetadataEntry,      TestInProgress::kMetadataEntry,
     HardwareFaultAlert::kMetadataEntry, EndOfServiceAlert::kMetadataEntry,

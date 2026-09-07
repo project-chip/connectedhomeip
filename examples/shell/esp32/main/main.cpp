@@ -34,8 +34,8 @@ extern "C" void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
     chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    SuccessOrDie(chip::DeviceLayer::PlatformMgr().InitChipStack());
+    SuccessOrDie(chip::DeviceLayer::PlatformMgr().StartEventLoopTask());
 
     int ret = Engine::Root().Init();
     VerifyOrDie(ret == 0);

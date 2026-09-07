@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+#
 # Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,11 +31,11 @@ class HelloWorldTest(base_test.BaseTestClass):
     def test_hello(self):
         expected = "hello!"
         status, payload = self.dut.rpcs().EchoService.Echo(msg=expected)
-        asserts.assert_true(status.ok(), "Status is %s" % status)
+        asserts.assert_true(status.ok(), f"Status is {status}")
         asserts.assert_equal(
             payload.msg,
             expected,
-            'Returned payload is "%s" expected "%s"' % (payload.msg, expected),
+            f'Returned payload is "{payload.msg}" expected "{expected}"',
         )
 
 

@@ -35,43 +35,18 @@
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/raw/GroupcastTesting.h>
 
 #include <optional>
 
 namespace chip {
 namespace app {
-
-namespace {
-
-using Protocols::InteractionModel::Status;
-
-/// Wraps a EndpointIterator and ensures that `::Release()` is called
-/// for the iterator (assuming it is non-null)
-class AutoReleaseGroupEndpointIterator
-{
-public:
-    explicit AutoReleaseGroupEndpointIterator(Credentials::GroupDataProvider::EndpointIterator * iterator) : mIterator(iterator) {}
-    ~AutoReleaseGroupEndpointIterator()
-    {
-        if (mIterator != nullptr)
-        {
-            mIterator->Release();
-        }
-    }
-
-    bool IsNull() const { return mIterator == nullptr; }
-    bool Next(Credentials::GroupDataProvider::GroupEndpoint & item) { return mIterator->Next(item); }
-
-private:
-    Credentials::GroupDataProvider::EndpointIterator * mIterator;
-};
-
-} // namespace
 
 using namespace Protocols::InteractionModel;
 using Status = Protocols::InteractionModel::Status;
@@ -86,7 +61,6 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
     mDelegate = apWriteHandlerDelegate;
     MoveToState(State::Initialized);
 
-    mACLCheckCache.ClearValue();
     mProcessingAttributePath.ClearValue();
 
     return CHIP_NO_ERROR;
@@ -143,8 +117,8 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
 
     Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
-    // Do not send response on Group Write
-    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
+    // Do not send response on Group Write or Write request with SuppressResponse flag set.
+    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext() && !mStateFlags.Has(StateBits::kSuppressResponse))
     {
         CHIP_ERROR err = SendWriteResponse(std::move(messageWriter));
         if (err != CHIP_NO_ERROR)
@@ -170,7 +144,14 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     // The write transaction will be alive only when the message was handled successfully and there are more chunks.
     if (!(status == Status::Success && mStateFlags.Has(StateBits::kHasMoreChunks)))
     {
+        const bool suppressResponse = mStateFlags.Has(StateBits::kSuppressResponse);
         Close();
+        // Return Success if SuppressResponse is set to avoid sending StatusResponse when error is caught
+        // in InteractionModelEngine.
+        if (suppressResponse)
+        {
+            return Status::Success;
+        }
     }
 
     return status;
@@ -191,10 +172,13 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
         {
             CHIP_ERROR statusError = CHIP_NO_ERROR;
             // Parse the status response so we can log it properly.
-            StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
+            TEMPORARY_RETURN_IGNORED StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
         }
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        if (!mStateFlags.Has(StateBits::kSuppressResponse))
+        {
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        }
         Close();
         return CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
@@ -211,10 +195,13 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
     }
     else
     {
-        err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        if (!mStateFlags.Has(StateBits::kSuppressResponse))
+        {
+            err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        }
         Close();
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
@@ -244,7 +231,8 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     SuccessOrExit(err);
 
     VerifyOrExit(mExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    err = mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    SuccessOrExit(err);
     err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
                                     mStateFlags.Has(StateBits::kHasMoreChunks) ? Messaging::SendMessageFlags::kExpectResponse
                                                                                : Messaging::SendMessageFlags::kNone);
@@ -260,7 +248,8 @@ void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 {
     if (mDataModelProvider != nullptr)
     {
-        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin);
+        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin,
+                                                           GetAccessingFabricIndex());
     }
 }
 
@@ -270,7 +259,8 @@ void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool
     {
         mDataModelProvider->ListAttributeWriteNotification(aPath,
                                                            writeWasSuccessful ? DataModel::ListWriteOperation::kListWriteSuccess
-                                                                              : DataModel::ListWriteOperation::kListWriteFailure);
+                                                                              : DataModel::ListWriteOperation::kListWriteFailure,
+                                                           GetAccessingFabricIndex());
     }
 }
 
@@ -290,7 +280,6 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
 
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-    Credentials::GroupDataProvider::EndpointIterator * iterator;
 
     GroupId groupId         = mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     FabricIndex fabricIndex = GetAccessingFabricIndex();
@@ -298,8 +287,8 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
     auto processingConcreteAttributePath = mProcessingAttributePath.Value();
     mProcessingAttributePath.ClearValue();
 
-    iterator = groupDataProvider->IterateEndpoints(fabricIndex);
-    VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
+    AutoRelease iterator(groupDataProvider->IterateEndpoints(fabricIndex));
+    VerifyOrReturnError(!iterator.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     while (iterator->Next(mapping))
     {
@@ -316,7 +305,6 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
             DeliverListWriteEnd(processingConcreteAttributePath, writeWasSuccessful);
         }
     }
-    iterator->Release();
     return CHIP_NO_ERROR;
 }
 namespace {
@@ -483,7 +471,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                       "Received group attribute write for Group=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                       groupId, ChipLogValueMEI(dataAttributePath.mClusterId), ChipLogValueMEI(dataAttributePath.mAttributeId));
 
-        AutoReleaseGroupEndpointIterator iterator(Credentials::GetGroupDataProvider()->IterateEndpoints(fabric));
+        AutoRelease iterator(Credentials::GetGroupDataProvider()->IterateEndpoints(fabric));
         VerifyOrExit(!iterator.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         bool shouldReportListWriteEnd = ShouldReportListWriteEnd(
@@ -493,7 +481,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         std::optional<bool> isListAttribute = std::nullopt;
 
         Credentials::GroupDataProvider::GroupEndpoint mapping;
-        while (iterator.Next(mapping))
+        while (iterator->Next(mapping))
         {
             if (groupId != mapping.group_id)
             {
@@ -501,6 +489,15 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             }
 
             dataAttributePath.mEndpointId = mapping.endpoint_id;
+            // Groupcast Testing
+            auto & testing = Groupcast::GetTesting();
+            if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
+            {
+                testing.SetGroupID(groupId);
+                testing.SetEndpointID(dataAttributePath.mEndpointId);
+                testing.SetClusterID(dataAttributePath.mClusterId);
+                testing.SetElementID(static_cast<uint32_t>(dataAttributePath.mAttributeId));
+            }
 
             // Try to get the metadata from for the attribute from one of the expanded endpoints (it doesn't really matter which
             // endpoint we pick, as long as it's valid) and update the path info according to it and recheck if we need to report
@@ -588,7 +585,7 @@ exit:
     // The DeliverFinalListWriteEndForGroupWrite above will deliver the successful state of the list write and clear the
     // mProcessingAttributePath making the following call no-op. So we call it again after the exit label to deliver a failure state
     // to the clusters. Ignore the error code since we need to deliver other more important failures.
-    DeliverFinalListWriteEndForGroupWrite(false);
+    TEMPORARY_RETURN_IGNORED DeliverFinalListWriteEndForGroupWrite(false);
     return err;
 }
 
@@ -617,7 +614,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    writeRequestParser.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED writeRequestParser.PrettyPrint();
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
@@ -645,10 +642,14 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
 
     if (mStateFlags.Has(StateBits::kHasMoreChunks) &&
-        (mExchangeCtx->IsGroupExchangeContext() || mStateFlags.Has(StateBits::kIsTimedRequest)))
+        (mExchangeCtx->IsGroupExchangeContext() || mStateFlags.Has(StateBits::kIsTimedRequest) ||
+         mStateFlags.Has(StateBits::kSuppressResponse)))
     {
         // Sanity check: group exchange context should only have one chunk.
         // Also, timed requests should not have more than one chunk.
+        // A chunked write needs intermediate WriteResponses (sent with kExpectResponse) to keep the exchange
+        // alive and pace the sender, so SuppressResponse is incompatible with more chunks; rejecting the
+        // combination avoids leaving a handler allocated on an exchange that the messaging layer closes.
         ExitNow(err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
     }
 
@@ -889,10 +890,8 @@ CHIP_ERROR WriteHandler::WriteClusterData(const Access::SubjectDescriptor & aSub
     DataModel::ActionReturnStatus status = CheckWriteAllowed(aSubject, aPath);
     if (status.IsSuccess())
     {
-        DataModel::WriteAttributeRequest request;
+        DataModel::WriteAttributeRequest request(aPath, aSubject);
 
-        request.path              = aPath;
-        request.subjectDescriptor = &aSubject;
         request.writeFlags.Set(DataModel::WriteFlags::kTimed, IsTimedWrite());
 
         AttributeValueDecoder decoder(aData, aSubject);

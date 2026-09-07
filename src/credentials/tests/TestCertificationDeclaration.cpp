@@ -33,6 +33,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::ASN1;
@@ -359,7 +360,7 @@ TEST(TestCertificationDeclaration, TestCD_CMSSignAndVerify)
     P256Keypair keypair2;
     P256SerializedKeypair serializedKeypair;
     memcpy(serializedKeypair.Bytes(), sTestCMS_SignerSerializedKeypair, sizeof(sTestCMS_SignerSerializedKeypair));
-    serializedKeypair.SetLength(sizeof(sTestCMS_SignerSerializedKeypair));
+    EXPECT_SUCCESS(serializedKeypair.SetLength(sizeof(sTestCMS_SignerSerializedKeypair)));
     cdContentIn   = ByteSpan(sTestCMS_CDContent02);
     signedMessage = MutableByteSpan(signedMessageBuf);
     EXPECT_EQ(keypair2.Deserialize(serializedKeypair), CHIP_NO_ERROR);

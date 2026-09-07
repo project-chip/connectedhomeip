@@ -28,6 +28,7 @@
 #include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 namespace {
 
@@ -262,7 +263,7 @@ TEST_F(TestJsonToTlv, Test32BitConvert)
     // convert a simple single value
     {
         SetupWriters();
-        JsonToTlv("{\"1:INT\": 321}", gWriter1);
+        EXPECT_SUCCESS(JsonToTlv("{\"1:INT\": 321}", gWriter1));
         EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
@@ -283,7 +284,7 @@ TEST_F(TestJsonToTlv, Test32BitConvert)
     // convert a single value that is larger than 8 bit
     {
         SetupWriters();
-        JsonToTlv("{\"1234:INT\": 321}", gWriter1);
+        EXPECT_SUCCESS(JsonToTlv("{\"1234:INT\": 321}", gWriter1));
         EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
@@ -304,7 +305,7 @@ TEST_F(TestJsonToTlv, Test32BitConvert)
     // Convert to a full 32-bit value, unsigned
     {
         SetupWriters();
-        JsonToTlv("{\"4275878552:INT\": 321}", gWriter1);
+        EXPECT_SUCCESS(JsonToTlv("{\"4275878552:INT\": 321}", gWriter1));
         EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
@@ -334,7 +335,7 @@ TEST_F(TestJsonToTlv, TestMEIConvert)
     // Vendor ID = 1, Tag ID = 0
     {
         SetupWriters();
-        JsonToTlv("{\"65536:INT\": 321}", gWriter1);
+        EXPECT_SUCCESS(JsonToTlv("{\"65536:INT\": 321}", gWriter1));
         EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
@@ -355,7 +356,7 @@ TEST_F(TestJsonToTlv, TestMEIConvert)
     // Vendor ID = 0xFFFF, Tag ID = 0
     {
         SetupWriters();
-        JsonToTlv("{\"4294901760:INT\": 123}", gWriter1);
+        EXPECT_SUCCESS(JsonToTlv("{\"4294901760:INT\": 123}", gWriter1));
         EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());
@@ -376,7 +377,7 @@ TEST_F(TestJsonToTlv, TestMEIConvert)
     // Vendor ID = 0xFFFF, Tag ID = 0xFFFF
     {
         SetupWriters();
-        JsonToTlv("{\"4294967295:INT\": 123}", gWriter1);
+        EXPECT_SUCCESS(JsonToTlv("{\"4294967295:INT\": 123}", gWriter1));
         EXPECT_EQ(gWriter1.Finalize(), CHIP_NO_ERROR);
 
         reader.Init(gBuf1, gWriter1.GetLengthWritten());

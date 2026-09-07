@@ -602,7 +602,7 @@ public:
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
         size_t count = 0;
-        GetSubjectCount(count);
+        TEMPORARY_RETURN_IGNORED GetSubjectCount(count);
         if (count < EntryStorage::kMaxSubjects)
         {
             CHIP_ERROR err = mStorage->mSubjects[count].Add(subject);
@@ -619,7 +619,7 @@ public:
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
         size_t count = 0;
-        GetSubjectCount(count);
+        TEMPORARY_RETURN_IGNORED GetSubjectCount(count);
         if (index < count)
         {
             // The storage at the specified index will be deleted by copying any subsequent storage
@@ -675,7 +675,7 @@ public:
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
         size_t count = 0;
-        GetTargetCount(count);
+        TEMPORARY_RETURN_IGNORED GetTargetCount(count);
         if (count < EntryStorage::kMaxTargets)
         {
             CHIP_ERROR err = mStorage->mTargets[count].Add(target);
@@ -692,7 +692,7 @@ public:
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
         size_t count = 0;
-        GetTargetCount(count);
+        TEMPORARY_RETURN_IGNORED GetTargetCount(count);
         if (index < count)
         {
             // The storage at the specified index will be deleted by copying any subsequent storage
@@ -732,7 +732,7 @@ public:
         if (mStorage == &storage)
         {
             // Best effort, OK if it fails.
-            EnsureStorageInPool();
+            TEMPORARY_RETURN_IGNORED EnsureStorageInPool();
         }
     }
 

@@ -84,7 +84,7 @@ void ParseSigma1_RawPayload(const vector<uint8_t> & fuzzEncodedSigma1)
         tlvReaderEncodedSigma1.Init(std::move(EncodedSigma1));
 
         FuzzCASESession::ParsedSigma1 unused;
-        FuzzCASESession::ParseSigma1(tlvReaderEncodedSigma1, unused);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma1(tlvReaderEncodedSigma1, unused);
     }
 
     Platform::MemoryShutdown();
@@ -156,9 +156,8 @@ CHIP_ERROR EncodeSigma1Helper(PacketBufferHandle & msg, FuzzCASESession::EncodeS
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(kInitiatorEphPubKeyTag), initiatorEphPubKey.data(), initiatorEphPubKey.size()));
 
-    VerifyOrReturnError(inputParams.initiatorMrpConfig != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(
-        CASESession::EncodeSessionParameters(TLV::ContextTag(kInitiatorMRPParamsTag), *inputParams.initiatorMrpConfig, tlvWriter));
+    ReturnErrorOnFailure(CASESession::EncodeSessionParameters(TLV::ContextTag(kInitiatorMRPParamsTag),
+                                                              inputParams.initiatorSessionParams, tlvWriter));
 
     if (inputParams.sessionResumptionRequested)
     {
@@ -198,7 +197,7 @@ void ParseSigma1_StructuredPayload(const vector<uint8_t> & fuzzInitiatorRandom, 
         encodeParams.destinationId      = ByteSpan(fuzzDestinationID.data(), fuzzDestinationID.size());
         ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                      System::Clock::Milliseconds16(4000));
-        encodeParams.initiatorMrpConfig = &LocalMRPConfig;
+        encodeParams.initiatorSessionParams.SetMRPConfig(LocalMRPConfig);
 
         if (fuzzSessionResumptionRequested)
         {
@@ -212,14 +211,14 @@ void ParseSigma1_StructuredPayload(const vector<uint8_t> & fuzzInitiatorRandom, 
 
         /********************************* Encode Sigma1 *********************************/
         PacketBufferHandle encodedSigma1Msg;
-        EncodeSigma1Helper(encodedSigma1Msg, encodeParams, initiatorEphPubKey);
+        RETURN_SAFELY_IGNORED EncodeSigma1Helper(encodedSigma1Msg, encodeParams, initiatorEphPubKey);
 
         /********************************* Fuzz the Encoded Sigma1 Payload *********************************/
         PacketBufferTLVReader tlvReader;
         tlvReader.Init(std::move(encodedSigma1Msg));
         FuzzCASESession::ParsedSigma1 unused;
 
-        FuzzCASESession::ParseSigma1(tlvReader, unused);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma1(tlvReader, unused);
         // std::cout << "ParseSigma1: " << err.Format() << std::endl;
     }
 
@@ -270,7 +269,7 @@ void EncodeParseSigma1RoundTrip(const vector<uint8_t> & fuzzInitiatorRandom, uin
         encodeParams.destinationId      = ByteSpan(fuzzDestinationID.data(), fuzzDestinationID.size());
         ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                      System::Clock::Milliseconds16(4000));
-        encodeParams.initiatorMrpConfig = &LocalMRPConfig;
+        encodeParams.initiatorSessionParams.SetMRPConfig(LocalMRPConfig);
 
         if (fuzzSessionResumptionRequested)
         {
@@ -362,7 +361,7 @@ void ParseSigma2_RawPayload(const vector<uint8_t> & seededEncodedSigma2)
         tlvReaderEncodedSigma2.Init(std::move(EncodedSigma2));
 
         FuzzCASESession::ParsedSigma2 unused;
-        FuzzCASESession::ParseSigma2(tlvReaderEncodedSigma2, unused);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma2(tlvReaderEncodedSigma2, unused);
     }
 
     Platform::MemoryShutdown();
@@ -493,7 +492,7 @@ void ParseSigma2_StructuredPayload(const vector<uint8_t> & fuzzResponderRandom, 
         tlvReader.Init(encodedSpan);
 
         FuzzCASESession::ParsedSigma2 unused;
-        FuzzCASESession::ParseSigma2(tlvReader, unused);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma2(tlvReader, unused);
         // std::cout << err.Format() << std::endl;
 
         mem.Free();
@@ -545,7 +544,7 @@ void EncodeParseSigma2RoundTrip(const vector<uint8_t> & fuzzResponderRandom, uin
 
         ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                      System::Clock::Milliseconds16(4000));
-        encodeParams.responderMrpConfig = &LocalMRPConfig;
+        encodeParams.responderSessionParams.SetMRPConfig(LocalMRPConfig);
 
         /********************************* Encode Sigma2 Using CASESession::EncodeSigma2 *********************************/
         PacketBufferHandle encodedSigma2;
@@ -614,7 +613,7 @@ void ParseSigma2TBEData_RawPayload(const vector<uint8_t> & fuzzEncodedSigma2TBED
         PacketBufferTLVReader tlvReaderFuzzed;
         tlvReaderFuzzed.Init(std::move(fuzzedMsg));
 
-        FuzzCASESession::ParseSigma2TBEData(tlvReaderFuzzed, parsedSigma2TBEDataFuzzed);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma2TBEData(tlvReaderFuzzed, parsedSigma2TBEDataFuzzed);
     }
     Platform::MemoryShutdown();
 }
@@ -732,7 +731,7 @@ void ParseSigma2TBEData_StructuredPayload(const vector<uint8_t> & fuzzResponderN
         tlvReader.Init(encodedSpan);
         FuzzCASESession::ParsedSigma2TBEData parsedSigma2TBEData;
 
-        FuzzCASESession::ParseSigma2TBEData(tlvReader, parsedSigma2TBEData);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma2TBEData(tlvReader, parsedSigma2TBEData);
         // std::cout << "ParseSigma2TBEData: " << err.Format() << std::endl;
     }
 
@@ -774,7 +773,7 @@ void ParseSigma2Resume_RawPayload(const vector<uint8_t> & seededEncodedSigma2Res
         tlvReaderSeeded.Init(std::move(encodedSigma2Resume));
 
         FuzzCASESession::ParsedSigma2Resume unused;
-        FuzzCASESession::ParseSigma2Resume(tlvReaderSeeded, unused);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma2Resume(tlvReaderSeeded, unused);
     }
     Platform::MemoryShutdown();
 }
@@ -867,7 +866,7 @@ void ParseSigma2Resume_StructuredPayload(const vector<uint8_t> & fuzzResumptionI
         tlvReader.Init(std::move(encodedSigma2Resume));
 
         FuzzCASESession::ParsedSigma2Resume unused;
-        FuzzCASESession::ParseSigma2Resume(tlvReader, unused);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma2Resume(tlvReader, unused);
     }
 
     Platform::MemoryShutdown();
@@ -909,7 +908,7 @@ void EncodeParseSigma2ResumeRoundTrip(const vector<uint8_t> & fuzzResumptionID, 
 
         ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                      System::Clock::Milliseconds16(4000));
-        encodeParams.responderMrpConfig = &LocalMRPConfig;
+        encodeParams.responderSessionParams.SetMRPConfig(LocalMRPConfig);
 
         /***************** Encode Sigma2Resume Using CASESession::EncodeSigma2Resume *********************/
         PacketBufferHandle encodedSigma2Resume;
@@ -975,7 +974,7 @@ void ParseSigma3_RawPayload(const vector<uint8_t> & fuzzEncodedSigma3)
         MutableByteSpan outMsgR3EncryptedPayload;
         ByteSpan outMsgR3MIC;
 
-        FuzzCASESession::ParseSigma3(tlvReader2, outMsgR3Encrypted, outMsgR3EncryptedPayload, outMsgR3MIC);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma3(tlvReader2, outMsgR3Encrypted, outMsgR3EncryptedPayload, outMsgR3MIC);
     }
     Platform::MemoryShutdown();
 }
@@ -1083,7 +1082,7 @@ void ParseSigma3_StructuredPayload(const vector<uint8_t> & fuzzEncrypted3)
         ByteSpan outMsgR3MIC;
 
         // Parse Sigma3
-        FuzzCASESession::ParseSigma3(tlvReader, outMsgR3Encrypted, outMsgR3EncryptedPayload, outMsgR3MIC);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma3(tlvReader, outMsgR3Encrypted, outMsgR3EncryptedPayload, outMsgR3MIC);
 
         mem.Free();
     }
@@ -1120,7 +1119,7 @@ void ParseSigma3TBEData_RawPayload(const vector<uint8_t> & fuzzEncodedSigma3TBED
         tlvReader2.Init(std::move(EncodedSigma3));
 
         FuzzCASESession::HandleSigma3Data unused;
-        FuzzCASESession::ParseSigma3TBEData(tlvReader2, unused);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma3TBEData(tlvReader2, unused);
         // std::cout << "Seeded Encoded Sigma3TBEData:" << err.Format() << std::endl;
     }
 
@@ -1230,7 +1229,7 @@ void ParseSigma3TBEData_StructuredPayload(const vector<uint8_t> & fuzzInitiatorN
         tlvReader.Init(encodedSpan);
 
         FuzzCASESession::HandleSigma3Data unused;
-        FuzzCASESession::ParseSigma3TBEData(tlvReader, unused);
+        RETURN_SAFELY_IGNORED FuzzCASESession::ParseSigma3TBEData(tlvReader, unused);
         // std::cout << err.Format() << std::endl;
 
         mem.Free();
@@ -1285,12 +1284,12 @@ void HandleSigma3b(const vector<uint8_t> & fuzzInitiatorNOC, const vector<uint8_
         data.msgR3SignedSpan = MutableByteSpan{ data.msgR3Signed.Get(), fuzzMsg3Signed.size() };
 
         // prepare the fuzzed signature
-        data.tbsData3Signature.SetLength(fuzzTbs3Signature.size());
+        RETURN_SAFELY_IGNORED data.tbsData3Signature.SetLength(fuzzTbs3Signature.size());
         memcpy(data.tbsData3Signature.Bytes(), fuzzTbs3Signature.data(), fuzzTbs3Signature.size());
 
         /************ Fuzz CASESession::HandleSigma3b *************/
         bool unused = false;
-        FuzzCASESession::HandleSigma3b(data, unused);
+        RETURN_SAFELY_IGNORED FuzzCASESession::HandleSigma3b(data, unused);
         // std::cout << "fuzzed HandleSigma3b: " << err.Format() << std::endl;
     }
 

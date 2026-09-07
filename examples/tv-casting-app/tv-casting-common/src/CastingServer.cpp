@@ -63,13 +63,17 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
     ReturnErrorOnFailure(InitBindingHandlers());
 
     // Set FabricDelegate
-    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&mPersistenceManager);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&mPersistenceManager);
 
     // Add callback to send Content casting commands after commissioning completes
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(this);
+    auto * client = chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(this);
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     mInited = true;
@@ -111,8 +115,8 @@ CHIP_ERROR CastingServer::SetRotatingDeviceIdUniqueId(chip::Optional<chip::ByteS
 CHIP_ERROR CastingServer::InitBindingHandlers()
 {
     auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    LogErrorOnFailure(app::Clusters::Binding::Manager::GetInstance().Init(
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }));
     return CHIP_NO_ERROR;
 }
 
@@ -121,7 +125,7 @@ CHIP_ERROR CastingServer::TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex f
                                                     std::function<void(CHIP_ERROR)> onConnectionFailure,
                                                     std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint)
 {
-    Init();
+    TEMPORARY_RETURN_IGNORED Init();
     mOnConnectionSuccessClientCallback = onConnectionSuccess;
     mOnConnectionFailureClientCallback = onConnectionFailure;
     mOnNewOrUpdatedEndpoint            = onNewOrUpdatedEndpoint;
@@ -304,14 +308,14 @@ void CastingServer::ReadServerClustersForNode(NodeId nodeId)
         ChipLogError(AppServer, "Init error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    for (const auto & binding : BindingTable::GetInstance())
+    for (const auto & binding : app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(NotSpecified,
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-        if (binding.type == MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
+        if (binding.type == app::Clusters::Binding::MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
         {
             if (!mActiveTargetVideoPlayerInfo.HasEndpoint(binding.remote))
             {
@@ -365,7 +369,7 @@ CHIP_ERROR CastingServer::ReadMACAddress(TargetEndpointInfo * endpoint)
     {
         // Read MAC address
         ChipLogProgress(AppServer, "Endpoint supports WoL. Reading Active VideoPlayer's MACAddress");
-        mMACAddressReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId());
+        TEMPORARY_RETURN_IGNORED mMACAddressReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId());
         err = mMACAddressReader.ReadAttribute(
             &mActiveTargetVideoPlayerInfo,
             [](void * context, const chip::app::Clusters::WakeOnLan::Attributes::MACAddress::TypeInfo::DecodableArgType response) {
@@ -415,7 +419,7 @@ void CastingServer::OnDescriptorReadSuccessResponse(void * context, const app::D
     }
 
     // Read WoL:MACAddress (if available from this endpoint)
-    CastingServer::GetInstance()->ReadMACAddress(endpointInfo);
+    TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->ReadMACAddress(endpointInfo);
 
     if (CastingServer::GetInstance()->mOnNewOrUpdatedEndpoint)
     {
@@ -510,14 +514,14 @@ void CastingServer::VerifyOrEstablishConnectionTask(chip::System::Layer * aSyste
         [](TargetVideoPlayerInfo * videoPlayer) {
             ChipLogProgress(AppServer, "CastingServer::OnConnectionSuccess lambda called");
             CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo = *videoPlayer;
-            CastingServer::GetInstance()->ReadMACAddress(
+            TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->ReadMACAddress(
                 videoPlayer->GetEndpoint(1)); // Read MACAddress from cached VideoPlayer endpoint (1) which supports WoL
             CastingServer::GetInstance()->mOnConnectionSuccessClientCallback(videoPlayer);
         },
         [](CHIP_ERROR error) {
             ChipLogProgress(AppServer, "Deleting VideoPlayer from cache after connection failure: %" CHIP_ERROR_FORMAT,
                             error.Format());
-            CastingServer::GetInstance()->mPersistenceManager.DeleteVideoPlayer(
+            TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->mPersistenceManager.DeleteVideoPlayer(
                 &CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo);
             CastingServer::GetInstance()->mOnConnectionFailureClientCallback(error);
         });
@@ -575,7 +579,7 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
 
             // find targetPeerNodeId from binding table by matching the binding's fabricIndex with the accessing fabricIndex
             // received in BindingsChanged event
-            for (const auto & binding : BindingTable::GetInstance())
+            for (const auto & binding : app::Clusters::Binding::Table::GetInstance())
             {
                 ChipLogProgress(
                     AppServer,
@@ -583,7 +587,8 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
                     " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                     binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                     binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-                if (binding.type == MATTER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
+                if (binding.type == app::Clusters::Binding::MATTER_UNICAST_BINDING &&
+                    event->BindingsChanged.fabricIndex == binding.fabricIndex)
                 {
                     ChipLogProgress(
                         NotSpecified,
@@ -639,7 +644,7 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
         {
             // add discovery timestamp
             chip::System::Clock::Timestamp currentUnixTimeMS = chip::System::Clock::kZero;
-            chip::System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS);
+            TEMPORARY_RETURN_IGNORED chip::System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS);
             ChipLogProgress(AppServer, "Updating discovery timestamp for VideoPlayer to %lu",
                             static_cast<unsigned long>(currentUnixTimeMS.count()));
             CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo.SetLastDiscovered(currentUnixTimeMS);
@@ -667,14 +672,14 @@ NodeId CastingServer::GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
     {
         ChipLogError(AppServer, "GetVideoPlayerNodeForFabricIndex Init error: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    for (const auto & binding : BindingTable::GetInstance())
+    for (const auto & binding : app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(NotSpecified,
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-        if (binding.type == MATTER_UNICAST_BINDING && fabricIndex == binding.fabricIndex)
+        if (binding.type == app::Clusters::Binding::MATTER_UNICAST_BINDING && fabricIndex == binding.fabricIndex)
         {
             ChipLogProgress(NotSpecified, "GetVideoPlayerNodeForFabricIndex nodeId=0x" ChipLogFormatX64,
                             ChipLogValueX64(binding.nodeId));
@@ -693,14 +698,14 @@ FabricIndex CastingServer::GetVideoPlayerFabricIndexForNode(NodeId nodeId)
     {
         ChipLogError(AppServer, "GetVideoPlayerFabricIndexForNode Init error: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    for (const auto & binding : BindingTable::GetInstance())
+    for (const auto & binding : app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(NotSpecified,
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-        if (binding.type == MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
+        if (binding.type == app::Clusters::Binding::MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
         {
             ChipLogProgress(NotSpecified, "GetVideoPlayerFabricIndexForNode fabricIndex=%d nodeId=0x" ChipLogFormatX64,
                             binding.fabricIndex, ChipLogValueX64(binding.nodeId));
@@ -716,7 +721,7 @@ void CastingServer::SetDefaultFabricIndex(std::function<void(TargetVideoPlayerIn
                                           std::function<void(CHIP_ERROR)> onConnectionFailure,
                                           std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint)
 {
-    Init();
+    TEMPORARY_RETURN_IGNORED Init();
 
     // set fabric to be the first in the list
     for (const auto & fb : chip::Server::GetInstance().GetFabricTable())
@@ -744,8 +749,8 @@ void CastingServer::SetDefaultFabricIndex(std::function<void(TargetVideoPlayerIn
         mOnConnectionFailureClientCallback = onConnectionFailure;
         mOnNewOrUpdatedEndpoint            = onNewOrUpdatedEndpoint;
 
-        mActiveTargetVideoPlayerInfo.Initialize(videoPlayerNodeId, fabricIndex, mOnConnectionSuccessClientCallback,
-                                                mOnConnectionFailureClientCallback);
+        TEMPORARY_RETURN_IGNORED mActiveTargetVideoPlayerInfo.Initialize(
+            videoPlayerNodeId, fabricIndex, mOnConnectionSuccessClientCallback, mOnConnectionFailureClientCallback);
         return;
     }
     ChipLogError(AppServer, " -- No initialized fabrics with video players");

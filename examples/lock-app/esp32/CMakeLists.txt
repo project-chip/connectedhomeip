@@ -16,7 +16,7 @@
 
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 set(PROJECT_VER "v1.0")
 set(PROJECT_VER_NUMBER 1)
@@ -27,6 +27,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cm
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/QRCode"
+    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/platform/esp32/led_widget"
 )
 
 project(chip-lock-app)

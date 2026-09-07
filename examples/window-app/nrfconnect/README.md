@@ -60,8 +60,13 @@ you can configure either on a PC or a mobile device.
 ### Bluetooth LE advertising
 
 In this example, to commission the device onto a Matter network, it must be
-discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
-LE advertising manually after powering up the device by pressing **Button 4**.
+discoverable over Bluetooth LE. The Bluetooth LE advertising is automatically
+started after powering up the device, but it may timeout and require re-starting
+by pressing:
+
+-   On nRF52840 DK and nRF5340 DK: **Button 4**.
+
+-   On nRF54L15 DK: **Button 3**.
 
 ### Bluetooth LE rendezvous
 
@@ -145,10 +150,11 @@ more information.
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
-| ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk/nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk/nrf5340/cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| Hardware platform                                                                         | Build target                 | Platform image                                                                                                                                   |
+| ----------------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk/nrf52840`        | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk/nrf5340/cpuapp`   | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| [nRF54L15 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF54L15-DK) | `nrf54l15dk/nrf54l15/cpuapp` | <details><summary>nRF54L15 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF54L15_DK_info-medium.png" alt="nRF54L15 DK"/></details> |
 
 <hr>
 
@@ -158,61 +164,65 @@ This section lists the User Interface elements that you can use to control and
 monitor the state of the device. These correspond to PCB components on the
 platform image.
 
-**LED 1** shows the overall state of the device and its connectivity. The
-following states are possible:
+**Device UI elements by platform:**
 
--   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
-    unprovisioned (unpaired) state and is waiting for a commissioning
-    application to connect.
+#### nRF52840 DK and nRF5340 DK
 
--   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
-    unprovisioned state and a commissioning application is connected through
-    Bluetooth LE.
+-   **LED 1** shows the overall state of the device and its connectivity. The
+    following states are possible:
 
--   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full connectivity for Thread or Wi-Fi
-    network.
+        -   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
+        unprovisioned (unpaired) state and is waiting for a commissioning
+        application to connect.
 
--   _Solid On_ &mdash; The device is fully provisioned and has full Thread
-    network and service connectivity.
+        -   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
+        unprovisioned state and a commissioning application is connected through
+        Bluetooth LE.
 
-**LED 2** indicates the lift position of the shutter, which is represented by
-the brightness of the LED. The brightness level ranges from 0 to 255, where the
-switched off LED with brightness level 0 indicates a fully opened shutter
-(lifted) and 255 indicates a fully closed shutter (lowered).
+        -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
+        provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+        network.
 
-**LED 3** indicates the tilt position of the shutter, which is represented by
-the brightness of the LED. The brightness level ranges from 0 to 255, where the
-switched off LED with brightness level 0 indicates a fully opened shutter
-(tilted to a horizontal position) and 255 indicates a fully closed shutter
-(tilted to a vertical position).
+        -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
+        network and service connectivity.
 
-**Button 1** can be used for the following purposes:
+-   **LED 2** indicates the lift position of the shutter, which is represented
+    by the brightness of the LED. The brightness level ranges from 0 to 255,
+    where the switched off LED with brightness level 0 indicates a fully opened
+    shutter (lifted) and 255 indicates a fully closed shutter (lowered).
 
--   _Pressed for 6 s_ &mdash; Initiates the factory reset of the device.
-    Releasing the button within the 6-second window cancels the factory reset
-    procedure. **LED 1** and **LED 4** blink in unison when the factory reset
-    procedure is initiated.
+-   **LED 3** indicates the tilt position of the shutter, which is represented
+    by the brightness of the LED. The brightness level ranges from 0 to 255,
+    where the switched off LED with brightness level 0 indicates a fully opened
+    shutter (tilted to a horizontal position) and 255 indicates a fully closed
+    shutter (tilted to a vertical position).
 
--   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
-    process. This feature is disabled by default, but can be enabled by
-    following the
-    [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
-    instruction.
+-   **Button 1** can be used for the following purposes:
 
-**Button 2** &mdash; Pressing the button once moves the shutter towards the open
-position by one step. Depending on the current movement mode, the button
-decreases the brightness of **LED2** for the lift mode and **LED3** for the tilt
-mode.
+    -   _Pressed for 6 s_ &mdash; Initiates the factory reset of the device.
+        Releasing the button within the 6-second window cancels the factory
+        reset procedure. **LED 1** and **LED 4** blink in unison when the
+        factory reset procedure is initiated.
 
-**Button 3** &mdash; Pressing the button once moves the shutter towards the
-closed position by one step. Depending on the current movement mode, the button
-increases the brightness of **LED2** for the lift mode and **LED3** for the tilt
-mode.
+    -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
+        process. This feature is disabled by default, but can be enabled by
+        following the
+        [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+        instruction.
 
-**Button 2** and **Button 3** &mdash; Pressing both buttons at the same time
-toggles the shutter movement mode between lift and tilt. After each device
-reset, the mode is set to lift by default.
+-   **Button 2** &mdash; Pressing the button once moves the shutter towards the
+    open position by one step. Depending on the current movement mode, the
+    button decreases the brightness of **LED2** for the lift mode and **LED3**
+    for the tilt mode.
+
+-   **Button 3** &mdash; Pressing the button once moves the shutter towards the
+    closed position by one step. Depending on the current movement mode, the
+    button increases the brightness of **LED2** for the lift mode and **LED3**
+    for the tilt mode.
+
+-   **Button 2** and **Button 3** &mdash; Pressing both buttons at the same time
+    toggles the shutter movement mode between lift and tilt. After each device
+    reset, the mode is set to lift by default.
 
 > **Note**:
 >
@@ -223,18 +233,98 @@ reset, the mode is set to lift by default.
 > factory reset both LEDs are switched off by default, which corresponds to the
 > shutter being fully open, both lift-wise and tilt-wise.
 
-**Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time (15 minutes
-by default).
+-   **Button 4** &mdash; Pressing the button once starts the NFC tag emulation
+    and enables Bluetooth LE advertising for the predefined period of time (60
+    minutes by default).
 
-**SEGGER J-Link USB port** can be used to get logs from the device or
-communicate with it using the
-[command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
+-   **SEGGER J-Link USB port** can be used to get logs from the device or
+    communicate with it using the
+    [command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
 
-**NFC port with antenna attached** can be used to start the
-[rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
-information from the Matter device in a data payload that can be shared using
-NFC.
+-   **NFC port with antenna attached** can be used to start the
+    [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
+    information from the Matter device in a data payload that can be shared
+    using NFC.
+
+#### nRF54L15 DK
+
+-   **LED 0** shows the overall state of the device and its connectivity. The
+    following states are possible:
+
+        -   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
+        unprovisioned (unpaired) state and is waiting for a commissioning
+        application to connect.
+
+        -   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
+        unprovisioned state and a commissioning application is connected through
+        Bluetooth LE.
+
+        -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
+        provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+        network.
+
+        -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
+        network and service connectivity.
+
+-   **LED 1** indicates the lift position of the shutter, which is represented
+    by the brightness of the LED. The brightness level ranges from 0 to 255,
+    where the switched off LED with brightness level 0 indicates a fully opened
+    shutter (lifted) and 255 indicates a fully closed shutter (lowered).
+
+-   **LED 2** indicates the tilt position of the shutter, which is represented
+    by the brightness of the LED. The brightness level ranges from 0 to 255,
+    where the switched off LED with brightness level 0 indicates a fully opened
+    shutter (tilted to a horizontal position) and 255 indicates a fully closed
+    shutter (tilted to a vertical position).
+
+-   **Button 0** can be used for the following purposes:
+
+    -   _Pressed for 6 s_ &mdash; Initiates the factory reset of the device.
+        Releasing the button within the 6-second window cancels the factory
+        reset procedure. **LED 0** and **LED 3** blink in unison when the
+        factory reset procedure is initiated.
+
+    -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
+        process. This feature is disabled by default, but can be enabled by
+        following the
+        [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+        instruction.
+
+-   **Button 1** &mdash; Pressing the button once moves the shutter towards the
+    open position by one step. Depending on the current movement mode, the
+    button decreases the brightness of **LED1** for the lift mode and **LED2**
+    for the tilt mode.
+
+-   **Button 2** &mdash; Pressing the button once moves the shutter towards the
+    closed position by one step. Depending on the current movement mode, the
+    button increases the brightness of **LED1** for the lift mode and **LED2**
+    for the tilt mode.
+
+-   **Button 1** and **Button 2** &mdash; Pressing both buttons at the same time
+    toggles the shutter movement mode between lift and tilt. After each device
+    reset, the mode is set to lift by default.
+
+> **Note**:
+>
+> Completely opening and closing the shutter requires 20 button presses (steps).
+> Each step takes approximately 200 ms to simulate the real shutter movement.
+> The shutter position and LED brightness values are stored in non-volatile
+> memory and are restored after every device reset. After the firmware update or
+> factory reset both LEDs are switched off by default, which corresponds to the
+> shutter being fully open, both lift-wise and tilt-wise.
+
+-   **Button 3** &mdash; Pressing the button once starts the NFC tag emulation
+    and enables Bluetooth LE advertising for the predefined period of time (15
+    minutes by default).
+
+-   **SEGGER J-Link USB port** can be used to get logs from the device or
+    communicate with it using the
+    [command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
+
+-   **NFC port with antenna attached** can be used to start the
+    [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
+    information from the Matter device in a data payload that can be shared
+    using NFC.
 
 <hr>
 
@@ -359,10 +449,10 @@ using (for example `nrf52840dk/nrf52840`):
 >
 > There are two types of Device Firmware Upgrade modes: single-image DFU and
 > multi-image DFU. Single-image mode supports upgrading only one firmware image,
-> the application image, and should be used for single-core nRF52840 DK devices.
-> Multi-image mode allows to upgrade more firmware images and is suitable for
-> upgrading the application core and network core firmware in two-core nRF5340
-> DK devices.
+> the application image, and should be used for single-core nRF52840 DK and
+> nRF54L15 DK devices. Multi-image mode allows to upgrade more firmware images
+> and is suitable for upgrading the application core and network core firmware
+> in two-core nRF5340 DK devices.
 
 #### Changing bootloader configuration
 

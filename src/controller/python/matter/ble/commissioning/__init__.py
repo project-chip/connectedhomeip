@@ -17,7 +17,6 @@
 from dataclasses import dataclass
 from enum import Enum
 from queue import Queue
-from typing import Optional
 
 from ...internal import GetCommissioner
 from ...internal.commissioner import PairingState
@@ -34,8 +33,8 @@ class PairNotificationType(Enum):
 @dataclass
 class _PairNotification:
     type: PairNotificationType
-    csr: Optional[bytes]
-    error_code: Optional[int]
+    csr: bytes | None
+    error_code: int | None
 
 
 class Connection:
@@ -100,11 +99,10 @@ class Connection:
 
         if step.type == PairNotificationType.COMPLETE:
             if step.error_code != 0:
-                raise Exception('Pairing ended with error code %d' %
-                                step.error_code)
+                raise Exception(f'Pairing ended with error code {step.error_code}')
 
 
-def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = None) -> Connection:
+def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: int | None = None) -> Connection:
     """Initiates the connection to a BLE device for the purpose of commissioning
 
     Args:
@@ -112,7 +110,7 @@ def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optio
                           the device
       pin:                the pin number used to pair with the device (must match the
                           device secret pin, typically available in a QR code)
-      deprecated_nodeid:  TEMPORARY, TO BE REMOVED nodeid that will be set during
+      deprecated_nodeid:  TEMPORARY, TO BE REMOVED node ID that will be set during
                           the commissioning. This will be replaced by setting the node id
                           at the time of setting operational credentials once such
                           credentials are supported.
@@ -131,7 +129,7 @@ def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optio
     return connection
 
 
-def Connect(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = None) -> Connection:
+def Connect(discriminator: int, pin: int, deprecated_nodeid: int | None = None) -> Connection:
     """Connects to a BLE device for the purpose of commissioning.
     Will block until the remote device can be operated on (e.g. setting network
     credentials or operational credentials.)
@@ -141,7 +139,7 @@ def Connect(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = Non
                           the device
       pin:                the pin number used to pair with the device (must match the
                           device secret pin, typically available in a QR code)
-      deprecated_nodeid:  TEMPORARY, TO BE REMOVED nodeid that will be set during
+      deprecated_nodeid:  TEMPORARY, TO BE REMOVED node ID that will be set during
                           the commissioning. This will be replaced by setting the node id
                           at the time of setting operational credentials once such
                           credentials are supported.

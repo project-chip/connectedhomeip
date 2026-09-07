@@ -29,6 +29,55 @@ namespace Clusters {
 namespace GeneralDiagnostics {
 namespace Structs {
 
+namespace DeviceLoadStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kCurrentSubscriptions), currentSubscriptions);
+    encoder.Encode(to_underlying(Fields::kCurrentSubscriptionsForFabric), currentSubscriptionsForFabric);
+    encoder.Encode(to_underlying(Fields::kTotalSubscriptionsEstablished), totalSubscriptionsEstablished);
+    encoder.Encode(to_underlying(Fields::kTotalInteractionModelMessagesSent), totalInteractionModelMessagesSent);
+    encoder.Encode(to_underlying(Fields::kTotalInteractionModelMessagesReceived), totalInteractionModelMessagesReceived);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kCurrentSubscriptions))
+        {
+            err = DataModel::Decode(reader, currentSubscriptions);
+        }
+        else if (__context_tag == to_underlying(Fields::kCurrentSubscriptionsForFabric))
+        {
+            err = DataModel::Decode(reader, currentSubscriptionsForFabric);
+        }
+        else if (__context_tag == to_underlying(Fields::kTotalSubscriptionsEstablished))
+        {
+            err = DataModel::Decode(reader, totalSubscriptionsEstablished);
+        }
+        else if (__context_tag == to_underlying(Fields::kTotalInteractionModelMessagesSent))
+        {
+            err = DataModel::Decode(reader, totalInteractionModelMessagesSent);
+        }
+        else if (__context_tag == to_underlying(Fields::kTotalInteractionModelMessagesReceived))
+        {
+            err = DataModel::Decode(reader, totalInteractionModelMessagesReceived);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace DeviceLoadStruct
+
 namespace NetworkInterface {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {

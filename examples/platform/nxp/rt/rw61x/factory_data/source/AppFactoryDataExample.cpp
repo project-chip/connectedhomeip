@@ -63,14 +63,29 @@ CHIP_ERROR NXP::App::AppFactoryData_PreMatterStackInit(void)
  */
 CHIP_ERROR NXP::App::AppFactoryData_PostMatterStackInit(void)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 #ifdef ENABLE_SECURE_WHOLE_FACTORY_DATA
     /* Please Note, because currently we only support AES-256 key provisioning and de-wrap, so the trasfterred AES key should be 256
      * bit size*/
-    FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
-    FactoryDataPrvdImpl().SetAesKey(&aes256TestKey[0], FactoryDataProvider::aes_256);
+    err = FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
+        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: SetEncryptionMode failed: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    });
+
+    err = FactoryDataPrvdImpl().SetAesKey(&aes256TestKey[0], FactoryDataProvider::aes_256);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
+        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: SetAesKey failed: %" CHIP_ERROR_FORMAT, err.Format());
+    });
 #endif
-    FactoryDataPrvdImpl().Init();
+    err = FactoryDataPrvdImpl().Init();
+    VerifyOrExit(err == CHIP_NO_ERROR, {
+        ChipLogError(DeviceLayer, "AppFactoryData_PostMatterStackInit: FactoryDataPrvdImpl().Init() failed: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+    });
+
     SetDeviceInstanceInfoProvider(&FactoryDataPrvdImpl());
     SetDeviceAttestationCredentialsProvider(&FactoryDataPrvdImpl());
     SetCommissionableDataProvider(&FactoryDataPrvdImpl());
@@ -78,5 +93,7 @@ CHIP_ERROR NXP::App::AppFactoryData_PostMatterStackInit(void)
     // Initialize device attestation with example one (only for debug purpose)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-    return CHIP_NO_ERROR;
+
+exit:
+    return err;
 }

@@ -65,7 +65,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ZoneTriggered.
+} // namespace ZoneTriggered
 namespace ZoneStopped {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -101,7 +101,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ZoneStopped.
+} // namespace ZoneStopped
 } // namespace Events
 } // namespace ZoneManagement
 } // namespace Clusters

@@ -56,6 +56,8 @@ public:
 
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) override;
 
+    bool IsValidAnalysisZone(uint16_t zoneId) override;
+
     void OnAttributeChanged(AttributeId attributeId) override;
 
     CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> & aZones) override;
@@ -89,6 +91,7 @@ private:
         uint32_t prevTriggerDetectedDuration = 0;
         TriggerState triggerState            = TriggerState::Idle;
         uint16_t triggerCount                = 0;
+        uint16_t remainingBlindDuration      = 0;
         ZoneTriggerControlStruct triggerCtrl;
     };
 

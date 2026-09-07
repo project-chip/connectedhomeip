@@ -23,9 +23,9 @@
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/ovenopstate_2_5_fifo
+#     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --endpoint 1
-#       --int-arg PIXIT.WAITTIME.REBOOT:5
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -42,10 +42,16 @@
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_OVENOPSTATE_2_5(MatterBaseTest, TC_OPSTATE_BASE):
+    # This test reboots the DUT (step 15). Disable the background wildcard subscription
+    # so reads after the reboot are not cross-checked against a now-stale subscription cache.
+    disable_wildcard_subscription = True
+
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -62,9 +68,13 @@ class TC_OVENOPSTATE_2_5(MatterBaseTest, TC_OPSTATE_BASE):
     def pics_TC_OVENOPSTATE_2_5(self) -> list[str]:
         return ["OVENOPSTATE.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_OVENOPSTATE_2_5(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         await self.TEST_TC_OPSTATE_BASE_2_5(endpoint=endpoint)
 

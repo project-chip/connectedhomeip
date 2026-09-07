@@ -20,8 +20,27 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --device electrical-sensor:1
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
@@ -39,12 +58,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
@@ -58,7 +79,7 @@ class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
         return ["EEM.S", "EEM.S.F03", "EEM.S.F01"]
 
     def steps_TC_EEM_2_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -73,8 +94,6 @@ class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_EEM_2_5(self):
 
@@ -88,13 +107,13 @@ class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
         await self.send_test_event_trigger_start_fake_3kw_generator_5s()
 
         self.step("4")
-        time.sleep(6)
+        await asyncio.sleep(6)
 
         self.step("4a")
         periodic_energy_exported = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
 
         self.step("5")
-        time.sleep(6)
+        await asyncio.sleep(6)
 
         self.step("5a")
         periodic_energy_exported_2 = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")

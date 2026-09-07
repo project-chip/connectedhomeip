@@ -29,9 +29,10 @@ config("boringssl_config_disable_warnings") {
   cflags = [
     "-Wno-cast-function-type-mismatch",
     "-Wno-conversion",
-    "-Wno-unterminated-string-initialization",
     "-Wno-unused-variable",
   ]
+
+  cflags_c = [ "-Wno-unterminated-string-initialization" ]
 
   if (is_clang) {
     cflags += [ "-Wno-shorten-64-to-32" ]

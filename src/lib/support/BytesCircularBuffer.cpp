@@ -98,7 +98,7 @@ CHIP_ERROR BytesCircularBuffer::Push(const ByteSpan & payload)
     // Free up space until there is enough space.
     while (storageNeed > StorageAvailable())
     {
-        VerifyOrDie(Pop() == CHIP_NO_ERROR);
+        SuccessOrDie(Pop());
     }
 
     SizeType size = static_cast<SizeType>(length);
@@ -127,7 +127,7 @@ CHIP_ERROR BytesCircularBuffer::Push(const ByteSpan & payload1, const ByteSpan &
     // Free up space until there is enough space.
     while (storageNeed > StorageAvailable())
     {
-        VerifyOrDie(Pop() == CHIP_NO_ERROR);
+        SuccessOrDie(Pop());
     }
 
     SizeType size = static_cast<SizeType>(length);

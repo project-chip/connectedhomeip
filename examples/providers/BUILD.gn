@@ -16,7 +16,10 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 config("include_providers_dir") {
-  include_dirs = [ "." ]
+  include_dirs = [
+    ".",
+    "${chip_root}/examples",
+  ]
 }
 
 static_library("device_info_provider_please_do_not_reuse_as_is") {

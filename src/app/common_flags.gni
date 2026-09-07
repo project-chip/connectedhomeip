@@ -39,6 +39,28 @@ declare_args() {
       current_os == "linux" || current_os == "ios" || current_os == "mac" ||
       current_os == "android"
 
+  # Enable shutdown callbacks in CodegenDataModelProvider::Shutdown() so that
+  # Server::Shutdown() → Server::Init() cycles re-initialize clusters correctly.
+  # Disabled by default on embedded platforms to avoid pulling in per-cluster
+  # shutdown callbacks (~7-8K flash on some lighting apps).
+  chip_enable_server_restart_support =
+      current_os == "linux" || current_os == "ios" || current_os == "mac" ||
+      current_os == "android"
+
   # Flag that controls whether the camera server is enabled
   matter_enable_camera_server = false
+
+  # Disable matter groupcast by default, this should be enabled on an
+  # application/platform specific layer
+  chip_config_enable_groupcast = false
+
+  # Optional path to a directory containing well-known override source
+  # files for the data model. When set to a non-empty path, the build
+  # system looks for files like cluster-objects-override.cpp,
+  # Accessors-override.cpp, cluster-servers-override.gni,
+  # CHIPAttributeTLVValueDecoder-override.cpp, and
+  # CHIPEventTLVValueDecoder-override.cpp inside this directory and
+  # compiles them instead of the full zap-generated sources.
+  # When empty (default), the full generated sources are used.
+  chip_data_model_overrides_dir = ""
 }

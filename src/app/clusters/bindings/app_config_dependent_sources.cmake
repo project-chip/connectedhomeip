@@ -16,10 +16,5 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/BindingManager.cpp"
-    "${CLUSTER_DIR}/BindingManager.h"
-    "${CLUSTER_DIR}/PendingNotificationMap.cpp"
-    "${CLUSTER_DIR}/PendingNotificationMap.h"
-    "${CLUSTER_DIR}/bindings.cpp"
-    "${CLUSTER_DIR}/bindings.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )

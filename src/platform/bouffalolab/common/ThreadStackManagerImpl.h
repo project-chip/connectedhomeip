@@ -29,6 +29,11 @@ extern "C" otInstance * otrGetInstance();
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+
+CHIP_ERROR InitThreadPlatform();
+
+} // namespace Internal
 
 class ThreadStackManager;
 class ThreadStackManagerImpl;

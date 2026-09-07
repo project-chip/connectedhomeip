@@ -20,9 +20,11 @@
 
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/Nullable.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <type_traits>
@@ -63,26 +65,40 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value && !detail::HasUnknownValue<X>, int> = 0>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
-    return writer.Put(tag, x);
+    return writer.Put(tag, to_underlying(x));
 }
+
+// Reusable macro for dealing with unknown enum values that we can use in
+// attribute value encoding.
+#if CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+#define CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(value)                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        /* Nothing to do */                                                                                                        \
+    } while (0)
+#else
+#define CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(value)                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (value == std::remove_reference_t<decltype(value)>::kUnknownEnumValue)                                                  \
+        {                                                                                                                          \
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);                                                                         \
+        }                                                                                                                          \
+    } while (0)
+#endif // CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
 
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value && detail::HasUnknownValue<X>, int> = 0>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
-#if !CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
-    if (x == X::kUnknownEnumValue)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-#endif // !CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+    CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(x);
 
-    return writer.Put(tag, x);
+    return writer.Put(tag, to_underlying(x));
 }
 
 template <typename X>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, BitFlags<X> x)
 {
-    return writer.Put(tag, x);
+    return writer.Put(tag, x.Raw());
 }
 
 inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, ByteSpan x)

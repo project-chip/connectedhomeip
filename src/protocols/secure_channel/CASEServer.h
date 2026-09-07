@@ -44,7 +44,8 @@ public:
     {
         if (mExchangeManager != nullptr)
         {
-            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
+            TEMPORARY_RETURN_IGNORED mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(
+                Protocols::SecureChannel::MsgType::CASE_Sigma1);
             mExchangeManager = nullptr;
         }
 
@@ -71,6 +72,11 @@ public:
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return GetSession().GetMessageDispatch(); }
 
     CASESession & GetSession() { return mPairingSession; }
+
+    void SetLocalSessionParameters(const SessionParameters & sessionParams)
+    {
+        mPairingSession.SetLocalSessionParameters(sessionParams);
+    }
 
 private:
     Messaging::ExchangeManager * mExchangeManager                       = nullptr;

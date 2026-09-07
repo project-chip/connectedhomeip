@@ -179,7 +179,7 @@ void OnPlatformEvent(const ChipDeviceEvent * event, intptr_t arg)
     switch (event->Type)
     {
     case DeviceEventType::kCommissioningComplete:
-        PlatformMgr().ScheduleWork(OnCommissioningComplete, arg);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(OnCommissioningComplete, arg);
         break;
     }
 }
@@ -210,7 +210,7 @@ bool InteractiveServer::OnWebSocketMessageReceived(char * msg)
     if (strcmp(msg, kWaitForCommissioningCommand) == 0)
     {
         mIsReady = false;
-        PlatformMgr().AddEventHandler(OnPlatformEvent);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(OnPlatformEvent);
     }
     else
     {

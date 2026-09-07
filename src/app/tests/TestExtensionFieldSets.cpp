@@ -19,6 +19,7 @@
 #include <app/clusters/scenes-server/ExtensionFieldSetsImpl.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
@@ -226,25 +227,25 @@ TEST_F(TestExtensionFieldSets, TestSerializeDerializeExtensionFieldSet)
     EXPECT_LE(EFS3_serialized_length, scenes::kMaxFieldBytesPerCluster);
 
     reader.Init(EFS1Buffer);
-    reader.Next(TLV::AnonymousTag());
+    EXPECT_SUCCESS(reader.Next(TLV::AnonymousTag()));
     EXPECT_EQ(CHIP_NO_ERROR, tempEFS.Deserialize(reader));
     EXPECT_EQ(EFS1, tempEFS);
 
     reader.Init(EFS2Buffer);
-    reader.Next(TLV::AnonymousTag());
+    EXPECT_SUCCESS(reader.Next(TLV::AnonymousTag()));
     EXPECT_EQ(CHIP_NO_ERROR, tempEFS.Deserialize(reader));
     EXPECT_EQ(EFS2, tempEFS);
 
     reader.Init(EFS3Buffer);
-    reader.Next(TLV::AnonymousTag());
+    EXPECT_SUCCESS(reader.Next(TLV::AnonymousTag()));
     EXPECT_EQ(CHIP_NO_ERROR, tempEFS.Deserialize(reader));
     EXPECT_EQ(EFS3, tempEFS);
 
     // All ExtensionFieldSets serialize / deserialize
     writer.Init(sceneEFSBuffer);
-    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
+    EXPECT_SUCCESS(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
     EXPECT_EQ(CHIP_NO_ERROR, EFS->Serialize(writer));
-    writer.EndContainer(outer);
+    EXPECT_SUCCESS(writer.EndContainer(outer));
     sceneEFS_serialized_length = writer.GetLengthWritten();
     EXPECT_LE(sceneEFS_serialized_length, kPersistentSceneBufferMax);
 

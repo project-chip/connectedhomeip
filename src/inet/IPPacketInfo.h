@@ -42,6 +42,8 @@ public:
 
     /**
      *  Reset the members of the IPPacketInfo object.
+     *  Clear() MUST be called before using a newly constructed IPPacketInfo,
+     *  as some members contain uninitialized memory after construction.
      */
     void Clear();
 };

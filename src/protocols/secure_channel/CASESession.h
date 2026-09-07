@@ -214,8 +214,8 @@ protected:
 
     struct EncodeSigma1Inputs : Sigma1Param
     {
-        const Crypto::P256PublicKey * initiatorEphPubKey         = nullptr;
-        const ReliableMessageProtocolConfig * initiatorMrpConfig = nullptr;
+        const Crypto::P256PublicKey * initiatorEphPubKey = nullptr;
+        SessionParameters initiatorSessionParams;
         uint8_t initiatorResume1MICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
     };
 
@@ -238,7 +238,7 @@ protected:
         // size
         Platform::ScopedMemoryBuffer<uint8_t> msgR2Encrypted;
         size_t encrypted2Length = 0;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
+        SessionParameters responderSessionParams;
     };
     struct ParsedSigma2
     {
@@ -275,7 +275,7 @@ protected:
         uint8_t sigma2ResumeMICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
         MutableByteSpan sigma2ResumeMIC{ sigma2ResumeMICBuffer };
         uint16_t responderSessionId;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
+        SessionParameters responderSessionParams;
     };
 
     struct ParsedSigma2Resume
@@ -542,19 +542,17 @@ private:
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    static void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
-    static void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    void HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
+    void HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 
-    // Context to pass down when connecting to peer
-    Transport::AppTCPConnectionCallbackCtxt mTCPConnCbCtxt;
-    // Pointer to the underlying TCP connection state. Returned by the
+    // Reference holder to the underlying TCP connection state. Returned by the
     // TCPConnect() method (on the connection Initiator side) when an
     // ActiveTCPConnectionState object is allocated. This connection
     // context is used on the CASE Initiator side to facilitate the
     // invocation of the callbacks when the connection is established/closed.
     //
     // This pointer must be nulled out when the connection is closed.
-    Transport::ActiveTCPConnectionState * mPeerConnState = nullptr;
+    Transport::ActiveTCPConnectionHandle mPeerConnState;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

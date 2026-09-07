@@ -73,7 +73,7 @@ const char * pychip_webrtc_get_local_description(WebRTCClientHandle handle)
     return chip::webrtc::webrtc_get_local_description(handle);
 }
 
-int pychip_webrtc_get_peer_connection_state(WebRTCClientHandle handle)
+const char * pychip_webrtc_get_peer_connection_state(WebRTCClientHandle handle)
 {
     return chip::webrtc::webrtc_get_peer_connection_state(handle);
 }
@@ -86,6 +86,16 @@ void pychip_webrtc_client_set_gathering_complete_callback(WebRTCClientHandle han
 void pychip_webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateChangeCallback cb)
 {
     chip::webrtc::webrtc_client_set_state_change_callback(handle, cb);
+}
+
+void * pychip_webrtc_provider_client_create()
+{
+    return chip::webrtc::webrtc_provider_client_create();
+}
+
+void pychip_webrtc_provider_client_destroy(void * client)
+{
+    chip::webrtc::webrtc_provider_client_destroy(client);
 }
 
 void pychip_webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
