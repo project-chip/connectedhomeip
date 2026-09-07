@@ -197,7 +197,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-zephyr-all-clusters \
+                      --target nxp-rw61x-zephyr-all-clusters-build-only-no-blobs \
                       build \
                   "
 
@@ -211,7 +211,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-zephyr-thermostat-ota \
+                      --target nxp-rw61x-zephyr-thermostat-ota-build-only-no-blobs \
                       build \
                   "
 
@@ -225,7 +225,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-zephyr-thermostat-thread \
+                      --target nxp-rw61x-zephyr-thermostat-thread-build-only-no-blobs \
                       build \
                   "
 
@@ -239,7 +239,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-zephyr-laundry-washer-factory \
+                      --target nxp-rw61x-zephyr-laundry-washer-factory-build-only-no-blobs \
                       build \
                   "
 
@@ -253,7 +253,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-zephyr-unit-test \
+                      --target nxp-rw61x-zephyr-unit-test-build-only-no-blobs \
                       build \
                   "
             - name: Notify Slack on Failure
