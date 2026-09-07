@@ -101,7 +101,7 @@ CHIP_ERROR SimulatedWindowCovering::HandleMovement(Clusters::WindowCovering::Win
     {
         auto target  = cluster.GetTargetPositionLiftPercent100ths();
         auto current = cluster.GetCurrentPositionLiftPercent100ths();
-        if (!target.IsNull() && !current.IsNull() && target.Value() != current.Value())
+        if (!target.IsNull() && !current.IsNull() && target != current)
         {
             mMovingLift = true;
         }
