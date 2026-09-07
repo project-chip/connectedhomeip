@@ -514,20 +514,19 @@ jobs:
             - name: Run Commissioning Proxy certification tests over mocked BLE and Wi-Fi PAF
               timeout-minutes: 25
               env:
-                # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
-                # The reason for that is BlueZ integration which involves GIO globals (glib
-                # internals) that TSAN does not understand...
+                # Disable TSAN bug reporting, as it reports false positives as BlueZ
+                # integration uses GIO globals (glib internals) that TSAN does not
+                # understand.
                 TSAN_OPTIONS: report_bugs=0
               run: |
                   # These drive three actors (test harness, proxy, end device) rather than
                   # the single app run_test_suite.py models, so they have their own runner.
                   # They share /tmp and the mock system bus, so they run one at a time.
                   # The end device is chip-lighting-app rather than a second all-devices-app
-                  # because all-devices-app's --wifi only sets a cluster feature flag: it never
-                  # starts Wi-Fi management, so it cannot join a network as an end device.
-                  # Both transports are exercised: the end device advertises over BLE and
-                  # Wi-Fi PAF at once, which is what the scan tests need to see one device
-                  # reported once per transport.
+                  # because all-devices-app's --wifi only sets a cluster feature flag, it
+                  # never starts Wi-Fi management, so it cannot join a network as an end
+                  # device. All transports are exercised with the end device advertising
+                  # over BLE and Wi-Fi PAF simultaneously.
                   fail=0
                   for test in 2_1 2_2 2_3 2_4 2_5 2_6 2_7 2_8 2_9; do
                       echo "::group::TC_COMPRO_${test}"

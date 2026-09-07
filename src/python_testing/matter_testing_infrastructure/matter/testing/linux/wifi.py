@@ -63,9 +63,8 @@ class NANSimulator:
         self.publishers: dict[int, tuple[str, Any]] = {}
         self.subscribers: dict[int, tuple[str, Any]] = {}
         # (subscribe_id, publish_id) pairs already reported. A subscriber
-        # starting and a publisher starting both trigger matching, so without
-        # this a pair that appears at both moments is reported twice and the
-        # same device turns up twice in one scan.
+        # starting and a publisher starting both trigger a match, this
+        # prevents reporting twice in the scan.
         self.announced: set[tuple[int, int]] = set()
         # When each subscriber registered, so announce_publisher can leave a
         # just-started one to its own discovery pass.
@@ -105,7 +104,7 @@ class NANSimulator:
             log.debug("NANSimulator: Publisher cancelled: id=%d", publish_id)
 
     async def announce_publisher(self, pub_iface_name: str, pub_id: int, pub_args: dict):
-        """Tell subscribers already running about a publisher that just started.
+        """Tell the running subscriber about a publisher that just started.
 
         A subscriber does not have to be started after the publisher to see it: an
         active subscriber keeps receiving unsolicited publish frames, which is how a
@@ -201,7 +200,7 @@ class NANSimulator:
             "ssi": ("ay", pub_args.get("ssi", b"")),
         })
 
-        # Recorded only now: a pair marked reported before the emit would be
+        # Recorded only after the emit: a pair marked before it would be
         # suppressed for good if the emit raised.
         with self._lock:
             self.announced.add((sub_id, pub_id))
@@ -274,7 +273,7 @@ class WpaSupplicantMock(TerminableThread):
     class InterfaceUnknownError(sdbus.DbusFailedError):
         """Raised for an interface name the mock was not asked to provide.
 
-        The error wpa_supplicant itself returns from GetInterface, so the
+        The error wpa_supplicant returns from GetInterface, so the
         application reacts as it would on a real system.
         """
 
@@ -302,9 +301,9 @@ class WpaSupplicantMock(TerminableThread):
                 if interface.interface_name_in_sim in ifname.lower():
                     return interface.path
             # The platform falls back to CreateInterface once GetInterface has
-            # failed. The mock cannot honour it: its interfaces are created up
-            # front, each bound to a network link, so there is nothing to bind a
-            # new one to. Say that rather than repeating InterfaceUnknown.
+            # failed. The mock cannot honour it as its interfaces are created up
+            # front and bound to a network link, so there is nothing to bind a
+            # new one to.
             registered = [i.interface_name_in_sim for i in self.mock.interfaces]
             log.error("Cannot create mock interface '%s'; the mock serves %s only. "
                       "Is the application in the right network namespace?", ifname, registered)
@@ -353,10 +352,7 @@ class WpaSupplicantMock(TerminableThread):
             self.link: NetworkLink | None = None
             # Unique bus name of the application currently using this interface.
             self.owner: str | None = None
-            # Whether this interface brought its link up by associating. Links the
-            # harness brought up itself -- an on-network proxy's, say -- are not
-            # ours to take down: doing so cuts the only path its controller has to
-            # it, and it never associated in the first place.
+            # Set when this interface brought the link up by associating.
             self.associated = False
 
         @staticmethod
@@ -385,12 +381,10 @@ class WpaSupplicantMock(TerminableThread):
             self.owner = sender
 
         def _cancel_nan_sessions(self, current_owner: str) -> None:
-            """Forget the NAN sessions of applications that have gone away.
+            """Forget the NAN sessions for applications that have gone away.
 
-            A killed application cancels nothing, so its stale registrations would
-            keep being matched and the device reported once per stale id. Only
-            another application's sessions are dropped: an application publishes
-            before it scans, so its own are already recorded here.
+            Only another application's sessions are dropped: an application
+            publishes before it scans, so its own are already recorded here.
             """
             simulator = self.mock.nan_simulator
             stale = [session_id for session_id, session in self.nan_sessions.items()
@@ -513,7 +507,7 @@ class WpaSupplicantMock(TerminableThread):
                 "args": args_dict,
                 "active": True,
                 # Which application owns this session, so a restart can drop the
-                # sessions of the instance that went away and only those.
+                # sessions of the instance that went away.
                 "owner": self._current_sender(),
             }
             self.nan_sessions[publish_id] = session_info
@@ -568,8 +562,8 @@ class WpaSupplicantMock(TerminableThread):
                 "id": subscribe_id,
                 "args": args_dict,
                 "active": True,
-                # Which application owns this session, so a restart can drop the
-                # sessions of the instance that went away and only those.
+                # The application owning the session, so a restart can drop the
+                # sessions of the instance that went away.
                 "owner": self._current_sender(),
             }
             self.nan_sessions[subscribe_id] = session_info

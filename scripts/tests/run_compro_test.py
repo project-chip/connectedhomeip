@@ -16,33 +16,29 @@
 #    limitations under the License.
 #
 
-"""Run a Commissioning Proxy certification test against mocked BLE / Wi-Fi transports.
+"""Run a Commissioning Proxy (CP) certification test against mocked BLE / Wi-Fi transports.
 
-The COMPRO tests need three actors, which `run_python_test.py` cannot express
-because it models a single application:
+The COMPRO tests need three actors, `run_python_test.py` can only model a
+single application. So this file manages the following:
 
     ns-eth-tool-N    the test script itself (TH), reaching the proxy over IP
     ns-<proxy>-N     the commissioning proxy, on-network from the start
     ns-<app>-N       the end device, with no IP address until it associates
 
-BLE and Wi-Fi come from the mock servers in `matter.testing.linux`: `bluezoo`
-for BlueZ, `WpaSupplicantMock` (including its NAN simulator) for wpa_supplicant.
-Both applications find them because the test D-Bus system bus is exported to
-their environment, and each resolves its own interface by the name of the only
-link in its namespace.
+BLE and Wi-Fi are from the mock servers in `matter.testing.linux`: `bluezoo`
+for BlueZ and `WpaSupplicantMock` (including its NAN simulator) for
+wpa_supplicant. Both applications use the exported test D-Bus and each
+resolves its own interface by the name in its namespace.
 
 The proxy's own commissioning uses the framework's `--discriminator` /
 `--passcode` and `--commissioning-method on-network`, exactly as a hardware run
-does, so the same test script runs unchanged against real devices. Everything
+does. Hence the same test script runs unchanged against hardware. Everything
 specific to the mocked topology is supplied by this script.
 
-Each test's `CI TEST ARGUMENTS` block is the authority for how the test harness
-reaches the proxy: the commissioning method (whether the framework commissions
-the proxy before the test body or the test does it itself, as 2.6 does), the
-discriminator, passcode and endpoint, and the end device identifiers. Reading
-them keeps a mocked run and a hardware run of the same test on one set of values.
-A command-line option overrides the block; a value the block does not name falls
-back to a default here.
+Each test's `CI TEST ARGUMENTS` block provides the test harness information
+about accessing the CP including whether the framework commissions the proxy
+before the test body or the test does it itself, (as 2.6 does).
+A command-line option overrides the block, otherwise a default value is used.
 
 The block's `app`, `app-args` and `factory-reset` are for `run_python_test.py`
 and are not used: this script launches two applications and builds their
@@ -90,9 +86,7 @@ DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(
 MOCK_AP_SSID = "MatterAP"
 MOCK_AP_PASSWORD = "MatterAPPassword"
 
-# Used only for a test whose CI arguments block does not name them; the block is
-# the first source, so that a mocked run and a hardware run of the same test
-# reach the proxy with the same discriminator, passcode and endpoint.
+# Used only for a test whose CI arguments block does not provide them.
 DEFAULT_CP_ENDPOINT = 5
 DEFAULT_PROXY_DISCRIMINATOR = 3840
 DEFAULT_ED_DISCRIMINATOR = 3841
@@ -101,7 +95,7 @@ DEFAULT_ED_PASSCODE = 20202021
 # NAN operating frequency: channel 6, the default Matter PAF channel.
 PAF_FREQ_LIST = "2437"
 
-# bluezoo exposes two adapters; the end device advertises on the first and the
+# bluezoo exposes two adapters. The end device advertises on the first and the
 # proxy scans and connects as central on the second.
 BLE_CONTROLLER_ED = 0
 BLE_CONTROLLER_PROXY = 1
@@ -116,8 +110,7 @@ BLE_CONTROLLER_TOOL_ABSENT = 9
 # built-in test passcode and the test script has to be given the same value.
 PROXY_PASSCODE = 20202021
 
-# Logged by every example application once it is up and commissionable; the same
-# marker the CI test-argument blocks use as their app-ready-pattern.
+# Logged by every example application once it is up and commissionable
 APP_READY_PATTERN = "APP STATUS: Starting event loop"
 APP_READY_TIMEOUT_S = 30
 
@@ -144,12 +137,12 @@ class MockRecordsOnly(logging.Filter):
 
 
 class ProxyAppSubprocess(Subprocess):
-    """The proxy application, tagged to tell its output from the end device's.
+    """The proxy application, tagged as [PROXY].
 
-    all-devices-app parses its own option set rather than the shared
+    all-devices-app parses its own options rather than the shared
     LinuxDeviceOptions, so AppServerSubprocess cannot launch it: that class always
     passes --secured-device-port, which all-devices-app rejects in favour of
-    --port, and there is no --passcode to pass at all.
+    --port, and there is no --passcode.
     """
 
     PREFIX = b"[PROXY]"
@@ -163,7 +156,7 @@ class Transport(enum.StrEnum):
     """Transport the proxy uses to reach the end device.
 
     BOTH makes the end device commissionable over BLE and Wi-Fi PAF at the same
-    time, which the scan tests need in order to see one device reported once per
+    time, which the scan tests need in order to receive device reports per
     transport.
     """
 
@@ -185,8 +178,8 @@ def proxy_link_name(transport: str) -> str:
 def wpa_interface_names(transport: str) -> list[str]:
     """Interface names to register with the wpa_supplicant mock, in index order.
 
-    The end device always needs one: even over BLE it joins the mock AP to finish
-    commissioning. The proxy needs one only for Wi-Fi PAF.
+    The end device always needs one, over BLE it joins the mock AP to complete
+    the commissioning. The proxy needs one only for Wi-Fi PAF.
     """
     names = ["wlx-app"]
     if transport != Transport.BLE:
@@ -214,13 +207,13 @@ def proxy_app_args(transport: str, endpoint: int, proxy_ble: bool) -> list[str]:
 
 
 def proxy_build_transports(proxy_app: str) -> set[str]:
-    """Transports the proxy application was *built* with.
+    """Transports the proxy application was built with.
 
     The Transport attribute is derived from the build, not from which adapters
     or interfaces exist, and the tests scan on that whole bitmap. Asking a
-    both-transport build to run a single-transport leg therefore exercises a
+    multiple-transport build to run a single-transport leg therefore exercises a
     transport the run never set up. The application only offers the options for
-    the transports it was built with, so its own help output answers this.
+    the transports it was built with.
     """
     help_text = subprocess.run([proxy_app, "--help"], capture_output=True, text=True).stdout
     transports = set()
@@ -234,9 +227,9 @@ def proxy_build_transports(proxy_app: str) -> set[str]:
 def check_transport_matches_build(proxy_app: str, transport: str, proxy_ble: bool) -> bool:
     """Compare the requested transport against the proxy build; return proxy_ble.
 
-    Raises when the build cannot serve the requested transport at all, and warns
-    when it serves more, because the extra transport reaches the tests through
-    the Transport attribute whatever this run configured.
+    Raises when the build cannot serve the requested transport at all, and
+    warns when it serves more. Note, the extra transport reaches the tests
+    through the Transport attribute whatever was configured.
     """
     built = proxy_build_transports(proxy_app)
     if not built:
@@ -252,8 +245,8 @@ def check_transport_matches_build(proxy_app: str, transport: str, proxy_ble: boo
             f"it supports {', '.join(sorted(built))}. Use a matching build.")
     if extra := built - wanted:
         log.warning("%s was built with %s, which this run does not configure. The Transport "
-                    "attribute still advertises it and the scan tests use that bitmap "
-                    "(TC_COMPRO_2_8 step 10), so use a %s-only build to test that leg alone.",
+                    "attribute still advertises it and the scan tests use that bitmap, "
+                    "so use a %s-only build to test that leg alone.",
                     proxy_app, ", ".join(sorted(extra)), transport)
 
     if Transport.BLE not in built:
@@ -274,10 +267,9 @@ def declared_test_params(script: str) -> dict[str, int]:
     The test file is the authority for the discriminator, passcode and endpoint it
     expects, and for the end device identifiers it passes as string arguments: a
     hardware run through `run_python_test.py` takes them from the same block, so
-    reading them here keeps the two kinds of run on one set of values instead of
-    two that have to be kept in step by hand. Anything the block does not name
-    falls back to this script's defaults, and an explicit command-line option
-    overrides both.
+    reading them here keeps the runs on one set of values. Anything the block does
+    not name falls back to this script's defaults, and an explicit command-line
+    option overrides both.
     """
     params: dict[str, int] = {}
     flags = {"--discriminator": "discriminator", "--passcode": "passcode", "--endpoint": "endpoint"}
@@ -298,11 +290,11 @@ def declared_commissioning_args(script: str) -> list[str]:
     """The commissioning-method arguments the test itself declares.
 
     Whether the framework commissions the proxy before the test body, or the test
-    does it mid-run, is a property of the test: 2.6 opens its own PASE and calls
-    commission_dut_in_test(), so it asks for --in-test-commissioning-method and
-    would fail if CommissionDeviceTest had already consumed the commissioning
-    window. Read it from the test's CI arguments block rather than assuming, so a
-    test that changes its mind does not need this script changed too.
+    does it mid-run is a property of the test. For example 2.6 opens its own PASE
+    and calls commission_dut_in_test(), so it asks for
+    --in-test-commissioning-method and would fail if CommissionDeviceTest had
+    already consumed the commissioning window. Read it from the test's CI
+    arguments block rather than assuming.
     """
     for run in extract_runs_args(script).values():
         args = shlex.split(run.get("script-args", ""))
@@ -427,10 +419,9 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
         stack.enter_context(chiptest.linux.WpaSupplicantMock(
             wpa_interface_names(transport), MOCK_AP_SSID, MOCK_AP_PASSWORD, net_ns))
 
-        # Both applications open these fixed paths whatever --KVS says, so they
+        # Both applications open these fixed paths regardless of --KVS, so they
         # carry state from one run to the next and between the two applications.
-        # Upstream's YAML worker avoids this by bind-mounting a private /tmp; here
-        # it is enough to start from nothing.
+        # The YAML worker avoids this by bind-mounting a private /tmp.
         for stale in ("/tmp/chip_factory.ini", "/tmp/chip_config.ini",
                       "/tmp/chip_counters.ini", "/tmp/chip_kvs"):
             with contextlib.suppress(OSError):
@@ -483,10 +474,10 @@ def test_script_args(script: str, ed_app: str | None, script_args: str, transpor
             f"ed_transport:{transport}",
             f"ed_extra_args:{ed_app_args(transport)}",
             f"ed_launch_wrapper:{shlex.join(net_ns.app_ns.netns_cmd_wrapper)}",
-            # Credentials of the mock access point, needed by the tests that
-            # provision the end device onto the operational network through the
-            # proxy. The mock ignores the password, but the test still has to
-            # send one for the ED to complete its association.
+            # Credentials of the mock access point, used to provision the end
+            # device onto the operational network through the proxy. The mock
+            # ignores the password, but the test still has to send one for
+            # the ED to complete its association.
             f"wifi_ssid:{MOCK_AP_SSID}",
             f"wifi_password:{MOCK_AP_PASSWORD}",
             # Multi-transport tests build one end device per transport under

@@ -173,11 +173,11 @@ class NetworkLink(NetworkResource):
         if ns:  # Only needed when running in netns, otherwise can be an unintended side-effect
             up_cmds.append(NetworkCmd("ip link set dev lo up", ns_wrapper=True))
 
-        # "replace" rather than "add": bringing a link up has to be idempotent, because
+        # "replace" rather than "add", bringing a link up has to be idempotent, because
         # a link can be brought up once per association and a test may associate more
         # than once -- for example one commissioning per transport under test. A second
         # "add" fails, and the failure surfaces inside the mock's association task where
-        # nothing awaits it, stalling the state machine before it reports "completed".
+        # nothing awaits it stalling the state machine before it reports "completed".
         up_cmds.extend(NetworkCmd(f"ip addr replace {addr} dev {name}", ns_wrapper=True) for addr in self.ipv4_addrs)
 
         if self.ipv6_addrs:

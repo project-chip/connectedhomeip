@@ -31,9 +31,9 @@ BLUEZ_SERVICE = "org.bluez"
 class BluetoothMock(TerminablePopen[str]):
     """Run a BlueZ mock server in a subprocess.
 
-    The mock never re-reports a device: it exports one the first time it sees a
-    peer advertising and keeps it, and its RSSI never changes, so the SDK -- which
-    re-reports only on an RSSI change -- misses a peer that stops advertising and
+    The mock never re-reports a device, it exports a device the first time it
+    sees a peer advertising and keeps it and the RSSI never changes. So the SDK
+    which re-reports on an RSSI change misses a peer that stops advertising and
     comes back.  Advertising state is therefore watched here and stale device
     objects evicted, so the next sweep exports a fresh one.
     """
@@ -76,7 +76,7 @@ class BluetoothMock(TerminablePopen[str]):
 
     def __init__(self) -> None:
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
-        # Advertising instances per adapter, as last seen by the watcher. An
+        # Advertising instances per adapter as last seen by the watcher. An
         # adapter is only interesting once it goes from silent back to
         # advertising, so the initial state has to be "silent" rather than
         # unknown.
@@ -115,7 +115,7 @@ class BluetoothMock(TerminablePopen[str]):
                 log.debug("Removed stale device %s so it is discovered again", device_path)
             except sdbus.DbusFailedError:
                 # Nothing cached for this peer on that adapter, which is the
-                # common case: only an adapter that has already discovered the
+                # common case. Only an adapter that has already discovered the
                 # peer holds an object for it.
                 pass
 
@@ -168,8 +168,8 @@ class BluetoothMock(TerminablePopen[str]):
 
     def resource_terminate(self) -> None:
         if self._loop_thread is not None:
-            # Nothing here may raise: teardown runs while a test is already
-            # failing, and an exception raised now replaces the reason it failed.
+            # Teardown runs while a test is already failing, and an exception raised
+            # now replaces the reason it failed.
             try:
                 asyncio.run_coroutine_threadsafe(
                     self._stop_watching(), self._loop).result(self.RESOURCE_TIMEOUT_TERMINATE_S)

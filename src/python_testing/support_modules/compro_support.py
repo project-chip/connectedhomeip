@@ -1203,9 +1203,8 @@ class COMPROBaseTest(MatterBaseTest):
         elif ed_transport == "wifipaf":
             bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
         elif ed_transport == "both":
-            # The ED really is commissionable on either, so choosing one is not a
-            # guess. Prefer WiFi-PAF where the DUT supports it: it is the longer
-            # and more failure-prone path of the two, so it yields more signal.
+            # The ED is commissionable on all transports, so choosing one is not a
+            # guess. Prefer WiFi-PAF where the DUT supports it.
             kWiFiPAF = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
             kBle = int(cp.Bitmaps.CapabilitiesBitmap.kBle)
             bit = kWiFiPAF if (valid_transports & kWiFiPAF) else kBle
