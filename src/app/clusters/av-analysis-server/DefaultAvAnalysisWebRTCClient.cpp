@@ -249,22 +249,30 @@ void DefaultAvAnalysisWebRTCClient::HandleServerListReport(const ConcreteDataAtt
                    aPath.mEndpointId == mRequest.WebRTCEndpoint());
 
     DataModel::DecodableList<ClusterId> serverList;
-    VerifyOrReturn(DataModel::Decode(aData, serverList) == CHIP_NO_ERROR);
+    VerifyOrReturn(DataModel::Decode(aData, serverList) == CHIP_NO_ERROR,
+                   mRequest.SetProviderCheck(Request::ProviderCheck::kUnreadable));
 
     auto iter = serverList.begin();
     while (iter.Next())
     {
         if (iter.GetValue() == WebRTCTransportProvider::Id)
         {
-            mRequest.SetProviderFound(true);
+            mRequest.SetProviderCheck(Request::ProviderCheck::kFound);
             return;
         }
+    }
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        mRequest.SetProviderCheck(Request::ProviderCheck::kUnreadable);
     }
 }
 
 void DefaultAvAnalysisWebRTCClient::OnError(CHIP_ERROR aError)
 {
+    // A failed read says nothing about the endpoint; OnDone follows and fails the request
     ChipLogError(Zcl, "AvAnalysisWebRTCClient: provider check error: %" CHIP_ERROR_FORMAT, aError.Format());
+    VerifyOrReturn(mRequest.InPhase(Request::Phase::kCheckingProvider));
+    mRequest.SetProviderCheck(Request::ProviderCheck::kUnreadable);
 }
 
 void DefaultAvAnalysisWebRTCClient::OnDone(ReadClient * apReadClient)
@@ -279,12 +287,19 @@ void DefaultAvAnalysisWebRTCClient::OnDone(ReadClient * apReadClient)
 
 void DefaultAvAnalysisWebRTCClient::OnProviderCheckComplete()
 {
-    if (!mRequest.ProviderFound())
+    switch (mRequest.GetProviderCheck())
     {
+    case Request::ProviderCheck::kUnreadable:
+        ChipLogError(Zcl, "AvAnalysisWebRTCClient: the ServerList of endpoint %u could not be read", mRequest.WebRTCEndpoint());
+        FinishRequest(Status::Failure, mRequest.WebRTCSessionId());
+        return;
+    case Request::ProviderCheck::kNotFound:
         // no WebRTCTransportProvider on the endpoint the command named
         ChipLogError(Zcl, "AvAnalysisWebRTCClient: no WebRTCTransportProvider on endpoint %u", mRequest.WebRTCEndpoint());
         FinishRequest(Status::NotFound, mRequest.WebRTCSessionId());
         return;
+    case Request::ProviderCheck::kFound:
+        break;
     }
 
     mRequest.Advance(Request::Phase::kCreatingOffer);

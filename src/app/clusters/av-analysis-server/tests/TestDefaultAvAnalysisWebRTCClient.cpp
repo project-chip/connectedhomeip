@@ -442,6 +442,41 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ReportsForOtherPathsDoNotSatisfyThePro
     EXPECT_EQ(mCallback.mLastStatus, Status::NotFound);
 }
 
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUndecodableServerListFailsTheRequestRatherThanNotFound)
+{
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+    mClient.EnterProviderCheck();
+
+    // A report for the right path whose payload is not a list
+    uint8_t buffer[8];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    ASSERT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint32_t>(7)), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    mClient.HandleServerListReport(
+        ConcreteDataAttributePath(kProviderEndpoint, Descriptor::Id, Descriptor::Attributes::ServerList::Id), reader);
+    mClient.OnDone(static_cast<ReadClient *>(nullptr));
+
+    // Nothing is known about the endpoint, so the cluster is not reported absent
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AFailedServerListReadFailsTheRequestRatherThanNotFound)
+{
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+    mClient.EnterProviderCheck();
+
+    // The read itself fails (for instance the camera denies access to the Descriptor cluster)
+    mClient.OnError(CHIP_ERROR_ACCESS_DENIED);
+    mClient.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+}
+
 TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelSilentlyAbandonsTheRequest)
 {
     EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);

@@ -130,8 +130,9 @@ public:
     void Cancel() override;
 
     /**
-     * Inbound session signals, forwarded by the application when the camera's Answer or End
-     * arrives on its WebRTCTransportRequestor cluster, or its media layer observes a failure.
+     * Inbound session signals, forwarded by the application when its media layer sees the session's
+     * connection established or failed, or when the camera's End arrives on its
+     * WebRTCTransportRequestor cluster. A signal for a session this client does not track is ignored.
      */
     void NotifyConnected(uint16_t aWebRTCSessionId);
     void NotifyFailed(uint16_t aWebRTCSessionId);
@@ -281,8 +282,15 @@ protected:
         void SetInvokedSender(CommandSender * aSender) { mInvokedSender = aSender; }
         bool WasInvokedBy(const CommandSender * aSender) const { return mInvokedSender == aSender; }
 
-        void SetProviderFound(bool aFound) { mProviderFound = aFound; }
-        bool ProviderFound() const { return mProviderFound; }
+        // What the provider check learnt about the named endpoint
+        enum class ProviderCheck : uint8_t
+        {
+            kNotFound,   // The ServerList was read and WebRTCTransportProvider is not in it (or no report came)
+            kFound,      // WebRTCTransportProvider is in the ServerList
+            kUnreadable, // The read failed or its report did not decode: nothing is known about the endpoint
+        };
+        void SetProviderCheck(ProviderCheck aResult) { mProviderCheck = aResult; }
+        ProviderCheck GetProviderCheck() const { return mProviderCheck; }
 
         // Records the command's failure; completion is delivered once the exchange closes
         void Fail(Protocols::InteractionModel::Status aStatus)
@@ -311,7 +319,7 @@ protected:
         CommandType mCommandType                           = CommandType::kProvideOffer;
         AvAnalysisWebRTCClient::Callback * mCallback       = nullptr;
         CommandSender * mInvokedSender                     = nullptr;
-        bool mProviderFound                                = false;
+        ProviderCheck mProviderCheck                       = ProviderCheck::kNotFound;
         Protocols::InteractionModel::Status mFailureStatus = Protocols::InteractionModel::Status::Failure;
 
         // Sending the command
@@ -389,7 +397,7 @@ private:
     // The session is over on both nodes, so it leaves the requestor cluster, the peer
     // delegate releases its connection, and the slot is free again.
     void ReleaseSession(TrackedSession & aSession);
-    // Routes NotifyFailed/NotifyEnded,the tracked session is released
+    // Routes NotifyFailed/NotifyEnded: the tracked session is released
     void FailTrackedSession(uint16_t aWebRTCSessionId);
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId);
     TrackedSession * FindTrackedSession(uint16_t aWebRTCSessionId);
