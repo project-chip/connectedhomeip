@@ -34,9 +34,6 @@
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
-// Must precede SessionManager.h: enables EncryptedPacketBufferHandle::CastToWritable.
-#define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
-
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
@@ -59,8 +56,6 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/GroupcastTesting.h>
 #include <transport/tests/LoopbackTransportManager.h>
-
-#undef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
 namespace {
 
@@ -140,6 +135,12 @@ struct Fixture
 Fixture * gFixture = nullptr;
 
 // Needed for IterateGroupSessions() to yield a real group session.
+// Empties gGroupPeerTable so a crash reproduces from its input alone.
+void ResetPeerTable(Fixture & fx)
+{
+    fx.sessionManager.FabricRemoved(fx.fabricIndex);
+}
+
 void SetupGroupKeys(Fixture & fx)
 {
     using namespace chip::TestCerts;
@@ -277,6 +278,7 @@ Fixture & GetFixture()
 void GroupDispatchDoesNotCrash(bool useRawDomain, bool testingEnabled, const std::vector<uint8_t> & bytes)
 {
     Fixture & fx = GetFixture();
+    ResetPeerTable(fx);
 
     ApplyTestingMode(fx, testingEnabled);
 
@@ -355,6 +357,7 @@ void GroupValidEncryptedDoesNotCrash(uint8_t payloadType, bool needsAck, bool te
                                      const std::vector<uint8_t> & payload)
 {
     Fixture & fx = GetFixture();
+    ResetPeerTable(fx);
 
     ApplyTestingMode(fx, testingEnabled);
 
@@ -451,6 +454,7 @@ void GroupManualFrameDoesNotCrash(bool controlMsg, uint8_t sourceSelector, uint3
                                   bool testingEnabled, const std::vector<uint8_t> & payload)
 {
     Fixture & fx = GetFixture();
+    ResetPeerTable(fx);
 
     ApplyTestingMode(fx, testingEnabled);
 

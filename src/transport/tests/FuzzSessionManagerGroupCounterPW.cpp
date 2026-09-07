@@ -418,11 +418,9 @@ auto RecordDomain()
 FUZZ_TEST(FuzzSessionManagerGroupCounterPW, GroupPeerTableDoesNotCorrupt)
     .WithDomains(VectorOf(RecordDomain()).WithMaxSize(64).WithSeeds(&GroupCounterSeeds));
 
-// The outgoing side of the same translation unit: GroupOutgoingCounters::GetCounter /
-// IncrementCounter are reached only from SessionManager::PrepareMessage (:224-225), which the
-// hand-rolled EncodeGroupDatagram above deliberately bypasses in order to choose the counter.
-// This case sends through the real PrepareMessage instead, then loops the result back in, so
-// the send-side counter advances and a canonical frame also traverses the receive path.
+// GroupOutgoingCounters::GetCounter and IncrementCounter are reached only from
+// PrepareMessage, which EncodeGroupDatagram above bypasses in order to choose the counter.
+// This case sends through the real PrepareMessage and loops the result back in.
 void GroupSendThenReceiveDoesNotCrash(uint8_t fabricSel, uint8_t typeSel, const std::vector<uint8_t> & payload)
 {
     Fixture & fx = GetFixture();
@@ -433,10 +431,9 @@ void GroupSendThenReceiveDoesNotCrash(uint8_t fabricSel, uint8_t typeSel, const 
     SessionHandle outgoingHandle(outgoingSession);
     SessionHolder outgoingHolder(outgoingHandle);
 
-    // typeSel picks the send-side counter branch. The two SecureChannel counter-sync types are
-    // what SessionManager::IsControlMessage recognises, and GetCounter/IncrementCounter run at
-    // :224-225 before the IsValidGroupMsg() bail at :259, so the control branch is still covered
-    // even though a control group send cannot complete.
+    // typeSel picks the send-side counter branch: the two SecureChannel counter-sync types are
+    // what IsControlMessage recognises. The counters advance before the IsValidGroupMsg bail,
+    // so the control branch is covered even though a control group send cannot complete.
     PayloadHeader payloadHeader;
     switch (typeSel % 3)
     {
