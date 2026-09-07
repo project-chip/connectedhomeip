@@ -78,7 +78,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 TestStep("4", "[FC] TH reads from the DUT the FanModeSequence attribute.",
                          "Store value for future reference."),
                 TestStep("5", "[FC] TH determines the PercentSetting range per Step command.",
-                         "- Set PercentSetting to 0. - Send Step command with direction=Increase, lowestOff=True, and wrap=False. - Read the resulting PercentSetting attribute report value. - Calculate the PercentSetting range per Step command. - Store value for future reference."),
+                         "- Set PercentSetting to 0. - Send Step command with direction=Increase, lowestOff=True, and wrap=False. - Read the resulting PercentSetting attribute report value. Store value for future reference."),
 
                 TestStep("6", """[FC] LowestOff field test
                                             Iteratively send step commands with LowestOff set to True, Direction set to Decrease, and Wrap set to False.
@@ -964,7 +964,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH checks the DUT for the presence of the OnOff cluster
         # - If the cluster is present, set it to On
         self.step("2")
-        has_on_off_cluster = await self.cluster_guard(endpoint=self.endpoint, cluster=Clusters.OnOff, skip_step=False)
+        has_on_off_cluster = await self.cluster_present(endpoint=self.endpoint, cluster=Clusters.OnOff)
         if has_on_off_cluster:
             await self.send_on_off_command(Clusters.OnOff.Commands.On())
 
