@@ -14,6 +14,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from typing import Any
+
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -50,8 +52,8 @@ class AVANALYTestBase:
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
     async def send_enable_context_triggers_cmd(
-        self, endpoint, context_triggers=NullValue, expected_status: Status = Status.Success
-    ):
+        self, endpoint: int, context_triggers: Any = NullValue, expected_status: Status = Status.Success
+    ) -> Any:
         """Send EnableContextTriggers command to the AvAnalysis cluster and assert expected status.
 
         Args:
@@ -82,8 +84,8 @@ class AVANALYTestBase:
     send_enable_context_triggers_command = send_enable_context_triggers_cmd
 
     async def send_disable_context_triggers_cmd(
-        self, endpoint, context_triggers=NullValue, expected_status: Status = Status.Success
-    ):
+        self, endpoint: int, context_triggers: Any = NullValue, expected_status: Status = Status.Success
+    ) -> Any:
         """Send DisableContextTriggers command to the AvAnalysis cluster and assert expected status.
 
         Args:

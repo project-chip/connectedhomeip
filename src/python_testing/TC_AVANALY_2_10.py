@@ -132,16 +132,24 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase):
                 self.default_controller, self.dut_node_id, endpoint
             )
 
-        self.step(3)
-        if not self.is_ci:
-            self.wait_for_user_input(
-                prompt_msg="Simulate ambient context detection on the DUT to trigger clip recording. Press Enter once initiated."
-            )
-        else:
+        if self.is_ci:
             log.info("CI mode: skipping physical ambient context detection simulation")
+            self.skip_step(3)
+            self.skip_step(4)
+            if push_av_event_cb:
+                push_av_event_cb.cancel()
+            await self.send_disable_context_triggers_cmd(
+                endpoint, context_triggers=NullValue
+            )
+            return
+
+        self.step(3)
+        self.wait_for_user_input(
+            prompt_msg="Simulate ambient context detection on the DUT to trigger clip recording. Press Enter once initiated."
+        )
 
         self.step(4)
-        if not self.is_ci and has_push_av:
+        if has_push_av:
             event_data = push_av_event_cb.wait_for_event_report(
                 push_av_cluster.Events.PushTransportBegin, timeout_sec=15
             )
@@ -150,12 +158,8 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase):
                 event_data,
                 "Expected PushTransportBegin event indicating clip initiation",
             )
-        elif not has_push_av:
-            log.info("PushAvStreamTransport cluster not present on endpoint")
         else:
-            log.info(
-                "CI mode: skipping PushTransportBegin event wait (simulated clip recording not available in CI)"
-            )
+            log.info("PushAvStreamTransport cluster not present on endpoint")
 
         # Cleanup
         if push_av_event_cb:

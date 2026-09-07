@@ -87,9 +87,15 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
         supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
         asserts.assert_greater_equal(len(supported_contexts), 1, "SupportedAmbientContexts must not be empty")
 
+        if len(supported_contexts) < 2:
+            log.info("DUT does not support at least 2 distinct ambient contexts, skipping TC-AVANALY-2.7")
+            for s in range(2, 9):
+                self.skip_step(s)
+            return
+
         self.step(2)
         context_a = supported_contexts[0]
-        context_b = supported_contexts[1] if len(supported_contexts) > 1 else supported_contexts[0]
+        context_b = supported_contexts[1]
 
         if self.has_feature_perzonedetect:
             triggers = [
@@ -155,11 +161,12 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
             new_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event2.newIdentifiedContexts]
             asserts.assert_in((context_b.namespaceID, context_b.tag), new_tags_2,
                               "Context B not found in newIdentifiedContexts of event 2")
-            if event2.currentIdentifiedContexts is not None:
-                current_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
-                                  for tc in event2.currentIdentifiedContexts]
-                asserts.assert_in((context_a.namespaceID, context_a.tag), current_tags_2,
-                                  "Context A not found in currentIdentifiedContexts of event 2")
+            asserts.assert_is_not_none(event2.currentIdentifiedContexts,
+                                       "currentIdentifiedContexts must be present in event 2")
+            current_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
+                              for tc in event2.currentIdentifiedContexts]
+            asserts.assert_in((context_a.namespaceID, context_a.tag), current_tags_2,
+                              "Context A not found in currentIdentifiedContexts of event 2")
         else:
             log.info("CI mode: skipping blocking event wait in Step 6")
 
@@ -185,11 +192,12 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
             expired_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event3.expiredContexts]
             asserts.assert_in((context_a.namespaceID, context_a.tag), expired_tags_3,
                               "Context A not found in expiredContexts of event 3")
-            if event3.currentIdentifiedContexts is not None:
-                current_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
-                                  for tc in event3.currentIdentifiedContexts]
-                asserts.assert_in((context_b.namespaceID, context_b.tag), current_tags_3,
-                                  "Context B not found in currentIdentifiedContexts of event 3")
+            asserts.assert_is_not_none(event3.currentIdentifiedContexts,
+                                       "currentIdentifiedContexts must be present in event 3")
+            current_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
+                              for tc in event3.currentIdentifiedContexts]
+            asserts.assert_in((context_b.namespaceID, context_b.tag), current_tags_3,
+                              "Context B not found in currentIdentifiedContexts of event 3")
         else:
             log.info("CI mode: skipping blocking event wait in Step 8")
 

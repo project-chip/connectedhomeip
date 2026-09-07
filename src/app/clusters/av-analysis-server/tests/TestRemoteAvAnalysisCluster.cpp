@@ -421,6 +421,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteActivateAnalysisStreamCommandTest)
     ASSERT_TRUE(iter.Next());
     ASSERT_EQ(iter.GetValue().analysisStreamID, 0);
     ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kWebRTCActive);
+    ASSERT_FALSE(iter.Next());
 
     // Activating an already active stream returns InvalidInState
     response = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, kCommandPath, commandData);
@@ -475,6 +476,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDeactivateAnalysisStreamCommandTest)
     ASSERT_TRUE(iter.Next());
     ASSERT_EQ(iter.GetValue().analysisStreamID, 0);
     ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kPendingInitiation);
+    ASSERT_FALSE(iter.Next());
 
     // Deactivating again returns InvalidInState
     response = mServer.GetLogic().HandleDeactivateAnalysisStream(commandHandler, kCommandPath, commandData);

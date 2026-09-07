@@ -124,7 +124,10 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         {
             ChipLogError(Camera, "Failed to init AvAnalysisCameraClient: %" CHIP_ERROR_FORMAT, clientErr.Format());
         }
-        mAVAnalysisServer.Cluster().SetCameraClient(&mAVAnalysisCameraClient);
+        else
+        {
+            mAVAnalysisServer.Cluster().SetCameraClient(&mAVAnalysisCameraClient);
+        }
     }
 
     // The delegate must be set before registering the server
