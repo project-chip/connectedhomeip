@@ -952,6 +952,7 @@ class TC_FAN_3_5(MatterBaseTest):
     async def test_TC_FAN_3_5(self) -> None:
         # Setup
         self.endpoint = self.get_endpoint(default=1)
+        self.subscriptions = None
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         cmd = cluster.Commands
