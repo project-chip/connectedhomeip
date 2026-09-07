@@ -104,6 +104,28 @@ is tracked by git.
 You can get more details on `west build` with
 [Zephyr's building guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#building-west-build)
 
+
+### VS Code devcontainer
+
+If you are using the VS Code devcontainer environment, initialize the NXP Zephyr
+workspace before building for the first time:
+
+```shell
+bash scripts/setup/nxp/setup_zephyr_workspace.sh
+```
+
+This script initializes the workspace at `/opt/nxp-zephyr/zephyrproject` using
+the same Zephyr revision as the CI (`NXP_ZEPHYR_REVISION` in
+`.github/workflows/examples-nxp.yaml`), so local development and CI always use
+the same upstream Zephyr.
+
+After the workspace is initialized, build the example using the VS Code "Build
+specific example" task or run directly:
+
+```shell
+scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target nxp-rw61x-zephyr-all-clusters build"
+```
+
 <a name="flashing-and-debugging"></a>
 
 ## Flashing and debugging
