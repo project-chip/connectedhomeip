@@ -31,6 +31,11 @@ from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+# Bound on how long to wait, after the tester confirms the reader has been brought close to
+# the DUT's NFC tag, for the background monitor to actually detect and read tag data.
+_NFC_TAG_DETECTION_TIMEOUT_SEC = 5.0
+_NFC_TAG_POLL_INTERVAL_SEC = 0.1
+
 
 class TC_DD_1_3(OnboardingPayloadChecks, MatterTestUncommissionedDevice):
     def desc_TC_DD_1_3(self) -> str:
@@ -69,7 +74,12 @@ class TC_DD_1_3(OnboardingPayloadChecks, MatterTestUncommissionedDevice):
         monitoring_task = asyncio.create_task(reader.activate_tag_monitoring())
         await self.wait_for_user_input_async(
             "Bring the TH NFC reader close to the DUT's NFC tag. Press Enter when done.")
-        reader.deactivate_tag_monitoring()
+        try:
+            await asyncio.wait_for(self._wait_for_nfc_tag_data(reader), timeout=_NFC_TAG_DETECTION_TIMEOUT_SEC)
+        except TimeoutError:
+            asserts.fail("Timed out waiting for the NFC reader to detect tag data")
+        finally:
+            reader.deactivate_tag_monitoring()
         nfc_tag_content = await monitoring_task
         log.info("nfc_tag_content: %s", nfc_tag_content)
         asserts.assert_true(reader.is_onboarding_data(nfc_tag_content), "No NFC tag with onboarding data found")
@@ -110,6 +120,22 @@ class TC_DD_1_3(OnboardingPayloadChecks, MatterTestUncommissionedDevice):
     async def wait_for_user_input_async(self, *args, **kwargs):
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self.wait_for_user_input, *args, **kwargs)
+
+    @staticmethod
+    async def _wait_for_nfc_tag_data(reader: matter.testing.nfc.NFCReader) -> None:
+        """Poll until the NFC monitor has read some tag data.
+
+        NFCReader.activate_tag_monitoring() only resolves once deactivate_tag_monitoring() is
+        called, so it can't be used by itself to detect that a tag has actually been read, and
+        there is no public API for that. This polls the same observer.last_ndef field that
+        TagMonitorManager.activate() returns once deactivated, so monitoring can be stopped as
+        soon as data is available instead of only when the tester presses Enter. An
+        asyncio.Event isn't an option here: last_ndef is set by TagEventObserver.update() on the
+        pcsc backend's own monitoring thread, not scheduled onto this event loop.
+        """
+        while (reader._monitor_manager is None or reader._monitor_manager.observer is None  # noqa: ASYNC110
+                or reader._monitor_manager.observer.last_ndef is None):
+            await asyncio.sleep(_NFC_TAG_POLL_INTERVAL_SEC)
 
 
 if __name__ == "__main__":
