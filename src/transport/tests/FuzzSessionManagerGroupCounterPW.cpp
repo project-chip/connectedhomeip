@@ -18,21 +18,15 @@
 
 /**
  *    @file
- *      Stateful FuzzTest harness for the Matter group-multicast peer-counter table.
+ *      Stateful FuzzTest harness for the group peer-counter table.
  *
- *      The state that matters lives in the file-static gGroupPeerTable and only builds up
- *      across datagrams: FindOrAddPeer maintains a fixed-size LRU per fabric, so its
- *      insert, evict and most-recently-used paths depend on what earlier datagrams left
- *      behind. One fuzz input is therefore a SEQUENCE of records replayed in order.
- *
- *      FindOrAddPeer runs only after AES-CCM MIC verification succeeds, which mutated bytes
- *      cannot pass, so each record is encrypted with the real group key before being fed to
- *      SessionManager::OnMessageReceived. The encoder replicates the production encrypt
- *      sequence; it differs from PrepareMessage only in taking the source node id, message
- *      counter and control flag as parameters, which PrepareMessage fixes internally.
+ *      FindOrAddPeer maintains a fixed-size LRU whose insert, evict and MRU paths depend on
+ *      what earlier datagrams left behind, so one input is a sequence of records. It runs
+ *      only after AES-CCM verification, which mutated bytes cannot pass, so each record is
+ *      encrypted with the real group key first.
  *
  *      Real SessionManager, FabricTable, GroupDataProviderImpl, CryptoContext, libcrypto
- *      and the file-static gGroupPeerTable; nothing on the exercised path is stubbed.
+ *      and gGroupPeerTable; nothing on the exercised path is stubbed.
  */
 
 #include <array>
@@ -50,6 +44,9 @@
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/AutoRelease.h>
@@ -81,14 +78,12 @@ using GroupInfo = GroupDataProvider::GroupInfo;
 using GroupKey  = GroupDataProvider::GroupKey;
 using KeySet    = GroupDataProvider::KeySet;
 
-// The single group id every fabric registers a key for. The epoch key is a valid
-// configured key; the fuzzer varies the datagram's sourceNodeId and counter.
+// The key stays a valid configured key; the fuzzer varies sourceNodeId and counter.
 constexpr GroupId kGroupId       = 2;
 constexpr uint16_t kTestKeysetId = 0x0123;
 
-// Fabrics the harness attempts to install; the cert vectors cap how many succeed, so
-// routing uses the achieved Fixture::fabricCount. Two or more exercise the fabric-search
-// loop; one still drives the per-fabric LRU.
+// The cert vectors cap how many installs succeed, so routing uses the achieved
+// Fixture::fabricCount. Two or more exercise the fabric-search loop.
 constexpr size_t kMaxFabrics = 4;
 
 // Distinct epoch key per fabric so each yields a distinct derived group key.
@@ -99,8 +94,8 @@ const uint8_t kEpochKeys[kMaxFabrics][16] = {
     { 0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef },
 };
 
-// Dispatch needs a landing point. The delegate is the ExchangeManager boundary, past
-// everything this harness measures, so a no-op removes no check.
+// The delegate is the ExchangeManager boundary, past everything measured here, so a
+// no-op removes no check.
 class NoopDelegate : public SessionMessageDelegate
 {
 public:
@@ -109,8 +104,8 @@ public:
     {}
 };
 
-// Built once and reused. gGroupPeerTable is file-static, so the per-input reset below is
-// what makes an input self-contained and its result reproducible.
+// Built once. gGroupPeerTable is file-static, so the per-input reset below is what makes
+// an input reproducible on its own.
 struct Fixture
 {
     Testing::LoopbackTransportManager ctx;
@@ -138,8 +133,7 @@ struct Fixture
 
 Fixture * gFixture = nullptr;
 
-// Install one fabric from a distinct NOC asset, plus its group key. Each successful add
-// yields a distinct fabric index.
+// Each successful add yields a distinct fabric index.
 bool InstallFabric(Fixture & fx, size_t slot, const TestCerts::UnitTestCertAsset & root, const TestCerts::UnitTestCertAsset & icac,
                    const TestCerts::UnitTestCertAsset & noc)
 {
@@ -172,9 +166,8 @@ bool InstallFabric(Fixture & fx, size_t slot, const TestCerts::UnitTestCertAsset
     return true;
 }
 
-// Encode a valid, privacy-protected group datagram with fabric `slot`'s real key. Mirrors
-// the production encrypt sequence, differing from PrepareMessage only in taking the node id,
-// counter and control flag as parameters rather than fixing them.
+// Mirrors the production encrypt sequence, but takes the node id, counter and control flag
+// as parameters; PrepareMessage fixes all three internally.
 CHIP_ERROR EncodeGroupDatagram(Fixture & fx, size_t slot, NodeId nodeId, uint32_t counter, bool isControl,
                                std::vector<uint8_t> & out)
 {
@@ -182,10 +175,9 @@ CHIP_ERROR EncodeGroupDatagram(Fixture & fx, size_t slot, NodeId nodeId, uint32_
 
     PayloadHeader payloadHeader;
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
-    // NeedsAck must stay false: a group message requesting an ack is dropped before
-    // FindOrAddPeer.
+    // Must stay false: a group message requesting an ack is dropped before FindOrAddPeer.
 
-    const uint8_t payload[]        = { 'h', '4' };
+    const uint8_t payload[]        = { 0x01, 0x02 };
     System::PacketBufferHandle msg = MessagePacketBuffer::NewWithData(payload, sizeof(payload));
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -239,6 +231,10 @@ Fixture & GetFixture()
     static std::once_flag once;
     std::call_once(once, [] {
         VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        // A fuzz binary links gmock_main, which does not init PSA; key derivation needs it.
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
 
         auto * fx = new Fixture();
 
@@ -262,8 +258,7 @@ Fixture & GetFixture()
         fx->sessionManager.SetMessageDelegate(&fx->delegate);
 
         using namespace chip::TestCerts;
-        // Distinct roots give distinct compressed fabric ids; NodeA2 adds a third fabric under
-        // root A. Each successful add is one routable slot; a single fabric is a valid fallback.
+        // Distinct roots give distinct compressed fabric ids; a single fabric is a valid fallback.
         InstallFabric(*fx, 0, GetRootACertAsset(), GetIAA1CertAsset(), GetNodeA1CertAsset());
         InstallFabric(*fx, 1, GetRootBCertAsset(), GetIAB1CertAsset(), GetNodeB1CertAsset());
         InstallFabric(*fx, 2, GetRootACertAsset(), GetIAA1CertAsset(), GetNodeA2CertAsset());
@@ -275,9 +270,8 @@ Fixture & GetFixture()
 
         gFixture = fx;
 
-        // The fixture is intentionally leaked, but the file-static Inet EndPointManagers
-        // VerifyOrDie in their destructors unless the layers were shut down first -- without
-        // this hook the run ends in a SIGABRT that reads as a crash.
+        // The fixture is leaked, but the file-static Inet EndPointManagers VerifyOrDie in
+        // their destructors unless shut down first, which reads as a crash.
         std::atexit([] {
             if (gFixture != nullptr)
             {
@@ -299,12 +293,10 @@ struct Record
     bool undefinedNode; // send sourceNodeId 0 -> FindOrAddPeer's CHIP_ERROR_INVALID_ARGUMENT arm
 };
 
-// Base for the generated node IDs. 256 distinct values (via nodeSel) is enough to over-fill the
-// 15/2 caps and force many evictions + MRU re-inserts.
+// 256 distinct node ids via nodeSel is enough to over-fill the caps and force evictions.
 constexpr NodeId kNodeBase = 0x0000000100000000ull;
 
-// Reset gGroupPeerTable to empty so each fuzz input is self-contained and any crash reproduces
-// standalone. SessionManager::FabricRemoved is public and clears that fabric's slot.
+// Empties gGroupPeerTable so a crash reproduces from its input alone.
 void ResetPeerTable(Fixture & fx)
 {
     for (size_t i = 0; i < fx.fabricCount; i++)
@@ -313,8 +305,7 @@ void ResetPeerTable(Fixture & fx)
     }
 }
 
-// Drive a sequence of datagrams through the real receive function, accumulating state in
-// gGroupPeerTable. The fuzzer controls the record count and every per-record field.
+// State accumulates across the sequence; the fuzzer controls the count and every field.
 void GroupPeerTableDoesNotCorrupt(const std::vector<Record> & records)
 {
     Fixture & fx = GetFixture();
@@ -341,23 +332,21 @@ void GroupPeerTableDoesNotCorrupt(const std::vector<Record> & records)
     }
 }
 
-// Programmatic seeds (record sequences), one per transition the table cares about, so the
-// mutator starts with a representative of every fill/evict/re-insert/first-add path.
+// One seed per table transition, so the mutator starts from a representative of each.
 std::vector<std::vector<Record>> GroupCounterSeeds()
 {
     std::vector<std::vector<Record>> seeds;
 
     auto data = [](uint8_t node) { return Record{ 0, node, false, 1, false }; };
 
-    // 1. A single valid data-message record (baseline reach of FindOrAddPeer non-control branch).
+    // Baseline: one data record.
     seeds.push_back({ data(1) });
 
-    // 2. A control-message record. SecureGroupMessageDispatch requires !IsSecureSessionControlMsg()
-    //    (MessageHeader.h IsValidGroupMsg), so this is rejected before FindOrAddPeer and the
-    //    control table is never reached from here. Kept as the negative case for that guard.
+    // Control frames fail IsValidGroupMsg before FindOrAddPeer, so this covers that guard,
+    // not the control table.
     seeds.push_back({ Record{ 0, 1, true, 1, false } });
 
-    // 3. > MAX_GROUP_DATA_PEERS (17) distinct data nodes, one fabric: fill -> evict past cap 15.
+    // Past the data cap on one fabric: fill, then evict.
     {
         std::vector<Record> s;
         for (uint8_t n = 1; n <= 17; n++)
@@ -367,15 +356,13 @@ std::vector<std::vector<Record>> GroupCounterSeeds()
         seeds.push_back(std::move(s));
     }
 
-    // 4. Several control records in a row: still the rejection guard, not the control cap.
-    //    CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS is unreachable through this function.
+    // Still the rejection guard: the control cap is unreachable through this function.
     seeds.push_back({ Record{ 0, 1, true, 1, false }, Record{ 0, 2, true, 1, false }, Record{ 0, 3, true, 1, false } });
 
-    // 5. Mix >=2 fabrics: drives the first-add branch for a second mGroupFabrics slot.
+    // Two fabrics: the first-add branch for a second slot.
     seeds.push_back({ Record{ 0, 1, false, 1, false }, Record{ 1, 2, false, 1, false }, Record{ 2, 3, false, 1, false } });
 
-    // 6. Fill the data cap, then re-send an already-present node id: drives the search-hit
-    //    MRU-move ShiftAndInsert(list, i, ...) path.
+    // Re-sending a present node id takes the search-hit MRU-move path.
     {
         std::vector<Record> s;
         for (uint8_t n = 1; n <= 15; n++)
@@ -387,8 +374,7 @@ std::vector<std::vector<Record>> GroupCounterSeeds()
         seeds.push_back(std::move(s));
     }
 
-    // 7. Replay-window walk on ONE node: adopt a base counter, then revisit positions around
-    //    it. Covers FutureCounter, the in-window bitset test, equal-to-max and before-window.
+    // Walks one node's replay window: future, in-window, equal-to-max and behind.
     {
         const uint8_t node = 5;
         std::vector<Record> s;
@@ -496,18 +482,14 @@ void GroupSendThenReceiveDoesNotCrash(uint8_t fabricSel, uint8_t typeSel, const 
 FUZZ_TEST(FuzzSessionManagerGroupCounterPW, GroupSendThenReceiveDoesNotCrash)
     .WithDomains(Arbitrary<uint8_t>(), Arbitrary<uint8_t>(), VectorOf(Arbitrary<uint8_t>()).WithMaxSize(128));
 
-// The peer table drives replay protection: each entry carries the PeerMessageCounter state
-// for one sender, and the LRU maintenance moves those entries around on every insert. The
-// two cases below drive GroupPeerTable directly, because the property worth checking is not
-// "does it crash" but "does a sender's counter state stay bound to that sender" -- if an
-// entry's counter were aliased to a neighbour by a shuffle, replays would be accepted with
-// no memory error for a sanitizer to see.
+// These two drive GroupPeerTable directly: the property is that a sender's counter state
+// stays bound to that sender across LRU shuffles. Aliasing it to a neighbour would accept
+// replays with no memory error for a sanitizer to catch.
 
 constexpr FabricIndex kOracleFabric = 1;
 constexpr NodeId kOracleNodeBase    = 0x0000000200000000ull;
 
-// A committed counter must still be recognised as a replay after the victim's entry has been
-// shuffled down the list by unrelated inserts.
+// A committed counter must still read as a replay after unrelated inserts shuffle its entry.
 void PeerCounterSurvivesLruChurn(uint8_t victimSel, uint8_t churn, uint32_t counterValue)
 {
     Transport::GroupPeerTable table;
@@ -520,9 +502,9 @@ void PeerCounterSurvivesLruChurn(uint8_t victimSel, uint8_t churn, uint32_t coun
     ASSERT_EQ(counter->VerifyOrTrustFirstGroup(counterValue), CHIP_NO_ERROR);
     counter->CommitGroup(counterValue);
 
-    // Stay strictly under CHIP_CONFIG_MAX_GROUP_DATA_PEERS so the victim cannot be evicted;
-    // eviction is the other case's subject.
-    const uint8_t inserts = churn % (CHIP_CONFIG_MAX_GROUP_DATA_PEERS - 1);
+    // Up to a full table, leaving the victim at the least-recently-used end but still
+    // present: the boundary where a ShiftAndInsert off-by-one would show.
+    const uint8_t inserts = churn % CHIP_CONFIG_MAX_GROUP_DATA_PEERS;
     for (uint8_t i = 0; i < inserts; i++)
     {
         const NodeId other                      = kOracleNodeBase + static_cast<NodeId>(victimSel) + 1 + i;
@@ -539,14 +521,12 @@ void PeerCounterSurvivesLruChurn(uint8_t victimSel, uint8_t churn, uint32_t coun
 FUZZ_TEST(FuzzSessionManagerGroupCounterPW, PeerCounterSurvivesLruChurn)
     .WithDomains(Arbitrary<uint8_t>(), Arbitrary<uint8_t>(), InRange<uint32_t>(1, 0xFFFFFFFEu));
 
-// The mirror property. Whether a peer that no longer fits is admitted with fresh state or
-// refused outright is the table's policy choice, so both outcomes are accepted here; what
-// must hold either way is that the peer is never handed a counter carrying some *other*
-// peer's history, which is what a mis-shuffled list would produce.
+// Admitting a crowded-out peer with fresh state or refusing it outright is a policy choice,
+// so both are accepted; either way it must never be handed another peer's counter history.
 void PeerCounterCrowdedOutPeerKeepsNoForeignState(uint8_t victimSel, uint32_t victimCounter)
 {
-    // Far enough apart that neither counter can fall in the other's 32-entry window, so a
-    // duplicate verdict below can only come from state that belongs to a different peer.
+    // Far enough apart to fall outside each other's 32-entry window, so a duplicate verdict
+    // can only come from another peer's state.
     const uint32_t otherCounter = victimCounter + 0x10000u;
 
     Transport::GroupPeerTable table;
@@ -559,7 +539,7 @@ void PeerCounterCrowdedOutPeerKeepsNoForeignState(uint8_t victimSel, uint32_t vi
     ASSERT_EQ(counter->VerifyOrTrustFirstGroup(victimCounter), CHIP_NO_ERROR);
     counter->CommitGroup(victimCounter);
 
-    // Fill every remaining slot, each peer committing a counter of its own.
+    // Fill the remaining slots, each peer committing its own counter.
     for (uint8_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
     {
         const NodeId other                        = kOracleNodeBase + static_cast<NodeId>(victimSel) + 1 + i;

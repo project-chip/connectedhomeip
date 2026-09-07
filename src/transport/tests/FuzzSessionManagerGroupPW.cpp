@@ -18,15 +18,9 @@
 
 /**
  *    @file
- *      FuzzTest harness for the Matter group-multicast decrypt-and-dispatch path.
- *
- *      Drives SessionManager::OnMessageReceived down its group branch
- *      (SecureGroupMessageDispatch): privacy AES-CTR deobfuscation, AES-CCM MIC
- *      verification, group header and counter parsing, and dispatch.
- *
- *      A real SessionManager, GroupDataProviderImpl, FabricTable and the file-static
- *      gGroupPeerTable are stood up with a valid epoch key; nothing on the parse,
- *      crypto or decode path is stubbed.
+ *      Drives SessionManager::OnMessageReceived down its group branch. Real
+ *      SessionManager, GroupDataProviderImpl, FabricTable and gGroupPeerTable;
+ *      nothing on the parse, crypto or decode path is stubbed.
  */
 
 #include <cstdint>
@@ -40,14 +34,17 @@
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
-// Must precede SessionManager.h: enables EncryptedPacketBufferHandle::CastToWritable,
-// used ONLY by the valid-seed generator (mirrors TestSessionManagerDispatch.cpp).
+// Must precede SessionManager.h: enables EncryptedPacketBufferHandle::CastToWritable.
 #define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
@@ -79,23 +76,21 @@ using GroupKey       = GroupDataProvider::GroupKey;
 using KeySet         = GroupDataProvider::KeySet;
 using SecurityPolicy = GroupDataProvider::SecurityPolicy;
 
-// Same parameters as TestGroupPrepareMessagePrivacy. The key is a valid configured group
-// key throughout; the fuzzer varies the datagram, not the key material.
+// The key stays a valid configured group key; the fuzzer varies the datagram, not the key.
 constexpr GroupId kGroupId  = 2;
 const uint8_t kEpochKey[16] = { 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf };
 constexpr uint16_t kTestKeysetId = 0x0123;
 
-// A second group under its own keyset, so the trial-decryption loop runs more than once.
-// kCacheAndSync is deliberately not used: GroupDataProviderImpl::SetKeySet rejects every
-// policy but kTrustFirst, so no keyset carrying it can reach the receive path.
+// A second keyset so the trial-decryption loop runs more than once. Not kCacheAndSync:
+// SetKeySet rejects every policy but kTrustFirst.
 constexpr GroupId kGroupIdSecond   = 3;
 constexpr uint16_t kKeysetIdSecond = 0x0124;
 const uint8_t kEpochKeySecond[16]  = {
     0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf
 };
 
-// Dispatch needs a landing point. The delegate is the ExchangeManager boundary, past
-// everything this harness measures, so a no-op removes no check.
+// The delegate is the ExchangeManager boundary, past everything measured here, so a
+// no-op removes no check.
 class NoopDelegate : public SessionMessageDelegate
 {
 public:
@@ -104,8 +99,7 @@ public:
     {}
 };
 
-// The Groupcast testing event sink. A null delegate would leave NotifyDelegate's dispatch
-// arm unexercised.
+// A null delegate would leave NotifyDelegate's dispatch arm unexercised.
 class TestingSink : public chip::Groupcast::Testing::Delegate
 {
 public:
@@ -115,8 +109,7 @@ private:
     uint64_t mFlushes = 0;
 };
 
-// Built once and reused: gGroupPeerTable is file-static and persists regardless, so
-// rebuilding the manager per input would cost time without isolating anything.
+// Built once: gGroupPeerTable is file-static, so rebuilding per input isolates nothing.
 struct Fixture
 {
     Testing::LoopbackTransportManager ctx;
@@ -146,8 +139,7 @@ struct Fixture
 
 Fixture * gFixture = nullptr;
 
-// Register a fabric and group key so IterateGroupSessions() yields a real group session.
-// Mirrors SetupGroupKeys in TestSessionManagerDispatch.cpp.
+// Needed for IterateGroupSessions() to yield a real group session.
 void SetupGroupKeys(Fixture & fx)
 {
     using namespace chip::TestCerts;
@@ -187,8 +179,7 @@ void SetupGroupKeys(Fixture & fx)
     VerifyOrDie(provider->SetGroupInfoAt(fx.fabricIndex, 1, secondGroupInfo) == CHIP_NO_ERROR);
 }
 
-// The testing state is a process-wide singleton, so set it explicitly on every input rather
-// than only when enabling -- otherwise the mode leaks across iterations.
+// Process-wide singleton: set on every input, or the mode leaks across iterations.
 void ApplyTestingMode(Fixture & fx, bool enabled)
 {
     auto & testing = chip::Groupcast::GetTesting();
@@ -197,8 +188,7 @@ void ApplyTestingMode(Fixture & fx, bool enabled)
     testing.SetEnabled(enabled);
 }
 
-// One valid privacy-protected datagram via the real PrepareMessage round-trip, used as a
-// seed and to learn the installed sessionId. Any mutation of it breaks the MIC.
+// Seed source, and how the installed sessionId is learned. Any mutation breaks its MIC.
 void BuildValidSeed(Fixture & fx)
 {
     Transport::OutgoingGroupSession outgoingSession(kGroupId, fx.fabricIndex);
@@ -233,6 +223,10 @@ Fixture & GetFixture()
     static std::once_flag once;
     std::call_once(once, [] {
         VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        // A fuzz binary links gmock_main, which does not init PSA; key derivation needs it.
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
 
         auto * fx = new Fixture();
 
@@ -265,9 +259,8 @@ Fixture & GetFixture()
 
         gFixture = fx;
 
-        // The fixture is intentionally leaked, but the file-static Inet EndPointManagers
-        // VerifyOrDie in their destructors unless the layers were shut down first -- without
-        // this hook the run ends in a SIGABRT that reads as a crash. atexit runs before them.
+        // The fixture is leaked, but the file-static Inet EndPointManagers VerifyOrDie in
+        // their destructors unless shut down first, which reads as a crash. atexit precedes them.
         std::atexit([] {
             if (gFixture != nullptr)
             {
@@ -279,10 +272,8 @@ Fixture & GetFixture()
     return *gFixture;
 }
 
-// One datagram of arbitrary bytes. useRawDomain leaves the session id arbitrary, so most
-// inputs are rejected before any key is tried; otherwise it is overwritten with the
-// installed key's hash, which forces every input through privacy deobfuscation and a
-// decrypt attempt.
+// useRawDomain leaves the session id arbitrary, so most inputs are rejected before any key
+// is tried; otherwise it is pinned to the installed key's hash, forcing a decrypt attempt.
 void GroupDispatchDoesNotCrash(bool useRawDomain, bool testingEnabled, const std::vector<uint8_t> & bytes)
 {
     Fixture & fx = GetFixture();
@@ -318,29 +309,37 @@ std::vector<std::vector<uint8_t>> GroupSeeds()
         seeds.push_back(fx.validSeed);
     }
 
-    const uint8_t lo = static_cast<uint8_t>(fx.sessionId & 0xff);
-    const uint8_t hi = static_cast<uint8_t>((fx.sessionId >> 8) & 0xff);
+    // Written by field offset, not by hand-counted literal: PacketHeader::Encode lays the
+    // fixed part out as [0] msgFlags, [1..2] sessionId, [3] secFlags, [4..7] counter,
+    // [8..15] sourceNodeId, [16..17] destinationGroupId, and a group id placed anywhere but
+    // 16..17 decodes as 0 and dies at the group-id compare.
+    auto headerSeed = [&fx](uint8_t msgFlags, uint8_t secFlags, const std::vector<uint8_t> & tail) {
+        std::vector<uint8_t> seed(18, 0);
+        seed[0] = msgFlags;
+        seed[1] = static_cast<uint8_t>(fx.sessionId & 0xff);
+        seed[2] = static_cast<uint8_t>((fx.sessionId >> 8) & 0xff);
+        seed[3] = secFlags;
+        // counter and sourceNodeId stay zero; the mutator explores them.
+        seed[16] = static_cast<uint8_t>(kGroupId & 0xff);
+        seed[17] = static_cast<uint8_t>((kGroupId >> 8) & 0xff);
+        seed.insert(seed.end(), tail.begin(), tail.end());
+        return seed;
+    };
 
-    // Structured header-shape seeds, each pinned to the installed sessionId (Domain A shape),
-    // giving the mutator a representative for each DSIZ/flag dispatch arm.
-    // msgFlags byte0: version 0; 0x04 = SourceNodeId present, 0x02 = DestGroupId present.
-    // secFlags byte3: 0x01 = group session, 0x80 = privacy, 0x20 = MsgExtension.
+    // Long enough for a payload header plus the 16-byte MIC.
+    const std::vector<uint8_t> body = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+                                        0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x01, 0x02 };
 
-    // Source + DestGroup, group session, privacy on (mirrors the real shape), short body.
-    seeds.push_back({ 0x06, lo,   hi,   0x81, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                      0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00 });
-    // Same but privacy OFF.
-    seeds.push_back({ 0x06, lo,   hi,   0x01, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                      0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00 });
-    // MsgExtension flag set with a small MX block (length prefix 0x0002 + 2 bytes).
-    seeds.push_back({ 0x06, lo,   hi,   0xa1, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x02, 0x00, 0xAB, 0xCD, 0x00, 0x00, 0x00,
-                      0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00 });
-    // DSIZ reserved 0b11 (both node+group dest bits): byte0 = 0x06 | 0x01? DSIZ is bits 0-1:
-    // 0x03 => both DestNode(0x01)+DestGroup(0x02). Plus SourceNodeId 0x04 => 0x07.
-    seeds.push_back({ 0x07, lo,   hi,   0x81, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                      0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00 });
-    // Truncated-to-16 buffer (mirrors TestGroupIncomingPrivacyBoundsCheck's shrink → :1126 guard).
-    seeds.push_back({ 0x06, lo, hi, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+    // msgFlags 0x06 = sourceNodeId + destinationGroupId present.
+    // secFlags: 0x01 group session, 0x80 privacy, 0x20 message extension.
+    seeds.push_back(headerSeed(0x06, 0x81, body)); // the real shape: group session, privacy on
+    seeds.push_back(headerSeed(0x06, 0x01, body)); // privacy off
+    seeds.push_back(headerSeed(0x06, 0xa1, body)); // message-extension flag set
+    seeds.push_back(headerSeed(0x06, 0x81, {}));   // fixed header only, no body or MIC
+
+    // Truncated below the fixed header, for the length guards before any key lookup.
+    seeds.push_back({ 0x06, static_cast<uint8_t>(fx.sessionId & 0xff), static_cast<uint8_t>((fx.sessionId >> 8) & 0xff), 0x81, 0x00,
+                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
     return seeds;
 }
@@ -350,13 +349,8 @@ FUZZ_TEST(FuzzSessionManagerGroupPW, GroupDispatchDoesNotCrash)
                  // Cap input size: header + small payload + 16-byte MIC is well under 512.
                  VectorOf(Arbitrary<uint8_t>()).WithMaxSize(512).WithSeeds(&GroupSeeds));
 
-// Encrypt-per-iteration: build a group message from fuzzer-controlled inner content and encrypt
-// it with the installed epoch key on EVERY input, so the AES-CCM MIC is always valid. The seeded
-// valid datagram only reaches the post-MIC region on its single unmutated replay -- any mutation
-// breaks the MIC -- so it cannot explore the post-MIC branches. This case re-MACs each input,
-// exercising the post-MIC continuation: the group message-counter window (GroupPeerMessageCounter),
-// payload-header decode, and the dispatch arms. Reachable by a group member holding the shared
-// epoch key.
+// Re-MACs every input with the installed epoch key, so the MIC always verifies and the
+// post-MIC continuation is reachable; a mutated seed cannot get there.
 void GroupValidEncryptedDoesNotCrash(uint8_t payloadType, bool needsAck, bool testingEnabled, bool useSecondGroup,
                                      const std::vector<uint8_t> & payload)
 {
@@ -403,19 +397,14 @@ FUZZ_TEST(FuzzSessionManagerGroupPW, GroupValidEncryptedDoesNotCrash)
     .WithDomains(Arbitrary<uint8_t>(), Arbitrary<bool>(), Arbitrary<bool>(), Arbitrary<bool>(),
                  VectorOf(Arbitrary<uint8_t>()).WithMaxSize(256));
 
-// Source node ids offered to the manual-frame case. kUndefinedNodeId is included because
-// SessionManager.cpp:1331 rejects a decrypted frame whose node id the peer table will not
-// accept, and that arm is otherwise unreachable.
+// kUndefinedNodeId is included so the peer table's rejecting arm is reachable.
 constexpr NodeId kManualSourceNodeIds[] = { 0x0000000011223344ULL, 0x0000000000000001ULL, kUndefinedNodeId, 0xFFFFFFFFFFFFFFFFULL };
 
-// Build a group datagram field by field instead of through PrepareMessage, then MAC it with
-// the installed epoch key. PrepareMessage emits exactly one header shape -- destination group
-// id, its own node id, its own monotonic counter, never the control-message flag, since
-// IsValidGroupMsg() rejects that combination -- so the arms keyed on those fields cannot be
-// reached through it however the payload is mutated. Privacy is left off: both forms are
-// handled on receive and the unobfuscated form keeps the built frame verifiable.
-bool BuildManualGroupFrame(Fixture & fx, bool controlMsg, bool destinationIsNode, uint8_t sourceSelector, uint32_t counter,
-                           uint8_t payloadType, const std::vector<uint8_t> & payload, std::vector<uint8_t> & out)
+// Built field by field because PrepareMessage fixes the source node id, counter and control
+// flag internally, leaving the arms keyed on those unreachable through it. Privacy off keeps
+// the frame verifiable; receive handles both forms.
+bool BuildManualGroupFrame(Fixture & fx, bool controlMsg, uint8_t sourceSelector, uint32_t counter, uint8_t payloadType,
+                           const std::vector<uint8_t> & payload, std::vector<uint8_t> & out)
 {
     GroupDataProvider * groups = GetGroupDataProvider();
     VerifyOrReturnValue(groups != nullptr, false);
@@ -430,14 +419,8 @@ bool BuildManualGroupFrame(Fixture & fx, bool controlMsg, bool destinationIsNode
     packetHeader.SetSessionId(keyContext->GetKeyHash());
     packetHeader.SetMessageCounter(counter);
     packetHeader.SetSourceNodeId(sourceNodeId);
-    // SecureGroupMessageDispatch returns at :1178 unless a destination group id is present,
-    // while IsValidMCSPMsg() additionally requires a destination node id -- so the MCSP arm
-    // is only reachable by a frame carrying both.
+    // Group id only: Encode refuses a header carrying both destination kinds.
     packetHeader.SetDestinationGroupId(kGroupId);
-    if (destinationIsNode)
-    {
-        packetHeader.SetDestinationNodeId(sourceNodeId);
-    }
     packetHeader.SetSecureSessionControlMsg(controlMsg);
 
     PayloadHeader payloadHeader;
@@ -464,15 +447,15 @@ bool BuildManualGroupFrame(Fixture & fx, bool controlMsg, bool destinationIsNode
     return true;
 }
 
-void GroupManualFrameDoesNotCrash(bool controlMsg, bool destinationIsNode, uint8_t sourceSelector, uint32_t counter,
-                                  uint8_t payloadType, bool testingEnabled, const std::vector<uint8_t> & payload)
+void GroupManualFrameDoesNotCrash(bool controlMsg, uint8_t sourceSelector, uint32_t counter, uint8_t payloadType,
+                                  bool testingEnabled, const std::vector<uint8_t> & payload)
 {
     Fixture & fx = GetFixture();
 
     ApplyTestingMode(fx, testingEnabled);
 
     std::vector<uint8_t> datagram;
-    if (!BuildManualGroupFrame(fx, controlMsg, destinationIsNode, sourceSelector, counter, payloadType, payload, datagram))
+    if (!BuildManualGroupFrame(fx, controlMsg, sourceSelector, counter, payloadType, payload, datagram))
     {
         return;
     }
@@ -487,7 +470,7 @@ void GroupManualFrameDoesNotCrash(bool controlMsg, bool destinationIsNode, uint8
 }
 
 FUZZ_TEST(FuzzSessionManagerGroupPW, GroupManualFrameDoesNotCrash)
-    .WithDomains(Arbitrary<bool>(), Arbitrary<bool>(), Arbitrary<uint8_t>(), Arbitrary<uint32_t>(), Arbitrary<uint8_t>(),
-                 Arbitrary<bool>(), VectorOf(Arbitrary<uint8_t>()).WithMaxSize(256));
+    .WithDomains(Arbitrary<bool>(), Arbitrary<uint8_t>(), Arbitrary<uint32_t>(), Arbitrary<uint8_t>(), Arbitrary<bool>(),
+                 VectorOf(Arbitrary<uint8_t>()).WithMaxSize(256));
 
 } // namespace

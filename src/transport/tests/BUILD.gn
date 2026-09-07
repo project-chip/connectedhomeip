@@ -93,7 +93,7 @@ if (pw_enable_fuzz_test_targets) {
     ]
   }
 
-  # h4: stateful multi-datagram harness for the group peer-counter table LRU.
+  # Stateful multi-datagram harness for the group peer-counter table LRU.
   chip_pw_fuzz_target("fuzz-session-manager-group-counter-pw") {
     test_source = [ "FuzzSessionManagerGroupCounterPW.cpp" ]
     public_deps = [

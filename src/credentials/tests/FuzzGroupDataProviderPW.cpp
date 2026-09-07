@@ -19,18 +19,15 @@
 /**
  *    @file
  *      FuzzTest harness for GroupDataProviderImpl's group, key-set and endpoint
- *      management API -- the storage side of group state, reached in production from
- *      the GroupKeyManagement and Groups clusters.
+ *      management API, reached in production from the GroupKeyManagement and Groups
+ *      clusters.
  *
- *      The API is driven as an operation sequence rather than one call at a time
- *      because the behaviour worth exercising is the index arithmetic and the
- *      persisted TLV round-trip across operations: entries written by one operation
- *      are read, overwritten, compacted and removed by later ones. Provider state
- *      persists between inputs, so a sequence continues from what earlier sequences
- *      built.
+ *      Driven as an operation sequence because the behaviour worth exercising is the
+ *      index arithmetic and the persisted TLV round-trip across operations, not any
+ *      single call. State persists between inputs.
  *
- *      The receive-side use of the same provider (key lookup during group message
- *      decryption) is covered separately by FuzzSessionManagerGroupPW.
+ *      The same provider's receive-side key lookup is covered by
+ *      FuzzSessionManagerGroupPW.
  */
 
 #include <cstdint>
@@ -44,7 +41,11 @@
 #include <pw_unit_test/framework.h>
 
 #include <credentials/GroupDataProviderImpl.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -60,13 +61,11 @@ using GroupInfo = GroupDataProvider::GroupInfo;
 using GroupKey  = GroupDataProvider::GroupKey;
 using KeySet    = GroupDataProvider::KeySet;
 
-// The provider keys everything by fabric index; no FabricTable is needed because no
-// operation here resolves the index to a fabric.
+// No FabricTable: nothing here resolves the index to a fabric.
 constexpr FabricIndex kFuzzFabric = 1;
 
-// Persistent one-time state. The provider is created once and reused so that a sequence
-// acts on state accumulated by previous inputs; its pools are fixed-size, so the state
-// cannot grow without bound.
+// Reused across inputs so a sequence acts on accumulated state; the pools are fixed-size,
+// so it cannot grow without bound.
 struct Fixture
 {
     TestPersistentStorageDelegate storage;
@@ -80,13 +79,16 @@ Fixture & GetFixture()
     static std::once_flag once;
     std::call_once(once, [] {
         VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        // A fuzz binary links gmock_main, which does not init PSA; key derivation needs it.
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
         auto * fx = new Fixture();
         fx->provider.SetStorageDelegate(&fx->storage);
         fx->provider.SetSessionKeystore(&fx->keystore);
         VerifyOrDie(fx->provider.Init() == CHIP_NO_ERROR);
         fixture = fx;
-        // The fixture is intentionally leaked (built once, reused across inputs), so Finish()
-        // runs from an exit hook rather than a destructor.
+        // The fixture is leaked, so Finish() needs an exit hook rather than a destructor.
         std::atexit([] {
             if (fixture != nullptr)
             {
@@ -97,11 +99,6 @@ Fixture & GetFixture()
     return *fixture;
 }
 
-// The provider's group/keyset/endpoint management API, reached in production from the
-// GroupKeyManagement and Groups clusters rather than from an inbound datagram. It is driven
-// as an operation sequence because the interesting behaviour is in the index arithmetic and
-// the persisted TLV round-trip across operations, not in any single call: entries survive
-// between iterations, so later inputs act on state earlier ones built.
 void ProviderSequenceDoesNotCrash(const std::vector<std::tuple<uint8_t, uint16_t, uint16_t, uint16_t>> & ops)
 {
     GroupDataProvider * provider = &GetFixture().provider;
@@ -134,8 +131,7 @@ void ProviderSequenceDoesNotCrash(const std::vector<std::tuple<uint8_t, uint16_t
             GroupInfo info(static_cast<GroupId>(a), "G");
             if (provider->SetGroupInfoAt(fabric, b, info) == CHIP_NO_ERROR)
             {
-                // A stored entry must read back at the index it was written to: this is the
-                // index arithmetic and the persisted TLV round-trip, not just a no-crash check.
+                // A stored entry must read back at the index it was written to.
                 GroupInfo readBack;
                 ASSERT_EQ(provider->GetGroupInfoAt(fabric, b, readBack), CHIP_NO_ERROR);
                 ASSERT_EQ(readBack.group_id, info.group_id);
@@ -200,7 +196,7 @@ void ProviderSequenceDoesNotCrash(const std::vector<std::tuple<uint8_t, uint16_t
             (void) provider->RemoveGroupKeyAt(fabric, b);
             break;
         case 16: {
-            // num_keys_used is clamped by the API; c drives which epoch-key count is stored.
+            // num_keys_used is clamped by the API.
             KeySet keySet(c, GroupDataProvider::SecurityPolicy::kTrustFirst, static_cast<uint8_t>(1 + (a % KeySet::kEpochKeysMax)));
             for (uint8_t i = 0; i < keySet.num_keys_used; i++)
             {
@@ -220,7 +216,7 @@ void ProviderSequenceDoesNotCrash(const std::vector<std::tuple<uint8_t, uint16_t
             (void) provider->RemoveKeySet(fabric, c);
             break;
         case 19: {
-            // Drain each iterator; Release is mandatory, the pools are fixed-size.
+            // Release is mandatory: the iterator pools are fixed-size.
             if (auto * it = provider->IterateGroupInfo(fabric))
             {
                 GroupInfo info;
@@ -263,18 +259,19 @@ void ProviderSequenceDoesNotCrash(const std::vector<std::tuple<uint8_t, uint16_t
         case 20:
             if (provider->RemoveFabric(fabric) == CHIP_NO_ERROR)
             {
-                // Removing the fabric must leave nothing enumerable behind it.
-                auto * it = provider->IterateGroupInfo(fabric);
-                ASSERT_NE(it, nullptr);
-                ASSERT_EQ(it->Count(), 0u);
-                it->Release();
+                // Checked against the storage, not an iterator: iterators read their total
+                // from the deleted fabric record and so report empty regardless of orphans.
+                // RemoveFabric ignores each sub-removal's return, which is how one arises.
+                const size_t keysAfterRemoval = GetFixture().storage.GetNumKeys();
+                (void) provider->RemoveFabric(fabric);
+                EXPECT_EQ(GetFixture().storage.GetNumKeys(), keysAfterRemoval);
             }
             break;
         case 21:
             (void) provider->RemoveGroupKeys(fabric);
             break;
         case 22:
-            // The endpoint-only overload, distinct from the (group, endpoint) one above.
+            // The endpoint-only overload, distinct from the (group, endpoint) one.
             (void) provider->RemoveEndpoint(fabric, static_cast<EndpointId>(b));
             break;
         case 23:
