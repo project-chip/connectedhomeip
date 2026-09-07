@@ -196,7 +196,7 @@ void ProviderSequenceDoesNotCrash(const std::vector<std::tuple<uint8_t, uint16_t
             (void) provider->RemoveGroupKeyAt(fabric, b);
             break;
         case 16: {
-            // num_keys_used is clamped by the API.
+            // c is the keyset id; a picks how many epoch keys are stored.
             KeySet keySet(c, GroupDataProvider::SecurityPolicy::kTrustFirst, static_cast<uint8_t>(1 + (a % KeySet::kEpochKeysMax)));
             for (uint8_t i = 0; i < keySet.num_keys_used; i++)
             {
