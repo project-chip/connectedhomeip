@@ -1,78 +1,6 @@
 # Tests that are NOT executed in CI, along with the reason on
 # why they are not.
 not_automated:
-    - name: TC_COMPRO_2_1.py
-      reason:
-          Excluded from this runner, which models a single application and
-          cannot set up mocked transports. The test needs a proxy and an end
-          device, a mocked BlueZ, and a mocked wpa_supplicant for the end device
-          to join the AP with. Covered instead by the Commissioning Proxy step
-          of the Test Suites - Linux job, which runs it through
-          scripts/tests/run_compro_test.py.
-    - name: TC_COMPRO_2_2.py
-      reason:
-          Excluded from this runner, which models a single application and
-          cannot set up mocked transports. The test needs a proxy and an end
-          device, a mocked BlueZ, and a mocked wpa_supplicant for the end device
-          to join the AP with. Covered instead by the Commissioning Proxy step
-          of the Test Suites - Linux job, which runs it through
-          scripts/tests/run_compro_test.py.
-    - name: TC_COMPRO_2_3.py
-      reason:
-          Excluded from this runner, which models a single application and
-          cannot set up mocked transports. The test needs a proxy and an end
-          device, a mocked BlueZ, and a mocked wpa_supplicant for the end device
-          to join the AP with. Covered instead by the Commissioning Proxy step
-          of the Test Suites - Linux job, which runs it through
-          scripts/tests/run_compro_test.py.
-    - name: TC_COMPRO_2_4.py
-      reason:
-          Excluded from this runner, which models a single application and
-          cannot set up mocked transports. The test needs a proxy and an end
-          device, a mocked BlueZ, and a mocked wpa_supplicant for the end device
-          to join the AP with. Covered instead by the Commissioning Proxy step
-          of the Test Suites - Linux job, which runs it through
-          scripts/tests/run_compro_test.py.
-    - name: TC_COMPRO_2_5.py
-      reason:
-          Excluded from this runner, which models a single application and
-          cannot set up mocked transports. The test needs a proxy and an end
-          device, a mocked BlueZ, and a mocked wpa_supplicant for the end device
-          to join the AP with. Covered instead by the Commissioning Proxy step
-          of the Test Suites - Linux job, which runs it through
-          scripts/tests/run_compro_test.py.
-    - name: TC_COMPRO_2_6.py
-      reason:
-          Excluded from this runner, which models a single application and
-          cannot set up mocked transports. The test needs a proxy and an end
-          device, a mocked BlueZ, and a mocked wpa_supplicant for the end device
-          to join the AP with. Covered instead by the Commissioning Proxy step
-          of the Test Suites - Linux job, which runs it through
-          scripts/tests/run_compro_test.py.
-    - name: TC_COMPRO_2_7.py
-      reason:
-          Excluded from this runner, which models a single application and
-          cannot set up mocked transports. The test needs a proxy and an end
-          device, a mocked BlueZ, and a mocked wpa_supplicant for the end device
-          to join the AP with. Covered instead by the Commissioning Proxy step
-          of the Test Suites - Linux job, which runs it through
-          scripts/tests/run_compro_test.py.
-    - name: TC_COMPRO_2_8.py
-      reason:
-          Excluded from this runner, which models a single application and
-          cannot set up mocked transports. The test needs a proxy and an end
-          device, a mocked BlueZ, and a mocked wpa_supplicant for the end device
-          to join the AP with. Covered instead by the Commissioning Proxy step
-          of the Test Suites - Linux job, which runs it through
-          scripts/tests/run_compro_test.py.
-    - name: TC_COMPRO_2_9.py
-      reason:
-          Excluded from this runner, which models a single application and
-          cannot set up mocked transports. The test needs a proxy and an end
-          device, a mocked BlueZ, and a mocked wpa_supplicant for the end device
-          to join the AP with. Covered instead by the Commissioning Proxy step
-          of the Test Suites - Linux job, which runs it through
-          scripts/tests/run_compro_test.py.
     - name: TC_DD_3_23.py
       reason:
           NFC Reader needed for running this test-case and CI does not support
@@ -269,6 +197,29 @@ not_automated:
           https://github.com/project-chip/connectedhomeip/issues/71932
     - name: TC_AVANALYTestBase.py
       reason: Shared helper methods for AV Analysis tests, not a standalone test
+
+# Tests that ARE executed in CI, but by a dedicated runner rather than
+# run_python_test.py, which models a single application. Excluded from the
+# default run; the runner named here is what executes them.
+dedicated_runner:
+    - name: TC_COMPRO_2_1.py
+      runner: scripts/tests/run_compro_test.py
+    - name: TC_COMPRO_2_2.py
+      runner: scripts/tests/run_compro_test.py
+    - name: TC_COMPRO_2_3.py
+      runner: scripts/tests/run_compro_test.py
+    - name: TC_COMPRO_2_4.py
+      runner: scripts/tests/run_compro_test.py
+    - name: TC_COMPRO_2_5.py
+      runner: scripts/tests/run_compro_test.py
+    - name: TC_COMPRO_2_6.py
+      runner: scripts/tests/run_compro_test.py
+    - name: TC_COMPRO_2_7.py
+      runner: scripts/tests/run_compro_test.py
+    - name: TC_COMPRO_2_8.py
+      runner: scripts/tests/run_compro_test.py
+    - name: TC_COMPRO_2_9.py
+      runner: scripts/tests/run_compro_test.py
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

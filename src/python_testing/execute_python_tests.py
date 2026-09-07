@@ -306,7 +306,10 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
 
     with open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml")) as f:
         metadata = yaml.full_load(f)
-    excluded_patterns = {item["name"] for item in metadata["not_automated"]}
+    # not_automated is never run in CI. dedicated_runner tests are run, but by
+    # their own runner rather than run_python_test.py, so this one skips them too.
+    excluded_patterns = {item["name"] for item in
+                         metadata["not_automated"] + metadata.get("dedicated_runner", [])}
     nightly_tests = {item["name"] for item in metadata["nightly"]}
 
     all_python_files = g.glob(os.path.join(search_directory, "*.py"))

@@ -1035,7 +1035,10 @@ def python_tests(
 
     with open("src/python_testing/test_metadata.yaml") as f:
         metadata = yaml.full_load(f)
-    excluded_patterns = {item["name"] for item in metadata["not_automated"]}
+    # not_automated is never run in CI. dedicated_runner tests are run, but by
+    # their own runner rather than run_python_test.py, so this one skips them too.
+    excluded_patterns = {item["name"] for item in
+                         metadata["not_automated"] + metadata.get("dedicated_runner", [])}
     nightly_tests = {item["name"] for item in metadata["nightly"]}
 
     # NOTE: for slow tests. we add logs to not get impatient

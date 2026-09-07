@@ -43,7 +43,8 @@ A command-line option overrides the block, otherwise a default value is used.
 The block's `app`, `app-args` and `factory-reset` are for `run_python_test.py`
 and are not used: this script launches two applications and builds their
 arguments itself. The tests are listed in `test_metadata.yaml` under
-`not_automated` for the same reason.
+`dedicated_runner`, which keeps them out of the default run and records that
+this script is what runs them.
 
 Must run as root, so that the namespaces and the mock D-Bus bus can be created.
 When invoked as a normal user it re-executes itself under `unshare
