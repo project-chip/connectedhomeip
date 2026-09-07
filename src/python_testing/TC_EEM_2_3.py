@@ -37,7 +37,6 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-# test-runner-runs:
 #   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: >

@@ -67,15 +67,16 @@ CHIP_ERROR SimulatedElectricalSensor::Register(chip::EndpointId endpoint, CodeDr
                                                EndpointComposition composition)
 {
     ReturnErrorOnFailure(ElectricalSensor::Register(endpoint, provider, composition));
-    mFakeReadings.SetEEMCluster(&ElectricalEnergyMeasurementCluster());
     ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(&mFakeReadings));
+    mFakeReadings.SetEEMCluster(&ElectricalEnergyMeasurementCluster());
     return CHIP_NO_ERROR;
 }
 
 void SimulatedElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mTestEventTriggerDelegate.RemoveHandler(&mFakeReadings);
+    mFakeReadings.StopFakeReadings();
     mFakeReadings.SetEEMCluster(nullptr);
+    mTestEventTriggerDelegate.RemoveHandler(&mFakeReadings);
     ElectricalSensor::Unregister(provider);
 }
 

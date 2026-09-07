@@ -30,6 +30,7 @@ ElectricalSensor::ElectricalSensor(const Config & config) :
 CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                       EndpointComposition composition)
 {
+    DeviceRegistrationTransaction transaction(*this, provider);
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // ElectricalEnergyMeasurement Cluster
@@ -71,7 +72,9 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
         ReturnErrorOnFailure(provider.AddCluster(mPowerTopologyCluster.Registration()));
     }
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void ElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)

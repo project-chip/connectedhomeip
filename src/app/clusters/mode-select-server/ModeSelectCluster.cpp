@@ -88,15 +88,6 @@ void ModeSelectCluster::ApplyStartupModeLogic()
             ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id), mCurrentMode));
     }
 
-    // TODO: remove this workaround once TC_MOD_1_2.py is updated to accept a null StartUpMode.
-    // StartUpMode is nullable per spec (null = no startup override), but TC_MOD_1_2 step 5 asserts
-    // isinstance(startup_mode, int). Until that test is fixed, default to CurrentMode on first boot.
-    // See https://github.com/project-chip/connectedhomeip/issues/73795
-    if (mOptionalAttributeSet.IsSet(StartUpMode::Id) && mStartUpMode.IsNull())
-    {
-        mStartUpMode.SetNonNull(mCurrentMode);
-    }
-
     if (!mStartUpMode.IsNull())
     {
         BootReasonType bootReason = BootReasonType::kUnspecified;
