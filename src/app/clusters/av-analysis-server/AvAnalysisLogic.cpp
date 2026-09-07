@@ -94,9 +94,7 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
 
 void AvAnalysisServerLogic::CancelCameraInteraction()
 {
-    VerifyOrReturn(mCameraInteraction.InFlight());
-
-    if (mCameraClient != nullptr)
+    if (mCameraInteraction.InFlight() && mCameraClient != nullptr)
     {
         mCameraClient->Cancel();
     }

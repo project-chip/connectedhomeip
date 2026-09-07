@@ -1571,6 +1571,54 @@ TEST_F(TestRemoteAvAnalysisCluster, ShutdownAnswersTheParkedCommand)
     EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, ShutdownCancelsTheWebRTCClientEvenWithNoCommandInFlight)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+    ActivateStream(0, 2, 55);
+
+    // The active session's callback is this logic: the client must forget it before the logic goes,
+    // while the camera client, with nothing of ours in flight, is left alone
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(mFakeWebRTCClient.mCancelCount, 1);
+    ASSERT_EQ(mFakeCameraClient.mCancelCount, 0);
+
+    // Restart so the fixture TearDown shuts down a running server
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, ShutdownDuringActivateCancelsTheClientsAndAnswersTheCommand)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+
+    Testing::MockCommandHandler activateHandler;
+    activateHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::ActivateAnalysisStream::Id };
+    Commands::ActivateAnalysisStream::DecodableType commandData;
+    const EndpointId kWebRTCEndpoint = 2;
+    commandData.analysisStreamID     = 0;
+    commandData.webRTCEndpointID     = MakeOptional(kWebRTCEndpoint);
+
+    auto response = mServer.GetLogic().HandleActivateAnalysisStream(activateHandler, path, commandData);
+    ASSERT_FALSE(response.has_value()); // Pending on the offer exchange
+    auto * pendingCallback = mFakeWebRTCClient.mLastCallback;
+    ASSERT_NE(pendingCallback, nullptr);
+
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_GE(mFakeWebRTCClient.mCancelCount, 1);
+    ASSERT_GE(mFakeCameraClient.mCancelCount, 1);
+    ASSERT_EQ(activateHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+
+    // A stray late completion
+    pendingCallback->OnSessionInitiated(Status::Success, 55);
+
+    // Restart so the fixture TearDown shuts down a running server
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableEncodeDecodeTest)
 {
     AnalysisStreamTable table;
