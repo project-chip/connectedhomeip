@@ -22,6 +22,9 @@
 #include <device-manager/AVStreamManagement.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <map>
+#include <optional>
+
 namespace camera {
 
 enum class WebRTCOfferType : uint8_t
@@ -90,13 +93,25 @@ public:
      */
     void OnWebRTCSessionEstablished(uint16_t streamId);
 
+    /**
+     * @brief Look up the currently active LiveView video stream ID for a given node.
+     *
+     * Returns the stream ID recorded when a LiveView WebRTC session was last
+     * established for that node, or std::nullopt if no LiveView stream is
+     * currently tracked for it.
+     *
+     * @param nodeId The node ID of the remote camera device.
+     */
+    std::optional<uint16_t> GetActiveLiveViewStreamId(chip::NodeId nodeId) const;
+
 private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
     chip::NodeId mNodeId                                 = chip::kUndefinedNodeId;
     uint8_t mStreamUsage                                 = 0;
     WebRTCOfferType mOfferType                           = WebRTCOfferType::kProvideOffer;
-    std::map<uint16_t, pid_t> mVideoStreamProcesses; // Stream ID -> Process ID mapping
-    uint16_t mPendingVideoStreamId = 0;              // Track the stream ID we're setting up
+    std::map<uint16_t, pid_t> mVideoStreamProcesses;        // Stream ID -> Process ID mapping
+    std::map<chip::NodeId, uint16_t> mActiveLiveViewByNode; // Node ID -> active LiveView stream ID
+    uint16_t mPendingVideoStreamId = 0;                     // Track the stream ID we're setting up
 
     AVStreamManagement mAVStreamManagment;
 
