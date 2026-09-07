@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <AppMain.h>
+#include <electrical-alarm-stub.h>
 #include <electrical-distribution-stub.h>
 #include <electrical-protection-alarm-stub.h>
 #include <power-topology-stub.h>
@@ -66,10 +67,17 @@ void ApplicationInit()
 
     VerifyOrDie(SetTagList(kBreakerEndpointId, Span<const Descriptor::Structs::SemanticTagStruct::Type>(kBreakerTagList)) ==
                 CHIP_NO_ERROR);
+
+    // Electrical Alarm reports measurement-threshold alarms on the breaker. The device type makes
+    // OverCurrent mandatory and leaves the rest optional; this app offers every feature so that a
+    // test script gating on any one of them has a DUT. Each alarm-class feature exposes its own
+    // threshold attribute, and ADJUST exposes SetElectricalAlarmThresholds over all of them.
+    VerifyOrDie(ElectricalAlarm::ElectricalAlarmInit(kBreakerEndpointId, ElectricalAlarm::kAllFeatures) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
 {
+    ElectricalAlarm::ElectricalAlarmShutdown();
     ElectricalProtectionAlarm::ElectricalProtectionAlarmShutdown();
     PowerTopology::PowerTopologyShutdown();
     ElectricalDistribution::ElectricalDistributionShutdown();
