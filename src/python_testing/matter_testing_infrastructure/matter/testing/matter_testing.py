@@ -1812,44 +1812,16 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Accesses the global Matter test configuration object."""
         return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
 
-    async def cluster_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, skip_step: bool = True):
-        """Similar to attribute_guard.
+    async def cluster_present(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor) -> bool:
+        """Returns whether the given cluster is present on the given endpoint.
 
-           If the `skip_step` argument is set to True (default), and the condition check returns False,
-           it marks the test step as skipped; otherwise the test step is executed.
-
-           If the `skip_step` argument is set to False, and the condition check returns False, the test
-           step isn't skipped, and the function returns True or False.
-
-           For example, it can be used to check if a test step should be run:
-
-              self.step("1")
-              if await self.cluster_guard(condition1_needs_to_be_true_to_execute):
-                  # executes step 1
-
-              self.step("2")
-              if await self.cluster_guard(condition2_needs_to_be_false_to_skip_step):
-                  # skip step 2
-
-              self.step("3")
-              if await self.cluster_guard(Clusters.FanControl, skip_step=False):
-                  # handle logic if True
-
-              self.step("4")
-              if await self.cluster_guard(Clusters.DoorLock, skip_step=False):
-                  # handle logic if False
+              endpoint = self.get_endpoint()
+              if await self.cluster_present(endpoint, Clusters.OnOff):
+                  # handle logic when the OnOff cluster is present
            """
         await self._populate_wildcard()
-        cluster_condition = _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster)
-        if not cluster_condition:
-            if skip_step:
-                self.mark_current_step_skipped()
-        return cluster_condition
+        return _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster)
 
-    async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
-        """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
-           returns False using attributes against attributes_list, otherwise returns True.
-           For example can be used to check if a test step should be run:
     @property
     def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
         """Accesses the default device controller instance for the test."""
