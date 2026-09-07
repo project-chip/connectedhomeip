@@ -47,10 +47,10 @@ declare_args() {
   # to get more information.
   chip_with_imx_ele = false
 
-  # Enable support for x509 certificates.
-  # Disable this argument to reduce the code footprint if your device does not
-  # need to manage the x509 certificates.
-  chip_crypto_use_x509 = true
+  # Enable mbedTLS CryptoPAL X.509 support (cert parsing/validation and, on the
+  # mbedTLS crypto backend, operational CSR generation). Defaults to false for
+  # footprint; see chip_crypto_use_x509_required below for auto-enable cases.
+  chip_crypto_use_x509 = false
 }
 
 if (chip_crypto == "") {
@@ -70,6 +70,20 @@ assert(
         chip_crypto == "openssl" || chip_crypto == "boringssl" ||
         chip_crypto == "platform",
     "Please select a valid crypto implementation: mbedtls, psa, openssl, boringssl, platform")
+
+# mbedTLS backend operational CSR generation requires X509 PAL support.
+# Host-side tests (non-PSA) exercise X509 PAL code paths. PSA products keep
+# X509 disabled by default; see TestX509Disabled_* in TestChipCryptoPAL.
+_chip_build_tests = defined(chip_build_tests) && chip_build_tests
+chip_crypto_use_x509_required = chip_crypto == "mbedtls" ||
+                                (_chip_build_tests && chip_crypto != "psa")
+
+if (chip_crypto_use_x509_required) {
+  chip_crypto_use_x509 = true
+}
+
+assert(!chip_crypto_use_x509_required || chip_crypto_use_x509,
+       "chip_crypto_use_x509 must be enabled when required for the selected crypto backend")
 
 if (chip_crypto_keystore == "") {
   if (chip_crypto == "psa") {

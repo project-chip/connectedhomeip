@@ -40,6 +40,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <crypto/CryptoBuildConfig.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -321,6 +322,11 @@ static void TestAES_CTR_128_Decrypt(const AesCtrTestEntry * vector)
     {
         printf("\n Test failed due to mismatching plaintext\n");
     }
+}
+
+bool IsX509PalFeatureUnavailable(CHIP_ERROR err)
+{
+    return err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE || err == CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 struct TestChipCryptoPAL : public ::testing::Test
@@ -1732,7 +1738,7 @@ TEST_F(TestChipCryptoPAL, TestCSR_Verify)
         err = VerifyCertificateSigningRequest(&kBadTrailingGarbageCsr[0], sizeof(kBadTrailingGarbageCsr), pubKey);
 
         // On first test case, check if CSRs are supported at all, and skip test if they are not.
-        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        if (IsX509PalFeatureUnavailable(err))
         {
             ChipLogError(Crypto, "The current platform does not support CSR parsing.");
             return;
@@ -1895,7 +1901,7 @@ TEST_F(TestChipCryptoPAL, TestCSR_GenDirect)
     P256PublicKey pubkey;
 
     CHIP_ERROR err = VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), pubkey);
-    if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    if (!IsX509PalFeatureUnavailable(err))
     {
         EXPECT_EQ(err, CHIP_NO_ERROR);
         EXPECT_EQ(pubkey.Length(), kP256_PublicKey_Length);
@@ -1927,7 +1933,7 @@ TEST_F(TestChipCryptoPAL, TestCSR_GenByKeypair)
 
     P256PublicKey pubkey;
     CHIP_ERROR err = VerifyCertificateSigningRequest(csr, length, pubkey);
-    if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    if (!IsX509PalFeatureUnavailable(err))
     {
         ASSERT_EQ(err, CHIP_NO_ERROR);
         EXPECT_EQ(pubkey.Length(), kP256_PublicKey_Length);
@@ -2452,6 +2458,8 @@ TEST_F(TestChipCryptoPAL, TestCompressedFabricIdentifier)
     error = GenerateCompressedFabricId(invalid_root_public_key, kFabricId, compressed_fabric_id_span);
     EXPECT_EQ(error, CHIP_ERROR_INVALID_ARGUMENT);
 }
+
+#if CHIP_CRYPTO_USE_X509
 
 TEST_F(TestChipCryptoPAL, TestPubkey_x509Extraction)
 {
@@ -3295,6 +3303,8 @@ TEST_F(TestChipCryptoPAL, TestX509_ReplaceCertIfResignedCertFound)
     }
 }
 
+#endif // CHIP_CRYPTO_USE_X509
+
 static const uint8_t kCompressedFabricId[] = { 0x29, 0x06, 0xC9, 0x08, 0xD1, 0x15, 0xD3, 0x62 };
 
 const uint8_t kEpochKeyBuffer1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7,
@@ -3822,3 +3832,88 @@ TEST_F(TestChipCryptoPAL, TestHazardousOperationLoadKeypairFromRaw)
     // Verify again with that instance
     EXPECT_EQ(pubkey.ECDSA_validate_msg_signature(reinterpret_cast<const uint8_t *>(msg), msg_len, signature), CHIP_NO_ERROR);
 }
+
+#if !CHIP_CRYPTO_USE_X509
+
+TEST_F(TestChipCryptoPAL, TestX509Disabled_CertParsingUnavailable)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker;
+
+    P256PublicKey publicKey;
+    CertificateChainValidationResult chainValidationResult;
+    AttestationCertVidPid vidpid;
+    ByteSpan outCert;
+    ByteSpan candidateCerts[] = { sTestCert_PAA_FFF1_Cert };
+    uint8_t skidBuf[kSubjectKeyIdentifierLength];
+    MutableByteSpan skidOut(skidBuf);
+    uint8_t akidBuf[kAuthorityKeyIdentifierLength];
+    MutableByteSpan akidOut(akidBuf);
+    char cdpBuf[kMaxCRLDistributionPointURLLength] = { '\0' };
+    MutableCharSpan cdp(cdpBuf);
+    uint8_t crlIssuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+    MutableByteSpan crlIssuer(crlIssuerBuf);
+    uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
+    MutableByteSpan serialNumber(serialNumberBuf);
+    uint8_t dnBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+    MutableByteSpan dn(dnBuf);
+
+    EXPECT_EQ(VerifyAttestationCertificateFormat(sTestCert_PAA_FFF1_Cert, AttestationCertType::kPAA),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ValidateCertificateChain(sTestCert_PAA_FFF1_Cert.data(), sTestCert_PAA_FFF1_Cert.size(),
+                                       sTestCert_PAI_FFF1_8000_Cert.data(), sTestCert_PAI_FFF1_8000_Cert.size(),
+                                       sTestCert_DAC_FFF1_8000_0000_Cert.data(), sTestCert_DAC_FFF1_8000_0000_Cert.size(),
+                                       chainValidationResult),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(IsCertificateValidAtIssuance(sTestCert_DAC_FFF1_8000_0000_Cert, sTestCert_PAA_FFF1_Cert),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(IsCertificateValidAtCurrentTime(sTestCert_PAA_FFF1_Cert), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ExtractPubkeyFromX509Cert(sTestCert_PAA_FFF1_Cert, publicKey), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ExtractSKIDFromX509Cert(sTestCert_PAA_FFF1_Cert, skidOut), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ExtractAKIDFromX509Cert(sTestCert_PAA_FFF1_Cert, akidOut), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ExtractCRLDistributionPointURIFromX509Cert(sTestCert_PAA_FFF1_Cert, cdp), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ExtractCDPExtensionCRLIssuerFromX509Cert(sTestCert_PAA_FFF1_Cert, crlIssuer), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ExtractSerialNumberFromX509Cert(sTestCert_PAA_FFF1_Cert, serialNumber), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ExtractSubjectFromX509Cert(sTestCert_PAA_FFF1_Cert, dn), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ExtractIssuerFromX509Cert(sTestCert_PAA_FFF1_Cert, dn), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(VerifyCertificateSigningRequest(sTestCert_PAA_FFF1_Cert.data(), sTestCert_PAA_FFF1_Cert.size(), publicKey),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ReplaceCertIfResignedCertFound(sTestCert_PAI_FFF1_8000_Cert, candidateCerts, MATTER_ARRAY_SIZE(candidateCerts),
+                                               outCert),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(ExtractVIDPIDFromX509Cert(sTestCert_PAI_FFF1_8000_Cert, vidpid), CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
+TEST_F(TestChipCryptoPAL, TestX509Disabled_PsaOperationalCsrGeneration)
+{
+#if !CHIP_CRYPTO_PSA
+    GTEST_SKIP() << "PSA backend only";
+#endif
+
+    HeapChecker heapChecker;
+
+    uint8_t csr[kMIN_CSR_Buffer_Size];
+    size_t length = sizeof(csr);
+
+    Test_P256Keypair keypair;
+    ASSERT_EQ(keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+    ASSERT_EQ(keypair.NewCertificateSigningRequest(csr, length), CHIP_NO_ERROR);
+    ASSERT_GT(length, 2u);
+
+    uint8_t csrBuf[kMIN_CSR_Buffer_Size];
+    ClearSecretData(csrBuf);
+    MutableByteSpan csrSpan(csrBuf);
+    ASSERT_EQ(GenerateCertificateSigningRequest(&keypair, csrSpan), CHIP_NO_ERROR);
+
+    // CSR generation uses the ASN.1 path and remains available without X509 PAL support.
+    EXPECT_EQ(VerifyCertificateSigningRequestFormat(csr, length), CHIP_NO_ERROR);
+    EXPECT_EQ(VerifyCertificateSigningRequestFormat(csrSpan.data(), csrSpan.size()), CHIP_NO_ERROR);
+
+    // Signature verification still requires X509 PAL parsing.
+    P256PublicKey pubkey;
+    EXPECT_EQ(VerifyCertificateSigningRequest(csr, length, pubkey), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), pubkey), CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
+#endif // !CHIP_CRYPTO_USE_X509

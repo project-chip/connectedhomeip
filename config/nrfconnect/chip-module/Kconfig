@@ -1,17 +1,17 @@
 #
-#   Copyright (c) 2021 Project CHIP Authors
+#Copyright(c) 2021 Project CHIP Authors
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+#Licensed under the Apache License, Version 2.0(the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#http: // www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
 #
 
 rsource "../../zephyr/Kconfig"
@@ -34,11 +34,11 @@ config CHIP_NRF_PLATFORM
 	  what can be used to conditionally deviate from Zephyr generic configuration
 	  for nRF platform related purposes.
 
-# See config/zephyr/Kconfig for full definition
+#See config / zephyr / Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	default "Nordic Semiconductor ASA"
 
-# See config/common/cmake/Kconfig for full definition
+#See config / common / cmake / Kconfig for full definition
 config CHIP_NFC_ONBOARDING_PAYLOAD
 	default n
 	imply NFC_T2T_NRFXLIB
@@ -65,11 +65,11 @@ endchoice
 
 config CHIP_DFU_LIBRARY_MCUMGR
 	bool "Use mcumgr library for Matter DFU purposes"
-	# MCUBOOT
+#MCUBOOT
 	select MCUMGR_GRP_IMG if CHIP_BOOTLOADER_MCUBOOT
 	select MCUMGR_GRP_OS if CHIP_BOOTLOADER_MCUBOOT
 	select MCUMGR_GRP_IMG_STATUS_HOOKS if CHIP_BOOTLOADER_MCUBOOT
-	# COMMON
+#COMMON
 	select MCUMGR
 	imply STREAM_FLASH
 	imply STREAM_FLASH_ERASE
@@ -77,14 +77,14 @@ config CHIP_DFU_LIBRARY_MCUMGR
 config CHIP_DFU_LIBRARY_DFU_TARGET
 	bool "Use dfu target library for Matter DFU purposes"
 	imply DFU_MULTI_IMAGE
-	# COMMON
+#COMMON
 	imply DFU_TARGET
 	imply STREAM_FLASH
 	imply STREAM_FLASH_ERASE
 	select ZCBOR
 	select ZCBOR_CANONICAL
 
-# See config/zephyr/Kconfig for full definition
+#See config / zephyr / Kconfig for full definition
 config CHIP_OTA_REQUESTOR
 	bool
 	imply DFU_MULTI_IMAGE
@@ -197,7 +197,7 @@ config CHIP_FACTORY_DATA_WRITE_PROTECT
 
 if CHIP_FACTORY_DATA_BUILD
 
-# Factory data definitions
+#Factory data definitions
 config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 	bool "Merge generated factory data with merged.hex output build file"
 	default y
@@ -216,7 +216,7 @@ config CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES
 	  onboarding codes a Matter controller to commission a device to a Matter 
 	  network.
 
-# Select source of the certificates
+#Select source of the certificates
 choice CHIP_FACTORY_DATA_CERT_SOURCE
 	prompt "Attestation certificate file source"
 	default CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
@@ -268,7 +268,7 @@ config CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT
 
 endif # CHIP_FACTORY_DATA_CERT_SOURCE_USER
 
-# Configs for SPAKE2+ generation
+#Configs for SPAKE2 + generation
 config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
 	bool "Generate SPAKE2+ verifier"
 	default y
@@ -286,7 +286,7 @@ endif # CHIP_FACTORY_DATA_BUILD
 
 endif # CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
 
-# See config/zephyr/Kconfig for full definition
+#See config / zephyr / Kconfig for full definition
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
 	depends on NVS || ZMS
@@ -476,10 +476,13 @@ config CHIP_CRYPTO_USE_X509
 	bool "X.509 certificate support"
 	depends on MBEDTLS_X509_LIBRARY || MBEDTLS
 	default y if CHIP_BUILD_TESTS
-	default n if CHIP_CRYPTO_PSA
-	default y if MBEDTLS_X509_LIBRARY
+	default y if !CHIP_CRYPTO_PSA
+	default n
 	help
-	  Controls compilation of X.509-related crypto functionality in Matter.
-	  Disable to reduce code footprint if your device does not need X.509 certificate parsing/validation.
+	  Controls compilation of X.509-related crypto functionality in the
+	  mbedTLS CryptoPAL (certificate parsing/validation and, on the mbedTLS
+	  crypto backend, operational CSR generation during commissioning).
+	  Must remain enabled when using the mbedTLS crypto backend for standard
+	  Matter commissioning (OperationalCredentials CSRRequest).
 
 endif # CHIP

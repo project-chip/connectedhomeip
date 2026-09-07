@@ -837,7 +837,7 @@ exit:
 #else
     ChipLogError(Crypto, "MBEDTLS_X509_CSR_WRITE_C is not enabled. CSR cannot be created");
 #endif
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_CRYPTO_USE_X509 && defined(MBEDTLS_X509_CSR_WRITE_C)
 }
 

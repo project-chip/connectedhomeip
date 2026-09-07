@@ -146,7 +146,7 @@ exit:
 #else
     ChipLogError(Crypto, "MBEDTLS_X509_CSR_PARSE_C is not enabled. CSR cannot be parsed");
 #endif
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_CRYPTO_USE_X509 && defined(MBEDTLS_X509_CSR_PARSE_C)
 }
 
@@ -402,7 +402,7 @@ exit:
 #else
     ChipLogError(Crypto, "MBEDTLS_X509_CRT_PARSE_C is not enabled. Attestation certificate format cannot be verified");
 #endif
-    CHIP_ERROR error = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_CRYPTO_USE_X509 && defined(MBEDTLS_X509_CRT_PARSE_C)
 
     return error;
