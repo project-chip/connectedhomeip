@@ -43,6 +43,13 @@ public:
     using DefaultAvAnalysisWebRTCClient::HandleServerListReport;
     using DefaultAvAnalysisWebRTCClient::Request;
 
+    // The interaction callbacks, so the tests can play the camera's and the application's side
+    using DefaultAvAnalysisWebRTCClient::OnAttributeData;
+    using DefaultAvAnalysisWebRTCClient::OnDone;
+    using DefaultAvAnalysisWebRTCClient::OnError;
+    using DefaultAvAnalysisWebRTCClient::OnOfferReady;
+    using DefaultAvAnalysisWebRTCClient::OnResponse;
+
     // Drives the request into the provider-check phase, as OnDeviceConnected would after CASE
     void EnterProviderCheck() { CurrentRequest().Advance(Request::Phase::kCheckingProvider); }
 

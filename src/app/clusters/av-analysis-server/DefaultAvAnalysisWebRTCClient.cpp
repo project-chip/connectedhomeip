@@ -142,6 +142,40 @@ void DefaultAvAnalysisWebRTCClient::Cancel()
     }
 }
 
+CHIP_ERROR DefaultAvAnalysisWebRTCClient::InvokeOnHeldSession(CommandId aCommandId, const DataModel::EncodableToTLV & aRequest)
+{
+    VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
+
+    // A CommandSender may only be destroyed from its own OnDone, so it must not be replaced while a
+    // previous one's callbacks can still fire.
+    VerifyOrReturnError(!mCommandSender, CHIP_ERROR_INCORRECT_STATE);
+
+    auto session   = mRequest.Session();
+    mCommandSender = Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager(), /* aIsTimedRequest = */ false,
+                                                         /* aSuppressResponse = */ false, session.Value()->AllowsLargePayload());
+    VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // Recorded before sending: a send can dispatch the interaction's completion synchronously, and
+    // that callback must already recognise this sender as ours.
+    mRequest.SetInvokedSender(mCommandSender.get());
+    mRequest.Advance(Request::Phase::kInvoking);
+
+    CommandPathParams commandPath{ mRequest.WebRTCEndpoint(), WebRTCTransportProvider::Id, aCommandId,
+                                   CommandPathFlags::kEndpointIdValid };
+    CommandSender::AddRequestDataParameters addRequestDataParams;
+    CHIP_ERROR err = mCommandSender->AddRequestData(commandPath, aRequest, addRequestDataParams);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = mCommandSender->SendCommandRequest(session.Value());
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        mRequest.SetInvokedSender(nullptr);
+        mCommandSender.reset();
+    }
+    return err;
+}
+
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::CanStartRequest() const
 {
     VerifyOrReturnError(mCASESessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -353,7 +387,8 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendProvideOffer()
 {
     WebRTCTransportProvider::Commands::ProvideOffer::Type request;
     ReturnErrorOnFailure(BuildProvideOffer(request));
-    return InvokeOnHeldSession(request);
+    return InvokeOnHeldSession(WebRTCTransportProvider::Commands::ProvideOffer::Id,
+                               DataModel::EncodableType<WebRTCTransportProvider::Commands::ProvideOffer::Type>(request));
 }
 
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::BuildEndSession(WebRTCTransportProvider::Commands::EndSession::Type & aRequest) const
@@ -367,7 +402,8 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendEndSession()
 {
     WebRTCTransportProvider::Commands::EndSession::Type request;
     ReturnErrorOnFailure(BuildEndSession(request));
-    return InvokeOnHeldSession(request);
+    return InvokeOnHeldSession(WebRTCTransportProvider::Commands::EndSession::Id,
+                               DataModel::EncodableType<WebRTCTransportProvider::Commands::EndSession::Type>(request));
 }
 
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::BuildProvideICECandidates(
@@ -401,7 +437,8 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendProvideICECandidates()
     std::vector<Globals::Structs::ICECandidateStruct::Type> candidates;
     WebRTCTransportProvider::Commands::ProvideICECandidates::Type request;
     ReturnErrorOnFailure(BuildProvideICECandidates(request, candidates));
-    return InvokeOnHeldSession(request);
+    return InvokeOnHeldSession(WebRTCTransportProvider::Commands::ProvideICECandidates::Id,
+                               DataModel::EncodableType<WebRTCTransportProvider::Commands::ProvideICECandidates::Type>(request));
 }
 
 void DefaultAvAnalysisWebRTCClient::OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
@@ -523,7 +560,7 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
     // Tracked session
     slot->inUse            = true;
     slot->webRTCSessionId  = aWebRTCSessionId;
-    slot->mCallback        = mRequest.PeekCallback();
+    slot->callback         = mRequest.PeekCallback();
     slot->cameraNode       = mRequest.CameraNode();
     slot->providerEndpoint = mRequest.WebRTCEndpoint();
 
@@ -553,10 +590,12 @@ void DefaultAvAnalysisWebRTCClient::ReleaseSession(TrackedSession & aSession)
 void DefaultAvAnalysisWebRTCClient::NotifyConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
     TrackedSession * session = FindTrackedSession(aCameraNode, aWebRTCSessionId);
-    VerifyOrReturn(session != nullptr,
-                   ChipLogProgress(Zcl, "AvAnalysisWebRTCClient: connection of untracked session %u ignored", aWebRTCSessionId));
+    VerifyOrReturn(
+        session != nullptr,
+        ChipLogDetail(Zcl, "AvAnalysisWebRTCClient: connection of untracked session %u of " ChipLogFormatScopedNodeId " ignored",
+                      aWebRTCSessionId, ChipLogValueScopedNodeId(aCameraNode)));
 
-    session->mCallback->OnSessionActive(aCameraNode, aWebRTCSessionId);
+    session->callback->OnSessionActive(aCameraNode, aWebRTCSessionId);
 }
 
 void DefaultAvAnalysisWebRTCClient::NotifyFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
@@ -574,10 +613,12 @@ void DefaultAvAnalysisWebRTCClient::FailTrackedSession(const ScopedNodeId & aCam
 {
     TrackedSession * session = FindTrackedSession(aCameraNode, aWebRTCSessionId);
     VerifyOrReturn(session != nullptr,
-                   ChipLogProgress(Zcl, "AvAnalysisWebRTCClient: end of untracked session %u ignored", aWebRTCSessionId));
+                   ChipLogDetail(Zcl,
+                                 "AvAnalysisWebRTCClient: end of untracked session %u of " ChipLogFormatScopedNodeId " ignored",
+                                 aWebRTCSessionId, ChipLogValueScopedNodeId(aCameraNode)));
 
     // Released before the callback learns of it, so the callback finds the session already gone
-    AvAnalysisWebRTCClient::Callback * callback = session->mCallback;
+    AvAnalysisWebRTCClient::Callback * callback = session->callback;
     ReleaseSession(*session);
     callback->OnSessionFailed(aCameraNode, aWebRTCSessionId);
 }
@@ -607,8 +648,10 @@ void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebR
         // which the application reports through NotifyFailed
         if (aStatus != Status::Success)
         {
-            ChipLogError(Zcl, "AvAnalysisWebRTCClient: ProvideICECandidates for session %u failed with status 0x%02x",
-                         aWebRTCSessionId, to_underlying(aStatus));
+            ChipLogError(Zcl,
+                         "AvAnalysisWebRTCClient: ProvideICECandidates for session %u of " ChipLogFormatScopedNodeId
+                         " failed with status 0x%02x",
+                         aWebRTCSessionId, ChipLogValueScopedNodeId(cameraNode), to_underlying(aStatus));
         }
         return;
     }

@@ -24,6 +24,7 @@
 #include <app/ReadClient.h>
 #include <app/clusters/av-analysis-server/AvAnalysisWebRTCClient.h>
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
+#include <app/data-model/EncodableToTLV.h>
 #include <clusters/WebRTCTransportProvider/Commands.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ScopedMemoryBuffer.h>
@@ -144,6 +145,9 @@ public:
     CHIP_ERROR SendICECandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId,
                                  Span<const Globals::Structs::ICECandidateStruct::Type> aCandidates);
 
+protected:
+    // The interaction callbacks are the SDK's to invoke, not the application's
+
     // CommandSender::Callback
     void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
                     TLV::TLVReader * apData) override;
@@ -158,7 +162,6 @@ public:
     // AvAnalysisWebRTCPeerDelegate::OfferCallback
     void OnOfferReady(CHIP_ERROR aError, CharSpan aSdp) override;
 
-protected:
     /**
      * Starts CASE session establishment toward the camera; the connected/connection-failure
      * callbacks continue the pending request. The default body is the expected behavior; virtual
@@ -380,8 +383,8 @@ private:
     // callback that initiated it, and (for outbound sends about it) back to the camera.
     struct TrackedSession
     {
-        uint16_t webRTCSessionId                     = 0;
-        AvAnalysisWebRTCClient::Callback * mCallback = nullptr;
+        uint16_t webRTCSessionId                    = 0;
+        AvAnalysisWebRTCClient::Callback * callback = nullptr;
         ScopedNodeId cameraNode;
         EndpointId providerEndpoint = kInvalidEndpointId;
         bool inUse                  = false;
@@ -406,45 +409,11 @@ private:
     TrackedSession * FindFreeSession();
 
     /**
-     * Invokes aRequest on the held session with a fresh CommandSender, recording it as the
-     * request's sender and advancing to kInvoking; the command's outcome arrives through the
-     * CommandSender callbacks. A send that never left reclaims the sender, since its OnDone will
-     * never come.
+     * Invokes the command aCommandId of WebRTCTransportProvider with the encodable aRequest on the
+     * held session with a fresh CommandSender, recording it as the request's sender and advancing
+     * to kInvoking; the command's outcome arrives through the CommandSender callbacks.
      */
-    template <typename RequestType>
-    CHIP_ERROR InvokeOnHeldSession(const RequestType & aRequest)
-    {
-        VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
-
-        // A CommandSender may only be destroyed from its own OnDone, so it must not be replaced
-        // while a previous one's callbacks can still fire.
-        VerifyOrReturnError(!mCommandSender, CHIP_ERROR_INCORRECT_STATE);
-
-        auto session = mRequest.Session();
-        mCommandSender =
-            Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager(), /* aIsTimedRequest = */ false,
-                                                /* aSuppressResponse = */ false, session.Value()->AllowsLargePayload());
-        VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        // Recorded before sending: a send can dispatch the interaction's completion synchronously,
-        // and that callback must already recognise this sender as ours.
-        mRequest.SetInvokedSender(mCommandSender.get());
-        mRequest.Advance(Request::Phase::kInvoking);
-
-        CommandPathParams commandPath{ mRequest.WebRTCEndpoint(), WebRTCTransportProvider::Id, RequestType::GetCommandId(),
-                                       CommandPathFlags::kEndpointIdValid };
-        CHIP_ERROR err = mCommandSender->AddRequestData(commandPath, aRequest);
-        if (err == CHIP_NO_ERROR)
-        {
-            err = mCommandSender->SendCommandRequest(session.Value());
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            mRequest.SetInvokedSender(nullptr);
-            mCommandSender.reset();
-        }
-        return err;
-    }
+    CHIP_ERROR InvokeOnHeldSession(CommandId aCommandId, const DataModel::EncodableToTLV & aRequest);
 
     static void OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
