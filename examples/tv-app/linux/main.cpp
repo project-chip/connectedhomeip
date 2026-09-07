@@ -143,17 +143,20 @@ bool TvAppOptionHandler(const char * program, chip::ArgParser::OptionSet * optio
     {
         if (strcmp(value, option.name) == 0)
         {
-            gMediaDeviceTypeList[0]    = option.deviceType;
-            gMediaDeviceTypeOverridden = true;
             // Override the DNS-SD advertised device type now, before the server
-            // starts advertising. The Descriptor DeviceTypeList is updated later
-            // in ApplicationInit (the endpoint table does not exist yet here).
+            // starts advertising. Only record the override (which also drives
+            // the Descriptor DeviceTypeList update in ApplicationInit) once this
+            // succeeds, so a failure does not leave us claiming an override that
+            // did not take effect.
             CHIP_ERROR err = ConfigurationMgr().SetDeviceTypeId(option.deviceType.deviceTypeId);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "%s: failed to override advertised device type: %" CHIP_ERROR_FORMAT, program,
                              err.Format());
+                return false;
             }
+            gMediaDeviceTypeList[0]    = option.deviceType;
+            gMediaDeviceTypeOverridden = true;
             ChipLogProgress(DeviceLayer, "TV Linux App: endpoint 1 device type selected: %s (0x%04X revision %u)", option.name,
                             static_cast<unsigned>(option.deviceType.deviceTypeId), option.deviceType.deviceTypeRevision);
             return true;
