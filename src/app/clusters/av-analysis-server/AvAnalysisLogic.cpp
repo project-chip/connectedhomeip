@@ -1017,16 +1017,18 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeacti
 
     mCameraInteraction.Begin(AvAnalysis::CameraInteraction::State::kDeactivating, handler, commandPath, entry->cameraNode,
                              entry->analysisStreamID);
+    SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCPendingDeactivation);
+
     CHIP_ERROR err =
         mWebRTCClient->EndSession(entry->cameraNode, entry->webRTCEndpointID.Value(), entry->webRTCSessionID.Value(), *this);
     if (err != CHIP_NO_ERROR)
     {
+        // Nothing was sent: the session is untouched and the stream still active
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to end session: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
         mCameraInteraction.Abort();
+        SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCActive);
         return (err == CHIP_ERROR_BUSY) ? Status::Busy : Status::Failure;
     }
-
-    SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCPendingDeactivation);
 
     // Response is produced in OnSessionEnded once the camera answers
     return std::nullopt;

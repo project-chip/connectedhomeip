@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <optional>
 #include <pw_unit_test/framework.h>
 #include <ranges>
 
@@ -146,8 +147,21 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
             mLastEndpoint  = aWebRTCEndpoint;
             mLastSessionId = aWebRTCSessionId;
             mLastCallback  = &aCallback;
+            ReturnErrorOnFailure(mEndSessionResult);
+
+            // A real client completes synchronously when the CASE session is cached and the send
+            // fails at once: the outcome arrives before EndSession() returns success
+            if (mSynchronousEndOutcome.has_value())
+            {
+                aCallback.OnSessionEnded(*mSynchronousEndOutcome, aWebRTCSessionId);
+            }
             return CHIP_NO_ERROR;
         }
+
+        // What EndSession() returns; a failure means the request never started
+        CHIP_ERROR mEndSessionResult = CHIP_NO_ERROR;
+        // When set, EndSession() delivers this outcome before returning
+        std::optional<Status> mSynchronousEndOutcome;
 
         void Cancel() override
         {
@@ -993,6 +1007,78 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateEndsTheSession)
     ASSERT_TRUE(iter.GetValue().webRTCEndpointID.Value().IsNull());
 
     // The stream is activatable again
+    ActivateStream(0, 2, 77);
+    ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 2);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, DeactivateThatCannotStartLeavesTheStreamActive)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+    ActivateStream(0, 2, 55);
+
+    // The client cannot take the request: nothing is sent
+    mFakeWebRTCClient.mEndSessionResult = CHIP_ERROR_BUSY;
+
+    Testing::MockCommandHandler deactivateHandler;
+    deactivateHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DeactivateAnalysisStream::Id };
+    Commands::DeactivateAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 0;
+
+    auto response = mServer.GetLogic().HandleDeactivateAnalysisStream(deactivateHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_EQ(response.value().GetStatusCode().GetStatus(), Status::Busy);
+
+    // The session is untouched, so the stream is still active and deactivatable
+    Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
+    auto iter = streams.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kWebRTCActive);
+
+    mFakeWebRTCClient.mEndSessionResult = CHIP_NO_ERROR;
+    Testing::MockCommandHandler retryHandler;
+    retryHandler.SetFabricIndex(1);
+    response = mServer.GetLogic().HandleDeactivateAnalysisStream(retryHandler, path, commandData);
+    ASSERT_FALSE(response.has_value());
+    ASSERT_EQ(mFakeWebRTCClient.mEndRequests, 2);
+
+    // Finish the retry so no interaction outlives its handler
+    mFakeWebRTCClient.mLastCallback->OnSessionEnded(Status::Success, 55);
+    ASSERT_EQ(retryHandler.GetLastStatus().status.GetStatus(), Status::Success);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, DeactivateCompletingSynchronouslyKeepsItsOutcome)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+    ActivateStream(0, 2, 55);
+
+    // The client fails the request before EndSession() returns (a cached CASE session whose send
+    // fails at once); the handler must not overwrite that outcome afterwards
+    mFakeWebRTCClient.mSynchronousEndOutcome = Status::Failure;
+
+    Testing::MockCommandHandler deactivateHandler;
+    deactivateHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DeactivateAnalysisStream::Id };
+    Commands::DeactivateAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 0;
+
+    auto response = mServer.GetLogic().HandleDeactivateAnalysisStream(deactivateHandler, path, commandData);
+    ASSERT_FALSE(response.has_value()); // The parked handler already answered
+    ASSERT_EQ(deactivateHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+
+    Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
+    auto iter = streams.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kFailure);
+
+    // Failure is an exit: the stream can be re-initiated
+    mFakeWebRTCClient.mSynchronousEndOutcome.reset();
     ActivateStream(0, 2, 77);
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 2);
 }
