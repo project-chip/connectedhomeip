@@ -207,12 +207,19 @@ public:
         return mSetMaxHeatStatus;
     }
 
+    Protocols::InteractionModel::Status GetCriticalFreezeProtection(bool & enabled) const override
+    {
+        enabled = mCriticalFreezeProtection;
+        return mGetCriticalFreezeProtectionStatus;
+    }
+
     temperature mOccupiedHeatingSetpoint                            = 2000;
     temperature mUnoccupiedHeatingSetpoint                          = 1600;
     temperature mAbsMinHeat                                         = 700;
     temperature mAbsMaxHeat                                         = 3000;
     temperature mMinHeat                                            = 700;
     temperature mMaxHeat                                            = 3000;
+    bool mCriticalFreezeProtection                                  = false;
     Protocols::InteractionModel::Status mGetOccupiedHeatingStatus   = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mSetOccupiedHeatingStatus   = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mGetUnoccupiedHeatingStatus = Protocols::InteractionModel::Status::Success;
@@ -223,6 +230,7 @@ public:
     Protocols::InteractionModel::Status mSetMinHeatStatus           = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mGetMaxHeatStatus           = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mSetMaxHeatStatus           = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mGetCriticalFreezeProtectionStatus = Protocols::InteractionModel::Status::Success;
 };
 
 class MockCoolingDelegate : public ThermostatCoolingSetpoints::Delegate
@@ -287,12 +295,19 @@ public:
         return mSetUnoccupiedCoolingStatus;
     }
 
+    Protocols::InteractionModel::Status GetCriticalOverheatProtection(bool & enabled) const override
+    {
+        enabled = mCriticalOverheatProtection;
+        return mGetCriticalOverheatProtectionStatus;
+    }
+
     temperature mOccupiedCoolingSetpoint                            = 2600;
     temperature mUnoccupiedCoolingSetpoint                          = 2800;
     temperature mAbsMinCool                                         = 1600;
     temperature mAbsMaxCool                                         = 3200;
     temperature mMinCool                                            = 1600;
     temperature mMaxCool                                            = 3200;
+    bool mCriticalOverheatProtection                                = false;
     Protocols::InteractionModel::Status mGetOccupiedCoolingStatus   = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mSetOccupiedCoolingStatus   = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mGetAbsMinCoolStatus        = Protocols::InteractionModel::Status::Success;
@@ -303,6 +318,7 @@ public:
     Protocols::InteractionModel::Status mSetMaxCoolStatus           = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mGetUnoccupiedCoolingStatus = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mSetUnoccupiedCoolingStatus = Protocols::InteractionModel::Status::Success;
+    Protocols::InteractionModel::Status mGetCriticalOverheatProtectionStatus = Protocols::InteractionModel::Status::Success;
 };
 
 class MockAutoDelegate : public ThermostatAutoSetpoints::Delegate
