@@ -41,6 +41,11 @@ public class CommandResponseHolder {
         Clusters.AccountLogin.Commands.Logout.ID,
         // 0 is for success, you can return 1 for failure
         "{\"Status\":0}");
+    setResponseValue(
+        Clusters.KeypadInput.Id,
+        Clusters.KeypadInput.Commands.SendKey.ID,
+        // 0 is for Success status
+        "{\"0\":0}");
   };
 
   public static CommandResponseHolder getInstance() {
