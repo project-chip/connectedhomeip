@@ -156,6 +156,11 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
     TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
+void ConfigurationManagerImpl::InitiateFactoryResetSkipReboot()
+{
+    PlatformMgr().ScheduleWork(DoFactoryReset, true); // true to skip reboot
+}
+
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                uint32_t & value)
 {
@@ -251,7 +256,7 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
     QPGConfig::RunConfigUnitTest();
 }
 
-void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
+void ConfigurationManagerImpl::DoFactoryReset(intptr_t skipReboot)
 {
     CHIP_ERROR err;
     qvStatus_t qvErr;
@@ -277,9 +282,12 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    // Restart the system.
-    ChipLogProgress(DeviceLayer, "System restarting");
-    qvCHIP_ResetSystem();
+    if (!skipReboot)
+    {
+        // Restart the system.
+        ChipLogProgress(DeviceLayer, "System restarting");
+        qvCHIP_ResetSystem();
+    }
 }
 
 ConfigurationManager & ConfigurationMgrImpl()
