@@ -35,7 +35,7 @@ depends on the number of attributes and the network conditions.
    </td>
   </tr>
   <tr>
-   <td>Unexpected error writing non-writeable attribute - expected Unsupported Write, got {resp[0].Status}
+   <td>Unexpected error writing non-writable attribute - expected Unsupported Write, got {resp[0].Status}
    </td>
   </tr>
   <tr>

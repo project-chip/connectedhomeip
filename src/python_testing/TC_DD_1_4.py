@@ -50,6 +50,7 @@ class TC_DD_1_4(CertificationUnitTestNoDevice):
         device_count_response = self.wait_for_user_input(
             "Please specify the number of devices that will be onboarded.", "0x2")
         device_count = int(device_count_response, 16)
+        asserts.assert_greater_equal(device_count, 2, "At least two devices must be used to verify concatenation.")
 
         delimiter_count = qr_code_content.count(_CONCATENATION_DELIMITER)
         asserts.assert_equal(
