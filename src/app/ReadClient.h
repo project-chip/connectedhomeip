@@ -368,10 +368,15 @@ public:
 
     void OnUnsolicitedMessageFromPublisher()
     {
-        TriggerResubscribeIfScheduled("unsolicited message");
-
-        // Then notify callbacks
+        // Notify callbacks first. Per this method's contract the notification fires even for
+        // disconnected subscriptions, and OnUnsolicitedMessageFromPublisher() callees must not destroy
+        // the ReadClient before returning, so `this` is guaranteed valid for the call below.
         mpCallback.OnUnsolicitedMessageFromPublisher(this);
+
+        // Trigger the resubscribe last: it can synchronously close and destroy this ReadClient (a
+        // scheduled resubscribe whose session re-establishment fails -> Close -> OnDone). As the final
+        // statement, nothing dereferences `this` afterwards.
+        TriggerResubscribeIfScheduled("unsolicited message");
     }
 
     auto GetSubscriptionId() const
@@ -516,6 +521,9 @@ public:
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
+    // Test-only: TestInteractionModelEngine sets mPeer / mIsResubscriptionScheduled to drive the
+    // OnUnsolicitedReportData read-client-destroyed-during-walk regression test.
+    friend class TestInteractionModelEngine;
 
     enum class ClientState : uint8_t
     {

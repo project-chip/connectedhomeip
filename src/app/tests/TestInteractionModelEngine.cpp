@@ -18,6 +18,9 @@
 
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
+#include <app/MessageDef/ReportDataMessage.h>
+#include <app/ReadClient.h>
+#include <app/StatusResponse.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
@@ -71,6 +74,7 @@ public:
     void TestHasSubscriptionsToResumeHandlesNullIterator();
     void TestFabricHasAtLeastOneActiveSubscription();
     void TestFabricHasAtLeastOneActiveSubscriptionWithMixedStates();
+    void TestUnsolicitedReportDataReadClientDestroyedDuringWalk();
     static int GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apattributePathParamsList);
 };
 
@@ -877,6 +881,73 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResumeHand
 }
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+namespace {
+// A ReadClient::Callback whose OnDone deletes the ReadClient. This mirrors an application that destroys
+// its ReadClient from within OnDone, which the ReadClient API contract permits.
+class FreeingReadClientCallback : public ReadClient::Callback
+{
+public:
+    bool mOnDoneCalled = false;
+    void OnDone(ReadClient * apReadClient) override
+    {
+        mOnDoneCalled = true;
+        delete apReadClient;
+    }
+};
+} // namespace
+
+// InteractionModelEngine::OnUnsolicitedReportData walks mpActiveReadClientList and notifies each entry via
+// readClient->OnUnsolicitedMessageFromPublisher(). For a subscription with a scheduled resubscribe and no
+// live session, that notification synchronously runs the resubscribe, fails to re-establish the session, and
+// closes the client (Close -> OnDone), which an application may use to destroy it. The walk must snapshot the
+// next pointer before the notification and not dereference the client afterwards, mirroring the sibling
+// walkers OnActiveModeNotification / OnPeerTypeChange. This drives that exact path and verifies the walk
+// completes cleanly while the client is destroyed mid-walk (confirmed via mOnDoneCalled).
+TEST_F_FROM_FIXTURE_NO_BODY(TestInteractionModelEngine, TestUnsolicitedReportDataReadClientDestroyedDuringWalk)
+void TestInteractionModelEngine::TestUnsolicitedReportDataReadClientDestroyedDuringWalk()
+{
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    // Exchange whose session peer the ReadClient is matched against.
+    Messaging::ExchangeContext * exchange = NewExchangeToAlice(nullptr, false);
+    ASSERT_TRUE(exchange);
+    const ScopedNodeId peer = exchange->GetSessionHandle()->GetPeer();
+
+    // Heap-allocate the subscribe ReadClient; its constructor registers it on mpActiveReadClientList. The
+    // callback frees it on OnDone.
+    FreeingReadClientCallback callback;
+    auto * readClient = new ReadClient(engine, &GetExchangeManager(), callback, ReadClient::InteractionType::Subscribe);
+
+    // Drive the client into the "resubscription scheduled, no active session" state so that
+    // OnUnsolicitedMessageFromPublisher() -> TriggerResubscribeIfScheduled() fires OnResubscribeTimerCallback()
+    // synchronously, fails EstablishSessionToPeer() (no CASESessionManager registered), and Close()s -> OnDone()
+    // -> the callback deletes the client mid-walk.
+    readClient->mPeer                      = peer; // match the loop's peer filter so the callback is reached
+    readClient->mIsResubscriptionScheduled = true;
+
+    // A minimal ReportDataMessage carrying a SubscriptionId so OnUnsolicitedReportData parses past its header
+    // checks and reaches the active-read-client walk.
+    System::PacketBufferHandle payload = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    ASSERT_FALSE(payload.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(payload));
+    ReportDataMessage::Builder reportBuilder;
+    EXPECT_SUCCESS(reportBuilder.Init(&writer));
+    reportBuilder.SubscriptionId(0x1234);
+    EXPECT_SUCCESS(reportBuilder.EndOfReportDataMessage());
+    EXPECT_EQ(writer.Finalize(&payload), CHIP_NO_ERROR);
+
+    PayloadHeader payloadHeader;
+    // The walk notifies readClient, which is destroyed during the notification; it must continue past the
+    // destroyed entry (via the snapshotted next pointer) and return without dereferencing it.
+    engine->OnUnsolicitedReportData(exchange, payloadHeader, std::move(payload));
+
+    EXPECT_TRUE(callback.mOnDoneCalled); // confirms the client was destroyed during the walk
+    engine->Shutdown();
+}
 
 } // namespace app
 } // namespace chip
