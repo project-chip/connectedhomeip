@@ -160,16 +160,19 @@ public:
         mLastStatus  = aStatus;
         mLastSession = aWebRTCSessionId;
     }
-    void OnSessionActive(uint16_t aWebRTCSessionId) override
+    void OnSessionActive(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override
     {
         mActiveCount++;
+        mLastCamera  = aCameraNode;
         mLastSession = aWebRTCSessionId;
     }
-    void OnSessionFailed(uint16_t aWebRTCSessionId) override
+    void OnSessionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override
     {
         mFailedCount++;
+        mLastCamera  = aCameraNode;
         mLastSession = aWebRTCSessionId;
     }
+    ScopedNodeId mLastCamera;
     void OnSessionEnded(Status aStatus, uint16_t aWebRTCSessionId) override
     {
         mEndedCount++;
@@ -197,7 +200,7 @@ public:
     }
 
     CHIP_ERROR mCreateOfferResult = CHIP_NO_ERROR;
-    void OnSessionAssigned(uint16_t aWebRTCSessionId) override
+    void OnSessionAssigned(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override
     {
         mSessionsAssigned++;
         mLastAssigned = aWebRTCSessionId;
@@ -211,7 +214,7 @@ public:
                 Globals::Structs::ICECandidateStruct::Type candidate;
                 candidate.candidate = "candidate:1 1 UDP 2122252543 192.168.1.10 5000 typ host"_span;
                 mSendResultAtAssign = mClient->SendICECandidates(
-                    aWebRTCSessionId, Span<const Globals::Structs::ICECandidateStruct::Type>(&candidate, 1));
+                    aCameraNode, aWebRTCSessionId, Span<const Globals::Structs::ICECandidateStruct::Type>(&candidate, 1));
             }
         }
     }
@@ -221,11 +224,13 @@ public:
     bool mSendCandidatesOnAssign       = false;
     CHIP_ERROR mSendResultAtAssign     = CHIP_ERROR_INTERNAL;
     void OnOfferAbandoned() override { mOffersAbandoned++; }
-    void OnSessionClosed(uint16_t aWebRTCSessionId) override
+    void OnSessionClosed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override
     {
         mSessionsClosed++;
-        mLastClosed = aWebRTCSessionId;
+        mLastClosedCamera = aCameraNode;
+        mLastClosed       = aWebRTCSessionId;
     }
+    ScopedNodeId mLastClosedCamera;
 
     OfferCallback * mLastOfferCallback = nullptr;
 };
@@ -324,7 +329,17 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     void EstablishSessionWithId(uint16_t aWebRTCSessionId) { EstablishSessionWithId(aWebRTCSessionId, mCallback); }
     void EstablishSessionWithId(uint16_t aWebRTCSessionId, RecordingCallback & aCallback)
     {
-        DriveToOffer(aCallback);
+        EstablishSessionWithId(aWebRTCSessionId, aCallback, kCameraNode);
+    }
+
+    // The full exchange toward a specific camera, for sessions of several cameras side by side
+    void EstablishSessionWithId(uint16_t aWebRTCSessionId, RecordingCallback & aCallback, const ScopedNodeId & aCameraNode)
+    {
+        ASSERT_EQ(mClient.RequestSession(aCameraNode, kProviderEndpoint, kVideoStreamId, aCallback), CHIP_NO_ERROR);
+        mClient.EnterProviderCheck();
+        const ClusterId kProviderList[] = { WebRTCTransportProvider::Id };
+        FeedServerList(mClient, kProviderEndpoint, Span<const ClusterId>(kProviderList));
+        mClient.OnDone(static_cast<ReadClient *>(nullptr));
         ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
         mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
         FeedOfferResponse(aWebRTCSessionId);
@@ -364,7 +379,7 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     {
         auto candidates = TwoCandidates();
         ASSERT_EQ(
-            mClient.SendICECandidates(aWebRTCSessionId,
+            mClient.SendICECandidates(kCameraNode, aWebRTCSessionId,
                                       Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
             CHIP_NO_ERROR);
         ASSERT_EQ(mClient.SendPendingICECandidates(), CHIP_NO_ERROR);
@@ -654,7 +669,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ARequestWithNoFreeSessionSlotIsRefused
     EXPECT_EQ(mPeerDelegate.mOffersRequested, kMaxSessions);
 
     // A released session frees a slot for the next request
-    mClient.NotifyFailed(101);
+    mClient.NotifyFailed(kCameraNode, 101);
     EstablishSessionWithId(200);
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
     EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), static_cast<size_t>(kMaxSessions));
@@ -735,7 +750,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ConnectedSessionIsReportedActiveAndSta
 {
     EstablishSessionWithId(55);
 
-    mClient.NotifyConnected(55);
+    mClient.NotifyConnected(kCameraNode, 55);
 
     EXPECT_EQ(mCallback.mActiveCount, 1);
     EXPECT_EQ(mCallback.mLastSession, 55);
@@ -752,7 +767,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CameraEndedSessionIsReportedFailedAndR
     EstablishSessionWithId(55);
 
     // The camera's End arrives on the requestor cluster, not as the outcome of our EndSession
-    mClient.NotifyEnded(55);
+    mClient.NotifyEnded(kCameraNode, 55);
 
     EXPECT_EQ(mCallback.mFailedCount, 1);
     EXPECT_EQ(mCallback.mLastSession, 55);
@@ -769,7 +784,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, MediaFailureIsReportedFailedAndRelease
 {
     EstablishSessionWithId(55);
 
-    mClient.NotifyFailed(55);
+    mClient.NotifyFailed(kCameraNode, 55);
 
     EXPECT_EQ(mCallback.mFailedCount, 1);
     EXPECT_EQ(mCallback.mLastSession, 55);
@@ -785,9 +800,9 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, SignalsForUntrackedSessionsAreIgnored)
 {
     EstablishSessionWithId(55);
 
-    mClient.NotifyConnected(99);
-    mClient.NotifyFailed(99);
-    mClient.NotifyEnded(99);
+    mClient.NotifyConnected(kCameraNode, 99);
+    mClient.NotifyFailed(kCameraNode, 99);
+    mClient.NotifyEnded(kCameraNode, 99);
 
     EXPECT_EQ(mCallback.mActiveCount, 0);
     EXPECT_EQ(mCallback.mFailedCount, 0);
@@ -802,14 +817,40 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, SignalsRouteToTheCallbackThatInitiated
     EstablishSessionWithId(56, otherCallback);
     ASSERT_EQ(otherCallback.mInitiatedCount, 1);
 
-    mClient.NotifyConnected(56);
-    mClient.NotifyEnded(55);
+    mClient.NotifyConnected(kCameraNode, 56);
+    mClient.NotifyEnded(kCameraNode, 55);
 
     EXPECT_EQ(otherCallback.mActiveCount, 1);
     EXPECT_EQ(otherCallback.mFailedCount, 0);
     EXPECT_EQ(mCallback.mActiveCount, 0);
     EXPECT_EQ(mCallback.mFailedCount, 1);
     EXPECT_EQ(mCallback.mLastSession, 55);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, SessionsOfDifferentCamerasSharingAnIdAreToldApart)
+{
+    // Session ids are assigned per camera: two cameras both hand out id 0
+    const ScopedNodeId kOtherCamera(0x5678, 1);
+    RecordingCallback otherCallback;
+    EstablishSessionWithId(0, mCallback, kCameraNode);
+    EstablishSessionWithId(0, otherCallback, kOtherCamera);
+    ASSERT_EQ(mRequestorCluster.GetCurrentSessions().size(), 2u);
+
+    // The other camera's session fails: only it is released and reported
+    mClient.NotifyFailed(kOtherCamera, 0);
+
+    EXPECT_EQ(otherCallback.mFailedCount, 1);
+    EXPECT_EQ(otherCallback.mLastCamera, kOtherCamera);
+    EXPECT_EQ(mCallback.mFailedCount, 0);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
+    EXPECT_EQ(mPeerDelegate.mLastClosedCamera, kOtherCamera);
+    ASSERT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions()[0].peerNodeID, kCameraNode.GetNodeId());
+
+    // The first camera's session is intact: connected, and still endable under its own camera
+    mClient.NotifyConnected(kCameraNode, 0);
+    EXPECT_EQ(mCallback.mActiveCount, 1);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 0, mCallback), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, AnEstablishedSessionIsNotAnAbandonedOffer)
@@ -889,8 +930,8 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelReleasesEveryTrackedSessionSilen
     EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Late signals for the forgotten sessions are ignored
-    mClient.NotifyConnected(55);
-    mClient.NotifyEnded(56);
+    mClient.NotifyConnected(kCameraNode, 55);
+    mClient.NotifyEnded(kCameraNode, 56);
     EXPECT_EQ(mCallback.mActiveCount, 0);
     EXPECT_EQ(mCallback.mFailedCount, 0);
 
@@ -902,9 +943,9 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelReleasesEveryTrackedSessionSilen
 TEST_F(TestDefaultAvAnalysisWebRTCClient, ICECandidatesForAnUntrackedSessionAreRejected)
 {
     auto candidates = TwoCandidates();
-    EXPECT_EQ(
-        mClient.SendICECandidates(99, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
-        CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mClient.SendICECandidates(
+                  kCameraNode, 99, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+              CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(mClient.mConnectRequests, 0);
 }
 
@@ -912,7 +953,8 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnEmptyCandidateListIsRejected)
 {
     EstablishSessionWithId(55);
 
-    EXPECT_EQ(mClient.SendICECandidates(55, Span<const Globals::Structs::ICECandidateStruct::Type>()), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mClient.SendICECandidates(kCameraNode, 55, Span<const Globals::Structs::ICECandidateStruct::Type>()),
+              CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, ICECandidatesAreCopiedAndSentToTheSessionsCamera)
@@ -923,9 +965,10 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ICECandidatesAreCopiedAndSentToTheSess
     {
         // The caller's list dies before the send; the client must have copied it
         auto candidates = TwoCandidates();
-        ASSERT_EQ(mClient.SendICECandidates(
-                      55, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
-                  CHIP_NO_ERROR);
+        ASSERT_EQ(
+            mClient.SendICECandidates(kCameraNode, 55,
+                                      Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+            CHIP_NO_ERROR);
     }
     ASSERT_EQ(mClient.SendPendingICECandidates(), CHIP_NO_ERROR);
 
@@ -989,9 +1032,9 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CandidatesWhileAnotherRequestIsInFligh
     ASSERT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
 
     auto candidates = TwoCandidates();
-    EXPECT_EQ(
-        mClient.SendICECandidates(55, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
-        CHIP_ERROR_BUSY);
+    EXPECT_EQ(mClient.SendICECandidates(
+                  kCameraNode, 55, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+              CHIP_ERROR_BUSY);
 }
 
 } // namespace

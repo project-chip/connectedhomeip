@@ -69,7 +69,7 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::EndSession(const ScopedNodeId & aCamer
                                                      uint16_t aWebRTCSessionId, AvAnalysisWebRTCClient::Callback & aCallback)
 {
     // Ending a session this client tracks
-    VerifyOrReturnError(FindTrackedSession(aWebRTCSessionId) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(FindTrackedSession(aCameraNode, aWebRTCSessionId) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(CanStartRequest());
 
     mRequest.BeginEndSession(aCameraNode, aWebRTCEndpoint, aWebRTCSessionId, aCallback);
@@ -78,11 +78,11 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::EndSession(const ScopedNodeId & aCamer
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendICECandidates(uint16_t aWebRTCSessionId,
+CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendICECandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId,
                                                             Span<const Globals::Structs::ICECandidateStruct::Type> aCandidates)
 {
     // Candidates for a session this client tracks, routed to the camera that assigned it
-    TrackedSession * session = FindTrackedSession(aWebRTCSessionId);
+    TrackedSession * session = FindTrackedSession(aCameraNode, aWebRTCSessionId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!aCandidates.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(CanStartRequest());
@@ -464,6 +464,7 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
     VerifyOrReturn(isOurs);
 
     const uint16_t webRTCSessionId = mRequest.WebRTCSessionId();
+    const ScopedNodeId cameraNode  = mRequest.CameraNode();
 
     if (mRequest.InPhase(Request::Phase::kFailed))
     {
@@ -500,7 +501,7 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
 
     // Last, once the request is over and the callback knows the session: the application binds the
     // peer connection it created for this offer to the assigned id
-    mPeerDelegate->OnSessionAssigned(webRTCSessionId);
+    mPeerDelegate->OnSessionAssigned(cameraNode, webRTCSessionId);
 }
 
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessionId)
@@ -532,40 +533,40 @@ void DefaultAvAnalysisWebRTCClient::ReleaseSession(TrackedSession & aSession)
 {
     mRequestorCluster->RemoveSession(aSession.webRTCSessionId, aSession.cameraNode.GetNodeId(),
                                      aSession.cameraNode.GetFabricIndex());
-    mPeerDelegate->OnSessionClosed(aSession.webRTCSessionId);
+    mPeerDelegate->OnSessionClosed(aSession.cameraNode, aSession.webRTCSessionId);
     aSession = TrackedSession{};
 }
 
-void DefaultAvAnalysisWebRTCClient::NotifyConnected(uint16_t aWebRTCSessionId)
+void DefaultAvAnalysisWebRTCClient::NotifyConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
-    TrackedSession * session = FindTrackedSession(aWebRTCSessionId);
+    TrackedSession * session = FindTrackedSession(aCameraNode, aWebRTCSessionId);
     VerifyOrReturn(session != nullptr,
                    ChipLogProgress(Zcl, "AvAnalysisWebRTCClient: connection of untracked session %u ignored", aWebRTCSessionId));
 
-    session->mCallback->OnSessionActive(aWebRTCSessionId);
+    session->mCallback->OnSessionActive(aCameraNode, aWebRTCSessionId);
 }
 
-void DefaultAvAnalysisWebRTCClient::NotifyFailed(uint16_t aWebRTCSessionId)
+void DefaultAvAnalysisWebRTCClient::NotifyFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
-    FailTrackedSession(aWebRTCSessionId);
+    FailTrackedSession(aCameraNode, aWebRTCSessionId);
 }
 
-void DefaultAvAnalysisWebRTCClient::NotifyEnded(uint16_t aWebRTCSessionId)
+void DefaultAvAnalysisWebRTCClient::NotifyEnded(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
     // An End this node did not ask for: to the AV Analysis cluster the session has failed
-    FailTrackedSession(aWebRTCSessionId);
+    FailTrackedSession(aCameraNode, aWebRTCSessionId);
 }
 
-void DefaultAvAnalysisWebRTCClient::FailTrackedSession(uint16_t aWebRTCSessionId)
+void DefaultAvAnalysisWebRTCClient::FailTrackedSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
-    TrackedSession * session = FindTrackedSession(aWebRTCSessionId);
+    TrackedSession * session = FindTrackedSession(aCameraNode, aWebRTCSessionId);
     VerifyOrReturn(session != nullptr,
                    ChipLogProgress(Zcl, "AvAnalysisWebRTCClient: end of untracked session %u ignored", aWebRTCSessionId));
 
     // Released before the callback learns of it, so the callback finds the session already gone
     AvAnalysisWebRTCClient::Callback * callback = session->mCallback;
     ReleaseSession(*session);
-    callback->OnSessionFailed(aWebRTCSessionId);
+    callback->OnSessionFailed(aCameraNode, aWebRTCSessionId);
 }
 
 void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebRTCSessionId)
@@ -573,6 +574,7 @@ void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebR
     VerifyOrReturn(mRequest.InFlight());
 
     const Request::CommandType completed        = mRequest.GetCommandType();
+    const ScopedNodeId cameraNode               = mRequest.CameraNode();
     AvAnalysisWebRTCClient::Callback * callback = mRequest.TakeCallback();
     // An offer request failing after asking for the offer leaves the application a peer connection
     // that will never get a session
@@ -610,7 +612,7 @@ void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebR
     // EndSession failed goes to Failure, whose only exit is a new session, so nothing could ever
     // end this one again. Its peer connection closes with it; a camera that still holds the
     // session ends it on its side once the peer is gone.
-    TrackedSession * session = FindTrackedSession(aWebRTCSessionId);
+    TrackedSession * session = FindTrackedSession(cameraNode, aWebRTCSessionId);
     if (session != nullptr)
     {
         ReleaseSession(*session);
@@ -630,11 +632,12 @@ DefaultAvAnalysisWebRTCClient::TrackedSession * DefaultAvAnalysisWebRTCClient::F
     return nullptr;
 }
 
-DefaultAvAnalysisWebRTCClient::TrackedSession * DefaultAvAnalysisWebRTCClient::FindTrackedSession(uint16_t aWebRTCSessionId)
+DefaultAvAnalysisWebRTCClient::TrackedSession * DefaultAvAnalysisWebRTCClient::FindTrackedSession(const ScopedNodeId & aCameraNode,
+                                                                                                  uint16_t aWebRTCSessionId)
 {
     for (uint8_t i = 0; i < mMaxSessions; i++)
     {
-        if (mSessions[i].inUse && mSessions[i].webRTCSessionId == aWebRTCSessionId)
+        if (mSessions[i].inUse && mSessions[i].cameraNode == aCameraNode && mSessions[i].webRTCSessionId == aWebRTCSessionId)
         {
             return &mSessions[i];
         }

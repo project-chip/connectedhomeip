@@ -55,15 +55,17 @@ public:
         virtual void OnSessionInitiated(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) = 0;
 
         /**
-         * The initiated session completed its signaling flow and media is streaming.
+         * The initiated session completed its signaling flow and media is streaming. Session ids are
+         * assigned by each camera and unique only within it, so the camera identifies the session
+         * together with the id.
          */
-        virtual void OnSessionActive(uint16_t aWebRTCSessionId) = 0;
+        virtual void OnSessionActive(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
 
         /**
          * The initiated session failed after initiation, or ended for a reason other than a
          * requested EndSession (e.g. the camera ended it).
          */
-        virtual void OnSessionFailed(uint16_t aWebRTCSessionId) = 0;
+        virtual void OnSessionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
 
         /**
          * Outcome of EndSession for aWebRTCSessionId. A non-Success status is the camera's

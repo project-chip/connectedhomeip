@@ -1121,9 +1121,9 @@ void AvAnalysisServerLogic::OnSessionInitiated(Status aStatus, uint16_t aWebRTCS
     handler->AddStatus(commandPath, Status::Success);
 }
 
-void AvAnalysisServerLogic::OnSessionActive(uint16_t aWebRTCSessionId)
+void AvAnalysisServerLogic::OnSessionActive(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
-    AnalysisStreamEntry * entry = FindByWebRTCSession(aWebRTCSessionId);
+    AnalysisStreamEntry * entry = FindByWebRTCSession(aCameraNode, aWebRTCSessionId);
     VerifyOrReturn(entry != nullptr,
                    ChipLogError(Zcl, "AvAnalysis[ep=%d]: unknown session %u active", mEndpointId, aWebRTCSessionId));
     VerifyOrReturn(entry->state == AnalysisStreamStateEnum::kWebRTCInitiated,
@@ -1132,9 +1132,9 @@ void AvAnalysisServerLogic::OnSessionActive(uint16_t aWebRTCSessionId)
     SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCActive);
 }
 
-void AvAnalysisServerLogic::OnSessionFailed(uint16_t aWebRTCSessionId)
+void AvAnalysisServerLogic::OnSessionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
-    AnalysisStreamEntry * entry = FindByWebRTCSession(aWebRTCSessionId);
+    AnalysisStreamEntry * entry = FindByWebRTCSession(aCameraNode, aWebRTCSessionId);
     VerifyOrReturn(entry != nullptr,
                    ChipLogError(Zcl, "AvAnalysis[ep=%d]: unknown session %u failed", mEndpointId, aWebRTCSessionId));
 
@@ -1189,11 +1189,11 @@ void AvAnalysisServerLogic::OnSessionEnded(Status aStatus, uint16_t aWebRTCSessi
     handler->AddStatus(commandPath, aStatus);
 }
 
-AnalysisStreamEntry * AvAnalysisServerLogic::FindByWebRTCSession(uint16_t aWebRTCSessionId)
+AnalysisStreamEntry * AvAnalysisServerLogic::FindByWebRTCSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
     for (auto & entry : mStreamTable)
     {
-        if (!entry.webRTCSessionID.IsNull() && entry.webRTCSessionID.Value() == aWebRTCSessionId)
+        if (entry.cameraNode == aCameraNode && !entry.webRTCSessionID.IsNull() && entry.webRTCSessionID.Value() == aWebRTCSessionId)
         {
             return &entry;
         }

@@ -39,8 +39,8 @@ namespace Clusters {
 
 /**
  * The application side of the default WebRTC client: manages the peer connections whose signaling
- * the client performs. The methods carry the camera-assigned
- * WebRTC session id, under which the application keys its peer connections.
+ * the client performs. The methods carry the camera and the camera-assigned WebRTC session id,
+ * under which pair the application keys its peer connections: ids are unique only within a camera.
  *
  * All methods are invoked on the Matter thread.
  */
@@ -72,7 +72,7 @@ public:
      * The offer most recently produced now has a camera-assigned session id: the application binds
      * the peer connection it created to this id.
      */
-    virtual void OnSessionAssigned(uint16_t aWebRTCSessionId) = 0;
+    virtual void OnSessionAssigned(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
 
     /**
      * The offer most recently asked for will not become a session (the camera refused it, the
@@ -85,7 +85,7 @@ public:
     /**
      * The session is over, the application releases the peer connection bound to this id.
      */
-    virtual void OnSessionClosed(uint16_t aWebRTCSessionId) = 0;
+    virtual void OnSessionClosed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
 };
 
 /**
@@ -134,14 +134,15 @@ public:
      * connection established or failed, or when the camera's End arrives on its
      * WebRTCTransportRequestor cluster. A signal for a session this client does not track is ignored.
      */
-    void NotifyConnected(uint16_t aWebRTCSessionId);
-    void NotifyFailed(uint16_t aWebRTCSessionId);
-    void NotifyEnded(uint16_t aWebRTCSessionId);
+    void NotifyConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
+    void NotifyFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
+    void NotifyEnded(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
 
     /**
      * Sends this node's ICE candidates for a tracked session to its camera with ProvideICECandidates
      */
-    CHIP_ERROR SendICECandidates(uint16_t aWebRTCSessionId, Span<const Globals::Structs::ICECandidateStruct::Type> aCandidates);
+    CHIP_ERROR SendICECandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId,
+                                 Span<const Globals::Structs::ICECandidateStruct::Type> aCandidates);
 
     // CommandSender::Callback
     void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
@@ -398,9 +399,10 @@ private:
     // delegate releases its connection, and the slot is free again.
     void ReleaseSession(TrackedSession & aSession);
     // Routes NotifyFailed/NotifyEnded: the tracked session is released
-    void FailTrackedSession(uint16_t aWebRTCSessionId);
+    void FailTrackedSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId);
-    TrackedSession * FindTrackedSession(uint16_t aWebRTCSessionId);
+    // Session ids are unique only within a camera, so a session is identified by both
+    TrackedSession * FindTrackedSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
     TrackedSession * FindFreeSession();
 
     /**

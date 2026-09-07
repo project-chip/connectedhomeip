@@ -92,8 +92,8 @@ public:
     void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
 
     void OnSessionInitiated(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) override;
-    void OnSessionActive(uint16_t aWebRTCSessionId) override;
-    void OnSessionFailed(uint16_t aWebRTCSessionId) override;
+    void OnSessionActive(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
+    void OnSessionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
     void OnSessionEnded(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) override;
 
     EndpointId mEndpointId = kInvalidEndpointId;
@@ -208,7 +208,8 @@ private:
     /*
      * Command and event handler helper methods
      */
-    AvAnalysis::AnalysisStreamEntry * FindByWebRTCSession(uint16_t aWebRTCSessionId);
+    // Session ids are assigned per camera, so the camera is part of the key
+    AvAnalysis::AnalysisStreamEntry * FindByWebRTCSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
     bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext);
 

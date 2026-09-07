@@ -250,6 +250,12 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
     // succeeds with aSessionId and the session goes active.
     void ActivateStream(uint16_t aAnalysisStreamId, EndpointId aWebRTCEndpoint, uint16_t aSessionId)
     {
+        ActivateStream(aAnalysisStreamId, aWebRTCEndpoint, aSessionId, ScopedNodeId(0x1234, 1));
+    }
+
+    void ActivateStream(uint16_t aAnalysisStreamId, EndpointId aWebRTCEndpoint, uint16_t aSessionId,
+                        const ScopedNodeId & aCameraNode)
+    {
         Testing::MockCommandHandler activateHandler;
         activateHandler.SetFabricIndex(1);
         ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::ActivateAnalysisStream::Id };
@@ -262,7 +268,7 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         ASSERT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
         mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, aSessionId);
         ASSERT_EQ(activateHandler.GetLastStatus().status.GetStatus(), Status::Success);
-        mFakeWebRTCClient.mLastCallback->OnSessionActive(aSessionId);
+        mFakeWebRTCClient.mLastCallback->OnSessionActive(aCameraNode, aSessionId);
     }
 
     MockAvAnalysisDelegate mMockDelegate;
@@ -902,11 +908,37 @@ TEST_F(TestRemoteAvAnalysisCluster, SessionActiveMarksTheStreamActive)
     ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kWebRTCActive);
 
     // An unknown session going active changes nothing
-    mFakeWebRTCClient.mLastCallback->OnSessionActive(99);
+    mFakeWebRTCClient.mLastCallback->OnSessionActive(ScopedNodeId(0x1234, 1), 99);
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
     iter = streams.begin();
     ASSERT_TRUE(iter.Next());
     ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kWebRTCActive);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, SessionsOfDifferentCamerasSharingAnIdAreToldApart)
+{
+    // Two cameras, each assigning WebRTC session id 0 to its stream
+    Testing::MockCommandHandler firstHandler;
+    firstHandler.SetFabricIndex(1);
+    EstablishStream(firstHandler, 0x1234, Status::Success, 42);
+    Testing::MockCommandHandler secondHandler;
+    secondHandler.SetFabricIndex(1);
+    EstablishStream(secondHandler, 0x5678, Status::Success, 42);
+    ActivateStream(0, 2, 0, ScopedNodeId(0x1234, 1));
+    ActivateStream(1, 2, 0, ScopedNodeId(0x5678, 1));
+
+    // The second camera's session fails: only its stream does
+    mFakeWebRTCClient.mLastCallback->OnSessionFailed(ScopedNodeId(0x5678, 1), 0);
+
+    Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
+    auto iter = streams.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().analysisStreamID, 0);
+    ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kWebRTCActive);
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().analysisStreamID, 1);
+    ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kFailure);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, SessionFailureMarksTheStreamFailed)
@@ -918,7 +950,7 @@ TEST_F(TestRemoteAvAnalysisCluster, SessionFailureMarksTheStreamFailed)
 
     // The flow failing at any point post-initiation marks the stream Failure.
     // The dead session's id is forgotten; the endpoint stays until deactivation or re-activation.
-    mFakeWebRTCClient.mLastCallback->OnSessionFailed(55);
+    mFakeWebRTCClient.mLastCallback->OnSessionFailed(ScopedNodeId(0x1234, 1), 55);
 
     Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
@@ -927,7 +959,7 @@ TEST_F(TestRemoteAvAnalysisCluster, SessionFailureMarksTheStreamFailed)
     ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kFailure);
 
     // A repeated report for the dead session changes nothing
-    mFakeWebRTCClient.mLastCallback->OnSessionFailed(55);
+    mFakeWebRTCClient.mLastCallback->OnSessionFailed(ScopedNodeId(0x1234, 1), 55);
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
     iter = streams.begin();
     ASSERT_TRUE(iter.Next());
@@ -956,7 +988,7 @@ TEST_F(TestRemoteAvAnalysisCluster, SessionFailureBeforeActiveMarksTheStreamFail
     mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55);
     ASSERT_EQ(activateHandler.GetLastStatus().status.GetStatus(), Status::Success);
 
-    mFakeWebRTCClient.mLastCallback->OnSessionFailed(55);
+    mFakeWebRTCClient.mLastCallback->OnSessionFailed(ScopedNodeId(0x1234, 1), 55);
 
     Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
@@ -1111,8 +1143,8 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateFailureMarksTheStreamFailed)
 
     // The client is done with session 55, so the stream no longer refers to it: late signals for
     // it change nothing
-    mFakeWebRTCClient.mLastCallback->OnSessionActive(55);
-    mFakeWebRTCClient.mLastCallback->OnSessionFailed(55);
+    mFakeWebRTCClient.mLastCallback->OnSessionActive(ScopedNodeId(0x1234, 1), 55);
+    mFakeWebRTCClient.mLastCallback->OnSessionFailed(ScopedNodeId(0x1234, 1), 55);
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
     iter = streams.begin();
     ASSERT_TRUE(iter.Next());
