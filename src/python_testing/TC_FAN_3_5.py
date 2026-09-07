@@ -407,6 +407,8 @@ class TC_FAN_3_5(MatterBaseTest):
             fan_modes = [fm_enum.kOff, fm_enum.kHigh, fm_enum.kAuto]
         elif self.fan_mode_sequence == 5:
             fan_modes = [fm_enum.kOff, fm_enum.kHigh]
+        else:
+            asserts.fail(f"[FC] Unsupported FanModeSequence value: {self.fan_mode_sequence}")
 
         self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
