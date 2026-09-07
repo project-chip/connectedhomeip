@@ -491,6 +491,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequest)
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
 
     // Both MinPower and MaxPower null - rejected
+    command.duration = 60; // Ensure valid Duration
     command.minPower.ClearValue();
     command.maxPower.ClearValue();
     EXPECT_FALSE(tester.Invoke(Commands::PowerRangeAdjustRequest::Id, command).IsSuccess());
