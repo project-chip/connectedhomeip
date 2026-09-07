@@ -81,8 +81,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
-                                                                           const DataModel::Nullable<int64_t> maxPower,
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                                           const Optional<int64_t> maxPower,
                                                                            const uint32_t durationS, AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
