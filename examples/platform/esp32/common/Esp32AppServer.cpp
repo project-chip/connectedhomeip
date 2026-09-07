@@ -29,6 +29,11 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
+#if defined(CONFIG_SECURE_ENABLE_TEE)
+#include <platform/ESP32/ESP32TEEOpKey.h>
+#include <platform/ESP32/ESP32TEEOperationalKeystore.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <inet/EndPointStateOpenThread.h>
 #include <platform/ESP32/ThreadStackManagerImpl.h>
@@ -228,6 +233,33 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+
+#if defined(CONFIG_SECURE_ENABLE_TEE)
+    // Keep operational (NOC) private keys inside ESP-TEE secure storage instead of the
+    // default software keystore. Uses the same persistent storage only for its slot pointer.
+    static chip::DeviceLayer::Internal::ESP32TEEOperationalKeystore sTEEOpKeystore;
+    VerifyOrDie(sTEEOpKeystore.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
+    initParams.operationalKeystore = &sTEEOpKeystore;
+    ChipLogProgress(AppServer, "Operational keystore: ESP-TEE secure storage");
+#if defined(CONFIG_ENABLE_ESP32_TEE_OPKEY_SELFTEST)
+    if (chip::DeviceLayer::Internal::ESP32TEEOpKeySelfTest() == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "TEE op-key self-test: PASSED");
+    }
+    else
+    {
+        ChipLogError(AppServer, "TEE op-key self-test: FAILED");
+    }
+    if (chip::DeviceLayer::Internal::ESP32TEEOperationalKeystoreSelfTest(initParams.persistentStorageDelegate) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "TEE op-keystore lifecycle self-test: PASSED");
+    }
+    else
+    {
+        ChipLogError(AppServer, "TEE op-keystore lifecycle self-test: FAILED");
+    }
+#endif
+#endif
     if (sAppDelegate != nullptr)
     {
         initParams.appDelegate = sAppDelegate;
