@@ -603,19 +603,25 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUnansweredExchangeFailsTheRequest)
     EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
 }
 
-TEST_F(TestDefaultAvAnalysisWebRTCClient, SessionSlotExhaustionIsResourceExhausted)
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ARequestWithNoFreeSessionSlotIsRefusedUpFront)
 {
     for (uint16_t id = 101; id < 101 + kMaxSessions; id++)
     {
         EstablishSessionWithId(id);
     }
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+    const int connectsBefore = mClient.mConnectRequests;
 
-    // The camera grants one more session than this node can track
+    // Nothing is signaled toward the camera, so no session can be granted that this node cannot track
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(mClient.mConnectRequests, connectsBefore);
+    EXPECT_EQ(mCallback.mInitiatedCount, kMaxSessions);
+    EXPECT_EQ(mPeerDelegate.mOffersRequested, kMaxSessions);
+
+    // A released session frees a slot for the next request
+    mClient.NotifyFailed(101);
     EstablishSessionWithId(200);
-
-    EXPECT_EQ(mCallback.mLastStatus, Status::ResourceExhausted);
-    EXPECT_EQ(mPeerDelegate.mSessionsAssigned, kMaxSessions);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
     EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), static_cast<size_t>(kMaxSessions));
 }
 
@@ -807,18 +813,6 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferTheApplicationCouldNotProduceIs
     mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_ERROR_INTERNAL, CharSpan());
 
     // The application may have created the peer connection before failing to describe it
-    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
-}
-
-TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUntrackableSessionAbandonsItsOffer)
-{
-    for (uint16_t id = 101; id < 101 + kMaxSessions; id++)
-    {
-        EstablishSessionWithId(id);
-    }
-    EstablishSessionWithId(200);
-
-    EXPECT_EQ(mCallback.mLastStatus, Status::ResourceExhausted);
     EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
 }
 

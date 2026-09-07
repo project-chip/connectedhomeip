@@ -393,6 +393,7 @@ private:
     void FailTrackedSession(uint16_t aWebRTCSessionId);
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId);
     TrackedSession * FindTrackedSession(uint16_t aWebRTCSessionId);
+    TrackedSession * FindFreeSession();
 
     /**
      * Invokes aRequest on the held session with a fresh CommandSender, recording it as the

@@ -55,6 +55,9 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RequestSession(const ScopedNodeId & aC
                                                          uint16_t aVideoStreamId, AvAnalysisWebRTCClient::Callback & aCallback)
 {
     ReturnErrorOnFailure(CanStartRequest());
+    // Refused before any signaling: a session the camera granted but this node could not track would
+    // be one nobody ends. Single flight means only this request can consume the slot found here.
+    VerifyOrReturnError(FindFreeSession() != nullptr, CHIP_ERROR_NO_MEMORY);
 
     mRequest.BeginProvideOffer(aCameraNode, aWebRTCEndpoint, aVideoStreamId, aCallback);
 
@@ -471,7 +474,8 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
     CHIP_ERROR err = RegisterSession(webRTCSessionId);
     if (err != CHIP_NO_ERROR)
     {
-        // The camera holds a session this node cannot track.
+        // Not reachable, a slot was free when the request started and only this path takes one.
+        // So a failed request rather than an untracked session.
         ChipLogError(Zcl, "AvAnalysisWebRTCClient: session %u not tracked: %" CHIP_ERROR_FORMAT, webRTCSessionId, err.Format());
         FinishRequest(Status::ResourceExhausted, webRTCSessionId);
         return;
@@ -486,15 +490,7 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
 
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessionId)
 {
-    TrackedSession * slot = nullptr;
-    for (uint8_t i = 0; i < mMaxSessions; i++)
-    {
-        if (!mSessions[i].inUse)
-        {
-            slot = &mSessions[i];
-            break;
-        }
-    }
+    TrackedSession * slot = FindFreeSession();
     VerifyOrReturnError(slot != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Tracked session
@@ -605,6 +601,18 @@ void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebR
         ReleaseSession(*session);
     }
     callback->OnSessionEnded(aStatus, aWebRTCSessionId);
+}
+
+DefaultAvAnalysisWebRTCClient::TrackedSession * DefaultAvAnalysisWebRTCClient::FindFreeSession()
+{
+    for (uint8_t i = 0; i < mMaxSessions; i++)
+    {
+        if (!mSessions[i].inUse)
+        {
+            return &mSessions[i];
+        }
+    }
+    return nullptr;
 }
 
 DefaultAvAnalysisWebRTCClient::TrackedSession * DefaultAvAnalysisWebRTCClient::FindTrackedSession(uint16_t aWebRTCSessionId)
