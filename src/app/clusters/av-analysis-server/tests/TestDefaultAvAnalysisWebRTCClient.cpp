@@ -980,8 +980,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ICECandidatesAreCopiedAndSentToTheSess
     EXPECT_EQ(mClient.mSentIceSessionId, 55);
     ASSERT_EQ(mClient.mSentCandidates.size(), 2u);
     EXPECT_EQ(mClient.mSentCandidates[0], "candidate:1 1 UDP 2122252543 192.168.1.10 5000 typ host");
-    ASSERT_TRUE(mClient.mSentMids[0].has_value());
-    EXPECT_EQ(*mClient.mSentMids[0], "video");
+    EXPECT_EQ(mClient.mSentMids[0].value_or(""), "video");
     ASSERT_FALSE(mClient.mSentMLineIndexes[0].IsNull());
     EXPECT_EQ(mClient.mSentMLineIndexes[0].Value(), 0);
     EXPECT_EQ(mClient.mSentCandidates[1], "candidate:2 1 UDP 1686052607 203.0.113.5 5000 typ srflx");
