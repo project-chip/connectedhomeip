@@ -59,8 +59,10 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import all_of, has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -943,10 +945,10 @@ class TC_FAN_3_5(MatterBaseTest):
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
 
-    @run_if_endpoint_matches(
-        has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kStep)
-        and has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kMultiSpeed)
-    )
+    @run_if_endpoint_matches(all_of(
+        has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kStep),
+        has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kMultiSpeed),
+    ))
     async def test_TC_FAN_3_5(self) -> None:
         # Setup
         self.endpoint = self.get_endpoint(default=1)
