@@ -102,7 +102,7 @@ class TC_DD_1_2(MatterTestUncommissionedDevice):
         self.step(3)
         try:
             SetupPayload().ParseManualPairingCode(manual_pairing_code)
-        except ChipStackError as e: # chipstack-ok
+        except ChipStackError as e:  # chipstack-ok
             asserts.fail(f"Validation failed for check digit of the manual pairing code: {e}")
 
     def _check_encoded_elements(self, manual_pairing_code: str) -> None:
