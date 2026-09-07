@@ -81,9 +81,9 @@ public:
         const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
         AdjustmentCauseEnum cause) override;
 
-    CHIP_ERROR HandleDeviceEnergyManagementPowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
-                                                                   const DataModel::Nullable<int64_t> maxPower,
-                                                                   const uint32_t durationS, AdjustmentCauseEnum cause) override;
+    CHIP_ERROR HandleDeviceEnergyManagementPowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                                   const Optional<int64_t> maxPower, const uint32_t durationS,
+                                                                   AdjustmentCauseEnum cause) override;
 
     CHIP_ERROR HandleDeviceEnergyManagementPowerRangeAdjustCompletion() override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(CauseEnum cause) override;

@@ -811,13 +811,12 @@ Status DeviceEnergyManagementDelegate::CancelRequest()
  *   5) Clear the PowerRangeAdjustment attribute (set to Null)
  *   6) generate a PowerRangeAdjustEnd event with cause NormalCompletion
  */
-Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
-                                                               const DataModel::Nullable<int64_t> maxPower, uint32_t duration,
-                                                               AdjustmentCauseEnum cause)
+Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const Optional<int64_t> minPower, const Optional<int64_t> maxPower,
+                                                               uint32_t duration, AdjustmentCauseEnum cause)
 {
     ChipLogDetail(AppServer, "PowerRangeAdjustRequest: minPower=%lld, maxPower=%lld, duration=%u, cause=%d",
-                  static_cast<long long>(minPower.IsNull() ? 0 : minPower.Value()),
-                  static_cast<long long>(maxPower.IsNull() ? 0 : maxPower.Value()), duration, to_underlying(cause));
+                  static_cast<long long>(minPower.HasValue() ? minPower.Value() : 0),
+                  static_cast<long long>(maxPower.HasValue() ? maxPower.Value() : 0), duration, to_underlying(cause));
 
     // Get the current time, but store it in a local variable until we confirm this request succeeds.
     // If a replacement PRA is active and the manufacturer callback rejects the new request, the original
@@ -896,10 +895,24 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
 
     // Build the PowerRangeAdjustment attribute
     Structs::PowerRangeAdjustStruct::Type powerRangeAdjustment;
-    powerRangeAdjustment.minPower = minPower;
-    powerRangeAdjustment.maxPower = maxPower;
-    powerRangeAdjustment.cause    = mappedCause;
-    powerRangeAdjustment.endTime  = endTimeUtc;
+    if (minPower.HasValue())
+    {
+        powerRangeAdjustment.minPower.SetNonNull(minPower.Value());
+    }
+    else
+    {
+        powerRangeAdjustment.minPower.SetNull();
+    }
+    if (maxPower.HasValue())
+    {
+        powerRangeAdjustment.maxPower.SetNonNull(maxPower.Value());
+    }
+    else
+    {
+        powerRangeAdjustment.maxPower.SetNull();
+    }
+    powerRangeAdjustment.cause   = mappedCause;
+    powerRangeAdjustment.endTime = endTimeUtc;
 
     mPowerRangeAdjustment.SetNonNull(powerRangeAdjustment);
 
