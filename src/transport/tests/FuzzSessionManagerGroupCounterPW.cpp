@@ -82,9 +82,10 @@ using KeySet    = GroupDataProvider::KeySet;
 constexpr GroupId kGroupId       = 2;
 constexpr uint16_t kTestKeysetId = 0x0123;
 
-// The cert vectors cap how many installs succeed, so routing uses the achieved
-// Fixture::fabricCount. Two or more exercise the fabric-search loop.
-constexpr size_t kMaxFabrics = 4;
+// Routing uses Fixture::fabricCount, and more than one is what exercises the fabric-search
+// loop, so a short install has to be loud rather than silently narrowing the harness.
+constexpr size_t kMaxFabrics       = 4;
+constexpr size_t kInstalledFabrics = 3;
 
 // Distinct epoch key per fabric so each yields a distinct derived group key.
 const uint8_t kEpochKeys[kMaxFabrics][16] = {
@@ -258,11 +259,11 @@ Fixture & GetFixture()
         fx->sessionManager.SetMessageDelegate(&fx->delegate);
 
         using namespace chip::TestCerts;
-        // Distinct roots give distinct compressed fabric ids; a single fabric is a valid fallback.
+        // Distinct roots give distinct compressed fabric ids.
         InstallFabric(*fx, 0, GetRootACertAsset(), GetIAA1CertAsset(), GetNodeA1CertAsset());
         InstallFabric(*fx, 1, GetRootBCertAsset(), GetIAB1CertAsset(), GetNodeB1CertAsset());
         InstallFabric(*fx, 2, GetRootACertAsset(), GetIAA1CertAsset(), GetNodeA2CertAsset());
-        VerifyOrDie(fx->fabricCount >= 1);
+        VerifyOrDie(fx->fabricCount == kInstalledFabrics);
 
         Inet::IPAddress addr;
         VerifyOrDie(Inet::IPAddress::FromString("::1", addr));

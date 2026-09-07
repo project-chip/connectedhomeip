@@ -105,6 +105,12 @@ private:
 };
 
 // Built once: gGroupPeerTable is file-static, so rebuilding per input isolates nothing.
+//
+// The peer table is deliberately not reset between inputs either, unlike the counter harness.
+// This case sends a single datagram per input, so a reset would leave the duplicate, window
+// and MRU arms unreachable -- measured 61.38% against 71.14% region on
+// SecureGroupMessageDispatch. The cost is that a crash here may need its predecessors to
+// reproduce; re-run the corpus in order.
 struct Fixture
 {
     Testing::LoopbackTransportManager ctx;
