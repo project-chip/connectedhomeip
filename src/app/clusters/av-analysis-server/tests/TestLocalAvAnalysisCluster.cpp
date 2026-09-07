@@ -934,6 +934,9 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::PerceivedContext::DecodableType secondPerceivedContextData;
     ASSERT_EQ(secondPerceivedContextEvent->GetEventData(secondPerceivedContextData), CHIP_NO_ERROR);
     ASSERT_EQ(secondPerceivedContextData.sessionID, mSessionId);
+    // Without RemoteContextDetection the source fields are absent on every PerceivedContext path
+    ASSERT_FALSE(secondPerceivedContextData.sourceNodeId.HasValue());
+    ASSERT_FALSE(secondPerceivedContextData.sourceStartTimestamp.HasValue());
 
     // Verify that the event contains a new and current identified context only
     ASSERT_TRUE(secondPerceivedContextData.newIdentifiedContexts.HasValue());
@@ -988,6 +991,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::PerceivedContext::DecodableType thirdPerceivedContextData;
     ASSERT_EQ(thirdPerceivedContextEvent->GetEventData(thirdPerceivedContextData), CHIP_NO_ERROR);
     ASSERT_EQ(thirdPerceivedContextData.sessionID, mSessionId);
+    ASSERT_FALSE(thirdPerceivedContextData.sourceNodeId.HasValue());
+    ASSERT_FALSE(thirdPerceivedContextData.sourceStartTimestamp.HasValue());
 
     // Verify that the event contains a current and expired identified context only
     ASSERT_FALSE(thirdPerceivedContextData.newIdentifiedContexts.HasValue());

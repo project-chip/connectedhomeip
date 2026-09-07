@@ -303,7 +303,11 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     }
 
     // Feeds the camera's ProvideOfferResponse{sessionId, videoStreamId} into the client
-    void FeedOfferResponse(uint16_t aWebRTCSessionId)
+    void FeedOfferResponse(uint16_t aWebRTCSessionId) { FeedOfferResponse(aWebRTCSessionId, kVideoStreamId); }
+
+    // The camera's response names the video stream it selected, which need not be the one asked
+    // for; absent means the field was omitted
+    void FeedOfferResponse(uint16_t aWebRTCSessionId, std::optional<uint16_t> aVideoStreamId)
     {
         using Fields = WebRTCTransportProvider::Commands::ProvideOfferResponse::Fields;
 
@@ -313,7 +317,10 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
         TLV::TLVType containerType;
         ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType), CHIP_NO_ERROR);
         ASSERT_EQ(writer.Put(TLV::ContextTag(Fields::kWebRTCSessionID), aWebRTCSessionId), CHIP_NO_ERROR);
-        ASSERT_EQ(writer.Put(TLV::ContextTag(Fields::kVideoStreamID), kVideoStreamId), CHIP_NO_ERROR);
+        if (aVideoStreamId.has_value())
+        {
+            ASSERT_EQ(writer.Put(TLV::ContextTag(Fields::kVideoStreamID), *aVideoStreamId), CHIP_NO_ERROR);
+        }
         ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
 
         TLV::TLVReader reader;
@@ -938,6 +945,184 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelReleasesEveryTrackedSessionSilen
     // The client is fully reusable
     EstablishSessionWithId(57);
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ARequestBeforeInitIsRefused)
+{
+    InterceptingWebRTCClient uninitialised;
+    EXPECT_EQ(uninitialised.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(uninitialised.mConnectRequests, 0);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnEmptyOfferFailsTheRequest)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, CharSpan());
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    EXPECT_EQ(mClient.mSendAttempts, 0);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, TheRequestorRecordCarriesTheCamerasVideoStreamId)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    // The camera selects a different stream than the one asked for
+    FeedOfferResponse(55, static_cast<uint16_t>(kVideoStreamId + 1));
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    auto sessions = mRequestorCluster.GetCurrentSessions();
+    ASSERT_EQ(sessions.size(), 1u);
+    ASSERT_FALSE(sessions[0].videoStreamID.IsNull());
+    EXPECT_EQ(sessions[0].videoStreamID.Value(), kVideoStreamId + 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferResponseWithoutAVideoStreamIdRecordsNull)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    FeedOfferResponse(55, std::nullopt);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+    auto sessions = mRequestorCluster.GetCurrentSessions();
+    ASSERT_EQ(sessions.size(), 1u);
+    EXPECT_TRUE(sessions[0].videoStreamID.IsNull());
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ASecondOfferResponseIsIgnored)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    FeedOfferResponse(55);
+    FeedOfferResponse(56); // rejected: the command was already responded to
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastSession, 55);
+    EXPECT_EQ(mPeerDelegate.mLastAssigned, 55);
+    ASSERT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions()[0].id, 55);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferResponseWithoutDataFailsTheRequest)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    ConcreteCommandPath responsePath(kProviderEndpoint, WebRTCTransportProvider::Id,
+                                     WebRTCTransportProvider::Commands::ProvideOfferResponse::Id);
+    mClient.OnResponse(nullptr, responsePath, StatusIB(), nullptr);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AResponseOnTheWrongCommandFailsTheRequest)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    // A well-formed ProvideOfferResponse payload arriving under another command id
+    using Fields = WebRTCTransportProvider::Commands::ProvideOfferResponse::Fields;
+    uint8_t buffer[64];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType containerType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Put(TLV::ContextTag(Fields::kWebRTCSessionID), static_cast<uint16_t>(55)), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    ConcreteCommandPath wrongPath(kProviderEndpoint, WebRTCTransportProvider::Id,
+                                  WebRTCTransportProvider::Commands::SolicitOfferResponse::Id);
+    mClient.OnResponse(nullptr, wrongPath, StatusIB(), &reader);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUndecodableOfferResponseFailsTheRequest)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    // A scalar where a structure is expected
+    uint8_t buffer[8];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    ASSERT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint32_t>(7)), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    ConcreteCommandPath responsePath(kProviderEndpoint, WebRTCTransportProvider::Id,
+                                     WebRTCTransportProvider::Commands::ProvideOfferResponse::Id);
+    mClient.OnResponse(nullptr, responsePath, StatusIB(), &reader);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelDuringTheOfferExchangeAbandonsTheOffer)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+    ASSERT_EQ(mClient.mSendAttempts, 1);
+
+    mClient.Cancel();
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 0);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CancelDuringAnEndSessionDeliversNothingAndForgetsTheSession)
+{
+    EstablishSessionWithId(55);
+    DriveToEndSessionSent(55);
+
+    mClient.Cancel();
+
+    EXPECT_EQ(mCallback.mEndedCount, 0);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnUnansweredCandidateSendKeepsTheSession)
+{
+    EstablishSessionWithId(55);
+    DriveToICECandidatesSent(55);
+
+    // The exchange closes with no response at all
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mFailedCount, 0);
+    EXPECT_EQ(mCallback.mEndedCount, 0);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, ICECandidatesForAnUntrackedSessionAreRejected)
