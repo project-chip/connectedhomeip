@@ -34,23 +34,18 @@ namespace Clusters {
 using namespace AmbientSensingUnion;
 using namespace AmbientSensingUnion::Attributes;
 
-AmbientSensingUnionCluster::AmbientSensingUnionCluster(const Config & config) :
+AmbientSensingUnionCluster::AmbientSensingUnionCluster(const Config & config, ContributorEntry * storage, size_t capacity) :
     DefaultServerCluster({ config.mEndpointId, AmbientSensingUnion::Id }), mDelegate(config.mDelegate), mUnionNameLength(0),
-    mUnionHealth(UnionHealthEnum::kNonFunctional), mContributorCount(0)
+    mUnionHealth(UnionHealthEnum::kNonFunctional), mContributors(storage), mCapacity(capacity), mContributorCount(0)
 {
     mUnionNameBuffer[0] = '\0';
-
-    for (size_t i = 0; i < kMaxContributors; i++)
-    {
-        mContributors[i].Clear();
-    }
 
     if (config.mUnionName.data() != nullptr && !config.mUnionName.empty())
     {
         size_t len = std::min(config.mUnionName.size(), kMaxUnionNameLength);
         memcpy(mUnionNameBuffer, config.mUnionName.data(), len);
-        mUnionNameBuffer[len] = '\0';
         mUnionNameLength      = len;
+        mUnionNameBuffer[len] = '\0';
     }
 }
 
@@ -191,7 +186,7 @@ CharSpan AmbientSensingUnionCluster::GetUnionName() const
 AmbientSensingUnionCluster::ContributorEntry * AmbientSensingUnionCluster::FindMatterContributor(NodeId nodeId,
                                                                                                  EndpointId endpointId)
 {
-    for (size_t i = 0; i < kMaxContributors; i++)
+    for (size_t i = 0; i < mCapacity; i++)
     {
         if (mContributors[i].active && mContributors[i].IsMatter() && mContributors[i].nodeId == nodeId &&
             mContributors[i].endpointId == endpointId)
@@ -204,7 +199,7 @@ AmbientSensingUnionCluster::ContributorEntry * AmbientSensingUnionCluster::FindM
 
 AmbientSensingUnionCluster::ContributorEntry * AmbientSensingUnionCluster::FindNonMatterContributor(const CharSpan & name)
 {
-    for (size_t i = 0; i < kMaxContributors; i++)
+    for (size_t i = 0; i < mCapacity; i++)
     {
         if (mContributors[i].active && !mContributors[i].IsMatter() && mContributors[i].GetName().data_equal(name))
         {
@@ -216,7 +211,7 @@ AmbientSensingUnionCluster::ContributorEntry * AmbientSensingUnionCluster::FindN
 
 AmbientSensingUnionCluster::ContributorEntry * AmbientSensingUnionCluster::FindFreeSlot()
 {
-    for (size_t i = 0; i < kMaxContributors; i++)
+    for (size_t i = 0; i < mCapacity; i++)
     {
         if (!mContributors[i].active)
         {
@@ -427,7 +422,7 @@ void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const Contrib
 
     uint8_t contributorIndex = 0;
     uint8_t activeIndex      = 0;
-    for (size_t i = 0; i < kMaxContributors; i++)
+    for (size_t i = 0; i < mCapacity; i++)
     {
         if (mContributors[i].active)
         {
@@ -459,7 +454,7 @@ void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const Contrib
 CHIP_ERROR AmbientSensingUnionCluster::EncodeContributorList(AttributeValueEncoder & encoder)
 {
     return encoder.EncodeList([this](const auto & listEncoder) {
-        for (size_t i = 0; i < kMaxContributors; i++)
+        for (size_t i = 0; i < mCapacity; i++)
         {
             if (mContributors[i].active)
             {
@@ -482,7 +477,7 @@ void AmbientSensingUnionCluster::RecalculateUnionHealth()
 {
     size_t onlineCount = 0;
 
-    for (size_t i = 0; i < kMaxContributors; i++)
+    for (size_t i = 0; i < mCapacity; i++)
     {
         if (mContributors[i].active && mContributors[i].status == UnionContributorStatusEnum::kUnionContributorOnline)
         {

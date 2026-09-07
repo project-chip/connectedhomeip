@@ -38,6 +38,10 @@ namespace Clusters {
  * This cluster provides data modeling for multi-node ambient sensing systems,
  * allowing a union of sensors to be managed as a cohesive group.
  *
+ * Product makers should instantiate AmbientSensingUnionClusterT<N> with the
+ * number of contributors their product needs to support (1 <= N <= kMaxContributors).
+ * This keeps the static contributor array sized for the actual product capacity
+ * rather than the specification maximum.
  */
 class AmbientSensingUnionCluster : public DefaultServerCluster
 {
@@ -132,7 +136,6 @@ public:
         AmbientSensingUnionDelegate * mDelegate = nullptr;
     };
 
-    explicit AmbientSensingUnionCluster(const Config & config);
     ~AmbientSensingUnionCluster() override = default;
 
     AmbientSensingUnionCluster(const AmbientSensingUnionCluster &)             = delete;
@@ -172,6 +175,16 @@ public:
     CHIP_ERROR RemoveNonMatterContributor(const CharSpan & name);
     CHIP_ERROR UpdateNonMatterContributorStatus(const CharSpan & name, AmbientSensingUnion::UnionContributorStatusEnum status);
 
+protected:
+    /**
+     * @brief Constructor used by AmbientSensingUnionClusterT.
+     *
+     * @param config        Cluster configuration.
+     * @param storage       Pointer to the caller-owned contributor entry array.
+     * @param capacity      Number of entries in storage (must be in [kMinContributors, kMaxContributors]).
+     */
+    AmbientSensingUnionCluster(const Config & config, ContributorEntry * storage, size_t capacity);
+
 private:
     ContributorEntry * FindMatterContributor(NodeId nodeId, EndpointId endpointId);
     ContributorEntry * FindNonMatterContributor(const CharSpan & name);
@@ -194,8 +207,44 @@ private:
     size_t mUnionNameLength;
     AmbientSensingUnion::UnionHealthEnum mUnionHealth;
 
-    ContributorEntry mContributors[kMaxContributors];
+    // Pointer to externally-owned storage provided by AmbientSensingUnionClusterT.
+    ContributorEntry * mContributors;
+    size_t mCapacity;
     size_t mContributorCount;
+};
+
+/**
+ * @brief Concrete cluster instantiation with a product-specific contributor capacity.
+ *
+ * @tparam N  Maximum number of contributors this instance can hold.
+ *            Must satisfy kMinContributors <= N <= kMaxContributors.
+ *            Defaults to 16, which is sufficient for most embedded products and
+ *            keeps the contributor array at roughly 2.3 KB.
+ *
+ * To support the full specification maximum of 128 contributors, instantiate
+ * with the explicit capacity:
+ * @code
+ *   AmbientSensingUnionClusterT<AmbientSensingUnionCluster::kMaxContributors> cluster(config);
+ * @endcode
+ *
+ * To use a smaller capacity (e.g. 4 contributors):
+ * @code
+ *   AmbientSensingUnionClusterT<4> cluster(config);
+ * @endcode
+ */
+template <size_t N = 16>
+class AmbientSensingUnionClusterT : public AmbientSensingUnionCluster
+{
+    static_assert(N >= AmbientSensingUnionCluster::kMinContributors,
+                  "AmbientSensingUnionClusterT: N must be at least kMinContributors");
+    static_assert(N <= AmbientSensingUnionCluster::kMaxContributors,
+                  "AmbientSensingUnionClusterT: N must not exceed kMaxContributors (128)");
+
+public:
+    explicit AmbientSensingUnionClusterT(const Config & config) : AmbientSensingUnionCluster(config, mStorage, N) {}
+
+private:
+    ContributorEntry mStorage[N];
 };
 
 } // namespace Clusters

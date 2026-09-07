@@ -48,7 +48,7 @@ protected:
     Clusters::AmbientContextSensing::AmbientContextSensingDelegate & mDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::AmbientContextSensingCluster> mAmbientContextSensingCluster;
-    LazyRegisteredServerCluster<Clusters::AmbientSensingUnionCluster> mAmbientSensingUnionCluster;
+    LazyRegisteredServerCluster<Clusters::AmbientSensingUnionClusterT<>> mAmbientSensingUnionCluster;
 };
 
 } // namespace chip::app

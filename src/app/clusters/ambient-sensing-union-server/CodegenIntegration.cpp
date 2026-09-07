@@ -34,15 +34,16 @@ using namespace chip::app::Clusters::AmbientSensingUnion;
 namespace {
 
 /**
- * @note Memory footprint: Each AmbientSensingUnionCluster instance uses approximately
- * 16KB for contributor storage (128 entries × ~130 bytes each). Total static allocation
- * depends on kAmbientSensingUnionMaxClusterCount.
+ * @note Memory footprint: Each AmbientSensingUnionClusterT<> instance uses memory
+ * proportional to its contributor capacity (default 16 entries x ~130 bytes each).
+ * Product makers can modify this by instantiating AmbientSensingUnionClusterT<N> (up to 128 entries).
+ * Total static allocation depends on kAmbientSensingUnionMaxClusterCount.
  */
 constexpr size_t kAmbientSensingUnionFixedClusterCount = AmbientSensingUnion::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kAmbientSensingUnionMaxClusterCount =
     kAmbientSensingUnionFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<AmbientSensingUnionCluster> gServers[kAmbientSensingUnionMaxClusterCount];
+LazyRegisteredServerCluster<AmbientSensingUnionClusterT<>> gServers[kAmbientSensingUnionMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
