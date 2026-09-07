@@ -23,6 +23,7 @@
 #include "media-file-management/MediaFileManagementBdxProvider.h"
 #include "media-file-management/MediaFileManagementBdxRequestor.h"
 #include "media-file-management/MediaFileManagementManager.h"
+#include "speaker/SpeakerAudioControl.h"
 #include "speaker/SpeakerOnOffLevelControl.h"
 
 #include <access/AccessControl.h>
@@ -198,6 +199,11 @@ void ApplicationInit()
     // which still fire once for endpoint 2 during Server::Init() itself.
     Speaker::InitOnOffLevelControl();
 
+    // Register the code-driven Audio Control cluster (BasicEqualizer feature) on the same
+    // Speaker endpoint. Not present in tv-app.zap -- registered directly in the cluster
+    // registry to avoid a second instance from the ember codegen path.
+    Speaker::InitAudioControl();
+
     // Register the code-driven Media File Management cluster on endpoint 1.
     gMediaFileManagementManager.emplace();
     gMediaFileManagementServer.emplace(kMediaFileManagementEndpointId, *gMediaFileManagementManager);
@@ -328,6 +334,7 @@ void ApplicationShutdown()
         gMediaFileManagementServer->Shutdown();
     }
 
+    Speaker::ShutdownAudioControl();
     Speaker::ShutdownOnOffLevelControl();
 }
 

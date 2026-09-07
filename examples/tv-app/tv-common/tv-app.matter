@@ -4578,7 +4578,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_speaker = 34, version 1;
+  device type ma_speaker = 34, version 2;
 
 
   server cluster OnOff {
