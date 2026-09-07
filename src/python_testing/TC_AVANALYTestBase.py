@@ -49,84 +49,117 @@ class AVANALYTestBase:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
-    async def send_enable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
-        """Generate an EnableContextTriggers command executed on the cluster instance on the provided endpoint
+    async def send_enable_context_triggers_cmd(
+        self, endpoint, context_triggers=NullValue, expected_status: Status = Status.Success
+    ):
+        """Send EnableContextTriggers command to the AvAnalysis cluster and assert expected status.
 
         Args:
-            context_triggers: The value of the ContextTriggers field that is sent
-            expected_status:  The status response to be matched, defaults to Success if a value is not provided.
+            endpoint: The endpoint to send the command to.
+            context_triggers: The value of the ContextTriggers field that is sent. Defaults to NullValue.
+            expected_status: The status response to match. Defaults to Status.Success.
         """
+        if context_triggers is None:
+            context_triggers = NullValue
+        cmd = Clusters.Objects.AvAnalysis.Commands.EnableContextTriggers(contextTriggers=context_triggers)
         try:
-            await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.EnableContextTriggers(
-                contextTriggers=context_triggers),
-                endpoint=endpoint)
-
-            asserts.assert_equal(expected_status, Status.Success)
-
+            resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            asserts.assert_equal(
+                expected_status,
+                Status.Success,
+                f"Expected status {expected_status} on enabling context triggers, but command succeeded",
+            )
+            return resp
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned on enabling context triggers")
+            asserts.assert_equal(
+                e.status,
+                expected_status,
+                f"Unexpected error returned on enabling context triggers: expected {expected_status}, got {e.status}",
+            )
+            return None
 
-    async def send_disable_context_triggers_command(self, endpoint, context_triggers, expected_status: Status = Status.Success):
-        """Generate a DisableContextTriggers command executed on the cluster instance on the provided endpoint
+    # Alias for backwards compatibility
+    send_enable_context_triggers_command = send_enable_context_triggers_cmd
+
+    async def send_disable_context_triggers_cmd(
+        self, endpoint, context_triggers=NullValue, expected_status: Status = Status.Success
+    ):
+        """Send DisableContextTriggers command to the AvAnalysis cluster and assert expected status.
 
         Args:
-            context_triggers: The value of the ContextTriggers field that is sent
-            expected_status:  The status response to be matched, defaults to Success if a value is not provided.
+            endpoint: The endpoint to send the command to.
+            context_triggers: The value of the ContextTriggers field that is sent. Defaults to NullValue.
+            expected_status: The status response to match. Defaults to Status.Success.
         """
+        if context_triggers is None:
+            context_triggers = NullValue
+        cmd = Clusters.Objects.AvAnalysis.Commands.DisableContextTriggers(contextTriggers=context_triggers)
         try:
-            await self.send_single_cmd(cmd=Clusters.AvAnalysis.Commands.DisableContextTriggers(
-                contextTriggers=context_triggers),
-                endpoint=endpoint)
-
-            asserts.assert_equal(expected_status, Status.Success)
-
+            resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            asserts.assert_equal(
+                expected_status,
+                Status.Success,
+                f"Expected status {expected_status} on disabling context triggers, but command succeeded",
+            )
+            return resp
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned on disabling context triggers")
+            asserts.assert_equal(
+                e.status,
+                expected_status,
+                f"Unexpected error returned on disabling context triggers: expected {expected_status}, got {e.status}",
+            )
+            return None
 
-    async def get_zoneids_from_zone_management(self, endpoint) -> list[int]:
-        """Returns a list of ZoneIDs that are available from the ZoneManagament cluster on the target endpoint. If none are
-        present it will attempt to create one.
+    # Alias for backwards compatibility
+    send_disable_context_triggers_command = send_disable_context_triggers_cmd
+
+    async def get_zoneids_from_zone_management(self, endpoint, min_count: int = 1) -> list[int]:
+        """Returns a list of ZoneIDs that are available from the ZoneManagement cluster on the target endpoint. If fewer
+        than min_count are present it will attempt to create additional zones.
+
+        Args:
+            endpoint:  Target endpoint.
+            min_count: Minimum number of zones required (defaults to 1).
 
         Returns:
-            list[int]:  the list of ZoneIDs that are found.  Will be empty if there are none.
+            list[int]: the list of ZoneIDs that are found/created.
         """
-        zones = []
         zoneIDs = []
 
-        # pull zone ids from Zone Management, if none, try to create
+        # pull zone ids from Zone Management, if not enough, try to create
         clusterZM = Clusters.Objects.ZoneManagement
         attributesZM = clusterZM.Attributes
         aFeatureMapZM = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=clusterZM, attribute=attributesZM.FeatureMap)
-        twoDCartSupported = aFeatureMapZM & clusterZM.Bitmaps.Feature.kTwoDimensionalCartesianZone
-        userDefinedSupported = aFeatureMapZM & clusterZM.Bitmaps.Feature.kUserDefined
+        twoDCartSupported = (aFeatureMapZM & clusterZM.Bitmaps.Feature.kTwoDimensionalCartesianZone) != 0
+        userDefinedSupported = (aFeatureMapZM & clusterZM.Bitmaps.Feature.kUserDefined) != 0
 
         zones = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=clusterZM, attribute=attributesZM.Zones)
-
-        if len(zones) >= 1:
+        if zones:
             for zone in zones:
                 zoneIDs.append(zone.zoneID)
-        else:
-            # None on the DUT, create one, but only if possible
-            if twoDCartSupported and userDefinedSupported:
-                # Form the Create request and send
-                zoneVertices = [
-                    clusterZM.Structs.TwoDCartesianVertexStruct(10, 10),
-                    clusterZM.Structs.TwoDCartesianVertexStruct(20, 10),
-                    clusterZM.Structs.TwoDCartesianVertexStruct(20, 20),
-                    clusterZM.Structs.TwoDCartesianVertexStruct(10, 20)
-                ]
-                zoneToCreate = clusterZM.Structs.TwoDCartesianZoneStruct(
-                    name="Zone1", use=clusterZM.Enums.ZoneUseEnum.kMotion, vertices=zoneVertices,
-                    color="#00FFFF")
-                createTwoDCartesianCmd = clusterZM.Commands.CreateTwoDCartesianZone(
-                    zone=zoneToCreate
-                )
-                cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-                asserts.assert_equal(type(cmdResponse), clusterZM.Commands.CreateTwoDCartesianZoneResponse,
-                                     "Incorrect response type")
-                asserts.assert_is_not_none(
-                    cmdResponse.zoneID, "CreateTwoDCartesianCmdResponse does not contain ZoneID")
-                zoneIDs.append(cmdResponse.zoneID)
+
+        # If not enough zones on the DUT, create additional zones if supported
+        while len(zoneIDs) < min_count and twoDCartSupported and userDefinedSupported:
+            idx = len(zoneIDs) + 1
+            offset = idx * 15
+            zoneVertices = [
+                clusterZM.Structs.TwoDCartesianVertexStruct(offset, offset),
+                clusterZM.Structs.TwoDCartesianVertexStruct(offset + 10, offset),
+                clusterZM.Structs.TwoDCartesianVertexStruct(offset + 10, offset + 10),
+                clusterZM.Structs.TwoDCartesianVertexStruct(offset, offset + 10)
+            ]
+            zoneToCreate = clusterZM.Structs.TwoDCartesianZoneStruct(
+                name=f"Zone{idx}", use=clusterZM.Enums.ZoneUseEnum.kMotion, vertices=zoneVertices,
+                color="#00FFFF")
+            createTwoDCartesianCmd = clusterZM.Commands.CreateTwoDCartesianZone(
+                zone=zoneToCreate
+            )
+            cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
+            asserts.assert_equal(type(cmdResponse), clusterZM.Commands.CreateTwoDCartesianZoneResponse,
+                                 "Incorrect response type")
+            asserts.assert_is_not_none(
+                cmdResponse.zoneID, "CreateTwoDCartesianCmdResponse does not contain ZoneID")
+            zoneIDs.append(cmdResponse.zoneID)
 
         return zoneIDs
 
@@ -139,20 +172,6 @@ class AVANALYTestBase:
         self.has_feature_remcondetect = (feature_map & cluster.Bitmaps.Feature.kRemoteContextDetection) != 0
         self.has_feature_perzonedetect = (feature_map & cluster.Bitmaps.Feature.kPerZoneContextDetection) != 0
         return feature_map
-
-    async def send_enable_context_triggers_cmd(self, endpoint, context_triggers=NullValue):
-        """Send EnableContextTriggers command to the AvAnalysis cluster."""
-        if context_triggers is None:
-            context_triggers = NullValue
-        cmd = Clusters.Objects.AvAnalysis.Commands.EnableContextTriggers(contextTriggers=context_triggers)
-        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-
-    async def send_disable_context_triggers_cmd(self, endpoint, context_triggers=NullValue):
-        """Send DisableContextTriggers command to the AvAnalysis cluster."""
-        if context_triggers is None:
-            context_triggers = NullValue
-        cmd = Clusters.Objects.AvAnalysis.Commands.DisableContextTriggers(contextTriggers=context_triggers)
-        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
     async def send_establish_analysis_stream_cmd(self, endpoint, node_id):
         """Send EstablishAnalysisStream command to the AvAnalysis cluster."""

@@ -43,6 +43,7 @@ from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
@@ -113,7 +114,7 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
                 has_remote_zones = (
                     zone_feature_map & zone_cluster.Bitmaps.Feature.kRemoteZones
                 ) != 0
-            except Exception as e:
+            except InteractionModelError as e:
                 log.info("ZoneManagement cluster query exception: %s", e)
 
         if not has_remote_zones:
@@ -133,16 +134,17 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
 
         self.step(2)
         remote_zone_id = 1
-        try:
-            zones = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=zone_cluster,
-                attribute=zone_cluster.Attributes.Zones,
-            )
-            if zones:
-                remote_zone_id = zones[0].zoneID
-        except Exception as e:
-            log.info("ZoneManagement read Zones attribute: %s", e)
+        zones = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=zone_cluster,
+            attribute=zone_cluster.Attributes.Zones,
+        )
+        if zones:
+            remote_zone_id = zones[0].zoneID
+        else:
+            zone_ids = await self.get_zoneids_from_zone_management(endpoint, min_count=1)
+            if zone_ids:
+                remote_zone_id = zone_ids[0]
         log.info(
             "Remote NodeId: %d, Remote Zone ID: %d", remote_node_id, remote_zone_id
         )
@@ -152,7 +154,11 @@ class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
             endpoint, node_id=remote_node_id
         )
         log.info("EstablishAnalysisStreamResponse: %s", resp)
+        asserts.assert_is_not_none(resp, "Expected EstablishAnalysisStreamResponse")
         stream_id = getattr(resp, "analysisStreamID", None)
+        asserts.assert_is_not_none(
+            stream_id, "EstablishAnalysisStreamResponse must contain analysisStreamID"
+        )
 
         supported_contexts = await self.read_avanaly_attribute_expect_success(
             endpoint, cluster.Attributes.SupportedAmbientContexts

@@ -124,19 +124,9 @@ class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
         self.step(2)
         # TH sends EnableContextTriggers command before establishing analysis stream
         # Expect INVALID_IN_STATE because no stream is active
-        try:
-            await self.send_enable_context_triggers_cmd(
-                endpoint, context_triggers=NullValue
-            )
-            asserts.fail(
-                "EnableContextTriggers should fail with INVALID_IN_STATE when no stream is active"
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.InvalidInState,
-                f"Expected INVALID_IN_STATE status, received {e.status}",
-            )
+        await self.send_enable_context_triggers_cmd(
+            endpoint, context_triggers=NullValue, expected_status=Status.InvalidInState
+        )
 
         self.step(3)
         # Establish analysis stream with TH node id or valid NodeID

@@ -103,24 +103,12 @@ class TC_AVANALY_2_9(MatterBaseTest, AVANALYTestBase):
         )
 
         # Discover or define Zone 1 and Zone 2 in Zone Management
-        zone_1_id = 1
-        zone_2_id = 2
-        zone_cluster = Clusters.Objects.ZoneManagement
-        try:
-            existing_zones = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=zone_cluster,
-                attribute=zone_cluster.Attributes.Zones,
-            )
-            if len(existing_zones) >= 2:
-                zone_1_id = existing_zones[0].zoneID
-                zone_2_id = existing_zones[1].zoneID
-            elif len(existing_zones) == 1:
-                zone_1_id = existing_zones[0].zoneID
-                zone_2_id = zone_1_id + 1
-        except Exception as e:
-            log.info("ZoneManagement cluster query exception: %s", e)
-
+        zone_ids = await self.get_zoneids_from_zone_management(endpoint, min_count=2)
+        asserts.assert_greater_equal(
+            len(zone_ids), 2, "ZoneManagement must provide at least 2 zones for zone boundary testing"
+        )
+        zone_1_id = zone_ids[0]
+        zone_2_id = zone_ids[1]
         log.info("Using Zone 1 ID: %d, Zone 2 ID: %d", zone_1_id, zone_2_id)
 
         # Enable TrackingEnabled and enable context triggers for all zones

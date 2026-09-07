@@ -159,7 +159,15 @@ static AvAnalysis::Structs::TrackedContext::Type ParseTrackedContext(const Json:
         }
         else
         {
-            tc.currentZone.SetValue(DataModel::MakeNullable(static_cast<uint16_t>(czVal.asUInt())));
+            uint32_t val = czVal.asUInt();
+            if (chip::CanCastTo<uint16_t>(val))
+            {
+                tc.currentZone.SetValue(DataModel::MakeNullable(static_cast<uint16_t>(val)));
+            }
+            else
+            {
+                ChipLogError(NotSpecified, "CurrentZone value %" PRIu32 " exceeds uint16_t range", val);
+            }
         }
     }
     if (ctxVal.isMember("PreviousZone") || ctxVal.isMember("previousZone"))
@@ -171,7 +179,15 @@ static AvAnalysis::Structs::TrackedContext::Type ParseTrackedContext(const Json:
         }
         else
         {
-            tc.previousZone.SetValue(DataModel::MakeNullable(static_cast<uint16_t>(pzVal.asUInt())));
+            uint32_t val = pzVal.asUInt();
+            if (chip::CanCastTo<uint16_t>(val))
+            {
+                tc.previousZone.SetValue(DataModel::MakeNullable(static_cast<uint16_t>(val)));
+            }
+            else
+            {
+                ChipLogError(NotSpecified, "PreviousZone value %" PRIu32 " exceeds uint16_t range", val);
+            }
         }
     }
     return tc;
@@ -192,12 +208,28 @@ void CameraAppCommandHandler::OnAvAnalysisSessionStartHandler()
         {
             for (const auto & item : val)
             {
-                zoneIds.push_back(static_cast<uint16_t>(item.asUInt()));
+                uint32_t zVal = item.asUInt();
+                if (chip::CanCastTo<uint16_t>(zVal))
+                {
+                    zoneIds.push_back(static_cast<uint16_t>(zVal));
+                }
+                else
+                {
+                    ChipLogError(NotSpecified, "ZoneIds value %" PRIu32 " exceeds uint16_t range", zVal);
+                }
             }
         }
         else
         {
-            zoneIds.push_back(static_cast<uint16_t>(val.asUInt()));
+            uint32_t zVal = val.asUInt();
+            if (chip::CanCastTo<uint16_t>(zVal))
+            {
+                zoneIds.push_back(static_cast<uint16_t>(zVal));
+            }
+            else
+            {
+                ChipLogError(NotSpecified, "ZoneIds value %" PRIu32 " exceeds uint16_t range", zVal);
+            }
         }
     }
     else if (mJsonValue.isMember("ZoneId") && !mJsonValue["ZoneId"].isNull())
@@ -208,12 +240,28 @@ void CameraAppCommandHandler::OnAvAnalysisSessionStartHandler()
         {
             for (const auto & item : val)
             {
-                zoneIds.push_back(static_cast<uint16_t>(item.asUInt()));
+                uint32_t zVal = item.asUInt();
+                if (chip::CanCastTo<uint16_t>(zVal))
+                {
+                    zoneIds.push_back(static_cast<uint16_t>(zVal));
+                }
+                else
+                {
+                    ChipLogError(NotSpecified, "ZoneId value %" PRIu32 " exceeds uint16_t range", zVal);
+                }
             }
         }
         else
         {
-            zoneIds.push_back(static_cast<uint16_t>(val.asUInt()));
+            uint32_t zVal = val.asUInt();
+            if (chip::CanCastTo<uint16_t>(zVal))
+            {
+                zoneIds.push_back(static_cast<uint16_t>(zVal));
+            }
+            else
+            {
+                ChipLogError(NotSpecified, "ZoneId value %" PRIu32 " exceeds uint16_t range", zVal);
+            }
         }
     }
 
@@ -260,7 +308,15 @@ void CameraAppCommandHandler::OnAvAnalysisPerceivedContextHandler()
     Optional<uint16_t> sessionId;
     if (mJsonValue.isMember("SessionId") && !mJsonValue["SessionId"].isNull())
     {
-        sessionId.SetValue(static_cast<uint16_t>(mJsonValue["SessionId"].asUInt()));
+        uint32_t sVal = mJsonValue["SessionId"].asUInt();
+        if (chip::CanCastTo<uint16_t>(sVal))
+        {
+            sessionId.SetValue(static_cast<uint16_t>(sVal));
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "SessionId value %" PRIu32 " exceeds uint16_t range", sVal);
+        }
     }
 
     Optional<NodeId> sourceNodeId;
@@ -280,7 +336,15 @@ void CameraAppCommandHandler::OnAvAnalysisSessionEndHandler()
     Optional<uint16_t> sessionId;
     if (mJsonValue.isMember("SessionId") && !mJsonValue["SessionId"].isNull())
     {
-        sessionId.SetValue(static_cast<uint16_t>(mJsonValue["SessionId"].asUInt()));
+        uint32_t sVal = mJsonValue["SessionId"].asUInt();
+        if (chip::CanCastTo<uint16_t>(sVal))
+        {
+            sessionId.SetValue(static_cast<uint16_t>(sVal));
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "SessionId value %" PRIu32 " exceeds uint16_t range", sVal);
+        }
     }
 
     Optional<NodeId> sourceNodeId;
