@@ -20,6 +20,7 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
 #include <clusters/HepaFilterMonitoring/Metadata.h>
+#include <clusters/WaterTankLevelMonitoring/Metadata.h>
 #include <platform/DeviceInfoProvider.h>
 #include <tracing/macros.h>
 
@@ -102,6 +103,10 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const Dat
         if (mPath.mClusterId == HepaFilterMonitoring::Id)
         {
             return encoder.Encode(HepaFilterMonitoring::kRevision);
+        }
+        if (mPath.mClusterId == WaterTankLevelMonitoring::Id)
+        {
+            return encoder.Encode(WaterTankLevelMonitoring::kRevision);
         }
         return encoder.Encode(ActivatedCarbonFilterMonitoring::kRevision);
     default:

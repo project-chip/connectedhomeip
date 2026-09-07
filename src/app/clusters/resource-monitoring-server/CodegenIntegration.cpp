@@ -26,6 +26,7 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/static-cluster-config/ActivatedCarbonFilterMonitoring.h>
 #include <app/static-cluster-config/HepaFilterMonitoring.h>
+#include <app/static-cluster-config/WaterTankLevelMonitoring.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -111,6 +112,10 @@ void MatterActivatedCarbonFilterMonitoringClusterInitCallback(EndpointId) {}
 
 void MatterHepaFilterMonitoringClusterInitCallback(EndpointId) {}
 
+void MatterWaterTankLevelMonitoringClusterInitCallback(EndpointId) {}
+
 void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
 
 void MatterHepaFilterMonitoringClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
+
+void MatterWaterTankLevelMonitoringClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}

@@ -8398,17 +8398,17 @@ endpoint 1 {
   }
 
   server cluster WaterTankLevelMonitoring {
-    ram      attribute condition;
-    ram      attribute degradationDirection;
-    ram      attribute changeIndication;
-    ram      attribute inPlaceIndicator;
-    ram      attribute lastChangedTime;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication;
+    callback attribute inPlaceIndicator;
+    callback attribute lastChangedTime;
     callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 7;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ResetCondition;
   }
