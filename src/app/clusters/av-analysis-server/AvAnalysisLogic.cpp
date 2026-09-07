@@ -692,7 +692,7 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
         //
         VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
 
-        // Second pass: apply the validated triggers. Duplicate entries within the provided list are ignored
+        // Second pass: apply the validated triggers; duplicates in the list are ignored, the first occurrence wins
         //
         for (auto trigger = validatedTriggers.begin(); trigger != validatedTriggers.end(); ++trigger)
         {
@@ -953,6 +953,7 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
  * Handler for the ActivateAnalysisStream command, it initiates a WebRTC session for the
  * stream through the WebRTC client. The PushAV transport path
  * is not supported by this implementation and will answer INVALID_COMMAND.
+ * The response follows the offer exchange's outcome, not the sending of ProvideOffer.
  */
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
@@ -961,7 +962,7 @@ AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, co
     AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
     VerifyOrReturnValue(entry != nullptr, Status::NotFound);
 
-    // A stream that is already active is answered SUCCESS with no side-effects
+    // Any state other than PendingInitiation or Failure is answered SUCCESS with no side-effects (11.9.8.5)
     VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kPendingInitiation ||
                             entry->state == AnalysisStreamStateEnum::kFailure,
                         Status::Success);
@@ -994,6 +995,7 @@ AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, co
     return std::nullopt;
 }
 
+/** Handler for DeactivateAnalysisStream; the response carries the camera's answer to EndSession, not the send */
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeactivateAnalysisStream(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::DeactivateAnalysisStream::DecodableType & commandData)
@@ -1181,6 +1183,7 @@ void AvAnalysisServerLogic::OnSessionEnded(Status aStatus, uint16_t aWebRTCSessi
     }
     else
     {
+        // Any other answer, NOT_FOUND included, sets Failure, no reconciliation as in Remove
         // The client no longer tracks a session whose EndSession failed, so the entry refers to
         // none; the endpoint stays populated until a deactivation or re-activation
         entry->webRTCSessionID.SetNull();

@@ -305,9 +305,10 @@ void DefaultAvAnalysisWebRTCClient::HandleServerListReport(const ConcreteDataAtt
 
 void DefaultAvAnalysisWebRTCClient::OnError(CHIP_ERROR aError)
 {
+    VerifyOrReturn(mRequest.InPhase(Request::Phase::kCheckingProvider));
+
     // A failed read says nothing about the endpoint; OnDone follows and fails the request
     ChipLogError(Zcl, "AvAnalysisWebRTCClient: provider check error: %" CHIP_ERROR_FORMAT, aError.Format());
-    VerifyOrReturn(mRequest.InPhase(Request::Phase::kCheckingProvider));
     mRequest.SetProviderCheck(Request::ProviderCheck::kUnreadable);
 }
 

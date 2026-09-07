@@ -79,12 +79,14 @@ public:
     /**
      * Sets the camera client used by a RemoteContextDetection instance to allocate/deallocate analysis
      * streams on the camera (not used with LocalContextDetection).
+     * Required before Startup.
      */
     void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mCameraClient = aCameraClient; }
 
     /**
      * Sets the WebRTC client used by a RemoteContextDetection instance to initiate/end the WebRTC
      * sessions carrying analysis streams (not used with LocalContextDetection).
+     * Required before Startup.
      */
     void SetWebRTCClient(AvAnalysisWebRTCClient * aWebRTCClient) { mWebRTCClient = aWebRTCClient; }
 
@@ -201,7 +203,7 @@ private:
     void MarkDirty(AttributeId aAttributeId);
 
     /**
-     * Abandons the in-flight camera interaction, if any, on whichever client carries it.
+     * Abandons the in-flight camera interaction, if any, and every tracked WebRTC session.
      */
     void CancelCameraInteraction();
 

@@ -42,6 +42,7 @@ namespace Clusters {
  * The application side of the default WebRTC client: manages the peer connections whose signaling
  * the client performs. The methods carry the camera and the camera-assigned WebRTC session id,
  * under which pair the application keys its peer connections: ids are unique only within a camera.
+ * A connection that never establishes is the application's to report as failed; the client sets no timeout.
  *
  * All methods are invoked on the Matter thread.
  */
@@ -72,6 +73,7 @@ public:
     /**
      * The offer most recently produced now has a camera-assigned session id: the application binds
      * the peer connection it created to this id.
+     * Delivered after the request's OnSessionInitiated.
      */
     virtual void OnSessionAssigned(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
 
@@ -134,13 +136,15 @@ public:
      * Inbound session signals, forwarded by the application when its media layer sees the session's
      * connection established or failed, or when the camera's End arrives on its
      * WebRTCTransportRequestor cluster. A signal for a session this client does not track is ignored.
+     * Invoked on the Matter thread. NotifyFailed and NotifyEnded remove the session from the requestor cluster.
      */
     void NotifyConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
     void NotifyFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
     void NotifyEnded(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
 
     /**
-     * Sends this node's ICE candidates for a tracked session to its camera with ProvideICECandidates
+     * Sends this node's ICE candidates for a tracked session to its camera with ProvideICECandidates.
+     * The candidates are copied; fails with CHIP_ERROR_BUSY while another request is in flight.
      */
     CHIP_ERROR SendICECandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId,
                                  Span<const Globals::Structs::ICECandidateStruct::Type> aCandidates);
@@ -395,13 +399,11 @@ private:
     CHIP_ERROR SendProviderCheckRead();
     void ResetReadClient();
     void OnProviderCheckComplete();
-    // Tracks the camera-assigned session, records it on the requestor cluster, and hands it to the
-    // peer delegate; the offer request's success completion.
+    // Tracks the camera-assigned session on the requestor cluster; a stale session under the same key is failed first
     CHIP_ERROR RegisterSession(uint16_t aWebRTCSessionId);
-    // The session is over on both nodes, so it leaves the requestor cluster, the peer
-    // delegate releases its connection, and the slot is free again.
+    // Frees the slot, then removes the session from the requestor cluster and releases the peer connection
     void ReleaseSession(TrackedSession & aSession);
-    // Routes NotifyFailed/NotifyEnded: the tracked session is released
+    // Routes NotifyFailed/NotifyEnded: releases the tracked session, then reports OnSessionFailed
     void FailTrackedSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
     void FinishRequest(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId);
     // Session ids are unique only within a camera, so a session is identified by both

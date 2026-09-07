@@ -38,6 +38,7 @@ namespace Clusters {
  * outcome will be reported through the per-request Callback. A failing return means the
  * interaction could not be started and no callback will occur. Callbacks are always delivered on
  * the Matter thread.
+ * A completion may arrive before the call returns.
  */
 class AvAnalysisWebRTCClient
 {
@@ -70,6 +71,7 @@ public:
         /**
          * Outcome of EndSession for aWebRTCSessionId. A non-Success status is the camera's
          * response status.
+         * The session is no longer tracked
          */
         virtual void OnSessionEnded(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) = 0;
     };
@@ -104,9 +106,7 @@ public:
                                   Callback & aCallback) = 0;
 
     /**
-     * Abandons any in-flight request and forgets every initiated session; none of their callbacks
-     * are delivered. Safe to call from within a completion callback: the request is already
-     * finished by then
+     * Abandons the in-flight request and forgets every session, delivering no callbacks. Not for use from a Callback.
      */
     virtual void Cancel() = 0;
 };
