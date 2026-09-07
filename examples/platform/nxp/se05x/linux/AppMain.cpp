@@ -748,34 +748,20 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
     {
-        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
-        std::string logpath = "/run/thread.log";
-        unlink(logpath.c_str());
-        FILE * f = fopen(logpath.c_str(), "wt");
+        std::string nodeid   = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+        const char * logpath = "/dev/stderr";
+        FILE * f             = fopen(logpath, "wt");
         if (f != nullptr)
         {
             fclose(f);
-            std::string logfile = "--log-file=" + logpath;
+            std::string logfile = std::string("--log-file=") + logpath;
             char * args[]       = { argv[0], logfile.data(), nodeid.data() };
             otSysInit(MATTER_ARRAY_SIZE(args), args);
         }
         else
         {
-            unlink("thread.log");
-            FILE * f2 = fopen("thread.log", "wt");
-            if (f2 != nullptr)
-            {
-                fclose(f2);
-                std::string logfile = "--log-file=thread.log";
-                char * args[]       = { argv[0], logfile.data(), nodeid.data() };
-                otSysInit(MATTER_ARRAY_SIZE(args), args);
-            }
-            else
-            {
-                ChipLogError(NotSpecified, "Failed to open thread.log: %s. Omitting --log-file", strerror(errno));
-                char * args[] = { argv[0], nodeid.data() };
-                otSysInit(MATTER_ARRAY_SIZE(args), args);
-            }
+            char * args[] = { argv[0], nodeid.data() };
+            otSysInit(MATTER_ARRAY_SIZE(args), args);
         }
 
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
