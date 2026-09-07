@@ -229,8 +229,15 @@ public:
         mSessionsClosed++;
         mLastClosedCamera = aCameraNode;
         mLastClosed       = aWebRTCSessionId;
+
+        // An application whose peer connection reports its own close synchronously
+        if (mReportFailureOnClose && mClient != nullptr)
+        {
+            mClient->NotifyFailed(aCameraNode, aWebRTCSessionId);
+        }
     }
     ScopedNodeId mLastClosedCamera;
+    bool mReportFailureOnClose = false;
 
     OfferCallback * mLastOfferCallback = nullptr;
 };
@@ -431,6 +438,18 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, EndingAnUntrackedSessionIsRejected)
 {
     EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(mClient.mConnectRequests, 0);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, EndingASessionAtAnotherEndpointIsRejected)
+{
+    EstablishSessionWithId(55);
+    const int connectsBefore = mClient.mConnectRequests;
+
+    // The session was initiated on kProviderEndpoint; EndSession must go there
+    EXPECT_EQ(mClient.EndSession(kCameraNode, static_cast<EndpointId>(kProviderEndpoint + 1), 55, mCallback),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mClient.mConnectRequests, connectsBefore);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, MissingProviderClusterIsNotFound)
@@ -767,6 +786,77 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ConnectedSessionIsReportedActiveAndSta
     EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
     EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
     EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AFailureReportedFromWithinOnSessionClosedReleasesOnce)
+{
+    mPeerDelegate.mReportFailureOnClose = true;
+    EstablishSessionWithId(55);
+
+    // The camera's End releases the session; the application's close handler reports the same
+    // session failed while the release is in progress
+    mClient.NotifyEnded(kCameraNode, 55);
+
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
+    EXPECT_EQ(mCallback.mFailedCount, 1);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AReissuedSessionIdFailsTheSessionStillTrackedUnderIt)
+{
+    // A camera restarted and grants id 0 again while we still track its earlier session 0
+    EstablishSessionWithId(0);
+    EstablishSessionWithId(0);
+
+    // The earlier session is failed and released; the new one is the only one tracked
+    EXPECT_EQ(mCallback.mInitiatedCount, 2);
+    EXPECT_EQ(mCallback.mFailedCount, 1);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
+    EXPECT_EQ(mPeerDelegate.mSessionsAssigned, 2);
+    ASSERT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 0, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnErrorAfterTheResponseDoesNotUndoIt)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+    FeedOfferResponse(55);
+
+    // A stray error IB after the successful response is ignored
+    mClient.OnError(static_cast<CommandSender *>(nullptr), StatusIB(Status::Failure).ToChipError());
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+    EXPECT_EQ(mCallback.mLastSession, 55);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AResponseFromAnotherEndpointFailsTheRequest)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    using Fields = WebRTCTransportProvider::Commands::ProvideOfferResponse::Fields;
+    uint8_t buffer[64];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType containerType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Put(TLV::ContextTag(Fields::kWebRTCSessionID), static_cast<uint16_t>(55)), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    ConcreteCommandPath otherEndpoint(static_cast<EndpointId>(kProviderEndpoint + 1), WebRTCTransportProvider::Id,
+                                      WebRTCTransportProvider::Commands::ProvideOfferResponse::Id);
+    mClient.OnResponse(nullptr, otherEndpoint, StatusIB(), &reader);
+    mClient.OnDone(static_cast<CommandSender *>(nullptr));
+
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, CameraEndedSessionIsReportedFailedAndReleased)

@@ -68,8 +68,10 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RequestSession(const ScopedNodeId & aC
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::EndSession(const ScopedNodeId & aCameraNode, EndpointId aWebRTCEndpoint,
                                                      uint16_t aWebRTCSessionId, AvAnalysisWebRTCClient::Callback & aCallback)
 {
-    // Ending a session this client tracks
-    VerifyOrReturnError(FindTrackedSession(aCameraNode, aWebRTCSessionId) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    // Ending a session this client tracks, at the endpoint it was initiated on
+    TrackedSession * session = FindTrackedSession(aCameraNode, aWebRTCSessionId);
+    VerifyOrReturnError(session != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(session->providerEndpoint == aWebRTCEndpoint, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(CanStartRequest());
 
     mRequest.BeginEndSession(aCameraNode, aWebRTCEndpoint, aWebRTCSessionId, aCallback);
@@ -422,9 +424,9 @@ void DefaultAvAnalysisWebRTCClient::OnResponse(CommandSender * apCommandSender, 
 
     VerifyOrReturn(aStatusIB.IsSuccess() && apData != nullptr,
                    ChipLogError(Zcl, "AvAnalysisWebRTCClient: ProvideOffer response carried no data"));
-    VerifyOrReturn(aPath.mClusterId == WebRTCTransportProvider::Id &&
+    VerifyOrReturn(aPath.mEndpointId == mRequest.WebRTCEndpoint() && aPath.mClusterId == WebRTCTransportProvider::Id &&
                        aPath.mCommandId == WebRTCTransportProvider::Commands::ProvideOfferResponse::Id,
-                   ChipLogError(Zcl, "AvAnalysisWebRTCClient: unexpected response command"));
+                   ChipLogError(Zcl, "AvAnalysisWebRTCClient: unexpected response path"));
 
     WebRTCTransportProvider::Commands::ProvideOfferResponse::DecodableType response;
     VerifyOrReturn(DataModel::Decode(*apData, response) == CHIP_NO_ERROR,
@@ -439,6 +441,8 @@ void DefaultAvAnalysisWebRTCClient::OnError(const CommandSender * apCommandSende
 {
     VerifyOrReturn(mRequest.WasInvokedBy(apCommandSender),
                    ChipLogError(Zcl, "AvAnalysisWebRTCClient: error for an interaction already finished with"));
+    VerifyOrReturn(mRequest.InPhase(Request::Phase::kInvoking),
+                   ChipLogError(Zcl, "AvAnalysisWebRTCClient: error after the command was already responded to"));
 
     // A camera status response, or Failure for a transport error such as a timeout. Recorded only:
     // the sender is still alive here, so completion waits for OnDone
@@ -506,6 +510,13 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
 
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessionId)
 {
+    // A camera restarts its ids from 0, so one may come back for a session we still track because
+    // its End never reached us; that session died with the camera, so its stream is failed first
+    if (FindTrackedSession(mRequest.CameraNode(), aWebRTCSessionId) != nullptr)
+    {
+        FailTrackedSession(mRequest.CameraNode(), aWebRTCSessionId);
+    }
+
     TrackedSession * slot = FindFreeSession();
     VerifyOrReturnError(slot != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -531,10 +542,12 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
 
 void DefaultAvAnalysisWebRTCClient::ReleaseSession(TrackedSession & aSession)
 {
-    mRequestorCluster->RemoveSession(aSession.webRTCSessionId, aSession.cameraNode.GetNodeId(),
-                                     aSession.cameraNode.GetFabricIndex());
-    mPeerDelegate->OnSessionClosed(aSession.cameraNode, aSession.webRTCSessionId);
-    aSession = TrackedSession{};
+    const ScopedNodeId cameraNode  = aSession.cameraNode;
+    const uint16_t webRTCSessionId = aSession.webRTCSessionId;
+    aSession                       = TrackedSession{};
+
+    mRequestorCluster->RemoveSession(webRTCSessionId, cameraNode.GetNodeId(), cameraNode.GetFabricIndex());
+    mPeerDelegate->OnSessionClosed(cameraNode, webRTCSessionId);
 }
 
 void DefaultAvAnalysisWebRTCClient::NotifyConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
