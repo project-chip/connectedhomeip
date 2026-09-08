@@ -13128,10 +13128,10 @@ public class ClusterReadMapping {
         InteractionInfo readHumidistatMistTypeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.HumidistatCluster) cluster).readMistTypeAttribute(
-              (ChipClusters.HumidistatCluster.MistTypeAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedHumidistatClusterMistTypeAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readHumidistatMistTypeCommandParams
         );
         result.put("readMistTypeAttribute", readHumidistatMistTypeAttributeInteractionInfo);

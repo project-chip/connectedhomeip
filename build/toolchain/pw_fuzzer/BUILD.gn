@@ -170,8 +170,13 @@ gcc_toolchain("chip_pw_fuzztest") {
           [ "$dir_pw_toolchain/host_clang:sanitize_address" ]
       default_configs += [ "//build/config/compiler:sanitize_memory" ]
     } else {
-      # Local builds keep pigweed's base -fsanitize=address. Optional UBSan on top via the
-      # `ubsan` modifier on a -pw-fuzztest target.
+      # Pigweed's -fsanitize=address comes from this toolchain's default_configs, which
+      # only reaches pigweed-template targets. Chip targets key sanitizers off is_asan, so
+      # set it to instrument them too; config("sanitize_address") also carries the
+      # -fsanitize-coverage= counters.
+      is_asan = true
+
+      # Optional UBSan on top via the `ubsan` modifier on a -pw-fuzztest target.
       if (chip_pw_fuzz_ubsan) {
         default_configs += [ "//build/toolchain/pw_fuzzer:fuzztest_ubsan" ]
       }
