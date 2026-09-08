@@ -241,7 +241,8 @@ class TC_ASU_2_2(MatterBaseTest):
 
         for contributor in reported_list:
             if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == contnode:
-                asserts.fail(f"Removed contributor (NodeID={contnode_str}) is still found in UnionContributorList subscription report.")
+                asserts.fail(
+                    f"Removed contributor (NodeID={contnode_str}) is still found in UnionContributorList subscription report.")
 
         attrib_listener.reset()
 
@@ -255,7 +256,8 @@ class TC_ASU_2_2(MatterBaseTest):
         asserts.assert_true(len(removed_list) > 0, "removedContributor field is empty in UnionContributorRemoved event.")
         removed = removed_list[0]
         asserts.assert_equal(removed.contributorNodeID, contnode, "Wrong ContributorNodeID in UnionContributorRemoved event.")
-        asserts.assert_equal(removed.contributorEndpointID, contend, "Wrong ContributorEndpointID in UnionContributorRemoved event.")
+        asserts.assert_equal(removed.contributorEndpointID, contend,
+                             "Wrong ContributorEndpointID in UnionContributorRemoved event.")
         # Per spec, ContributorName MAY be NULL or MAY contain a valid string for a Matter contributor.
         asserts.assert_true(
             removed.contributorName == Clusters.Types.NullValue or isinstance(removed.contributorName, str),
@@ -306,7 +308,8 @@ class TC_ASU_2_2(MatterBaseTest):
                                      "ContributorStatus was not updated in UnionContributorList subscription report.")
                 found_updated = True
 
-        asserts.assert_true(found_updated, "Could not find contributor in UnionContributorList subscription report to verify status change.")
+        asserts.assert_true(
+            found_updated, "Could not find contributor in UnionContributorList subscription report to verify status change.")
         attrib_listener.reset()
 
         self.step("11")
