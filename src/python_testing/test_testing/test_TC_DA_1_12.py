@@ -23,12 +23,12 @@ from pathlib import Path
 from types import MethodType, SimpleNamespace
 
 from mobly import signals
-from test_pqc_support import _load_pem_fixtures
-
-import matter.clusters as Clusters
 from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCredentialsFeature, is_ml_dsa_supported,
                                          kCertificateSegmentSize, profile_mask)
 from TC_DA_1_12 import TC_DA_1_12
+from test_pqc_support import _load_pem_fixtures
+
+import matter.clusters as Clusters
 
 
 class _ProfileRetrievalComplete(Exception):
@@ -69,7 +69,7 @@ class TestTCDA112Profiles(unittest.IsolatedAsyncioTestCase):
 
         def step(number):
             if number == 7:
-                raise _ProfileRetrievalComplete()
+                raise _ProfileRetrievalComplete
 
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, 'paa.der').write_bytes(fixtures['kMlDsa65PaaPem'])
