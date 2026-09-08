@@ -197,6 +197,60 @@ not_automated:
           https://github.com/project-chip/connectedhomeip/issues/71932
     - name: TC_AVANALYTestBase.py
       reason: Shared helper methods for AV Analysis tests, not a standalone test
+    - name: TC_AUDIOCONTROLTestBase.py
+      reason: Shared code for TC_AUDIOCONTROL, not a standalone test.
+    - name: TC_MEDIAPLAYBACKTestBase.py
+      reason: Shared code for TC_MEDIAPLAYBACK, not a standalone test.
+    - name: TC_MESSTestBase.py
+      reason: Shared code for TC_MESS, not a standalone test.
+    - name: TC_MEDIAFILEMANAGEMENTTestBase.py
+      reason: Shared code for TC_MEDIAFILEMANAGEMENT, not a standalone test.
+    - name: TC_AUDIOCONTROL_2_1.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_2.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_3.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_4.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_5.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_6.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_7.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_8.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAPLAYBACK_6_11.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAPLAYBACK_6_12.py
+      reason: Pending tv-app in CI
+    - name: TC_CONTENTLAUNCHER_10_10.py
+      reason: Pending tv-app in CI
+    - name: TC_MESS_1_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MESS_3_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_1_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_2_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_2_2.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_3_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_3_2.py
+      reason: Pending tv-app in CI
+    - name: TC_CONTENTLAUNCHER_10_8.py
+      reason: Requires an operator to place the DUT into a non-movable-content state.
+    - name: TC_CONTENTLAUNCHER_10_9.py
+      reason: Requires a media URL PIXIT and user interaction.
+    - name: TC_ALOGIN_12_3.py
+      reason: Requires a user to complete an OAuth login on a second device.
+    - name: TC_MESS_3_2.py
+      reason: Requires real audio URI PIXITs and times actual playback.
+    - name: TC_MESS_3_3.py
+      reason: Requires an audio URI PIXIT and an operator to mute the DUT.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
