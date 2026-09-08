@@ -39,29 +39,8 @@ public:
     virtual void ShutdownApp() override;
 
     /**
-     * Delegate command handlers
+     * Delegate command assists
      */
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status ActivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status DeactivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status RemoveAnalysisStream() override;
-
-    /**
-     * Delegate command helpers
-     */
-
     virtual CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override;
 
     virtual bool CanAddContextTriggers() override;
