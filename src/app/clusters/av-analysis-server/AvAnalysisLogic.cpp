@@ -813,7 +813,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
     //
     if (!commandData.contextTriggers.IsNull())
     {
-        // Loop over the provided context triggers
+        // Applied per trigger, not atomically: the spec nests the removal inside this loop, unlike Enable's after it
         auto iter = commandData.contextTriggers.Value().begin();
 
         while (iter.Next())
