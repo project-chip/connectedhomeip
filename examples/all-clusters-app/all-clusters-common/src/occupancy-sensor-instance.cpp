@@ -21,8 +21,9 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-CHIP_ERROR OccupancySensingDelegateImpl::GetPredictedOccupancyAtIndex(
-    size_t index, OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction)
+CHIP_ERROR
+OccupancySensingDelegateImpl::GetPredictedOccupancyAtIndex(size_t index,
+                                                           OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction)
 {
     switch (index)
     {
