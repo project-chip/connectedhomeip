@@ -20,8 +20,8 @@
 
 from mobly import asserts
 
-from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import CertificationUnitTestNoDevice, TestStep
+from matter.testing.decorators import async_test_body, pics
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 
 # Section 5.1.5 "Concatenation" of the specification defines '*' as the delimiter
@@ -30,21 +30,13 @@ _CONCATENATION_DELIMITER = "*"
 
 
 class TC_DD_1_4(CertificationUnitTestNoDevice):
-    def desc_TC_DD_1_4(self) -> str:
-        return "[TC-DD-1.4] Concatenated QR Code Content [DUT - Commissionee]"
 
-    def pics_TC_DD_1_4(self) -> list[str]:
-        return ["MCORE.ROLE.COMMISSIONEE", "MCORE.DD.CONCATENATED_QR_CODE"]
-
-    def steps_TC_DD_1_4(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Scan the DUTs' concatenated QR code and verify the number of delimiters",
-                     "Number of '*' delimiters is one less than the number of onboarding DUTs"),
-        ]
-
+    @pics('MCORE.ROLE.COMMISSIONEE', 'MCORE.DD.CONCATENATED_QR_CODE')
     @async_test_body
     async def test_TC_DD_1_4(self):
-        self.step(1)
+        """[TC-DD-1.4] Concatenated QR Code Content [DUT - Commissionee]"""
+        self.step(1, "Scan the DUTs' concatenated QR code and verify the number of delimiters",
+                  expectation="Number of '*' delimiters is one less than the number of onboarding DUTs")
         asserts.assert_true(self.matter_test_config.qr_code_content, "This test needs to be run with the qr-code param.")
         qr_code_content = self.matter_test_config.qr_code_content[0]
         device_count_response = self.wait_for_user_input(
