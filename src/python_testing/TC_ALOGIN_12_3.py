@@ -137,8 +137,8 @@ class TC_ALOGIN_12_3(MatterBaseTest):
         # ExpiresIn bounds how long the operator has to finish; surface it in the prompt.
         self.wait_for_user_input(
             prompt_msg=f"On another device, visit {response.verificationURI} and enter the user code "
-                       f"'{response.userCode}' to complete the OAuth login.\n"
-                       f"This must be done within {response.expiresIn} seconds. Press Enter when finished.\n")
+            f"'{response.userCode}' to complete the OAuth login.\n"
+            f"This must be done within {response.expiresIn} seconds. Press Enter when finished.\n")
         oauth_logged_in = await self._read_oauth_logged_in(endpoint)
         asserts.assert_true(oauth_logged_in,
                             "OAuthLoggedIn should be TRUE once the user has completed the OAuth login")
