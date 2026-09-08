@@ -146,8 +146,8 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::InvokeOnHeldSession(CommandId aCommand
 {
     VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
 
-    // A CommandSender may only be destroyed from its own OnDone, so it must not be replaced while a
-    // previous one's callbacks can still fire.
+    // A CommandSender may be destroyed at any time except from its own OnResponse or OnError, so
+    // replacing a live one is only safe outside those; single flight means there is none here.
     VerifyOrReturnError(!mCommandSender, CHIP_ERROR_INCORRECT_STATE);
 
     auto session   = mRequest.Session();
@@ -240,7 +240,8 @@ void DefaultAvAnalysisWebRTCClient::OnDeviceConnectionFailure(void * context, co
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendProviderCheckRead()
 {
     VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
-    // A ReadClient may only be destroyed from its OnDone
+    // A ReadClient may be destroyed outside its callbacks and from its own OnDone, but not from any
+    // other one, so a live one is never replaced; single flight means there is none here.
     VerifyOrReturnError(!mReadClient, CHIP_ERROR_INCORRECT_STATE);
 
     AttributePathParams readPath(mRequest.WebRTCEndpoint(), Descriptor::Id, Descriptor::Attributes::ServerList::Id);
@@ -570,7 +571,7 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
     slot->callback         = mRequest.PeekCallback();
     slot->cameraNode       = mRequest.CameraNode();
     slot->providerEndpoint = mRequest.WebRTCEndpoint();
-    slot->videoStreamId = mRequest.VideoStreamId();
+    slot->videoStreamId    = mRequest.VideoStreamId();
 
     // The requestor cluster is the receiving end of this session
     Globals::Structs::WebRTCSessionStruct::Type session;
@@ -579,8 +580,8 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
     session.fabricIndex    = mRequest.CameraNode().GetFabricIndex();
     session.peerEndpointID = mRequest.WebRTCEndpoint();
     session.streamUsage    = Globals::StreamUsageEnum::kAnalysis;
-    session.videoStreams = MakeOptional(DataModel::List<const uint16_t>(&slot->videoStreamId, 1));
-    session.videoStreamID = DataModel::MakeNullable(slot->videoStreamId);
+    session.videoStreams   = MakeOptional(DataModel::List<const uint16_t>(&slot->videoStreamId, 1));
+    session.videoStreamID  = DataModel::MakeNullable(slot->videoStreamId);
     session.audioStreamID.SetNull();
     mRequestorCluster->UpsertSession(session);
     return CHIP_NO_ERROR;

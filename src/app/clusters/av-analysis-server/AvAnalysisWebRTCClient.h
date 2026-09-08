@@ -83,7 +83,8 @@ public:
      * the WebRTCTransportProvider cluster on the given endpoint of the camera node.
      *
      * OnSessionInitiated reports the outcome of initiation; a successfully initiated session then
-     * reports OnSessionActive while it is connected, and OnSessionFailed once, when it is over.
+     * reports OnSessionActive while it is connected. It ends exactly once: through OnSessionEnded
+     * when EndSession asked for it, and through OnSessionFailed otherwise.
      *
      * @param aCameraNode      The camera, on the same fabric as this Analysis Node.
      * @param aWebRTCEndpoint  The camera endpoint hosting WebRTCTransportProvider, as provided by

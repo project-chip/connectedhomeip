@@ -137,6 +137,10 @@ public:
      * connection established or failed, or when the camera's End arrives on its
      * WebRTCTransportRequestor cluster. A signal for a session this client does not track is ignored.
      * Invoked on the Matter thread. NotifyFailed and NotifyEnded remove the session from the requestor cluster.
+     *
+     * Removing it invalidates the WebRTCSessionStruct the requestor cluster handed the application,
+     * which is a reference into the cluster's own session list: a delegate calling these from
+     * HandleEnd or HandleICECandidates must not touch its session argument afterwards.
      */
     void NotifyConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
     void NotifyFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
