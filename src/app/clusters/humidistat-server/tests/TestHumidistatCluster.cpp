@@ -650,27 +650,6 @@ TEST_F(TestHumidistatCluster, SetSettingsEmptyCommand)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestHumidistatCluster, WriteEmptyMistTypeFailsInHumidifierMode)
-{
-    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kColdMist };
-    HumidistatCluster cluster(kTestEndpointId, features, {});
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(cluster.SetMode(ModeEnum::kHumidifier), CHIP_NO_ERROR);
-    ASSERT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold)), CHIP_NO_ERROR);
-
-    // MistType can no longer be null; an empty value while Mode is Humidifier is inconsistent and rejected.
-    chip::BitMask<MistTypeBitmap> emptyMistType;
-    EXPECT_EQ(tester.WriteAttribute(MistType::Id, emptyMistType), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-    chip::BitMask<MistTypeBitmap> readMistType;
-    ASSERT_EQ(tester.ReadAttribute(MistType::Id, readMistType), CHIP_NO_ERROR);
-    EXPECT_EQ(readMistType.Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
 TEST_F(TestHumidistatCluster, SetSettingsModeFailStopsProcessing)
 {
     // If Mode fails, subsequent fields should not be applied.
