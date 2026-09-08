@@ -118,9 +118,9 @@ bool DeviceAttestationCredentialsProvider::HasRequiredPqcCredentials() const
 DeviceAttestationProfileSupport DeviceAttestationCredentialsProvider::GetDeviceAttestationProfileSupport() const
 {
     return {
-        .paaSupportedProfiles = kLegacyDeviceAttestationProfiles,
-        .paiSupportedProfiles = kLegacyDeviceAttestationProfiles,
-        .dacSupportedProfiles = kLegacyDeviceAttestationProfiles,
+        kLegacyDeviceAttestationProfiles,
+        kLegacyDeviceAttestationProfiles,
+        kLegacyDeviceAttestationProfiles,
     };
 }
 
