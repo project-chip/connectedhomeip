@@ -41,8 +41,8 @@ message ThirdCluster {
     */
 
 
-  /** LevelControlOptions Type: 1 IsList: 0 FieldId: 20 */
-  uint32 options = 524308;
+  /** LevelControlOptions Type: 6 IsList: 0 FieldId: 20 */
+  LevelControlOptions options = 3145748;
     /*
     [(attribute) = {
       is_writable : true,
