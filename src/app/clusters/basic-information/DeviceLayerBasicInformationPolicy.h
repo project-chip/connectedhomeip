@@ -236,7 +236,10 @@ public:
     //
     struct OwnedDeviceLocation
     {
-        std::string locationName;
+        static constexpr size_t kMaxLocationNameLength = 128;
+        char locationName[kMaxLocationNameLength] = {};
+        size_t locationNameLen = 0;
+
         std::optional<int16_t> floorNumber;
         std::optional<Globals::AreaTypeTag> areaType;
 
@@ -246,26 +249,25 @@ public:
         LocationDescriptorStructType ToView() const
         {
             return {
-                .locationName = { locationName.data(), locationName.size() },
-                .floorNumber  = floorNumber.has_value() ? DataModel::MakeNullable(*floorNumber) : DataModel::Nullable<int16_t>(),
-                .areaType = areaType.has_value() ? DataModel::MakeNullable(*areaType) : DataModel::Nullable<Globals::AreaTypeTag>(),
+                .locationName = CharSpan(locationName, locationNameLen),
+                .floorNumber  = floorNumber.has_value()
+                    ? DataModel::MakeNullable(*floorNumber)
+                    : DataModel::Nullable<int16_t>(),
+                .areaType = areaType.has_value()
+                    ? DataModel::MakeNullable(*areaType)
+                    : DataModel::Nullable<Globals::AreaTypeTag>(),
             };
         }
 
         // Safe for empty LocationName (CharSpan.data() may be nullptr)
         OwnedDeviceLocation & operator=(const LocationDescriptorStructType & value)
         {
-            // Special handling since empty char-span will return nullptr for data() and
-            // std::string does not like that
-            if (value.locationName.empty())
+            locationNameLen = value.locationName.size();
+            VerifyOrDie(locationNameLen <= kMaxLocationNameLength);
+            if (locationNameLen > 0)
             {
-                locationName.clear();
+                memcpy(locationName, value.locationName.data(), locationNameLen);
             }
-            else
-            {
-                locationName = std::string{ value.locationName.data(), value.locationName.size() };
-            }
-
             if (value.floorNumber.IsNull())
             {
                 floorNumber.reset();
