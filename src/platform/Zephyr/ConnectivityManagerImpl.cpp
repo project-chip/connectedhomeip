@@ -32,6 +32,7 @@
 #include <platform/internal/BLEManager.h>
 
 #ifndef CONFIG_ARCH_POSIX
+#include <zephyr/net/mld.h>
 #include <zephyr/net/net_if.h>
 #endif
 
@@ -78,20 +79,22 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    // Use MLD join/leave so Ethernet/Wi-Fi L2 installs the HW multicast MAC
+    // filter (e.g. 33:33:00:00:00:fb for ff02::fb). Plain maddr_add/join does
+    // not program SiWx917 filters, so mDNS queries are dropped after other
+    // filters (all-nodes / solicited-node) enable filtering.
     const InetUtils::ZephyrIn6Addr in6Addr = InetUtils::ToZephyrAddr(address);
+    int status;
 
     if (operation == UDPEndPointImplSockets::MulticastOperation::kJoin)
     {
-        net_if_mcast_addr * maddr = net_if_ipv6_maddr_add(iface, &in6Addr);
-
-        if (maddr && !net_if_ipv6_maddr_is_joined(maddr))
-        {
-            net_if_ipv6_maddr_join(iface, maddr);
-        }
+        status = net_ipv6_mld_join(iface, &in6Addr);
+        VerifyOrReturnError((status == 0 || status == -EALREADY), System::MapErrorZephyr(status));
     }
     else if (operation == UDPEndPointImplSockets::MulticastOperation::kLeave)
     {
-        VerifyOrReturnError(net_if_ipv6_maddr_rm(iface, &in6Addr), CHIP_ERROR_INVALID_ADDRESS);
+        status = net_ipv6_mld_leave(iface, &in6Addr);
+        VerifyOrReturnError(status == 0, System::MapErrorZephyr(status));
     }
     else
     {
