@@ -91,10 +91,16 @@ public:
     virtual CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                 EndpointComposition composition = {}) = 0;
 
-    /// Removes a device's clusters from the given provider. This
+    /// Removes a device's clusters and endpoint from the given provider. This
     /// must only be called when register has succeeded before. Expected
     /// usage of this function is for when the device is no longer needed
     /// (for example, on shutdown), to destroy the device's clusters.
+    ///
+    /// Required teardown order:
+    /// Subclasses MUST call UnregisterDescriptor() (which unregisters the endpoint from the provider
+    /// via provider.RemoveEndpoint()) BEFORE unregistering or destroying any device-specific clusters
+    /// via provider.RemoveCluster(). Attempting to call RemoveCluster() while the endpoint remains
+    /// registered will fail with CHIP_ERROR_INCORRECT_STATE.
     virtual void Unregister(CodeDrivenDataModelProvider & provider) = 0;
 
     // Endpoint interface implementation
@@ -114,7 +120,12 @@ protected:
     virtual CHIP_ERROR RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                           EndpointComposition composition = {});
 
-    /// Reverse of `RegisterDescrioptor`
+    /// Unregisters the endpoint from the data model provider (via provider.RemoveEndpoint()) and
+    /// unregisters/destroys the Descriptor cluster.
+    ///
+    /// This MUST be called FIRST in any device's Unregister() implementation before removing any
+    /// other clusters from the provider, because CodeDrivenDataModelProvider disallows removing
+    /// clusters while their associated endpoint is still registered.
     virtual void UnregisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
