@@ -28,6 +28,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/thermostat-server/AttributeAccessorShim.h>
+#include <app/clusters/thermostat-user-interface-configuration-server/CodegenIntegration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "gpSched.h"
@@ -469,9 +470,12 @@ void ThermostaticRadiatorValveManager::SetSystemMode(ThermostaticRadiatorValveMa
 
 ThermostaticRadiatorValveManager::TempDisplayMode_t ThermostaticRadiatorValveManager::GetTemperatureDisplayMode(void)
 {
-    ThermostaticRadiatorValveManager::TempDisplayMode_t value;
+    ThermostaticRadiatorValveManager::TempDisplayMode_t value = TempDisplayMode_t::kCelsius;
 
-    ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
+    if (ThermostatUserInterfaceConfiguration::GetTemperatureDisplayMode(QPG_THERMOSTATIC_ENDPOINT_ID, &value) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "GetTemperatureDisplayMode failed");
+    }
 
     ChipLogDetail(NotSpecified, "GetTemperatureDisplayMode -  %d", (uint8_t) value);
 
@@ -481,7 +485,7 @@ ThermostaticRadiatorValveManager::TempDisplayMode_t ThermostaticRadiatorValveMan
 void ThermostaticRadiatorValveManager::SetTemperatureDisplayMode(ThermostaticRadiatorValveManager::TempDisplayMode_t aMode)
 {
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aMode] {
-        ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aMode);
+        LogErrorOnFailure(ThermostatUserInterfaceConfiguration::SetTemperatureDisplayMode(QPG_THERMOSTATIC_ENDPOINT_ID, aMode));
 
         ChipLogDetail(NotSpecified, "SetTemperatureDisplayMode value %d", (uint8_t) aMode);
     });

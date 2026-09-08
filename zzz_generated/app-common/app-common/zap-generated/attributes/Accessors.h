@@ -2726,54 +2726,7 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 } // namespace FanControl
 
 namespace ThermostatUserInterfaceConfiguration {
-namespace Attributes {
-
-namespace TemperatureDisplayMode {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum * value); // TemperatureDisplayModeEnum
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace TemperatureDisplayMode
-
-namespace KeypadLockout {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum * value); // KeypadLockoutEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace KeypadLockout
-
-namespace ScheduleProgrammingVisibility {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum *
-        value); // ScheduleProgrammingVisibilityEnum
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value,
-    MarkAttributeDirty markDirty);
-} // namespace ScheduleProgrammingVisibility
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 } // namespace ThermostatUserInterfaceConfiguration
 
 namespace Humidistat {

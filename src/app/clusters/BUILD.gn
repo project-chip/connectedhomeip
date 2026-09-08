@@ -95,6 +95,7 @@ source_set("clusters") {
     "temperature-control-server",
     "temperature-measurement-server",
     "thermostat-server",
+    "thermostat-user-interface-configuration-server",
     "thread-border-router-management-server",
     "thread-network-diagnostics-server",
     "thread-network-directory-server",
