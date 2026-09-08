@@ -95,7 +95,7 @@ class TC_ASU_2_1(MatterBaseTest):
         log.info("Rx'd UnionName: %s", unionName_read)
         string_size = len(unionName_read)
         # checkvalue between 1 and 128
-        asserts.assert_greater_equal(1, string_size, "The string size needs to be betwween 1 and 128.")
+        asserts.assert_greater_equal(string_size, 1, "The string size needs to be betwween 1 and 128.")
         asserts.assert_less_equal(string_size, 128, "The string size needs to be betwween 1 and 128.")
 
         self.step("3")
@@ -122,7 +122,7 @@ class TC_ASU_2_1(MatterBaseTest):
 
         list_size = len(unionlist_read)
         # checkvalue between 1 and 128
-        asserts.assert_greater_equal(1, list_size, "The string size needs to be betwween 1 and 128.")
+        asserts.assert_greater_equal(list_size, 1, "The string size needs to be betwween 1 and 128.")
         asserts.assert_less_equal(list_size, 128, "The string size needs to be betwween 1 and 128.")
 
         valid_contributor_status_values = [
@@ -154,7 +154,7 @@ class TC_ASU_2_1(MatterBaseTest):
                 )
                 string_size = len(contributor.contributorName)
                 # checkvalue between 1 and 128
-                asserts.assert_greater_equal(1, string_size, "The string size needs to be betwween 1 and 128.")
+                asserts.assert_greater_equal(string_size, 1, "The string size needs to be betwween 1 and 128.")
                 asserts.assert_less_equal(string_size, 128, "The string size needs to be betwween 1 and 128.")
 
             else:
@@ -167,6 +167,11 @@ class TC_ASU_2_1(MatterBaseTest):
                                              "ContributorEndpointID shall be >= 0")
                 asserts.assert_less_equal(contributor.contributorEndpointID, MAX_UINT16,
                                           "ContributorEndpointID shall be <= MAX_UINT16")
+                if contributor..contributorName == NullValue:
+                    string_size = len(contributor.contributorName)
+                    # checkvalue between 1 and 128
+                    asserts.assert_greater_equal(string_size, 1, "The string size needs to be betwween 1 and 128.")
+                    asserts.assert_less_equal(string_size, 128, "The string size needs to be betwween 1 and 128.")
 
             asserts.assert_in(
                 contributor.contributorStatus,
