@@ -79,14 +79,14 @@ public:
     /**
      * Sets the camera client used by a RemoteContextDetection instance to allocate/deallocate analysis
      * streams on the camera (not used with LocalContextDetection).
-     * Required before Startup.
+     * Required before Startup; must outlive this instance.
      */
     void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mCameraClient = aCameraClient; }
 
     /**
      * Sets the WebRTC client used by a RemoteContextDetection instance to initiate/end the WebRTC
      * sessions carrying analysis streams (not used with LocalContextDetection).
-     * Required before Startup.
+     * Required before Startup; must outlive this instance, which cancels it on destruction.
      */
     void SetWebRTCClient(AvAnalysisWebRTCClient * aWebRTCClient) { mWebRTCClient = aWebRTCClient; }
 

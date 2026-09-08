@@ -348,11 +348,6 @@ protected:
     Request & CurrentRequest() { return mRequest; }
 
     /**
-     * Provider-check report decoder, dispatched from OnAttributeData.
-     */
-    void HandleServerListReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData);
-
-    /**
      * Fills a ProvideOffer request from the pending request and the buffered SDP, per the WebRTC
      * Normal Flow: a null session id asks for a new session, StreamUsage is Analysis, and the
      * originating endpoint is where our WebRTCTransportRequestor cluster is registered. The sdp
@@ -398,6 +393,7 @@ private:
     CHIP_ERROR CanStartRequest() const;
     CHIP_ERROR SendProviderCheckRead();
     void ResetReadClient();
+    void HandleServerListReport(const ConcreteDataAttributePath & aPath, TLV::TLVReader & aData);
     void OnProviderCheckComplete();
     // Tracks the camera-assigned session on the requestor cluster; a stale session under the same key is failed first
     CHIP_ERROR RegisterSession(uint16_t aWebRTCSessionId);

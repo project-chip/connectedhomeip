@@ -13,9 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <algorithm>
 #include <optional>
 #include <pw_unit_test/framework.h>
-#include <ranges>
 
 #include <app/CommandHandler.h>
 #include <app/InteractionModelEngine.h>
@@ -303,7 +303,7 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         ASSERT_FALSE(response.has_value());
         ASSERT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
         mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, aSessionId);
-        ASSERT_EQ(activateHandler.GetLastStatus().status.GetStatus(), Status::Success);
+        ASSERT_EQ(LastStatus(activateHandler), Status::Success);
         mFakeWebRTCClient.mLastCallback->OnSessionActive(aCameraNode, aSessionId);
     }
 
@@ -316,7 +316,9 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         Commands::ActivateAnalysisStream::DecodableType commandData;
         commandData.analysisStreamID = aAnalysisStreamId;
         commandData.webRTCEndpointID = MakeOptional(aWebRTCEndpoint);
-        return StatusOf(mServer.GetLogic().HandleActivateAnalysisStream(handler, path, commandData)).GetStatusCode().GetStatus();
+        auto response                = mServer.GetLogic().HandleActivateAnalysisStream(handler, path, commandData);
+        EXPECT_TRUE(response.has_value()) << "ActivateAnalysisStream unexpectedly parked";
+        return StatusOf(response).GetStatusCode().GetStatus();
     }
 
     Status ImmediateDeactivateStatus(uint16_t aAnalysisStreamId)
@@ -326,7 +328,9 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DeactivateAnalysisStream::Id };
         Commands::DeactivateAnalysisStream::DecodableType commandData;
         commandData.analysisStreamID = aAnalysisStreamId;
-        return StatusOf(mServer.GetLogic().HandleDeactivateAnalysisStream(handler, path, commandData)).GetStatusCode().GetStatus();
+        auto response                = mServer.GetLogic().HandleDeactivateAnalysisStream(handler, path, commandData);
+        EXPECT_TRUE(response.has_value()) << "DeactivateAnalysisStream unexpectedly parked";
+        return StatusOf(response).GetStatusCode().GetStatus();
     }
 
     Status ImmediateRemoveStatus(uint16_t aAnalysisStreamId)
@@ -336,7 +340,17 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
         Commands::RemoveAnalysisStream::DecodableType commandData;
         commandData.analysisStreamID = aAnalysisStreamId;
-        return StatusOf(mServer.GetLogic().HandleRemoveAnalysisStream(handler, path, commandData)).GetStatusCode().GetStatus();
+        auto response                = mServer.GetLogic().HandleRemoveAnalysisStream(handler, path, commandData);
+        EXPECT_TRUE(response.has_value()) << "RemoveAnalysisStream unexpectedly parked";
+        return StatusOf(response).GetStatusCode().GetStatus();
+    }
+
+    // The last status recorded on aHandler, or InvalidAction when it was never answered: no handler
+    // is ever answered InvalidAction, so an unanswered command fails the comparison rather than
+    // reading an empty vector
+    static Status LastStatus(const Testing::MockCommandHandler & aHandler)
+    {
+        return aHandler.HasStatus() ? aHandler.GetLastStatus().status.GetStatus() : Status::InvalidAction;
     }
 
     // The state of the first stream in the AnalysisStreams attribute
@@ -796,9 +810,9 @@ TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
 
     // On startup there should be no active triggers
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
-    size_t triggersSize;
+    size_t triggersSize = 1;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    TEMPORARY_RETURN_IGNORED aActiveContextTriggers.ComputeSize(&triggersSize);
+    ASSERT_EQ(aActiveContextTriggers.ComputeSize(&triggersSize), CHIP_NO_ERROR);
     ASSERT_EQ(triggersSize, static_cast<size_t>(0));
 
     uint8_t aMaxAnalysisStreamCount = 0;
@@ -811,9 +825,9 @@ TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
 
     // On startup there should be no analysis streams
     Attributes::AnalysisStreams::TypeInfo::DecodableType aAnalysisStreams;
-    size_t streamsSize;
+    size_t streamsSize = 1;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, aAnalysisStreams), CHIP_NO_ERROR);
-    TEMPORARY_RETURN_IGNORED aAnalysisStreams.ComputeSize(&streamsSize);
+    ASSERT_EQ(aAnalysisStreams.ComputeSize(&streamsSize), CHIP_NO_ERROR);
     ASSERT_EQ(streamsSize, static_cast<size_t>(0));
 
     bool trackingEnabled = false;
@@ -881,7 +895,7 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamPropagatesCameraFailu
 
     ASSERT_FALSE(commandHandler.HasResponse());
     ASSERT_TRUE(commandHandler.HasStatus());
-    ASSERT_EQ(commandHandler.GetLastStatus().status.GetStatus(), Status::ResourceExhausted);
+    ASSERT_EQ(LastStatus(commandHandler), Status::ResourceExhausted);
 
     uint8_t currentCount = 0xFF;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
@@ -1070,7 +1084,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiatesAWebRTCSession)
     // The camera assigns session 55: the entry records it and the command answers SUCCESS
     ASSERT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
     mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55);
-    ASSERT_EQ(activateHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(activateHandler), Status::Success);
 
     Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
@@ -1109,7 +1123,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiationFailureIsPropagatedWithout
     // No WebRTCTransportProvider on the camera surfaces as NOT_FOUND
     ASSERT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
     mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::NotFound, 0);
-    ASSERT_EQ(activateHandler.GetLastStatus().status.GetStatus(), Status::NotFound);
+    ASSERT_EQ(LastStatus(activateHandler), Status::NotFound);
 
     // The entry is untouched: still PendingInitiation, no endpoint, and activatable again
     Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
@@ -1130,7 +1144,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiationFailureIsPropagatedWithout
 
     // Settle the retry: a mock handler must not outlive the test with an interaction parked on it
     mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 56);
-    ASSERT_EQ(retryHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(retryHandler), Status::Success);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ActivateThatCannotStartIsAnsweredAtOnce)
@@ -1248,7 +1262,7 @@ TEST_F(TestRemoteAvAnalysisCluster, SessionFailureBeforeActiveMarksTheStreamFail
     auto response                = mServer.GetLogic().HandleActivateAnalysisStream(activateHandler, path, commandData);
     ASSERT_FALSE(response.has_value());
     mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55);
-    ASSERT_EQ(activateHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(activateHandler), Status::Success);
 
     mFakeWebRTCClient.mLastCallback->OnSessionFailed(ScopedNodeId(0x1234, 1), 55);
 
@@ -1290,7 +1304,7 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateEndsTheSession)
 
     // The camera confirms: back to an activatable stream with no session associations
     mFakeWebRTCClient.mLastCallback->OnSessionEnded(Status::Success, 55);
-    ASSERT_EQ(deactivateHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(deactivateHandler), Status::Success);
 
     Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
@@ -1342,7 +1356,7 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateThatCannotStartLeavesTheStreamActi
 
     // Finish the retry so no interaction outlives its handler
     mFakeWebRTCClient.mLastCallback->OnSessionEnded(Status::Success, 55);
-    ASSERT_EQ(retryHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(retryHandler), Status::Success);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, DeactivateCompletingSynchronouslyKeepsItsOutcome)
@@ -1364,7 +1378,7 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateCompletingSynchronouslyKeepsItsOut
 
     auto response = mServer.GetLogic().HandleDeactivateAnalysisStream(deactivateHandler, path, commandData);
     ASSERT_FALSE(response.has_value()); // The parked handler already answered
-    ASSERT_EQ(deactivateHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+    ASSERT_EQ(LastStatus(deactivateHandler), Status::Failure);
 
     Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
@@ -1396,7 +1410,7 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateFailureMarksTheStreamFailed)
 
     // The camera's failure is propagated and the stream is marked Failure; the endpoint stays populated
     mFakeWebRTCClient.mLastCallback->OnSessionEnded(Status::NotFound, 55);
-    ASSERT_EQ(deactivateHandler.GetLastStatus().status.GetStatus(), Status::NotFound);
+    ASSERT_EQ(LastStatus(deactivateHandler), Status::NotFound);
 
     Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
@@ -1521,7 +1535,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateWhileAnotherActivateIsParkedIsBusy)
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 1);
 
     mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55);
-    ASSERT_EQ(activateHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(activateHandler), Status::Success);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, DeactivateWhileAnotherInteractionIsParkedIsBusy)
@@ -1548,7 +1562,7 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateWhileAnotherInteractionIsParkedIsB
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kWebRTCActive);
 
     mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Success, 43);
-    ASSERT_EQ(removeHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(removeHandler), Status::Success);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, SessionFailureDuringDeactivationIsLeftToTheEndSessionOutcome)
@@ -1573,22 +1587,58 @@ TEST_F(TestRemoteAvAnalysisCluster, SessionFailureDuringDeactivationIsLeftToTheE
 
     // The EndSession outcome decides
     mFakeWebRTCClient.mLastCallback->OnSessionEnded(Status::Success, 55);
-    ASSERT_EQ(deactivateHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(deactivateHandler), Status::Success);
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
 }
 
-TEST_F(TestRemoteAvAnalysisCluster, SessionActiveOnAnActiveStreamIsIgnored)
+TEST_F(TestRemoteAvAnalysisCluster, SessionActiveOnAnAlreadyActiveStreamIsIgnored)
 {
     InvalidatableCommandHandler establishHandler;
     establishHandler.SetFabricIndex(1);
     EstablishStream(establishHandler, 0x1234, Status::Success, 42);
     ActivateStream(0, 2, 55);
 
-    // Nothing changes, so nothing is reported changed
+    // Only an initiated stream goes active; a repeat report of the same connection changes nothing
     const size_t dirtyBefore = mClusterTester.GetDirtyList().size();
     mFakeWebRTCClient.mLastCallback->OnSessionActive(ScopedNodeId(0x1234, 1), 55);
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kWebRTCActive);
     ASSERT_EQ(mClusterTester.GetDirtyList().size(), dirtyBefore);
+
+    // The stream is still active, so it is still deactivatable
+    InvalidatableCommandHandler deactivateHandler;
+    deactivateHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DeactivateAnalysisStream::Id };
+    Commands::DeactivateAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 0;
+    ASSERT_FALSE(mServer.GetLogic().HandleDeactivateAnalysisStream(deactivateHandler, path, commandData).has_value());
+    mFakeWebRTCClient.mLastCallback->OnSessionEnded(Status::Success, 55);
+    ASSERT_EQ(LastStatus(deactivateHandler), Status::Success);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, SessionActiveDuringDeactivationIsIgnored)
+{
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+    ActivateStream(0, 2, 55);
+
+    InvalidatableCommandHandler deactivateHandler;
+    deactivateHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DeactivateAnalysisStream::Id };
+    Commands::DeactivateAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 0;
+    ASSERT_FALSE(mServer.GetLogic().HandleDeactivateAnalysisStream(deactivateHandler, path, commandData).has_value());
+
+    // Only an initiated stream goes active: a late connection report leaves the deactivation alone
+    const size_t dirtyBefore = mClusterTester.GetDirtyList().size();
+    mFakeWebRTCClient.mLastCallback->OnSessionActive(ScopedNodeId(0x1234, 1), 55);
+    ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kWebRTCPendingDeactivation);
+    ASSERT_EQ(mClusterTester.GetDirtyList().size(), dirtyBefore);
+    ASSERT_FALSE(deactivateHandler.HasStatus());
+
+    mFakeWebRTCClient.mLastCallback->OnSessionEnded(Status::Success, 55);
+    ASSERT_EQ(LastStatus(deactivateHandler), Status::Success);
+    ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ExecuteDeactivateAnalysisStreamCommandTest)
@@ -1650,7 +1700,7 @@ TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamSuccess)
     mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Success, 42);
 
     ASSERT_TRUE(removeHandler.HasStatus());
-    ASSERT_EQ(removeHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(removeHandler), Status::Success);
 
     // The stream is gone
     uint8_t currentCount = 0xFF;
@@ -1693,11 +1743,11 @@ TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamRetiresEntryButPropagate
     auto response = mServer.GetLogic().HandleRemoveAnalysisStream(removeHandler, path, commandData);
     ASSERT_FALSE(response.has_value());
 
-    // The camera no longer has the stream. keeping
-    // the entry would occupy capacity that no retry could ever free.
+    // The camera no longer has the stream, and keeping the entry would occupy capacity that no
+    // retry could ever free
     mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::NotFound, 42);
 
-    ASSERT_EQ(removeHandler.GetLastStatus().status.GetStatus(), Status::NotFound);
+    ASSERT_EQ(LastStatus(removeHandler), Status::NotFound);
 
     uint8_t currentCount = 0xFF;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
@@ -1722,7 +1772,7 @@ TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamPropagatesCameraFailure)
     // The camera's status is returned and the stream entry is kept
     mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Failure, 42);
 
-    ASSERT_EQ(removeHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+    ASSERT_EQ(LastStatus(removeHandler), Status::Failure);
 
     uint8_t currentCount = 0;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
@@ -1819,8 +1869,6 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteTrackingEnabledPersistenceTest)
     ASSERT_TRUE(trackingEnabled);
 }
 
-// Simulates the real CommandHandlerImpl handle lifecycle: tracks Handles and can invalidate them,
-// as happens when the invoking client's exchange closes (e.g. client-side timeout).
 TEST_F(TestRemoteAvAnalysisCluster, BusyWhileInteractionInFlightEvenIfCommandExchangeDied)
 {
     ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
@@ -1957,7 +2005,7 @@ TEST_F(TestRemoteAvAnalysisCluster, DeadExchangeActivateStillRecordsTheSession)
     ASSERT_FALSE(mServer.GetLogic().HandleDeactivateAnalysisStream(deactivateHandler, deactivatePath, deactivateData).has_value());
     ASSERT_EQ(mFakeWebRTCClient.mLastSessionId, 55);
     mFakeWebRTCClient.mLastCallback->OnSessionEnded(Status::Success, 55);
-    ASSERT_EQ(deactivateHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    ASSERT_EQ(LastStatus(deactivateHandler), Status::Success);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, DeadExchangeDeactivateStillSettlesTheStream)
@@ -2019,10 +2067,71 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishSameCameraStreamIsIdempotent)
     ASSERT_EQ(currentCount, 2);
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, StartupRejectsAMisconfiguredInstance)
+{
+    // A cluster instance is only startable with a coherent feature/resource configuration; each
+    // check stops a misconfigured product from booting into an unusable state
+    const BitFlags<Feature> kRemote(Feature::kRemoteContextDetection);
+    const BitFlags<Feature> kRemoteAndZones(Feature::kRemoteContextDetection, Feature::kPerZoneContextDetection);
+
+    // Neither Local nor Remote detection, and both at once: exactly one is mandatory
+    AvAnalysisCluster noDetection(kTestEndpointId, BitFlags<Feature>(), testAmbientContexts, DataModel::NullNullable,
+                                  kTestMaxAnalysisStreams);
+    noDetection.SetDelegate(&mMockDelegate);
+    EXPECT_EQ(noDetection.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    AvAnalysisCluster bothDetection(kTestEndpointId,
+                                    BitFlags<Feature>(Feature::kLocalContextDetection, Feature::kRemoteContextDetection),
+                                    testAmbientContexts, DataModel::NullNullable, kTestMaxAnalysisStreams);
+    bothDetection.SetDelegate(&mMockDelegate);
+    EXPECT_EQ(bothDetection.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // PerZone detection and the zone count go together
+    AvAnalysisCluster zonesWithoutMax(kTestEndpointId, kRemoteAndZones, testAmbientContexts, DataModel::NullNullable,
+                                      kTestMaxAnalysisStreams);
+    zonesWithoutMax.SetDelegate(&mMockDelegate);
+    EXPECT_EQ(zonesWithoutMax.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    AvAnalysisCluster maxWithoutZones(kTestEndpointId, kRemote, testAmbientContexts, DataModel::MakeNullable(kTestMaxZones),
+                                      kTestMaxAnalysisStreams);
+    maxWithoutZones.SetDelegate(&mMockDelegate);
+    EXPECT_EQ(maxWithoutZones.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Remote detection needs room for at least one analysis stream
+    AvAnalysisCluster noStreams(kTestEndpointId, kRemote, testAmbientContexts, DataModel::NullNullable, 0);
+    noStreams.SetDelegate(&mMockDelegate);
+    EXPECT_EQ(noStreams.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, StartupRequiresBothClientsWithRemoteDetection)
+{
+    const BitFlags<Feature> kRemote(Feature::kRemoteContextDetection);
+
+    AvAnalysisCluster noClients(kTestEndpointId, kRemote, testAmbientContexts, DataModel::NullNullable, kTestMaxAnalysisStreams);
+    noClients.SetDelegate(&mMockDelegate);
+    EXPECT_EQ(noClients.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INCORRECT_STATE);
+
+    AvAnalysisCluster cameraOnly(kTestEndpointId, kRemote, testAmbientContexts, DataModel::NullNullable, kTestMaxAnalysisStreams);
+    cameraOnly.SetDelegate(&mMockDelegate);
+    cameraOnly.SetCameraClient(&mFakeCameraClient);
+    EXPECT_EQ(cameraOnly.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INCORRECT_STATE);
+
+    AvAnalysisCluster webRTCOnly(kTestEndpointId, kRemote, testAmbientContexts, DataModel::NullNullable, kTestMaxAnalysisStreams);
+    webRTCOnly.SetDelegate(&mMockDelegate);
+    webRTCOnly.SetWebRTCClient(&mFakeWebRTCClient);
+    EXPECT_EQ(webRTCOnly.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INCORRECT_STATE);
+
+    AvAnalysisCluster bothClients(kTestEndpointId, kRemote, testAmbientContexts, DataModel::NullNullable, kTestMaxAnalysisStreams);
+    bothClients.SetDelegate(&mMockDelegate);
+    bothClients.SetCameraClient(&mFakeCameraClient);
+    bothClients.SetWebRTCClient(&mFakeWebRTCClient);
+    EXPECT_EQ(bothClients.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    bothClients.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, ShutdownWithoutInteractionLeavesTheCameraClientAlone)
 {
-    // The camera client may be shared with other AV Analysis endpoints; shutting this cluster down
-    // with nothing of ours in flight must not cancel another endpoint's request.
+    // Nothing of ours is in flight on the camera client, so there is nothing for Shutdown to abandon
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_EQ(mFakeCameraClient.mCancelCount, 0);
 
@@ -2071,7 +2180,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ShutdownAnswersTheParkedCommand)
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     ASSERT_TRUE(commandHandler.HasStatus());
-    ASSERT_EQ(commandHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+    ASSERT_EQ(LastStatus(commandHandler), Status::Failure);
 
     // Restart so the fixture TearDown shuts down a running server
     EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -2116,7 +2225,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ShutdownDuringActivateCancelsTheClientsAndAn
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_GE(mFakeWebRTCClient.mCancelCount, 1);
     ASSERT_GE(mFakeCameraClient.mCancelCount, 1);
-    ASSERT_EQ(activateHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+    ASSERT_EQ(LastStatus(activateHandler), Status::Failure);
 
     // A stray late completion (contract violation by a client) answers nothing more
     pendingCallback->OnSessionInitiated(Status::Success, 55);
@@ -2144,7 +2253,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ShutdownDuringDeactivateAnswersTheCommandAnd
 
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
     ASSERT_GE(mFakeWebRTCClient.mCancelCount, 1);
-    ASSERT_EQ(deactivateHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+    ASSERT_EQ(LastStatus(deactivateHandler), Status::Failure);
 
     // A stray late completion answers nothing more
     pendingCallback->OnSessionEnded(Status::Success, 55);

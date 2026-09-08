@@ -30,13 +30,13 @@ public:
 
     bool CanAddContextTriggers() override { return mCanAddContextTriggers; }
 
-    // What the zone check and the capacity check answer
-    CHIP_ERROR mZoneVerificationResult = CHIP_NO_ERROR;
-    bool mCanAddContextTriggers        = true;
-
     void ActiveAmbientContextTriggersUpdated() override {}
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override { return CHIP_NO_ERROR; }
+
+    // What the zone check and the capacity check answer
+    CHIP_ERROR mZoneVerificationResult = CHIP_NO_ERROR;
+    bool mCanAddContextTriggers        = true;
 };
 
 } // namespace Clusters

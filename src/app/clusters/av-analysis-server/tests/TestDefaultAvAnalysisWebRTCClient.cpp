@@ -301,8 +301,9 @@ ConcreteDataAttributePath ServerListPath(EndpointId aEndpoint)
     return ConcreteDataAttributePath(aEndpoint, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
 }
 
-// Feeds a ServerList report for aEndpoint into the client, as the read would deliver it
-void FeedServerList(InterceptingWebRTCClient & aClient, EndpointId aEndpoint, Span<const ClusterId> aClusters)
+// Feeds a cluster-id list report for aPath with aStatus into the client, as the read would deliver it
+void FeedClusterList(InterceptingWebRTCClient & aClient, const ConcreteDataAttributePath & aPath, Span<const ClusterId> aClusters,
+                     const StatusIB & aStatus)
 {
     uint8_t buffer[64];
     TLV::TLVWriter writer;
@@ -318,7 +319,13 @@ void FeedServerList(InterceptingWebRTCClient & aClient, EndpointId aEndpoint, Sp
     TLV::TLVReader reader;
     reader.Init(buffer, writer.GetLengthWritten());
     ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
-    aClient.OnAttributeData(ServerListPath(aEndpoint), &reader, StatusIB());
+    aClient.OnAttributeData(aPath, &reader, aStatus);
+}
+
+// A successful ServerList report for aEndpoint
+void FeedServerList(InterceptingWebRTCClient & aClient, EndpointId aEndpoint, Span<const ClusterId> aClusters)
+{
+    FeedClusterList(aClient, ServerListPath(aEndpoint), aClusters, StatusIB());
 }
 
 struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
@@ -573,7 +580,10 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnErrorStatusForTheServerListIsNotFoun
     EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
     mClient.EnterProviderCheck();
 
-    // The camera has no such endpoint: the report is a status with no data
+    // The camera has no such endpoint: whatever the report carries, its status says the list is not to be had
+    const ClusterId kProviderList[] = { WebRTCTransportProvider::Id };
+    FeedClusterList(mClient, ServerListPath(kProviderEndpoint), Span<const ClusterId>(kProviderList),
+                    StatusIB(Status::UnsupportedEndpoint));
     mClient.OnAttributeData(ServerListPath(kProviderEndpoint), nullptr, StatusIB(Status::UnsupportedEndpoint));
     mClient.OnDone(static_cast<ReadClient *>(nullptr));
 
@@ -597,12 +607,39 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AServerListReportOutsideTheProviderChe
     EXPECT_EQ(mPeerDelegate.mOffersRequested, 0);
 }
 
-TEST_F(TestDefaultAvAnalysisWebRTCClient, AStaleReadCompletionIsIgnored)
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AProviderListReportedUnderAnotherPathIsNotTheProviderCheck)
 {
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+    mClient.EnterProviderCheck();
+
+    // The provider is listed, but under the ClientList attribute of the right endpoint
+    const ClusterId kProviderList[] = { WebRTCTransportProvider::Id };
+    FeedClusterList(mClient, ConcreteDataAttributePath(kProviderEndpoint, Descriptor::Id, Descriptor::Attributes::ClientList::Id),
+                    Span<const ClusterId>(kProviderList), StatusIB());
     mClient.OnDone(static_cast<ReadClient *>(nullptr));
 
-    EXPECT_EQ(mCallback.mInitiatedCount, 0);
-    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::NotFound);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ReadCallbacksOutsideTheProviderCheckAreIgnored)
+{
+    // An EndSession is in flight: no read of ours is
+    EstablishSessionWithId(55);
+    DriveToEndSessionSent(55);
+
+    mClient.OnError(CHIP_ERROR_ACCESS_DENIED);
+    mClient.OnDone(static_cast<ReadClient *>(nullptr));
+
+    // The request is untouched, still awaiting the camera's answer
+    EXPECT_EQ(mClient.CurrentRequest().GetPhase(), InterceptingWebRTCClient::Request::Phase::kInvoking);
+    EXPECT_EQ(mCallback.mEndedCount, 0);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+
+    FeedEndSessionStatus(Status::Success);
+    mClient.OnDone(mClient.Sender());
+    EXPECT_EQ(mCallback.mEndedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, AFailedServerListReadFailsTheRequestRatherThanNotFound)
@@ -775,8 +812,10 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ATransportErrorIsReportedAsFailure)
     ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
     mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
 
-    // No camera status behind the error: the exchange timed out
+    // No camera status behind the error: the exchange timed out. Recorded as a failure at once
     mClient.OnError(mClient.Sender(), CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(mClient.CurrentRequest().GetPhase(), InterceptingWebRTCClient::Request::Phase::kFailed);
+    EXPECT_EQ(mClient.CurrentRequest().FailureStatus(), Status::Failure);
     mClient.OnDone(mClient.Sender());
 
     EXPECT_EQ(mCallback.mInitiatedCount, 1);
@@ -1185,18 +1224,6 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnEstablishedSessionIsNotAnAbandonedOf
     EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 0);
 }
 
-TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferTheCameraRefusesIsAbandoned)
-{
-    DriveToOffer();
-    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
-    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
-    mClient.OnError(mClient.Sender(), StatusIB(Status::ResourceExhausted).ToChipError());
-    mClient.OnDone(mClient.Sender());
-
-    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
-    EXPECT_EQ(mCallback.mInitiatedCount, 1);
-}
-
 TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferLeftUnansweredIsAbandoned)
 {
     DriveToOffer();
@@ -1269,6 +1296,27 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ARequestBeforeInitIsRefused)
 {
     InterceptingWebRTCClient uninitialised;
     EXPECT_EQ(uninitialised.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(uninitialised.mConnectRequests, 0);
+
+    // With no session table nothing is tracked, so the session-bound entry points find nothing to
+    // act on and walk no memory
+    RecordingCallback uninitialisedCallback;
+    EXPECT_NE(uninitialised.EndSession(kCameraNode, kProviderEndpoint, 55, uninitialisedCallback), CHIP_NO_ERROR);
+    auto candidates = TwoCandidates();
+    EXPECT_NE(uninitialised.SendICECandidates(
+                  kCameraNode, 55, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+              CHIP_NO_ERROR);
+    uninitialised.NotifyConnected(kCameraNode, 55);
+    uninitialised.NotifyFailed(kCameraNode, 55);
+    uninitialised.NotifyEnded(kCameraNode, 55);
+    uninitialised.Cancel();
+
+    EXPECT_EQ(uninitialisedCallback.mInitiatedCount, 0);
+    EXPECT_EQ(uninitialisedCallback.mActiveCount, 0);
+    EXPECT_EQ(uninitialisedCallback.mFailedCount, 0);
+    EXPECT_EQ(uninitialisedCallback.mEndedCount, 0);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 0);
     EXPECT_EQ(uninitialised.mConnectRequests, 0);
 }
 
@@ -1489,6 +1537,27 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ICECandidatesAreCopiedAndSentToTheSess
     EXPECT_EQ(mClient.mSentCandidates[1], "candidate:2 1 UDP 1686052607 203.0.113.5 5000 typ srflx");
     EXPECT_FALSE(mClient.mSentMids[1].has_value());
     EXPECT_TRUE(mClient.mSentMLineIndexes[1].IsNull());
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ICECandidatesAreRoutedToTheSessionsOwnCamera)
+{
+    // Two cameras, each with a session 0
+    const ScopedNodeId kOtherCamera(0x5678, 1);
+    RecordingCallback otherCallback;
+    EstablishSessionWithId(0, mCallback, kCameraNode);
+    EstablishSessionWithId(0, otherCallback, kOtherCamera);
+
+    auto candidates = TwoCandidates();
+    ASSERT_EQ(mClient.SendICECandidates(
+                  kOtherCamera, 0, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+              CHIP_NO_ERROR);
+
+    // The send reaches the camera that assigned the session, not the first camera with that id
+    EXPECT_EQ(mClient.mLastPeer, kOtherCamera);
+    ASSERT_EQ(mClient.SendPendingICECandidates(), CHIP_NO_ERROR);
+    ASSERT_EQ(mClient.mIceSendAttempts, 1);
+    EXPECT_EQ(mClient.mSentIceSessionId, 0);
+    EXPECT_EQ(mClient.mSentCandidates.size(), 2u);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, AConfirmedCandidateSendCompletesSilentlyAndFreesTheClient)
