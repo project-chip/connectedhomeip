@@ -32,6 +32,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/server:joint_fabric",
     "${chip_root}/src/app/server:thread_rendezvous_announcement",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd/wire:reader",
     "${chip_root}/src/lib/support:testing",
   ]
 }
