@@ -17,7 +17,6 @@
 
 #include "CodegenIntegration.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <app/static-cluster-config/ThermostatUserInterfaceConfiguration.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -27,8 +26,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration;
-using namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes;
-using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -45,24 +42,6 @@ public:
     {
         ThermostatUserInterfaceConfigurationCluster::Config config;
         config.optionalAttributes = ThermostatUserInterfaceConfigurationCluster::OptionalAttributeSet(optionalAttributeBits);
-
-        if (TemperatureDisplayMode::GetDefault(endpointId, &config.temperatureDisplayMode) != Status::Success)
-        {
-            config.temperatureDisplayMode = TemperatureDisplayModeEnum::kCelsius;
-        }
-
-        if (KeypadLockout::GetDefault(endpointId, &config.keypadLockout) != Status::Success)
-        {
-            config.keypadLockout = KeypadLockoutEnum::kNoLockout;
-        }
-
-        if (config.optionalAttributes.IsSet(ScheduleProgrammingVisibility::Id))
-        {
-            if (ScheduleProgrammingVisibility::GetDefault(endpointId, &config.scheduleProgrammingVisibility) != Status::Success)
-            {
-                config.scheduleProgrammingVisibility = ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted;
-            }
-        }
 
         gServers[clusterInstanceIndex].Create(endpointId, config);
         return gServers[clusterInstanceIndex].Registration();
