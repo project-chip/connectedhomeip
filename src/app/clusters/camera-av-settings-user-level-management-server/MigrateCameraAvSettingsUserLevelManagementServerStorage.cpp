@@ -29,38 +29,28 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes;
 
-namespace {
-
-static constexpr AttrMigrationData kAttributesToMigrate[] = {
-    { MPTZPosition::Id, Clusters::kMptzPositionStructMaxSerializedSize, false /* isScalar */ },
-    { MPTZPresets::Id, kMaxMPTZPresetsSerializedSize, false /* isScalar */ },
-    { DPTZStreams::Id, kMaxDPTZStreamsSerializedSize, false /* isScalar */ },
-};
-
-static constexpr size_t kBufferSize = MaxAttrMigrationValueSize(kAttributesToMigrate);
-static_assert(kBufferSize > 0, "All migration attributes have zero valueSize");
-
-// File-scope buffer avoids a large stack allocation for MPTZPresets migration.
-static uint8_t sAttributeBuffer[kBufferSize];
-
-} // namespace
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace CameraAvSettingsUserLevelManagement {
+namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement {
 
 CHIP_ERROR MigrateCameraAvSettingsUserLevelManagementServerStorage(EndpointId endpointId,
                                                                    SafeAttributePersistenceProvider & safeProvider,
                                                                    AttributePersistenceProvider & dstProvider)
 {
-    MutableByteSpan buffer(sAttributeBuffer);
+    static constexpr AttrMigrationData kAttributesToMigrate[] = {
+        { MPTZPosition::Id, Clusters::kMptzPositionStructMaxSerializedSize, false /* isScalar */ },
+        { MPTZPresets::Id, kMaxMPTZPresetsSerializedSize, false /* isScalar */ },
+        { DPTZStreams::Id, kMaxDPTZStreamsSerializedSize, false /* isScalar */ },
+    };
+
+    static constexpr size_t kBufferSize = MaxAttrMigrationValueSize(kAttributesToMigrate);
+    static_assert(kBufferSize > 0, "All migration attributes have zero valueSize");
+
+    // Static storage avoids a large stack allocation for MPTZPresets migration.
+    static uint8_t attributeBuffer[kBufferSize];
+    MutableByteSpan buffer(attributeBuffer);
+
     return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider,
                                                          ConcreteClusterPath(endpointId, CameraAvSettingsUserLevelManagement::Id),
                                                          Span<const AttrMigrationData>(kAttributesToMigrate), buffer);
 }
 
-} // namespace CameraAvSettingsUserLevelManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement
