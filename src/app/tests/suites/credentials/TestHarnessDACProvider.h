@@ -38,6 +38,12 @@ struct TestHarnessDACProviderData
     chip::Optional<CharSpan> description;
     chip::Optional<bool> isSuccessCase;
     chip::Optional<uint16_t> pid;
+    // The ML-DSA suffix identifies the PAA/chain, not necessarily the PAI public key.
+    // JSON keys: pai_profile_ml_dsa_44 / pai_profile_ml_dsa_65; values: 0 = ECDSA,
+    // 1 = ML-DSA-44, 2 = ML-DSA-65. Set these to the provisioned PAI key algorithm.
+    // Defaults preserve the interpretation of existing homogeneous issuer fixtures.
+    DeviceAttestationCertProfile paiProfileMlDsa44 = DeviceAttestationCertProfile::kMlDsa44;
+    DeviceAttestationCertProfile paiProfileMlDsa65 = DeviceAttestationCertProfile::kMlDsa65;
 };
 
 class TestHarnessDACProvider : public DeviceAttestationCredentialsProvider
@@ -54,6 +60,7 @@ public:
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) override;
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) override;
     DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const override;
+    DeviceAttestationCertProfile GetPreferredDeviceAttestationChainProfile() const override;
     CHIP_ERROR GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType documentType, DeviceAttestationCertProfile profile,
                                                    size_t offset, MutableByteSpan & out_document_buffer,
                                                    size_t & out_document_size) override;

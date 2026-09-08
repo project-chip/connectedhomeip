@@ -1001,6 +1001,9 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
 
     CHIP_ERROR err                                             = CHIP_NO_ERROR;
     Credentials::DeviceAttestationCertProfile requestedProfile = Credentials::DeviceAttestationCertProfile::kEcdsaMatterLegacy;
+    // CryptoProfile describes the requested certificate's key. An ECDSA PAI/DAC
+    // can belong to an ML-DSA-rooted chain, so choose the stored chain separately.
+    const auto chainProfile                                    = dacProvider.GetPreferredDeviceAttestationChainProfile();
     Credentials::DeviceAttestationDocumentType documentType;
     uint8_t documentBuffer[kDefaultCertificateSegmentSize];
     MutableByteSpan documentSpan(documentBuffer);
@@ -1030,7 +1033,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
                                 profileSupport.dacSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(requestedProfile)),
                             Status::InvalidCommand);
         documentType = Credentials::DeviceAttestationDocumentType::kDACCertificate;
-        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, requestedProfile, offset,
+        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, chainProfile, offset,
                                                                                              documentSpan, documentSize)
                                            : dacProvider.GetDeviceAttestationCert(documentSpan));
     }
@@ -1041,7 +1044,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
                                 profileSupport.paiSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(requestedProfile)),
                             Status::InvalidCommand);
         documentType = Credentials::DeviceAttestationDocumentType::kPAICertificate;
-        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, requestedProfile, offset,
+        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, chainProfile, offset,
                                                                                              documentSpan, documentSize)
                                            : dacProvider.GetProductAttestationIntermediateCert(documentSpan));
     }

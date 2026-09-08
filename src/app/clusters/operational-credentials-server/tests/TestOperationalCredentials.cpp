@@ -96,12 +96,15 @@ public:
                 Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy,
                 Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa44),
             .paiSupportedProfiles = BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
-                Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy,
-                Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa44),
+                Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy),
             .dacSupportedProfiles = BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
-                Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy,
-                Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa44),
+                Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy),
         };
+    }
+
+    Credentials::DeviceAttestationCertProfile GetPreferredDeviceAttestationChainProfile() const override
+    {
+        return Credentials::DeviceAttestationCertProfile::kMlDsa44;
     }
 
     CHIP_ERROR GetDeviceAttestationDocumentSegment(Credentials::DeviceAttestationDocumentType documentType,
@@ -328,8 +331,9 @@ TEST_F(TestOperationalCredentials, TestAttributesWithPQCFeature)
               BitMask<AttestationCryptoProfileBitmap>(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
                                                       AttestationCryptoProfileBitmap::kSupportsMlDsa44)
                   .Raw());
-    EXPECT_EQ(profile.PAISupportedProfiles.Raw(), profile.PAASupportedProfiles.Raw());
-    EXPECT_EQ(profile.DACSupportedProfiles.Raw(), profile.PAASupportedProfiles.Raw());
+    EXPECT_EQ(profile.PAISupportedProfiles.Raw(),
+              BitMask<AttestationCryptoProfileBitmap>(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy).Raw());
+    EXPECT_EQ(profile.DACSupportedProfiles.Raw(), profile.PAISupportedProfiles.Raw());
 }
 
 TEST_F(TestOperationalCredentials, TestCommands)
@@ -398,14 +402,14 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCFeatureServesLe
     EXPECT_FALSE(paiResult.response->nextSegmentID.HasValue());
 }
 
-TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCFeatureServesRequestedPQCChain)
+TEST_F(TestOperationalCredentials, TestCertificateChainRequestEcdsaProfilesSelectMixedPQCChain)
 {
     OperationalCredentialsCluster cluster(kRootEndpointId, MakeContext(BitFlags<Feature>(Feature::kPQCDeviceAttestation)));
     ClusterTester tester(cluster);
 
     Commands::CertificateChainRequest::Type dacRequest;
     dacRequest.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    dacRequest.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+    dacRequest.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
 
     auto dacResult = tester.Invoke(dacRequest);
     ASSERT_TRUE(dacResult.IsSuccess());
@@ -418,7 +422,7 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCFeatureServesRe
 
     Commands::CertificateChainRequest::Type paiRequest;
     paiRequest.certificateType = CertificateChainTypeEnum::kPAICertificate;
-    paiRequest.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+    paiRequest.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
 
     auto paiResult = tester.Invoke(paiRequest);
     ASSERT_TRUE(paiResult.IsSuccess());
@@ -434,6 +438,17 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
 {
     OperationalCredentialsCluster cluster(kRootEndpointId, MakeContext(BitFlags<Feature>(Feature::kPQCDeviceAttestation)));
     ClusterTester tester(cluster);
+
+    // The PAA supports ML-DSA-44, but neither the PAI nor DAC has an ML-DSA key.
+    for (auto type : { CertificateChainTypeEnum::kDACCertificate, CertificateChainTypeEnum::kPAICertificate })
+    {
+        Commands::CertificateChainRequest::Type request;
+        request.certificateType = type;
+        request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+        auto result = tester.Invoke(request);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
 
     Commands::CertificateChainRequest::Type unsupportedProfile;
     unsupportedProfile.certificateType = CertificateChainTypeEnum::kDACCertificate;
@@ -464,7 +479,7 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     // CHIP_ERROR_INVALID_ARGUMENT.
     Commands::CertificateChainRequest::Type outOfRangeSegment;
     outOfRangeSegment.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    outOfRangeSegment.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+    outOfRangeSegment.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
     outOfRangeSegment.segmentID.SetValue(3);
 
     auto outOfRangeSegmentResult = tester.Invoke(outOfRangeSegment);
@@ -473,7 +488,7 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
 
     Commands::CertificateChainRequest::Type undersizedSegmentSize;
     undersizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    undersizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+    undersizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
     undersizedSegmentSize.maxSegmentSize.SetValue(kDefaultCertificateSegmentSize - 1);
 
     auto undersizedSegmentSizeResult = tester.Invoke(undersizedSegmentSize);
@@ -484,7 +499,7 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     // honored, so it is rejected instead of being silently served at the default segment size.
     Commands::CertificateChainRequest::Type oversizedSegmentSize;
     oversizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    oversizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+    oversizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
     oversizedSegmentSize.maxSegmentSize.SetValue(std::numeric_limits<uint16_t>::max());
 
     auto oversizedSegmentSizeResult = tester.Invoke(oversizedSegmentSize);
@@ -503,7 +518,7 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegm
     {
         Commands::CertificateChainRequest::Type request;
         request.certificateType = CertificateChainTypeEnum::kDACCertificate;
-        request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+        request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
         request.maxSegmentSize.SetValue(maxSegmentSize);
 
         auto result = tester.Invoke(request);

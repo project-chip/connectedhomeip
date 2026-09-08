@@ -46,6 +46,9 @@ enum class DeviceAttestationDocumentType : uint8_t
     kPAICertificate,
 };
 
+// Each bitmap describes the corresponding certificate's subject public key capabilities,
+// not its issuer's signature algorithm or the profile of the chain containing it.
+// Phase 1 DAC keys (and device attestation signatures) remain ECDSA-P256.
 struct DeviceAttestationProfileSupport
 {
     BitMask<DeviceAttestationCertProfileBitmap> paaSupportedProfiles;
@@ -99,7 +102,7 @@ public:
     virtual CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer) = 0;
 
     /**
-     * @brief Get the Device Attestation Certificate in DER format for a given attestation profile.
+     * @brief Get the Device Attestation Certificate in DER format for a given stored chain profile.
      *
      * The default implementation serves the legacy Matter profile through
      * GetDeviceAttestationCert() and reports unsupported profiles as not implemented.
@@ -119,7 +122,7 @@ public:
     virtual CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) = 0;
 
     /**
-     * @brief Get the PAI Certificate in DER format for a given attestation profile.
+     * @brief Get the PAI Certificate in DER format for a given stored chain profile.
      *
      * The default implementation serves the legacy Matter profile through
      * GetProductAttestationIntermediateCert() and reports unsupported profiles as not implemented.
@@ -134,11 +137,28 @@ public:
      */
     virtual DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const;
 
+    /**
+     * Select the strongest complete stored attestation chain for profile-aware requests.
+     * This is a storage selector, independent of each certificate's public key profile.
+     * Both PAI and DAC reads, including all segments, must use this same chain.
+     * Providers must keep the selection stable while commissioning is in progress.
+     *
+     * The legacy default preserves source compatibility for existing providers. Providers
+     * with multiple chains override this method based on their complete chain inventory.
+     */
+    virtual DeviceAttestationCertProfile GetPreferredDeviceAttestationChainProfile() const
+    {
+        return DeviceAttestationCertProfile::kEcdsaMatterLegacy;
+    }
+
     /// Whether the provider reports a legacy chain and PQC PAA or PAI profiles, as required to enable PQC attestation.
     bool HasRequiredPqcCredentials() const;
 
     /**
-     * @brief Read one segment of a device attestation document for a given profile.
+     * @brief Read one segment of a device attestation document for a given stored chain profile.
+     *
+     * `profile` selects a chain, not the requested certificate's public key algorithm.
+     * For example, an ML-DSA chain can contain an ECDSA PAI and DAC.
      *
      * On success, the implementation updates `out_document_buffer` to the bytes read starting at `offset` and sets
      * `out_document_size` to the size of the complete document. Implementations backed by persistent storage should read only

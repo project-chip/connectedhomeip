@@ -337,6 +337,15 @@ void TestHarnessDACProvider::Init(const char * filepath)
         data.pid.SetValue(ReadUint16(root[kPid]));
     }
 
+    if (root.isMember("pai_profile_ml_dsa_44"))
+    {
+        data.paiProfileMlDsa44 = static_cast<DeviceAttestationCertProfile>(root["pai_profile_ml_dsa_44"].asUInt());
+    }
+    if (root.isMember("pai_profile_ml_dsa_65"))
+    {
+        data.paiProfileMlDsa65 = static_cast<DeviceAttestationCertProfile>(root["pai_profile_ml_dsa_65"].asUInt());
+    }
+
     Init(data);
 }
 
@@ -363,11 +372,38 @@ void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
 
     mPid = data.pid.ValueOr(0x8000);
 
-    mProfileSupport = {
-        .paaSupportedProfiles = BuildProfileSupport(mPaiCert, mPqcPaiCertMlDsa44, mPqcPaiCertMlDsa65),
-        .paiSupportedProfiles = BuildProfileSupport(mPaiCert, mPqcPaiCertMlDsa44, mPqcPaiCertMlDsa65),
-        .dacSupportedProfiles = BuildProfileSupport(mDacCert, mPqcDacCertMlDsa44, mPqcDacCertMlDsa65),
+    // Only complete pairs can be selected. In particular, do not mix a DAC from
+    // one chain with a PAI from a different chain when a fixture is incomplete.
+    const bool has44 = !mPqcPaiCertMlDsa44.empty() && !mPqcDacCertMlDsa44.empty();
+    const bool has65 = !mPqcPaiCertMlDsa65.empty() && !mPqcDacCertMlDsa65.empty();
+    mProfileSupport  = {
+        .paaSupportedProfiles =
+            BuildProfileSupport(mPaiCert, has44 ? mPqcPaiCertMlDsa44 : ByteSpan(), has65 ? mPqcPaiCertMlDsa65 : ByteSpan()),
+        .paiSupportedProfiles = BuildProfileSupport(mPaiCert, ByteSpan(), ByteSpan()),
+        .dacSupportedProfiles = BuildProfileSupport(mDacCert, ByteSpan(), ByteSpan()),
     };
+    auto addPaiProfile = [this](DeviceAttestationCertProfile profile) {
+        switch (profile)
+        {
+        case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
+            mProfileSupport.paiSupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
+            break;
+        case DeviceAttestationCertProfile::kMlDsa44:
+            mProfileSupport.paiSupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44);
+            break;
+        case DeviceAttestationCertProfile::kMlDsa65:
+            mProfileSupport.paiSupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
+            break;
+        }
+    };
+    if (has44)
+    {
+        addPaiProfile(data.paiProfileMlDsa44);
+    }
+    if (has65)
+    {
+        addPaiProfile(data.paiProfileMlDsa65);
+    }
 }
 
 CHIP_ERROR TestHarnessDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
@@ -426,6 +462,19 @@ CHIP_ERROR TestHarnessDACProvider::SignWithDeviceAttestationKey(const ByteSpan &
 DeviceAttestationProfileSupport TestHarnessDACProvider::GetDeviceAttestationProfileSupport() const
 {
     return mProfileSupport;
+}
+
+DeviceAttestationCertProfile TestHarnessDACProvider::GetPreferredDeviceAttestationChainProfile() const
+{
+    if (!mPqcPaiCertMlDsa65.empty() && !mPqcDacCertMlDsa65.empty())
+    {
+        return DeviceAttestationCertProfile::kMlDsa65;
+    }
+    if (!mPqcPaiCertMlDsa44.empty() && !mPqcDacCertMlDsa44.empty())
+    {
+        return DeviceAttestationCertProfile::kMlDsa44;
+    }
+    return DeviceAttestationCertProfile::kEcdsaMatterLegacy;
 }
 
 CHIP_ERROR TestHarnessDACProvider::GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType documentType,

@@ -215,13 +215,15 @@ TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderPqcReadyGatesProf
     EXPECT_TRUE(pqcProvider.HasRequiredPqcCredentials());
 
     auto pqcSupport = pqcProvider.GetDeviceAttestationProfileSupport();
-    EXPECT_EQ(pqcSupport.dacSupportedProfiles.Raw(),
+    EXPECT_EQ(pqcSupport.paaSupportedProfiles.Raw(),
               BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
                   Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy,
                   Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa44,
                   Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa65)
                   .Raw());
-    EXPECT_EQ(pqcSupport.paiSupportedProfiles.Raw(), pqcSupport.dacSupportedProfiles.Raw());
+    EXPECT_EQ(pqcSupport.paiSupportedProfiles.Raw(), pqcSupport.paaSupportedProfiles.Raw());
+    EXPECT_EQ(pqcSupport.dacSupportedProfiles.Raw(), nonPqcSupport.dacSupportedProfiles.Raw());
+    EXPECT_EQ(pqcProvider.GetPreferredDeviceAttestationChainProfile(), DeviceAttestationCertProfile::kMlDsa65);
 
     span = MutableByteSpan(buffer);
     ASSERT_EQ(pqcProvider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa44, span), CHIP_NO_ERROR);
@@ -257,6 +259,69 @@ TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderPqcReadyGatesProf
     span = MutableByteSpan(buffer);
     ASSERT_EQ(pqcProvider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa44, span), CHIP_NO_ERROR);
     EXPECT_EQ(pqcProvider.SignWithDeviceAttestationKey(ByteSpan(kMessageToSign), signatureSpan), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestMixedChainSelection)
+{
+    using namespace chip::Credentials::Examples;
+    using Profile              = DeviceAttestationCertProfile;
+    constexpr uint8_t kDac44[] = { 0x11, 0x12, 0x13 };
+    constexpr uint8_t kPai44[] = { 0x21, 0x22, 0x23 };
+    constexpr uint8_t kDac65[] = { 0x31, 0x32, 0x33 };
+    constexpr uint8_t kPai65[] = { 0x41, 0x42, 0x43 };
+    TestHarnessDACProviderData data;
+    data.paiProfileMlDsa44 = Profile::kEcdsaMatterLegacy;
+    data.paiProfileMlDsa65 = Profile::kEcdsaMatterLegacy;
+    data.pqcDacCertMlDsa44.SetValue(ByteSpan(kDac44));
+    data.pqcPaiCertMlDsa44.SetValue(ByteSpan(kPai44));
+    data.pqcDacCertMlDsa65.SetValue(ByteSpan(kDac65));
+    TestHarnessDACProvider provider(true);
+    provider.Init(data);
+
+    // An incomplete stronger chain must not displace a complete pair.
+    EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), Profile::kMlDsa44);
+    EXPECT_FALSE(provider.GetDeviceAttestationProfileSupport().paaSupportedProfiles.HasAll(
+        DeviceAttestationCertProfileBitmap::kSupportsMlDsa65));
+    data.pqcPaiCertMlDsa65.SetValue(ByteSpan(kPai65));
+    provider.Init(data);
+    const auto selected = provider.GetPreferredDeviceAttestationChainProfile();
+    EXPECT_EQ(selected, Profile::kMlDsa65);
+    const auto profiles = provider.GetDeviceAttestationProfileSupport();
+    EXPECT_EQ(profiles.paiSupportedProfiles.Raw(),
+              BitMask<DeviceAttestationCertProfileBitmap>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy).Raw());
+    EXPECT_EQ(profiles.dacSupportedProfiles.Raw(), profiles.paiSupportedProfiles.Raw());
+    EXPECT_TRUE(provider.HasRequiredPqcCredentials());
+
+    for (auto type : { DeviceAttestationDocumentType::kDACCertificate, DeviceAttestationDocumentType::kPAICertificate })
+    {
+        const ByteSpan expected = type == DeviceAttestationDocumentType::kDACCertificate ? ByteSpan(kDac65) : ByteSpan(kPai65);
+        for (size_t offset = 0; offset < expected.size(); ++offset)
+        {
+            uint8_t buffer[1];
+            MutableByteSpan segment(buffer);
+            size_t documentSize = 0;
+            ASSERT_EQ(provider.GetDeviceAttestationDocumentSegment(type, selected, offset, segment, documentSize), CHIP_NO_ERROR);
+            EXPECT_EQ(documentSize, expected.size());
+            ASSERT_EQ(segment.size(), 1u);
+            EXPECT_EQ(segment[0], expected[offset]);
+        }
+    }
+
+    constexpr uint8_t kMessage[] = { 1, 2, 3 };
+    P256ECDSASignature signature;
+    MutableByteSpan signatureSpan(signature.Bytes(), signature.Capacity());
+    ASSERT_EQ(provider.SignWithDeviceAttestationKey(ByteSpan(kMessage), signatureSpan), CHIP_NO_ERROR);
+    ASSERT_EQ(signatureSpan.size(), kP256_ECDSA_Signature_Length_Raw);
+    ASSERT_EQ(signature.SetLength(signatureSpan.size()), CHIP_NO_ERROR);
+    P256PublicKey publicKey;
+    ASSERT_EQ(ExtractPubkeyFromX509Cert(DevelopmentCerts::kDacCert, publicKey), CHIP_NO_ERROR);
+    EXPECT_EQ(publicKey.ECDSA_validate_msg_signature(kMessage, sizeof(kMessage), signature), CHIP_NO_ERROR);
+
+    data.pqcDacCertMlDsa44.ClearValue();
+    data.pqcDacCertMlDsa65.ClearValue();
+    provider.Init(data);
+    EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), Profile::kEcdsaMatterLegacy);
+    EXPECT_FALSE(provider.HasRequiredPqcCredentials());
 }
 
 static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
