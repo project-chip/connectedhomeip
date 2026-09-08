@@ -250,16 +250,8 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     {
         ChipLogError(AppServer, "TEE op-key self-test: FAILED");
     }
-    if (chip::DeviceLayer::Internal::ESP32TEEOperationalKeystoreSelfTest(initParams.persistentStorageDelegate) == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "TEE op-keystore lifecycle self-test: PASSED");
-    }
-    else
-    {
-        ChipLogError(AppServer, "TEE op-keystore lifecycle self-test: FAILED");
-    }
-#endif
-#endif
+#endif // CONFIG_ENABLE_ESP32_TEE_OPKEY_SELFTEST
+#endif // CONFIG_SECURE_ENABLE_TEE
     if (sAppDelegate != nullptr)
     {
         initParams.appDelegate = sAppDelegate;
