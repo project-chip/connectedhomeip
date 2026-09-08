@@ -29,9 +29,11 @@ namespace Uld {
 
 bool KeyResourceRecord::WriteData(RecordWriter & out) const
 {
+    // The PublicKeyLenght should match kP256RawPublicKeySize + 1 byte for the `Uncompressed Marker`
     static_assert(Crypto::kP256_PublicKey_Length == kP256RawPublicKeySize + 1);
     VerifyOrReturnValue(mPublicKey.IsUncompressed(), false);
 
+    // +1 to skip the kUncompressedPointMarker
     const uint8_t * rawBegin = mPublicKey.ConstBytes() + 1;
     const uint8_t * rawEnd   = rawBegin + kP256RawPublicKeySize;
     VerifyOrReturnValue(std::any_of(rawBegin, rawEnd, [](uint8_t value) { return value != 0; }), false);
