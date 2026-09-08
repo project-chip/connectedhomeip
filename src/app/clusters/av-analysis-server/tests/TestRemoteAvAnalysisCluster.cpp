@@ -313,7 +313,15 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         mFakeWebRTCClient.mLastCallback->OnSessionActive(aCameraNode, aSessionId);
     }
 
-    // The immediate status of a stream command that the handler rejects without a camera interaction
+    template <typename RequestType>
+    Status InvokedStatus(CommandId aCommandId, const RequestType & aRequest)
+    {
+        auto result = mClusterTester.Invoke(aCommandId, aRequest);
+        auto code   = result.GetStatusCode();
+        EXPECT_TRUE(code.has_value()) << "command 0x" << std::hex << aCommandId << " answered no status";
+        return code.has_value() ? code->GetStatus() : Status::InvalidAction;
+    }
+
     Status ImmediateActivateStatus(uint16_t aAnalysisStreamId, EndpointId aWebRTCEndpoint)
     {
         InvalidatableCommandHandler handler;
@@ -1091,6 +1099,84 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateRequiresExactlyOneEndpointField)
     ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::InvalidCommand);
 
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 0);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EveryCommandReachesItsOwnHandler)
+{
+    // One stream in PendingInitiation, so every command has something to act on
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+
+    // Each command is given arguments only its own handler answers this way, so a request reaching
+    // the wrong one changes the status. The six answers are pairwise distinct.
+
+    // EnableContextTriggers: a context outside SupportedAmbientContexts
+    Structs::ContextTriggerStruct::Type unsupported;
+    unsupported.context.namespaceID = 0x99;
+    unsupported.context.tag         = 0x99;
+    Commands::EnableContextTriggers::Type enable;
+    enable.contextTriggers.SetNonNull(DataModel::List<const Structs::ContextTriggerStruct::Type>(&unsupported, 1));
+    EXPECT_EQ(InvokedStatus(Commands::EnableContextTriggers::Id, enable), Status::ConstraintError);
+
+    // DisableContextTriggers: a null list disables everything and succeeds
+    Commands::DisableContextTriggers::Type disable;
+    disable.contextTriggers.SetNull();
+    EXPECT_EQ(InvokedStatus(Commands::DisableContextTriggers::Id, disable), Status::Success);
+
+    // EstablishAnalysisStream: the camera client is busy, so it answers without parking
+    mFakeCameraClient.mAllocationResult = CHIP_ERROR_BUSY;
+    Commands::EstablishAnalysisStream::Type establish;
+    establish.nodeID = 0x1234;
+    EXPECT_EQ(InvokedStatus(Commands::EstablishAnalysisStream::Id, establish), Status::Busy);
+
+    // ActivateAnalysisStream: both endpoint fields, the only command with any
+    Commands::ActivateAnalysisStream::Type activate;
+    activate.analysisStreamID = 0;
+    activate.webRTCEndpointID = MakeOptional(static_cast<EndpointId>(2));
+    activate.pushAVEndpointID = MakeOptional(static_cast<EndpointId>(3));
+    EXPECT_EQ(InvokedStatus(Commands::ActivateAnalysisStream::Id, activate), Status::InvalidCommand);
+
+    // DeactivateAnalysisStream: the stream is not active
+    Commands::DeactivateAnalysisStream::Type deactivate;
+    deactivate.analysisStreamID = 0;
+    EXPECT_EQ(InvokedStatus(Commands::DeactivateAnalysisStream::Id, deactivate), Status::InvalidInState);
+
+    // RemoveAnalysisStream: removable, but the camera client refuses outright
+    mFakeCameraClient.mDeallocationResult = CHIP_ERROR_NO_MEMORY;
+    Commands::RemoveAnalysisStream::Type remove;
+    remove.analysisStreamID = 0;
+    EXPECT_EQ(InvokedStatus(Commands::RemoveAnalysisStream::Id, remove), Status::Failure);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, ActivateEndpointFieldRuleHoldsOverTheWire)
+{
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+
+    // Exactly one endpoint field selects the transport, decoded from the request rather than
+    // assembled in the test: absence and presence are what the encoding carries
+    Commands::ActivateAnalysisStream::Type neither;
+    neither.analysisStreamID = 0;
+    EXPECT_EQ(InvokedStatus(Commands::ActivateAnalysisStream::Id, neither), Status::InvalidCommand);
+
+    Commands::ActivateAnalysisStream::Type both;
+    both.analysisStreamID = 0;
+    both.webRTCEndpointID = MakeOptional(static_cast<EndpointId>(2));
+    both.pushAVEndpointID = MakeOptional(static_cast<EndpointId>(3));
+    EXPECT_EQ(InvokedStatus(Commands::ActivateAnalysisStream::Id, both), Status::InvalidCommand);
+
+    // PushAV alone is well formed, and unsupported by this implementation
+    Commands::ActivateAnalysisStream::Type pushAVOnly;
+    pushAVOnly.analysisStreamID = 0;
+    pushAVOnly.pushAVEndpointID = MakeOptional(static_cast<EndpointId>(3));
+    EXPECT_EQ(InvokedStatus(Commands::ActivateAnalysisStream::Id, pushAVOnly), Status::InvalidCommand);
+
+    // WebRTC alone is accepted: it parks on the offer exchange rather than answering
+    ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
+    ActivateStream(0, 2, 55);
+    ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 1);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ActivateWithANonEndpointIsAConstraintError)
