@@ -14,12 +14,12 @@
 #    limitations under the License.
 #
 
-from typing import Optional, cast
+from typing import cast
 
 # Represents the node ID that is to be used when creating device
 # controllers/commissioning devices
-_local_node_id: Optional[int] = None
-_local_cat: Optional[int] = None
+_local_node_id: int | None = None
+_local_cat: int | None = None
 
 DEFAULT_LOCAL_NODE_ID = 12345
 DEFAULT_COMMISSIONER_CAT = 0xABCD0010

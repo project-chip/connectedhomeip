@@ -106,7 +106,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
     rngMutexHandle = osMutexNew(nullptr);
-    VerifyOrExit((&rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit((rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
@@ -199,10 +199,7 @@ void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
 
     switch (eventData->header.id)
     {
-// TODO: Work around until we unify the data structures behind a Matter level common structure
-#if WF200_WIFI
-    case SL_WFX_STARTUP_IND_ID:
-#endif
+
     case to_underlying(WifiInterface::WifiEvent::kStartUp):
         memcpy(&event.Platform.event.WFXSystemEvent.data.startupEvent, eventData,
                sizeof(event.Platform.event.WFXSystemEvent.data.startupEvent));

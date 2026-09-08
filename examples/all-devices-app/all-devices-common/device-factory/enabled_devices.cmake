@@ -23,6 +23,7 @@
 # Exports:
 #   ALL_DEVICES_DEVICE_SRCDIRS  — list of device module source directories
 #   ALL_DEVICES_DEVICE_SOURCES  — list of device module source files (for non-component builds)
+#   ALL_DEVICES_EXTRA_INCLUDE_DIRS — shared include directories for enabled devices
 #
 # After including this file, callers must append ${CMAKE_CURRENT_BINARY_DIR}
 # to their include-directory list so that the generated
@@ -37,80 +38,90 @@ set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
     "${ALL_DEVICES_COMMON_DIR}/oob-accessors/OOBDataSerializer.cpp"
     "${ALL_DEVICES_COMMON_DIR}/oob-accessors/boolean-state-sensor/BooleanStateSensorAccessor.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/aggregator/AggregatorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/air-purifier/AirPurifierDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/air-purifier/impl/LoggingAirPurifierDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/air-quality-sensor/AirQualitySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/bridged-node/BridgedNodeDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/cooktop/CooktopDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/cooktop/impl/LoggingCooktopDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/device-energy-management/DeviceEnergyManagementDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/dishwasher/DishwasherDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/extractor-hood/ExtractorHoodDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/fan/FanDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/fan/impl/LoggingFanDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/flow-sensor/FlowSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/flow-sensor/impl/IncreasingFlowSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/generic-switch/GenericSwitchDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/HumiditySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/laundry-dryer/LaundryDryerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/laundry-washer/LaundryWasherDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/LightSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/impl/IncreasingLightSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/microwave-oven/MicrowaveOvenDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/mounted-dimmable-load-control/MountedDimmableLoadControlDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/mounted-on-off-control/MountedOnOffControlDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/LoggingOccupancySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/impl/LoggingOnOffLightDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light-switch/OnOffLightSwitchDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/oven/OvenDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/oven/impl/LoggingOvenDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/power-source/BatteryPowerSourceDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/power-source/impl/DecreasingBatteryPowerSourceDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/pressure-sensor/PressureSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/pressure-sensor/impl/IncreasingPressureSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/refrigerator/RefrigeratorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/refrigerator/impl/LoggingRefrigeratorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/robotic-vacuum-cleaner/RoboticVacuumCleanerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/LoggingProximityRangerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/LoggingRangingAdapter.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarmDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/SmokeCoAlarmDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-controlled-cabinet/TemperatureControlledCabinetPart.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/water-valve/WaterValveDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/aggregator/Aggregator.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/air-purifier/AirPurifier.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/air-purifier/impl/LoggingAirPurifier.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/air-quality-sensor/AirQualitySensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/ambient-context-sensor/AmbientContextSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/ambient-context-sensor/impl/LoggingAmbientContextSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/boolean-state-sensor/BooleanStateSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/bridged-node/BridgedNode.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/chime/Chime.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/cooktop/Cooktop.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/cooktop/impl/LoggingCooktop.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/device-energy-management/EnergyManagement.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/DimmableLight.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/impl/LoggingDimmableLight.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/DimmablePlugInUnit.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/Dishwasher.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/impl/EmulatedDishwasher.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/ElectricalSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/SimulatedElectricalSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/FakeReadings.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/ExtractorHood.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/fan/Fan.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/fan/impl/LoggingFan.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/FlowSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/impl/IncreasingFlowSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/generic-switch/GenericSwitch.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/HumiditySensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/impl/IncreasingHumiditySensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-dryer/LaundryDryer.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-dryer/impl/EmulatedLaundryDryer.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-washer/LaundryWasher.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-washer/impl/EmulatedLaundryWasher.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/light-sensor/LightSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/light-sensor/impl/IncreasingLightSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/microwave-oven/MicrowaveOven.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/microwave-oven/impl/EmulatedMicrowaveOven.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/MountedOnOffControl.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OccupancySensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/impl/LoggingOccupancySensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/impl/LoggingOnOffLight.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light-switch/OnOffLightSwitch.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OnOffPlugInUnit.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/oven/Oven.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/oven/impl/LoggingOven.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/BatteryPowerSource.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/impl/DecreasingBatteryPowerSource.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/pressure-sensor/PressureSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/pressure-sensor/impl/IncreasingPressureSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/ProximityRanger.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/Refrigerator.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/impl/LoggingRefrigerator.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/RootNode.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/Speaker.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/impl/LoggingSpeaker.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/TemperatureSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/impl/IncreasingTemperatureSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
     # keep-sorted: end
 
     # Baseline for devices (not real device types)
     # keep-sorted: start
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/dimmable-load/DimmableLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/dimmable-load/impl/LoggingDimmableLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/fan-load/FanLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/fan-load/impl/LoggingFanLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/on-off-load/OnOffLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/on-off-load/impl/LoggingOnOffLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/operational-state/LoggingOperationalStateDelegate.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/operational-state/LoggingRvcOperationalStateDelegate.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/endpoint-id-allocator/DynamicEndpointIdAllocator.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/DimmableLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/impl/LoggingDimmableLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/FanLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/impl/LoggingFanLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
     # keep-sorted: end
 )
 
@@ -154,14 +165,17 @@ foreach(_key
         aggregator
         air-purifier
         air-quality-sensor
+        ambient-context-sensor
         bridged-node
         chime
+        commissioning-proxy
         contact-sensor
         cooktop
         device-energy-management
         dimmable-light
         dimmable-plug-in-unit
         dishwasher
+        electrical-sensor
         extractor-hood
         fan
         flow-sensor
@@ -251,3 +265,6 @@ set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/binding-table.cpp"
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
 )
+
+# No extra include directories beyond ALL_DEVICES_COMMON_DIR (for <device/...> paths).
+set(ALL_DEVICES_EXTRA_INCLUDE_DIRS)

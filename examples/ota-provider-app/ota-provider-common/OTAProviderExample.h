@@ -84,6 +84,17 @@ public:
     void SetIgnoreQueryImageCount(uint32_t count) { mIgnoreQueryImageCount = count; }
     void SetIgnoreApplyUpdateCount(uint32_t count) { mIgnoreApplyUpdateCount = count; }
     void SetQueryImageStatus(OTAQueryStatus status) { mQueryImageStatus = status; }
+    // When enabled, the configured QueryImageStatus (and its DelayedActionTime) is kept for
+    // every QueryImageResponse instead of reverting to UpdateAvailable after the first one.
+    void SetPersistQueryImageStatus(bool persist) { mPersistQueryImageStatus = persist; }
+    OTAQueryStatus GetQueryImageStatus() const { return mQueryImageStatus; }
+    uint32_t GetDelayedQueryActionTimeSec() const { return mDelayedQueryActionTimeSec; }
+
+    // Applies the post-response transition of the QueryImage state: unless persistence is
+    // enabled, revert QueryImageStatus to UpdateAvailable and DelayedActionTime to 0 so that
+    // subsequent queries default to UpdateAvailable. Called at the end of HandleQueryImage;
+    // exposed so the persistence behaviour can be unit tested without a full server/BDX stack.
+    void ApplyQueryImageStatusAfterResponse();
     void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
     {
         mUpdateAction = action;
@@ -104,12 +115,23 @@ public:
     uint16_t GetProductId() const { return mProductId; }
     uint16_t GetHardwareVersion() const { return mHardwareVersion; }
     uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
+    // Variables used for named pipes
+    bool GetApplyRequestSentStatus() const { return mApplyUpdateRequestSent; }
+    chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction GetApplyRequestActionStatus() const
+    {
+        return mApplyUpdateRequestActionSent;
+    }
+    uint32_t GetApplyRequestDelayStatus() const { return mApplyUpdateRequestDelaySent; }
+    uint16_t GetApplyRequestCount() const { return mApplyUpdateRequestCount; }
+    // End of variables used for named pipes
     chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
     {
         return chip::Span<const DownloadProtocolEnum>(mProtocolsSupported);
     }
     bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
     const char * GetLocation() const { return mLocation; }
+    bool GetUserConsentNeeded() const { return mUserConsentNeeded; }
+    uint16_t GetMaxBlockSize() const { return mMaxBDXBlockSize; }
 
     const char * GetFilePathForDesignator(const char * designator) const;
 
@@ -143,6 +165,7 @@ private:
     char mImageUri[kUriMaxLen];
     bool mImageUriIsSupplied = false;
     OTAQueryStatus mQueryImageStatus;
+    bool mPersistQueryImageStatus = false;
     OTAApplyUpdateAction mUpdateAction;
     uint32_t mIgnoreQueryImageCount;
     uint32_t mIgnoreApplyUpdateCount;
@@ -161,4 +184,8 @@ private:
     DownloadProtocolEnum mProtocolsSupported[kMaxProtocolsSupported];
     bool mRequestorCanConsent;
     char mLocation[kMaxLocation] = { 0, 0, 0 };
+    bool mApplyUpdateRequestSent = false;
+    OTAApplyUpdateAction mApplyUpdateRequestActionSent;
+    uint32_t mApplyUpdateRequestDelaySent;
+    u_int16_t mApplyUpdateRequestCount = 0;
 };

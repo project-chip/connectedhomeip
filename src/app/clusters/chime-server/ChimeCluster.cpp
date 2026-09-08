@@ -218,9 +218,9 @@ Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
     VerifyOrReturnValue(IsSupportedChimeID(chimeID), Status::NotFound);
     VerifyOrReturnValue(SetAttributeValue(mSelectedChime, chimeID, Attributes::SelectedChime::Id), Status::Success);
 
-    TEMPORARY_RETURN_IGNORED mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id),
-        { reinterpret_cast<const uint8_t *>(&mSelectedChime), sizeof(mSelectedChime) });
+    AttributePersistence attrPersistence{ mContext->attributeStorage };
+    TEMPORARY_RETURN_IGNORED attrPersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id), mSelectedChime);
 
     return Protocols::InteractionModel::Status::Success;
 }
@@ -230,9 +230,9 @@ Status ChimeCluster::SetEnabled(bool enabled)
     VerifyOrReturnValue(mContext != nullptr, Status::InvalidInState);
     VerifyOrReturnValue(SetAttributeValue(mEnabled, enabled, Attributes::Enabled::Id), Status::Success);
 
-    TEMPORARY_RETURN_IGNORED mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id),
-        { reinterpret_cast<const uint8_t *>(&mEnabled), sizeof(mEnabled) });
+    AttributePersistence attrPersistence{ mContext->attributeStorage };
+    TEMPORARY_RETURN_IGNORED attrPersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id), mEnabled);
 
     return Protocols::InteractionModel::Status::Success;
 }

@@ -182,8 +182,7 @@ def toFieldTag(field: Field):
 def toFieldComment(field: Field):
     protobufType = toProtobufType(field.data_type.name)
     typeNum = EncodingDataType.fromType(protobufType)
-    return "/** %s Type: %d IsList: %d FieldId: %d */" % (
-        field.data_type.name, typeNum, field.is_list, field.code)
+    return f"/** {field.data_type.name} Type: {typeNum} IsList: {field.is_list:d} FieldId: {field.code} */"
 
 
 class CustomGenerator(CodeGenerator):
@@ -229,8 +228,7 @@ class CustomGenerator(CodeGenerator):
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            filename = "proto/%s_cluster.proto" % toLowerSnakeCase(
-                cluster.name)
+            filename = f"proto/{toLowerSnakeCase(cluster.name)}_cluster.proto"
 
             # Header containing a macro to initialize all cluster plugins
             self.internal_render_one_output(

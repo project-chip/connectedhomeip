@@ -648,6 +648,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+ *
+ * Enable BLE advertising after commissioning completes.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+#define CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
  *
  * Enable opening pairing window automatically after device power-up.
@@ -1697,6 +1706,22 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #ifndef CHIP_DEVICE_ENABLE_PORT_PARAMS
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 0
 #endif // CHIP_DEVICE_ENABLE_PORT_PARAMS
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY enables Commissioning Proxy
+ * support.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 0
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
+// NOTE: the BLE proxy transport has no dedicated CP-side enable flag.  The
+// Commissioning Proxy cluster source itself is only compiled when
+// CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY is on (the build system pulls
+// it in via app_config_dependent_sources.gni only for those apps), so the
+// transport is gated purely on its own existing compile flag:
+//   BLE: CONFIG_NETWORK_LAYER_BLE (the BLE-wide GN arg
+//        chip_config_network_layer_ble)
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY

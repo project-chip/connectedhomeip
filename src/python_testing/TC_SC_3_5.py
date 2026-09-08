@@ -37,6 +37,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
+from matter.exceptions import ChipStackError
 from matter.fault_injection import CHIPFaultId
 from matter.interaction_model import InteractionModelError
 from matter.testing.apps import AppServerSubprocess
@@ -48,6 +49,9 @@ log = logging.getLogger(__name__)
 
 
 class TC_SC_3_5(MatterBaseTest):
+
+    disable_wildcard_subscription = True
+
     def setup_class(self):
         super().setup_class()
 
@@ -69,6 +73,8 @@ class TC_SC_3_5(MatterBaseTest):
         if not os.path.exists(self.th_server_app):
             asserts.fail(f"The path {self.th_server_app} does not exist")
 
+        self.commissioning_timeout = int(self.user_params.get("commissioning_timeout", 90))
+
         # Start TH Server
         self.start_th_server()
 
@@ -88,10 +94,18 @@ class TC_SC_3_5(MatterBaseTest):
             "MCORE.ROLE.COMMISSIONER",
         ]
 
+    @property
+    def default_timeout(self) -> int:
+        # Test requires manual control of a commissioner, so we set a long enough timeout
+        # so that testers can input commands/control the commissioner without worrying about a timeout.
+        # Note that individual user prompt steps still time out after 60s, but this is now more flexible
+        # because testers merely need to start the commissioning within that timeframe
+        return 25*60
+
     def steps_TC_SC_3_5(self) -> list[TestStep]:
         return [
 
-            TestStep("precondition", "TH_SERVER has been commissioned to TH_CLIENT", is_commissioning=True),
+            TestStep("precondition", "TH_SERVER has been commissioned to TH_CLIENT"),
 
             TestStep("1a", "TH Client sends an OpenCommissioningWindow command to TH_SERVER to allow it to be commissioned by DUT_Commissioner to determine if the DUT_Commissioner has an ICAC in its NOC Chain",
                      "Verify that the TH_SERVER returns SUCCESS"),
@@ -241,6 +255,14 @@ class TC_SC_3_5(MatterBaseTest):
         asserts.assert_not_equal(window_status, AC_cluster.Enums.CommissioningWindowStatusEnum.kWindowNotOpen,
                                  "Commissioning window is expected to be open, but was found to be closed. This indicates that DUT_Commissioner completed commissioning successfully, which is not expected in this test step")
 
+    def create_second_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
+        new_CA = self.certificate_authority_manager.NewCertificateAuthority()
+
+        new_fabric_admin = new_CA.NewFabricAdmin(vendorId=0xFFF1,
+                                                 fabricId=self.matter_test_config.fabric_id)
+
+        return new_fabric_admin.NewController(nodeId=112233)
+
     @async_test_body
     async def test_TC_SC_3_5(self):
 
@@ -250,70 +272,63 @@ class TC_SC_3_5(MatterBaseTest):
 
         # ------------------------------------------- Determine if DUT Commissioner has ICAC in its NOC Chain---------------------------------------------
 
-        if self.is_pics_sdk_ci_only:
-            log.info("Skip steps 1a-1d since we are running in CI and there is no DUT Commissioner in CI to check for its ICAC")
-            self.skip_step("1a")
-            self.skip_step("1b")
-            self.skip_step("1c")
-            self.skip_step("1d")
+        self.step("1a")
+        th_server_manual_code, th_server_passcode = await self.open_commissioning_window()
 
+        self.step("1b")
+        prompt_msg = (
+            "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
+            f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 1 {th_server_passcode})\n"
+            "Input anything once commissioning has started \n"
+        )
+
+        self.th_server.set_output_match("Commissioning completed successfully")
+        self.th_server.event.clear()
+
+        if not self.is_pics_sdk_ci_only:
+            self.wait_for_user_input(prompt_msg)
         else:
-            self.step("1a")
-            th_server_manual_code, th_server_passcode = await self.open_commissioning_window()
+            th2 = self.create_second_controller()
+            await th2.CommissionOnNetwork(nodeId=1, setupPinCode=th_server_passcode)
 
-            self.step("1b")
-            prompt_msg = (
-                "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
-                f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 1 {th_server_passcode})\n"
-                "Input 'Y' if commissioner DUT commissions TH server app successfully \n"
-                "Input 'N' if commissioner DUT fails commissioning \n "
-            )
+        if not self.th_server.event.wait(self.commissioning_timeout):
+            asserts.fail("DUT_Commissioner failed to commission TH_SERVER successfully within 90s.")
 
-            resp = self.wait_for_user_input(prompt_msg)
+        self.step("1c")
+        nocStructs = await self.read_single_attribute_check_success(dev_ctrl=self.th_client,
+                                                                    node_id=self.th_server_local_nodeid,
+                                                                    cluster=Clusters.OperationalCredentials,
+                                                                    attribute=Clusters.OperationalCredentials.Attributes.NOCs,
+                                                                    fabric_filtered=False)
 
-            commissioning_success = resp.lower() == 'y'
+        asserts.assert_equal(len(nocStructs), 2,
+                             f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}")
 
-            # Verify that DUT commissioned TH_SERVER successfully
-            asserts.assert_true(
-                commissioning_success,
-                "Expected DUT_Commissioner to commission TH_SERVER app successfully"
-            )
+        dut_commissioner_noc_struct = next((noc for noc in nocStructs if noc.fabricIndex != self.th_client.fabricId), None)
 
-            self.step("1c")
-            nocStructs = await self.read_single_attribute_check_success(dev_ctrl=self.th_client,
-                                                                        node_id=self.th_server_local_nodeid,
-                                                                        cluster=Clusters.OperationalCredentials,
-                                                                        attribute=Clusters.OperationalCredentials.Attributes.NOCs,
-                                                                        fabric_filtered=False)
+        asserts.assert_is_not_none(
+            dut_commissioner_noc_struct,
+            "Could not find a NOCStruct for DUT Commissioner. Please ensure that DUT Commissioner commissioned TH Server successfully."
+        )
 
-            asserts.assert_equal(len(nocStructs), 2,
-                                 f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}")
+        dut_commissioner_icac = dut_commissioner_noc_struct.icac
+        dut_commissioner_fabric_index = dut_commissioner_noc_struct.fabricIndex
 
-            dut_commissioner_noc_struct = next((noc for noc in nocStructs if noc.fabricIndex != self.th_client.fabricId), None)
+        # Determine if DUT_Commissioner has ICAC in its NOC Chain
+        if dut_commissioner_icac == NullValue:
+            log.info("DUT_Commissioner does not have ICAC in its NOC Chain")
+            self.dut_has_icac = False
+        else:
+            log.info("DUT_Commissioner has ICAC in its NOC Chain")
+            self.dut_has_icac = True
 
-            asserts.assert_is_not_none(
-                dut_commissioner_noc_struct,
-                "Could not find a NOCStruct for DUT Commissioner. Please ensure that DUT Commissioner commissioned TH Server successfully."
-            )
+        # Remove DUT_Commissioner's fabric from TH_SERVER to prepare for commissioning DUT_Commissioner in next step
+        self.step("1d")
 
-            dut_commissioner_icac = dut_commissioner_noc_struct.icac
-            dut_commissioner_fabric_index = dut_commissioner_noc_struct.fabricIndex
-
-            # Determine if DUT_Commissioner has ICAC in its NOC Chain
-            if dut_commissioner_icac == NullValue:
-                log.info("DUT_Commissioner does not have ICAC in its NOC Chain")
-                self.dut_has_icac = False
-            else:
-                log.info("DUT_Commissioner has ICAC in its NOC Chain")
-                self.dut_has_icac = True
-
-            # Remove DUT_Commissioner's fabric from TH_SERVER to prepare for commissioning DUT_Commissioner in next step
-            self.step("1d")
-
-            cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=dut_commissioner_fabric_index)
-            resp = await self.send_single_cmd(dev_ctrl=self.th_client, node_id=self.th_server_local_nodeid, cmd=cmd)
-            asserts.assert_equal(
-                resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
+        cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=dut_commissioner_fabric_index)
+        resp = await self.send_single_cmd(dev_ctrl=self.th_client, node_id=self.th_server_local_nodeid, cmd=cmd)
+        asserts.assert_equal(
+            resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk)
 
         # ------------------------------------------- Inject Fault into Sigma2 TBEData2Encrypted---------------------------------------------
         self.step("2a")
@@ -326,24 +341,21 @@ class TC_SC_3_5(MatterBaseTest):
         prompt_msg = (
             "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
             f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 1 {th_server_passcode})\n"
-            "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
-            "Input 'N' if commissioner DUT commissions successfully \n "
-            "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
+            "Input anything once commissioning has started \n"
         )
 
-        if self.is_pics_sdk_ci_only:
-            resp = 'Y'
+        self.th_server.set_output_match("Invalid CASE parameter")
+        self.th_server.event.clear()
+
+        if not self.is_pics_sdk_ci_only:
+            self.wait_for_user_input(prompt_msg)
         else:
-            resp = self.wait_for_user_input(prompt_msg)
+            th2 = self.create_second_controller()
+            with asserts.assert_raises(ChipStackError):
+                await th2.CommissionOnNetwork(nodeId=1, setupPinCode=th_server_passcode)
 
-        expected_error_found = resp.lower() == 'y'
-
-        # Verify results
-        asserts.assert_equal(
-            expected_error_found,
-            True,
-            f"Expected Error in TH_SERVER logs is {'found' if expected_error_found else 'not found'}"
-        )
+        if not self.th_server.event.wait(self.commissioning_timeout):
+            asserts.fail("Commissioning failure was not detected within 90s.")
 
         await self.assert_dut_commissioner_failed_to_complete_commissioning()
 
@@ -360,24 +372,21 @@ class TC_SC_3_5(MatterBaseTest):
             "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
             "\nWARNING: Make sure that the Commissioner restarts commissioning from scratch, such as by changing NodeID or by restarting the commissioner\n"
             f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 2 {th_server_passcode})\n"
-            "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
-            "Input 'N' if commissioner DUT commissions successfully \n "
-            "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
+            "Input anything once commissioning has started \n"
         )
 
-        if self.is_pics_sdk_ci_only:
-            resp = 'Y'
+        self.th_server.set_output_match("Invalid CASE parameter")
+        self.th_server.event.clear()
+
+        if not self.is_pics_sdk_ci_only:
+            self.wait_for_user_input(prompt_msg)
         else:
-            resp = self.wait_for_user_input(prompt_msg)
+            th2 = self.create_second_controller()
+            with asserts.assert_raises(ChipStackError):
+                await th2.CommissionOnNetwork(nodeId=2, setupPinCode=th_server_passcode)
 
-        expected_error_found = resp.lower() == 'y'
-
-        # Verify results
-        asserts.assert_equal(
-            expected_error_found,
-            True,
-            f"Expected Error in TH_SERVER logs is {'found' if expected_error_found else 'not found'}"
-        )
+        if not self.th_server.event.wait(self.commissioning_timeout):
+            asserts.fail("Commissioning failure was not detected within 90s.")
 
         await self.assert_dut_commissioner_failed_to_complete_commissioning()
 
@@ -400,24 +409,21 @@ class TC_SC_3_5(MatterBaseTest):
                 "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
                 "\nWARNING: Make sure that the Commissioner restarts commissioning from scratch, such as by changing NodeID or by restarting the commissioner\n"
                 f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 3 {th_server_passcode})\n"
-                "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
-                "Input 'N' if commissioner DUT commissions successfully \n "
-                "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
+                "Input anything once commissioning has started \n"
             )
 
-            if self.is_pics_sdk_ci_only:
-                resp = 'Y'
+            self.th_server.set_output_match("Invalid CASE parameter")
+            self.th_server.event.clear()
+
+            if not self.is_pics_sdk_ci_only:
+                self.wait_for_user_input(prompt_msg)
             else:
-                resp = self.wait_for_user_input(prompt_msg)
+                th2 = self.create_second_controller()
+                with asserts.assert_raises(ChipStackError):
+                    await th2.CommissionOnNetwork(nodeId=3, setupPinCode=th_server_passcode)
 
-            expected_error_found = resp.lower() == 'y'
-
-            # Verify results
-            asserts.assert_equal(
-                expected_error_found,
-                True,
-                f"Expected Error in TH_SERVER logs is {'found' if expected_error_found else 'not found'}"
-            )
+            if not self.th_server.event.wait(self.commissioning_timeout):
+                asserts.fail("Commissioning failure was not detected within 90s.")
 
             await self.assert_dut_commissioner_failed_to_complete_commissioning()
 
@@ -434,23 +440,21 @@ class TC_SC_3_5(MatterBaseTest):
             "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
             "\nWARNING: Make sure that the Commissioner restarts commissioning from scratch, such as by changing NodeID or by restarting the commissioner\n"
             f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 4 {th_server_passcode})\n"
-            "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
-            "Input 'N' if commissioner DUT commissions successfully \n "
-            "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
+            "Input anything once commissioning has started \n"
         )
-        if self.is_pics_sdk_ci_only:
-            resp = 'Y'
+
+        self.th_server.set_output_match("Invalid CASE parameter")
+        self.th_server.event.clear()
+
+        if not self.is_pics_sdk_ci_only:
+            self.wait_for_user_input(prompt_msg)
         else:
-            resp = self.wait_for_user_input(prompt_msg)
+            th2 = self.create_second_controller()
+            with asserts.assert_raises(ChipStackError):
+                await th2.CommissionOnNetwork(nodeId=4, setupPinCode=th_server_passcode)
 
-        expected_error_found = resp.lower() == 'y'
-
-        # Verify results
-        asserts.assert_equal(
-            expected_error_found,
-            True,
-            f"Expected Error in TH_SERVER logs is {'found' if expected_error_found else 'not found'}"
-        )
+        if not self.th_server.event.wait(self.commissioning_timeout):
+            asserts.fail("Commissioning failure was not detected within 90s.")
 
         await self.assert_dut_commissioner_failed_to_complete_commissioning()
 

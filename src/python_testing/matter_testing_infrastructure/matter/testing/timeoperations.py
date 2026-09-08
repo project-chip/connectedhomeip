@@ -27,14 +27,13 @@ Examples:
 """
 
 from datetime import UTC, datetime, timedelta
-from typing import Optional
 
 from mobly import asserts
 
 # TODO(#31177): Need to add unit tests for all time conversion methods.
 
 
-def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
+def utc_time_in_matter_epoch(desired_datetime: datetime | None = None):
     """ Converts a datetime to microseconds since Matter epoch.
 
     The Matter epoch is defined as January 1, 2000, 00:00:00 UTC. This function
@@ -112,7 +111,7 @@ def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
     return datetime.fromtimestamp(seconds, UTC) + timedelta(milliseconds=millis)
 
 
-def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
+def compare_time(received: int, offset: timedelta = timedelta(), utc: int | None = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
     """ Validates a Matter timestamp against expected time within tolerance.
 
     Args:

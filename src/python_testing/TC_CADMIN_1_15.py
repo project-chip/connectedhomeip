@@ -33,7 +33,6 @@
 
 import logging
 import random
-from typing import Optional
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
@@ -50,7 +49,7 @@ log = logging.getLogger(__name__)
 
 
 class TC_CADMIN_1_15(MatterBaseTest):
-    async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
+    async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Clusters.AdministratorCommissioning.Enums.StatusCode | None = None) -> CommissioningParameters:
         if expectedErrCode == 0x00:
             return await th.OpenCommissioningWindow(
                 nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)

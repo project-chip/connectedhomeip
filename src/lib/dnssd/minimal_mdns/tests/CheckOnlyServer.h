@@ -26,11 +26,11 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
-#include <lib/dnssd/minimal_mdns/records/Ptr.h>
-#include <lib/dnssd/minimal_mdns/records/Srv.h>
-#include <lib/dnssd/minimal_mdns/records/Txt.h>
+#include <lib/dnssd/wire/RecordData.h>
+#include <lib/dnssd/wire/records/Ptr.h>
+#include <lib/dnssd/wire/records/Srv.h>
+#include <lib/dnssd/wire/records/Txt.h>
 #include <lib/support/CHIPMemString.h>
 #include <system/SystemMutex.h>
 
@@ -38,15 +38,15 @@ namespace mdns {
 namespace Minimal {
 namespace test {
 
-inline constexpr QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
+inline constexpr chip::Dnssd::QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
 namespace {
-bool StringMatches(const BytesRange & br, const char * str)
+bool StringMatches(const chip::Dnssd::BytesRange & br, const char * str)
 {
     return br.Size() == strlen(str) && memcmp(str, br.Start(), br.Size()) == 0;
 }
 
 template <size_t N>
-void MakePrintableName(char (&location)[N], SerializedQNameIterator name)
+void MakePrintableName(char (&location)[N], chip::Dnssd::SerializedQNameIterator name)
 {
     auto buf = chip::Encoding::BigEndian::BufferWriter(reinterpret_cast<uint8_t *>(&location[0]), N);
     while (name.Next())
@@ -58,7 +58,7 @@ void MakePrintableName(char (&location)[N], SerializedQNameIterator name)
 }
 
 template <size_t N>
-void MakePrintableName(char (&location)[N], FullQName name)
+void MakePrintableName(char (&location)[N], chip::Dnssd::FullQName name)
 {
     auto buf = chip::Encoding::BigEndian::BufferWriter(reinterpret_cast<uint8_t *>(&location[0]), N);
     for (size_t i = 0; i < name.nameCount; ++i)
@@ -74,15 +74,15 @@ void MakePrintableName(char (&location)[N], FullQName name)
 class CheckOnlyServer : private chip::PoolImpl<ServerBase::EndpointInfo, 0, chip::ObjectPoolMem::kInline,
                                                ServerBase::EndpointInfoPoolType::Interface>,
                         public ServerBase,
-                        public ParserDelegate,
-                        public TxtRecordDelegate
+                        public chip::Dnssd::ParserDelegate,
+                        public chip::Dnssd::TxtRecordDelegate
 {
 public:
     CheckOnlyServer() : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)) { Reset(); }
     ~CheckOnlyServer() {}
 
     // Parser delegates
-    void OnHeader(ConstHeaderRef & header) override
+    void OnHeader(chip::Dnssd::ConstHeaderRef & header) override
     {
         EXPECT_TRUE(header.GetFlags().IsResponse());
         EXPECT_TRUE(header.GetFlags().IsValidMdns());
@@ -99,16 +99,16 @@ public:
         }
     }
 
-    void OnResource(ResourceType type, const ResourceData & data) override
+    void OnResource(chip::Dnssd::ResourceType type, const chip::Dnssd::ResourceData & data) override
     {
-        SerializedQNameIterator target;
+        chip::Dnssd::SerializedQNameIterator target;
         switch (data.GetType())
         {
-        case QType::PTR:
-            ParsePtrRecord(data.GetData(), mPacketData, &target);
+        case chip::Dnssd::QType::PTR:
+            chip::Dnssd::ParsePtrRecord(data.GetData(), mPacketData, &target);
             break;
-        case QType::SRV: {
-            SrvRecord srv;
+        case chip::Dnssd::QType::SRV: {
+            chip::Dnssd::SrvRecord srv;
             bool srvParseOk = srv.Parse(data.GetData(), mPacketData);
             EXPECT_TRUE(srvParseOk);
             if (!srvParseOk)
@@ -134,17 +134,18 @@ public:
                 (info.record->GetName() == kIgnoreQname || data.GetName() == info.record->GetName()) &&
                 (info.target == kIgnoreQname || target == info.target))
             {
-                if (data.GetType() == QType::TXT)
+                if (data.GetType() == chip::Dnssd::QType::TXT)
                 {
                     // First parse out the expected record to see what keys/values we have.
                     ClearTxtRecords();
-                    const TxtResourceRecord * expectedTxt = static_cast<const TxtResourceRecord *>(info.record);
+                    const chip::Dnssd::TxtResourceRecord * expectedTxt =
+                        static_cast<const chip::Dnssd::TxtResourceRecord *>(info.record);
                     for (size_t t = 0; t < expectedTxt->GetNumEntries(); ++t)
                     {
                         bool ok = AddExpectedTxtRecord(expectedTxt->GetEntries()[t]);
                         EXPECT_TRUE(ok);
                     }
-                    ParseTxtRecord(data.GetData(), this);
+                    chip::Dnssd::ParseTxtRecord(data.GetData(), this);
                     if (CheckTxtRecordMatches())
                     {
                         info.found       = true;
@@ -165,16 +166,16 @@ public:
         {
             char nameStr[64];
             char targetStr[64];
-            SerializedQNameIterator dataTarget;
-            SerializedQNameIterator it = data.GetName();
+            chip::Dnssd::SerializedQNameIterator dataTarget;
+            chip::Dnssd::SerializedQNameIterator it = data.GetName();
             MakePrintableName(nameStr, it);
             switch (data.GetType())
             {
-            case QType::PTR:
-                ParsePtrRecord(data.GetData(), data.GetData(), &dataTarget);
+            case chip::Dnssd::QType::PTR:
+                chip::Dnssd::ParsePtrRecord(data.GetData(), data.GetData(), &dataTarget);
                 break;
-            case QType::SRV: {
-                SrvRecord srv;
+            case chip::Dnssd::QType::SRV: {
+                chip::Dnssd::SrvRecord srv;
                 if (srv.Parse(data.GetData(), data.GetData()))
                 {
                     dataTarget = srv.GetName();
@@ -190,10 +191,10 @@ public:
         }
     }
 
-    void OnQuery(const QueryData & data) override {}
+    void OnQuery(const chip::Dnssd::QueryData & data) override {}
 
-    // TxtRecordDelegate
-    void OnRecord(const BytesRange & name, const BytesRange & value) override
+    // chip::Dnssd::TxtRecordDelegate
+    void OnRecord(const chip::Dnssd::BytesRange & name, const chip::Dnssd::BytesRange & value) override
     {
         for (size_t i = 0; i < mNumExpectedTxtRecords; ++i)
         {
@@ -226,8 +227,8 @@ public:
     DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                chip::Inet::InterfaceId interface) override
     {
-        mPacketData = BytesRange(data->Start(), data->Start() + data->TotalLength());
-        ParsePacket(mPacketData, this);
+        mPacketData = chip::Dnssd::BytesRange(data->Start(), data->Start() + data->TotalLength());
+        chip::Dnssd::ParsePacket(mPacketData, this);
         if (mHeaderFound)
         {
             TestGotAllExpectedPackets();
@@ -237,7 +238,7 @@ public:
     }
 
     // Functions used for controlling testing.
-    void AddExpectedRecord(PtrResourceRecord * ptr)
+    void AddExpectedRecord(chip::Dnssd::PtrResourceRecord * ptr)
     {
         RecordInfo * info = AddExpectedRecordBase(ptr);
         if (info == nullptr)
@@ -246,7 +247,7 @@ public:
         }
         info->target = ptr->GetPtr();
     }
-    void AddExpectedRecord(SrvResourceRecord * srv)
+    void AddExpectedRecord(chip::Dnssd::SrvResourceRecord * srv)
     {
         RecordInfo * info = AddExpectedRecordBase(srv);
         ASSERT_NE(info, nullptr);
@@ -256,7 +257,7 @@ public:
         }
         info->target = srv->GetServerName();
     }
-    void AddExpectedRecord(TxtResourceRecord * txt)
+    void AddExpectedRecord(chip::Dnssd::TxtResourceRecord * txt)
     {
         RecordInfo * info = AddExpectedRecordBase(txt);
         ASSERT_NE(info, nullptr);
@@ -285,9 +286,9 @@ private:
     static constexpr size_t kMaxExpectedRecords = 10;
     struct RecordInfo
     {
-        ResourceRecord * record;
+        chip::Dnssd::ResourceRecord * record;
         bool found = false;
-        FullQName target;
+        chip::Dnssd::FullQName target;
     };
     RecordInfo mExpectedRecordInfo[kMaxExpectedRecords];
     struct KV
@@ -307,13 +308,13 @@ private:
     };
     static constexpr size_t kMaxExpectedTxt = 13;
     KV mExpectedTxt[kMaxExpectedTxt];
-    size_t mNumExpectedTxtRecords = 0;
-    size_t mNumReceivedTxtRecords = 0;
-    bool mHeaderFound             = false;
-    bool mSendCalled              = false;
-    int mTotalRecords             = 0;
-    FullQName kIgnoreQname        = FullQName(kIgnoreQNameParts);
-    BytesRange mPacketData;
+    size_t mNumExpectedTxtRecords       = 0;
+    size_t mNumReceivedTxtRecords       = 0;
+    bool mHeaderFound                   = false;
+    bool mSendCalled                    = false;
+    int mTotalRecords                   = 0;
+    chip::Dnssd::FullQName kIgnoreQname = chip::Dnssd::FullQName(kIgnoreQNameParts);
+    chip::Dnssd::BytesRange mPacketData;
 
     int GetNumExpectedRecords() const
     {
@@ -375,7 +376,7 @@ private:
         return true;
     }
 
-    RecordInfo * AddExpectedRecordBase(ResourceRecord * record)
+    RecordInfo * AddExpectedRecordBase(chip::Dnssd::ResourceRecord * record)
     {
         for (auto & info : mExpectedRecordInfo)
         {

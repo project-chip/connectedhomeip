@@ -21,7 +21,6 @@ import logging
 import threading
 from collections import defaultdict
 from ctypes import string_at
-from typing import Optional
 
 from .async_websocket_client import AsyncWebSocketClient
 from .browser_peer_connection import BrowserPeerConnection
@@ -50,7 +49,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
     _peerconnection_map = {}  # dict[Node-id, PeerConnection]
     _lock = threading.RLock()
 
-    def __init__(self, event_loop: Optional[asyncio.AbstractEventLoop] = None):
+    def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None):
         super().__init__()
         self.init_webrtc_requestor_server()
         self.set_webrtc_requestor_delegate_callbacks()
@@ -132,7 +131,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
 
     @staticmethod
     def get_peer(
-        session_id: Optional[int] = None, node_id: Optional[int] = None
+        session_id: int | None = None, node_id: int | None = None
     ) -> LibdatachannelPeerConnection | BrowserPeerConnection | None:
         """Retrieves the PeerConnection instance associated with the given session ID or node ID."""
         if session_id is None and node_id is None:

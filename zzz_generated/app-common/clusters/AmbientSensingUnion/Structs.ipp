@@ -29,6 +29,45 @@ namespace Clusters {
 namespace AmbientSensingUnion {
 namespace Structs {
 
+namespace ContributorStatusChangeStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kContributorIndex), contributorIndex);
+    encoder.Encode(to_underlying(Fields::kPreviousContributorStatus), previousContributorStatus);
+    encoder.Encode(to_underlying(Fields::kCurrentContributorStatus), currentContributorStatus);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kContributorIndex))
+        {
+            err = DataModel::Decode(reader, contributorIndex);
+        }
+        else if (__context_tag == to_underlying(Fields::kPreviousContributorStatus))
+        {
+            err = DataModel::Decode(reader, previousContributorStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kCurrentContributorStatus))
+        {
+            err = DataModel::Decode(reader, currentContributorStatus);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ContributorStatusChangeStruct
+
 namespace UnionContributorStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -36,7 +75,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kContributorNodeID), contributorNodeID);
     encoder.Encode(to_underlying(Fields::kContributorEndpointID), contributorEndpointID);
     encoder.Encode(to_underlying(Fields::kContributorName), contributorName);
-    encoder.Encode(to_underlying(Fields::kContributorHealth), contributorHealth);
+    encoder.Encode(to_underlying(Fields::kContributorStatus), contributorStatus);
     return encoder.Finalize();
 }
 
@@ -62,9 +101,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, contributorName);
         }
-        else if (__context_tag == to_underlying(Fields::kContributorHealth))
+        else if (__context_tag == to_underlying(Fields::kContributorStatus))
         {
-            err = DataModel::Decode(reader, contributorHealth);
+            err = DataModel::Decode(reader, contributorStatus);
         }
 
         ReturnErrorOnFailure(err);

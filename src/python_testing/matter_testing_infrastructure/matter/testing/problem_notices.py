@@ -17,7 +17,7 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Optional, TypeAlias
+from typing import TypeAlias
 
 from matter.testing.conversions import cluster_id_with_name, format_decimal_and_hex
 from matter.testing.global_attribute_ids import GlobalAttributeIds
@@ -63,8 +63,8 @@ class ClusterPathLocation:
 
 @dataclass
 class AttributePathLocation(ClusterPathLocation):
-    cluster_id: Optional[int] = None
-    attribute_id: Optional[int] = None
+    cluster_id: int | None = None
+    attribute_id: int | None = None
 
     def as_cluster_string(self, mapper: ClusterMapper):
         desc = f"Endpoint {self.endpoint_id}"
@@ -114,8 +114,8 @@ class FeaturePathLocation(ClusterPathLocation):
 @dataclass
 class DeviceTypePathLocation:
     device_type_id: int
-    cluster_id: Optional[int] = None
-    endpoint_id: Optional[int] = None
+    cluster_id: int | None = None
+    endpoint_id: int | None = None
 
     def __str__(self):
         msg = ""
@@ -130,8 +130,8 @@ class DeviceTypePathLocation:
 @dataclass
 class NamespacePathLocation:
     """Location in a namespace definition"""
-    namespace_id: Optional[int] = None
-    tag_id: Optional[int] = None
+    namespace_id: int | None = None
+    tag_id: int | None = None
 
     def __str__(self) -> str:
         result = "Namespace"

@@ -53,8 +53,8 @@ config CHIP_IPV4
 	default y
 
 config CHIP_TASK_STACK_SIZE
-	default 14500 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers
-	default 6144 if CHIP_NXP_PLATFORM_MCXW72
+	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers required for Secure Sessions
+	default 7000 if CHIP_NXP_PLATFORM_MCXW72
 	default 10240
 
  config CHIP_INET_ENABLE_TCP_ENDPOINT
@@ -191,6 +191,9 @@ endif # CHIP_OTA_REQUESTOR
 
 # Multi AEAD operation are not HW accelerated by S200, enable single operation for all platform
 config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
+	default y
+
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
 
 # Include defaults for SDK Kconfig

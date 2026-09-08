@@ -82,11 +82,15 @@ CHIP_ERROR MigrateValueFromSafe(const ConcreteAttributePath & attrPath, SafeAttr
     // On little-endian systems, no byte swap is needed for scalar values.
     // Read directly into the output buffer and validate the size.
     ReturnErrorOnFailure(provider.SafeReadValue(attrPath, buffer));
-    VerifyOrReturnError(buffer.size() == valueSize, CHIP_ERROR_INCORRECT_STATE);
     // For scalar values in LE the function HostSwapBySize just checks that a valid size was provided.
     if (isScalar)
     {
+        VerifyOrReturnError(buffer.size() == valueSize, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(HostSwapBySize(buffer.data(), valueSize));
+    }
+    else
+    {
+        VerifyOrReturnError(buffer.size() <= valueSize, CHIP_ERROR_INCORRECT_STATE);
     }
 #else
 
@@ -94,7 +98,8 @@ CHIP_ERROR MigrateValueFromSafe(const ConcreteAttributePath & attrPath, SafeAttr
     // For non-scalar values, just return the raw data.
     if (!isScalar)
     {
-        return provider.SafeReadValue(attrPath, buffer);
+        ReturnErrorOnFailure(provider.SafeReadValue(attrPath, buffer));
+        return buffer.size() <= valueSize ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
     }
 
     // For scalar values, read into a temp buffer, byte-swap, then copy out.

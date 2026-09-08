@@ -12857,6 +12857,7 @@ class OperationalCredentials(Cluster):
                 ClusterObjectFieldDescriptor(Label="commissionedFabrics", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="trustedRootCertificates", Tag=0x00000004, Type=typing.List[bytes]),
                 ClusterObjectFieldDescriptor(Label="currentFabricIndex", Tag=0x00000005, Type=uint),
+                ClusterObjectFieldDescriptor(Label="PQCDeviceAttestationProfile", Tag=0x00000006, Type=typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -12870,6 +12871,7 @@ class OperationalCredentials(Cluster):
     commissionedFabrics: uint = 0
     trustedRootCertificates: typing.List[bytes] = field(default_factory=lambda: [])
     currentFabricIndex: uint = 0
+    PQCDeviceAttestationProfile: typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -12877,6 +12879,16 @@ class OperationalCredentials(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class AttestationCryptoProfileEnum(MatterIntEnum):
+            kEcdsaMatterLegacy = 0x00
+            kMlDsa44 = 0x01
+            kMlDsa65 = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class CertificateChainTypeEnum(MatterIntEnum):
             kDACCertificate = 0x01
             kPAICertificate = 0x02
@@ -12902,6 +12914,15 @@ class OperationalCredentials(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
+
+    class Bitmaps:
+        class AttestationCryptoProfileBitmap(IntFlag):
+            kSupportsEcdsaMatterLegacy = 0x1
+            kSupportsMlDsa44 = 0x2
+            kSupportsMlDsa65 = 0x4
+
+        class Feature(IntFlag):
+            kPQCDeviceAttestation = 0x1
 
     class Structs:
         @dataclass
@@ -12943,6 +12964,21 @@ class OperationalCredentials(Cluster):
             icac: 'typing.Union[Nullable, bytes]' = NullValue
             vvsc: 'typing.Optional[bytes]' = None
             fabricIndex: 'uint' = 0
+
+        @dataclass
+        class PQCDeviceAttestationProfileStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="PAASupportedProfiles", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="PAISupportedProfiles", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="DACSupportedProfiles", Tag=2, Type=uint),
+                    ])
+
+            PAASupportedProfiles: 'uint' = 0
+            PAISupportedProfiles: 'uint' = 0
+            DACSupportedProfiles: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -12991,9 +13027,15 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="certificateType", Tag=0, Type=OperationalCredentials.Enums.CertificateChainTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="cryptoProfile", Tag=1, Type=typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum]),
+                        ClusterObjectFieldDescriptor(Label="segmentID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxSegmentSize", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             certificateType: OperationalCredentials.Enums.CertificateChainTypeEnum = 0
+            cryptoProfile: typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum] = None
+            segmentID: typing.Optional[uint] = None
+            maxSegmentSize: typing.Optional[uint] = None
 
         @dataclass
         class CertificateChainResponse(ClusterCommand):
@@ -13007,9 +13049,13 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="certificate", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="totalDocumentSize", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="nextSegmentID", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             certificate: bytes = b""
+            totalDocumentSize: typing.Optional[uint] = None
+            nextSegmentID: typing.Optional[uint] = None
 
         @dataclass
         class CSRRequest(ClusterCommand):
@@ -13313,6 +13359,22 @@ class OperationalCredentials(Cluster):
             value: uint = 0
 
         @dataclass
+        class PQCDeviceAttestationProfile(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000003E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct])
+
+            value: typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct] = None
+
+        @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -13425,15 +13487,6 @@ class GroupKeyManagement(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
-        class GroupKeyMulticastPolicyEnum(MatterIntEnum):
-            kPerGroupID = 0x00
-            kAllNodes = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
-
         class GroupKeySecurityPolicyEnum(MatterIntEnum):
             kTrustFirst = 0x00
             kCacheAndSync = 0x01
@@ -20676,11 +20729,12 @@ class Groupcast(Cluster):
             kFailedAuth = 0x03
             kNoAvailableKey = 0x04
             kSendFailure = 0x05
+            kUnknownGroup = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6
+            kUnknownEnumValue = 7
 
         class GroupcastTestingEnum(MatterIntEnum):
             kDisableTesting = 0x00
@@ -24229,6 +24283,8 @@ class Messages(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="messages", Tag=0x00000000, Type=typing.List[Messages.Structs.MessageStruct]),
                 ClusterObjectFieldDescriptor(Label="activeMessageIDs", Tag=0x00000001, Type=typing.List[bytes]),
+                ClusterObjectFieldDescriptor(Label="supportedLanguageCodes", Tag=0x00000002, Type=typing.Optional[typing.List[str]]),
+                ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=0x00000003, Type=typing.Optional[typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -24238,6 +24294,8 @@ class Messages(Cluster):
 
     messages: typing.List[Messages.Structs.MessageStruct] = field(default_factory=lambda: [])
     activeMessageIDs: typing.List[bytes] = field(default_factory=lambda: [])
+    supportedLanguageCodes: typing.Optional[typing.List[str]] = None
+    supportedMimeTypes: typing.Optional[typing.List[str]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -24274,6 +24332,9 @@ class Messages(Cluster):
             kConfirmationResponse = 0x2
             kConfirmationReply = 0x4
             kProtectedMessages = 0x8
+            kSpokenMessages = 0x10
+            kAudioMessages = 0x20
+            kMultiModalMessages = 0x40
 
         class MessageControlBitmap(IntFlag):
             kConfirmationRequired = 0x1
@@ -24281,6 +24342,8 @@ class Messages(Cluster):
             kReplyMessage = 0x4
             kMessageConfirmed = 0x8
             kMessageProtected = 0x10
+            kSpokenMessage = 0x20
+            kAudioMessage = 0x40
 
     class Structs:
         @dataclass
@@ -24309,6 +24372,8 @@ class Messages(Cluster):
                         ClusterObjectFieldDescriptor(Label="duration", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="messageText", Tag=5, Type=str),
                         ClusterObjectFieldDescriptor(Label="responses", Tag=6, Type=typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]),
+                        ClusterObjectFieldDescriptor(Label="languageCode", Tag=7, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="messageURI", Tag=8, Type=typing.Optional[str]),
                     ])
 
             messageID: 'bytes' = b""
@@ -24318,6 +24383,8 @@ class Messages(Cluster):
             duration: 'typing.Union[Nullable, uint]' = NullValue
             messageText: 'str' = ""
             responses: 'typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]' = None
+            languageCode: 'typing.Optional[str]' = None
+            messageURI: 'typing.Optional[str]' = None
 
     class Commands:
         @dataclass
@@ -24338,6 +24405,8 @@ class Messages(Cluster):
                         ClusterObjectFieldDescriptor(Label="duration", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="messageText", Tag=5, Type=str),
                         ClusterObjectFieldDescriptor(Label="responses", Tag=6, Type=typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]),
+                        ClusterObjectFieldDescriptor(Label="languageCode", Tag=7, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="messageURI", Tag=8, Type=typing.Optional[str]),
                     ])
 
             messageID: bytes = b""
@@ -24347,6 +24416,8 @@ class Messages(Cluster):
             duration: typing.Union[Nullable, uint] = NullValue
             messageText: str = ""
             responses: typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]] = None
+            languageCode: typing.Optional[str] = None
+            messageURI: typing.Optional[str] = None
 
         @dataclass
         class CancelMessagesRequest(ClusterCommand):
@@ -24396,6 +24467,38 @@ class Messages(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
 
             value: typing.List[bytes] = field(default_factory=lambda: [])
+
+        @dataclass
+        class SupportedLanguageCodes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000097
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[str]])
+
+            value: typing.Optional[typing.List[str]] = None
+
+        @dataclass
+        class SupportedMimeTypes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000097
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[str]])
+
+            value: typing.Optional[typing.List[str]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -24540,6 +24643,29 @@ class Messages(Cluster):
             responseID: typing.Union[None, Nullable, uint] = None
             reply: typing.Union[None, Nullable, str] = None
             futureMessagesPreference: typing.Union[Nullable, Messages.Enums.FutureMessagePreferenceEnum] = NullValue
+
+        @dataclass
+        class MessageNotPresented(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000097
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="messageID", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="removedFromQueue", Tag=1, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            messageID: bytes = b""
+            removedFromQueue: bool = False
+            fabricIndex: uint = 0
 
 
 @dataclass
@@ -25007,14 +25133,14 @@ class DeviceEnergyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="minPower", Tag=0, Type=typing.Union[Nullable, int]),
-                        ClusterObjectFieldDescriptor(Label="maxPower", Tag=1, Type=typing.Union[Nullable, int]),
+                        ClusterObjectFieldDescriptor(Label="minPower", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="maxPower", Tag=1, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="duration", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="cause", Tag=3, Type=DeviceEnergyManagement.Enums.AdjustmentCauseEnum),
                     ])
 
-            minPower: typing.Union[Nullable, int] = NullValue
-            maxPower: typing.Union[Nullable, int] = NullValue
+            minPower: typing.Optional[int] = None
+            maxPower: typing.Optional[int] = None
             duration: uint = 0
             cause: DeviceEnergyManagement.Enums.AdjustmentCauseEnum = 0
 
@@ -27206,10 +27332,6 @@ class DeviceEnergyManagementMode(Cluster):
             # prone, and was removed. See
             # src/app/common/templates/config-data.yaml.
 
-    class Bitmaps:
-        class Feature(IntFlag):
-            kOnOff = 0x1
-
     class Structs:
         @dataclass
         class ModeTagStruct(ClusterObject):
@@ -28524,7 +28646,7 @@ class ElectricalProtectionAlarm(Cluster):
                         ClusterObjectFieldDescriptor(Label="maxVoltageProtection", Tag=4, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="maxTemporaryVoltage", Tag=5, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="nominalDischargeCurrent", Tag=6, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="maximumDishargeCurrent", Tag=7, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="maximumDischargeCurrent", Tag=7, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="ratedShortCircuitCurrent", Tag=8, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="ratedShortTimeWithstandCurrent", Tag=9, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="energyAbsorptionCapability", Tag=10, Type=typing.Optional[uint]),
@@ -28538,7 +28660,7 @@ class ElectricalProtectionAlarm(Cluster):
             maxVoltageProtection: 'typing.Optional[int]' = None
             maxTemporaryVoltage: 'typing.Optional[int]' = None
             nominalDischargeCurrent: 'typing.Optional[int]' = None
-            maximumDishargeCurrent: 'typing.Optional[int]' = None
+            maximumDischargeCurrent: 'typing.Optional[int]' = None
             ratedShortCircuitCurrent: 'typing.Optional[int]' = None
             ratedShortTimeWithstandCurrent: 'typing.Optional[int]' = None
             energyAbsorptionCapability: 'typing.Optional[uint]' = None
@@ -36444,17 +36566,20 @@ class Humidistat(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="mode", Tag=0x00000000, Type=Humidistat.Enums.ModeEnum),
-                ClusterObjectFieldDescriptor(Label="systemState", Tag=0x00000001, Type=Humidistat.Enums.SystemStateEnum),
-                ClusterObjectFieldDescriptor(Label="userSetpoint", Tag=0x00000002, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="minSetpoint", Tag=0x00000003, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="maxSetpoint", Tag=0x00000004, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="step", Tag=0x00000005, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="targetSetpoint", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="mistType", Tag=0x00000007, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="continuous", Tag=0x00000008, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="sleep", Tag=0x00000009, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="optimal", Tag=0x0000000A, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[Humidistat.Enums.ModeEnum]),
+                ClusterObjectFieldDescriptor(Label="mode", Tag=0x00000001, Type=Humidistat.Enums.ModeEnum),
+                ClusterObjectFieldDescriptor(Label="systemState", Tag=0x00000002, Type=Humidistat.Enums.SystemStateEnum),
+                ClusterObjectFieldDescriptor(Label="userSetpoint", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="minSetpoint", Tag=0x00000004, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="maxSetpoint", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="step", Tag=0x00000006, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="targetSetpoint", Tag=0x00000007, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="mistType", Tag=0x00000008, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="continuous", Tag=0x00000009, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="sleep", Tag=0x0000000A, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="optimal", Tag=0x0000000B, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="condPumpEnabled", Tag=0x0000000C, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="condRunCount", Tag=0x0000000D, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -36462,6 +36587,7 @@ class Humidistat(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    supportedModes: typing.List[Humidistat.Enums.ModeEnum] = field(default_factory=lambda: [])
     mode: Humidistat.Enums.ModeEnum = 0
     systemState: Humidistat.Enums.SystemStateEnum = 0
     userSetpoint: typing.Optional[uint] = None
@@ -36473,6 +36599,8 @@ class Humidistat(Cluster):
     continuous: typing.Optional[bool] = None
     sleep: typing.Optional[bool] = None
     optimal: typing.Optional[bool] = None
+    condPumpEnabled: typing.Optional[bool] = None
+    condRunCount: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -36481,28 +36609,26 @@ class Humidistat(Cluster):
 
     class Enums:
         class ModeEnum(MatterIntEnum):
-            kOff = 0x00
-            kHumidifier = 0x01
-            kDehumidifier = 0x02
-            kAuto = 0x03
-            kFanOnly = 0x04
+            kHumidifier = 0x00
+            kDehumidifier = 0x01
+            kAuto = 0x02
+            kFanOnly = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5
+            kUnknownEnumValue = 4
 
         class SystemStateEnum(MatterIntEnum):
-            kOff = 0x00
-            kHumidifying = 0x01
-            kDehumidifying = 0x02
-            kFan = 0x03
-            kIdle = 0x04
+            kHumidifying = 0x00
+            kDehumidifying = 0x01
+            kFan = 0x02
+            kIdle = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -36515,6 +36641,7 @@ class Humidistat(Cluster):
             kOptimal = 0x40
             kWarmMist = 0x80
             kColdMist = 0x100
+            kCondPump = 0x200
 
         class MistTypeBitmap(IntFlag):
             kMistCold = 0x1
@@ -36549,7 +36676,7 @@ class Humidistat(Cluster):
 
     class Attributes:
         @dataclass
-        class Mode(ClusterAttributeDescriptor):
+        class SupportedModes(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000205
@@ -36557,6 +36684,22 @@ class Humidistat(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[Humidistat.Enums.ModeEnum])
+
+            value: typing.List[Humidistat.Enums.ModeEnum] = field(default_factory=lambda: [])
+
+        @dataclass
+        class Mode(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000205
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36572,7 +36715,7 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000001
+                return 0x00000002
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36588,7 +36731,7 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000002
+                return 0x00000003
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36604,7 +36747,7 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000003
+                return 0x00000004
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36620,7 +36763,7 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000004
+                return 0x00000005
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36636,7 +36779,7 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000005
+                return 0x00000006
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36652,7 +36795,7 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000006
+                return 0x00000007
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36668,7 +36811,7 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000007
+                return 0x00000008
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36684,7 +36827,7 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000008
+                return 0x00000009
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36700,7 +36843,7 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000009
+                return 0x0000000A
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -36716,13 +36859,45 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x0000000A
+                return 0x0000000B
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
             value: typing.Optional[bool] = None
+
+        @dataclass
+        class CondPumpEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000205
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class CondRunCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000205
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000D
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -44621,6 +44796,21 @@ class AmbientSensingUnion(Cluster):
 
     class Structs:
         @dataclass
+        class ContributorStatusChangeStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contributorIndex", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="previousContributorStatus", Tag=1, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="currentContributorStatus", Tag=2, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                    ])
+
+            contributorIndex: 'uint' = 0
+            previousContributorStatus: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
+            currentContributorStatus: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
+
+        @dataclass
         class UnionContributorStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -44628,14 +44818,14 @@ class AmbientSensingUnion(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="contributorNodeID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="contributorEndpointID", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="contributorName", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="contributorHealth", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="contributorName", Tag=2, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="contributorStatus", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
                     ])
 
             contributorNodeID: 'typing.Union[Nullable, uint]' = NullValue
             contributorEndpointID: 'typing.Union[Nullable, uint]' = NullValue
-            contributorName: 'typing.Optional[str]' = None
-            contributorHealth: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
+            contributorName: 'typing.Union[Nullable, str]' = NullValue
+            contributorStatus: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
 
     class Attributes:
         @dataclass
@@ -44819,10 +45009,10 @@ class AmbientSensingUnion(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="statusChangedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
+                        ClusterObjectFieldDescriptor(Label="contributorStatusChange", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.ContributorStatusChangeStruct]),
                     ])
 
-            statusChangedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
+            contributorStatusChange: typing.List[AmbientSensingUnion.Structs.ContributorStatusChangeStruct] = field(default_factory=lambda: [])
 
 
 @dataclass
@@ -44839,7 +45029,8 @@ class ProximityRanging(Cluster):
                 ClusterObjectFieldDescriptor(Label="BLTDevIK", Tag=0x00000003, Type=typing.Optional[bytes]),
                 ClusterObjectFieldDescriptor(Label="BLTCSSecurityLevel", Tag=0x00000004, Type=typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum]),
                 ClusterObjectFieldDescriptor(Label="BLTCSModeCapability", Tag=0x00000005, Type=typing.Optional[ProximityRanging.Enums.BLTCSModeEnum]),
-                ClusterObjectFieldDescriptor(Label="sessionIDList", Tag=0x00000006, Type=typing.Union[Nullable, typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="sessionIDList", Tag=0x00000006, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="rangingConstraints", Tag=0x00000007, Type=typing.Optional[typing.List[ProximityRanging.Structs.RangingConstraintStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -44853,7 +45044,8 @@ class ProximityRanging(Cluster):
     BLTDevIK: typing.Optional[bytes] = None
     BLTCSSecurityLevel: typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum] = None
     BLTCSModeCapability: typing.Optional[ProximityRanging.Enums.BLTCSModeEnum] = None
-    sessionIDList: typing.Union[Nullable, typing.List[uint]] = NullValue
+    sessionIDList: typing.List[uint] = field(default_factory=lambda: [])
+    rangingConstraints: typing.Optional[typing.List[ProximityRanging.Structs.RangingConstraintStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -44861,6 +45053,15 @@ class ProximityRanging(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class BLERBCSecurityModeEnum(MatterIntEnum):
+            kBLEDeviceIDObfuscation = 0x00
+            kEncryptedAdvertisingData = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
         class BLTCSModeEnum(MatterIntEnum):
             kPBROnly = 0x00
             kRTTOnly = 0x01
@@ -44885,7 +45086,6 @@ class ProximityRanging(Cluster):
         class NADMEnum(MatterIntEnum):
             kAttackExtremelyUnlikely = 0x00
             kAttackVeryUnlikely = 0x01
-            kAttackUnlikely = 0x02
             kAttackIsPossible = 0x03
             kAttackIsLikely = 0x04
             kAttackVeryLikely = 0x05
@@ -44895,7 +45095,17 @@ class ProximityRanging(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7
+            kUnknownEnumValue = 2
+
+        class RDRCapabilityEnum(MatterIntEnum):
+            kNoRDR = 0x00
+            kAzimuthOnly = 0x01
+            kAzimuthElevation = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
 
         class RDRReferenceEnum(MatterIntEnum):
             kDeviceCoordinates = 0x00
@@ -44919,24 +45129,18 @@ class ProximityRanging(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6
 
-        class RangingSecurityEnum(MatterIntEnum):
-            kSecureRanging = 0x00
-            kOpenRanging = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
-
         class RangingSessionStatusEnum(MatterIntEnum):
-            kSessionEndTimeReached = 0x00
-            kPeerNotFound = 0x01
-            kHardwareError = 0x02
+            kSessionStarted = 0x00
+            kSessionEndTimeReached = 0x01
+            kSessionStoppedByRequest = 0x02
+            kPeerNotFound = 0x03
+            kHardwareError = 0x04
+            kSessionFailed = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
+            kUnknownEnumValue = 6
 
         class RangingTechEnum(MatterIntEnum):
             kBluetoothChannelSounding = 0x00
@@ -44949,17 +45153,16 @@ class ProximityRanging(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
 
-        class ResultCodeEnum(MatterIntEnum):
-            kAccepted = 0x00
-            kRejectedInfeasibleRanging = 0x01
-            kRejectedInfeasibleRangingTriggers = 0x02
-            kBusySessionCapacityReached = 0x03
-            kBusyTryAgainLater = 0x04
+        class StatusCodeEnum(MatterIntEnum):
+            kRejectedInfeasibleRanging = 0x02
+            kRejectedInfeasibleRangingTriggers = 0x03
+            kBusySessionCapacityReached = 0x04
+            kBusyTryAgainLater = 0x05
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5
+            kUnknownEnumValue = 0
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -44988,6 +45191,10 @@ class ProximityRanging(Cluster):
             k80MHz = 0x80
             k160MHz = 0x100
             k320MHz = 0x200
+
+        class RangingRoleSupportBitmap(IntFlag):
+            kInitiatorSupport = 0x1
+            kResponderSupport = 0x2
 
     class Structs:
         @dataclass
@@ -45048,10 +45255,14 @@ class ProximityRanging(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="role", Tag=0, Type=ProximityRanging.Enums.RangingRoleEnum),
                         ClusterObjectFieldDescriptor(Label="peerBLEDeviceID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="BLERBCSecurityMode", Tag=2, Type=ProximityRanging.Enums.BLERBCSecurityModeEnum),
+                        ClusterObjectFieldDescriptor(Label="sessionKey", Tag=3, Type=typing.Optional[bytes]),
                     ])
 
             role: 'ProximityRanging.Enums.RangingRoleEnum' = 0
             peerBLEDeviceID: 'uint' = 0
+            BLERBCSecurityMode: 'ProximityRanging.Enums.BLERBCSecurityModeEnum' = 0
+            sessionKey: 'typing.Optional[bytes]' = None
 
         @dataclass
         class BLTChannelSoundingDeviceRoleConfigStruct(ClusterObject):
@@ -45062,15 +45273,15 @@ class ProximityRanging(Cluster):
                         ClusterObjectFieldDescriptor(Label="role", Tag=0, Type=ProximityRanging.Enums.RangingRoleEnum),
                         ClusterObjectFieldDescriptor(Label="peerBLTDevIK", Tag=1, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="BLTCSMode", Tag=2, Type=typing.Optional[ProximityRanging.Enums.BLTCSModeEnum]),
-                        ClusterObjectFieldDescriptor(Label="BLTCSSecurityLevel", Tag=3, Type=typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum]),
-                        ClusterObjectFieldDescriptor(Label="ltk", Tag=4, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="BLTCSSecurityLevel", Tag=3, Type=ProximityRanging.Enums.BLTCSSecurityLevelEnum),
+                        ClusterObjectFieldDescriptor(Label="ltk", Tag=4, Type=bytes),
                     ])
 
             role: 'ProximityRanging.Enums.RangingRoleEnum' = 0
             peerBLTDevIK: 'bytes' = b""
             BLTCSMode: 'typing.Optional[ProximityRanging.Enums.BLTCSModeEnum]' = None
-            BLTCSSecurityLevel: 'typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum]' = None
-            ltk: 'typing.Optional[bytes]' = None
+            BLTCSSecurityLevel: 'ProximityRanging.Enums.BLTCSSecurityLevelEnum' = 0
+            ltk: 'bytes' = b""
 
         @dataclass
         class RangingCapabilitiesStruct(ClusterObject):
@@ -45080,12 +45291,41 @@ class ProximityRanging(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="technology", Tag=0, Type=ProximityRanging.Enums.RangingTechEnum),
                         ClusterObjectFieldDescriptor(Label="frequencyBand", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="periodicRangingSupport", Tag=2, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="bandwidth", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="supportedRangingRoles", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="RDRCapability", Tag=4, Type=ProximityRanging.Enums.RDRCapabilityEnum),
+                        ClusterObjectFieldDescriptor(Label="periodicRangingSupport", Tag=5, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="maxConcurrentSessions", Tag=6, Type=typing.Optional[uint]),
                     ])
 
             technology: 'ProximityRanging.Enums.RangingTechEnum' = 0
             frequencyBand: 'uint' = 0
+            bandwidth: 'uint' = 0
+            supportedRangingRoles: 'uint' = 0
+            RDRCapability: 'ProximityRanging.Enums.RDRCapabilityEnum' = 0
             periodicRangingSupport: 'bool' = False
+            maxConcurrentSessions: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class RangingConstraintStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="technology", Tag=0, Type=ProximityRanging.Enums.RangingTechEnum),
+                        ClusterObjectFieldDescriptor(Label="role", Tag=1, Type=ProximityRanging.Enums.RangingRoleEnum),
+                        ClusterObjectFieldDescriptor(Label="enabled", Tag=3, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="minRangingInterval", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxSessionDuration", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxRangingInstances", Tag=6, Type=typing.Optional[uint]),
+                    ])
+
+            technology: 'ProximityRanging.Enums.RangingTechEnum' = 0
+            role: 'ProximityRanging.Enums.RangingRoleEnum' = 0
+            enabled: 'typing.Optional[bool]' = None
+            minRangingInterval: 'typing.Optional[uint]' = None
+            maxSessionDuration: 'typing.Optional[uint]' = None
+            maxRangingInstances: 'typing.Optional[uint]' = None
 
         @dataclass
         class RangingTriggerConditionStruct(ClusterObject):
@@ -45125,12 +45365,12 @@ class ProximityRanging(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="role", Tag=0, Type=ProximityRanging.Enums.RangingRoleEnum),
                         ClusterObjectFieldDescriptor(Label="peerWiFiDevIK", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="pmk", Tag=2, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="pmk", Tag=2, Type=bytes),
                     ])
 
             role: 'ProximityRanging.Enums.RangingRoleEnum' = 0
             peerWiFiDevIK: 'bytes' = b""
-            pmk: 'typing.Optional[bytes]' = None
+            pmk: 'bytes' = b""
 
     class Commands:
         @dataclass
@@ -45150,9 +45390,8 @@ class ProximityRanging(Cluster):
                         ClusterObjectFieldDescriptor(Label="BLTChannelSoundingDeviceRoleConfig", Tag=3, Type=typing.Optional[ProximityRanging.Structs.BLTChannelSoundingDeviceRoleConfigStruct]),
                         ClusterObjectFieldDescriptor(Label="frequencyBand", Tag=4, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="bandwidth", Tag=5, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="securityMode", Tag=6, Type=ProximityRanging.Enums.RangingSecurityEnum),
-                        ClusterObjectFieldDescriptor(Label="trigger", Tag=7, Type=ProximityRanging.Structs.RangingTriggerConditionStruct),
-                        ClusterObjectFieldDescriptor(Label="reportingCondition", Tag=8, Type=typing.Optional[ProximityRanging.Structs.ReportingConditionStruct]),
+                        ClusterObjectFieldDescriptor(Label="trigger", Tag=6, Type=ProximityRanging.Structs.RangingTriggerConditionStruct),
+                        ClusterObjectFieldDescriptor(Label="reportingCondition", Tag=7, Type=typing.Optional[ProximityRanging.Structs.ReportingConditionStruct]),
                     ])
 
             technology: ProximityRanging.Enums.RangingTechEnum = 0
@@ -45161,7 +45400,6 @@ class ProximityRanging(Cluster):
             BLTChannelSoundingDeviceRoleConfig: typing.Optional[ProximityRanging.Structs.BLTChannelSoundingDeviceRoleConfigStruct] = None
             frequencyBand: typing.Optional[uint] = None
             bandwidth: typing.Optional[uint] = None
-            securityMode: ProximityRanging.Enums.RangingSecurityEnum = 0
             trigger: ProximityRanging.Structs.RangingTriggerConditionStruct = field(default_factory=lambda: ProximityRanging.Structs.RangingTriggerConditionStruct())
             reportingCondition: typing.Optional[ProximityRanging.Structs.ReportingConditionStruct] = None
 
@@ -45176,12 +45414,10 @@ class ProximityRanging(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="resultCode", Tag=0, Type=ProximityRanging.Enums.ResultCodeEnum),
-                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
                     ])
 
-            resultCode: ProximityRanging.Enums.ResultCodeEnum = 0
-            sessionID: typing.Union[Nullable, uint] = NullValue
+            sessionID: uint = 0
 
         @dataclass
         class StopRangingRequest(ClusterCommand):
@@ -45308,9 +45544,25 @@ class ProximityRanging(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[uint]])
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
-            value: typing.Union[Nullable, typing.List[uint]] = NullValue
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class RangingConstraints(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000433
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ProximityRanging.Structs.RangingConstraintStruct]])
+
+            value: typing.Optional[typing.List[ProximityRanging.Structs.RangingConstraintStruct]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -48221,6 +48473,8 @@ class MediaPlayback(Cluster):
                 ClusterObjectFieldDescriptor(Label="availableAudioTracks", Tag=0x00000008, Type=typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]]),
                 ClusterObjectFieldDescriptor(Label="activeTextTrack", Tag=0x00000009, Type=typing.Union[None, Nullable, MediaPlayback.Structs.TrackStruct]),
                 ClusterObjectFieldDescriptor(Label="availableTextTracks", Tag=0x0000000A, Type=typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]]),
+                ClusterObjectFieldDescriptor(Label="availableCommands", Tag=0x0000000B, Type=typing.Union[Nullable, typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="contentInfo", Tag=0x0000000C, Type=typing.Union[Nullable, MediaPlayback.Structs.ContentInfoStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -48239,6 +48493,8 @@ class MediaPlayback(Cluster):
     availableAudioTracks: typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]] = None
     activeTextTrack: typing.Union[None, Nullable, MediaPlayback.Structs.TrackStruct] = None
     availableTextTracks: typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]] = None
+    availableCommands: typing.Union[Nullable, typing.List[uint]] = NullValue
+    contentInfo: typing.Union[Nullable, MediaPlayback.Structs.ContentInfoStruct] = NullValue
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -48270,6 +48526,17 @@ class MediaPlayback(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 18
+
+        class MediaType(MatterIntEnum):
+            kGeneric = 0x00
+            kTVShow = 0x01
+            kMusic = 0x02
+            kPodcast = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
 
         class PlaybackStateEnum(MatterIntEnum):
             kPlaying = 0x00
@@ -48311,10 +48578,12 @@ class MediaPlayback(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="languageCode", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="displayName", Tag=1, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="characteristics", Tag=1, Type=typing.Union[None, Nullable, typing.List[MediaPlayback.Enums.CharacteristicEnum]]),
+                        ClusterObjectFieldDescriptor(Label="displayName", Tag=2, Type=typing.Union[None, Nullable, str]),
                     ])
 
             languageCode: 'str' = ""
+            characteristics: 'typing.Union[None, Nullable, typing.List[MediaPlayback.Enums.CharacteristicEnum]]' = None
             displayName: 'typing.Union[None, Nullable, str]' = None
 
         @dataclass
@@ -48329,6 +48598,33 @@ class MediaPlayback(Cluster):
 
             id: 'str' = ""
             trackAttributes: 'typing.Union[Nullable, MediaPlayback.Structs.TrackAttributesStruct]' = NullValue
+
+        @dataclass
+        class ContentInfoStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contentType", Tag=0, Type=MediaPlayback.Enums.MediaType),
+                        ClusterObjectFieldDescriptor(Label="title", Tag=1, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="show", Tag=2, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="season", Tag=3, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="episode", Tag=4, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="provider", Tag=5, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="artist", Tag=6, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="album", Tag=7, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="track", Tag=8, Type=typing.Union[None, Nullable, str]),
+                    ])
+
+            contentType: 'MediaPlayback.Enums.MediaType' = 0
+            title: 'typing.Union[None, Nullable, str]' = None
+            show: 'typing.Union[None, Nullable, str]' = None
+            season: 'typing.Union[None, Nullable, str]' = None
+            episode: 'typing.Union[None, Nullable, str]' = None
+            provider: 'typing.Union[None, Nullable, str]' = None
+            artist: 'typing.Union[None, Nullable, str]' = None
+            album: 'typing.Union[None, Nullable, str]' = None
+            track: 'typing.Union[None, Nullable, str]' = None
 
         @dataclass
         class PlaybackPositionStruct(ClusterObject):
@@ -48743,6 +49039,38 @@ class MediaPlayback(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]])
 
             value: typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]] = None
+
+        @dataclass
+        class AvailableCommands(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000506
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[uint]])
+
+            value: typing.Union[Nullable, typing.List[uint]] = NullValue
+
+        @dataclass
+        class ContentInfo(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000506
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, MediaPlayback.Structs.ContentInfoStruct])
+
+            value: typing.Union[Nullable, MediaPlayback.Structs.ContentInfoStruct] = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -49476,6 +49804,8 @@ class ContentLauncher(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="acceptHeader", Tag=0x00000000, Type=typing.Optional[typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="supportedStreamingProtocols", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="movable", Tag=0x00000002, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="presets", Tag=0x00000003, Type=typing.Optional[typing.List[ContentLauncher.Structs.ContentPresetStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -49485,6 +49815,8 @@ class ContentLauncher(Cluster):
 
     acceptHeader: typing.Optional[typing.List[str]] = None
     supportedStreamingProtocols: typing.Optional[uint] = None
+    movable: typing.Optional[bool] = None
+    presets: typing.Optional[typing.List[ContentLauncher.Structs.ContentPresetStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -49550,17 +49882,33 @@ class ContentLauncher(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 17
 
+        class QueueTypeEnum(MatterIntEnum):
+            kReplace = 0x00
+            kNext = 0x01
+            kLast = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kURLNotAvailable = 0x01
             kAuthFailed = 0x02
             kTextTrackNotAvailable = 0x03
             kAudioTrackNotAvailable = 0x04
+            kInvalidData = 0x05
+            kAccountMismatch = 0x06
+            kContentAppNotAvailable = 0x07
+            kReplicationNotAllowed = 0x08
+            kReplicationNotSupported = 0x09
+            kPresetNotFound = 0x0A
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5
+            kUnknownEnumValue = 11
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -49569,6 +49917,9 @@ class ContentLauncher(Cluster):
             kAdvancedSeek = 0x4
             kTextTracks = 0x8
             kAudioTracks = 0x10
+            kContentReplication = 0x20
+            kContentQueueing = 0x40
+            kPresets = 0x80
 
         class SupportedProtocolsBitmap(IntFlag):
             kDash = 0x1
@@ -49589,6 +49940,57 @@ class ContentLauncher(Cluster):
             width: 'float' = 0.0
             height: 'float' = 0.0
             metric: 'ContentLauncher.Enums.MetricTypeEnum' = 0
+
+        @dataclass
+        class ContentAppInfo(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contentAppVendorID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="contentAppProductID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="data", Tag=2, Type=str),
+                    ])
+
+            contentAppVendorID: 'uint' = 0
+            contentAppProductID: 'uint' = 0
+            data: 'str' = ""
+
+        @dataclass
+        class LaunchUrlInfo(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="url", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="contentType", Tag=2, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="contentHeaders", Tag=3, Type=typing.Union[None, Nullable, typing.List[str]]),
+                        ClusterObjectFieldDescriptor(Label="offsetMillisecs", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="queueType", Tag=5, Type=typing.Union[None, Nullable, ContentLauncher.Enums.QueueTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="nextUrl", Tag=6, Type=typing.Union[None, Nullable, str]),
+                    ])
+
+            url: 'str' = ""
+            data: 'typing.Union[None, Nullable, str]' = None
+            contentType: 'typing.Union[None, Nullable, str]' = None
+            contentHeaders: 'typing.Union[None, Nullable, typing.List[str]]' = None
+            offsetMillisecs: 'typing.Union[None, Nullable, uint]' = None
+            queueType: 'typing.Union[None, Nullable, ContentLauncher.Enums.QueueTypeEnum]' = None
+            nextUrl: 'typing.Union[None, Nullable, str]' = None
+
+        @dataclass
+        class ReplicationInfo(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="launchUrlInfo", Tag=0, Type=typing.Union[None, Nullable, ContentLauncher.Structs.LaunchUrlInfo]),
+                        ClusterObjectFieldDescriptor(Label="contentAppInfo", Tag=1, Type=typing.Union[None, Nullable, ContentLauncher.Structs.ContentAppInfo]),
+                    ])
+
+            launchUrlInfo: 'typing.Union[None, Nullable, ContentLauncher.Structs.LaunchUrlInfo]' = None
+            contentAppInfo: 'typing.Union[None, Nullable, ContentLauncher.Structs.ContentAppInfo]' = None
 
         @dataclass
         class TrackPreferenceStruct(ClusterObject):
@@ -49695,6 +50097,19 @@ class ContentLauncher(Cluster):
             splash: 'typing.Optional[ContentLauncher.Structs.StyleInformationStruct]' = None
             waterMark: 'typing.Optional[ContentLauncher.Structs.StyleInformationStruct]' = None
 
+        @dataclass
+        class ContentPresetStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="presetName", Tag=1, Type=str),
+                    ])
+
+            presetID: 'uint' = 0
+            presetName: 'str' = ""
+
     class Commands:
         @dataclass
         class LaunchContent(ClusterCommand):
@@ -49712,6 +50127,8 @@ class ContentLauncher(Cluster):
                         ClusterObjectFieldDescriptor(Label="data", Tag=2, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="playbackPreferences", Tag=3, Type=typing.Optional[ContentLauncher.Structs.PlaybackPreferencesStruct]),
                         ClusterObjectFieldDescriptor(Label="useCurrentContext", Tag=4, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="contentAppVendorID", Tag=5, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="contentAppProductID", Tag=6, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             search: ContentLauncher.Structs.ContentSearchStruct = field(default_factory=lambda: ContentLauncher.Structs.ContentSearchStruct())
@@ -49719,6 +50136,8 @@ class ContentLauncher(Cluster):
             data: typing.Optional[str] = None
             playbackPreferences: typing.Optional[ContentLauncher.Structs.PlaybackPreferencesStruct] = None
             useCurrentContext: typing.Optional[bool] = None
+            contentAppVendorID: typing.Union[None, Nullable, uint] = None
+            contentAppProductID: typing.Union[None, Nullable, uint] = None
 
         @dataclass
         class LaunchURL(ClusterCommand):
@@ -49734,11 +50153,23 @@ class ContentLauncher(Cluster):
                         ClusterObjectFieldDescriptor(Label="contentURL", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="displayString", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="brandingInformation", Tag=2, Type=typing.Optional[ContentLauncher.Structs.BrandingInformationStruct]),
+                        ClusterObjectFieldDescriptor(Label="playbackPreferences", Tag=3, Type=typing.Optional[ContentLauncher.Structs.PlaybackPreferencesStruct]),
+                        ClusterObjectFieldDescriptor(Label="contentType", Tag=4, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="contentHeaders", Tag=5, Type=typing.Union[None, Nullable, typing.List[str]]),
+                        ClusterObjectFieldDescriptor(Label="offsetMillisecs", Tag=6, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="queueType", Tag=7, Type=typing.Union[None, Nullable, ContentLauncher.Enums.QueueTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="nextUrl", Tag=8, Type=typing.Union[None, Nullable, str]),
                     ])
 
             contentURL: str = ""
             displayString: typing.Optional[str] = None
             brandingInformation: typing.Optional[ContentLauncher.Structs.BrandingInformationStruct] = None
+            playbackPreferences: typing.Optional[ContentLauncher.Structs.PlaybackPreferencesStruct] = None
+            contentType: typing.Union[None, Nullable, str] = None
+            contentHeaders: typing.Union[None, Nullable, typing.List[str]] = None
+            offsetMillisecs: typing.Union[None, Nullable, uint] = None
+            queueType: typing.Union[None, Nullable, ContentLauncher.Enums.QueueTypeEnum] = None
+            nextUrl: typing.Union[None, Nullable, str] = None
 
         @dataclass
         class LauncherResponse(ClusterCommand):
@@ -49757,6 +50188,53 @@ class ContentLauncher(Cluster):
 
             status: ContentLauncher.Enums.StatusEnum = 0
             data: typing.Optional[str] = None
+
+        @dataclass
+        class ContentReplicationRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050A
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ContentReplicationResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class ContentReplicationResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050A
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.StatusEnum),
+                        ClusterObjectFieldDescriptor(Label="replicationInfo", Tag=1, Type=typing.Union[None, Nullable, ContentLauncher.Structs.ReplicationInfo]),
+                    ])
+
+            status: ContentLauncher.Enums.StatusEnum = 0
+            replicationInfo: typing.Union[None, Nullable, ContentLauncher.Structs.ReplicationInfo] = None
+
+        @dataclass
+        class PlayPreset(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050A
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetID", Tag=0, Type=uint),
+                    ])
+
+            presetID: uint = 0
 
     class Attributes:
         @dataclass
@@ -49790,6 +50268,38 @@ class ContentLauncher(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
             value: typing.Optional[uint] = None
+
+        @dataclass
+        class Movable(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class Presets(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ContentLauncher.Structs.ContentPresetStruct]])
+
+            value: typing.Optional[typing.List[ContentLauncher.Structs.ContentPresetStruct]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -49870,6 +50380,26 @@ class ContentLauncher(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+    class Events:
+        @dataclass
+        class ContentReplication(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050A
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.StatusEnum),
+                    ])
+
+            status: ContentLauncher.Enums.StatusEnum = 0
 
 
 @dataclass
@@ -50614,6 +51144,7 @@ class AccountLogin(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
+                ClusterObjectFieldDescriptor(Label="OAuthLoggedIn", Tag=0x00000000, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -50621,11 +51152,16 @@ class AccountLogin(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    OAuthLoggedIn: typing.Optional[bool] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kOAuth = 0x1
 
     class Commands:
         @dataclass
@@ -50708,7 +51244,64 @@ class AccountLogin(Cluster):
 
             node: typing.Optional[uint] = None
 
+        @dataclass
+        class GetDeviceAuthURI(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050E
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetDeviceAuthURIResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+        @dataclass
+        class GetDeviceAuthURIResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050E
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userCode", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="verificationURI", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="verificationURIComplete", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="expiresIn", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="interval", Tag=4, Type=uint),
+                    ])
+
+            userCode: str = ""
+            verificationURI: str = ""
+            verificationURIComplete: typing.Optional[str] = None
+            expiresIn: uint = 0
+            interval: uint = 0
+
     class Attributes:
+        @dataclass
+        class OAuthLoggedIn(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -55501,6 +56094,7 @@ class PushAvStreamTransport(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedFormats", Tag=0x00000000, Type=typing.List[PushAvStreamTransport.Structs.SupportedFormatStruct]),
                 ClusterObjectFieldDescriptor(Label="currentConnections", Tag=0x00000001, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
+                ClusterObjectFieldDescriptor(Label="maxZones", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -55510,6 +56104,7 @@ class PushAvStreamTransport(Cluster):
 
     supportedFormats: typing.List[PushAvStreamTransport.Structs.SupportedFormatStruct] = field(default_factory=lambda: [])
     currentConnections: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
+    maxZones: typing.Union[None, Nullable, uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -55908,6 +56503,26 @@ class PushAvStreamTransport(Cluster):
 
             transportConfigurations: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
 
+        @dataclass
+        class UpdateMotionZoneOptions(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000555
+            command_id: typing.ClassVar[int] = 0x00000008
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="motionZones", Tag=1, Type=typing.Union[None, Nullable, typing.List[PushAvStreamTransport.Structs.TransportZoneOptionsStruct]]),
+                        ClusterObjectFieldDescriptor(Label="motionSensitivity", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                    ])
+
+            connectionID: uint = 0
+            motionZones: typing.Union[None, Nullable, typing.List[PushAvStreamTransport.Structs.TransportZoneOptionsStruct]] = None
+            motionSensitivity: typing.Union[None, Nullable, uint] = None
+
     class Attributes:
         @dataclass
         class SupportedFormats(ClusterAttributeDescriptor):
@@ -55940,6 +56555,22 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct])
 
             value: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class MaxZones(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000555
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: typing.Union[None, Nullable, uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -57990,15 +58621,6 @@ class JointFabricDatastore(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0
-
-        class DatastoreGroupKeyMulticastPolicyEnum(MatterIntEnum):
-            kPerGroupID = 0x00
-            kAllNodes = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
 
         class DatastoreGroupKeySecurityPolicyEnum(MatterIntEnum):
             kTrustFirst = 0x00

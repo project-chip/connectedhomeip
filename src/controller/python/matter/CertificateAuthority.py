@@ -22,7 +22,6 @@ import ctypes
 import logging
 from ctypes import c_void_p
 from datetime import timedelta
-from typing import Optional
 
 from . import ChipStack, FabricAdmin
 from .native import GetLibraryHandle, PyChipError
@@ -58,7 +57,7 @@ class CertificateAuthority:
     def logger(cls):
         return logging.getLogger('CertificateAuthority')
 
-    def __init__(self, chipStack: ChipStack.ChipStack, caIndex: int, persistentStorage: Optional[PersistentStorage] = None):
+    def __init__(self, chipStack: ChipStack.ChipStack, caIndex: int, persistentStorage: PersistentStorage | None = None):
         '''  Initializes the CertificateAuthority. This will set-up the associated C++ OperationalCredentialsAdapter
              as well.
 
@@ -250,7 +249,7 @@ class CertificateAuthorityManager:
     def logger(cls):
         return logging.getLogger('CertificateAuthorityManager')
 
-    def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: Optional[PersistentStorage] = None):
+    def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: PersistentStorage | None = None):
         ''' Initializes the manager.
 
             chipStack:          Reference to a matter.ChipStack object that is used to initialize
@@ -294,7 +293,7 @@ class CertificateAuthorityManager:
             ca = self.NewCertificateAuthority(int(caIndex))
             ca.LoadFabricAdminsFromStorage()
 
-    def NewCertificateAuthority(self, caIndex: Optional[int] = None, maximizeCertChains: bool = False, certificateValidityPeriodSec: Optional[int] = None):
+    def NewCertificateAuthority(self, caIndex: int | None = None, maximizeCertChains: bool = False, certificateValidityPeriodSec: int | None = None):
         ''' Creates a new CertificateAuthority instance with the provided CA Index and the PersistentStorage
             instance previously setup in the constructor.
 

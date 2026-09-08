@@ -50,6 +50,7 @@ log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_19(MatterBaseTest, AVSMTestBase):
+    disable_wildcard_subscription = True
 
     def desc_TC_AVSM_2_19(self) -> str:
         return "[TC-AVSM-2.19] Validate persistence of allocated audio streams with DUT"

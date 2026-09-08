@@ -16,13 +16,17 @@
  */
 #pragma once
 
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
+
+#include <PosixAudioManager.h>
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate);
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable & fabricTable,
+                                    PersistentStorageDelegate * storageDelegate, PosixAudioManager & audioManager);
 
 } // namespace app
 } // namespace chip

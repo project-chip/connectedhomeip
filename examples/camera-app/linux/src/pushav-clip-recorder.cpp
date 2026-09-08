@@ -512,17 +512,20 @@ void PushAVClipRecorder::Stop()
             ChipLogError(Camera, "PushAVClipRecorder::Stop - Cluster server reference is null for connection %u", mConnectionID);
         }
 
-        while (!mVideoQueue.empty())
         {
-            AVPacket * packet = mVideoQueue.front();
-            mVideoQueue.pop();
-            av_packet_free(&packet);
-        }
-        while (!mAudioQueue.empty())
-        {
-            AVPacket * packet = mAudioQueue.front();
-            mAudioQueue.pop();
-            av_packet_free(&packet);
+            std::lock_guard<std::mutex> lock(mQueueMutex);
+            while (!mVideoQueue.empty())
+            {
+                AVPacket * packet = mVideoQueue.front();
+                mVideoQueue.pop();
+                av_packet_free(&packet);
+            }
+            while (!mAudioQueue.empty())
+            {
+                AVPacket * packet = mAudioQueue.front();
+                mAudioQueue.pop();
+                av_packet_free(&packet);
+            }
         }
     }
     else
@@ -653,7 +656,9 @@ RecorderStatus PushAVClipRecorder::StartClipRecording()
         {
             ChipLogError(Camera, "Error processing buffers and writing");
             result = RecorderStatus::kFail;
+            lock.unlock(); // Unlock before calling Stop() to avoid deadlock
             Stop();
+            break;
         }
         else if (status == RecorderStatus::kWarning)
         {

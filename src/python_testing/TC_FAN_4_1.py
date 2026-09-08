@@ -53,7 +53,6 @@
 
 import asyncio
 import logging
-from typing import Optional
 
 from mobly import asserts
 
@@ -239,7 +238,7 @@ class TC_FAN_4_1(MatterBaseTest):
         step_num = 16
         num_substeps = 7
 
-        async def verify_onoff_off(attr: Clusters.ClusterObjects.ClusterAttributeDescriptor, expected_mode: Clusters.FanControl.Enums.FanModeEnum, expected_percent_setting: Optional[int], expected_speed_setting: Optional[int]):
+        async def verify_onoff_off(attr: Clusters.ClusterObjects.ClusterAttributeDescriptor, expected_mode: Clusters.FanControl.Enums.FanModeEnum, expected_percent_setting: int | None, expected_speed_setting: int | None):
             """ Writes specified attribute and checks expected results for On/Off cluster in Off mode
                 None on PercentSetting or SpeedSetting just verifies the values are not 0.
             """

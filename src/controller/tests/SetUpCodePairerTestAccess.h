@@ -53,6 +53,14 @@ public:
 
     void ExpectPASEEstablishment() { mPairer->ExpectPASEEstablishment(); }
 
+    void NotifyCommissionableDeviceDiscovered(const Dnssd::CommonResolutionData & resolutionData,
+                                              std::optional<uint16_t> matchedLongDiscriminator)
+    {
+        mPairer->NotifyCommissionableDeviceDiscovered(resolutionData, matchedLongDiscriminator);
+    }
+
+    size_t GetDiscoveredParametersCount() const { return mPairer->mDiscoveredParameters.size(); }
+
     void CallOnPairingComplete(CHIP_ERROR error) { mPairer->OnPairingComplete(error, std::nullopt, std::nullopt); }
 
     void FireTimeoutCallback() { Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(nullptr, mPairer); }

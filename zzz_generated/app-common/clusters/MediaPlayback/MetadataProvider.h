@@ -45,6 +45,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::MediaPlaybac
             return ActiveTextTrack::kMetadataEntry;
         case AvailableTextTracks::Id:
             return AvailableTextTracks::kMetadataEntry;
+        case AvailableCommands::Id:
+            return AvailableCommands::kMetadataEntry;
+        case ContentInfo::Id:
+            return ContentInfo::kMetadataEntry;
         default:
             return std::nullopt;
         }

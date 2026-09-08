@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "av-analysis-manager.h"
 #include "camera-av-stream-manager.h"
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
@@ -26,9 +27,11 @@
 #include "zone-manager.h"
 
 #include "default-media-controller.h"
+#include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <gst/gst.h>
+
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
@@ -66,6 +69,7 @@ static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
 static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
 static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
 static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
+static constexpr uint8_t kMaxAnalysisStreams         = 8;   // Spec max is 255
 
 // StreamIDs typically start from 0 and monotonically increase. Setting
 // Invalid value to a large and practically unused value.
@@ -83,6 +87,43 @@ constexpr int16_t kMinTiltValue = -90;
 constexpr int16_t kMaxTiltValue = 90;
 constexpr uint8_t kMaxZoomValue = 75;
 
+// Camera defined set of supported detectable ambient contexts; for the purposes of the app this is limited to package
+// detection
+static const std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> kSupportedAmbientContexts = {
+    { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
+      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Object.Package"))) },
+    { std::nullopt, static_cast<uint8_t>(0x4B), static_cast<uint8_t>(0x08),
+      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Activity.Delivery"))) },
+    { std::nullopt, static_cast<uint8_t>(0x4B), static_cast<uint8_t>(0x09),
+      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Activity.Retrieval"))) }
+};
+
+/**
+ * Examples of other ambient contexts for illustrative purposes only, note that _span requires that you are within the chip
+namespace
+ * Person
+    { .namespaceID = static_cast<uint8_t>(0x49),
+      .tag         = static_cast<uint8_t>(0x03),
+      .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Person"_span)) }
+ * Pet, Dog, Cat
+    {{ .namespaceID = static_cast<uint8_t>(0x49),
+       .tag         = static_cast<uint8_t>(0x05),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Pet"_span)) },
+     { .namespaceID = static_cast<uint8_t>(0x49),
+       .tag         = static_cast<uint8_t>(0x06),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Dog"_span)) },
+     { .namespaceID = static_cast<uint8_t>(0x49),
+       .tag         = static_cast<uint8_t>(0x07),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Cat"_span)) }}
+ * Package delivery and retrieval
+    {{ .namespaceID = static_cast<uint8_t>(0x4B),
+       .tag         = static_cast<uint8_t>(0x08),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.PackageDelivery"_span)) },
+     { .namespaceID = static_cast<uint8_t>(0x4B),
+       .tag         = static_cast<uint8_t>(0x09),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.PackageRetrieval"_span)) }}
+**/
+
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
@@ -95,6 +136,7 @@ public:
     chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
     chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
+    chip::app::Clusters::AvAnalysisDelegate & GetAVAnalysisDelegate() override;
 
     MediaController & GetMediaController() override;
 
@@ -301,6 +343,8 @@ public:
 
     CameraError RemoveZoneTrigger(uint16_t zoneId) override;
 
+    bool IsValidAnalysisZone(uint16_t zoneId) override;
+
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
     CameraError SetZoom(uint8_t aZoom) override;
@@ -317,6 +361,9 @@ public:
     void HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds);
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
+
+    uint8_t GetMaxAnalysisStreams() override { return mMaxAnalysisStreams; }
+    std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> GetSupportedAmbientContexts() override;
 
     // Audio playback pipeline methods
     CameraError StartAudioPlaybackStream();
@@ -346,7 +393,7 @@ private:
     GstElement * CreateAudioPlaybackPipeline(CameraError & error);
 
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
-                                        const std::string & filename, CameraError & error);
+                                        CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
 
     bool MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
@@ -359,6 +406,7 @@ private:
     chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager mPushAVTransportManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
     chip::app::Clusters::ZoneManagement::ZoneManager mZoneManager;
+    chip::app::Clusters::AvAnalysis::AvAnalysisManager mAVAnalysisManager;
 
     DefaultMediaController mMediaController;
 
@@ -389,6 +437,7 @@ private:
     bool mImageFlipHorizontal              = false;
     bool mImageFlipVertical                = false;
     uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
+    uint8_t mMaxAnalysisStreams            = kMaxAnalysisStreams;
 
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 

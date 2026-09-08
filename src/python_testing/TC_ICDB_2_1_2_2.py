@@ -62,6 +62,12 @@ ClientTypeEnum = cluster.Enums.ClientTypeEnum
 
 class TC_ICDB_2_1_2_2(ICDBaseTest):
 
+    # DUT can take more than one cycle to detect a dropped subscriber and resume check-ins, default_timeout
+    # is raised to accommodate that (can be overridden by a --timeout on the command line)
+    @property
+    def default_timeout(self) -> int:
+        return 5 * 60
+
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -239,9 +245,9 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
                      "Verify ICDCounter is unchanged from icd_counter_at_subscription. An unchanged counter confirms no check-in was sent."),
             TestStep(7, "Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration). TH writes a new value to the NodeLabel attribute. Verify the existing subscription reports the change.",
                      "The subscription receives a report for the NodeLabel attribute within MaxInterval."),
-            TestStep(8, "TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration).", """
-                     DUT resumed sending check-in messages after the subscription was torn down.
-                     Verify ICDCounter is greater than icd_counter_at_subscription, indicating a check-in was sent."""),
+            TestStep(8, "TH shuts down the subscription, then waits for the DUT to detect the dropped subscriber and resume check-ins.", """
+                     DUT resumes sending check-in messages once it detects the subscription is gone.
+                     Verify ICDCounter increments beyond icd_counter_at_subscription, indicating a check-in was sent."""),
         ]
 
     def pics_TC_ICDB_2_2(self) -> list[str]:
@@ -364,27 +370,25 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         except TimeoutError:
             asserts.fail(f"Subscription did not receive report for NodeLabel within MaxInterval ({max_interval_s}s)")
 
-        subscription.Shutdown()
-
         # *** STEP 8 ***
-        # TH shuts down the subscription. Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration).
-        #   - DUT resumed sending check-in messages. Confirmed by ICDCounter increment.
+        # TH shuts down the subscription, then waits for the DUT to detect the dropped subscriber and resume check-ins
+        #   - DUT resumes sending check-in messages once it detects the subscription is gone.
         self.step(8)
         subscription.Shutdown()
         log.info("Subscription shut down.")
-        await self.wait_for_transition(ICDTransition.FullCycle,
-                                       active_mode_duration_ms=active_mode_duration_ms,
-                                       idle_mode_duration_s=idle_mode_duration_s)
 
-        # Verify ICDCounter is greater than icd_counter_at_subscription, indicating a check-in was sent
+        wait_s = self.checkin_resume_wait_s(max_interval_s=max_interval_s,
+                                            active_mode_duration_ms=active_mode_duration_ms,
+                                            idle_mode_duration_s=idle_mode_duration_s)
+        await asyncio.sleep(wait_s)
+
+        # Verify ICDCounter incremented beyond icd_counter_at_subscription (check-in resumed)
         icd_counter_after_shutdown = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
         asserts.assert_greater(icd_counter_after_shutdown, icd_counter_at_subscription,
                                f"ICDCounter must increment after subscription shutdown (check-in resumed). "
                                f"Before: {icd_counter_at_subscription}, After: {icd_counter_after_shutdown}")
 
-        # Cleanup: unregister TH so the RegisteredClients list is clean after the test
-        await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=TH.nodeId))
-        log.info("UnregisterClient cleanup SUCCESS for checkInNodeID=%s", TH.nodeId)
+        await self.unregister_all_clients()
 
 
 if __name__ == "__main__":

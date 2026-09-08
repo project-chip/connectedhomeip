@@ -31,12 +31,12 @@
 #include "ShellCommands.h"
 #endif // defined(ENABLE_CHIP_SHELL)
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -429,7 +429,8 @@ void AppTask::ProcessOnOffBindingCommand(CommandId commandId, const Binding::Tab
     {
         VerifyOrDie(peer_device->ConnectionReady());
         Messaging::ExchangeManager * exchangeMgr = peer_device->GetExchangeManager();
-        const SessionHandle & sessionHandle      = peer_device->GetSecureSession().Value();
+        auto optionalSession                     = peer_device->GetSecureSession();
+        const SessionHandle & sessionHandle      = optionalSession.Value();
 
         switch (commandId)
         {
@@ -785,14 +786,14 @@ void AppTask::SwitchWorkerFunction(intptr_t context)
     }
 }
 
-void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+void AppTask::DMPostAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                             uint8_t * value)
 {
     ClusterId clusterId                      = attributePath.mClusterId;
     [[maybe_unused]] AttributeId attributeId = attributePath.mAttributeId;
     ChipLogDetail(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    if (clusterId == Identify::Id)
+    if (clusterId == Clusters::Identify::Id)
     {
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);

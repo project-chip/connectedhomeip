@@ -108,7 +108,7 @@ tests:
                 value: "y"
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
-      PICS: OTCCM.S.A0001 && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: OTCCM.S.M.CAN_TEST_MODE_FAILURE && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -123,8 +123,8 @@ tests:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.OTCCM.MODE_CHANGE_FAIL"
       PICS:
-          OTCCM.S.M.CAN_TEST_MODE_FAILURE && OTCCM.S.C00.Rsp &&
-          PICS_SKIP_SAMPLE_APP
+          OTCCM.S.M.CAN_TEST_MODE_FAILURE && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+          && PICS_SKIP_SAMPLE_APP
       verification: |
           Note : Please skip this step as SDK is not enabled with this failure response
 
@@ -147,7 +147,7 @@ tests:
                 value: "y"
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
-      PICS: OTCCM.S.A0001
+      PICS: OTCCM.S.M.CAN_TEST_MODE_FAILURE && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -171,7 +171,7 @@ tests:
                 value: "y"
 
     - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
-      PICS: OTCCM.S.A0001 && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -184,7 +184,7 @@ tests:
     - label:
           "Step 11: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.OTCCM.MODE_CHANGE_OK"
-      PICS: OTCCM.S.C00.Rsp
+      PICS: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "ChangeToMode"
       arguments:
           values:
@@ -199,7 +199,7 @@ tests:
           "Step 12: TH reads from the DUT the CurrentMode attribute. Verify that
           the DUT response contains an integer value equal to
           PIXIT.OTCCM.MODE_CHANGE_OK"
-      PICS: OTCCM.S.A0001
+      PICS: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -208,7 +208,7 @@ tests:
     - label:
           "Step 13: TH sends a ChangeToMode command to the DUT with NewMode set
           to invalid_mode_th"
-      PICS: OTCCM.S.C00.Rsp
+      PICS: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "ChangeToMode"
       arguments:
           values:
@@ -223,7 +223,7 @@ tests:
           "Step 14: TH reads from the DUT the CurrentMode attribute. Verify that
           the DUT response contains an integer value equal to
           PIXIT.OTCCM.MODE_CHANGE_OK"
-      PICS: OTCCM.S.A0001
+      PICS: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:

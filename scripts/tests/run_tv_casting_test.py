@@ -21,7 +21,6 @@ import sys
 import tempfile
 import time
 from dataclasses import dataclass
-from typing import Optional
 
 import click
 from linux.log_line_processing import ProcessOutputCapture
@@ -55,7 +54,7 @@ LINUX_TV_CASTING_APP_LOGS = "Linux-tv-casting-app-logs.txt"
 class TestStepException(Exception):
     """Thrown when a test fails, contains information about the test step that faied"""
 
-    def __init__(self, message, sequence_name: str, step: Optional[Step]):
+    def __init__(self, message, sequence_name: str, step: Step | None):
         super().__init__(message)
         self.sequence_name = sequence_name
         self.step = step

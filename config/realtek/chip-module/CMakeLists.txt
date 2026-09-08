@@ -73,6 +73,19 @@ zephyr_include_directories(
     ${ZEPHYR_BASE}/../modules/crypto/mbedtls/library/
 )
 
+if (CONFIG_BOARD_RTL87X3G_EVB)
+    zephyr_include_directories(
+        ${CHIP_ROOT}/src/platform/realtek/zephyr/rtl87x3g
+        ${CHIP_ROOT}/../platform
+        ${CHIP_ROOT}/../platform/bluetooth
+        ${CHIP_ROOT}/../platform/port/rtl87x3g
+    )
+endif()
+
+if (CONFIG_BOARD_RTL87X3G_EVB)
+    zephyr_compile_options(-fno-inline-atomics)
+endif()
+
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
 matter_add_cflags("${ZEPHYR_CFLAGS_C}")
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_CC CXX)
@@ -110,7 +123,16 @@ matter_add_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_CO
 matter_add_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
 matter_add_gn_arg_bool  ("chip_enable_thread"                     CONFIG_NET_L2_OPENTHREAD)
 matter_add_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
-matter_add_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
+
+# Realtek IC type configuration
+if (CONFIG_BOARD_RTL87X3G_EVB)
+    matter_add_gn_arg_string("chip_realtek_ic_type"              "rtl87x3g")
+    matter_add_gn_arg_bool  ("chip_config_network_layer_ble"      TRUE)
+else()
+    matter_add_gn_arg_string("chip_realtek_ic_type"              "rtl87x2g")
+    matter_add_gn_arg_bool  ("chip_config_network_layer_ble"      CONFIG_BT)
+endif()
+
 matter_add_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
 matter_add_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
 matter_add_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)

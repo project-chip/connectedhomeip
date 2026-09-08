@@ -46,27 +46,32 @@ public:
         CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, InitLightSwitchImpl, lightSwitchEndpoint, genericSwitchEndpoint);
     }
 
+    // Platform button callback, posts switch action or base application events.
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
+    // AppTask thread handler for queued button events, triggers switch actions on the Matter task.
     static void AppEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, AppEventHandlerImpl, aEvent);
     }
 
+    // Handler scheduled on the Matter thread to set up the binding table.
     static void InitBindingHandler(intptr_t arg)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, InitBindingHandlerImpl, arg);
     }
 
+    // Binding manager callback, sends switch commands to bound lights.
     static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry & binding,
                                           chip::OperationalDeviceProxy * peer_device, void * context)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightSwitchChangedHandlerImpl, binding, peer_device, context);
     }
 
+    // Matter stack callback after a server attribute change, logs Identify cluster changes.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
@@ -75,6 +80,9 @@ public:
 
 private:
     friend Derived;
+
+    // Default *Impl() hooks, each forwards to the matching AppTask method
+    // Override the corresponding hook in CustomerAppTask to customize behavior
 
     CHIP_ERROR AppInitImpl() { return AppTask::AppInit(); }
 

@@ -311,7 +311,7 @@ def generate_dac_cert(iteration, args, out_dirs, discriminator, passcode, ca_key
     cmd = [
         TOOLS['chip-cert'], 'gen-att-cert',
         '--type', 'd',
-        '--subject-cn', '"{} DAC {}"'.format(args.cn_prefix, iteration),
+        '--subject-cn', f'"{args.cn_prefix} DAC {iteration}"',
         '--out-key', out_key_pem,
         '--out', out_cert_pem,
     ]
@@ -477,7 +477,7 @@ def generate_partition(args, out_dirs):
     cbor_data = cbor.dumps(NVS_MEMORY)
     # Create hex file
     if len(cbor_data) > args.size:
-        raise ValueError("generated CBOR file exceeds declared maximum partition size! {} > {}".format(len(cbor_data), args.size))
+        raise ValueError(f"generated CBOR file exceeds declared maximum partition size! {len(cbor_data)} > {args.size}")
     ih = IntelHex()
     ih.putsz(args.offset, cbor_data)
     ih.write_hex_file(os.sep.join([out_dirs['output'], 'factory_data.hex']), True)

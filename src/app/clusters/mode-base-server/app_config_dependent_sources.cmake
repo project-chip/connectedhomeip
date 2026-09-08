@@ -19,5 +19,7 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/Delegate.h"
+    "${CLUSTER_DIR}/MigrateModeBaseServerStorage.cpp"
+    "${CLUSTER_DIR}/MigrateModeBaseServerStorage.h"
     "${CLUSTER_DIR}/mode-base-server.h"
 )

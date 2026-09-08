@@ -18,8 +18,8 @@ import enum
 import logging
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Optional
 
 from ..native import PyChipError
 from .library_handle import _GetDiscoveryLibraryHandle
@@ -80,25 +80,25 @@ class PendingDiscovery:
 
 @dataclass
 class CommissionableNode:
-    instanceName: Optional[str] = None
-    hostName: Optional[str] = None
-    port: Optional[int] = None
-    longDiscriminator: Optional[int] = None
-    vendorId: Optional[int] = None
-    productId: Optional[int] = None
-    commissioningMode: Optional[int] = None
-    deviceType: Optional[int] = None
-    deviceName: Optional[str] = None
-    pairingInstruction: Optional[str] = None
-    pairingHint: Optional[int] = None
-    mrpRetryIntervalIdle: Optional[int] = None
-    mrpRetryIntervalActive: Optional[int] = None
-    mrpRetryActiveThreshold: Optional[int] = None
-    supportsTcpClient: Optional[bool] = None
-    supportsTcpServer: Optional[bool] = None
-    isICDOperatingAsLIT: Optional[bool] = None
-    addresses: Optional[list[str]] = None
-    rotatingId: Optional[str] = None
+    instanceName: str | None = None
+    hostName: str | None = None
+    port: int | None = None
+    longDiscriminator: int | None = None
+    vendorId: int | None = None
+    productId: int | None = None
+    commissioningMode: int | None = None
+    deviceType: int | None = None
+    deviceName: str | None = None
+    pairingInstruction: str | None = None
+    pairingHint: int | None = None
+    mrpRetryIntervalIdle: int | None = None
+    mrpRetryIntervalActive: int | None = None
+    mrpRetryActiveThreshold: int | None = None
+    supportsTcpClient: bool | None = None
+    supportsTcpServer: bool | None = None
+    isICDOperatingAsLIT: bool | None = None
+    addresses: list[str] | None = None
+    rotatingId: str | None = None
 
 
 # Milliseconds to wait for additional results onece a single result has

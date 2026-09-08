@@ -30,9 +30,42 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
     kwargs = {'test_name': test_name, 'show_adapter_logs': show_adapter_logs, 'specifications_paths': specifications_paths, 'pics': pics,
               'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory}
 
+    # Translate command-line arguments to Click/Python parameter names:
+    #   - option to variable name translation (e.g. `--stop-on-error` translates to `stop_on_error`)
+    #   - custom mapping for option destination variables (e.g. `--PICS` maps to `pics`,
+    #     `--value-wait-extra-duration-ms` maps to `valueWaitExtraDurationMs`)
+    #   - manual type conversion (since options are parsed manually as strings, we must cast
+    #     to expected types like int or bool to match the function signature)
+    #
+    # See runner_base definition in scripts/tests/chipyaml/runner.py for the full parameter list and target types.
+    #
+    # These are known mappings between one argument and the corresponding known name. Everything else
+    # would just replace '-' with '_':
+    option_mapping = {
+        'PICS': 'pics',
+        'value-wait-extra-duration-ms': 'valueWaitExtraDurationMs',
+    }
+
+    def str_to_bool(val): return val.lower() in ('true', '1', 'yes')
+
+    type_conversions = {
+        'valueWaitExtraDurationMs': int,
+        'stop_on_error': str_to_bool,
+        'use_default_pseudo_clusters': str_to_bool,
+    }
+
     index = 0
     while len(commands) - index > 1:
-        kwargs[commands[index].replace('--', '')] = commands[index+1]
+        key = commands[index].replace('--', '')
+        # Map things like `--stop-on-error` to `stop_on_error` since we ctx.invoke directly (need python names)
+        mapped_key = option_mapping.get(key, key.replace('-', '_'))
+        val = commands[index+1]
+
+        # convert known typed values
+        if mapped_key in type_conversions:
+            val = type_conversions[mapped_key](val)
+
+        kwargs[mapped_key] = val
         index += 2
     ctx.invoke(runner_base, **kwargs)
 

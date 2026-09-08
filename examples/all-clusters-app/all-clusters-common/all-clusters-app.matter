@@ -772,7 +772,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -800,10 +800,7 @@ cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -937,7 +934,7 @@ cluster AccessControl = 31 {
   fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
-/** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
+/** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose logical grouping and actions. */
 cluster Actions = 37 {
   revision 1;
 
@@ -2709,7 +2706,7 @@ cluster Switch = 59 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -2760,7 +2757,13 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 2;
+  revision 3;
+
+  enum AttestationCryptoProfileEnum : enum8 {
+    kEcdsaMatterLegacy = 0;
+    kMlDsa44 = 1;
+    kMlDsa65 = 2;
+  }
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -2780,6 +2783,16 @@ cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  bitmap AttestationCryptoProfileBitmap : bitmap16 {
+    kSupportsEcdsaMatterLegacy = 0x1;
+    kSupportsMlDsa44 = 0x2;
+    kSupportsMlDsa65 = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPQCDeviceAttestation = 0x1;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -2797,12 +2810,19 @@ cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct PQCDeviceAttestationProfileStruct {
+    AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
+    AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
+    AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2820,10 +2840,15 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional int16u segmentID = 2;
+    optional int16u maxSegmentSize = 3;
   }
 
   response struct CertificateChainResponse = 3 {
-    long_octet_string<600> certificate = 0;
+    octet_string certificate = 0;
+    optional int16u totalDocumentSize = 1;
+    optional int16u nextSegmentID = 2;
   }
 
   request struct CSRRequestRequest {
@@ -2909,11 +2934,6 @@ cluster OperationalCredentials = 62 {
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
   revision 4;
-
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -3600,7 +3620,7 @@ cluster DishwasherMode = 89 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** Attributes for reporting air quality classification */
+/** This cluster provides an interface to air quality classification using distinct levels with human-readable labels. */
 cluster AirQuality = 91 {
   revision 1;
 
@@ -4357,7 +4377,7 @@ cluster ValveConfigurationAndControl = 129 {
 }
 
 /** This cluster provides an interface to specify preferences for how devices should consume energy. */
-provisional cluster EnergyPreference = 155 {
+cluster EnergyPreference = 155 {
   revision 1;
 
   enum EnergyPriorityEnum : enum8 {
@@ -5098,7 +5118,7 @@ cluster Thermostat = 513 {
   /** This command will remove the specified suggestion. */
   command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
-  command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
+  command AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
@@ -5220,19 +5240,17 @@ provisional cluster Humidistat = 517 {
   revision 1;
 
   enum ModeEnum : enum8 {
-    kOff = 0;
-    kHumidifier = 1;
-    kDehumidifier = 2;
-    kAuto = 3;
-    kFanOnly = 4;
+    kHumidifier = 0;
+    kDehumidifier = 1;
+    kAuto = 2;
+    kFanOnly = 3;
   }
 
   enum SystemStateEnum : enum8 {
-    kOff = 0;
-    kHumidifying = 1;
-    kDehumidifying = 2;
-    kFan = 3;
-    kIdle = 4;
+    kHumidifying = 0;
+    kDehumidifying = 1;
+    kFan = 2;
+    kIdle = 3;
   }
 
   bitmap Feature : bitmap32 {
@@ -5245,6 +5263,7 @@ provisional cluster Humidistat = 517 {
     kOptimal = 0x40;
     kWarmMist = 0x80;
     kColdMist = 0x100;
+    kCondPump = 0x200;
   }
 
   bitmap MistTypeBitmap : bitmap8 {
@@ -5252,17 +5271,20 @@ provisional cluster Humidistat = 517 {
     kMistWarm = 0x2;
   }
 
-  readonly attribute ModeEnum mode = 0;
-  readonly attribute SystemStateEnum systemState = 1;
-  readonly attribute optional percent userSetpoint = 2;
-  readonly attribute optional percent minSetpoint = 3;
-  readonly attribute optional percent maxSetpoint = 4;
-  readonly attribute optional percent step = 5;
-  readonly attribute optional percent targetSetpoint = 6;
-  readonly attribute optional MistTypeBitmap mistType = 7;
-  readonly attribute optional boolean continuous = 8;
-  readonly attribute optional boolean sleep = 9;
-  readonly attribute optional boolean optimal = 10;
+  readonly attribute ModeEnum supportedModes[] = 0;
+  attribute ModeEnum mode = 1;
+  readonly attribute SystemStateEnum systemState = 2;
+  attribute optional percent userSetpoint = 3;
+  readonly attribute optional percent minSetpoint = 4;
+  readonly attribute optional percent maxSetpoint = 5;
+  readonly attribute optional percent step = 6;
+  readonly attribute optional percent targetSetpoint = 7;
+  attribute optional MistTypeBitmap mistType = 8;
+  attribute optional boolean continuous = 9;
+  attribute optional boolean sleep = 10;
+  attribute optional boolean optimal = 11;
+  attribute optional boolean condPumpEnabled = 12;
+  readonly attribute optional int16u condRunCount = 13;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5643,9 +5665,68 @@ provisional cluster BallastConfiguration = 769 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides a means to activate and control dynamic lighting effects on a light. */
+provisional cluster DynamicLighting = 773 {
+  revision 1;
+
+  enum EffectColorModeEnum : enum8 {
+    kLevel = 0;
+    kXY = 1 [spec_name = "XY"];
+    kXYAndLevel = 2;
+    kHS = 3 [spec_name = "HS"];
+    kHSAndLevel = 4;
+    kEHUE = 5 [spec_name = "EHUE"];
+    kEHUEAndLevel = 6;
+  }
+
+  enum EffectSourceEnum : enum8 {
+    kInternal = 0;
+    kSoundBased = 1;
+  }
+
+  struct EffectColorStruct {
+    nullable int8u level = 0;
+    nullable int16u x = 1;
+    nullable int16u y = 2;
+    nullable int8u hue = 3;
+    nullable int16u enhancedHue = 4;
+    nullable int8u saturation = 5;
+  }
+
+  struct EffectStruct {
+    int16u effectID = 0;
+    EffectSourceEnum source = 1;
+    char_string<32> label = 2;
+    int16u maxSpeed = 3;
+    int16u defaultSpeed = 4;
+    boolean supportsColorPalette = 5;
+  }
+
+  readonly attribute EffectStruct availableEffects[] = 0;
+  readonly attribute nullable int16u currentEffectID = 1;
+  attribute nullable int16u currentSpeed = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct StartEffectRequest {
+    int16u effectID = 0;
+    int16u speed = 1;
+    nullable EffectColorModeEnum colorMode = 2;
+    nullable EffectColorStruct colorPalette[] = 3;
+  }
+
+  /** This command will start the specified effect. */
+  command StartEffect(StartEffectRequest): DefaultSuccess = 0;
+  /** This command will stop the current effect. */
+  command StopEffect(): DefaultSuccess = 1;
+}
+
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 cluster IlluminanceMeasurement = 1024 {
-  revision 3;
+  revision 5;
 
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
@@ -5705,7 +5786,7 @@ cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
-  revision 3;
+  revision 5;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -6424,6 +6505,83 @@ cluster LowPower = 1288 {
 
   /** This command SHALL put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
+}
+
+/** This cluster provides attributes and commands to control the audio output volume and frequency corrections of a device. */
+provisional cluster AudioControl = 1298 {
+  revision 1;
+
+  enum UnmutePolicyEnum : enum8 {
+    kUnmuteOrChangeVolume = 0;
+    kUnmuteOrDoNotChangeVolume = 1;
+    kDoNotUnmuteAndChangeVolume = 2;
+    kDoNotUnmuteAndDoNotChangeVolume = 3;
+  }
+
+  enum UnmuteVolumeEnum : enum8 {
+    kMinDeviceVolume = 0;
+    kVolume = 1;
+    kVolumePlusStepSize = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kDecibel = 0x1;
+    kBasicEqualizer = 0x2;
+  }
+
+  readonly attribute boolean softMuted = 0;
+  readonly attribute optional boolean physicallyMuted = 1;
+  readonly attribute int16u volume = 2;
+  readonly attribute int16u minDeviceVolume = 3;
+  readonly attribute int16u maxDeviceVolume = 4;
+  readonly attribute optional int16u maxDeviceVolumeDB = 5;
+  attribute access(write: manage) optional int16u maxUserVolume = 6;
+  attribute access(write: manage) int16u defaultStepSize = 7;
+  attribute access(write: manage) UnmutePolicyEnum setVolumeUnmutePolicy = 8;
+  attribute access(write: manage) UnmutePolicyEnum increaseVolumeUnmutePolicy = 9;
+  attribute access(write: manage) UnmuteVolumeEnum increaseVolumeUnmuteVolume = 10;
+  attribute access(write: manage) UnmutePolicyEnum decreaseVolumeUnmutePolicy = 11;
+  attribute optional nullable boolean startUpMuted = 12;
+  attribute optional nullable int16u startUpVolume = 13;
+  attribute optional int16s bass = 14;
+  attribute optional int16s mid = 15;
+  attribute optional int16s treble = 16;
+  readonly attribute optional int16s minCorrection = 17;
+  readonly attribute optional int16s maxCorrection = 18;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetVolumeRequest {
+    int16u newVolume = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  request struct IncreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+    optional UnmuteVolumeEnum unmuteVolume = 2;
+  }
+
+  request struct DecreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  /** This command allows the audio output of the device to be muted. */
+  command Mute(): DefaultSuccess = 0;
+  /** This command allows the audio output of the device to be unmuted. */
+  command Unmute(): DefaultSuccess = 1;
+  /** This command allows the audio output of the device to be muted if it is unmuted, or unmuted if it is muted. */
+  command ToggleMuted(): DefaultSuccess = 2;
+  /** Sets the volume to a specified level. */
+  command SetVolume(SetVolumeRequest): DefaultSuccess = 3;
+  /** Increases the volume by a specified level. */
+  command IncreaseVolume(IncreaseVolumeRequest): DefaultSuccess = 4;
+  /** Decreases the volume by a specified level. */
+  command DecreaseVolume(DecreaseVolumeRequest): DefaultSuccess = 5;
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
@@ -7910,26 +8068,26 @@ endpoint 1 {
 
   server cluster LaundryDryerControls {
     callback attribute supportedDrynessLevels;
-    ram      attribute selectedDrynessLevel;
+    callback attribute selectedDrynessLevel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster ModeSelect {
     ram      attribute description default = "Coffee";
     ram      attribute standardNamespace default = 0;
     callback attribute supportedModes;
-    persist  attribute currentMode default = 0;
-    persist  attribute startUpMode default = 0;
-    persist  attribute onMode default = 255;
+    callback attribute currentMode;
+    callback attribute startUpMode;
+    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -7960,14 +8118,14 @@ endpoint 1 {
 
   server cluster LaundryWasherControls {
     callback attribute spinSpeeds;
-    ram      attribute spinSpeedCurrent;
-    ram      attribute numberOfRinses;
+    callback attribute spinSpeedCurrent;
+    callback attribute numberOfRinses;
     callback attribute supportedRinses;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute clusterRevision;
   }
 
   server cluster RvcRunMode {
@@ -8015,7 +8173,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster DishwasherMode {
@@ -8074,14 +8232,14 @@ endpoint 1 {
   server cluster DishwasherAlarm {
     emits event Notify;
     ram      attribute mask default = 1;
-    ram      attribute latch default = 1;
+    ram      attribute latch default = 3;
     ram      attribute state default = 0;
-    ram      attribute supported default = 15;
+    ram      attribute supported default = 47;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Reset;
     handle command ModifyEnabledAlarms;
@@ -8236,15 +8394,15 @@ endpoint 1 {
 
   server cluster EnergyPreference {
     callback attribute energyBalances;
-    ram      attribute currentEnergyBalance;
+    callback attribute currentEnergyBalance;
     callback attribute energyPriorities;
     callback attribute lowPowerModeSensitivities;
-    ram      attribute currentLowPowerModeSensitivity;
+    callback attribute currentLowPowerModeSensitivity;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster WindowCovering {
@@ -8258,7 +8416,7 @@ endpoint 1 {
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 50;
     persist  attribute currentPositionTiltPercentage default = 50;
-    ram      attribute operationalStatus default = 0x00;
+    callback attribute operationalStatus;
     ram      attribute targetPositionLiftPercent100ths default = 5000;
     ram      attribute targetPositionTiltPercent100ths default = 5000;
     ram      attribute endProductType default = 0x00;
@@ -8269,7 +8427,7 @@ endpoint 1 {
     persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode default = 0x00;
-    ram      attribute safetyStatus default = 0x00;
+    callback attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8387,21 +8545,24 @@ endpoint 1 {
   }
 
   server cluster Humidistat {
+    callback attribute supportedModes;
     ram      attribute mode default = 0;
-    ram      attribute systemState default = 0;
+    ram      attribute systemState default = 3;
     ram      attribute userSetpoint default = 40;
-    ram      attribute minSetpoint default = 40;
+    ram      attribute minSetpoint default = 30;
     ram      attribute maxSetpoint default = 60;
     ram      attribute step default = 5;
-    ram      attribute targetSetpoint default = 0;
-    ram      attribute mistType default = 0;
+    ram      attribute targetSetpoint default = 40;
+    ram      attribute mistType default = 1;
     ram      attribute continuous default = 0;
     ram      attribute sleep default = 0;
     ram      attribute optimal default = 0;
+    ram      attribute condPumpEnabled default = 0;
+    ram      attribute condRunCount default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 511;
+    ram      attribute featureMap default = 1023;
     callback attribute clusterRevision default = 1;
 
     handle command SetSettings;
@@ -8504,6 +8665,20 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster DynamicLighting {
+    callback attribute availableEffects;
+    callback attribute currentEffectID;
+    callback attribute currentSpeed;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command StartEffect;
+    handle command StopEffect;
   }
 
   server cluster IlluminanceMeasurement {
@@ -8773,6 +8948,40 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command Sleep;
+  }
+
+  server cluster AudioControl {
+    callback attribute softMuted;
+    callback attribute physicallyMuted;
+    callback attribute volume;
+    callback attribute minDeviceVolume;
+    callback attribute maxDeviceVolume;
+    callback attribute maxDeviceVolumeDB;
+    callback attribute maxUserVolume;
+    callback attribute defaultStepSize;
+    callback attribute setVolumeUnmutePolicy;
+    callback attribute increaseVolumeUnmutePolicy;
+    callback attribute increaseVolumeUnmuteVolume;
+    callback attribute decreaseVolumeUnmutePolicy;
+    callback attribute startUpMuted;
+    callback attribute startUpVolume;
+    callback attribute bass;
+    callback attribute mid;
+    callback attribute treble;
+    callback attribute minCorrection;
+    callback attribute maxCorrection;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command Mute;
+    handle command Unmute;
+    handle command ToggleMuted;
+    handle command SetVolume;
+    handle command IncreaseVolume;
+    handle command DecreaseVolume;
   }
 
   server cluster Chime {

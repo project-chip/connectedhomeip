@@ -148,9 +148,18 @@ class Executor(contextlib.ExitStack):
         cmd = subproc.to_cmd()
         name = TerminablePopen.__class__.__name__ + (f"({cmd[0]})" if cmd else "")
 
+        # Run each subprocess in a new session, so that TerminablePopen can tear down the whole process group it leads. Wrappers
+        # like chipyaml/chiptool.py spawn servers of their own, which would otherwise be reparented to init and outlive the test.
+        #
+        # A new session, rather than just a new process group (`process_group=0`), because the subprocess would otherwise become a
+        # background group of our controlling terminal. Apps built with the CHIP shell (chip-tv-app) call tcsetattr() on stdin
+        # during startup, which the kernel answers with SIGTTOU for a background group, stopping the app before it ever reaches its
+        # event loop. A session leader has no controlling terminal, so the call is allowed. setsid() also makes the process a group
+        # leader, so the teardown story is unchanged.
+        #
         # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr, but mypy doesn't think the same.
         terminable_process: TerminablePopen[bytes] = TerminablePopen(
-            lambda: subprocess.Popen(cmd, stdin=stdin,
+            lambda: subprocess.Popen(cmd, start_new_session=True, stdin=stdin,
                                      stdout=stdout, stderr=stderr),  # type: ignore[arg-type]
             name, terminate_debug_logging=False)
         return self.enter_context(terminable_process)
@@ -172,7 +181,7 @@ class Runner:
         errpipe = LogPipe(logging.INFO, capture_delegate=self.capture_delegate, name=name + ' STDERR')
 
         if self.capture_delegate:
-            self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
+            self.capture_delegate.Log(name, f'EXECUTING {cmd!r}')
 
         s = self.executor.run(subproc, stdin=stdin, stdout=outpipe, stderr=errpipe)
         outpipe.close()

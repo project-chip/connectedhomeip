@@ -654,6 +654,7 @@ private:
 
     bool mForceCaseOnNextResub      = true;
     bool mIsResubscriptionScheduled = false;
+    bool mSuppressResponse          = false;
 
     // mMinimalResubscribeDelay is used to store the delay returned with a BUSY
     // response to a Sigma1 message.

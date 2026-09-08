@@ -39,16 +39,16 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 
-class TestInvokeReturnCodes(MatterBaseTest):
+class TestInvokeReturnCodes(MatterTestCommissionedDevice):
     """
     Validates that the invoke action correctly refuses commands
     on invalid endpoints.
     """
-    requires_dut = False
+    disable_wildcard_subscription = True
 
     @async_test_body
     async def test_invalid_endpoint_command(self):

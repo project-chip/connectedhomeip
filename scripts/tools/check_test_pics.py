@@ -30,8 +30,8 @@ value_regexp = re.compile("=.*")
 
 def main():
     if len(sys.argv) != 3:
-        print('Expecting two arguments: the CI PICS values file and the YAML file defining all PICS values.  Got: %r' %
-              sys.argv[1:])
+        print(
+            f'Expecting two arguments: the CI PICS values file and the YAML file defining all PICS values.  Got: {sys.argv[1:]!r}')
         return 1
 
     value_defs = sys.argv[1]
@@ -56,10 +56,9 @@ def main():
 
     if defined_values != possible_values:
         for value in sorted(possible_values - defined_values):
-            print('"%s" does not have a value defined in %s' %
-                  (value, value_defs))
+            print(f'"{value}" does not have a value defined in {value_defs}')
         for value in sorted(defined_values - possible_values):
-            print('"%s" is not a known PICS item in %s' % (value, pics_yaml))
+            print(f'"{value}" is not a known PICS item in {pics_yaml}')
         return 1
 
     return 0

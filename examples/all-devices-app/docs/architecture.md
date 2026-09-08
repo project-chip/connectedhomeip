@@ -97,14 +97,14 @@ classDiagram
         +SetEndpointId(EndpointId id)
     }
 
-    class OccupancySensorDevice {
+    class OccupancySensor {
         -mOccupancySensingCluster: OccupancySensingCluster
         -mBridgedDeviceBasicInformationCluster: BridgedDeviceBasicInformationCluster
         +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId) CHIP_ERROR
     }
 
     DeviceInterface <|-- SingleEndpointDevice
-    SingleEndpointDevice <|-- OccupancySensorDevice
+    SingleEndpointDevice <|-- OccupancySensor
 ```
 
 -   **`DeviceInterface`**
@@ -116,7 +116,7 @@ classDiagram
     Encapsulates endpoint state, managing its assigned `EndpointId`, its parent
     endpoint relationship (for bridges or composite devices), and a list of
     `DeviceTypeDescriptor` structures.
--   **Concrete Devices** (e.g., `OccupancySensorDevice`): Inherit from
+-   **Concrete Devices** (e.g., `OccupancySensor`): Inherit from
     `SingleEndpointDevice`, own one or more concrete strongly-typed cluster
     instances (`LazyRegisteredServerCluster`), and bind them to the endpoint
     during registration.
@@ -156,3 +156,14 @@ following guidelines:
 4. **Concrete Naming**: Avoid ambiguous umbrella folders or generic utility
    names. Use specific operational titles (e.g., `DeviceTypeParser.h`,
    `NetworkInfrastructureManager.h`).
+
+---
+
+## 5. Subsystem Design Documents
+
+Detailed architecture specifications for application subsystems:
+
+-   **[Out-of-Band Control Architecture](design/out_of_band_control.md)**:
+    Unified architecture for external control interfaces (Named Pipes, Pigweed
+    RPC, test runners), separating transport translators from cluster execution
+    backends (`OOBAccessor`).

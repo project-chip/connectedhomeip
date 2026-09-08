@@ -26,7 +26,7 @@
 #include <lib/support/PoolWrapper.h>
 
 #include <lib/dnssd/minimal_mdns/ListenIterator.h>
-#include <lib/dnssd/minimal_mdns/core/BytesRange.h>
+#include <lib/dnssd/wire/BytesRange.h>
 
 namespace mdns {
 namespace Minimal {
@@ -45,10 +45,10 @@ public:
     virtual ~ServerDelegate() {}
 
     // Callback of when a query is received
-    virtual void OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
+    virtual void OnQuery(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
 
     // Callback of when a response is received
-    virtual void OnResponse(const BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
+    virtual void OnResponse(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
 };
 
 // Defines an mDNS server that listens on one or more interfaces.

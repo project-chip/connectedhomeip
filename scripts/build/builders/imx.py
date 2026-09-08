@@ -44,7 +44,7 @@ class IMXApp(Enum):
             return 'all-clusters-minimal-app/linux'
         if self == IMXApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def OutputNames(self):
         if self == IMXApp.CHIP_TOOL:
@@ -164,18 +164,18 @@ class IMXBuilder(GnBuilder):
         args.extend([
             'treat_warnings_as_errors=false',
             'target_os="linux"',
-            'target_cpu="%s"' % target_cpu,
-            'arm_arch="%s"' % arm_arch,
+            f'target_cpu="{target_cpu}"',
+            f'arm_arch="{arm_arch}"',
             'import(\"//build_overrides/build.gni\")',
             'custom_toolchain=\"${build_root}/toolchain/custom\"',
-            'sysroot="%s"' % sdk_target_sysroot,
+            f'sysroot="{sdk_target_sysroot}"',
             'target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\\"mlan0\\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\\"udhcpc -b -i %s \\"" ]',
-            'target_cc="%s/sysroots/x86_64-pokysdk-linux/usr/bin/%s/%s"' % (self.SysRootPath('IMX_SDK_ROOT'), cross_compile,
-                                                                            cc),
-            'target_cxx="%s/sysroots/x86_64-pokysdk-linux/usr/bin/%s/%s"' % (self.SysRootPath('IMX_SDK_ROOT'), cross_compile,
-                                                                             cxx),
-            'target_ar="%s/sysroots/x86_64-pokysdk-linux/usr/bin/%s/%s-ar"' % (self.SysRootPath('IMX_SDK_ROOT'), cross_compile,
-                                                                               cross_compile),
+            'target_cc="{}/sysroots/x86_64-pokysdk-linux/usr/bin/{}/{}"'.format(
+                self.SysRootPath('IMX_SDK_ROOT'), cross_compile, cc),
+            'target_cxx="{}/sysroots/x86_64-pokysdk-linux/usr/bin/{}/{}"'.format(
+                self.SysRootPath('IMX_SDK_ROOT'), cross_compile, cxx),
+            'target_ar="{}/sysroots/x86_64-pokysdk-linux/usr/bin/{}/{}-ar"'.format(
+                self.SysRootPath('IMX_SDK_ROOT'), cross_compile, cross_compile),
         ])
 
         if self.release:
@@ -193,7 +193,7 @@ class IMXBuilder(GnBuilder):
 
     def SysRootPath(self, name):
         if name not in os.environ:
-            raise Exception('Missing environment variable "%s"' % name)
+            raise Exception(f'Missing environment variable "{name}"')
         return os.environ[name]
 
     @lock_output_dir

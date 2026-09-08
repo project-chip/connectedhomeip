@@ -37,7 +37,6 @@
 
 import logging
 from enum import Enum
-from typing import Optional
 
 from mobly import asserts
 
@@ -173,7 +172,7 @@ class TC_CC_2_1(MatterBaseTest):
                 log.warning("PrimaryN<X,Y,Intensity> with index %s was not found in the cluster.", pindex)
         return numberofprimaries
 
-    async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None, nullable: bool = False):
+    async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: list | None = None, min_len: int | None = None, max_len: int | None = None, nullable: bool = False):
         """Verify the attribute exists and value is the specific type of value.
 
         Args:

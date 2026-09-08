@@ -763,6 +763,7 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
         case Clusters::AccountLogin::Commands::Login::Id:
         case Clusters::AccountLogin::Commands::Logout::Id:
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
             return true;
         default:
             return false;
@@ -1128,8 +1129,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::Groupcast::Commands::LeaveGroup::Id:
             return true;
-        case Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
-            return true;
         case Clusters::Groupcast::Commands::UpdateGroupKey::Id:
             return true;
         case Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
@@ -1441,6 +1440,10 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::AccountLogin::Commands::Logout::Id:
             return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
+            return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Id:
+            return true;
         default:
             return false;
         }
@@ -1532,6 +1535,8 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id:
             return true;
         case Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Id:
             return true;
         default:
             return false;

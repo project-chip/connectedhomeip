@@ -18,6 +18,8 @@
 
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/CodegenIntegration.h>
+#include <app/clusters/mode-base-server/MigrateModeBaseServerStorage.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -44,11 +46,40 @@ namespace {
 // TODO: change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
 IntrusiveList<Instance> gModeBaseInstances;
 
+// The 10 clusters that share this attribute structure.
+constexpr ClusterEntry kAliasedClusters[] = {
+    kDeviceEnergyManagementMode,                      //
+    kDishwasherMode,                                  //
+    kEnergyEvseMode,                                  //
+    kLaundryWasherMode,                               //
+    kMicrowaveOvenMode,                               //
+    kOvenMode,                                        //
+    kRefrigeratorAndTemperatureControlledCabinetMode, //
+    kRvcCleanMode,                                    //
+    kRvcRunMode,                                      //
+    kWaterHeaterMode,                                 //
+};
+
 } // namespace
 
 IntrusiveList<Instance> & GetModeBaseInstanceList()
 {
     return gModeBaseInstances;
+}
+
+CHIP_ERROR CodegenModeBaseCluster::Startup(ServerClusterContext & context)
+{
+    // Migrate attributes for this cluster from SafeAttribute to AttributePersistence.
+    // This is done at Startup time when the persistence providers are guaranteed to be available.
+    SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
+    AttributePersistenceProvider & dstProvider     = context.attributeStorage;
+
+    if (srcProvider != nullptr)
+    {
+        LogErrorOnFailure(ModeBase::MigrateModeBaseServerStorage(mPath.mEndpointId, mPath.mClusterId, *srcProvider, dstProvider));
+    }
+
+    return ModeBaseCluster::Startup(context);
 }
 
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
@@ -66,16 +97,16 @@ CHIP_ERROR Instance::Init()
     const EmberAfCluster * cluster = emberAfFindServerCluster(mClusterPath.mEndpointId, mClusterPath.mClusterId);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    std::optional<uint32_t> clusterRevision;
+    std::optional<ClusterEntry> aliasedClusterEntry;
     for (const auto & entry : kAliasedClusters)
     {
         if (entry.id == mClusterPath.mClusterId)
         {
-            clusterRevision = entry.revision;
+            aliasedClusterEntry = entry;
             break;
         }
     }
-    VerifyOrReturnError(clusterRevision.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aliasedClusterEntry.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Although StartUpMode attribute is optional, spec says that none of the aliased clusters supports it.
     VerifyOrReturnError(!emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id),
@@ -109,19 +140,14 @@ CHIP_ERROR Instance::Init()
     mDelegate->SetInstance(this);
     ReturnErrorOnFailure(mDelegate->Init());
 
-    SafeAttributePersistenceProvider * safeAttributePersistenceProvider = GetSafeAttributePersistenceProvider();
-    VerifyOrReturnError(safeAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
     DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider();
 
-    ModeBaseCluster::Config config{ .feature                          = mFeature,
-                                    .optionalAttributeSet             = mOptionalAttributeSet,
-                                    .appDelegate                      = *mDelegate,
-                                    .onOffValueForStartUp             = onOffValueForStartUp,
-                                    .safeAttributePersistenceProvider = *safeAttributePersistenceProvider,
-                                    .diagnosticDataProvider           = diagnosticDataProvider,
-                                    .clusterRevision                  = clusterRevision.value() };
-    mCluster.Create(mClusterPath.mEndpointId, mClusterPath.mClusterId, config);
+    ModeBaseCluster::Config config{ .feature                = mFeature,
+                                    .optionalAttributeSet   = mOptionalAttributeSet,
+                                    .appDelegate            = *mDelegate,
+                                    .onOffValueForStartUp   = onOffValueForStartUp,
+                                    .diagnosticDataProvider = diagnosticDataProvider };
+    mCluster.Create(mClusterPath.mEndpointId, aliasedClusterEntry.value(), config);
     RegisterThisInstance();
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }

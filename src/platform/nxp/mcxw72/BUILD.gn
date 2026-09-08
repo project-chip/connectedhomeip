@@ -42,15 +42,7 @@ source_set("nxp_factory_data") {
 }
 
 source_set("nxp_ota") {
-  public = [ "../common/ota/OTAImageProcessorImpl.h" ]
-
-  sources = ota_sources
-
-  deps = [
-    ":nxp_platform",
-    "${chip_root}/src/app/clusters/ota-requestor:interface",
-    "${chip_root}/src/platform:platform",
-  ]
+  # Empty - OTA sources are compiled inside nxp_platform, gated on chip_enable_ota_requestor
 }
 
 config("nxp_platform_config") {
@@ -127,11 +119,12 @@ static_library("nxp_platform") {
     ]
   }
 
-  # When the app is built using cmake, we must ensure the OTA platform files are also compiled.
-  # When the app is built using gn, the app selects the nxp_ota target through its build file.
-  if (nxp_external_sdk && chip_enable_ota_requestor) {
+  if (chip_enable_ota_requestor) {
     sources += ota_sources
     deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+    if (nxp_enable_ota_factory_data_processor) {
+      defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
+    }
     sources += [
       "OTAFuseVerifier.cpp",
       "OTAFuseVerifier.h",
@@ -175,11 +168,16 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../common/factory_data/legacy/FactoryDataDriver.cpp",
-      "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
       "../common/factory_data/legacy/FactoryDataProvider.cpp",
       "../common/factory_data/legacy/FactoryDataProviderImpl.cpp",
     ]
+
+    if (nxp_enable_ota_factory_data_processor) {
+      sources += [
+        "../common/factory_data/legacy/FactoryDataDriver.cpp",
+        "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
+      ]
+    }
 
     defines += [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
   }

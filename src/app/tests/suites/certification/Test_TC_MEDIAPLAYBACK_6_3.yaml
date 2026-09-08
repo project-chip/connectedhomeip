@@ -52,7 +52,7 @@ tests:
       command: "Seek"
       arguments:
           values:
-              - name: "position"
+              - name: "Position"
                 value: 10000
       response:
           values:
@@ -127,7 +127,7 @@ tests:
       command: "Seek"
       arguments:
           values:
-              - name: "position"
+              - name: "Position"
                 value: SeekPosition
       response:
           values:

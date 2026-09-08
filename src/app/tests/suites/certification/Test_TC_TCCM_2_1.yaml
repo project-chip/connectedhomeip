@@ -20,7 +20,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Refrigerator and Temperature Controlled Cabinet Mode Cluster"
     endpoint: 0
 
 tests:
@@ -106,7 +106,7 @@ tests:
       disabled: true
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
-      PICS: TCCM.S.A0001 && TCCM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 
@@ -120,7 +120,7 @@ tests:
     - label:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.TCCM.MODE_CHANGE_FAIL"
-      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.C00.Rsp
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Note : Please skip this step as SDK is not enabled with this failure response
 
@@ -135,7 +135,7 @@ tests:
       disabled: true
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
-      PICS: TCCM.S.A0001
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 
@@ -154,7 +154,7 @@ tests:
       disabled: true
 
     - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
-      PICS: TCCM.S.A0001 && TCCM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 
@@ -168,7 +168,7 @@ tests:
     - label:
           "Step 11: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.TCCM.MODE_CHANGE_OK"
-      PICS: TCCM.S.C00.Rsp
+      PICS: TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode change-to-mode 1 1 1
 
@@ -181,7 +181,7 @@ tests:
       disabled: true
 
     - label: "Step 12: TH reads from the DUT the CurrentMode attribute."
-      PICS: TCCM.S.A0001
+      PICS: TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 
@@ -194,7 +194,7 @@ tests:
     - label:
           "Step 13: TH sends a ChangeToMode command to the DUT with NewMode set
           to invalid_mode_th"
-      PICS: TCCM.S.C00.Rsp
+      PICS: TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode change-to-mode 3 1 1
 
@@ -207,7 +207,7 @@ tests:
       disabled: true
 
     - label: "Step 14: TH reads from the DUT the CurrentMode attribute."
-      PICS: TCCM.S.A0001
+      PICS: TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 

@@ -196,6 +196,29 @@
             "AdminVendorId"
         ],
         "Ambient Context Sensing": ["HoldTimeLimits", "ObjectCountConfig"],
+        "Audio Control": [
+            "ClusterRevision",
+            "FeatureMap",
+            "SoftMuted",
+            "PhysicallyMuted",
+            "Volume",
+            "MinDeviceVolume",
+            "MaxDeviceVolume",
+            "MaxDeviceVolumeDB",
+            "MaxUserVolume",
+            "DefaultStepSize",
+            "SetVolumeUnmutePolicy",
+            "IncreaseVolumeUnmutePolicy",
+            "IncreaseVolumeUnmuteVolume",
+            "DecreaseVolumeUnmutePolicy",
+            "StartUpMuted",
+            "StartUpVolume",
+            "Bass",
+            "Mid",
+            "Treble",
+            "MinCorrection",
+            "MaxCorrection"
+        ],
         "Basic Information": [
             "FeatureMap",
             "ClusterRevision",
@@ -232,6 +255,12 @@
         ],
         "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
+        "Dynamic Lighting": [
+            "ClusterRevision",
+            "FeatureMap",
+            "CurrentEffectID",
+            "CurrentSpeed"
+        ],
         "Commissioner Control": [
             "SupportedDeviceCategories",
             "FeatureMap",
@@ -278,7 +307,8 @@
             "Currency",
             "CurrentPrice",
             "PriceForecast",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Commodity Tariff": [
             "TariffInfo",
@@ -427,6 +457,18 @@
             "MeasuredValue"
         ],
         "Joint Fabric Datastore": ["Status"],
+        "Laundry Dryer Controls": [
+            "ClusterRevision",
+            "SelectedDrynessLevel",
+            "FeatureMap"
+        ],
+        "Laundry Washer Controls": [
+            "ClusterRevision",
+            "SpinSpeeds",
+            "SpinSpeedCurrent",
+            "NumberOfRinses",
+            "SupportedRinses"
+        ],
         "Meter Identification": [
             "MeterType",
             "PointOfDelivery",
@@ -468,7 +510,8 @@
             "CommissionedFabrics",
             "CurrentFabricIndex",
             "FeatureMap",
-            "ClusterRevision"
+            "ClusterRevision",
+            "PQCDeviceAttestationProfile"
         ],
         "OTA Software Update Requestor": [
             "UpdatePossible",
@@ -594,7 +637,8 @@
         "Media Playback": [
             "SampledPosition",
             "ActiveAudioTrack",
-            "ActiveTextTrack"
+            "ActiveTextTrack",
+            "ContentInfo"
         ],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],
@@ -614,8 +658,16 @@
             "SupportedTemperatureLevels",
             "ClusterRevision"
         ],
+        "Dishwasher Alarm": ["ClusterRevision"],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Mode Select": [
+            "ClusterRevision",
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode"
+        ],
         "Microwave Oven Control": [
             "CookTime",
             "MaxCookTime",
@@ -631,6 +683,7 @@
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Refrigerator Alarm": ["ClusterRevision"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -872,6 +925,11 @@
             "NeutralCurrent",
             "FeatureMap"
         ],
+        "Energy Preference": [
+            "ClusterRevision",
+            "CurrentEnergyBalance",
+            "CurrentLowPowerModeSensitivity"
+        ],
         "Power Topology": ["FeatureMap"],
         "Power Source": [
             "ClusterRevision",
@@ -989,7 +1047,11 @@
             "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
-        "Window Covering": ["ClusterRevision"],
+        "Window Covering": [
+            "ClusterRevision",
+            "OperationalStatus",
+            "SafetyStatus"
+        ],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",

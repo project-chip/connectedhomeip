@@ -3,7 +3,6 @@ Data models for the Push AV Server.
 """
 
 from enum import StrEnum
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -33,14 +32,14 @@ class Track(BaseModel):
 
 class UploadError(BaseModel):
     """Represents an upload error with associated metadata."""
-    session_id: Optional[int]
+    session_id: int | None
     file_path: str
     reasons: list[str]
 
 
 class ValidUpload(BaseModel):
     """Represents a valid upload with associated metadata."""
-    session_id: Optional[int]
+    session_id: int | None
     file_path: str
 
 
@@ -55,7 +54,7 @@ class Session(BaseModel):
     # Track state management
     tracks: dict[str, Track] = {}
     # HLS-specific tracking attributes
-    hls_expected_track_count: Optional[int] = None
+    hls_expected_track_count: int | None = None
     hls_completed_tracks: int = 0
 
 
@@ -65,7 +64,7 @@ class Stream(BaseModel):
     id: int
     strict_mode: bool = True
     interface: SupportedIngestInterface
-    expected_track_names: Optional[list[str]] = None
+    expected_track_names: list[str] | None = None
     # Keep track of the various sessions encountered
     sessions: list[Session] = []
     # tracking uploads with unique file paths
@@ -79,7 +78,7 @@ class Stream(BaseModel):
         self.sessions.append(session)
         return session
 
-    def last_in_progress_session(self) -> Optional[Session]:
+    def last_in_progress_session(self) -> Session | None:
         """Get the last session that is still in progress."""
         if len(self.sessions) == 0:
             return None

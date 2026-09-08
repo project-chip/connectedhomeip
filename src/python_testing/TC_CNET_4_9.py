@@ -101,7 +101,7 @@ class TC_CNET_4_9(MatterBaseTest):
                      "Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)")
         ]
 
-    def def_TC_CNET_4_9(self):
+    def desc_TC_CNET_4_9(self):
         return '[TC-CNET-4.9] [Wi-Fi] Verification for RemoveNetwork Command [DUT-Server]'
 
     def pics_TC_CNET_4_9(self):

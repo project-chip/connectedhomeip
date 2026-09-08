@@ -19,7 +19,7 @@
 #pragma once
 
 #include <Options.h>
-#include <devices/device-type-parser/DeviceTypeParser.h>
+#include <app_options/DeviceTypeParser.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -43,8 +43,10 @@ public:
         std::optional<uint16_t> productId;
         std::optional<uint32_t> interfaceId;
         std::string kvsPath;
-        bool enableWiFi        = false;
-        uint32_t bleController = 0;
+        std::optional<std::string> dacProvider;
+        uint8_t testEventTriggerEnableKey[16] = { 0 };
+        bool enableWiFi                       = false;
+        uint32_t bleController                = 0;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();

@@ -1,0 +1,580 @@
+/*
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <crypto/CHIPCryptoPAL.h>
+#include <headers/AttestationKey.h>
+#include <headers/ProvisionStorage.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/Zephyr/CHIPDevicePlatformConfig.h>
+#include <platform/Zephyr/ZephyrConfig.h>
+#include <psa/crypto.h>
+#include <zephyr/settings/settings.h>
+
+#if SL_PROVISION_GENERATOR
+#include <settings/settings_nvs.h>
+#endif
+
+#include <cinttypes>
+#include <cstring>
+
+namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace Provision {
+
+namespace {
+
+using chip::DeviceLayer::Internal::ZephyrConfig;
+
+#define CONFIG_KEY(key)                                                                                                            \
+    (key);                                                                                                                         \
+    static_assert(sizeof(key) <= SETTINGS_MAX_NAME_LEN, "Config key too long: " key)
+
+#define NAMESPACE_SL_FACTORY CHIP_DEVICE_CONFIG_SETTINGS_KEY "-sl-fct/"
+
+const ZephyrConfig::Key kConfigKey_VendorId              = CONFIG_KEY(NAMESPACE_SL_FACTORY "vendor-id");
+const ZephyrConfig::Key kConfigKey_ProductId             = CONFIG_KEY(NAMESPACE_SL_FACTORY "product-id");
+const ZephyrConfig::Key kConfigKey_VendorName            = CONFIG_KEY(NAMESPACE_SL_FACTORY "vendor-name");
+const ZephyrConfig::Key kConfigKey_ProductName           = CONFIG_KEY(NAMESPACE_SL_FACTORY "product-name");
+const ZephyrConfig::Key kConfigKey_ProductLabel          = CONFIG_KEY(NAMESPACE_SL_FACTORY "product-label");
+const ZephyrConfig::Key kConfigKey_ProductUrl            = CONFIG_KEY(NAMESPACE_SL_FACTORY "product-url");
+const ZephyrConfig::Key kConfigKey_PartNumber            = CONFIG_KEY(NAMESPACE_SL_FACTORY "part-number");
+const ZephyrConfig::Key kConfigKey_HardwareVersionString = CONFIG_KEY(NAMESPACE_SL_FACTORY "hardware-ver-str");
+const ZephyrConfig::Key kConfigKey_SetupPayload          = CONFIG_KEY(NAMESPACE_SL_FACTORY "setup-payload");
+
+constexpr psa_key_id_t kDacPsaKeyId = 2;
+
+static constexpr ZephyrConfig::Key kProvisionRequestKey = CONFIG_KEY(NAMESPACE_SL_FACTORY "provision-req");
+static constexpr ZephyrConfig::Key kProvisionVersionKey = CONFIG_KEY(NAMESPACE_SL_FACTORY "provision-ver");
+
+CHIP_ERROR ReadConfigBin(ZephyrConfig::Key key, MutableByteSpan & buffer)
+{
+    size_t dataLen = 0;
+    ReturnErrorOnFailure(ZephyrConfig::ReadConfigValueBin(key, buffer.data(), buffer.size(), dataLen));
+    buffer.reduce_size(dataLen);
+    return CHIP_NO_ERROR;
+}
+
+bool DacPsaKeyExists()
+{
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    const psa_status_t status       = psa_get_key_attributes(kDacPsaKeyId, &attributes);
+    psa_reset_key_attributes(&attributes);
+    return status == PSA_SUCCESS;
+}
+
+bool sInitialized = false;
+
+} // namespace
+
+CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
+{
+#if SL_PROVISION_GENERATOR
+    // flash_addr is the offset to the start of the storage area, and flash_size is the total size of the storage area.
+    VerifyOrReturnError(settings_nvs_set_runtime_geometry(static_cast<off_t>(flash_addr), flash_size) == 0,
+                        CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    ReturnErrorOnFailure(ZephyrConfig::Init());
+#else
+    (void) flash_addr;
+    (void) flash_size;
+    ReturnErrorOnFailure(ZephyrConfig::Init());
+    VerifyOrDo(DacPsaKeyExists(), ChipLogError(DeviceLayer, "DAC PSA key id %u missing", kDacPsaKeyId));
+#endif // SL_PROVISION_GENERATOR
+    sInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::Commit()
+{
+    // Zephyr settings writes are immediate
+    return CHIP_NO_ERROR;
+}
+
+//
+// DeviceInstanceInfoProvider
+//
+
+CHIP_ERROR Storage::SetSerialNumber(const char * value, size_t len)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(ZephyrConfig::kConfigKey_SerialNum, value, len);
+}
+
+CHIP_ERROR Storage::GetSerialNumber(char * value, size_t max)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t size = 0;
+    return ZephyrConfig::ReadConfigValueStr(ZephyrConfig::kConfigKey_SerialNum, value, max, size);
+}
+
+CHIP_ERROR Storage::SetVendorId(uint16_t value)
+{
+    return ZephyrConfig::WriteConfigValue(kConfigKey_VendorId, static_cast<uint32_t>(value));
+}
+
+CHIP_ERROR Storage::GetVendorId(uint16_t & value)
+{
+    uint32_t stored = 0;
+    ReturnErrorOnFailure(ZephyrConfig::ReadConfigValue(kConfigKey_VendorId, stored));
+    value = static_cast<uint16_t>(stored);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::SetVendorName(const char * value, size_t len)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(kConfigKey_VendorName, value, len);
+}
+
+CHIP_ERROR Storage::GetVendorName(char * value, size_t max)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t name_len = 0;
+
+    return ZephyrConfig::ReadConfigValueStr(kConfigKey_VendorName, value, max, name_len);
+}
+
+CHIP_ERROR Storage::SetProductId(uint16_t value)
+{
+    return ZephyrConfig::WriteConfigValue(kConfigKey_ProductId, static_cast<uint32_t>(value));
+}
+
+CHIP_ERROR Storage::GetProductId(uint16_t & value)
+{
+    uint32_t stored = 0;
+    ReturnErrorOnFailure(ZephyrConfig::ReadConfigValue(kConfigKey_ProductId, stored));
+    value = static_cast<uint16_t>(stored);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::SetProductName(const char * value, size_t len)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(kConfigKey_ProductName, value, len);
+}
+
+CHIP_ERROR Storage::GetProductName(char * value, size_t max)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t size = 0;
+
+    return ZephyrConfig::ReadConfigValueStr(kConfigKey_ProductName, value, max, size);
+}
+
+CHIP_ERROR Storage::SetProductLabel(const char * value, size_t len)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(kConfigKey_ProductLabel, value, len);
+}
+
+CHIP_ERROR Storage::GetProductLabel(char * value, size_t max)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t size = 0;
+    return ZephyrConfig::ReadConfigValueStr(kConfigKey_ProductLabel, value, max, size);
+}
+
+CHIP_ERROR Storage::SetProductURL(const char * value, size_t len)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(kConfigKey_ProductUrl, value, len);
+}
+
+CHIP_ERROR Storage::GetProductURL(char * value, size_t max)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t size = 0;
+    return ZephyrConfig::ReadConfigValueStr(kConfigKey_ProductUrl, value, max, size);
+}
+
+CHIP_ERROR Storage::SetPartNumber(const char * value, size_t len)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(kConfigKey_PartNumber, value, len);
+}
+
+CHIP_ERROR Storage::GetPartNumber(char * value, size_t max)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t size = 0;
+    return ZephyrConfig::ReadConfigValueStr(kConfigKey_PartNumber, value, max, size);
+}
+
+CHIP_ERROR Storage::SetHardwareVersion(uint16_t value)
+{
+    return ZephyrConfig::WriteConfigValue(ZephyrConfig::kConfigKey_HardwareVersion, static_cast<uint32_t>(value));
+}
+
+CHIP_ERROR Storage::GetHardwareVersion(uint16_t & value)
+{
+    uint32_t stored = 0;
+    ReturnErrorOnFailure(ZephyrConfig::ReadConfigValue(ZephyrConfig::kConfigKey_HardwareVersion, stored));
+    value = static_cast<uint16_t>(stored);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::SetHardwareVersionString(const char * value, size_t len)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(kConfigKey_HardwareVersionString, value, len);
+}
+
+CHIP_ERROR Storage::GetHardwareVersionString(char * value, size_t max)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t size = 0;
+    return ZephyrConfig::ReadConfigValueStr(kConfigKey_HardwareVersionString, value, max, size);
+}
+
+CHIP_ERROR Storage::SetManufacturingDate(const char * value, size_t len)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(ZephyrConfig::kConfigKey_ManufacturingDate, value, len);
+}
+
+CHIP_ERROR Storage::GetManufacturingDate(uint8_t * value, size_t max, size_t & size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::ReadConfigValueStr(ZephyrConfig::kConfigKey_ManufacturingDate, reinterpret_cast<char *>(value), max, size);
+}
+
+CHIP_ERROR Storage::SetPersistentUniqueId(const uint8_t * value, size_t size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueBin(ZephyrConfig::kConfigKey_UniqueId, value, size);
+}
+
+CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::ReadConfigValueBin(ZephyrConfig::kConfigKey_UniqueId, value, max, size);
+}
+
+//
+// CommissionableDataProvider
+//
+
+CHIP_ERROR Storage::SetSetupDiscriminator(uint16_t value)
+{
+    return ZephyrConfig::WriteConfigValue(ZephyrConfig::kConfigKey_SetupDiscriminator, static_cast<uint32_t>(value));
+}
+
+CHIP_ERROR Storage::GetSetupDiscriminator(uint16_t & value)
+{
+    uint32_t stored = 0;
+    ReturnErrorOnFailure(ZephyrConfig::ReadConfigValue(ZephyrConfig::kConfigKey_SetupDiscriminator, stored));
+    value = static_cast<uint16_t>(stored);
+    VerifyOrReturnLogError(value <= kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::SetSpake2pIterationCount(uint32_t value)
+{
+    return ZephyrConfig::WriteConfigValue(ZephyrConfig::kConfigKey_Spake2pIterationCount, value);
+}
+
+CHIP_ERROR Storage::GetSpake2pIterationCount(uint32_t & value)
+{
+    return ZephyrConfig::ReadConfigValue(ZephyrConfig::kConfigKey_Spake2pIterationCount, value);
+}
+
+CHIP_ERROR Storage::SetSetupPasscode(uint32_t value)
+{
+    (void) value;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR Storage::GetSetupPasscode(uint32_t & value)
+{
+    (void) value;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR Storage::SetSpake2pSalt(const char * value, size_t size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(ZephyrConfig::kConfigKey_Spake2pSalt, value, size);
+}
+
+CHIP_ERROR Storage::GetSpake2pSalt(char * value, size_t max, size_t & size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::ReadConfigValueStr(ZephyrConfig::kConfigKey_Spake2pSalt, value, max, size);
+}
+
+CHIP_ERROR Storage::SetSpake2pVerifier(const char * value, size_t size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(ZephyrConfig::kConfigKey_Spake2pVerifier, value, size);
+}
+
+CHIP_ERROR Storage::GetSpake2pVerifier(char * value, size_t max, size_t & size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::ReadConfigValueStr(ZephyrConfig::kConfigKey_Spake2pVerifier, value, max, size);
+}
+
+//
+// DeviceAttestationCredentialsProvider
+//
+
+CHIP_ERROR Storage::SetFirmwareInformation(const ByteSpan & value)
+{
+    (void) value;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::GetFirmwareInformation(MutableByteSpan & value)
+{
+    value.reduce_size(0);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::SetCertificationDeclaration(const ByteSpan & value)
+{
+    return ZephyrConfig::WriteConfigValueBin(ZephyrConfig::kConfigKey_CertificationDeclaration, value.data(), value.size());
+}
+
+CHIP_ERROR Storage::GetCertificationDeclaration(MutableByteSpan & value)
+{
+    return ReadConfigBin(ZephyrConfig::kConfigKey_CertificationDeclaration, value);
+}
+
+CHIP_ERROR Storage::SetProductAttestationIntermediateCert(const ByteSpan & value)
+{
+    return ZephyrConfig::WriteConfigValueBin(ZephyrConfig::kConfigKey_MfrDeviceICACerts, value.data(), value.size());
+}
+
+CHIP_ERROR Storage::GetProductAttestationIntermediateCert(MutableByteSpan & value)
+{
+    return ReadConfigBin(ZephyrConfig::kConfigKey_MfrDeviceICACerts, value);
+}
+
+CHIP_ERROR Storage::SetDeviceAttestationCert(const ByteSpan & value)
+{
+    return ZephyrConfig::WriteConfigValueBin(ZephyrConfig::kConfigKey_MfrDeviceCert, value.data(), value.size());
+}
+
+CHIP_ERROR Storage::GetDeviceAttestationCert(MutableByteSpan & value)
+{
+    return ReadConfigBin(ZephyrConfig::kConfigKey_MfrDeviceCert, value);
+}
+
+CHIP_ERROR Storage::SetDeviceAttestationKey(const ByteSpan & value)
+{
+    AttestationKey key;
+    ReturnErrorOnFailure(key.Import(value.data(), value.size()));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::GetDeviceAttestationCSR(uint16_t vid, uint16_t pid, const CharSpan & cn, MutableCharSpan & csr)
+{
+    AttestationKey key;
+    ReturnErrorOnFailure(key.GenerateCSR(vid, pid, cn, csr));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, MutableByteSpan & signature)
+{
+    VerifyOrReturnError(DacPsaKeyExists(), CHIP_ERROR_NOT_FOUND,
+                        ChipLogError(DeviceLayer, "DAC PSA key id %u missing", kDacPsaKeyId));
+
+    Crypto::P256ECDSASignature rawSignature;
+    VerifyOrReturnError(signature.size() >= rawSignature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    size_t outputLen          = 0;
+    const psa_status_t status = psa_sign_message(kDacPsaKeyId, PSA_ALG_ECDSA(PSA_ALG_SHA_256), message.data(), message.size(),
+                                                 rawSignature.Bytes(), rawSignature.Capacity(), &outputLen);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "psa_sign_message failed: %" PRId32, status));
+    VerifyOrReturnError(outputLen == Crypto::kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INTERNAL);
+
+    ReturnErrorOnFailure(rawSignature.SetLength(outputLen));
+    return CopySpanToMutableSpan(ByteSpan{ rawSignature.ConstBytes(), rawSignature.Length() }, signature);
+}
+
+CHIP_ERROR Storage::SetCredentialsBaseAddress(uint32_t addr)
+{
+    (void) addr;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::GetCredentialsBaseAddress(uint32_t & addr)
+{
+    addr = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::SetProvisionVersion(const char * value, size_t size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueStr(kProvisionVersionKey, value, size);
+}
+
+CHIP_ERROR Storage::GetProvisionVersion(char * value, size_t max, size_t & size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::ReadConfigValueStr(kProvisionVersionKey, value, max, size);
+}
+
+CHIP_ERROR Storage::SetSetupPayload(const uint8_t * value, size_t size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::WriteConfigValueBin(kConfigKey_SetupPayload, value, size);
+}
+
+CHIP_ERROR Storage::GetSetupPayload(uint8_t * value, size_t max, size_t & size)
+{
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ZephyrConfig::ReadConfigValueBin(kConfigKey_SetupPayload, value, max, size);
+}
+
+CHIP_ERROR Storage::SetProvisionRequest(bool value)
+{
+    return sInitialized ? ZephyrConfig::WriteConfigValue(kProvisionRequestKey, static_cast<uint32_t>(value ? 1 : 0))
+                        : CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::GetProvisionRequest(bool & value)
+{
+    if (!sInitialized)
+    {
+        // Generator firmware hasn't initialized the NVS yet, so assume provisioning is required.
+        value = true;
+        return CHIP_NO_ERROR;
+    }
+    uint32_t stored = 0;
+    ReturnErrorOnFailure(ZephyrConfig::ReadConfigValue(kProvisionRequestKey, stored));
+    value = stored != 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
+{
+    (void) value;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR Storage::GetOtaTlvEncryptionKeyId(uint32_t & keyId)
+{
+    (void) keyId;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR Storage::DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & ivOffset)
+{
+    (void) block;
+    (void) ivOffset;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
+{
+    (void) value;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
+{
+    (void) keySpan;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+// ProvisionStorage functions for Zephyr settings backend, provided by provision libraries for other ProvisionStorage backends.
+#if !SL_PROVISION_GENERATOR
+
+CHIP_ERROR Storage::Set(uint16_t id, const uint8_t * value)
+{
+    (void) id;
+    (void) value;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+CHIP_ERROR Storage::Get(uint16_t id, uint8_t & value)
+{
+    (void) id;
+    (void) value;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+CHIP_ERROR Storage::Set(uint16_t id, const uint16_t * value)
+{
+    (void) id;
+    (void) value;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+CHIP_ERROR Storage::Get(uint16_t id, uint16_t & value)
+{
+    (void) id;
+    (void) value;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+CHIP_ERROR Storage::Set(uint16_t id, const uint32_t * value)
+{
+    (void) id;
+    (void) value;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+CHIP_ERROR Storage::Get(uint16_t id, uint32_t & value)
+{
+    (void) id;
+    (void) value;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+CHIP_ERROR Storage::Set(uint16_t id, const uint64_t * value)
+{
+    (void) id;
+    (void) value;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+CHIP_ERROR Storage::Get(uint16_t id, uint64_t & value)
+{
+    (void) id;
+    (void) value;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+CHIP_ERROR Storage::Get(uint16_t id, uint8_t * value, size_t max_size, size_t & size)
+{
+    (void) id;
+    (void) value;
+    (void) max_size;
+    (void) size;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+CHIP_ERROR Storage::Set(uint16_t id, const uint8_t * value, size_t size)
+{
+    (void) id;
+    (void) value;
+    (void) size;
+    return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+}
+
+#endif // !SL_PROVISION_GENERATOR
+
+} // namespace Provision
+} // namespace Silabs
+} // namespace DeviceLayer
+} // namespace chip

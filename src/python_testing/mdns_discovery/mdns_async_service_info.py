@@ -16,7 +16,7 @@
 #
 
 from random import randint
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
                       service_type_name)
@@ -55,7 +55,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         self,
         zc: Zeroconf,
         timeout_ms: float,
-        question_type: Optional[DNSQuestionType] = None,
+        question_type: DNSQuestionType | None = None,
         addr: str | None = None,
         port: int = _MDNS_PORT,
     ) -> bool:

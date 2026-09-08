@@ -58,9 +58,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     esp_err_t espErr = openthread_init_stack();
     VerifyOrReturnError(espErr == ESP_OK, ESP32Utils::MapError(espErr));
 
-    _LockThreadStack();
     err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
-    _UnlockThreadStack();
     ReturnErrorOnFailure(err);
 #if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
     // When using LwIP for OpenThread, we should set the RendezvousNetworkInterface to prevent no route error when

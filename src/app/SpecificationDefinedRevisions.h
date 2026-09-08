@@ -41,7 +41,7 @@ inline constexpr uint8_t kInteractionModelRevisionTag               = 0xFF;
  * See section 7.1.1. "Revision History" in the "Data Model Specification"
  * chapter of the core Matter specification.
  */
-inline constexpr uint16_t kDataModelRevision = 19;
+inline constexpr uint16_t kDataModelRevision = 21;
 
 /*
  * A number identifying the specification version against which the

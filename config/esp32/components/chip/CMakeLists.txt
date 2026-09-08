@@ -493,12 +493,12 @@ elseif("mdns" IN_LIST build_components)
     list(APPEND matter_requires mdns)
 endif()
 
-if (CONFIG_OPENTHREAD_BORDER_ROUTER)
-    list(APPEND matter_requires espressif__esp_rcp_update)
-endif()
-
 if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND matter_requires espressif__esp_secure_cert_mgr)
+endif()
+
+if (CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2)
+    list(APPEND matter_requires tee_sec_storage)
 endif()
 
 if (CONFIG_ENABLE_ENCRYPTED_OTA)

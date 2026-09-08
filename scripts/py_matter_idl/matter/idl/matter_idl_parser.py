@@ -16,7 +16,6 @@ import dataclasses
 import functools
 import logging
 import pprint
-from typing import Optional
 
 import click
 from lark import Lark
@@ -86,7 +85,7 @@ class PrefixCppDocComment:
                     yield entry
 
     def __repr__(self):
-        return ("PREFIXDoc: %r at %r" % (self.value, self.start_pos))
+        return (f"PREFIXDoc: {self.value!r} at {self.start_pos!r}")
 
 
 class AddServerClusterToEndpointTransform:
@@ -436,8 +435,7 @@ class MatterIdlTransformer(Transformer):
                 elif operation == AttributeOperation.WRITE:
                     acl['writeacl'] = access
                 else:
-                    raise Exception(
-                        "Unknown attribute operation: %r" % operation)
+                    raise Exception(f"Unknown attribute operation: {operation!r}")
 
         return (args[-1], acl)
 
@@ -573,7 +571,7 @@ class MatterIdlTransformer(Transformer):
             elif isinstance(item, Command):
                 result.commands.append(item)
             else:
-                raise Exception("UNKNOWN cluster content item: %r" % item)
+                raise Exception(f"UNKNOWN cluster content item: {item!r}")
 
         return result
 
@@ -599,7 +597,7 @@ class MatterIdlTransformer(Transformer):
                 global_structs.append(
                     dataclasses.replace(item, is_global=True))
             else:
-                raise Exception("UNKNOWN idl content item: %r" % item)
+                raise Exception(f"UNKNOWN idl content item: {item!r}")
 
         return Idl(clusters=clusters, endpoints=endpoints, global_bitmaps=global_bitmaps, global_enums=global_enums, global_structs=global_structs)
 
@@ -727,7 +725,7 @@ class ParserWithLines:
             }
         )
 
-    def parse(self, file: str, file_name: Optional[str] = None):
+    def parse(self, file: str, file_name: str | None = None):
         idl = self.transformer.transform(self.parser.parse(file))
         idl.parse_file_name = file_name
 

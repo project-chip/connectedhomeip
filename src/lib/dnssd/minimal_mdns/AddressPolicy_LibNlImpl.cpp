@@ -19,6 +19,8 @@
 #include <netlink/route/addr.h>
 #include <netlink/socket.h>
 
+#include <string.h>
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -244,6 +246,15 @@ bool AllListenIterator::IsCurrentLinkUsable()
     if ((flags & (IFF_BROADCAST | IFF_MULTICAST)) == 0)
     {
         // minmdns requires broadcast/multicast
+        return false;
+    }
+
+    // Skip IEEE 802.15.4 / Thread interfaces, matching AddressPolicy_DefaultImpl. Matching on the
+    // name is unsatisfying, but OpenThread's wpan0 is a tun device, so the link type does not
+    // identify it either.
+    const char * name = rtnl_link_get_name(CurrentLink());
+    if ((name != nullptr) && (strncmp(name, "wpan", 4) == 0))
+    {
         return false;
     }
 

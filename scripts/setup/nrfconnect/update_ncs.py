@@ -78,7 +78,7 @@ def print_check_revision_warning_message(current_revision, recommended_revision)
         allowed_message), len(update_message), len(call_command_message)])
 
     # To keep right frame shape the space characters are added to messages shorter than the longest one.
-    fmt = "# {:<%s}#" % (longest_message_len)
+    fmt = f"# {{:<{longest_message_len}}}#"
 
     print_messages([
         (longest_message_len+3)*'#', fmt.format(current_revision_message),

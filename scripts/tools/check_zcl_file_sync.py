@@ -58,7 +58,7 @@ def main():
     if base_data == ext_data:
         return 0
 
-    print("%s and %s have unexpected differences." % (base_name, ext_name))
+    print(f"{base_name} and {ext_name} have unexpected differences.")
     print("Differences between expected and actual:")
 
     for line in difflib.unified_diff(

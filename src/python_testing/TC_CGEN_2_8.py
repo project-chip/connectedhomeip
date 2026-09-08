@@ -42,11 +42,11 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.commissioning import ROOT_ENDPOINT_ID
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_CGEN_2_8(MatterBaseTest):
+class TC_CGEN_2_8(MatterTestCommissioner):
     def desc_TC_CGEN_2_8(self) -> str:
         return "[TC-CGEN-2.8] Verification that TCAcknowledgements is reset after Factory Reset [DUT as Server]"
 

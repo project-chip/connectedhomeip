@@ -57,6 +57,8 @@ constexpr uint16_t kOptionBLE           = 0xffd9;
 constexpr uint16_t kOptionGroupcast     = 0xffda;
 constexpr uint16_t kOptionAppPipe       = 0xffdb;
 constexpr uint16_t kOptionTraceTo       = 0xffdc;
+constexpr uint16_t kOptionDacProvider   = 0xffdd;
+constexpr uint16_t kOptionEnableKey     = 0xffde;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -172,6 +174,22 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.traceTo.push_back(value);
         ChipLogProgress(AppServer, "Added trace destination: %s", value);
         return true;
+    case kOptionDacProvider:
+        mConfig.dacProvider = value;
+        ChipLogProgress(AppServer, "DAC provider file set to %s", value);
+        return true;
+    case kOptionEnableKey: {
+        constexpr size_t kEnableKeyLength = sizeof(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey);
+
+        if (Encoding::HexToBytes(value, strlen(value), mConfig.testEventTriggerEnableKey, kEnableKeyLength) != kEnableKeyLength)
+        {
+
+            ChipLogError(Support, "%s: ERROR: invalid value specified for %s\n", program, name);
+            return false;
+        }
+        ChipLogProgress(AppServer, "TestEventTrigger enable key configured");
+        return true;
+    }
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -199,6 +217,8 @@ OptionSet * AppOptions::GetOptions()
         { "groupcast", kNoArgument, kOptionGroupcast },
         { "app-pipe", kArgumentRequired, kOptionAppPipe },
         { "trace-to", kArgumentRequired, kOptionTraceTo },
+        { "dac_provider", kArgumentRequired, kOptionDacProvider },
+        { "enable-key", kArgumentRequired, kOptionEnableKey },
         {}, // need empty terminator
     };
 
@@ -231,7 +251,11 @@ OptionSet * AppOptions::GetOptions()
 #endif
 
         result += "  --KVS <path>\n";
+#if defined(CHIP_CONFIG_KVS_PATH)
         result += "       Path to the Key Value Store file (default: " CHIP_CONFIG_KVS_PATH ")\n\n";
+#else
+        result += "       Path to the Key Value Store file\n\n";
+#endif
 
         result += "  --discriminator <number>\n";
         result += "       Discriminator value for commissioning (default: 3840)\n\n";
@@ -256,6 +280,12 @@ OptionSet * AppOptions::GetOptions()
 
         result += "  --trace-to <destination>\n";
         result += "       Enable tracing destination (e.g., json:log, json:file_path)\n\n";
+
+        result += "  --dac_provider <path>\n";
+        result += "       Path to JSON file containing device attestation credentials\n\n";
+
+        result += "  --enable-key <key>\n";
+        result += "       A 16-byte, hex-encoded key, used to validate TestEventTrigger command of General Diagnostics cluster\n\n";
 
         return result;
     }();

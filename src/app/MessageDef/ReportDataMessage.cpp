@@ -135,7 +135,14 @@ CHIP_ERROR ReportDataMessage::Parser::PrettyPrint() const
 
 CHIP_ERROR ReportDataMessage::Parser::GetSuppressResponse(bool * const apSuppressResponse) const
 {
-    return GetSimpleValue(to_underlying(Tag::kSuppressResponse), TLV::kTLVType_Boolean, apSuppressResponse);
+    CHIP_ERROR err = GetSimpleValue(to_underlying(Tag::kSuppressResponse), TLV::kTLVType_Boolean, apSuppressResponse);
+    if (CHIP_END_OF_TLV == err)
+    {
+        // If SuppressResponse is not present, treat it as false.
+        *apSuppressResponse = false;
+        return CHIP_NO_ERROR;
+    }
+    return err;
 }
 
 CHIP_ERROR ReportDataMessage::Parser::GetSubscriptionId(SubscriptionId * const apSubscriptionId) const

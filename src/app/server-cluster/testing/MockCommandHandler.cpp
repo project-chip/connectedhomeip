@@ -63,10 +63,24 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const app::ConcreteCommandPath & 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MockCommandHandler::AddResponseData(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                               const EncodableResponsePayload & aPayload)
+{
+    EncodableResponsePayload::Adapter adapter(aPayload);
+    return AddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
+}
+
 void MockCommandHandler::AddResponse(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                      const app::DataModel::EncodableToTLV & aEncodable)
 {
     CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
+    VerifyOrDie(err == CHIP_NO_ERROR);
+}
+
+void MockCommandHandler::AddResponse(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                     const EncodableResponsePayload & aPayload)
+{
+    CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aPayload);
     VerifyOrDie(err == CHIP_NO_ERROR);
 }
 

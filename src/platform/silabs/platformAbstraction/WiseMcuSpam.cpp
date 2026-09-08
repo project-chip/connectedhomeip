@@ -126,7 +126,7 @@ int soc_pll_config(void)
     status                                  = RSI_CLK_SetIntfPllFreq(M4CLK, INTF_PLL_CLK, SOC_PLL_REF_FREQUENCY);
     if (status != RSI_OK)
     {
-        ChipLogError(DeviceLayer, "Failed to Config Interface PLL Clock, status: %ld", status);
+        ChipLogError(DeviceLayer, "Failed to Config Interface PLL Clock, status: 0x%" PRIx32, status);
     }
     else
     {
@@ -241,7 +241,7 @@ extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
         // if the btn was not pressed and only a release event came, ignore it
         // if the btn was already pressed and another press event came, ignore it
         // essentially, if both of them are in the same state then ignore it.
-        VerifyOrReturn(btnAction != GetPlatform().GetButtonState(SL_BUTTON_BTN0_NUMBER));
+        VerifyOrReturn(btnAction != sButtonStates[SL_BUTTON_BTN0_NUMBER]);
     }
 #endif // SL_ICD_ENABLED
     VerifyOrReturn(GetPlatform().mButtonCallback != nullptr);
@@ -323,7 +323,7 @@ void SilabsPlatform::SleepButtonActionHandler()
 {
     const uint8_t btnAction = (sl_si91x_gpio_get_uulp_npss_pin(SL_BUTTON_BTN0_PIN) == LOW) ? BUTTON_PRESSED : BUTTON_RELEASED;
     // If the button state is the same as the last state, return
-    VerifyOrReturn(btnAction != GetButtonState(SL_BUTTON_BTN0_NUMBER));
+    VerifyOrReturn(btnAction != sButtonStates[SL_BUTTON_BTN0_NUMBER]);
     if (btnAction == BUTTON_PRESSED)
     {
 #if SL_MATTER_GN_BUILD == 0

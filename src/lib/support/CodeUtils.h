@@ -104,16 +104,29 @@
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
  */
+#if CHIP_CONFIG_ERROR_SOURCE
 #define ReturnLogErrorOnFailure(expr)                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        CHIP_ERROR __err = (expr);                                                                                                 \
-        if (__err != CHIP_NO_ERROR)                                                                                                \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
             return __err;                                                                                                          \
         }                                                                                                                          \
     } while (false)
+#else
+#define ReturnLogErrorOnFailure(expr)                                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            ::chip::Logging::LogFailure(::chip::Logging::kLogModule_NotSpecified, __err);                                          \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+#endif
 
 /**
  *  @def SuccessOrLog(expr, MOD, MSG, ...)
@@ -308,7 +321,7 @@
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
             auto __code = (code);                                                                                                  \
-            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__code), __FILE__, __LINE__);                                       \
+            ::chip::Logging::LogVerifyOrReturnErrorWithSource(__code, __FILE__, __LINE__);                                         \
             return __code;                                                                                                         \
         }                                                                                                                          \
     } while (false)
@@ -319,7 +332,7 @@
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
             auto __code = (code);                                                                                                  \
-            ChipLogError(NotSpecified, "%s:%d false: %" CHIP_ERROR_FORMAT, #expr, __LINE__, __code.Format());                      \
+            ::chip::Logging::LogVerifyOrReturnError(#expr, __LINE__, __code);                                                      \
             return __code;                                                                                                         \
         }                                                                                                                          \
     } while (false)
@@ -429,11 +442,9 @@ inline void chipDie(void)
  *
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE && CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
-#define VerifyOrDie(aCondition)                                                                                                    \
-    VerifyOrDo(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d", __FILE__, __LINE__); chipAbort())
+#define VerifyOrDie(aCondition) VerifyOrDo(aCondition, ::chip::Logging::LogVerifyOrDie(__FILE__, __LINE__))
 #elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
-#define VerifyOrDie(aCondition)                                                                                                    \
-    VerifyOrDo(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition); chipAbort())
+#define VerifyOrDie(aCondition) VerifyOrDo(aCondition, ::chip::Logging::LogVerifyOrDie(__FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -466,18 +477,14 @@ inline void chipDie(void)
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (error);                                                                                                      \
-        VerifyOrDo(::chip::ChipError::IsSuccess(__err),                                                                            \
-                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                 \
-                   chipAbort());                                                                                                   \
+        VerifyOrDo(::chip::ChipError::IsSuccess(__err), ::chip::Logging::LogSuccessOrDie(__FILE__, __LINE__, __err));              \
     } while (false)
 #elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define SuccessOrDie(error)                                                                                                        \
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (error);                                                                                                      \
-        VerifyOrDo(::chip::ChipError::IsSuccess(__err),                                                                            \
-                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d: %s", ErrorStr(__err), __FILE__, __LINE__, #error);     \
-                   chipAbort());                                                                                                   \
+        VerifyOrDo(::chip::ChipError::IsSuccess(__err), ::chip::Logging::LogSuccessOrDie(__FILE__, __LINE__, __err, #error));      \
     } while (false)
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define SuccessOrDie(error) VerifyOrDieWithoutLogging(::chip::ChipError::IsSuccess((error)))
@@ -492,8 +499,7 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDieWithObject(aCondition, aObject)                                                                                 \
-    VerifyOrDo(aCondition, ::chip::DumpObjectToLog(aObject);                                                                       \
-               ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition); chipAbort())
+    VerifyOrDo(aCondition, ::chip::DumpObjectToLog(aObject); ::chip::Logging::LogVerifyOrDie(__FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDieWithObject(aCondition, aObject) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -532,8 +538,19 @@ inline void chipDie(void)
  *  @sa #chipDie
  *
  */
-#define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
+#define CHIP_VERIFY_OR_DIE_WITH_MSG_SELECT(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME
+
+#define VerifyOrDieWithMsg_NO_VA_ARGS(aCondition, aModule, aMessage)                                                               \
+    VerifyOrDo(aCondition, ::chip::Logging::LogVerifyOrDieWithMsg(::chip::Logging::kLogModule_##aModule, aMessage))
+
+#define VerifyOrDieWithMsg_VA_ARGS(aCondition, aModule, aMessage, ...)                                                             \
     VerifyOrDo(aCondition, ChipLogError(aModule, aMessage, ##__VA_ARGS__); chipAbort())
+
+#define VerifyOrDieWithMsg(...)                                                                                                    \
+    CHIP_VERIFY_OR_DIE_WITH_MSG_SELECT(__VA_ARGS__, VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_VA_ARGS,                        \
+                                       VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_VA_ARGS,         \
+                                       VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_NO_VA_ARGS)      \
+    (__VA_ARGS__)
 
 /**
  *  @def LogErrorOnFailure(expr)
@@ -549,15 +566,27 @@ inline void chipDie(void)
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
  */
+#if CHIP_CONFIG_ERROR_SOURCE
 #define LogErrorOnFailure(expr)                                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        CHIP_ERROR __err = (expr);                                                                                                 \
-        if (__err != CHIP_NO_ERROR)                                                                                                \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
         }                                                                                                                          \
     } while (false)
+#else
+#define LogErrorOnFailure(expr)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            ::chip::Logging::LogFailure(::chip::Logging::kLogModule_NotSpecified, __err);                                          \
+        }                                                                                                                          \
+    } while (false)
+#endif
 
 #if (__cplusplus >= 201103L)
 

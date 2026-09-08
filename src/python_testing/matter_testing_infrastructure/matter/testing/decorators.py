@@ -23,9 +23,10 @@ and endpoint matching.
 
 import asyncio
 import logging
+from collections.abc import Callable
 from enum import IntFlag
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from mobly import asserts
 

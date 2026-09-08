@@ -14,7 +14,6 @@
 
 import enum
 import logging
-from typing import Optional
 from xml.sax.xmlreader import AttributesImpl
 
 from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, Command, CommandQuality,
@@ -444,7 +443,7 @@ class CommandHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
-        self._command: Optional[Command] = None
+        self._command: Command | None = None
 
         # Command information layout:
         #   "response":

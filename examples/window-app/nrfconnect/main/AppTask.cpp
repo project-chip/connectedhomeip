@@ -170,7 +170,12 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    sThreadNetworkDriver.Init();
+    err = sThreadNetworkDriver.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("sThreadNetworkDriver.Init() failed");
+        return err;
+    }
 #elif !defined(CONFIG_WIFI_NRF70)
     return CHIP_ERROR_INTERNAL;
 #endif
@@ -272,7 +277,13 @@ CHIP_ERROR AppTask::Init()
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    err = PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("PlatformMgr().AddEventHandler() failed");
+        return err;
+    }
+
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
@@ -616,7 +627,11 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCOnboardingPayloadMgr().StopTagEmulation();
+            CHIP_ERROR err = NFCOnboardingPayloadMgr().StopTagEmulation();
+            if (err != CHIP_NO_ERROR)
+            {
+                LOG_ERR("Stopping NFC Tag emulation failed");
+            }
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
