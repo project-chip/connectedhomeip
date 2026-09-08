@@ -1890,6 +1890,11 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
             ChipLogError(FabricProvisioning, "Missing pending fabric on update during commit!");
             hasInvalidInternalState = true;
         }
+        if (!mOpCertStore->HasPendingNocChain())
+        {
+            ChipLogError(FabricProvisioning, "Missing pending NOC chain for fabric update during commit!");
+            hasInvalidInternalState = true;
+        }
     }
 
     if (isAdding && hasPending && !hasInvalidInternalState)

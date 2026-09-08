@@ -541,7 +541,8 @@ bool PersistentStorageOpCertStore::HasAnyCertificateForFabric(FabricIndex fabric
     bool rcacMissing = !StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kRcac);
     bool icacMissing = !StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kIcac);
     bool nocMissing  = !StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kNoc);
-    bool anyPending  = (mPendingRcac.Get() != nullptr) || (mPendingIcac.Get() != nullptr) || (mPendingNoc.Get() != nullptr);
+    bool anyPending  = (fabricIndex == mPendingFabricIndex) &&
+        ((mPendingRcac.Get() != nullptr) || (mPendingIcac.Get() != nullptr) || (mPendingNoc.Get() != nullptr));
 
     if (rcacMissing && icacMissing && nocMissing && !anyPending)
     {
@@ -559,8 +560,12 @@ CHIP_ERROR PersistentStorageOpCertStore::RemoveOpCertsForFabric(FabricIndex fabr
     // If there was *no* state, pending or persisted, we have an error
     VerifyOrReturnError(HasAnyCertificateForFabric(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    // Clear any pending state
-    RevertPendingOpCerts();
+    // The pending certificates belong to a single fabric index, so they must only be cleared when
+    // that same index is the one being removed.
+    if (fabricIndex == mPendingFabricIndex)
+    {
+        RevertPendingOpCerts();
+    }
 
     // Remove all persisted certs for the given fabric, blindly
     CHIP_ERROR nocErr  = DeleteCertFromStorage(mStorage, fabricIndex, CertChainElement::kNoc);
