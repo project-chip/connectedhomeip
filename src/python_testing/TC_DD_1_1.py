@@ -45,71 +45,54 @@ from mobly import asserts
 from onboarding_payload_checks import OnboardingPayloadChecks
 
 from matter.setup_payload import SetupPayload
-from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterTestUncommissionedDevice, TestStep
+from matter.testing.decorators import async_test_body, pics
+from matter.testing.matter_testing import MatterTestUncommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
 class TC_DD_1_1(OnboardingPayloadChecks, MatterTestUncommissionedDevice):
-    def desc_TC_DD_1_1(self) -> str:
-        return "[TC-DD-1.1] QR Code Content [DUT - Commissionee]"
 
-    def pics_TC_DD_1_1(self) -> list[str]:
-        return ["MCORE.ROLE.COMMISSIONEE", "MCORE.DD.QR"]
-
-    def steps_TC_DD_1_1(self) -> list[TestStep]:
-        return [
-            TestStep(1, "TH parses the QR code payload provided for the DUT"),
-            TestStep("2a", "Verify the onboarding payload version", "Version field is 0"),
-            TestStep("2b", "Verify Vendor ID and Product ID are present in the payload"),
-            TestStep("2c", "Verify the Commissioning Flow value", "Value is 0, 1 or 2"),
-            TestStep("2d", "Verify the 8-bit Discovery Capabilities Bitmask",
-                     "No reserved bits are set, and at least one discovery method is advertised"),
-            TestStep("2e", "Verify the 12-bit discriminator matches the value the DUT advertises during commissioning",
-                     "DUT is discoverable using the discriminator encoded in the QR code"),
-            TestStep("2f", "Verify the onboarding payload contains a 27-bit Passcode",
-                     "Passcode is between 0x0000001 and 0x5f5e0fe"),
-            TestStep("2g", "Verify passcode is valid", "Passcode is not a disallowed default value"),
-            TestStep("2h", "Verify the QR code prefix", "Prefix is \"MT:\""),
-            TestStep(3, "Verify the packed binary data structure",
-                     "Structure is padded with 0 bits at the end to the nearest byte boundary"),
-        ]
-
+    @pics('MCORE.ROLE.COMMISSIONEE', 'MCORE.DD.QR')
     @async_test_body
     async def test_TC_DD_1_1(self):
-        self.step(1)
+        """[TC-DD-1.1] QR Code Content [DUT - Commissionee]"""
+        self.step(1, "TH parses the QR code payload provided for the DUT")
         asserts.assert_true(self.matter_test_config.qr_code_content, "This test needs to be run with the qr-code param.")
         qr_code_content = self.matter_test_config.qr_code_content[0]
         payload = SetupPayload().ParseQrCode(qr_code_content)
 
-        self.step("2a")
+        self.step("2a", "Verify the onboarding payload version", expectation="Version field is 0")
         self.check_payload_version(payload)
 
-        self.step("2b")
+        self.step("2b", "Verify Vendor ID and Product ID are present in the payload")
         self.log_vendor_and_product_id_not_verified(payload)
 
-        self.step("2c")
+        self.step("2c", "Verify the Commissioning Flow value", expectation="Value is 0, 1 or 2")
         self.check_commissioning_flow(payload)
 
-        self.step("2d")
+        self.step("2d", "Verify the 8-bit Discovery Capabilities Bitmask",
+                  expectation="No reserved bits are set, and at least one discovery method is advertised")
         self.check_discovery_capabilities_bitmask(payload)
 
-        self.step("2e")
+        self.step("2e", "Verify the 12-bit discriminator matches the value the DUT advertises during commissioning",
+                  expectation="DUT is discoverable using the discriminator encoded in the QR code")
         asserts.assert_is_not_none(payload.long_discriminator, "QR code payload is missing the long discriminator")
         await self.check_advertised_discriminator(payload.long_discriminator, long=True)
 
-        self.step("2f")
+        self.step("2f", "Verify the onboarding payload contains a 27-bit Passcode",
+                  expectation="Passcode is between 0x0000001 and 0x5f5e0fe")
         self.check_passcode_range(payload)
 
-        self.step("2g")
+        self.step("2g", "Verify passcode is valid", expectation="Passcode is not a disallowed default value")
         self.check_passcode_validity(payload)
 
-        self.step("2h")
+        self.step("2h", "Verify the QR code prefix", expectation="Prefix is \"MT:\"")
         self.check_code_prefix(qr_code_content[:3])
 
-        self.step(3)
+        self.step(3, "Verify the packed binary data structure",
+                  expectation="Structure is padded with 0 bits at the end to the nearest byte boundary")
         # QRCodeSetupPayloadParser (src/setup_payload/QRCodeSetupPayloadParser.cpp) rejects the
         # payload with CHIP_ERROR_INVALID_ARGUMENT if the trailing padding bits are not all 0, so
         # the successful parse in step 1 already confirms the packed structure is correctly padded.
