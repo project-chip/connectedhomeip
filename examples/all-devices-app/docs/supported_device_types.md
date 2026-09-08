@@ -16,8 +16,8 @@ To update or validate this list manually, follow these steps:
       type.
     - Some device types are registered from platform-specific
       `DeviceFactoryPlatformOverride.cpp` files instead of the `DeviceFactory`
-      constructor. For example, `Commissioning By Proxy` (0x0092) is
-      registered from
+      constructor. For example, `Commissioning By Proxy` (0x0092) is registered
+      from
       `examples/all-devices-app/posix/linux/DeviceFactoryPlatformOverride.cpp`
       and is available on the Linux platform only. Check those files as well.
     - Note: `Root Node` (0x0016) is a special device type that is always
