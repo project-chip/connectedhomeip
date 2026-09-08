@@ -2548,6 +2548,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentFabricIndex";
             break;
 
+        case MTRAttributeIDTypeClusterOperationalCredentialsAttributePQCDeviceAttestationProfileID:
+            result = @"PQCDeviceAttestationProfile";
+            break;
+
         case MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -7996,6 +8000,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SessionIDList";
             break;
 
+        case MTRAttributeIDTypeClusterProximityRangingAttributeRangingConstraintsID:
+            result = @"RangingConstraints";
+            break;
+
         case MTRAttributeIDTypeClusterProximityRangingAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -9566,6 +9574,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeCurrentConnectionsID:
             result = @"CurrentConnections";
+            break;
+
+        case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeMaxZonesID:
+            result = @"MaxZones";
             break;
 
         case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeGeneratedCommandListID:
@@ -13465,6 +13477,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterPushAVStreamTransportCommandFindTransportID:
             result = @"FindTransport";
+            break;
+
+        case MTRCommandIDTypeClusterPushAVStreamTransportCommandUpdateMotionZoneOptionsID:
+            result = @"UpdateMotionZoneOptions";
             break;
 
         default:

@@ -301,7 +301,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configASSERT(x)                                                                                                            \
     if ((x) == 0)                                                                                                                  \
     {                                                                                                                              \
-        taskDISABLE_INTERRUPTS();                                                                                                  \
+        portDISABLE_INTERRUPTS();                                                                                                  \
         printf("\nFREERTOS ASSERT ( %s )\n", #x);                                                                                  \
         for (;;)                                                                                                                   \
             ;                                                                                                                      \
@@ -309,7 +309,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configASSERTNULL(x)                                                                                                        \
     if ((x) == NULL)                                                                                                               \
     {                                                                                                                              \
-        taskDISABLE_INTERRUPTS();                                                                                                  \
+        portDISABLE_INTERRUPTS();                                                                                                  \
         for (;;)                                                                                                                   \
             ;                                                                                                                      \
     }

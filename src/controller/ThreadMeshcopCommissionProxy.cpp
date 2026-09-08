@@ -126,44 +126,44 @@ void ThreadMeshcopCommissionProxy::SetState(State state)
     mState = state;
 }
 
-void ThreadMeshcopCommissionProxy::OnHeader(mdns::Minimal::ConstHeaderRef & header)
+void ThreadMeshcopCommissionProxy::OnHeader(chip::Dnssd::ConstHeaderRef & header)
 {
     ChipLogDetail(Controller, "mDNS Response: ID=%u, Answers=%u, Additional=%u", header.GetMessageId(), header.GetAnswerCount(),
                   header.GetAdditionalCount());
 }
 
-void ThreadMeshcopCommissionProxy::OnQuery(const mdns::Minimal::QueryData & data)
+void ThreadMeshcopCommissionProxy::OnQuery(const chip::Dnssd::QueryData & data)
 {
     if (mState != State::kDiscovering)
     {
         ChipLogProgress(Controller, "Received mDNS query but proxy is not in discovery state");
     }
 
-    ChipLogDetail(Controller, "mDNS query: %s", mdns::Minimal::QNameString(data.GetName()).c_str());
+    ChipLogDetail(Controller, "mDNS query: %s", chip::Dnssd::QNameString(data.GetName()).c_str());
     mNodeData.Set<Dnssd::CommissionNodeData>();
 }
 
-void ThreadMeshcopCommissionProxy::OnResource(mdns::Minimal::ResourceType section, const mdns::Minimal::ResourceData & data)
+void ThreadMeshcopCommissionProxy::OnResource(chip::Dnssd::ResourceType section, const chip::Dnssd::ResourceData & data)
 {
     if (mState != State::kDiscovering)
     {
         return;
     }
 
-    auto name             = mdns::Minimal::QNameString(data.GetName());
+    auto name             = chip::Dnssd::QNameString(data.GetName());
     auto & commissionData = mNodeData.Get<Dnssd::CommissionNodeData>();
 
     commissionData.threadMeshcop = true;
 
     switch (data.GetType())
     {
-    case mdns::Minimal::QType::A:
-    case mdns::Minimal::QType::AAAA:
+    case chip::Dnssd::QType::A:
+    case chip::Dnssd::QType::AAAA:
         Platform::CopyString(commissionData.hostName, name.c_str());
         break;
 
-    case mdns::Minimal::QType::SRV: {
-        mdns::Minimal::SrvRecord srv;
+    case chip::Dnssd::QType::SRV: {
+        chip::Dnssd::SrvRecord srv;
         if (!srv.Parse(data.GetData(), mDnsPacket))
         {
             ChipLogError(Controller, "Failed to parse mDNS SRV record");
@@ -199,8 +199,8 @@ void ThreadMeshcopCommissionProxy::OnResource(mdns::Minimal::ResourceType sectio
         break;
     }
 
-    case mdns::Minimal::QType::TXT:
-        mdns::Minimal::ParseTxtRecord(data.GetData(), this);
+    case chip::Dnssd::QType::TXT:
+        chip::Dnssd::ParseTxtRecord(data.GetData(), this);
         break;
 
     default:
@@ -297,7 +297,7 @@ std::string ThreadMeshcopCommissionProxy::GetLastDiscoveryDiagnosticJson()
     return Json::writeString(writerBuilder, root);
 }
 
-void ThreadMeshcopCommissionProxy::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
+void ThreadMeshcopCommissionProxy::OnRecord(const chip::Dnssd::BytesRange & name, const chip::Dnssd::BytesRange & value)
 {
     ByteSpan key(name.Start(), name.Size());
     ByteSpan val(value.Start(), value.Size());
@@ -316,9 +316,9 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
     }
 
     mNodeData.Set<Dnssd::CommissionNodeData>();
-    mDnsPacket = mdns::Minimal::BytesRange(payload.data(), payload.data() + payload.size());
+    mDnsPacket = chip::Dnssd::BytesRange(payload.data(), payload.data() + payload.size());
 
-    if (!mdns::Minimal::ParsePacket(mDnsPacket, this))
+    if (!chip::Dnssd::ParsePacket(mDnsPacket, this))
     {
         ChipLogError(Controller, "Failed to parse joiner mDNS announcement");
         return;

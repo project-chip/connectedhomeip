@@ -20,11 +20,7 @@
 
 namespace chip::app {
 
-Oven::Oven(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff, Clusters::IdentifyDelegate & cavityIdentify,
-           Clusters::IdentifyDelegate & surfaceIdentify, const Config & config) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOven, 1)),
-    mCavity(timerDelegate, config.cavityConfig, cavityIdentify), mSurface(timerDelegate, surfaceOnOff, surfaceIdentify)
-{}
+Oven::Oven() : DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOven, 1)) {}
 
 CHIP_ERROR Oven::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
@@ -38,8 +34,7 @@ CHIP_ERROR Oven::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelPr
         EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mCavity.Register(allocator, provider, EndpointComposition::WithParent(mEndpointId)));
-    ReturnErrorOnFailure(mSurface.Register(allocator, provider, EndpointComposition::WithParent(mEndpointId)));
+    ReturnErrorOnFailure(RegisterParts(allocator, provider));
 
     transaction.Commit();
     return CHIP_NO_ERROR;
@@ -47,8 +42,7 @@ CHIP_ERROR Oven::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelPr
 
 void Oven::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mSurface.Unregister(provider);
-    mCavity.Unregister(provider);
+    UnregisterParts(provider);
     UnregisterDescriptor(mEndpointId, provider);
     mEndpointId = kInvalidEndpointId;
 }

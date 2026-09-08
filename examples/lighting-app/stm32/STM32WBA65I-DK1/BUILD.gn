@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/stm32_sdk.gni")
 import("${build_root}/config/defaults.gni")
+
 import("${chip_root}/src/platform/device.gni")
 import("${stm32_sdk_build_root}/stm32_executable.gni")
 import("${stm32_sdk_build_root}/stm32_sdk.gni")
@@ -42,8 +43,44 @@ declare_args() {
   OTA_periodic_query_timeout = 86400
 }
 
+if (chip_enable_ota_requestor) {
+  # OEMiROT Secure_nsclib path
+  oemirot_nsclib_path =
+      "${examples_plat_dir}/STM32WBA65I-DK1/oemirot/Secure_nsclib"
+}
+
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_thread))
+
+# Prebuild action to preprocess the linker script for OEMiROT
+if (chip_enable_ota_requestor) {
+  action("preprocess_linker_script") {
+    script = "${examples_plat_dir}/STM32WBA65I-DK1/oemirot/preprocess_ld.py"
+
+    ldscript_in =
+        "${examples_plat_dir}/ldscripts/STM32WBA65I-DK1_FLASH_NS.ld.in"
+    ldscript_out = "${target_gen_dir}/STM32WBA65I-DK1_FLASH_NS.ld"
+
+    sources = [
+      "${oemirot_nsclib_path}/appli_flash_layout.h",
+      "${oemirot_nsclib_path}/appli_region_defs.h",
+      ldscript_in,
+    ]
+
+    outputs = [ ldscript_out ]
+
+    args = [
+      "--input",
+      rebase_path(ldscript_in, root_build_dir),
+      "--output",
+      rebase_path(ldscript_out, root_build_dir),
+      "--include-dir",
+      rebase_path(oemirot_nsclib_path, root_build_dir),
+      "--define",
+      "STM32WBA65xx",
+    ]
+  }
+}
 
 stm32_sdk("sdk") {
   include_dirs = [
@@ -76,7 +113,6 @@ stm32_executable("lighting_app") {
   output_name = "${stm32_board}-lighting.elf"
   include_dirs = [
     "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
-    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/Inc",
     "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/Target",
     "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/App",
     "include/",
@@ -88,7 +124,6 @@ stm32_executable("lighting_app") {
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_ble.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_matter.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_thread.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/crypto_platform.cpp",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/custom_stm.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/flash.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/bleplat.c",
@@ -98,7 +133,6 @@ stm32_executable("lighting_app") {
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/ll_sys_if.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/power_table.c",
     "${stm32_board_src}/STM32WBA65I-DK1/Src/app_entry.cpp",
-    "${stm32_board_src}/STM32WBA65I-DK1/Src/main.c",
     "src/AppTask.cpp",
     "src/IdentifierEffect.cpp",
     "src/LightingManager.cpp",
@@ -121,9 +155,14 @@ stm32_executable("lighting_app") {
   ]
 
   # Add the startup file to the target
-  sources += [ "${examples_plat_dir}/startup_files/startup_STM32WBA65I-DK1.s" ]
-  sources +=
-      [ "${examples_plat_dir}/startup_files/stm32wbaxx_ResetHandler_GCC.s" ]
+  # OEMiROT TrustZone NonSecure configuration
+  if (chip_enable_ota_requestor) {
+    sources +=
+        [ "${examples_plat_dir}/startup_files/startup_stm32wbaxx_oemirot.c" ]
+  } else {
+    sources += [ "${examples_plat_dir}/startup_files/startup_stm32wba65xx.s" ]
+  }
+
   defines += [
     "DEBUG",
     "USE_HAL_DRIVER",
@@ -132,15 +171,27 @@ stm32_executable("lighting_app") {
   if (chip_enable_ota_requestor) {
     defines += [ "STM32_OTA_ENABLED" ]
     sources += [
-      "${examples_plat_dir}/OTAConfig.cpp",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_device.c",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_flash.c",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/stm_ota_spi_flash.c",
-      "src/STM32WBA6/ota.cpp",
+      "src/ota.cpp",
     ]
   }
 
-  ldscript = "${examples_plat_dir}/ldscripts/STM32WBA65I-DK1_FLASH.ld"
+  # OEMiROT TrustZone NonSecure configuration
+  if (chip_enable_ota_requestor) {
+    # Add dependency on linker script preprocessing
+    deps += [ ":preprocess_linker_script" ]
+
+    # Use preprocessed TrustZone NonSecure linker script
+    ldscript = "${target_gen_dir}/STM32WBA65I-DK1_FLASH_NS.ld"
+
+    # Add Secure_nsclib include path
+    include_dirs += [ oemirot_nsclib_path ]
+  } else {
+    # Standard linker script
+    ldscript = "${examples_plat_dir}/ldscripts/STM32WBA65I-DK1_FLASH.ld"
+  }
 
   inputs = [ ldscript ]
 
@@ -159,6 +210,13 @@ stm32_executable("lighting_app") {
     "-Wl,--end-group",
     "-Wl,--no-warn-execstack",
   ]
+
+  # Link with secure_nsclib.o for OEMiROT TrustZone
+  if (chip_enable_ota_requestor) {
+    ldflags += [ rebase_path("${oemirot_nsclib_path}/secure_nsclib.o",
+                             root_build_dir) ]
+  }
+
   if (chip_print_memory_usage) {
     ldflags += [
       "-Wl,--print-memory-usage",

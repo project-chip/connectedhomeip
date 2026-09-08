@@ -93,6 +93,7 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x00000146, MTRDeviceTypeClass::Simple, @"Chime" },
     { 0x00000147, MTRDeviceTypeClass::Simple, @"Camera Controller" },
     { 0x00000148, MTRDeviceTypeClass::Simple, @"Doorbell" },
+    { 0x00000149, MTRDeviceTypeClass::Simple, @"AV Analysis Node" },
     { 0x00000150, MTRDeviceTypeClass::Simple, @"Ambient Context Sensor" },
     { 0x00000152, MTRDeviceTypeClass::Simple, @"Proximity Ranger" },
     { 0x00000202, MTRDeviceTypeClass::Simple, @"Window Covering" },

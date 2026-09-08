@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "camera-device-interface.h"
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 
 namespace chip {
@@ -38,30 +39,10 @@ public:
     virtual void ShutdownApp() override;
 
     /**
-     * Delegate command handlers
-     */
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status ActivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status DeactivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status RemoveAnalysisStream() override;
-
-    /**
      * Delegate command assists
      */
 
-    virtual CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override;
+    virtual CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override;
 
     virtual bool CanAddContextTriggers() override;
 
@@ -69,7 +50,13 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    /**
+     * Camera App interface
+     */
+    void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
+
 private:
+    CameraDeviceInterface * mCameraDevice = nullptr;
 };
 
 } // namespace AvAnalysis

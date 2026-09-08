@@ -40356,6 +40356,7 @@ public:
 | * CommissionedFabrics                                               | 0x0003 |
 | * TrustedRootCertificates                                           | 0x0004 |
 | * CurrentFabricIndex                                                | 0x0005 |
+| * PQCDeviceAttestationProfile                                       | 0x0006 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -40427,6 +40428,15 @@ public:
         : ClusterCommand("certificate-chain-request")
     {
         AddArgument("CertificateType", 0, UINT8_MAX, &mRequest.certificateType);
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("CryptoProfile", 0, UINT8_MAX, &mRequest.cryptoProfile);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("SegmentID", 0, UINT16_MAX, &mRequest.segmentID);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("MaxSegmentSize", 0, UINT16_MAX, &mRequest.maxSegmentSize);
+#endif // MTR_ENABLE_PROVISIONAL
         ClusterCommand::AddArguments();
     }
 
@@ -40442,6 +40452,27 @@ public:
         __auto_type * params = [[MTROperationalCredentialsClusterCertificateChainRequestParams alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.certificateType = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.certificateType)];
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.cryptoProfile.HasValue()) {
+            params.cryptoProfile = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.cryptoProfile.Value())];
+        } else {
+            params.cryptoProfile = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.segmentID.HasValue()) {
+            params.segmentID = [NSNumber numberWithUnsignedShort:mRequest.segmentID.Value()];
+        } else {
+            params.segmentID = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.maxSegmentSize.HasValue()) {
+            params.maxSegmentSize = [NSNumber numberWithUnsignedShort:mRequest.maxSegmentSize.Value()];
+        } else {
+            params.maxSegmentSize = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -41449,6 +41480,92 @@ public:
         return CHIP_NO_ERROR;
     }
 };
+
+#if MTR_ENABLE_PROVISIONAL
+
+/*
+ * Attribute PQCDeviceAttestationProfile
+ */
+class ReadOperationalCredentialsPQCDeviceAttestationProfile : public ReadAttribute {
+public:
+    ReadOperationalCredentialsPQCDeviceAttestationProfile()
+        : ReadAttribute("pqcdevice-attestation-profile")
+    {
+    }
+
+    ~ReadOperationalCredentialsPQCDeviceAttestationProfile()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributePQCDeviceAttestationProfileWithCompletion:^(MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"OperationalCredentials.PQCDeviceAttestationProfile response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("OperationalCredentials PQCDeviceAttestationProfile read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class SubscribeAttributeOperationalCredentialsPQCDeviceAttestationProfile : public SubscribeAttribute {
+public:
+    SubscribeAttributeOperationalCredentialsPQCDeviceAttestationProfile()
+        : SubscribeAttribute("pqcdevice-attestation-profile")
+    {
+    }
+
+    ~SubscribeAttributeOperationalCredentialsPQCDeviceAttestationProfile()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributePQCDeviceAttestationProfileWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"OperationalCredentials.PQCDeviceAttestationProfile response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
 
 /*
  * Attribute GeneratedCommandList
@@ -77593,17 +77710,17 @@ public:
         __auto_type * params = [[MTRDeviceEnergyManagementClusterPowerRangeAdjustRequestParams alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
 #if MTR_ENABLE_PROVISIONAL
-        if (mRequest.minPower.IsNull()) {
-            params.minPower = nil;
-        } else {
+        if (mRequest.minPower.HasValue()) {
             params.minPower = [NSNumber numberWithLongLong:mRequest.minPower.Value()];
+        } else {
+            params.minPower = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        if (mRequest.maxPower.IsNull()) {
-            params.maxPower = nil;
-        } else {
+        if (mRequest.maxPower.HasValue()) {
             params.maxPower = [NSNumber numberWithLongLong:mRequest.maxPower.Value()];
+        } else {
+            params.maxPower = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
@@ -149217,6 +149334,7 @@ public:
 | * BLTCSSecurityLevel                                                | 0x0004 |
 | * BLTCSModeCapability                                               | 0x0005 |
 | * SessionIDList                                                     | 0x0006 |
+| * RangingConstraints                                                | 0x0007 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -149261,9 +149379,6 @@ public:
         AddArgument("Bandwidth", 0, UINT32_MAX, &mRequest.bandwidth);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("SecurityMode", 0, UINT8_MAX, &mRequest.securityMode);
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
         AddArgument("Trigger", &mComplex_Trigger);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
@@ -149291,11 +149406,7 @@ public:
             params.wiFiRangingDeviceRoleConfig = [MTRProximityRangingClusterWiFiRangingDeviceRoleConfigStruct new];
             params.wiFiRangingDeviceRoleConfig.role = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.wiFiRangingDeviceRoleConfig.Value().role)];
             params.wiFiRangingDeviceRoleConfig.peerWiFiDevIK = [NSData dataWithBytes:mRequest.wiFiRangingDeviceRoleConfig.Value().peerWiFiDevIK.data() length:mRequest.wiFiRangingDeviceRoleConfig.Value().peerWiFiDevIK.size()];
-            if (mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.HasValue()) {
-                params.wiFiRangingDeviceRoleConfig.pmk = [NSData dataWithBytes:mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.Value().data() length:mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.Value().size()];
-            } else {
-                params.wiFiRangingDeviceRoleConfig.pmk = nil;
-            }
+            params.wiFiRangingDeviceRoleConfig.pmk = [NSData dataWithBytes:mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.data() length:mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.size()];
         } else {
             params.wiFiRangingDeviceRoleConfig = nil;
         }
@@ -149305,6 +149416,12 @@ public:
             params.bleRangingDeviceRoleConfig = [MTRProximityRangingClusterBLERangingDeviceRoleConfigStruct new];
             params.bleRangingDeviceRoleConfig.role = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.BLERangingDeviceRoleConfig.Value().role)];
             params.bleRangingDeviceRoleConfig.peerBLEDeviceID = [NSNumber numberWithUnsignedLongLong:mRequest.BLERangingDeviceRoleConfig.Value().peerBLEDeviceID];
+            params.bleRangingDeviceRoleConfig.blerbcSecurityMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.BLERangingDeviceRoleConfig.Value().BLERBCSecurityMode)];
+            if (mRequest.BLERangingDeviceRoleConfig.Value().sessionKey.HasValue()) {
+                params.bleRangingDeviceRoleConfig.sessionKey = [NSData dataWithBytes:mRequest.BLERangingDeviceRoleConfig.Value().sessionKey.Value().data() length:mRequest.BLERangingDeviceRoleConfig.Value().sessionKey.Value().size()];
+            } else {
+                params.bleRangingDeviceRoleConfig.sessionKey = nil;
+            }
         } else {
             params.bleRangingDeviceRoleConfig = nil;
         }
@@ -149319,16 +149436,8 @@ public:
             } else {
                 params.bltChannelSoundingDeviceRoleConfig.bltcsMode = nil;
             }
-            if (mRequest.BLTChannelSoundingDeviceRoleConfig.Value().BLTCSSecurityLevel.HasValue()) {
-                params.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.BLTChannelSoundingDeviceRoleConfig.Value().BLTCSSecurityLevel.Value())];
-            } else {
-                params.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel = nil;
-            }
-            if (mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.HasValue()) {
-                params.bltChannelSoundingDeviceRoleConfig.ltk = [NSData dataWithBytes:mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.Value().data() length:mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.Value().size()];
-            } else {
-                params.bltChannelSoundingDeviceRoleConfig.ltk = nil;
-            }
+            params.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.BLTChannelSoundingDeviceRoleConfig.Value().BLTCSSecurityLevel)];
+            params.bltChannelSoundingDeviceRoleConfig.ltk = [NSData dataWithBytes:mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.data() length:mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.size()];
         } else {
             params.bltChannelSoundingDeviceRoleConfig = nil;
         }
@@ -149346,9 +149455,6 @@ public:
         } else {
             params.bandwidth = nil;
         }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
-        params.securityMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.securityMode)];
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         params.trigger = [MTRProximityRangingClusterRangingTriggerConditionStruct new];
@@ -150053,6 +150159,91 @@ public:
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                 NSLog(@"ProximityRanging.SessionIDList response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+
+/*
+ * Attribute RangingConstraints
+ */
+class ReadProximityRangingRangingConstraints : public ReadAttribute {
+public:
+    ReadProximityRangingRangingConstraints()
+        : ReadAttribute("ranging-constraints")
+    {
+    }
+
+    ~ReadProximityRangingRangingConstraints()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ProximityRanging::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::ProximityRanging::Attributes::RangingConstraints::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterProximityRanging alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributeRangingConstraintsWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ProximityRanging.RangingConstraints response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("ProximityRanging RangingConstraints read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class SubscribeAttributeProximityRangingRangingConstraints : public SubscribeAttribute {
+public:
+    SubscribeAttributeProximityRangingRangingConstraints()
+        : SubscribeAttribute("ranging-constraints")
+    {
+    }
+
+    ~SubscribeAttributeProximityRangingRangingConstraints()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ProximityRanging::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::ProximityRanging::Attributes::RangingConstraints::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterProximityRanging alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributeRangingConstraintsWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"ProximityRanging.RangingConstraints response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -185925,10 +186116,12 @@ public:
 | * SetTransportStatus                                                |   0x04 |
 | * ManuallyTriggerTransport                                          |   0x05 |
 | * FindTransport                                                     |   0x06 |
+| * UpdateMotionZoneOptions                                           |   0x08 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedFormats                                                  | 0x0000 |
 | * CurrentConnections                                                | 0x0001 |
+| * MaxZones                                                          | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -186594,6 +186787,107 @@ private:
 };
 
 #endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+/*
+ * Command UpdateMotionZoneOptions
+ */
+class PushAvStreamTransportUpdateMotionZoneOptions : public ClusterCommand {
+public:
+    PushAvStreamTransportUpdateMotionZoneOptions()
+        : ClusterCommand("update-motion-zone-options")
+        , mComplex_MotionZones(&mRequest.motionZones)
+    {
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("MotionZones", &mComplex_MotionZones, "", Argument::kOptional);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("MotionSensitivity", 0, UINT8_MAX, &mRequest.motionSensitivity);
+#endif // MTR_ENABLE_PROVISIONAL
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId, commandId, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterPushAVStreamTransport alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams alloc] init];
+        params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
+#if MTR_ENABLE_PROVISIONAL
+        params.connectionID = [NSNumber numberWithUnsignedShort:mRequest.connectionID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.motionZones.HasValue()) {
+            if (mRequest.motionZones.Value().IsNull()) {
+                params.motionZones = nil;
+            } else {
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    for (auto & entry_2 : mRequest.motionZones.Value().Value()) {
+                        MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_2;
+                        newElement_2 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
+                        if (entry_2.zone.IsNull()) {
+                            newElement_2.zone = nil;
+                        } else {
+                            newElement_2.zone = [NSNumber numberWithUnsignedShort:entry_2.zone.Value()];
+                        }
+                        if (entry_2.sensitivity.HasValue()) {
+                            newElement_2.sensitivity = [NSNumber numberWithUnsignedChar:entry_2.sensitivity.Value()];
+                        } else {
+                            newElement_2.sensitivity = nil;
+                        }
+                        [array_2 addObject:newElement_2];
+                    }
+                    params.motionZones = array_2;
+                }
+            }
+        } else {
+            params.motionZones = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.motionSensitivity.HasValue()) {
+            if (mRequest.motionSensitivity.Value().IsNull()) {
+                params.motionSensitivity = nil;
+            } else {
+                params.motionSensitivity = [NSNumber numberWithUnsignedChar:mRequest.motionSensitivity.Value().Value()];
+            }
+        } else {
+            params.motionSensitivity = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+        uint16_t repeatCount = mRepeatCount.ValueOr(1);
+        uint16_t __block responsesNeeded = repeatCount;
+        while (repeatCount--) {
+            [cluster updateMotionZoneOptionsWithParams:params completion:
+                    ^(NSError * _Nullable error) {
+                        responsesNeeded--;
+                        if (error != nil) {
+                            mError = error;
+                            LogNSError("Error", error);
+                            TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(commandId), error);
+                        }
+                        if (responsesNeeded == 0) {
+                            SetCommandExitStatus(mError);
+                        }
+                    }];
+        }
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type>>>> mComplex_MotionZones;
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
 
 #if MTR_ENABLE_PROVISIONAL
 
@@ -186756,6 +187050,91 @@ public:
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                 NSLog(@"PushAVStreamTransport.CurrentConnections response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+
+/*
+ * Attribute MaxZones
+ */
+class ReadPushAvStreamTransportMaxZones : public ReadAttribute {
+public:
+    ReadPushAvStreamTransportMaxZones()
+        : ReadAttribute("max-zones")
+    {
+    }
+
+    ~ReadPushAvStreamTransportMaxZones()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::PushAvStreamTransport::Attributes::MaxZones::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterPushAVStreamTransport alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributeMaxZonesWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PushAVStreamTransport.MaxZones response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("PushAVStreamTransport MaxZones read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class SubscribeAttributePushAvStreamTransportMaxZones : public SubscribeAttribute {
+public:
+    SubscribeAttributePushAvStreamTransportMaxZones()
+        : SubscribeAttribute("max-zones")
+    {
+    }
+
+    ~SubscribeAttributePushAvStreamTransportMaxZones()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::PushAvStreamTransport::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::PushAvStreamTransport::Attributes::MaxZones::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterPushAVStreamTransport alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributeMaxZonesWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"PushAVStreamTransport.MaxZones response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -217569,6 +217948,10 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<SubscribeAttributeOperationalCredentialsTrustedRootCertificates>(), //
         make_unique<ReadOperationalCredentialsCurrentFabricIndex>(), //
         make_unique<SubscribeAttributeOperationalCredentialsCurrentFabricIndex>(), //
+#if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadOperationalCredentialsPQCDeviceAttestationProfile>(), //
+        make_unique<SubscribeAttributeOperationalCredentialsPQCDeviceAttestationProfile>(), //
+#endif // MTR_ENABLE_PROVISIONAL
         make_unique<ReadOperationalCredentialsGeneratedCommandList>(), //
         make_unique<SubscribeAttributeOperationalCredentialsGeneratedCommandList>(), //
         make_unique<ReadOperationalCredentialsAcceptedCommandList>(), //
@@ -221895,6 +222278,10 @@ void registerClusterProximityRanging(Commands & commands)
         make_unique<SubscribeAttributeProximityRangingSessionIDList>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadProximityRangingRangingConstraints>(), //
+        make_unique<SubscribeAttributeProximityRangingRangingConstraints>(), //
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         make_unique<ReadProximityRangingGeneratedCommandList>(), //
         make_unique<SubscribeAttributeProximityRangingGeneratedCommandList>(), //
 #endif // MTR_ENABLE_PROVISIONAL
@@ -223651,6 +224038,9 @@ void registerClusterPushAvStreamTransport(Commands & commands)
 #if MTR_ENABLE_PROVISIONAL
         make_unique<PushAvStreamTransportFindTransport>(), //
 #endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        make_unique<PushAvStreamTransportUpdateMotionZoneOptions>(), //
+#endif // MTR_ENABLE_PROVISIONAL
         make_unique<ReadAttribute>(Id), //
         make_unique<WriteAttribute>(Id), //
         make_unique<SubscribeAttribute>(Id), //
@@ -223661,6 +224051,10 @@ void registerClusterPushAvStreamTransport(Commands & commands)
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadPushAvStreamTransportCurrentConnections>(), //
         make_unique<SubscribeAttributePushAvStreamTransportCurrentConnections>(), //
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadPushAvStreamTransportMaxZones>(), //
+        make_unique<SubscribeAttributePushAvStreamTransportMaxZones>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadPushAvStreamTransportGeneratedCommandList>(), //

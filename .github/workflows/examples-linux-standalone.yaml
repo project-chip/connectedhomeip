@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
 
         steps:
             - name: Checkout
@@ -48,12 +48,32 @@ jobs:
               with:
                 platform: linux
 
-            - name: Build Standalone cert tool
+            - name: Build standalone tools
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-cert \
-                        build" && rm -rf out
+                        --target linux-x64-chip-tool \
+                        build"
+            - name: Strip executables
+              run: |
+                strip out/linux-x64-chip-cert/chip-cert
+                strip out/linux-x64-chip-tool/chip-tool
+            - name: Upload tools as artifact
+              if: github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
+              uses: actions/upload-artifact@v7
+              with:
+                name: chip-tools-linux-x64
+                retention-days: 7
+                path: |
+                  out/linux-x64-chip-cert/chip-cert
+                  out/linux-x64-chip-tool/chip-tool
+
+            - name: Test standalone cert tool
+              run: |
+                  CHIP_CERT=out/linux-x64-chip-cert/chip-cert \
+                      python3 src/tools/chip-cert/tests/test_chip_cert.py
+
             - name: Build minmdns example with platform dns
               run: |
                   ./scripts/run_in_build_env.sh \

@@ -30,6 +30,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/app/clusters/zone-management-server",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/support",
@@ -54,6 +55,7 @@ chip_test_suite("tests-backwards-compatibility") {
 
   public_deps = [
     "${chip_root}/src/app/clusters/zone-management-server",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/data-model-providers/codegen/tests:mock_model",

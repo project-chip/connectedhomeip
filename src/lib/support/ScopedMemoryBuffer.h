@@ -248,6 +248,7 @@ public:
 
     ScopedMemoryBufferWithSize & Calloc(size_t elementCount)
     {
+        mCount = 0;
         ScopedMemoryBuffer<T>::Calloc(elementCount);
         if (this->Get() != nullptr)
         {
@@ -258,6 +259,7 @@ public:
 
     ScopedMemoryBufferWithSize & Alloc(size_t elementCount)
     {
+        mCount = 0;
         ScopedMemoryBuffer<T>::Alloc(elementCount);
         if (this->Get() != nullptr)
         {
@@ -272,6 +274,7 @@ public:
     ScopedMemoryBufferWithSize & CopyFromSpan(const chip::Span<const U> & span)
     {
         static_assert(std::is_trivially_copyable_v<U>, "Span<const U> must be trivially copyable");
+        static_assert(sizeof(T) == sizeof(U), "Cannot copy between types of different sizes");
 
         if (span.size() == 0)
         {
@@ -283,7 +286,7 @@ public:
 
         if (AllocatedSize() > 0)
         {
-            memcpy(ScopedMemoryBuffer<T>::Get(), span.data(), AllocatedSize());
+            memcpy(ScopedMemoryBuffer<T>::Get(), span.data(), AllocatedSize() * sizeof(U));
         }
 
         return *this;

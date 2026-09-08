@@ -30,8 +30,8 @@
 #include <lib/dnssd/wire/BytesRange.h>
 #include <lib/dnssd/wire/DnsHeader.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 /// A QName part is a null-terminated string
 using QNamePart = const char *;
@@ -117,5 +117,5 @@ private:
     bool Next(bool followIndirectPointers);
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

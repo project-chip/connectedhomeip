@@ -24,8 +24,8 @@
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 /// Contructs a FullQName from a SerializedNameIterator
 ///
@@ -162,5 +162,5 @@ private:
     chip::Platform::ScopedMemoryBuffer<char *> mElementPointers;
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

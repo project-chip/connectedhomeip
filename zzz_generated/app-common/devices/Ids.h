@@ -233,6 +233,9 @@ constexpr uint8_t kCameraControllerDeviceTypeRevision = 1;
 constexpr DeviceTypeId kDoorbellDeviceTypeId  = 0x00000148;
 constexpr uint8_t kDoorbellDeviceTypeRevision = 2;
 
+constexpr DeviceTypeId kAvAnalysisNodeDeviceTypeId  = 0x00000149;
+constexpr uint8_t kAvAnalysisNodeDeviceTypeRevision = 1;
+
 constexpr DeviceTypeId kAmbientContextSensorDeviceTypeId  = 0x00000150;
 constexpr uint8_t kAmbientContextSensorDeviceTypeRevision = 2;
 

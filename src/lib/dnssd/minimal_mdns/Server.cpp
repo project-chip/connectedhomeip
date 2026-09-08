@@ -25,6 +25,8 @@
 
 namespace mdns {
 namespace Minimal {
+using namespace chip::Dnssd;
+
 namespace {
 
 class ShutdownOnError
@@ -432,7 +434,7 @@ void ServerBase::OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::S
         return;
     }
 
-    mdns::Minimal::BytesRange data(buffer->Start(), buffer->Start() + buffer->DataLength());
+    chip::Dnssd::BytesRange data(buffer->Start(), buffer->Start() + buffer->DataLength());
     if (data.Size() < HeaderRef::kSizeBytes)
     {
         ChipLogError(Discovery, "Packet too small for mDNS data: %d bytes", static_cast<int>(data.Size()));
