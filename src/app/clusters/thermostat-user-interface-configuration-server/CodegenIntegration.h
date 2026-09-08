@@ -22,11 +22,4 @@ namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration {
 
 ThermostatUserInterfaceConfigurationCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
-CHIP_ERROR GetTemperatureDisplayMode(EndpointId endpointId, TemperatureDisplayModeEnum * value);
-CHIP_ERROR SetTemperatureDisplayMode(EndpointId endpointId, TemperatureDisplayModeEnum value);
-CHIP_ERROR GetKeypadLockout(EndpointId endpointId, KeypadLockoutEnum * value);
-CHIP_ERROR SetKeypadLockout(EndpointId endpointId, KeypadLockoutEnum value);
-CHIP_ERROR GetScheduleProgrammingVisibility(EndpointId endpointId, ScheduleProgrammingVisibilityEnum * value);
-CHIP_ERROR SetScheduleProgrammingVisibility(EndpointId endpointId, ScheduleProgrammingVisibilityEnum value);
-
 } // namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration
