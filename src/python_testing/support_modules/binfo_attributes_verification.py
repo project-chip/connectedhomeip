@@ -25,27 +25,7 @@ from matter.clusters.ClusterObjects import Cluster
 from matter.testing.conformance import ConformanceException
 from matter.testing.decorators import _has_attribute
 from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, dm_from_spec_version
-
-# Expected Basic Information DataModelRevision for each Matter specification version.
-# the DataModelRevision value maps to Matter versions as follows:
-#   1 or 16 -> Matter 1.0 / 1.1
-#   17      -> Matter 1.2 / 1.3
-#   18      -> Matter 1.4 / 1.4.1
-#   19      -> Matter 1.4.2 / 1.5
-#   20      -> Matter 1.5.1
-#   21      -> Matter 1.6 / 1.6.1
-# SpecificationVersion (added in Matter 1.3) is used to select the expected value.
-_DATA_MODEL_REVISION_BY_SPEC = {
-    PrebuiltDataModelDirectory.k1_3: 17,    # Matter 1.3 (Technically also 1.2, but it has no SpecificationVersion attribute)
-    PrebuiltDataModelDirectory.k1_4: 18,    # Matter 1.4
-    PrebuiltDataModelDirectory.k1_4_1: 18,  # Matter 1.4.1
-    PrebuiltDataModelDirectory.k1_4_2: 19,  # Matter 1.4.2
-    PrebuiltDataModelDirectory.k1_5: 19,    # Matter 1.5
-    PrebuiltDataModelDirectory.k1_5_1: 20,  # Matter 1.5.1
-    PrebuiltDataModelDirectory.k1_6: 21,    # Matter 1.6
-    PrebuiltDataModelDirectory.k1_6_1: 21,  # Matter 1.6.1
-}
+from matter.testing.spec_parsing import data_model_revision_from_dm, dm_from_spec_version
 
 
 class BasicInformationAttributesVerificationBase(MatterBaseTest):
@@ -119,7 +99,12 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                     data_model = dm_from_spec_version(specification_version)
                 except ConformanceException:
                     asserts.fail(f'Unknown SpecificationVersion 0x{specification_version:08X}')
-                expected_data_model_revision = _DATA_MODEL_REVISION_BY_SPEC[data_model]
+                try:
+                    expected_data_model_revision = data_model_revision_from_dm(data_model)
+                except ConformanceException as e:
+                    # Not a DUT failure: spec_parsing knows this data model but has no
+                    # DataModelRevision recorded for it, so the mapping needs updating.
+                    asserts.fail(str(e))
                 asserts.assert_equal(ret1, expected_data_model_revision,
                                      f"DataModelRevision should be {expected_data_model_revision} for SpecificationVersion 0x{specification_version:08X}")
             else:

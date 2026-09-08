@@ -15,7 +15,9 @@
 #    limitations under the License.
 #
 
+import re
 import xml.etree.ElementTree as ElementTree
+from pathlib import Path
 
 import jinja2
 from mobly import asserts
@@ -25,9 +27,10 @@ from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
-from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
-                                         add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
-                                         combine_derived_clusters_with_base, get_data_model_directory)
+from matter.testing.spec_parsing import (_DM_TO_DATA_MODEL_REVISION, _SPEC_VERSION_TO_DM, ClusterParser, DataModelLevel,
+                                         PrebuiltDataModelDirectory, XmlCluster, add_cluster_data_from_xml, build_xml_clusters,
+                                         check_clusters_for_unknown_commands, combine_derived_clusters_with_base,
+                                         data_model_revision_from_dm, get_data_model_directory)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
@@ -261,6 +264,68 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
   </commands>
 </cluster>
 """
+
+# This file lives at <repo root>/src/python_testing/test_testing/, so the repository root is three
+# directories up. spec_parsing loads data models from the zips packaged into matter.testing, which
+# do not exist in the source tree, so the checked-in copies are located from here instead. Derive
+# these from __file__ rather than the working directory: only CI happens to run these tests from
+# the repository root.
+_CHIP_ROOT = Path(__file__).resolve().parents[3]
+_DATA_MODEL_DIR = _CHIP_ROOT / "data_model"
+_REVISIONS_HEADER = _CHIP_ROOT / "src" / "app" / "SpecificationDefinedRevisions.h"
+
+# Repo-relative names, so failure messages name the file to edit.
+_REVISIONS_HEADER_NAME = "src/app/SpecificationDefinedRevisions.h"
+_SPEC_PARSING_NAME = "src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py"
+
+# data_model/ holds one directory per specification version ("1.4", "1.6.1", ...) alongside files
+# such as README.md and errata_future.yaml. Requiring an all-numeric dotted name also skips
+# in-progress directories, which have historically been named things like "1.5_in_progress".
+_VERSION_DIR_PATTERN = re.compile(r"^\d+(?:\.\d+)*$")
+
+# Data model directories that are checked in but that the SDK deliberately does not claim
+# conformance to yet. This is the escape hatch for landing XMLs ahead of the C++ constants: add the
+# directory name here with a tracking issue, and remove it again in the PR that bumps
+# src/app/SpecificationDefinedRevisions.h.
+_UNCLAIMED_DATA_MODEL_DIRNAMES: frozenset[str] = frozenset()
+
+
+def _version_key(dirname: str) -> tuple[int, ...]:
+    # Integer tuples, so a future "1.10" sorts after "1.9" (a string compare gets that backwards)
+    # and "1.6" sorts before "1.6.1".
+    return tuple(int(part) for part in dirname.split("."))
+
+
+def _spec_version_from_dirname(dirname: str) -> int:
+    # SpecificationVersion is 1 byte major, 1 byte minor, 1 byte dot and 1 reserved byte, so it is
+    # derivable from the directory name. A newly added data_model directory may not have a
+    # PrebuiltDataModelDirectory member yet, so this cannot go through _SPEC_VERSION_TO_DM.
+    parts = list(_version_key(dirname)) + [0, 0]
+    return (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8)
+
+
+def _checked_in_data_model_dirnames() -> list[str]:
+    asserts.assert_true(_DATA_MODEL_DIR.is_dir(),
+                        f"Expected the checked-in data models at {_DATA_MODEL_DIR} - "
+                        "this test must run from a source checkout")
+    return [entry.name for entry in _DATA_MODEL_DIR.iterdir()
+            if entry.is_dir() and _VERSION_DIR_PATTERN.match(entry.name)]
+
+
+def _header_constant(name: str) -> int:
+    # Fail loudly when the constant cannot be located. A regex that silently matched nothing would
+    # skip the assertion these tests exist to make, which is worse than having no test at all.
+    asserts.assert_true(_REVISIONS_HEADER.is_file(), f"Expected the revision constants at {_REVISIONS_HEADER}")
+    header = _REVISIONS_HEADER.read_text(encoding="utf-8")
+    # The trailing "=" is what keeps kInteractionModelRevision from also matching
+    # kInteractionModelRevisionTag.
+    matches = re.findall(rf"\b{name}\s*=\s*(0[xX][0-9a-fA-F]+|[0-9]+)\s*;", header)
+    asserts.assert_equal(len(matches), 1,
+                         f"Expected exactly one definition of {name} in {_REVISIONS_HEADER_NAME}, found {len(matches)} - "
+                         "the header was restructured, update _header_constant in this file")
+    literal = matches[0]
+    # Explicit base rather than int(literal, 0), which rejects a zero-padded decimal.
+    return int(literal, 16) if literal.lower().startswith("0x") else int(literal, 10)
 
 
 class TestSpecParsingSupport(CertificationUnitTestNoDevice):
@@ -725,6 +790,105 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         for attribute_id in (0x0000, 0x0002, 0x0003):
             asserts.assert_false(xml_cluster.attributes[attribute_id].scene,
                                  f"Attribute {attribute_id:#06x} should not carry the Scene (S) quality")
+
+    def test_prebuilt_data_model_mappings_complete(self):
+        # Adding a PrebuiltDataModelDirectory member requires hand-updating three mappings that
+        # nothing else cross-checks. Missing any of them only surfaces when a test runs against a
+        # DUT reporting the new version, so assert coverage of every member here instead.
+        selectable = set(_SPEC_VERSION_TO_DM.values())
+        for data_model in PrebuiltDataModelDirectory:
+            try:
+                dirname = data_model.dirname
+            except KeyError:
+                asserts.fail(f"{data_model.name} has no dirname - update PrebuiltDataModelDirectory.dirname")
+            asserts.assert_true(dirname, f"{data_model.name} has an empty dirname")
+
+            asserts.assert_in(data_model, _DM_TO_DATA_MODEL_REVISION,
+                              f"{data_model.name} has no DataModelRevision - add an entry to _DM_TO_DATA_MODEL_REVISION")
+
+            # Matter 1.2 predates the SpecificationVersion attribute, so it is selected from
+            # endpoint contents rather than from a specification version.
+            if data_model is PrebuiltDataModelDirectory.k1_2:
+                continue
+
+            asserts.assert_in(data_model, selectable,
+                              f"{data_model.name} is not reachable from any SpecificationVersion - "
+                              "add an entry to _SPEC_VERSION_TO_DM")
+
+    def test_data_model_revision_from_dm(self):
+        asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_3), 17,
+                             "Incorrect DataModelRevision for 1.3")
+        asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_4_1), 18,
+                             "Incorrect DataModelRevision for 1.4.1")
+        asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_6_1), 21,
+                             "Incorrect DataModelRevision for 1.6.1")
+
+    def test_revision_constants_self_consistent(self):
+        # kDataModelRevision sat at 19 across the 1.5.1, 1.6 and 1.6.1 bumps while
+        # kSpecificationVersion was updated every time, because nothing tied the two constants
+        # together (fixed in PR #72874). TC_BINFO_2_1 now catches this against a running device;
+        # checking it here as well reports it in milliseconds instead of after an app build.
+        header_spec_version = _header_constant("kSpecificationVersion")
+        asserts.assert_in(header_spec_version, _SPEC_VERSION_TO_DM,
+                          f"{_REVISIONS_HEADER_NAME} sets kSpecificationVersion = 0x{header_spec_version:08X}, which is not a "
+                          f"known specification version - add it to _SPEC_VERSION_TO_DM in {_SPEC_PARSING_NAME}")
+        data_model = _SPEC_VERSION_TO_DM[header_spec_version]
+
+        asserts.assert_in(data_model, _DM_TO_DATA_MODEL_REVISION,
+                          f"{data_model.name} has no DataModelRevision - add an entry for it to "
+                          f"_DM_TO_DATA_MODEL_REVISION in {_SPEC_PARSING_NAME}")
+        expected_data_model_revision = data_model_revision_from_dm(data_model)
+        header_data_model_revision = _header_constant("kDataModelRevision")
+        asserts.assert_equal(header_data_model_revision, expected_data_model_revision,
+                             f"{_REVISIONS_HEADER_NAME} sets kDataModelRevision = {header_data_model_revision}, but "
+                             f"SpecificationVersion 0x{header_spec_version:08X} (Matter {data_model.dirname}) requires "
+                             f"{expected_data_model_revision}. Set kDataModelRevision = {expected_data_model_revision} in "
+                             f"{_REVISIONS_HEADER_NAME}, or correct _DM_TO_DATA_MODEL_REVISION[PrebuiltDataModelDirectory."
+                             f"{data_model.name}] in {_SPEC_PARSING_NAME} if that is not the DataModelRevision of Matter "
+                             f"{data_model.dirname}.")
+
+    def test_revision_constants_not_behind_data_model(self):
+        # Adding data_model/<version>/ without bumping the C++ constants leaves the SDK reporting
+        # the previous specification version, which every other check believes: the header stays
+        # self-consistent and the device truthfully reports the old version. Anchor on the newest
+        # checked-in data model instead. The comparison is deliberately one-sided - the SDK is
+        # allowed to claim a version whose files are not checked in yet, which it has done before,
+        # but it must never lag behind the files that are.
+        dirnames = _checked_in_data_model_dirnames()
+        asserts.assert_true(dirnames, f"No specification version directories found in {_DATA_MODEL_DIR}")
+
+        stale = sorted(_UNCLAIMED_DATA_MODEL_DIRNAMES - set(dirnames))
+        asserts.assert_false(stale,
+                             f"_UNCLAIMED_DATA_MODEL_DIRNAMES in this file lists {stale}, which is not checked in under "
+                             "data_model/ - remove the stale entries")
+
+        claimed = [dirname for dirname in dirnames if dirname not in _UNCLAIMED_DATA_MODEL_DIRNAMES]
+        asserts.assert_true(claimed,
+                            "Every checked-in data model is listed in _UNCLAIMED_DATA_MODEL_DIRNAMES in this file, leaving "
+                            f"nothing to check {_REVISIONS_HEADER_NAME} against")
+        newest_dirname = max(claimed, key=_version_key)
+        newest_spec_version = _spec_version_from_dirname(newest_dirname)
+
+        # Where the mapping already exists it is authoritative, so use it to confirm the version
+        # arithmetic above at the one point these tests depend on it.
+        for spec_version, data_model in _SPEC_VERSION_TO_DM.items():
+            if data_model.dirname == newest_dirname:
+                asserts.assert_equal(newest_spec_version, spec_version,
+                                     f"_SPEC_VERSION_TO_DM maps 0x{spec_version:08X} to {data_model.name} "
+                                     f"(data_model/{newest_dirname}/), but that version encodes as "
+                                     f"0x{newest_spec_version:08X} - fix the key in {_SPEC_PARSING_NAME}")
+
+        header_spec_version = _header_constant("kSpecificationVersion")
+        asserts.assert_greater_equal(header_spec_version, newest_spec_version,
+                                     f"{_REVISIONS_HEADER_NAME} sets kSpecificationVersion = 0x{header_spec_version:08X}, but "
+                                     f"data_model/{newest_dirname}/ is checked in and requires at least "
+                                     f"0x{newest_spec_version:08X}. Bump kSpecificationVersion and re-check "
+                                     "kDataModelRevision in that file - both must be updated for a specification bump, and "
+                                     "kDataModelRevision is the one that historically gets missed (PR #72874). Re-check "
+                                     "kInteractionModelRevision against the specification too; this test cannot verify that "
+                                     f"value. If the SDK is deliberately not claiming Matter {newest_dirname} yet, add "
+                                     f"\"{newest_dirname}\" to _UNCLAIMED_DATA_MODEL_DIRNAMES in this file with a tracking "
+                                     "issue.")
 
 
 if __name__ == "__main__":
