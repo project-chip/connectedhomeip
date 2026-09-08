@@ -155,7 +155,8 @@ following guidelines:
    explicitly by executing `Unregister(provider)`. Teardown must unregister the
    endpoint first (via `UnregisterDescriptor()`) before removing or destroying
    individual clusters, as `CodeDrivenDataModelProvider` disallows removing
-   clusters from an actively registered endpoint (`CHIP_ERROR_INCORRECT_STATE`).
+   clusters from an actively registered endpoint once started
+   (`CHIP_ERROR_INCORRECT_STATE`).
 4. **Concrete Naming**: Avoid ambiguous umbrella folders or generic utility
    names. Use specific operational titles (e.g., `DeviceTypeParser.h`,
    `NetworkInfrastructureManager.h`).

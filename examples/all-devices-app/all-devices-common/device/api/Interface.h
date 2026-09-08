@@ -99,8 +99,8 @@ public:
     /// Required teardown order:
     /// Subclasses MUST call UnregisterDescriptor() (which unregisters the endpoint from the provider
     /// via provider.RemoveEndpoint()) BEFORE unregistering or destroying any device-specific clusters
-    /// via provider.RemoveCluster(). Attempting to call RemoveCluster() while the endpoint remains
-    /// registered will fail with CHIP_ERROR_INCORRECT_STATE.
+    /// via provider.RemoveCluster(). Once the provider has been started, attempting to call RemoveCluster()
+    /// while the endpoint remains registered will fail with CHIP_ERROR_INCORRECT_STATE.
     virtual void Unregister(CodeDrivenDataModelProvider & provider) = 0;
 
     // Endpoint interface implementation
@@ -125,7 +125,7 @@ protected:
     ///
     /// This MUST be called FIRST in any device's Unregister() implementation before removing any
     /// other clusters from the provider, because CodeDrivenDataModelProvider disallows removing
-    /// clusters while their associated endpoint is still registered.
+    /// clusters while their associated endpoint is still registered once the provider has been started.
     virtual void UnregisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;

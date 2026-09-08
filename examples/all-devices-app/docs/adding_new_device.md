@@ -108,15 +108,15 @@ and easy to test:
       the descriptor cluster and initialize endpoint metadata), create and add
       all domain and optional clusters via `provider.AddCluster()`, and finally
       register the endpoint via `provider.AddEndpoint(mEndpointRegistration)`.
-      `CodeDrivenDataModelProvider` rejects adding clusters to an
+      Once started, `CodeDrivenDataModelProvider` rejects adding clusters to an
       already-registered endpoint (`CHIP_ERROR_INCORRECT_STATE`).
     - **Teardown order**: Call `UnregisterDescriptor(provider)` **first**,
       before removing or destroying any domain or optional clusters.
-      `UnregisterDescriptor()` unregisters the endpoint from the provider via
-      `provider.RemoveEndpoint()`. `CodeDrivenDataModelProvider` prevents
-      non-atomic endpoint modifications and returns `CHIP_ERROR_INCORRECT_STATE`
-      if `provider.RemoveCluster()` is called while the endpoint is still
-      registered.
+      `UnregisterDescriptor()` removes the endpoint from the provider via
+      `provider.RemoveEndpoint()`. Once started, `CodeDrivenDataModelProvider`
+      prevents non-atomic endpoint modifications and returns
+      `CHIP_ERROR_INCORRECT_STATE` if `provider.RemoveCluster()` is called while
+      the endpoint is still registered.
 
 ---
 
@@ -204,7 +204,7 @@ CHIP_ERROR MySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMod
 void MySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     // UnregisterDescriptor MUST be called first to remove the endpoint from the provider.
-    // Calling provider.RemoveCluster while the endpoint is still registered returns CHIP_ERROR_INCORRECT_STATE.
+    // Once started, calling provider.RemoveCluster while the endpoint is still registered returns CHIP_ERROR_INCORRECT_STATE.
     UnregisterDescriptor(provider);
     if (mMySensorCluster.IsConstructed())
     {
