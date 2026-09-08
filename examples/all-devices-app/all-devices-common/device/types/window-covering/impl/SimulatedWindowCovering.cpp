@@ -36,7 +36,7 @@ Percent100ths ComputeStepToTarget(Percent100ths current, Percent100ths target)
     {
         return static_cast<Percent100ths>((target - current > kPositionStep) ? (current + kPositionStep) : target);
     }
-    else if (current > target)
+    if (current > target)
     {
         return static_cast<Percent100ths>((current - target > kPositionStep) ? (current - kPositionStep) : target);
     }
