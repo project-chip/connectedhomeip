@@ -31,19 +31,22 @@ constexpr Percent100ths kPositionStep                       = 500; // 5% step
 } // namespace
 
 SimulatedWindowCovering::SimulatedWindowCovering(const Context & context) :
-    WindowCovering(*this, *this, context,
-                   BitFlags<Clusters::WindowCovering::Feature>(
-                       Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
-                       Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt),
-                   []() {
-                       Clusters::WindowCovering::OptionalAttributeSet optionals;
-                       optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
-                           .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
-                           .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
-                           .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
-                           .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
-                       return optionals;
-                   }())
+    WindowCovering(context,
+                   Delegates{ .windowCovering = *this, .identify = *this },
+                   Config{
+                       .features = BitFlags<Clusters::WindowCovering::Feature>(
+                           Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
+                           Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt),
+                       .optionalAttributes = []() {
+                           Clusters::WindowCovering::OptionalAttributeSet optionals;
+                           optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
+                               .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
+                               .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
+                               .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
+                               .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
+                           return optionals;
+                       }()
+                   })
 {}
 
 SimulatedWindowCovering::~SimulatedWindowCovering()

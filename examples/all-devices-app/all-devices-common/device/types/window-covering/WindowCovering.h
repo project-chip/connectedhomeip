@@ -36,9 +36,19 @@ public:
         TimerDelegate & timerDelegate;
     };
 
-    WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate, Clusters::IdentifyDelegate & identifyDelegate,
-                   const Context & context, BitFlags<Clusters::WindowCovering::Feature> features,
-                   Clusters::WindowCovering::OptionalAttributeSet optionalAttributes = {});
+    struct Delegates
+    {
+        Clusters::WindowCovering::WindowCoveringDelegate & windowCovering;
+        Clusters::IdentifyDelegate & identify;
+    };
+
+    struct Config
+    {
+        BitFlags<Clusters::WindowCovering::Feature> features;
+        Clusters::WindowCovering::OptionalAttributeSet optionalAttributes = {};
+    };
+
+    WindowCovering(const Context & context, const Delegates & delegates, const Config & config);
     ~WindowCovering() override = default;
 
     // DeviceInterface pure virtual lifecycle hooks
@@ -58,14 +68,11 @@ protected:
 
     virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
 
-    const Clusters::WindowCovering::OptionalAttributeSet mOptionalAttributes;
     const Context mContext;
-    const BitFlags<Clusters::WindowCovering::Feature> mFeatures;
+    const Delegates mDelegates;
+    const Config mConfig;
 
 private:
-    Clusters::WindowCovering::WindowCoveringDelegate & mWindowCoveringDelegate;
-    Clusters::IdentifyDelegate & mIdentifyDelegate;
-
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::WindowCovering::WindowCoveringCluster> mWindowCoveringCluster;
 };
