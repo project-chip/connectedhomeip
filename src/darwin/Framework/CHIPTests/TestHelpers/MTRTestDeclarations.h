@@ -62,6 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 - (void)_deviceMayBeReachable;
+- (void)nodeMayBeAdvertisingOperational;
 - (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs;
 
 @property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
@@ -103,6 +104,32 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSUInteger)unitTestAttributeCount;
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
+// Test SPIs for the duplicate-operational-advertisement CASE self-cancel fix.
+// Drive _handleSubscriptionReset: with a controlled starting backoff and
+// optionally a synthetic (MTRErrorDomain, MTRErrorCodeCancelled) error; returns
+// the resulting _lastSubscriptionAttemptWait.
+- (uint32_t)unitTestInjectSubscriptionResetWithStartingBackoffSeconds:(uint32_t)startingBackoff
+                                                      injectCancelled:(BOOL)injectCancelled;
+// Drive the real OnError-stash -> OnDone-consume hand-off (the fragile ivar
+// path) end to end; returns the resulting _lastSubscriptionAttemptWait and
+// reports via stashClearedByOnDone whether OnDone cleared the stash.
+- (uint32_t)unitTestInjectOnErrorThenOnDoneWithStartingBackoffSeconds:(uint32_t)startingBackoff
+                                                      injectCancelled:(BOOL)injectCancelled
+                                                 stashClearedByOnDone:(BOOL *)stashClearedByOnDone;
+// Read the in-flight CASE guard (verifies it is armed for the advertisement path).
+- (BOOL)unitTestDoingCASEAttemptForNodeLikelyReachable;
+// Read the in-flight CASE guard after draining the Matter queue, so the read is
+// ordered after the subscription-established block that clears it (that block
+// runs on the Matter queue, not the device work queue).
+- (BOOL)unitTestDoingCASEAttemptForNodeLikelyReachableSyncedOnMatterQueue;
+// Read the current stored subscription backoff (_lastSubscriptionAttemptWait).
+- (uint32_t)unitTestLastSubscriptionAttemptWait;
+// Deterministic prong-1 pin: reset the subscription, drive
+// _setupSubscriptionWithReason: with the given reason, and return whether the
+// in-flight CASE guard was armed.  Pre-fix this returned NO for the operational
+// advertisement reason (guard armed only for the SPI-hint reason); post-fix it
+// returns YES for any CASE-launching reason.
+- (BOOL)unitTestArmAndReadCASEGuardForSetupReason:(NSString *)reason;
 @end
 #endif
 
