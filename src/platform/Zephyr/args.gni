@@ -2,4 +2,7 @@ chip_device_platform = "zephyr"
 
 declare_args() {
   chip_malloc_sys_heap = false
+
+  # Use SiWx917 RPS firmware-upgrade OTA path instead of MCUboot DFU.
+  chip_enable_siwx_ota = false
 }

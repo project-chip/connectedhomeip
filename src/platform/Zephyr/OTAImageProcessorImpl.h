@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024-2025 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,13 @@
  */
 
 #pragma once
+
+#if defined(CONFIG_SOC_SERIES_SIWG917)
+
+// SiWx917 uses NWP RPS firmware upgrade instead of MCUboot DFU.
+#include <platform/silabs/zephyr/OTAImageProcessorImpl.h>
+
+#else
 
 #include <lib/core/OTAImageHeader.h>
 #include <lib/support/Span.h>
@@ -58,3 +65,5 @@ private:
 };
 
 } // namespace chip
+
+#endif // CONFIG_SOC_SERIES_SIWG917

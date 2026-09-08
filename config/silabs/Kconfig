@@ -25,19 +25,24 @@ config CHIP_DEVICE_VENDOR_NAME
 	string "Vendor Name"
 	default "Silicon Laboratories"
 
-# See config/zephyr/Kconfig for full definition
+# See config/zephyr/Kconfig for full definition.
+# SiWx917 uses the NWP/Security Bootloader RPS path (SIWX91X_FIRMWARE_UPGRADE).
+# EFR32 uses MCUboot (slot-based DFU).
 config CHIP_OTA_REQUESTOR
 	bool "Enable OTA Requestor"
 	default n
-	imply BOOTLOADER_MCUBOOT
-	imply IMG_MANAGER
-	imply STREAM_FLASH
-	imply STREAM_FLASH_ERASE
+	select SIWX91X_FIRMWARE_UPGRADE if SOC_SERIES_SIWG917
+	imply REBOOT if SOC_SERIES_SIWG917
+	imply BOOTLOADER_MCUBOOT if !SOC_SERIES_SIWG917
+	imply IMG_MANAGER if !SOC_SERIES_SIWG917
+	imply STREAM_FLASH if !SOC_SERIES_SIWG917
+	imply STREAM_FLASH_ERASE if !SOC_SERIES_SIWG917
 
 config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
-	depends on SIGN_IMAGES
+	# EFR32 OTA images wrap the MCUboot-signed app; SiWx917 wraps zephyr.rps.
+	depends on SIGN_IMAGES || SOC_SERIES_SIWG917
 
 # Sign the application with the MCUboot ECDSA-P256 development key. Only relevant
 # for MCUboot/OTA builds; replace with a private key for production.

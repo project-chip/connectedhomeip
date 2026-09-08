@@ -45,6 +45,7 @@ matter_add_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_CHIP_WI
 matter_add_gn_arg_bool  ("chip_system_config_provide_statistics"  CONFIG_CHIP_STATISTICS)
 matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
 matter_add_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
+matter_add_gn_arg_bool  ("chip_enable_siwx_ota"                   CONFIG_SOC_SERIES_SIWG917)
 
 if(CONFIG_DEBUG)
     matter_add_gn_arg_bool("optimize_debug" true)
