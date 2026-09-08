@@ -99,6 +99,8 @@ public:
 
     bool TryingSecondaryNetwork() const { return mCommissioner->TryingSecondaryNetwork(); }
 
+    bool WroteNetworkConfig() const { return mCommissioner->mWroteNetworkConfig; }
+
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
 };

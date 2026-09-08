@@ -16,13 +16,20 @@
  */
 
 #include "include/AppCommandDelegate.h"
+#include "include/ClusterRegistryTypes.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -30,6 +37,33 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
+
+template <typename RegistryType>
+auto * GetClusterByEndpoint(AllDevicesAppCommandDelegate * delegate, EndpointId endpointId, const char * clusterLabel)
+{
+    auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<RegistryType>(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(AppServer, "%s not found on endpoint %d", clusterLabel, endpointId);
+    }
+    return cluster;
+}
+
+RvcNamedPipeSimulation * GetRvcSimulation(AllDevicesAppCommandDelegate * delegate, EndpointId endpointId)
+{
+    auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+        delegate, endpointId, "RvcOperationalState");
+    if (operationalState == nullptr)
+    {
+        return nullptr;
+    }
+    auto * simulation = GetRvcNamedPipeSimulation(endpointId);
+    if (simulation == nullptr)
+    {
+        ChipLogError(AppServer, "RvcNamedPipeSimulation not found on endpoint %d", endpointId);
+    }
+    return simulation;
+}
 
 struct CommandContext
 {
@@ -425,6 +459,98 @@ public:
 };
 
 /**
+ * Named pipe handler for setting sensor fusion supported
+ *
+ * Usage example:
+ *   echo '{"Name":"SetSensorFusionSupported","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":2},{"TypeId":74,
+ * "TagId":2},{"TypeId":75, "TagId":2}]}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetSensorFusionSupported"
+ *   - "EndpointId": ID of endpoint
+ *   - "AmbientContextType": array of the supported ambient context sensing type
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+class SetSensorFusionSupportedCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SetSensorFusionSupported"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::AmbientContextSensingCluster>(
+                endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "AmbientContextSensingCluster not found on endpoint %d", endpointId);
+            return;
+        }
+        // Validate AmbientContextType exists and is an array
+        if (!json.isMember("AmbientContextType") || !json["AmbientContextType"].isArray())
+        {
+            std::string inputJson = json.toStyledString();
+            ChipLogError(AppServer, "Missing or invalid AmbientContextType array: %s", inputJson.c_str());
+            return;
+        }
+        const Json::Value & actArray = json["AmbientContextType"];
+        if (actArray.empty())
+        {
+            // Empty array is valid: clears the supported sensor fusion list
+            Span<Globals::Structs::SemanticTagStruct::Type> emptyTags;
+            LogErrorOnFailure(cluster->SetSensorFusionSupported(emptyTags));
+            return;
+        }
+        if (actArray.size() > AmbientContextSensing::kMaxSensorFusionSupported)
+        {
+            ChipLogError(AppServer, "AmbientContextType array too large: %u", static_cast<unsigned>(actArray.size()));
+            return;
+        }
+        Span<Globals::Structs::SemanticTagStruct::Type> semanticTags;
+        std::unique_ptr<Globals::Structs::SemanticTagStruct::Type[]> tagBuf =
+            std::make_unique<Globals::Structs::SemanticTagStruct::Type[]>(actArray.size());
+        for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
+        {
+            Json::Value item = actArray[i];
+            if (!item.isObject() || !item.isMember("TypeId") || !item.isMember("TagId"))
+            {
+                std::string inputJson = json.toStyledString();
+                ChipLogError(AppServer, "AmbientContextType[%u], missing/invalid TypeId/TagId in %s", static_cast<uint16_t>(i),
+                             inputJson.c_str());
+                return;
+            }
+
+            if (!item["TypeId"].isUInt() || !item["TagId"].isUInt())
+            {
+                ChipLogError(AppServer, "AmbientContextType[%u]: TypeId and TagId must be unsigned integers",
+                             static_cast<uint16_t>(i));
+                return;
+            }
+            uint32_t typeIdRaw = item["TypeId"].asUInt();
+            uint32_t tagIdRaw  = item["TagId"].asUInt();
+
+            if (typeIdRaw > std::numeric_limits<uint8_t>::max() || tagIdRaw > std::numeric_limits<uint8_t>::max())
+            {
+                std::string inputJson = json.toStyledString();
+                ChipLogError(AppServer, "AmbientContextType[%u]: TypeId (%u) or TagId (%u) out of uint8_t range in %s",
+                             static_cast<uint16_t>(i), typeIdRaw, tagIdRaw, inputJson.c_str());
+                return;
+            }
+
+            uint8_t typeId = static_cast<uint8_t>(typeIdRaw);
+            uint8_t tagId  = static_cast<uint8_t>(tagIdRaw);
+
+            ChipLogDetail(AppServer, "AmbientContextType[%u] -> (TypeId, TagId) = (%u, %u)", static_cast<unsigned>(i), typeId,
+                          tagId);
+            tagBuf[i].namespaceID = typeId;
+            tagBuf[i].tag         = tagId;
+        }
+        semanticTags = Span<Globals::Structs::SemanticTagStruct::Type>(tagBuf.get(), actArray.size());
+        LogErrorOnFailure(cluster->SetSensorFusionSupported(semanticTags));
+    }
+};
+
+/**
  * Named pipe handler for setting object count
  *
  * Usage example:
@@ -515,6 +641,369 @@ public:
     }
 };
 
+class RvcResetCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "Reset"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        simulation->HandleReset();
+    }
+};
+
+class RvcChargedCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "Charged"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        simulation->HandleCharged();
+    }
+};
+
+class RvcChargingCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "Charging"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        simulation->HandleCharging();
+    }
+};
+
+class RvcDockedCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "Docked"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        simulation->HandleDocked();
+    }
+};
+
+class RvcChargerFoundCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "ChargerFound"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        simulation->HandleChargerFound();
+    }
+};
+
+class RvcLowChargeCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "LowCharge"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        simulation->HandleLowCharge();
+    }
+};
+
+class RvcActivityCompleteCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "ActivityComplete"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        simulation->HandleActivityComplete();
+    }
+};
+
+class RvcAreaCompleteCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "AreaComplete"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        simulation->HandleAreaComplete();
+    }
+};
+
+class RvcClearErrorCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "ClearError"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        simulation->HandleClearError();
+    }
+};
+
+class RvcEmptyingDustBinCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "EmptyingDustBin"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+            delegate, endpointId, "RvcOperationalState");
+        if (operationalState == nullptr)
+        {
+            return;
+        }
+        LogErrorOnFailure(
+            operationalState->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)));
+    }
+};
+
+class RvcCleaningMopCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "CleaningMop"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+            delegate, endpointId, "RvcOperationalState");
+        if (operationalState == nullptr)
+        {
+            return;
+        }
+        LogErrorOnFailure(
+            operationalState->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop)));
+    }
+};
+
+class RvcFillingWaterTankCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "FillingWaterTank"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+            delegate, endpointId, "RvcOperationalState");
+        if (operationalState == nullptr)
+        {
+            return;
+        }
+        LogErrorOnFailure(
+            operationalState->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
+    }
+};
+
+class RvcUpdatingMapsCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "UpdatingMaps"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * operationalState = GetClusterByEndpoint<Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+            delegate, endpointId, "RvcOperationalState");
+        if (operationalState == nullptr)
+        {
+            return;
+        }
+        LogErrorOnFailure(
+            operationalState->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps)));
+    }
+};
+
+class RvcErrorEventCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "ErrorEvent"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * simulation = GetRvcSimulation(delegate, endpointId);
+        if (simulation == nullptr)
+        {
+            return;
+        }
+        if (json.isMember("Error") && json["Error"].isString())
+        {
+            simulation->HandleErrorEvent(json["Error"].asString());
+        }
+    }
+};
+
+class RvcAddMapCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "AddMap"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        if (serviceArea == nullptr)
+        {
+            return;
+        }
+        if (json.isMember("MapId") && json["MapId"].isUInt() && json.isMember("MapName") && json["MapName"].isString())
+        {
+            const uint32_t mapId = json["MapId"].asUInt();
+            std::string mapName  = json["MapName"].asString();
+            if (!serviceArea->AddSupportedMap(mapId, CharSpan(mapName.data(), mapName.size())))
+            {
+                ChipLogError(AppServer, "AddMap: failed to add map %u", static_cast<unsigned>(mapId));
+            }
+        }
+    }
+};
+
+class RvcRemoveMapCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "RemoveMap"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        if (serviceArea == nullptr)
+        {
+            return;
+        }
+        if (json.isMember("MapId") && json["MapId"].isUInt())
+        {
+            const uint32_t mapId = json["MapId"].asUInt();
+            if (!serviceArea->RemoveSupportedMap(mapId))
+            {
+                ChipLogError(AppServer, "RemoveMap: failed to remove map %u", static_cast<unsigned>(mapId));
+            }
+        }
+    }
+};
+
+class RvcAddAreaCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "AddArea"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        if (serviceArea == nullptr)
+        {
+            return;
+        }
+        if (!json.isMember("AreaId") || !json["AreaId"].isUInt())
+        {
+            return;
+        }
+
+        const uint32_t areaId = json["AreaId"].asUInt();
+        ServiceArea::AreaStructureWrapper area;
+        area.SetAreaId(areaId);
+        if (json.isMember("MapId"))
+        {
+            if (!json["MapId"].isUInt())
+            {
+                return;
+            }
+            area.SetMapId(json["MapId"].asUInt());
+        }
+        if (json.isMember("LocationName"))
+        {
+            if (!json["LocationName"].isString())
+            {
+                return;
+            }
+            std::string locationName = json["LocationName"].asString();
+            area.SetLocationInfo(CharSpan(locationName.data(), locationName.size()), DataModel::NullNullable,
+                                 DataModel::NullNullable);
+        }
+        if (!serviceArea->AddSupportedArea(area))
+        {
+            ChipLogError(AppServer, "AddArea: failed to add area %u", static_cast<unsigned>(areaId));
+        }
+    }
+};
+
+class RvcRemoveAreaCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "RemoveArea"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * serviceArea = GetClusterByEndpoint<Clusters::ServiceArea::ServiceAreaCluster>(delegate, endpointId, "ServiceArea");
+        if (serviceArea == nullptr)
+        {
+            return;
+        }
+        if (json.isMember("AreaId") && json["AreaId"].isUInt())
+        {
+            const uint32_t areaId = json["AreaId"].asUInt();
+            if (!serviceArea->RemoveSupportedArea(areaId))
+            {
+                ChipLogError(AppServer, "RemoveArea: failed to remove area %u", static_cast<unsigned>(areaId));
+            }
+        }
+    }
+};
+
+/**
+ * Named pipe handler for generating a electrical energy measurement snapshots on the ElectricalEnergyMeasurement cluster
+ *
+ * Usage example:
+ *   echo '{"Name":"GenerateElectricalEnergyMeasurementSnapshots","EndpointId":1}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "GenerateElectricalEnergyMeasurementSnapshots"
+ *   - "EndpointId": ID of endpoint
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+class GenerateElectricalEnergyMeasurementSnapshotsCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "GenerateElectricalEnergyMeasurementSnapshots"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>(
+                    endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "ElectricalEnergyMeasurementCluster not found on endpoint %d", endpointId);
+            return;
+        }
+        cluster->GenerateSnapshots();
+    }
+};
+
 } // namespace
 
 void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
@@ -590,7 +1079,27 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<SetAmbientContextSupportCommandHandler>());
     RegisterCommandHandler(std::make_unique<AddAmbientContextDetectCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetPredictedActivityCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SetSensorFusionSupportedCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetObjCountCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcResetCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcChargedCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcChargingCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcDockedCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcChargerFoundCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcLowChargeCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcActivityCompleteCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcAreaCompleteCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcClearErrorCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcEmptyingDustBinCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcCleaningMopCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcFillingWaterTankCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcUpdatingMapsCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcErrorEventCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcAddMapCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcRemoveMapCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcAddAreaCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcRemoveAreaCommandHandler>());
+    RegisterCommandHandler(std::make_unique<GenerateElectricalEnergyMeasurementSnapshotsCommandHandler>());
 }

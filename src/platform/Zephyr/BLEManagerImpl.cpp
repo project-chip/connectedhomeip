@@ -44,14 +44,10 @@
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/bluetooth/hci.h>
+#include <zephyr/random/random.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
-#if defined(CONFIG_ZEPHYR_VERSION_3_3)
-#include <version.h>
-#else
-#include <zephyr/random/random.h>
 #include <zephyr/version.h>
-#endif
 
 #ifdef CONFIG_BT_BONDABLE
 #include <zephyr/settings/settings.h>

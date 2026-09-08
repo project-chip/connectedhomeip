@@ -22,6 +22,12 @@ config("includes") {
   ]
 }
 
+# No commissioning proxy here, unlike the linux source_set: the proxy needs to switch
+# the local BLE role to central and to drive a scan that reports commissionable
+# devices, and src/platform/Darwin's BLEManagerImpl offers neither.  There is
+# therefore no Darwin CommissioningProxyBleAdapter to build.  Darwin still compiles
+# with the commissioning-proxy device enabled; the device is simply never registered
+# with the factory, so "--device commissioning-proxy" reports an invalid device type.
 source_set("darwin") {
   sources = [
     "../include/AppRootNode.h",
