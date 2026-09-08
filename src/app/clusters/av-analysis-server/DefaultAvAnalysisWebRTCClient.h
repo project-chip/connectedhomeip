@@ -178,6 +178,15 @@ protected:
     }
 
     /**
+     * Continues the pending request now that its CASE session is held
+     */
+    void ContinueWithSession();
+
+    // The CASE callbacks, the CASESessionManager's to invoke, not the application's
+    static void OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+
+    /**
      * One signaling request, from the first CASE attempt to the command's response. The phase says
      * which step is outstanding and therefore which callback is legitimate; exactly one request
      * exists at a time.
@@ -407,9 +416,6 @@ private:
      * to kInvoking; the command's outcome arrives through the CommandSender callbacks.
      */
     CHIP_ERROR InvokeOnHeldSession(CommandId aCommandId, const DataModel::EncodableToTLV & aRequest);
-
-    static void OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
-    static void OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     CASESessionManager * mCASESessionManager                                      = nullptr;
     AvAnalysisWebRTCPeerDelegate * mPeerDelegate                                  = nullptr;

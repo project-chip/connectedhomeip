@@ -191,36 +191,40 @@ void DefaultAvAnalysisWebRTCClient::OnDeviceConnected(void * context, Messaging:
                    ChipLogError(Zcl, "AvAnalysisWebRTCClient: unexpected session establishment"));
 
     self->mRequest.HoldSession(sessionHandle, exchangeMgr);
+    self->ContinueWithSession();
+}
 
-    if (self->mRequest.GetCommandType() == Request::CommandType::kEndSession)
+void DefaultAvAnalysisWebRTCClient::ContinueWithSession()
+{
+    if (mRequest.GetCommandType() == Request::CommandType::kEndSession)
     {
-        CHIP_ERROR endErr = self->SendEndSession();
+        CHIP_ERROR endErr = SendEndSession();
         if (endErr != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "AvAnalysisWebRTCClient: EndSession not sent: %" CHIP_ERROR_FORMAT, endErr.Format());
-            self->FinishRequest(Status::Failure, self->mRequest.WebRTCSessionId());
+            FinishRequest(Status::Failure, mRequest.WebRTCSessionId());
         }
         return;
     }
 
-    if (self->mRequest.GetCommandType() == Request::CommandType::kProvideICECandidates)
+    if (mRequest.GetCommandType() == Request::CommandType::kProvideICECandidates)
     {
-        CHIP_ERROR iceErr = self->SendProvideICECandidates();
+        CHIP_ERROR iceErr = SendProvideICECandidates();
         if (iceErr != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "AvAnalysisWebRTCClient: ProvideICECandidates not sent: %" CHIP_ERROR_FORMAT, iceErr.Format());
-            self->FinishRequest(Status::Failure, self->mRequest.WebRTCSessionId());
+            FinishRequest(Status::Failure, mRequest.WebRTCSessionId());
         }
         return;
     }
 
     // the provided endpoint must host WebRTCTransportProvider before a session may be initiated toward it
-    self->mRequest.Advance(Request::Phase::kCheckingProvider);
-    CHIP_ERROR err = self->SendProviderCheckRead();
+    mRequest.Advance(Request::Phase::kCheckingProvider);
+    CHIP_ERROR err = SendProviderCheckRead();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "AvAnalysisWebRTCClient: provider check not started: %" CHIP_ERROR_FORMAT, err.Format());
-        self->FinishRequest(Status::Failure, self->mRequest.WebRTCSessionId());
+        FinishRequest(Status::Failure, mRequest.WebRTCSessionId());
     }
 }
 

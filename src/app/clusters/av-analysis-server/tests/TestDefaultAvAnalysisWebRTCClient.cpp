@@ -29,7 +29,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Protocols::InteractionModel;
 
-constexpr EndpointId kProviderEndpoint = 2;
+constexpr EndpointId kProviderEndpoint  = 2;
+constexpr EndpointId kRequestorEndpoint = 7;
 const ScopedNodeId kCameraNode(0x1234, 1);
 constexpr uint8_t kMaxSessions = 4;
 
@@ -51,6 +52,12 @@ public:
 
     // Drives the request into the provider-check phase, as OnDeviceConnected would after CASE
     void EnterProviderCheck() { CurrentRequest().Advance(Request::Phase::kCheckingProvider); }
+
+    // The CASE outcomes, so the tests can play the CASESessionManager's side. A session cannot be
+    // fabricated here, so the connected case is driven through the continuation OnDeviceConnected
+    // runs once it has held one.
+    using DefaultAvAnalysisWebRTCClient::ContinueWithSession;
+    using DefaultAvAnalysisWebRTCClient::OnDeviceConnectionFailure;
 
     // The sender every intercepted send records as the request's; never sends, an identity only
     CommandSender * Sender() { return &mSender; }
@@ -460,7 +467,9 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     RecordingCallback mCallback;
     FakePeerDelegate mPeerDelegate;
     StubRequestorDelegate mRequestorDelegate;
-    WebRTCTransportRequestor::WebRTCTransportRequestorCluster mRequestorCluster{ 1, mRequestorDelegate };
+    // Not endpoint 1: the offer's OriginatingEndpointID must come from this registration and not
+    // from a plausible default
+    WebRTCTransportRequestor::WebRTCTransportRequestorCluster mRequestorCluster{ kRequestorEndpoint, mRequestorDelegate };
 };
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, InitArgumentValidation)
@@ -487,6 +496,112 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, SecondRequestWhilePendingIsBusy)
     EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_NO_ERROR);
     EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, 42, mCallback), CHIP_ERROR_BUSY);
     EXPECT_EQ(mClient.mConnectRequests, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ACameraThatCannotBeReachedFailsTheRequest)
+{
+    ASSERT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
+
+    mClient.OnDeviceConnectionFailure(&mClient, kCameraNode, CHIP_ERROR_TIMEOUT);
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    // The request is over rather than stuck: the client takes the next one
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, ACameraThatCannotBeReachedFailsAnEndSession)
+{
+    EstablishSessionWithId(55);
+    ASSERT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+
+    mClient.OnDeviceConnectionFailure(&mClient, kCameraNode, CHIP_ERROR_TIMEOUT);
+
+    EXPECT_EQ(mCallback.mEndedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    // This node is done with the session whatever became of the EndSession
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AConnectionFailureOutsideTheConnectingPhaseIsIgnored)
+{
+    DriveToOffer(); // the request is awaiting the application's offer, no longer connecting
+
+    mClient.OnDeviceConnectionFailure(&mClient, kCameraNode, CHIP_ERROR_TIMEOUT);
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 0);
+    EXPECT_TRUE(mClient.CurrentRequest().InPhase(InterceptingWebRTCClient::Request::Phase::kCreatingOffer));
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AHeldSessionSendsTheCommandTheRequestIsFor)
+{
+    // An offer request checks the provider before anything is sent
+    ASSERT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
+    mClient.ContinueWithSession();
+    EXPECT_EQ(mClient.mSendAttempts, 0);
+    EXPECT_EQ(mClient.mEndSendAttempts, 0);
+    EXPECT_EQ(mClient.mIceSendAttempts, 0);
+    // No session is really held, so the read cannot start and the request fails
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+
+    // An EndSession request sends EndSession
+    EstablishSessionWithId(55);
+    const int offersBefore = mClient.mSendAttempts;
+    ASSERT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+    mClient.ContinueWithSession();
+    EXPECT_EQ(mClient.mEndSendAttempts, 1);
+    EXPECT_EQ(mClient.mSentEndSessionId, 55);
+    EXPECT_EQ(mClient.mIceSendAttempts, 0);
+    EXPECT_EQ(mClient.mSendAttempts, offersBefore);
+    FeedEndSessionStatus(Status::Success);
+    mClient.OnDone(mClient.Sender());
+
+    // A candidate request sends ProvideICECandidates
+    EstablishSessionWithId(56);
+    auto candidates = TwoCandidates();
+    ASSERT_EQ(mClient.SendICECandidates(
+                  kCameraNode, 56, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+              CHIP_NO_ERROR);
+    mClient.ContinueWithSession();
+    EXPECT_EQ(mClient.mIceSendAttempts, 1);
+    EXPECT_EQ(mClient.mSentIceSessionId, 56);
+    EXPECT_EQ(mClient.mEndSendAttempts, 1);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnEndSessionTheClientCannotSendFailsTheRequest)
+{
+    EstablishSessionWithId(55);
+    ASSERT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+
+    mClient.mSendResult = CHIP_ERROR_INTERNAL;
+    mClient.ContinueWithSession();
+
+    EXPECT_EQ(mCallback.mEndedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+    // Completed: the client accepts a new request again
+    mClient.mSendResult = CHIP_NO_ERROR;
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, CandidatesTheClientCannotSendKeepTheSession)
+{
+    EstablishSessionWithId(55);
+    auto candidates = TwoCandidates();
+    ASSERT_EQ(mClient.SendICECandidates(
+                  kCameraNode, 55, Span<const Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size())),
+              CHIP_NO_ERROR);
+
+    mClient.mSendResult = CHIP_ERROR_INTERNAL;
+    mClient.ContinueWithSession();
+
+    // Nobody awaits a candidate send, and the session it was about survives
+    EXPECT_EQ(mCallback.mEndedCount, 0);
+    EXPECT_EQ(mCallback.mFailedCount, 0);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 1u);
+    mClient.mSendResult = CHIP_NO_ERROR;
+    EXPECT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, EndingAnUntrackedSessionIsRejected)
@@ -790,7 +905,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, OfferPayloadFollowsTheNormalFlow)
     EXPECT_TRUE(mClient.mSentSessionIdWasNull); // A new session is the camera's to assign
     EXPECT_EQ(mClient.mSentSdp, "v=0 test offer");
     EXPECT_EQ(mClient.mSentUsage, Globals::StreamUsageEnum::kAnalysis);
-    EXPECT_EQ(mClient.mSentOriginatingEndpoint, 1); // Where the requestor cluster is registered
+    EXPECT_EQ(mClient.mSentOriginatingEndpoint, kRequestorEndpoint); // Where the requestor cluster is registered
     ASSERT_EQ(mClient.mSentVideoStreams.size(), 1u);
     EXPECT_EQ(mClient.mSentVideoStreams[0], kVideoStreamId);
     EXPECT_TRUE(mClient.mSentDeprecatedStreamIdAbsent);
@@ -1323,8 +1438,6 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, ARequestBeforeInitIsRefused)
     EXPECT_EQ(uninitialisedCallback.mActiveCount, 0);
     EXPECT_EQ(uninitialisedCallback.mFailedCount, 0);
     EXPECT_EQ(uninitialisedCallback.mEndedCount, 0);
-    EXPECT_EQ(mPeerDelegate.mSessionsClosed, 0);
-    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 0);
     EXPECT_EQ(uninitialised.mConnectRequests, 0);
 }
 

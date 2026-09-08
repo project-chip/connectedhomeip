@@ -121,8 +121,13 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         uint16_t mLastStreamId   = 0;
         Callback * mLastCallback = nullptr;
 
+        // What the camera-bound requests answer; a failure starts nothing and reports nothing
+        CHIP_ERROR mAllocationResult   = CHIP_NO_ERROR;
+        CHIP_ERROR mDeallocationResult = CHIP_NO_ERROR;
+
         CHIP_ERROR RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode, Callback & aCallback) override
         {
+            ReturnErrorOnFailure(mAllocationResult);
             mAllocationRequests++;
             mLastCamera   = aCameraNode;
             mLastCallback = &aCallback;
@@ -132,6 +137,7 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aVideoStreamId,
                                                   Callback & aCallback) override
         {
+            ReturnErrorOnFailure(mDeallocationResult);
             mDeallocationRequests++;
             mLastCamera   = aCameraNode;
             mLastStreamId = aVideoStreamId;
@@ -400,6 +406,7 @@ TEST_F(TestRemoteAvAnalysisCluster, TestCommands)
                                                   Commands::DeactivateAnalysisStream::kMetadataEntry,
                                                   Commands::RemoveAnalysisStream::kMetadataEntry,
                                               }));
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(mServer, { Commands::EstablishAnalysisStreamResponse::Id }));
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersRequiresAnEstablishedStream)
@@ -682,10 +689,9 @@ TEST_F(TestRemoteAvAnalysisCluster, AnalysisSessionRequiresASourceCameraOnARemot
 {
     // Every event of a remote session names the camera the analyzed stream comes from, so a
     // session cannot start without one
+    // Through the cluster, so the source parameters it forwards are covered too
     uint16_t sessionId = 0;
-    ASSERT_EQ(
-        mServer.GetLogic().AnalysisSessionStart(sessionId, DataModel::NullNullable, &mClusterTester.GetServerClusterContext()),
-        CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(mServer.AnalysisSessionStart(sessionId, DataModel::NullNullable), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, EventsCarryTheSourceCameraOfTheSession)
@@ -706,11 +712,8 @@ TEST_F(TestRemoteAvAnalysisCluster, EventsCarryTheSourceCameraOfTheSession)
     auto enableResponse = mServer.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData);
     ASSERT_TRUE(enableResponse.has_value() && enableResponse.value().IsSuccess());
 
-    // Session start: the event names the source camera
     uint16_t sessionId = 0;
-    ASSERT_EQ(
-        mServer.GetLogic().AnalysisSessionStart(sessionId, DataModel::NullNullable, &clusterContext, kSourceCamera, kStreamStartUs),
-        CHIP_NO_ERROR);
+    ASSERT_EQ(mServer.AnalysisSessionStart(sessionId, DataModel::NullNullable, kSourceCamera, kStreamStartUs), CHIP_NO_ERROR);
     auto startEvent = mClusterTester.GetNextGeneratedEvent();
     ASSERT_TRUE(startEvent.has_value());
     Events::AnalysisSessionStart::DecodableType startData;
@@ -980,6 +983,65 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamWithoutCameraClientFa
     {
         FAIL();
     }
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EstablishThatCannotStartIsAnsweredAtOnce)
+{
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+    Commands::EstablishAnalysisStream::DecodableType commandData;
+    commandData.nodeID = 0x1234;
+
+    // The client is busy with a request of its own
+    mFakeCameraClient.mAllocationResult = CHIP_ERROR_BUSY;
+    InvalidatableCommandHandler busyHandler;
+    busyHandler.SetFabricIndex(1);
+    auto busyResponse = mServer.GetLogic().HandleEstablishAnalysisStream(busyHandler, path, commandData);
+    ASSERT_TRUE(busyResponse.has_value()) << "EstablishAnalysisStream unexpectedly parked";
+    ASSERT_EQ(StatusOf(busyResponse).GetStatusCode().GetStatus(), Status::Busy);
+
+    // The client refuses for any other reason
+    mFakeCameraClient.mAllocationResult = CHIP_ERROR_NO_MEMORY;
+    InvalidatableCommandHandler failHandler;
+    failHandler.SetFabricIndex(1);
+    auto failResponse = mServer.GetLogic().HandleEstablishAnalysisStream(failHandler, path, commandData);
+    ASSERT_TRUE(failResponse.has_value()) << "EstablishAnalysisStream unexpectedly parked";
+    ASSERT_EQ(StatusOf(failResponse).GetStatusCode().GetStatus(), Status::Failure);
+
+    // Neither refusal left an interaction behind
+    mFakeCameraClient.mAllocationResult = CHIP_NO_ERROR;
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+    ASSERT_EQ(mFakeCameraClient.mAllocationRequests, 1);
+    ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, RemoveThatCannotStartLeavesTheStream)
+{
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+
+    // The client is busy with a request of its own
+    mFakeCameraClient.mDeallocationResult = CHIP_ERROR_BUSY;
+    ASSERT_EQ(ImmediateRemoveStatus(0), Status::Busy);
+    ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
+
+    // The client refuses for any other reason
+    ASSERT_EQ(ImmediateRemoveStatus(0), Status::Failure);
+    ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
+
+    // Neither refusal left an interaction behind
+    mFakeCameraClient.mDeallocationResult = CHIP_NO_ERROR;
+    InvalidatableCommandHandler removeHandler;
+    removeHandler.SetFabricIndex(1);
+    ConcreteCommandPath removePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
+    Commands::RemoveAnalysisStream::DecodableType removeData;
+    removeData.analysisStreamID = 0;
+    ASSERT_FALSE(mServer.GetLogic().HandleRemoveAnalysisStream(removeHandler, removePath, removeData).has_value());
+    ASSERT_NE(mFakeCameraClient.mLastCallback, nullptr);
+    mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Success, 42);
+    ASSERT_EQ(LastStatus(removeHandler), Status::Success);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ExecuteActivateAnalysisStreamCommandTest)
