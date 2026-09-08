@@ -51,10 +51,18 @@ PyChipError pychip_case_handshake_metrics_stop_notifications(void);
 PyChipError pychip_case_handshake_metrics_wait_for_notification(PychipCASEHandshakeMetricsRecord * out, uint32_t timeoutMs,
                                                                 uint8_t * received, uint32_t * dropped);
 
-// Handshakes that began but never reached a conclusion, so no listener was ever told about them.
-// A timeout with no reply is the usual cause. This is what explains a run seeing fewer
-// notifications than it ran establishments.
+// Handshakes given up so that a later one could take their slot, and so never notified. Only
+// counts handshakes actually discarded; it is never an estimate of one presumed dead.
 PyChipError pychip_case_handshake_metrics_get_abandoned_count(uint32_t * abandoned);
+
+// Handshakes still open, whether progressing or stuck with no reply.
+//
+// Reported rather than guessed at. How long a handshake may legitimately take is not knowable
+// here, since a peer may advertise an MRP retry interval of up to an hour, so writing one off
+// after any fixed delay risks discarding one that was still running. Together with the abandoned
+// count this accounts exactly for a run that saw fewer notifications than it started handshakes:
+// notified + abandoned + in flight is every handshake that began.
+PyChipError pychip_case_handshake_metrics_get_in_flight_count(uint32_t * inFlight);
 
 // sizeof(PychipCASEHandshakeMetricsRecord), so the ctypes mirror can prove it still agrees with
 // this struct. A mismatch means the two definitions have drifted and every field read through the

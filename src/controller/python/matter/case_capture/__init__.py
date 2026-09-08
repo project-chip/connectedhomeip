@@ -136,6 +136,8 @@ RECORDED_SIGMA2_RESUME_RECEIVED = 0x10
 RECORDED_DEVICE_DISCOVERY = 0x20
 RECORDED_STATUS_REPORT_CODES = 0x40
 RECORDED_THIS_NODE_REJECTED_PEER = 0x80
+# This node sent the StatusReport that closed the handshake, which is what finishes a resumption.
+RECORDED_STATUS_REPORT_SENT = 0x100
 
 
 # Mirror of the C struct PychipCASEHandshakeMetricsRecord defined in CASECapture.h.
@@ -174,6 +176,7 @@ class PyCASEHandshakeMetricsRecord(ctypes.Structure):
         ("sigma3SentTimestampUs", ctypes.c_uint64),
         ("statusReportReceivedTimestampUs", ctypes.c_uint64),
         ("sigma2ResumeReceivedTimestampUs", ctypes.c_uint64),
+        ("statusReportSentTimestampUs", ctypes.c_uint64),
         ("discoveryStartedTimestampUs", ctypes.c_uint64),
         ("discoveryCompletedTimestampUs", ctypes.c_uint64),
         ("localEphemeralNodeId", ctypes.c_uint64),
@@ -181,7 +184,7 @@ class PyCASEHandshakeMetricsRecord(ctypes.Structure):
         ("statusReportGeneralCode", ctypes.c_uint16),
         ("statusReportProtocolCode", ctypes.c_uint16),
         ("exchangeId", ctypes.c_uint16),
-        ("recordedFields", ctypes.c_uint8),
+        ("recordedFields", ctypes.c_uint16),
         ("deviceDiscoveryOutcome", ctypes.c_uint8),
         ("peerTransportAddress", ctypes.c_char * PEER_TRANSPORT_ADDRESS_MAX_LENGTH),
     ]
@@ -212,6 +215,7 @@ class CASEHandshakeMetrics:
     sigma3_sent_timestamp_us: int | None
     status_report_received_timestamp_us: int | None
     sigma2_resume_received_timestamp_us: int | None
+    status_report_sent_timestamp_us: int | None
     discovery_started_timestamp_us: int | None
     discovery_completed_timestamp_us: int | None
     status_report_general_code: int | None
@@ -239,6 +243,7 @@ class CASEHandshakeMetrics:
             sigma3_sent_timestamp_us=value("sigma3SentTimestampUs", RECORDED_SIGMA3_SENT),
             status_report_received_timestamp_us=value("statusReportReceivedTimestampUs", RECORDED_STATUS_REPORT_RECEIVED),
             sigma2_resume_received_timestamp_us=value("sigma2ResumeReceivedTimestampUs", RECORDED_SIGMA2_RESUME_RECEIVED),
+            status_report_sent_timestamp_us=value("statusReportSentTimestampUs", RECORDED_STATUS_REPORT_SENT),
             discovery_started_timestamp_us=value("discoveryStartedTimestampUs", RECORDED_DEVICE_DISCOVERY),
             discovery_completed_timestamp_us=value("discoveryCompletedTimestampUs", RECORDED_DEVICE_DISCOVERY),
             status_report_general_code=value("statusReportGeneralCode", RECORDED_STATUS_REPORT_CODES),
@@ -310,7 +315,8 @@ class CASEHandshakeMetrics:
         # than reporting zero. Timestamps are monotonic, so the largest is the latest.
         marks_after_sigma1 = [timestamp for timestamp in (
             self.sigma2_received_timestamp_us, self.sigma3_sent_timestamp_us,
-            self.sigma2_resume_received_timestamp_us, self.status_report_received_timestamp_us)
+            self.sigma2_resume_received_timestamp_us, self.status_report_received_timestamp_us,
+            self.status_report_sent_timestamp_us)
             if timestamp is not None]
         return self._duration_between_ms(start, max(marks_after_sigma1) if marks_after_sigma1 else None)
 
@@ -415,6 +421,8 @@ def _GetNotificationLibraryHandle() -> ctypes.CDLL:
                     ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_uint32)])
         setter.Set('pychip_case_handshake_metrics_get_abandoned_count', PyChipError,
                    [ctypes.POINTER(ctypes.c_uint32)])
+        setter.Set('pychip_case_handshake_metrics_get_in_flight_count', PyChipError,
+                   [ctypes.POINTER(ctypes.c_uint32)])
         setter.Set('pychip_case_handshake_metrics_get_record_size', PyChipError,
                    [ctypes.POINTER(ctypes.c_uint32)])
         _CheckRecordLayoutMatchesNative(handle)
@@ -439,7 +447,7 @@ def _CheckRecordLayoutMatchesNative(handle: ctypes.CDLL) -> None:
             "back into line with PychipCASEHandshakeMetricsRecord in CASEHandshakeMetrics.h.")
 
 
-def StartCASEHandshakeNotifications(notification_queue_depth: int = NOTIFICATION_QUEUE_DEPTH_NATIVE_DEFAULT) -> None:
+def _StartCASEHandshakeNotifications(notification_queue_depth: int = NOTIFICATION_QUEUE_DEPTH_NATIVE_DEFAULT) -> None:
     """Start timing handshakes and queueing the completed ones, discarding anything left from
     before.
 
@@ -449,8 +457,12 @@ def StartCASEHandshakeNotifications(notification_queue_depth: int = NOTIFICATION
     _GetNotificationLibraryHandle().pychip_case_handshake_metrics_start_notifications(notification_queue_depth).raise_on_error()
 
 
-def StopCASEHandshakeNotifications() -> None:
-    """Stop queueing completed handshakes and release any waiting consumer."""
+def _StopCASEHandshakeNotifications() -> None:
+    """Stop queueing completed handshakes and release any waiting consumer.
+
+    Private because the listener registry owns this. Closing the native queue from outside would
+    leave the registry believing capture is still on: its delivery thread would spin on a queue
+    that returns nothing, and registering another listener would not switch capture back on."""
     _GetNotificationLibraryHandle().pychip_case_handshake_metrics_stop_notifications().raise_on_error()
 
 
@@ -473,14 +485,29 @@ def _WaitForCompletedCASEHandshake(timeout_ms: int) -> "CASEHandshakeMetrics | N
 
 
 def GetAbandonedCASEHandshakeCount() -> int:
-    """Handshakes that began but never reached a conclusion, so no listener heard about them.
+    """Handshakes given up so a later one could take their slot, and so never notified.
 
-    A handshake that times out with no reply is the usual cause. This is what explains a run
-    seeing fewer notifications than it ran establishments."""
+    Only counts handshakes actually discarded; it never guesses that one has died. Read it with
+    GetInFlightCASEHandshakeCount to account for a run that saw fewer notifications than it
+    started handshakes: notified plus abandoned plus in flight is every handshake that began."""
     abandoned = ctypes.c_uint32(0)
     _GetNotificationLibraryHandle().pychip_case_handshake_metrics_get_abandoned_count(
         ctypes.byref(abandoned)).raise_on_error()
     return abandoned.value
+
+
+def GetInFlightCASEHandshakeCount() -> int:
+    """Handshakes still open, whether progressing or stuck with no reply.
+
+    Reported rather than guessed at. How long a handshake may legitimately take is not knowable
+    from here: a peer may advertise an MRP retry interval of up to an hour, so writing one off
+    after any fixed delay would risk discarding one that was still running and losing a real
+    measurement. A figure that stays above zero once a run has finished is how a handshake that
+    never got a reply shows up."""
+    in_flight = ctypes.c_uint32(0)
+    _GetNotificationLibraryHandle().pychip_case_handshake_metrics_get_in_flight_count(
+        ctypes.byref(in_flight)).raise_on_error()
+    return in_flight.value
 
 
 def GetDroppedCASEHandshakeNotificationCount() -> int:
@@ -656,7 +683,7 @@ class _ListenerRegistry:
             return
         # Starting switches the whole thing on: it registers the backend so handshakes are
         # timed, and starts queueing the ones that complete.
-        StartCASEHandshakeNotifications()
+        _StartCASEHandshakeNotifications()
         self._running = True
         # Identifies this run. A thread left over from an earlier one sees the counter has moved
         # and exits, so a restart never ends up with two dispatchers competing.
@@ -697,7 +724,7 @@ class _ListenerRegistry:
             # Both done while holding the lock. Releasing it first would let a registration
             # slip in, switch notifications back on, and then have this call switch them off
             # again, leaving listeners registered but never told about anything.
-            StopCASEHandshakeNotifications()
+            _StopCASEHandshakeNotifications()
             self._shared_delivery_queue.put(None)
         # Joining cannot hold the lock, because the threads being joined take it themselves.
         # Correctness does not depend on it: a thread from an earlier run exits on its own once

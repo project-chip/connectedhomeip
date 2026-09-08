@@ -29,7 +29,7 @@ namespace python {
 // Which of a handshake record's fields have been filled in. Most mark a timestamp; the last two
 // record what the StatusReport said. The values are a bitmask, and the Python mirror tests the
 // same bits, so they are fixed rather than sequential.
-enum class CASEHandshakeRecordedField : uint8_t
+enum class CASEHandshakeRecordedField : uint16_t
 {
     kSigma1Sent           = 0x01u,
     kSigma2Received       = 0x02u,
@@ -41,6 +41,9 @@ enum class CASEHandshakeRecordedField : uint8_t
     kStatusReportCodes = 0x40u,
     // This node sent a StatusReport carrying a failure, i.e. it rejected the peer.
     kThisNodeRejectedPeer = 0x80u,
+    // This node sent the StatusReport that closes the handshake. On the resumption path that is
+    // what finishes it, so it is the last thing to time.
+    kStatusReportSent = 0x100u,
 };
 
 using CASEHandshakeRecordedFields = BitFlags<CASEHandshakeRecordedField>;
@@ -106,6 +109,9 @@ struct PychipCASEHandshakeMetricsRecord
     uint64_t sigma3SentTimestampUs;
     uint64_t statusReportReceivedTimestampUs;
     uint64_t sigma2ResumeReceivedTimestampUs;
+    // When this node sent the StatusReport that closed the handshake. Resumption is finished by
+    // this node acknowledging Sigma2_Resume, so on that path this is where the handshake ends.
+    uint64_t statusReportSentTimestampUs;
     // Operational discovery that resolved this handshake's peer. Recorded before Sigma1 is
     // sent, then attached once the peer replies and its address identifies which lookup it
     // came from. Left unset when the address was not resolved while listening, so a span is
@@ -138,8 +144,8 @@ struct PychipCASEHandshakeMetricsRecord
     char peerTransportAddress[chip::python::kCASEHandshakeMetricsPeerAddressMaxLength];
 };
 
-// The flags occupy exactly the byte the Python mirror reads them from.
-static_assert(sizeof(chip::python::CASEHandshakeRecordedFields) == sizeof(uint8_t),
-              "recordedFields must stay one byte wide for the ctypes mirror.");
+// The flags occupy exactly the two bytes the Python mirror reads them from.
+static_assert(sizeof(chip::python::CASEHandshakeRecordedFields) == sizeof(uint16_t),
+              "recordedFields must stay two bytes wide for the ctypes mirror.");
 
 } // extern "C"

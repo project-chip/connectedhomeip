@@ -68,5 +68,12 @@ uint32_t AbandonedCASEHandshakeCount()
     return count;
 }
 
+uint32_t InFlightCASEHandshakeCount()
+{
+    uint32_t count = 0;
+    MainLoopWork::ExecuteInMainLoop([&] { count = Backend().InFlightCASEHandshakeCount(); });
+    return count;
+}
+
 } // namespace python
 } // namespace chip

@@ -164,6 +164,16 @@ protected:
         mBackend.LogNodeLookup(lookup);
     }
 
+    // CASE moving on to another of the addresses the resolution found.
+    void RetryAtDifferentAddress(NodeId nodeId, const PeerAddress & address)
+    {
+        const PeerId peer = PeerId().SetCompressedFabricId(1).SetNodeId(nodeId);
+        chip::AddressResolve::ResolveResult result;
+        result.address = address;
+        chip::Tracing::NodeDiscoveredInfo retry{ chip::Tracing::DiscoveryInfoType::kRetryDifferent, &peer, &result };
+        mBackend.LogNodeDiscovered(retry);
+    }
+
     void ResolveNode(NodeId nodeId, const PeerAddress & address)
     {
         const PeerId peer = PeerId().SetCompressedFabricId(1).SetNodeId(nodeId);
@@ -384,20 +394,54 @@ TEST_F(TestCASEHandshakeMetricsBackend, NewestLookupWinsWhenTwoNodesShareAnAddre
     EXPECT_EQ(records[0].peerNodeId, kSecondNodeId) << "the peer should be named from the newest lookup";
 }
 
-TEST_F(TestCASEHandshakeMetricsBackend, HandshakesThatNeverConcludeAreCountedOnceTheSlotsRunOut)
+TEST_F(TestCASEHandshakeMetricsBackend, HandshakesThatNeverConcludeAreReportedAsStillInFlight)
 {
-    // Every slot is filled with a handshake that gets no reply, then one more is started. The one
-    // given up has to be counted, or a run would report fewer notifications than establishments
-    // with nothing to explain the difference.
+    // A handshake with no reply is not written off after any delay, because how long one may
+    // legitimately take is not knowable here. It stays counted as in flight, which is the honest
+    // answer and is what accounts for a run seeing fewer notifications than it started.
+    EXPECT_EQ(mBackend.InFlightCASEHandshakeCount(), 0u);
     EXPECT_EQ(mBackend.AbandonedCASEHandshakeCount(), 0u);
 
-    for (uint16_t i = 0; i <= chip::python::kCASEHandshakeMetricsMaxInFlight; i++)
+    SendSigma(MsgType::CASE_Sigma1, 0x5001);
+    SendSigma(MsgType::CASE_Sigma1, 0x5002);
+
+    EXPECT_EQ(mBackend.InFlightCASEHandshakeCount(), 2u);
+    EXPECT_EQ(mBackend.AbandonedCASEHandshakeCount(), 0u) << "nothing has been given up, so nothing is abandoned";
+    EXPECT_TRUE(Drain().empty()) << "a handshake that never concluded must not be published";
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, AHandshakeGivenUpForItsSlotIsCountedAsAbandoned)
+{
+    // Filling every slot and starting one more is the only thing that discards a handshake, and
+    // that is the one case the abandoned count reports.
+    for (uint16_t i = 0; i < chip::python::kCASEHandshakeMetricsMaxInFlight; i++)
     {
         SendSigma(MsgType::CASE_Sigma1, static_cast<uint16_t>(0x5000 + i));
     }
+    EXPECT_EQ(mBackend.InFlightCASEHandshakeCount(), chip::python::kCASEHandshakeMetricsMaxInFlight);
+    EXPECT_EQ(mBackend.AbandonedCASEHandshakeCount(), 0u);
+
+    SendSigma(MsgType::CASE_Sigma1, 0x6000);
 
     EXPECT_EQ(mBackend.AbandonedCASEHandshakeCount(), 1u);
-    EXPECT_TRUE(Drain().empty()) << "a handshake that never concluded must not be published";
+    EXPECT_EQ(mBackend.InFlightCASEHandshakeCount(), chip::python::kCASEHandshakeMetricsMaxInFlight)
+        << "the pool is still full: one was given up so the newest could take its place";
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, AConcludedHandshakeIsNoLongerInFlight)
+{
+    const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
+
+    SendSigma(MsgType::CASE_Sigma1);
+    EXPECT_EQ(mBackend.InFlightCASEHandshakeCount(), 1u);
+
+    ReceiveSigma(MsgType::CASE_Sigma2, Address("fd11::1"));
+    SendSigma(MsgType::CASE_Sigma3);
+    ReceiveSigma(MsgType::StatusReport, Address("fd11::1"), kExchange, kLocalNodeId, success.Span());
+
+    EXPECT_EQ(mBackend.InFlightCASEHandshakeCount(), 0u) << "its slot is released when it concludes";
+    EXPECT_EQ(mBackend.AbandonedCASEHandshakeCount(), 0u);
+    EXPECT_EQ(Drain().size(), 1u);
 }
 
 TEST_F(TestCASEHandshakeMetricsBackend, ASecondSigma1ForTheSameExchangeDoesNotStartASecondHandshake)
@@ -542,6 +586,63 @@ TEST_F(TestCASEHandshakeMetricsBackend, DiscoveryOutcomeSaysTheLookupWentToAnEar
     EXPECT_FALSE(second[0].recordedFields.Has(CASEHandshakeRecordedField::kDeviceDiscovery));
     EXPECT_EQ(second[0].deviceDiscoveryOutcome, chip::to_underlying(CASEHandshakeDiscoveryOutcome::kLookupAlreadyAttributed));
     EXPECT_EQ(second[0].peerNodeId, kPeerNodeId) << "the peer is still named from the address";
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, AReplyFromARetriedAddressIsStillMatched)
+{
+    // Resolution found several addresses and the first did not answer, so CASE moved to another.
+    // The handshake must still be able to name its peer and claim the span it was resolved by.
+    const PeerAddress first  = Address("fd11::1");
+    const PeerAddress second = Address("fd11::2");
+    const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
+
+    ResolveNode(kPeerNodeId, first);
+    RetryAtDifferentAddress(kPeerNodeId, second);
+
+    SendSigma(MsgType::CASE_Sigma1);
+    ReceiveSigma(MsgType::CASE_Sigma2, second);
+    SendSigma(MsgType::CASE_Sigma3);
+    ReceiveSigma(MsgType::StatusReport, second, kExchange, kLocalNodeId, success.Span());
+
+    const auto records = Drain();
+    ASSERT_EQ(records.size(), 1u);
+    EXPECT_EQ(records[0].peerNodeId, kPeerNodeId) << "the retried address must still name the peer";
+    EXPECT_TRUE(records[0].recordedFields.Has(CASEHandshakeRecordedField::kDeviceDiscovery));
+    EXPECT_EQ(records[0].deviceDiscoveryOutcome, chip::to_underlying(CASEHandshakeDiscoveryOutcome::kRecorded));
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, ResumptionIsTimedToTheAcknowledgementThisNodeSends)
+{
+    // A resumption finishes when this node acknowledges Sigma2_Resume, not when Sigma2_Resume
+    // arrives: the MIC is checked in between. The record has to carry that later mark, or the
+    // total duration stops short of where the handshake actually ended.
+    const StatusReportBody success(kGeneralCodeSuccess, kProtocolCodeSuccess);
+
+    SendSigma(MsgType::CASE_Sigma1);
+    ReceiveSigma(MsgType::CASE_Sigma2Resume, Address("fd11::1"));
+    SendSigma(MsgType::StatusReport, kExchange, kLocalNodeId, success.Span());
+
+    const auto records = Drain();
+    ASSERT_EQ(records.size(), 1u);
+    const auto & record = records[0];
+    ASSERT_TRUE(record.recordedFields.Has(CASEHandshakeRecordedField::kStatusReportSent));
+    EXPECT_GE(record.statusReportSentTimestampUs, record.sigma2ResumeReceivedTimestampUs)
+        << "the acknowledgement cannot precede the message it acknowledges";
+}
+
+TEST_F(TestCASEHandshakeMetricsBackend, ARejectionThisNodeSendsIsAlsoTimed)
+{
+    const StatusReportBody rejection(kGeneralCodeFailure, kProtocolCodeInvalidParameter);
+
+    SendSigma(MsgType::CASE_Sigma1);
+    ReceiveSigma(MsgType::CASE_Sigma2, Address("fd11::1"));
+    SendSigma(MsgType::StatusReport, kExchange, kLocalNodeId, rejection.Span());
+
+    const auto records = Drain();
+    ASSERT_EQ(records.size(), 1u);
+    EXPECT_TRUE(records[0].recordedFields.Has(CASEHandshakeRecordedField::kStatusReportSent));
+    EXPECT_TRUE(records[0].recordedFields.Has(CASEHandshakeRecordedField::kThisNodeRejectedPeer));
+    EXPECT_GE(records[0].statusReportSentTimestampUs, records[0].sigma2ReceivedTimestampUs);
 }
 
 TEST_F(TestCASEHandshakeMetricsBackend, ResetForgetsWhatWasInFlight)

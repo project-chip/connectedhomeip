@@ -106,7 +106,10 @@ public:
                     record->recordedFields.Set(CASEHandshakeRecordedField::kStatusReportCodes);
                 }
 
-                // Rejecting the peer ends the handshake from this side too.
+                // Rejecting the peer ends the handshake from this side too, so time the report
+                // that did it.
+                RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::statusReportSentTimestampUs,
+                                CASEHandshakeRecordedField::kStatusReportSent, now);
                 if (!alreadyRejectedPeer)
                 {
                     ConcludeCASEHandshake(*record);
@@ -117,7 +120,10 @@ public:
                 // Resumption exchanges no Sigma3, and is closed out by this node acknowledging
                 // Sigma2_Resume. That acknowledgement is only sent once the resumption MIC has been
                 // validated, so concluding here rather than on Sigma2_Resume itself is what keeps a
-                // resumption that failed validation from being reported as a success.
+                // resumption that failed validation from being reported as a success. It is also
+                // the moment the handshake finishes, so it is timed rather than only acted on.
+                RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::statusReportSentTimestampUs,
+                                CASEHandshakeRecordedField::kStatusReportSent, now);
                 ConcludeCASEHandshake(*record);
             }
         }
@@ -217,11 +223,29 @@ public:
 
     void LogNodeDiscovered(chip::Tracing::NodeDiscoveredInfo & info) override
     {
-        // Intermediate results and retries also arrive here; only completion ends the span.
-        VerifyOrReturn(info.type == chip::Tracing::DiscoveryInfoType::kResolutionDone);
+        // Three things arrive here. An intermediate result is of no interest. A completion ends
+        // the span. A retry means resolution has already finished and CASE is now trying another
+        // of the addresses it found, so the span stands but the address to expect a reply from
+        // changes; without following that, a reply from the new address matches no lookup and the
+        // handshake reports neither its peer nor its discovery.
+        const bool resolutionDone = info.type == chip::Tracing::DiscoveryInfoType::kResolutionDone;
+        const bool tryingAnother  = info.type == chip::Tracing::DiscoveryInfoType::kRetryDifferent;
+        VerifyOrReturn(resolutionDone || tryingAnother);
         VerifyOrReturn(info.peerId != nullptr);
         PendingDeviceDiscovery * pending = FindDiscoveryForPeer(*info.peerId);
         VerifyOrReturn(pending != nullptr && pending->inUse);
+
+        if (tryingAnother)
+        {
+            // Only the address moves. The span was timed by the resolution that produced both
+            // addresses, and is left as it is, claimed or not.
+            if (info.result != nullptr)
+            {
+                pending->address    = info.result->address;
+                pending->hasAddress = true;
+            }
+            return;
+        }
         // A completion carrying no address says nothing about what this lookup found, so it ends no
         // span. Leaving the slot unfinished is what keeps this lookup's duration off an address it
         // did not resolve, while any address the slot already held stays available for naming the
@@ -237,12 +261,23 @@ public:
 
     void Reset() { ClearRecordsAndDiscoveries(); }
 
-    uint32_t AbandonedCASEHandshakeCount()
+    // Handshakes given up so a later one could have their slot. Never an estimate: a handshake
+    // is only counted here once it has actually been discarded.
+    uint32_t AbandonedCASEHandshakeCount() const { return mAbandonedCASEHandshakeCount; }
+
+    // Handshakes still open, whether progressing or stuck. Reported rather than guessed at,
+    // because how long a handshake may legitimately take is not knowable here: a peer can
+    // advertise an MRP retry interval of up to an hour, so any deadline risks discarding one that
+    // was still running. Together with the abandoned count this accounts exactly for a run that
+    // saw fewer notifications than it started handshakes.
+    uint32_t InFlightCASEHandshakeCount() const
     {
-        // Swept here as well as when a handshake starts: a run that has stopped establishing would
-        // otherwise keep reporting the figure from before its last handshake timed out.
-        ExpireStaleCASEHandshakes(CurrentTimestampUs());
-        return mAbandonedCASEHandshakeCount;
+        uint32_t count = 0;
+        for (const auto & candidate : mInFlightCASEHandshakes)
+        {
+            count += IsSlotFree(candidate) ? 0u : 1u;
+        }
+        return count;
     }
 
 private:
@@ -282,14 +317,6 @@ private:
 
     // peerAddress holds a C string, so an empty first byte means the peer has not been seen yet.
     static constexpr char kPeerAddressNotYetKnown = '\0';
-
-    // How long an in-flight handshake is kept before it is written off. CASESession allows a peer
-    // 30 seconds of processing time while waiting for Sigma2, on top of the MRP round trip, and
-    // fails the establishment once that expires. Twice that allowance is used here, so a handshake
-    // is only written off well after the SDK itself has given up on it, while its slot is still
-    // freed and counted within a bounded time.
-    static constexpr uint64_t kCASEHandshakeProcessingAllowanceUs = 30 * 1000 * 1000ULL;
-    static constexpr uint64_t kStaleCASEHandshakeAgeUs            = 2 * kCASEHandshakeProcessingAllowanceUs;
 
     static uint64_t CurrentTimestampUs() { return chip::System::SystemClock().GetMonotonicMicroseconds64().count(); }
 
@@ -478,29 +505,8 @@ private:
         return victim;
     }
 
-    // Writes off handshakes that have been in flight too long to still be live, freeing their
-    // slots and counting them. Without this a handshake that never got a reply would hold its slot
-    // for the rest of the run and never be counted, which is the opposite of what the abandoned
-    // count is documented to mean.
-    void ExpireStaleCASEHandshakes(uint64_t now)
-    {
-        for (auto & candidate : mInFlightCASEHandshakes)
-        {
-            if (IsSlotFree(candidate) || now - candidate.sigma1SentTimestampUs < kStaleCASEHandshakeAgeUs)
-            {
-                continue;
-            }
-            candidate = PychipCASEHandshakeMetricsRecord{};
-            mAbandonedCASEHandshakeCount++;
-        }
-    }
-
     void BeginCASEHandshakeRecord(uint64_t now, uint16_t exchangeId, chip::NodeId localEphemeralNodeId)
     {
-        // Reclaim anything that has timed out, before deciding a slot has to be taken from a
-        // handshake that may still be live.
-        ExpireStaleCASEHandshakes(now);
-
         PychipCASEHandshakeMetricsRecord * slot = nullptr;
         for (auto & candidate : mInFlightCASEHandshakes)
         {
@@ -585,8 +591,11 @@ void StartCASEHandshakeMetricsBackend();
 // Stops timing. Handshakes still in flight are simply forgotten.
 void StopCASEHandshakeMetricsBackend();
 
-// Handshakes that began but never reached a conclusion, so no listener heard about them.
+// Handshakes given up so a later one could take their slot.
 uint32_t AbandonedCASEHandshakeCount();
+
+// Handshakes still open, whether progressing or stuck.
+uint32_t InFlightCASEHandshakeCount();
 
 } // namespace python
 } // namespace chip

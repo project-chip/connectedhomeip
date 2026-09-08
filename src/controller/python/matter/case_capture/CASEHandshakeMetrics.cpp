@@ -74,6 +74,14 @@ PyChipError pychip_case_handshake_metrics_get_abandoned_count(uint32_t * abandon
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+PyChipError pychip_case_handshake_metrics_get_in_flight_count(uint32_t * inFlight)
+{
+    VerifyOrReturnError(inFlight != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    *inFlight = chip::python::InFlightCASEHandshakeCount();
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
 PyChipError pychip_case_handshake_metrics_get_record_size(uint32_t * size)
 {
     VerifyOrReturnError(size != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
