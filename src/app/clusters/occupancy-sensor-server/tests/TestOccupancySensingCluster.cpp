@@ -1281,4 +1281,188 @@ TEST_F(TestOccupancySensingCluster, TestNotifyPredictedOccupancyChanged)
     }
 }
 
+class MinimalPredictionDelegate : public OccupancySensingDelegate
+{
+public:
+    CHIP_ERROR GetPredictedOccupancyAtIndex(size_t index,
+                                            OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction) override
+    {
+        if (index == 0)
+        {
+            prediction.startTimestamp = 100;
+            prediction.endTimestamp   = 200;
+            prediction.occupancy.Set(OccupancySensing::OccupancyBitmap::kOccupied);
+            prediction.confidence = 50;
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+};
+
+TEST_F(TestOccupancySensingCluster, TestPredictiveOccupancyMinimalDelegate)
+{
+    chip::Testing::TestServerClusterContext context;
+    MinimalPredictionDelegate delegate;
+
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithFeatures(OccupancySensing::Feature::kPrediction)
+                                         .WithDelegate(&delegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
+    Attributes::PredictedOccupancy::TypeInfo::DecodableType list;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::PredictedOccupancy::Id, list), CHIP_NO_ERROR);
+
+    auto it = list.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().startTimestamp, 100u);
+    EXPECT_EQ(it.GetValue().endTimestamp, 200u);
+    EXPECT_TRUE(it.GetValue().occupancy.Has(OccupancySensing::OccupancyBitmap::kOccupied));
+    EXPECT_EQ(it.GetValue().confidence, 50);
+    ASSERT_FALSE(it.Next());
+}
+
+TEST_F(TestOccupancySensingCluster, TestReadPredictedOccupancyEndTimestampNotAfterStartTimestamp)
+{
+    chip::Testing::TestServerClusterContext context;
+    TestPredictionDelegate delegate;
+
+    // 1. EndTimestamp equal to StartTimestamp
+    {
+        OccupancySensing::Structs::PredictedOccupancyStruct::Type pred;
+        pred.startTimestamp = 1000;
+        pred.endTimestamp   = 1000;
+        pred.confidence     = 50;
+        delegate.predictions.push_back(pred);
+
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                             .WithFeatures(OccupancySensing::Feature::kPrediction)
+                                             .WithDelegate(&delegate) };
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        chip::Testing::ClusterTester tester(cluster);
+
+        Attributes::PredictedOccupancy::TypeInfo::DecodableType list;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::PredictedOccupancy::Id, list), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // 2. EndTimestamp less than StartTimestamp
+    {
+        delegate.predictions.clear();
+        OccupancySensing::Structs::PredictedOccupancyStruct::Type pred;
+        pred.startTimestamp = 1000;
+        pred.endTimestamp   = 999;
+        pred.confidence     = 50;
+        delegate.predictions.push_back(pred);
+
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                             .WithFeatures(OccupancySensing::Feature::kPrediction)
+                                             .WithDelegate(&delegate) };
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        chip::Testing::ClusterTester tester(cluster);
+
+        Attributes::PredictedOccupancy::TypeInfo::DecodableType list;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::PredictedOccupancy::Id, list), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+}
+
+TEST_F(TestOccupancySensingCluster, TestReadPredictedOccupancyNonIncreasingIntervals)
+{
+    chip::Testing::TestServerClusterContext context;
+    TestPredictionDelegate delegate;
+
+    // 1. Second entry startTimestamp equals first entry endTimestamp
+    {
+        OccupancySensing::Structs::PredictedOccupancyStruct::Type pred1;
+        pred1.startTimestamp = 1000;
+        pred1.endTimestamp   = 2000;
+        pred1.confidence     = 50;
+
+        OccupancySensing::Structs::PredictedOccupancyStruct::Type pred2;
+        pred2.startTimestamp = 2000;
+        pred2.endTimestamp   = 3000;
+        pred2.confidence     = 50;
+
+        delegate.predictions.push_back(pred1);
+        delegate.predictions.push_back(pred2);
+
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                             .WithFeatures(OccupancySensing::Feature::kPrediction)
+                                             .WithDelegate(&delegate) };
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        chip::Testing::ClusterTester tester(cluster);
+
+        Attributes::PredictedOccupancy::TypeInfo::DecodableType list;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::PredictedOccupancy::Id, list), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // 2. Second entry startTimestamp less than first entry endTimestamp
+    {
+        delegate.predictions.clear();
+        OccupancySensing::Structs::PredictedOccupancyStruct::Type pred1;
+        pred1.startTimestamp = 1000;
+        pred1.endTimestamp   = 2000;
+        pred1.confidence     = 50;
+
+        OccupancySensing::Structs::PredictedOccupancyStruct::Type pred2;
+        pred2.startTimestamp = 1500;
+        pred2.endTimestamp   = 3000;
+        pred2.confidence     = 50;
+
+        delegate.predictions.push_back(pred1);
+        delegate.predictions.push_back(pred2);
+
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                             .WithFeatures(OccupancySensing::Feature::kPrediction)
+                                             .WithDelegate(&delegate) };
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        chip::Testing::ClusterTester tester(cluster);
+
+        Attributes::PredictedOccupancy::TypeInfo::DecodableType list;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::PredictedOccupancy::Id, list), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+}
+
+TEST_F(TestOccupancySensingCluster, TestReadPredictedOccupancyConfidenceOutOfRange)
+{
+    chip::Testing::TestServerClusterContext context;
+    TestPredictionDelegate delegate;
+
+    OccupancySensing::Structs::PredictedOccupancyStruct::Type pred;
+    pred.startTimestamp = 1000;
+    pred.endTimestamp   = 2000;
+    pred.confidence     = 101; // Out of range (percent is 0-100)
+    delegate.predictions.push_back(pred);
+
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithFeatures(OccupancySensing::Feature::kPrediction)
+                                         .WithDelegate(&delegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
+    Attributes::PredictedOccupancy::TypeInfo::DecodableType list;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::PredictedOccupancy::Id, list), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestOccupancySensingCluster, TestReadPredictedOccupancyOccupancyBitmapOutOfRange)
+{
+    chip::Testing::TestServerClusterContext context;
+    TestPredictionDelegate delegate;
+
+    OccupancySensing::Structs::PredictedOccupancyStruct::Type pred;
+    pred.startTimestamp = 1000;
+    pred.endTimestamp   = 2000;
+    pred.confidence     = 50;
+    pred.occupancy      = static_cast<chip::BitMask<OccupancySensing::OccupancyBitmap>>(0x02); // Out of range (only bit 0 defined)
+    delegate.predictions.push_back(pred);
+
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithFeatures(OccupancySensing::Feature::kPrediction)
+                                         .WithDelegate(&delegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
+    Attributes::PredictedOccupancy::TypeInfo::DecodableType list;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::PredictedOccupancy::Id, list), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 } // namespace

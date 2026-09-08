@@ -163,6 +163,7 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
             return encoder.EncodeEmptyList();
         }
         return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+            uint32_t previousEndTimestamp = 0;
             for (size_t i = 0; true; i++)
             {
                 OccupancySensing::Structs::PredictedOccupancyStruct::Type prediction;
@@ -172,7 +173,13 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
                     return CHIP_NO_ERROR;
                 }
                 ReturnErrorOnFailure(err);
+                VerifyOrReturnError(prediction.endTimestamp > prediction.startTimestamp, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError((i == 0) || (prediction.startTimestamp > previousEndTimestamp), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(prediction.confidence <= 100, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(prediction.occupancy.Raw() <= 1, CHIP_ERROR_INVALID_ARGUMENT);
+
                 ReturnErrorOnFailure(enc.Encode(prediction));
+                previousEndTimestamp = prediction.endTimestamp;
             }
         });
     }
