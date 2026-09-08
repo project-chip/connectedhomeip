@@ -37,7 +37,7 @@ ThermostatUserInterfaceConfigurationCluster::ThermostatUserInterfaceConfiguratio
 {}
 
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::Attributes(const ConcreteClusterPath & path,
-                                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 

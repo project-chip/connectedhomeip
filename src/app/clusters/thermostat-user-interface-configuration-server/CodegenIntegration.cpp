@@ -33,7 +33,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 constexpr size_t kFixedClusterCount = ThermostatUserInterfaceConfiguration::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kMaxClusterCount     = kFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kMaxClusterCount   = kFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<ThermostatUserInterfaceConfigurationCluster> gServers[kMaxClusterCount];
 

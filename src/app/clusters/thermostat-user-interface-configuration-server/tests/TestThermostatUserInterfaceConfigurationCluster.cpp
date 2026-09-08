@@ -146,7 +146,7 @@ TEST_F(TestThermostatUserInterfaceConfigurationCluster, ScheduleProgrammingVisib
     optionalAttributeSet.Set<ScheduleProgrammingVisibility::Id>();
 
     ThermostatUserInterfaceConfigurationCluster::Config config;
-    config.optionalAttributes              = optionalAttributeSet;
+    config.optionalAttributes            = optionalAttributeSet;
     config.scheduleProgrammingVisibility = ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted;
 
     ThermostatUserInterfaceConfigurationCluster cluster(kRootEndpointId, config);
@@ -158,13 +158,13 @@ TEST_F(TestThermostatUserInterfaceConfigurationCluster, ScheduleProgrammingVisib
     ASSERT_EQ(tester.ReadAttribute(ScheduleProgrammingVisibility::Id, scheduleProgrammingVisibility), CHIP_NO_ERROR);
     EXPECT_EQ(scheduleProgrammingVisibility, ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted);
 
-    ASSERT_EQ(tester.WriteAttribute(ScheduleProgrammingVisibility::Id, ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied),
-              CHIP_NO_ERROR);
+    ASSERT_EQ(
+        tester.WriteAttribute(ScheduleProgrammingVisibility::Id, ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied),
+        CHIP_NO_ERROR);
     ASSERT_EQ(tester.ReadAttribute(ScheduleProgrammingVisibility::Id, scheduleProgrammingVisibility), CHIP_NO_ERROR);
     EXPECT_EQ(scheduleProgrammingVisibility, ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied);
 
-    auto status =
-        tester.WriteAttribute(ScheduleProgrammingVisibility::Id, ScheduleProgrammingVisibilityEnum::kUnknownEnumValue);
+    auto status = tester.WriteAttribute(ScheduleProgrammingVisibility::Id, ScheduleProgrammingVisibilityEnum::kUnknownEnumValue);
     EXPECT_EQ(status, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);

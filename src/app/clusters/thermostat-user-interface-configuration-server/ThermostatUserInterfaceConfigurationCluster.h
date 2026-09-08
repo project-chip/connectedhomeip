@@ -27,8 +27,8 @@ namespace chip::app::Clusters {
 class ThermostatUserInterfaceConfigurationCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributeSet = app::OptionalAttributeSet<
-        ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id>;
+    using OptionalAttributeSet =
+        app::OptionalAttributeSet<ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id>;
 
     struct Config
     {
@@ -47,11 +47,9 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path,
-                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    DataModel::ActionReturnStatus
-    SetTemperatureDisplayMode(ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
+    DataModel::ActionReturnStatus SetTemperatureDisplayMode(ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
     DataModel::ActionReturnStatus SetKeypadLockout(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value);
     DataModel::ActionReturnStatus
     SetScheduleProgrammingVisibility(ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value);
