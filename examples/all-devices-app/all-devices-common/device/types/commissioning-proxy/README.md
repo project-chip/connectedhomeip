@@ -258,16 +258,23 @@ PAF channel, permitted in all regulatory regions:
 | -------------------------------- | ----------------------------------------------------------------------------------------- |
 | `--device commissioning-proxy:5` | Instantiate the CP device on endpoint 5                                                   |
 | `--wifi`                         | Enable Wi-Fi management via wpa_supplicant (required for PAF)                             |
-| `--wifipaf "freq_list=<MHz>"`    | NAN operating frequencies in MHz. `2437` = channel 6 (2.4 GHz); add e.g. `5745` for 5 GHz |
+| `--wifipaf "freq_list=<MHz>"`    | NAN frequencies in MHz. `2437` = channel 6 (2.4 GHz); add e.g. `5745` for 5 GHz           |
 | `--discriminator <value>`        | 12-bit value identifying the proxy during its own commissioning                           |
 
-The `WiFiBand` attribute advertised by the cluster is derived from `freq_list`
-at startup: 2412–2484 MHz → 2.4 GHz, 5035–5980 MHz → 5 GHz. If no valid
-frequency is parsed the proxy defaults to advertising 2.4 GHz.
+`freq_list` is parsed once at startup and drives two things. The `WiFiBand`
+attribute advertised by the cluster follows the bands it covers: 2412–2484 MHz
+→ 2.4 GHz, 5035–5980 MHz → 5 GHz, defaulting to 2.4 GHz if no valid frequency
+is parsed. Scans and `ProxyConnectRequest` create a subscribe instance on a
+single channel: 2437 when it is listed, otherwise the first frequency given.
 
-Once the proxy is commissioned (next step), it cancels its own NAN publisher and
-disconnects the associated receive handler, so the PAF subscribe calls it makes
-on behalf of commissioners register exactly one handler.
+The proxy does not publish on these frequencies. Starting a NAN publisher
+alongside the proxy's own subscribe leaves the PAFTP handshake for a
+`ProxyConnectRequest` unanswered, and the proxy is commissioned over IP or BLE
+rather than over PAF, so it does not need to be PAF-commissionable.
+
+Once the proxy is commissioned (next step), it disconnects the NAN receive
+handler, so the PAF subscribe calls it makes on behalf of commissioners register
+exactly one handler.
 
 <hr>
 
@@ -418,7 +425,8 @@ Adapter and driver are both constructed in
 `posix/linux/DeviceFactoryPlatformOverride.cpp`, which composes the driver onto
 the single `CommissioningProxyDevice` with `AddTransport()` — a build with BLE
 adds that driver the same way — and derives the advertised `WiFiBand` from
-`--wifipaf freq_list=`, since the device itself reads no command line.
+`--wifipaf freq_list=`, since the device itself reads no command line. The same
+parsed list reaches the radio from `posix/main.cpp`.
 Transports are registered before `Server::Init()`, so the fabric table is empty
 at that point and the driver's `DisconnectPublishReceiveHandler()` call lands on
 the commissioning-complete event instead.

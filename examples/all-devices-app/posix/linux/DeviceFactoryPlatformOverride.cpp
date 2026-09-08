@@ -38,9 +38,6 @@
 #include <CommissioningProxyPafAdapter.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyPafTransport.h> // nogncheck
 #include <app_options/AppOptions.h>
-
-#include <cstdlib>
-#include <cstring>
 #endif
 
 namespace chip {
@@ -59,32 +56,17 @@ BitMask<Clusters::CommissioningProxy::WiFiBandBitmap> ProxyWiFiBands()
     BitMask<WiFiBandBitmap> bands;
 
     const AppOptions::AppConfig * cfg = AppOptions::TryGetConfig();
-    const char * extCmds              = (cfg != nullptr && !cfg->wifipafExtCmds.empty()) ? cfg->wifipafExtCmds.c_str() : nullptr;
-    if (extCmds != nullptr)
+    if (cfg != nullptr)
     {
-        const char * p = std::strstr(extCmds, "freq_list=");
-        if (p != nullptr)
+        for (uint16_t freq : cfg->wifipafFreqList)
         {
-            p += std::strlen("freq_list=");
-            while (*p != '\0' && *p != ' ')
+            if (freq >= 2412 && freq <= 2484)
             {
-                uint32_t freq = static_cast<uint32_t>(std::strtoul(p, nullptr, 10));
-                if (freq >= 2412 && freq <= 2484)
-                {
-                    bands.Set(WiFiBandBitmap::k2g4);
-                }
-                else if (freq >= 5035 && freq <= 5980)
-                {
-                    bands.Set(WiFiBandBitmap::k5g);
-                }
-                while (*p != '\0' && *p != ',' && *p != ' ')
-                {
-                    ++p;
-                }
-                if (*p == ',')
-                {
-                    ++p;
-                }
+                bands.Set(WiFiBandBitmap::k2g4);
+            }
+            else if (freq >= 5035 && freq <= 5980)
+            {
+                bands.Set(WiFiBandBitmap::k5g);
             }
         }
     }

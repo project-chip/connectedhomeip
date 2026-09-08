@@ -46,6 +46,7 @@
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -67,6 +68,9 @@
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
+
+#include <algorithm>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -545,6 +549,28 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+// Apply "--wifipaf freq_list=" to the Wi-Fi PAF radio.  Without this the frequencies
+// would only reach the CommissioningProxy cluster's advertised WiFiBand, leaving the
+// scan and connect paths on the compile-time default channel.
+void ConfigureWiFiPaf(const std::vector<uint16_t> & freqList)
+{
+    if (freqList.empty())
+    {
+        return;
+    }
+    // A subscribe instance is created on a single channel, and a commissioner should use
+    // the default publish channel wherever it can, so only fall back to the first
+    // frequency listed when the default is not among them.
+    constexpr uint16_t kDefaultPublishChannel = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
+    const bool defaultListed     = std::find(freqList.begin(), freqList.end(), kDefaultPublishChannel) != freqList.end();
+    const uint16_t subscribeFreq = defaultListed ? kDefaultPublishChannel : freqList.front();
+    DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(subscribeFreq);
+
+    ChipLogProgress(AppServer, "Wi-Fi PAF: subscribing on %u MHz", subscribeFreq);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, const AppOptions::AppConfig & config)
 {
     auto discriminator = config.discriminator.value_or(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR));
@@ -598,6 +624,10 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ConfigurationMgr().LogDeviceConfig();
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ConfigureWiFiPaf(config.wifipafFreqList);
+#endif
 
     ReturnErrorOnFailure(chip::app::InitBle(AppOptions::GetConfig().bleController));
 
