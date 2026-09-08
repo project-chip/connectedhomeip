@@ -1,1 +1,1 @@
-215 : [Telink] Update Docker image (Zephyr update)
+216 : [NXP] Replace pre-installed NXP ZSDK with upstream Zephyr in docker image
