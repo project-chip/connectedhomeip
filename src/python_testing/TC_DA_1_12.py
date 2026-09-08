@@ -101,12 +101,12 @@ class TC_DA_1_12(MatterBaseTest):
                      "EcdsaMatterLegacy, the complete PAI is returned in one response. Segment numbering is "
                      "monotonic from zero; TotalDocumentSize is stable across all segments; NextSegmentID is absent "
                      "on the final response; profile_pai_cert parses as an X.509 certificate; the PAI subject key "
-                     "and signature algorithms are both advertised by paiProfiles; and the PAI signature algorithm "
+                     "algorithm matches selectedPAIProfile; and the PAI signature algorithm "
                      "matches selectedPAAProfile."),
             TestStep(5, "TH verifies that dacProfiles advertises EcdsaMatterLegacy and stores it as selectedDACProfile.",
                      "selectedDACProfile is EcdsaMatterLegacy."),
-            TestStep(6, "TH sends CertificateChainRequest for DACCertificate with CryptoProfile set to the selected "
-                        "chain profile, SegmentID set to 0, and MaxSegmentSize set to the value used for the PAI "
+            TestStep(6, "TH sends CertificateChainRequest for DACCertificate with CryptoProfile set to "
+                        "selectedDACProfile, SegmentID set to 0, and MaxSegmentSize set to the value used for the PAI "
                         "request. While NextSegmentID is present, TH requests the remaining segments and reassembles "
                         "the certificate as profile_dac_cert.",
                      "If the PAI subject key is a PQC profile, the DAC is returned in multiple segments because of "
@@ -238,18 +238,11 @@ class TC_DA_1_12(MatterBaseTest):
         selected_paa_profile = select_strongest_profile(paa_profiles, "PAA")
         selected_pai_profile = select_strongest_profile(pai_profiles, "PAI")
 
-        # A profile names a certificate chain variant rather than one algorithm, so the PAA and PAI
-        # bitmaps describe the same chain and their strongest entries must agree. The PAA is
-        # self-signed, which makes its profile the unambiguous identity of the chain.
-        asserts.assert_equal(selected_pai_profile, selected_paa_profile,
-                             f"paaProfiles (0x{paa_profiles:04X}) and paiProfiles (0x{pai_profiles:04X}) select "
-                             f"different chains ({selected_paa_profile.name} and {selected_pai_profile.name}); the "
-                             "PAI is signed by the PAA, so the strongest chain they advertise must be the same")
-        selected_chain_profile = selected_paa_profile
-
-        # Pre-condition 2 requires the TH to support the ML-DSA profiles it negotiates. Checking the
-        # TH here keeps a TH limitation from being reported as a DUT failure in step 10.
-        assert_profile_supported_by_test_harness(selected_chain_profile)
+        # PAA and PAI subject-key profiles are negotiated independently.
+        # Check the TH's crypto capabilities before retrieving either certificate.
+        assert_profile_supported_by_test_harness(selected_paa_profile)
+        assert_profile_supported_by_test_harness(selected_pai_profile)
+        chain_name = f"{selected_paa_profile.name}/{selected_pai_profile.name}"
 
         self.step(4)
         # kCertificateSegmentSize is both the smallest MaxSegmentSize the spec allows and the
@@ -267,12 +260,10 @@ class TC_DA_1_12(MatterBaseTest):
         profile_pai_cert = parse_certificate(pai_document.der, "profile_pai_cert")
         pai_algorithms = profile_pai_cert.algorithms
 
-        # Test plan deviation: the plan expects the PAI public key algorithm to equal
-        # selectedPAIProfile. A profile is the union of the algorithms that may appear on the
-        # certificate, and this step explicitly allows an ECDSA PAI signed by a PQC PAA, so the
-        # subject key is instead required to be one of the algorithms paiProfiles advertises.
-        assert_profile_advertised(pai_profiles, pai_algorithms.subject_key_profile, "PAI", "subjectPublicKeyInfo")
-        assert_profile_advertised(pai_profiles, pai_algorithms.signature_profile, "PAI", "signatureAlgorithm")
+        # The PAI subject key follows its own profile; its signature follows the issuer's.
+        asserts.assert_equal(pai_algorithms.subject_key_profile, selected_pai_profile,
+                             "profile_pai_cert public key algorithm must match selectedPAIProfile "
+                             f"{selected_pai_profile.name}")
         asserts.assert_equal(pai_algorithms.signature_profile, selected_paa_profile,
                              "profile_pai_cert must be signed with the selectedPAAProfile "
                              f"{selected_paa_profile.name} because the self-signed PAA issued it")
@@ -285,15 +276,10 @@ class TC_DA_1_12(MatterBaseTest):
         selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
 
         self.step(6)
-        # Test plan deviation: the plan requests the DAC with CryptoProfile set to selectedDACProfile
-        # (EcdsaMatterLegacy). CryptoProfile selects which certificate document the DUT serves, so
-        # that value returns the separate legacy DAC rather than the DAC the PQC PAI issued, and the
-        # requirement below that the DAC signature match the PAI could never hold. The DAC is
-        # therefore requested with the selected chain profile, and selectedDACProfile is asserted
-        # against the DAC subject key.
-        assert_profile_advertised(dac_profiles, selected_chain_profile, "DAC", "certificate chain")
+        # CryptoProfile describes the DAC subject key. The DUT selects the stored chain
+        # separately, so an explicit ECDSA request still retrieves the PQC-issued DAC.
         dac_document = await retrieve_segmented_document(
-            self._send_certificate_chain_request, certificate_type.kDACCertificate, selected_chain_profile, "DAC",
+            self._send_certificate_chain_request, certificate_type.kDACCertificate, selected_dac_profile, "DAC",
             kCertificateSegmentSize)
 
         # What drives the DAC size is the signature the PAI generated over it, so the segmentation
@@ -311,7 +297,6 @@ class TC_DA_1_12(MatterBaseTest):
         profile_dac_cert = parse_certificate(dac_document.der, "profile_dac_cert")
         dac_algorithms = profile_dac_cert.algorithms
         assert_profile_advertised(dac_profiles, dac_algorithms.subject_key_profile, "DAC", "subjectPublicKeyInfo")
-        assert_profile_advertised(dac_profiles, dac_algorithms.signature_profile, "DAC", "signatureAlgorithm")
         asserts.assert_equal(dac_algorithms.subject_key_profile, selected_dac_profile,
                              "profile_dac_cert must keep an ECDSA subject key so the Device Attestation signature "
                              "stays EcdsaMatterLegacy during PQC Phase 1")
@@ -358,9 +343,9 @@ class TC_DA_1_12(MatterBaseTest):
         basic_info_product_id = await self.read_single_attribute_check_success(
             cluster=basic_information, attribute=basic_information.Attributes.ProductID, endpoint=self.root_endpoint)
         profile_paa_cert = find_issuing_paa(profile_pai_cert, paa_candidates, selected_paa_profile,
-                                            selected_chain_profile.name)
+                                            chain_name)
         self._validate_chain_and_attestation(profile_paa_cert, profile_pai_cert, profile_dac_cert,
-                                             selected_chain_profile.name, attestation_elements,
+                                             chain_name, attestation_elements,
                                              attestation_signature, attestation_challenge, attestation_nonce,
                                              basic_info_vendor_id, basic_info_product_id, test_cd_signer_source,
                                              allow_provisional_test_signer)
