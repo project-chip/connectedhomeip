@@ -242,7 +242,7 @@ not_automated:
     - name: TC_MEDIAFILEMANAGEMENT_3_2.py
       reason: Pending tv-app in CI
     - name: TC_CONTENTLAUNCHER_10_8.py
-      reason: Requires an operator to place the DUT into a non-movable-content state.
+      reason: Requires user interaction.
     - name: TC_CONTENTLAUNCHER_10_9.py
       reason: Requires a media URL PIXIT and user interaction.
     - name: TC_ALOGIN_12_3.py
