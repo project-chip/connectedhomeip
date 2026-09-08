@@ -23,7 +23,8 @@ application's responsibility.
 It uses an optional delegate pattern
 (`chip::app::Clusters::OccupancySensingDelegate`) to notify the application
 about changes to the occupancy state or the hold time configuration, or to
-provide predictive occupancy data when the Prediction (`PRED`) feature is enabled.
+provide predictive occupancy data when the Prediction (`PRED`) feature is
+enabled.
 
 ## Usage
 
@@ -36,8 +37,8 @@ provides the most flexibility and control.
 If your application needs to be notified of changes or supports predictive
 occupancy, create a class that inherits from
 `chip::app::Clusters::OccupancySensingDelegate` and implement the relevant
-virtual methods. All methods have default implementations, so only override
-what is needed.
+virtual methods. All methods have default implementations, so only override what
+is needed.
 
 ```cpp
 #include "app/clusters/occupancy-sensor-server/OccupancySensingCluster.h"
@@ -140,8 +141,8 @@ void MySensorHardwareCallback(bool isOccupied)
 
 When the `PRED` (Prediction) feature is enabled, the cluster exposes the
 `PredictedOccupancy` attribute. Whenever predictions are updated by the
-application or delegate, notify the cluster so the attribute is marked dirty
-for subscriptions:
+application or delegate, notify the cluster so the attribute is marked dirty for
+subscriptions:
 
 ```cpp
 cluster->NotifyPredictedOccupancyChanged();

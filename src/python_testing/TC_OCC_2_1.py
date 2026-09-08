@@ -231,7 +231,8 @@ class TC_OCC_2_1(MatterBaseTest):
                 ultrasonic_otou_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.UltrasonicOccupiedToUnoccupiedDelay)
                 asserts.assert_less_equal(ultrasonic_otou_delay_dut, 0xFFFE,
                                           "UltrasonicOccupiedToUnoccupiedDelay is not in valid range")
-                asserts.assert_greater_equal(ultrasonic_otou_delay_dut, 0, "UltrasonicOccupiedToUnoccupiedDelay is not in valid range")
+                asserts.assert_greater_equal(ultrasonic_otou_delay_dut, 0,
+                                             "UltrasonicOccupiedToUnoccupiedDelay is not in valid range")
 
             else:
                 log.info("UltrasonicOccupiedToUnoccupiedDelay not supported. Test step skipped")
@@ -246,7 +247,8 @@ class TC_OCC_2_1(MatterBaseTest):
                 ultrasonic_utoo_delay_dut = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.UltrasonicUnoccupiedToOccupiedDelay)
                 asserts.assert_less_equal(ultrasonic_utoo_delay_dut, 0xFFFE,
                                           "UltrasonicUnoccupiedToOccupiedDelay is not in valid range")
-                asserts.assert_greater_equal(ultrasonic_utoo_delay_dut, 0, "UltrasonicUnoccupiedToOccupiedDelay is not in valid range")
+                asserts.assert_greater_equal(ultrasonic_utoo_delay_dut, 0,
+                                             "UltrasonicUnoccupiedToOccupiedDelay is not in valid range")
             else:
                 log.info("UltrasonicUnoccupiedToOccupiedDelay not supported. Test step skipped")
                 self.mark_current_step_skipped()
@@ -327,7 +329,8 @@ class TC_OCC_2_1(MatterBaseTest):
             asserts.assert_is_instance(predicted_occupancy, list, "PredictedOccupancy attribute must be a list")
             prev_end_timestamp = None
             for idx, entry in enumerate(predicted_occupancy):
-                matter_asserts.assert_valid_uint32(entry.startTimestamp, f"Entry {idx} startTimestamp must be a valid epoch-s (uint32)")
+                matter_asserts.assert_valid_uint32(
+                    entry.startTimestamp, f"Entry {idx} startTimestamp must be a valid epoch-s (uint32)")
                 matter_asserts.assert_valid_uint32(entry.endTimestamp, f"Entry {idx} endTimestamp must be a valid epoch-s (uint32)")
                 asserts.assert_greater_equal(entry.endTimestamp, entry.startTimestamp + 1,
                                              f"Entry {idx} endTimestamp must be >= startTimestamp + 1")
