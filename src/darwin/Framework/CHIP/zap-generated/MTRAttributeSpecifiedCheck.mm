@@ -1586,6 +1586,9 @@ static BOOL AttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId aAtt
     case Attributes::CurrentFabricIndex::Id: {
         return YES;
     }
+    case Attributes::PQCDeviceAttestationProfile::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5751,6 +5754,9 @@ static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::SessionIDList::Id: {
+        return YES;
+    }
+    case Attributes::RangingConstraints::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

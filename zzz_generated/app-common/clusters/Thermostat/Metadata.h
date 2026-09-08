@@ -344,7 +344,7 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RemoveThermostatSuggestion
 namespace AtomicRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AtomicRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+                                                                Access::Privilege::kOperate);
 } // namespace AtomicRequest
 
 } // namespace Commands

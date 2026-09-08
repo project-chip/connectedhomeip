@@ -23,7 +23,10 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestThreadNetworkDirectoryCluster.cpp" ]
 
-  sources = [ "FakeThreadNetworkDirectoryStorage.h" ]
+  sources = [
+    "../MigrateThreadNetworkDirectoryServerStorage.cpp",
+    "FakeThreadNetworkDirectoryStorage.h",
+  ]
 
   cflags = [ "-Wconversion" ]
 
