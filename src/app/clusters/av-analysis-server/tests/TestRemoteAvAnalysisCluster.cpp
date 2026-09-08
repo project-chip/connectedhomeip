@@ -1028,6 +1028,7 @@ TEST_F(TestRemoteAvAnalysisCluster, RemoveThatCannotStartLeavesTheStream)
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
 
     // The client refuses for any other reason
+    mFakeCameraClient.mDeallocationResult = CHIP_ERROR_NO_MEMORY;
     ASSERT_EQ(ImmediateRemoveStatus(0), Status::Failure);
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
 
@@ -1090,6 +1091,45 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateRequiresExactlyOneEndpointField)
     ASSERT_EQ(StatusOf(response).GetStatusCode().GetStatus(), Status::InvalidCommand);
 
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 0);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, ActivateWithANonEndpointIsAConstraintError)
+{
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+
+    // The endpoint is encoded into AnalysisStreams, where an out-of-range one fails every read
+    ASSERT_EQ(ImmediateActivateStatus(0, kInvalidEndpointId), Status::ConstraintError);
+    ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 0);
+    ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, DestructionAnswersACommandParkedOnACameraInteraction)
+{
+    InvalidatableCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+    Commands::EstablishAnalysisStream::DecodableType commandData;
+    commandData.nodeID = 0x1234;
+
+    {
+        AvAnalysisCluster cluster(kTestEndpointId, BitFlags<Feature>(Feature::kRemoteContextDetection), testAmbientContexts,
+                                  DataModel::NullNullable, kTestMaxAnalysisStreams);
+        cluster.SetDelegate(&mMockDelegate);
+        cluster.SetCameraClient(&mFakeCameraClient);
+        cluster.SetWebRTCClient(&mFakeWebRTCClient);
+        ASSERT_EQ(cluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        // Parked: the response waits on an allocation the camera will never answer
+        ASSERT_FALSE(cluster.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData).has_value());
+        ASSERT_FALSE(commandHandler.HasStatus());
+
+        // The instance goes away without a Shutdown of its own
+    }
+
+    // Abandoning the interaction cannot complete the command, so it is failed rather than dropped
+    ASSERT_EQ(LastStatus(commandHandler), Status::Failure);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ActivateWithPushAVEndpointIsUnsupported)

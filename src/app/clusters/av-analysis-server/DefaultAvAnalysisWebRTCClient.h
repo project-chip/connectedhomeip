@@ -390,6 +390,7 @@ private:
         AvAnalysisWebRTCClient::Callback * callback = nullptr;
         ScopedNodeId cameraNode;
         EndpointId providerEndpoint = kInvalidEndpointId;
+        uint16_t videoStreamId      = 0;
         bool inUse                  = false;
     };
 

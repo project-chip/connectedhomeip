@@ -207,6 +207,12 @@ private:
      */
     void CancelCameraInteraction();
 
+    /**
+     * Answers a command parked on a camera interaction with Failure, for the paths that abandon the
+     * interaction rather than completing it.
+     */
+    void FailParkedCommand();
+
     /*
      * Command and event handler helper methods
      */

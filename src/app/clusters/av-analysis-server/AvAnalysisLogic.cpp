@@ -29,6 +29,8 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <algorithm>
+
 using namespace chip::app::Clusters::AvAnalysis;
 using namespace chip::app::Clusters::AvAnalysis::Structs;
 using namespace chip::app::Clusters::AvAnalysis::Attributes;
@@ -50,6 +52,20 @@ AvAnalysisServerLogic::AvAnalysisServerLogic(
 AvAnalysisServerLogic::~AvAnalysisServerLogic()
 {
     CancelCameraInteraction();
+    // Cancelling means no completion will arrive, so a parked command must be answered here too:
+    // a Handle released without a status leaves the invoking client waiting for a response.
+    FailParkedCommand();
+}
+
+void AvAnalysisServerLogic::FailParkedCommand()
+{
+    // A command still waiting on a camera interaction can no longer be completed.
+    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    auto handleRef = mCameraInteraction.Complete(commandPath);
+    if (auto * handler = handleRef.Get(); handler != nullptr)
+    {
+        handler->AddStatus(commandPath, Status::Failure);
+    }
 }
 
 CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttributePersistenceProvider)
@@ -116,13 +132,7 @@ void AvAnalysisServerLogic::Shutdown()
         SetStreamState(entry, AnalysisStreamStateEnum::kPendingInitiation);
     }
 
-    // A command still waiting on a camera interaction can no longer be completed.
-    ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
-    auto handleRef = mCameraInteraction.Complete(commandPath);
-    if (auto * handler = handleRef.Get(); handler != nullptr)
-    {
-        handler->AddStatus(commandPath, Status::Failure);
-    }
+    FailParkedCommand();
 
     if (mDelegate != nullptr)
     {
@@ -980,6 +990,10 @@ AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, co
     // The PushAV transport path is not supported by this implementation
     VerifyOrReturnValue(!commandData.pushAVEndpointID.HasValue(), Status::InvalidCommand,
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: PushAV activation is not supported", mEndpointId));
+
+    // The endpoint is encoded into AnalysisStreams, where an out-of-range one would fail every read
+    VerifyOrReturnValue(commandData.webRTCEndpointID.Value() != kInvalidEndpointId, Status::ConstraintError,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: WebRTCEndpointID is not an endpoint number", mEndpointId));
 
     VerifyOrReturnValue(mWebRTCClient != nullptr, Status::Failure,
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: no WebRTC client configured", mEndpointId));

@@ -1469,6 +1469,19 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, TheRequestorRecordCarriesTheOfferedVid
     EXPECT_EQ(sessions[0].videoStreamID.Value(), kVideoStreamId);
 }
 
+TEST_F(TestDefaultAvAnalysisWebRTCClient, TheRequestorRecordCarriesTheStreamInVideoStreams)
+{
+    EstablishSessionWithId(55);
+
+    // An established session's streams are read from VideoStreams, not the deprecated scalar
+    auto sessions = mRequestorCluster.GetCurrentSessions();
+    ASSERT_EQ(sessions.size(), 1u);
+    ASSERT_TRUE(sessions[0].videoStreams.HasValue());
+    ASSERT_EQ(sessions[0].videoStreams.Value().size(), 1u);
+    EXPECT_EQ(sessions[0].videoStreams.Value().data()[0], kVideoStreamId);
+    EXPECT_TRUE(sessions[0].audioStreams.HasValue() == false);
+}
+
 TEST_F(TestDefaultAvAnalysisWebRTCClient, TheResponsesDeprecatedVideoStreamIdIsIgnored)
 {
     DriveToOffer();

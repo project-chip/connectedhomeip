@@ -104,7 +104,7 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendICECandidates(const ScopedNodeId &
 
     mRequest.BeginProvideICECandidates(session->cameraNode, session->providerEndpoint, aWebRTCSessionId);
 
-    EstablishSession(session->cameraNode);
+    EstablishSession(mRequest.CameraNode());
     return CHIP_NO_ERROR;
 }
 
@@ -570,6 +570,7 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
     slot->callback         = mRequest.PeekCallback();
     slot->cameraNode       = mRequest.CameraNode();
     slot->providerEndpoint = mRequest.WebRTCEndpoint();
+    slot->videoStreamId = mRequest.VideoStreamId();
 
     // The requestor cluster is the receiving end of this session
     Globals::Structs::WebRTCSessionStruct::Type session;
@@ -578,7 +579,8 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
     session.fabricIndex    = mRequest.CameraNode().GetFabricIndex();
     session.peerEndpointID = mRequest.WebRTCEndpoint();
     session.streamUsage    = Globals::StreamUsageEnum::kAnalysis;
-    session.videoStreamID  = DataModel::MakeNullable(mRequest.VideoStreamId());
+    session.videoStreams = MakeOptional(DataModel::List<const uint16_t>(&slot->videoStreamId, 1));
+    session.videoStreamID = DataModel::MakeNullable(slot->videoStreamId);
     session.audioStreamID.SetNull();
     mRequestorCluster->UpsertSession(session);
     return CHIP_NO_ERROR;
@@ -588,9 +590,11 @@ void DefaultAvAnalysisWebRTCClient::ReleaseSession(TrackedSession & aSession)
 {
     const ScopedNodeId cameraNode  = aSession.cameraNode;
     const uint16_t webRTCSessionId = aSession.webRTCSessionId;
-    aSession                       = TrackedSession{};
 
     mRequestorCluster->RemoveSession(webRTCSessionId, cameraNode.GetNodeId(), cameraNode.GetFabricIndex());
+
+    aSession = TrackedSession{};
+
     mPeerDelegate->OnSessionClosed(cameraNode, webRTCSessionId);
 }
 
