@@ -274,7 +274,7 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
             existingNocSpan.data_equal(ByteSpan(nocSpan));
         bool icacMatches = (fabricTable->FetchICACert(fabricIndex, existingIcacSpan) == CHIP_NO_ERROR) &&
             existingIcacSpan.data_equal(ByteSpan(icacSpan));
-        if (nocMatches && icacMatches)
+        if (nocMatches && icacMatches && fabricTable->HasOperationalKeyForFabric(fabricIndex))
         {
             mFabricIndex       = fabricIndex;
             mAdvertiseIdentity = advertiseOperational;
