@@ -69,15 +69,18 @@ namespace chip::app::Clusters::Speaker {
 //     -- drives OnOff.SetOnOff(!softMuted) and, for a real volume change,
 //     LevelControl.MoveToLevel(VolumeToLevel(volume)); forwards (volume, mute) to the hardware
 //     delegate, whose status gates the command's commit.
-//   * OnOnOffChanged(on) -- from an On/Off command -- drives AudioControl.SetSoftMuted(!on);
-//     Level Control (the other On/Off delegate) separately runs its CurrentLevel choreography.
+//   * OnOnOffChanged(on) -- from an On/Off command -- drives AudioControl.SetSoftMuted(!on) and
+//     forwards (Volume, SoftMuted) to the hardware delegate; Level Control (the other On/Off
+//     delegate) separately runs its CurrentLevel choreography.
 //   * OnLevelChanged(level) -- any CurrentLevel change, command- or choreography-driven --
-//     drives AudioControl.SetVolume(LevelToVolume(level)).
+//     drives AudioControl.SetVolume(LevelToVolume(level)) and forwards (Volume, SoftMuted) to
+//     the hardware delegate.
 //   * OnStartup() -- Audio Control is authoritative: OnOff and CurrentLevel are reconciled to
 //     its resolved SoftMuted/Volume.
 //
-// Every hardware-facing Audio Control notification (volume/mute, bass/mid/treble, startup) and
-// fixed-limit query is forwarded to one hardware/logging delegate.
+// Every change to Volume/SoftMuted reaches one hardware/logging delegate as a canonical
+// (Volume, SoftMuted) pair, whichever cluster it came from, alongside the bass/mid/treble and
+// startup notifications and the fixed-limit queries.
 class SpeakerAudioCoordinator final : public OnOffDelegate, public LevelControlDelegate, public AudioControlDelegate
 {
 public:
@@ -156,6 +159,11 @@ private:
 
     // Brings OnOff and CurrentLevel into agreement with the given Audio Control state.
     void SyncFromAudioControl(uint16_t volume, bool softMuted);
+
+    // Forwards the current (Volume, SoftMuted) pair to the hardware delegate. Called by the
+    // On/Off and Level Control callbacks, whose changes otherwise never reach the hardware
+    // delegate (the Audio Control command path forwards to hardware itself).
+    void NotifyHardware();
 
     AudioControlDelegate & mHardware;
 

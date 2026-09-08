@@ -171,6 +171,17 @@ void SpeakerAudioCoordinator::SyncFromAudioControl(uint16_t volume, bool softMut
     }
 }
 
+void SpeakerAudioCoordinator::NotifyHardware()
+{
+    // Post-commit (On/Off and Level Control already applied the change), so log-only, not gated.
+    const Status status =
+        mHardware.HandleVolumeAndMuteChange(mAudioControl.Cluster().GetVolume(), mAudioControl.Cluster().GetSoftMuted());
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "TV Speaker: hardware rejected an On/Off- or Level-driven volume/mute change");
+    }
+}
+
 Status SpeakerAudioCoordinator::HandleVolumeAndMuteChange(uint16_t newVolume, bool newSoftMuted)
 {
     // Called by an Audio Control command before the cluster commits newVolume/newSoftMuted.
@@ -189,6 +200,7 @@ void SpeakerAudioCoordinator::OnOnOffChanged(bool on)
     // This method leaves CurrentLevel alone; Level Control (the other On/Off delegate) runs its
     // own choreography and, OnLevel being NULL, settles back at the pre-off level.
     LogErrorOnFailure(mAudioControl.Cluster().SetSoftMuted(!on));
+    NotifyHardware();
 }
 
 void SpeakerAudioCoordinator::OnLevelChanged(uint8_t level)
@@ -196,8 +208,8 @@ void SpeakerAudioCoordinator::OnLevelChanged(uint8_t level)
     VerifyOrReturn(!mSyncing); // ignore our own echo from SyncFromAudioControl()
 
     ReentrancyGuard guard(mSyncing);
-    const uint16_t volume = LevelToVolume(level);
-    LogErrorOnFailure(mAudioControl.Cluster().SetVolume(volume));
+    LogErrorOnFailure(mAudioControl.Cluster().SetVolume(LevelToVolume(level)));
+    NotifyHardware();
 }
 
 void SpeakerAudioCoordinator::OnOffStartup(bool on)
