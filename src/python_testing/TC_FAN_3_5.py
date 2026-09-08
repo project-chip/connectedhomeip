@@ -64,6 +64,7 @@ from matter.testing.event_attribute_reporting import AttributeSubscriptionHandle
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
 
+log = logging.getLogger(__name__)
 
 class TC_FAN_3_5(MatterBaseTest):
     def desc_TC_FAN_3_5(self) -> str:
@@ -425,7 +426,7 @@ class TC_FAN_3_5(MatterBaseTest):
         Raises:
             AssertionError: If the write operation fails.
         """
-        logging.info(f"[FC] Writing to the {attribute.__name__} attribute, value: {value}")
+        log.info(f"[FC] Writing to the {attribute.__name__} attribute, value: {value}")
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         asserts.assert_equal(result[0].Status, Status.Success, f"[FC] {attribute.__name__} attribute write failed.")
 
@@ -439,7 +440,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AssertionError: If an unexpected error occurs during command execution.
         """
         try:
-            logging.info(
+            log.info(
                 f"[FC] Sending Step command - direction: {step.direction.name}, wrap: {step.wrap}, lowestOff: {step.lowestOff}")
             await self.send_single_cmd(step, endpoint=self.endpoint)
         except InteractionModelError as e:
@@ -455,7 +456,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AssertionError: If an unexpected error occurs during command execution.
         """
         try:
-            logging.info(f"[FC] Sending OnOff command: {cmd}")
+            log.info(f"[FC] Sending OnOff command: {cmd}")
             await self.send_single_cmd(cmd, endpoint=self.endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
@@ -557,7 +558,7 @@ class TC_FAN_3_5(MatterBaseTest):
         self.percent_setting_per_step = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
 
         percent_setting_sub.cancel()
-        logging.info(f"[FC] PercentSetting range per Step: {self.percent_setting_per_step}")
+        log.info(f"[FC] PercentSetting range per Step: {self.percent_setting_per_step}")
 
     def get_expected_percent_setting(self, step: Clusters.FanControl.Commands.Step) -> int:
         cluster = Clusters.FanControl
@@ -577,7 +578,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # Get the expected final PercentSetting value based on the Step command parameters
         percent_setting_expected = self.get_expected_percent_setting(step)
         if step.direction == cluster.Enums.StepDirectionEnum.kDecrease and not step.wrap and not step.lowestOff:
-            logging.info(f"[FC] Step command: {step}, percent_setting_expected: {percent_setting_expected}")
+            log.info(f"[FC] Step command: {step}, percent_setting_expected: {percent_setting_expected}")
 
         # The minimum PercentSetting increment per step is 1. The loop is written to handle that case, but it
         # won't necessarily run 100 iterations, only as many can fit within the 0–100 PercentSetting range.
@@ -598,7 +599,7 @@ class TC_FAN_3_5(MatterBaseTest):
             else:
                 percent_setting = percent_setting_last
 
-            logging.info(f"[FC] PercentSetting attribute report value: {percent_setting}")
+            log.info(f"[FC] PercentSetting attribute report value: {percent_setting}")
 
             # Once PercentSetting reaches the expected value, send an extra Step command to verify
             # that the PercentSetting attribute report value stays at the expected value (no wrap)
@@ -621,7 +622,7 @@ class TC_FAN_3_5(MatterBaseTest):
                     f"[FC] The expected PercentSetting attribute value ({percent_setting_expected}) was never reached, the last reported value is ({percent_setting})."
                 )
 
-            logging.info(f"[FC] percent_setting_from_queue: {self.percent_setting_from_queue}")
+            log.info(f"[FC] percent_setting_from_queue: {self.percent_setting_from_queue}")
 
     def next_step(self) -> None:
         """Advance to the next declared test step, using its declared identifier.
@@ -754,11 +755,11 @@ class TC_FAN_3_5(MatterBaseTest):
                     sub.log_queue()
 
         if not handle_current_values:
-            logging.info(f"[FC] fan_mode_values_produced: {fan_mode_values_produced}")
-            logging.info(f"[FC] speed_setting_values_produced: {speed_setting_values_produced}")
+            log.info(f"[FC] fan_mode_values_produced: {fan_mode_values_produced}")
+            log.info(f"[FC] speed_setting_values_produced: {speed_setting_values_produced}")
         else:
-            logging.info(f"[FC] percent_current_values_produced: {percent_current_values_produced}")
-            logging.info(f"[FC] speed_current_values_produced: {speed_current_values_produced}")
+            log.info(f"[FC] percent_current_values_produced: {percent_current_values_produced}")
+            log.info(f"[FC] speed_current_values_produced: {speed_current_values_produced}")
 
         if not handle_current_values:
             dependent_values1 = fan_mode_values_produced
@@ -804,11 +805,11 @@ class TC_FAN_3_5(MatterBaseTest):
                 reversed(speed_current_init_removed))[trim]
 
         if not handle_current_values:
-            logging.info(f"[FC] fan_modes_expected: {fan_modes_expected}")
-            logging.info(f"[FC] speed_setting_expected: {speed_setting_expected}")
+            log.info(f"[FC] fan_modes_expected: {fan_modes_expected}")
+            log.info(f"[FC] speed_setting_expected: {speed_setting_expected}")
         else:
-            logging.info(f"[FC] percent_current_expected: {percent_current_expected}")
-            logging.info(f"[FC] speed_current_expected: {speed_current_expected}")
+            log.info(f"[FC] percent_current_expected: {percent_current_expected}")
+            log.info(f"[FC] speed_current_expected: {speed_current_expected}")
 
         if not handle_current_values:
             # If the number of PercentSetting reports is greater than the number of FanMode reports,
