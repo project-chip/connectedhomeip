@@ -156,7 +156,7 @@ class TC_ASU_2_1(MatterBaseTest):
                 # checkvalue between 1 and 128
                 asserts.assert_greater_equal(1, string_size, "The string size needs to be betwween 1 and 128.")
                 asserts.assert_less_equal(string_size, 128, "The string size needs to be betwween 1 and 128.")
-                
+
             else:
                 # Matter contributor: NodeID and EndpointID are valid integers
                 asserts.assert_greater_equal(contributor.contributorNodeID, 0,
