@@ -17,6 +17,7 @@
  */
 
 #include "CameraAppCommandDelegate.h"
+#include <cstdint>
 #include <platform/PlatformManager.h>
 
 CameraAppCommandHandler * CameraAppCommandHandler::FromJSON(const char * json)
@@ -81,17 +82,28 @@ void CameraAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "AmbientContextTriggered")
     {
-        uint8_t namespaceValue           = self->mJsonValue["NamespaceId"].asUInt();
-        uint8_t tagValue                 = self->mJsonValue["TagId"].asUInt();
-        const Json::Value & zoneIdValues = self->mJsonValue["ZoneIds"];
-        std::vector<uint16_t> zoneIds;
+        const Json::Value & namespaceValue = self->mJsonValue["NamespaceId"];
+        const Json::Value & tagValue       = self->mJsonValue["TagId"];
+        const Json::Value & zoneIdValues   = self->mJsonValue["ZoneIds"];
 
-        // ZoneIDs is always an array, it may be empty
+        VerifyOrExit(namespaceValue.isUInt() && namespaceValue.asUInt() <= UINT8_MAX,
+                     ChipLogError(NotSpecified, "Camera App: NamespaceId is missing, invalid or out of unsigned 8-bit range"));
+        VerifyOrExit(tagValue.isUInt() && tagValue.asUInt() <= UINT8_MAX,
+                     ChipLogError(NotSpecified, "Camera App: TagId is missing, invalid or out of unsigned 8-bit range"));
+
+        // ZoneIds is always an array, it may be empty
+        VerifyOrExit(zoneIdValues.isArray(), ChipLogError(NotSpecified, "Camera App: ZoneIds must be an array"));
+
+        std::vector<uint16_t> zoneIds;
         for (const auto & zoneId : zoneIdValues)
         {
+            VerifyOrExit(zoneId.isUInt() && zoneId.asUInt() <= UINT16_MAX,
+                         ChipLogError(NotSpecified, "Camera App: ZoneIds entry is invalid or out of unsigned 16-bit range"));
             zoneIds.push_back(static_cast<uint16_t>(zoneId.asUInt()));
         }
-        self->OnAmbientContextTriggeredHandler(namespaceValue, tagValue, zoneIds);
+
+        self->OnAmbientContextTriggeredHandler(static_cast<uint8_t>(namespaceValue.asUInt()),
+                                               static_cast<uint8_t>(tagValue.asUInt()), zoneIds);
     }
     else
     {

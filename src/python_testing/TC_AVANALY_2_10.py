@@ -36,7 +36,6 @@
 #       --app-pipe /tmp/avanaly_2_10_fifo
 #     factory-reset: true
 #     quiet: true
-#     factory-reset: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -67,6 +66,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
     @async_test_body
     async def setup_class(self):
         th_server_app = self.user_params.get("th_server_app_path", None)
+        self.tlsEndpointId = None
         self.server = PushAvServerProcess(server_path=th_server_app)
         self.server.start(
             expected_output="Running on https://0.0.0.0:1234",
@@ -81,7 +81,8 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
 
     @async_test_body
     async def teardown_test(self):
-        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
+        if self.tlsEndpointId is not None:
+            await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
         super().teardown_test()
 
     def steps_TC_AVANALY_2_10(self) -> list[TestStep]:
@@ -144,7 +145,16 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
                 prompt_msg = "Press enter and immediately start a detectable ambient context activity anywhere in the frame."
             self.wait_for_user_input(prompt_msg=prompt_msg)
 
-    @run_if_endpoint_matches(has_cluster(Clusters.AvAnalysis) and has_cluster(Clusters.PushAvStreamTransport) and has_cluster(Clusters.CameraAvStreamManagement))
+    @run_if_endpoint_matches(
+        lambda wildcard, endpoint: all(
+            check(wildcard, endpoint)
+            for check in (
+                has_cluster(Clusters.AvAnalysis),
+                has_cluster(Clusters.PushAvStreamTransport),
+                has_cluster(Clusters.CameraAvStreamManagement),
+            )
+        )
+    )    
     async def test_TC_AVANALY_2_10(self):
         endpoint = self.get_endpoint()
         self.endpoint = endpoint
