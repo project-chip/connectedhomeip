@@ -854,6 +854,15 @@ bool pychip_SetTestCommissionerPrematureCompleteAfter(uint8_t stage)
     return sTestCommissioner.PrematureCompleteAfter(static_cast<chip::Controller::CommissioningStage>(stage));
 }
 
+// Returns the name of the given CommissioningStage, or a non-identifier placeholder if the
+// value is not a stage. Python builds its CommissioningStage enum by probing this over the
+// full uint8_t range, so that stage numbers never have to be duplicated (and kept in sync)
+// on that side.
+const char * pychip_CommissioningStageToString(uint8_t stage)
+{
+    return chip::Controller::StageToString(static_cast<chip::Controller::CommissioningStage>(stage));
+}
+
 PyChipError pychip_GetCompletionError()
 {
     return ToPyChipError(sTestCommissioner.GetCompletionError());
