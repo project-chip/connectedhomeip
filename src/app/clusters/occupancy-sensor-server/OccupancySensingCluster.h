@@ -121,6 +121,9 @@ public:
     bool IsHoldTimeEnabled() const;
     bool IsPredictionEnabled() const;
 
+    void SetDelegate(OccupancySensingDelegate * delegate) { mDelegate = delegate; }
+    OccupancySensingDelegate * GetDelegate() const { return mDelegate; }
+
     void NotifyPredictedOccupancyChanged();
 
     uint16_t GetHoldTime() const;

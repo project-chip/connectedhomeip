@@ -8732,8 +8732,9 @@ endpoint 1 {
     ram      attribute occupancySensorTypeBitmap default = 1;
     callback attribute holdTime;
     callback attribute holdTimeLimits;
+    callback attribute predictedOccupancy;
     callback attribute PIROccupiedToUnoccupiedDelay;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 0x0100;
     callback attribute clusterRevision;
   }
 

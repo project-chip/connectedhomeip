@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,10 +20,17 @@
 
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 
-namespace chip::app::Clusters::OccupancySensing {
+namespace chip {
+namespace app {
+namespace Clusters {
 
-OccupancySensingCluster * FindClusterOnEndpoint(EndpointId endpointId);
+class OccupancySensingDelegateImpl : public OccupancySensingDelegate
+{
+public:
+    CHIP_ERROR GetPredictedOccupancyAtIndex(size_t index,
+                                            OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction) override;
+};
 
-void SetDefaultDelegate(EndpointId endpointId, OccupancySensingDelegate * delegate);
-
-} // namespace chip::app::Clusters::OccupancySensing
+} // namespace Clusters
+} // namespace app
+} // namespace chip
