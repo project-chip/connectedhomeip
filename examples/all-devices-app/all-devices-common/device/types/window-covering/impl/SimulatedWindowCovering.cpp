@@ -48,7 +48,7 @@ SimulatedWindowCovering::SimulatedWindowCovering(const Context & context) :
 
 SimulatedWindowCovering::~SimulatedWindowCovering()
 {
-    mTimerDelegate.CancelTimer(this);
+    mContext.timerDelegate.CancelTimer(this);
 }
 
 CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -73,7 +73,7 @@ CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenData
 
 void SimulatedWindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mTimerDelegate.CancelTimer(this);
+    mContext.timerDelegate.CancelTimer(this);
     WindowCovering::Unregister(provider);
 }
 
@@ -118,8 +118,8 @@ CHIP_ERROR SimulatedWindowCovering::HandleMovement(Clusters::WindowCovering::Win
 
     if (mMovingLift || mMovingTilt)
     {
-        mTimerDelegate.CancelTimer(this);
-        ReturnErrorOnFailure(mTimerDelegate.StartTimer(this, kTransitionInterval));
+        mContext.timerDelegate.CancelTimer(this);
+        ReturnErrorOnFailure(mContext.timerDelegate.StartTimer(this, kTransitionInterval));
     }
 
     return CHIP_NO_ERROR;
@@ -129,7 +129,7 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
 {
     ChipLogProgress(DeviceLayer, "WindowCovering: HandleStopMotion");
 
-    mTimerDelegate.CancelTimer(this);
+    mContext.timerDelegate.CancelTimer(this);
     mMovingLift = false;
     mMovingTilt = false;
 
@@ -265,7 +265,7 @@ void SimulatedWindowCovering::TimerFired()
 
     if (mMovingLift || mMovingTilt)
     {
-        LogErrorOnFailure(mTimerDelegate.StartTimer(this, kTransitionInterval));
+        LogErrorOnFailure(mContext.timerDelegate.StartTimer(this, kTransitionInterval));
     }
 }
 
