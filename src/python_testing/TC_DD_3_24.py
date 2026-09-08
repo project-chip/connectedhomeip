@@ -24,7 +24,7 @@ import matter.testing.nfc
 from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterTestCommissioner, TestStep
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -32,19 +32,6 @@ log = logging.getLogger(__name__)
 
 class TC_DD_3_24(MatterTestCommissioner):
     disable_wildcard_subscription = True
-
-    def desc_TC_DD_3_24(self) -> str:
-        return "[TC-DD-3.24] NFC-based commissioning - DUT without power [DUT as Commissionee]"
-
-    def steps_TC_DD_3_24(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
-            TestStep(2, "Validate the NFC bit in payload and perform the first phase of the commissioning, over NFC"),
-            TestStep(3, "DUT is powered ON."),
-            TestStep(4, "Perform DNS-SD discovery and verify the DUT operational TXT record advertises IC=1."),
-            TestStep(5, "Continue commissioning after network connect request and verify SendComplete is reached."),
-            TestStep(6, "Poll DNS-SD until the DUT operational TXT record no longer advertises IC=1 (up to 20 seconds)."),
-        ]
 
     def setup_test(self):
         super().setup_test()
@@ -80,12 +67,13 @@ class TC_DD_3_24(MatterTestCommissioner):
 
     @async_test_body
     async def test_TC_DD_3_24(self):
+        """[TC-DD-3.24] NFC-based commissioning - DUT without power [DUT as Commissionee]"""
 
         self.wait_for_user_input(prompt_msg="Put the DUT in commissionable mode, bring its NFC interface close to the NFC reader"
                                  " and power OFF the DUT")
 
         # Step 1: Here we check if the Tag is connected to the Host machine and read the NFC Tag data
-        self.step(1)
+        self.step(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False)
 
         nfc_reader_index = self.user_params.get("NFC_Reader_index", 0)
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
@@ -98,7 +86,7 @@ class TC_DD_3_24(MatterTestCommissioner):
         self.matter_test_config.qr_code_content.append(nfc_tag_data)
 
         # Step 2: the NFC tag data is parsed and checked if the device supports NFC commissioning and commission begins
-        self.step(2)
+        self.step(2, "Validate the NFC bit in payload and perform the first phase of the commissioning, over NFC")
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
         asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
 
@@ -120,17 +108,17 @@ class TC_DD_3_24(MatterTestCommissioner):
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
         asserts.assert_true(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was not seen!")
 
-        self.step(3)    # Power ON the DUT
+        self.step(3, "DUT is powered ON.")
         self.wait_for_user_input(prompt_msg="Power ON the device")
 
-        self.step(4)    # Perform DNS-SD Discovery and check the presence of a mDNS service with “_IC” subtype.
+        self.step(4, "Perform DNS-SD discovery and verify the DUT operational TXT record advertises IC=1.")
 
         asserts.assert_true(
             await self.check_operational_service_has_txt_ic(),
             'TXT key "IC" was not found!'
         )
 
-        self.step(5)    # Complete commissioning
+        self.step(5, "Continue commissioning after network connect request and verify SendComplete is reached.")
 
         asserts.assert_not_equal(
             self.commissionee_node_id, 0,
@@ -152,7 +140,7 @@ class TC_DD_3_24(MatterTestCommissioner):
 
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
 
-        self.step(6)    # Perform DNS-SD Discovery and check that the “_IC” subtype is no more present.
+        self.step(6, "Perform DNS-SD discovery and verify the DUT operational TXT record no longer advertises IC=1.")
 
         txt_ic_still_present = True
         retry_query_timeout_sec = 1.0
