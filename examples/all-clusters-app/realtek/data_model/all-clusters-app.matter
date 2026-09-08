@@ -9213,8 +9213,8 @@ endpoint 1 {
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
-    callback attribute temperatureDisplayMode;
-    callback attribute keypadLockout;
+    callback attribute temperatureDisplayMode default = 0x00;
+    callback attribute keypadLockout default = 0x00;
     callback attribute scheduleProgrammingVisibility;
     callback attribute featureMap;
     callback attribute clusterRevision;
