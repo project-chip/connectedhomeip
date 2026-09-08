@@ -21,8 +21,7 @@
 # Callers must define ALL_DEVICES_COMMON_DIR before including this file.
 #
 # Exports:
-#   ALL_DEVICES_DEVICE_SRCDIRS  — list of device module source directories
-#   ALL_DEVICES_DEVICE_SOURCES  — list of device module source files (for non-component builds)
+#   ALL_DEVICES_DEVICE_SOURCES  — list of device module source files
 #   ALL_DEVICES_EXTRA_INCLUDE_DIRS — shared include directories for enabled devices
 #
 # After including this file, callers must append ${CMAKE_CURRENT_BINARY_DIR}
@@ -123,18 +122,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
 )
 
 include("${ALL_DEVICES_COMMON_DIR}/oob-accessors/all_devices_config.cmake")
-
-# ---------------------------------------------------------------------------
-# Source directories (unconditional — all device sources are always compiled;
-# LTO eliminates unreachable device code when only a subset is registered).
-# Derived automatically from ALL_DEVICES_DEVICE_SOURCES.
-# ---------------------------------------------------------------------------
-set(ALL_DEVICES_DEVICE_SRCDIRS "")
-foreach(_src IN LISTS ALL_DEVICES_DEVICE_SOURCES)
-    get_filename_component(_dir "${_src}" DIRECTORY)
-    list(APPEND ALL_DEVICES_DEVICE_SRCDIRS "${_dir}")
-endforeach()
-list(REMOVE_DUPLICATES ALL_DEVICES_DEVICE_SRCDIRS)
 
 # ---------------------------------------------------------------------------
 # Device selection.
