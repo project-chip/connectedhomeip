@@ -15,9 +15,12 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/CommandHandler.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CodegenCameraAvSettingsUserLevelManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -114,7 +117,7 @@ struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
     void TearDown() override { mServer.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     MockCameraAvSettingsUserLevelManagementDelegate mMockDelegate;
-    CameraAvSettingsUserLevelManagementCluster mServer;
+    CodegenCameraAvSettingsUserLevelManagementCluster mServer;
     ClusterTester mClusterTester;
 };
 
@@ -873,4 +876,161 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZStreamsPersist
         ASSERT_EQ(it.GetValue().viewport.y2, viewPort.y2);
     }
 }
+
+// ---------------------------------------------------------------------------
+// Migration tests for CodegenCameraAvSettingsUserLevelManagementCluster
+// ---------------------------------------------------------------------------
+
+struct TestCodegenCameraAvSettingsUserLevelManagementMigration : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    TestCodegenCameraAvSettingsUserLevelManagementMigration() :
+        mServer(kTestEndpointId,
+                chip::BitFlags<Feature>(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                        Feature::kMechanicalZoom, Feature::kMechanicalPresets),
+                testMaxPresets),
+        mClusterTester(mServer)
+    {}
+
+    void SetUp() override
+    {
+        mOldSafePersistence = app::GetSafeAttributePersistenceProvider();
+        ASSERT_EQ(mSafePersistence.Init(&mClusterTester.GetTestContext().StorageDelegate()), CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&mSafePersistence);
+    }
+
+    void TearDown() override
+    {
+        app::SetSafeAttributePersistenceProvider(mOldSafePersistence);
+        if (mServerStarted)
+        {
+            mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+        }
+    }
+
+    void StartServer()
+    {
+        mServer.SetDelegate(&mMockDelegate);
+        ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        mServerStarted = true;
+    }
+
+    void WriteSafeTlv(AttributeId attrId, const ByteSpan & tlvBytes)
+    {
+        ASSERT_EQ(mSafePersistence.SafeWriteValue(
+                      ConcreteAttributePath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, attrId), tlvBytes),
+                  CHIP_NO_ERROR);
+    }
+
+    MockCameraAvSettingsUserLevelManagementDelegate mMockDelegate;
+    CodegenCameraAvSettingsUserLevelManagementCluster mServer;
+    ClusterTester mClusterTester;
+    app::DefaultSafeAttributePersistenceProvider mSafePersistence;
+    app::SafeAttributePersistenceProvider * mOldSafePersistence = nullptr;
+    bool mServerStarted                                         = false;
+};
+
+TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPositionTlv)
+{
+    Structs::MPTZStruct::Type position;
+    position.pan.SetValue(10);
+    position.tilt.SetValue(20);
+    position.zoom.SetValue(30);
+
+    uint8_t buffer[CameraAvSettingsUserLevelManagement::kMptzPositionStructMaxSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    ASSERT_EQ(position.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    WriteSafeTlv(Attributes::MPTZPosition::Id, ByteSpan(buffer, writer.GetLengthWritten()));
+    StartServer();
+
+    Structs::MPTZStruct::DecodableType readPosition;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, readPosition), CHIP_NO_ERROR);
+    EXPECT_EQ(readPosition.pan.Value(), 10);
+    EXPECT_EQ(readPosition.tilt.Value(), 20);
+    EXPECT_EQ(readPosition.zoom.Value(), 30);
+}
+
+TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPresetsTlv)
+{
+    Structs::MPTZStruct::Type settings;
+    settings.pan.SetValue(5);
+    settings.tilt.SetValue(6);
+    settings.zoom.SetValue(7);
+
+    Structs::MPTZPresetStruct::Type preset;
+    preset.presetID = 2;
+    preset.name   = "TestPreset"_span;
+    preset.settings = settings;
+
+    uint8_t buffer[kMaxMPTZPresetStructSerializedSize + kArrayTlvOverhead];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(preset.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+    WriteSafeTlv(Attributes::MPTZPresets::Id, ByteSpan(buffer, writer.GetLengthWritten()));
+    StartServer();
+
+    Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+    auto it = presets.begin();
+    EXPECT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().presetID, static_cast<uint8_t>(2));
+    EXPECT_TRUE(it.GetValue().name.data_equal("TestPreset"_span));
+    EXPECT_EQ(it.GetValue().settings.pan.Value(), 5);
+    EXPECT_FALSE(it.Next());
+}
+
+TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesDPTZStreamsTlv)
+{
+    Globals::Structs::ViewportStruct::Type viewPort{ 1, 2, 100, 200 };
+    Structs::DPTZStruct::Type stream;
+    stream.videoStreamID = 42;
+    stream.viewport      = viewPort;
+
+    uint8_t buffer[kMaxDPTZStructSerializedSize + kArrayTlvOverhead];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(stream.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+    WriteSafeTlv(Attributes::DPTZStreams::Id, ByteSpan(buffer, writer.GetLengthWritten()));
+    StartServer();
+
+    Attributes::DPTZStreams::TypeInfo::DecodableType streams;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::DPTZStreams::Id, streams), CHIP_NO_ERROR);
+    auto it = streams.begin();
+    EXPECT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().videoStreamID, static_cast<uint16_t>(42));
+    EXPECT_EQ(it.GetValue().viewport.x1, viewPort.x1);
+    EXPECT_FALSE(it.Next());
+}
+
+TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, OldDataDeletedAfterMigration)
+{
+    Structs::MPTZStruct::Type position;
+    position.pan.SetValue(1);
+    position.tilt.SetValue(2);
+    position.zoom.SetValue(3);
+
+    uint8_t buffer[CameraAvSettingsUserLevelManagement::kMptzPositionStructMaxSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    ASSERT_EQ(position.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    WriteSafeTlv(Attributes::MPTZPosition::Id, ByteSpan(buffer, writer.GetLengthWritten()));
+    StartServer();
+
+    uint8_t readBuf[CameraAvSettingsUserLevelManagement::kMptzPositionStructMaxSerializedSize];
+    MutableByteSpan readSpan(readBuf);
+    EXPECT_EQ(mSafePersistence.SafeReadValue(
+                  ConcreteAttributePath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id),
+                  readSpan),
+              CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+}
+
 } // namespace
