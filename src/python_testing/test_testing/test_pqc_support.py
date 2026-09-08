@@ -29,27 +29,41 @@ The fixtures are read out of the C++ header rather than copied, so the vectors c
 
 import asyncio
 import base64
+import json
 import re
 import sys
 import unittest
 from dataclasses import dataclass
 from pathlib import Path
 
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
 from mobly import signals
+
+from matter.tlv import TLVWriter
 
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
 from support_modules.pqc_support import (AttestationCertType, AttestationCryptoProfile,  # noqa: E402
-                                         AttestationCryptoProfileBitmap, assert_attestation_certificate_format,
-                                         assert_certificate_currently_valid, assert_dac_and_pai_ids, assert_profile_advertised,
-                                         certificate_algorithms_for_oids, find_issuing_paa, is_ml_dsa_supported, is_pqc_profile,
-                                         kCertificateSegmentSize, kOidEcdsaWithSha256, kOidEcPublicKey, kOidMatterPid,
-                                         kOidMatterVid, kOidMlDsa44, kOidMlDsa65, parse_certificate, profile_mask,
-                                         retrieve_segmented_document, select_strongest_profile, validate_attestation_chain,
-                                         verify_certificate_signature)
+                                         AttestationCryptoProfileBitmap, CertificationType, assert_attestation_certificate_format,
+                                         assert_attestation_nonce, assert_authorized_paa, assert_certificate_currently_valid,
+                                         assert_dac_and_pai_ids, assert_profile_advertised, certificate_algorithms_for_oids,
+                                         find_issuing_paa, is_ml_dsa_supported, is_pqc_profile, kAttestationChallengeLength,
+                                         kAttestationNonceLength, kCertificateSegmentSize, kOidEcdsaWithSha256, kOidEcPublicKey,
+                                         kOidMatterPid, kOidMatterVid, kOidMlDsa44, kOidMlDsa65, parse_attestation_elements,
+                                         parse_certificate, profile_mask, retrieve_segmented_document, select_strongest_profile,
+                                         validate_attestation_chain, validate_certification_declaration,
+                                         verify_attestation_signature, verify_certificate_signature)
 
 _ML_DSA_VECTORS = _CHIP_ROOT / "src/crypto/tests/MlDsaAttestationChain_test_vectors.h"
+_DEV_VECTOR = (_CHIP_ROOT
+               / "credentials/development/commissioner_dut/struct_dac_cert_version_v3/test_case_vector.json")
+_OFFICIAL_TEST_VECTOR = (_CHIP_ROOT
+                         / "credentials/development/commissioner_dut/struct_cd_official_cd/test_case_vector.json")
+_PROVISIONAL_TEST_VECTOR = (_CHIP_ROOT
+                            / "credentials/development/commissioner_dut/struct_cd_provisional_cd/test_case_vector.json")
 _LEGACY_PAA = _CHIP_ROOT / "credentials/development/paa-root-certs/Chip-Test-PAA-FFF1-Cert.der"
 
 # The development attestation certificates all belong to vendor FFF1, product 0x8000.
@@ -507,6 +521,157 @@ class TestSegmentedRetrieval(unittest.TestCase):
 
         with self.assertRaises(signals.TestFailure):
             self._retrieve(send)
+
+
+class TestAttestationResponse(unittest.TestCase):
+    """Exercises the AttestationResponse handling against the development credential vector.
+
+    The vector carries a real CD, DAC, PAI and DAC private key, so an AttestationResponse can be
+    built and then verified the same way the test verifies a DUT's.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        vector = json.loads(_DEV_VECTOR.read_text())
+        cls.dac = parse_certificate(bytes.fromhex(vector["dac_cert"]), "vector DAC")
+        cls.pai = parse_certificate(bytes.fromhex(vector["pai_cert"]), "vector PAI")
+        cls.cd_der = bytes.fromhex(vector["certification_declaration"])
+        cls.dac_private_key = ec.derive_private_key(int(vector["dac_private_key"], 16), ec.SECP256R1())
+        cls.nonce = bytes(range(kAttestationNonceLength))
+        cls.challenge = bytes(range(kAttestationChallengeLength))
+        cls.elements_tlv = cls._build_elements(cls.cd_der, cls.nonce)
+
+    @staticmethod
+    def _build_elements(cd_der: bytes, nonce: bytes, timestamp: int = 0) -> bytes:
+        """Encode an AttestationElements TLV the way a device would."""
+        writer = TLVWriter()
+        writer.put(None, {1: cd_der, 2: nonce, 3: timestamp})
+        return bytes(writer.encoding)
+
+    def _sign(self, elements: bytes, challenge: bytes) -> bytes:
+        """Produce a raw r||s Device Attestation signature over elements || challenge."""
+        der_signature = self.dac_private_key.sign(elements + challenge, ec.ECDSA(hashes.SHA256()))
+        r, s = decode_dss_signature(der_signature)
+        return r.to_bytes(32, "big") + s.to_bytes(32, "big")
+
+    def test_parses_the_attestation_elements(self):
+        elements = parse_attestation_elements(self.elements_tlv)
+        self.assertEqual(elements.certification_declaration, self.cd_der)
+        self.assertEqual(elements.attestation_nonce, self.nonce)
+        self.assertIsNone(elements.firmware_information)
+
+    def test_rejects_elements_missing_the_nonce(self):
+        writer = TLVWriter()
+        writer.put(None, {1: self.cd_der, 3: 0})
+        with self.assertRaises(signals.TestFailure):
+            parse_attestation_elements(bytes(writer.encoding))
+
+    def test_rejects_oversized_elements(self):
+        with self.assertRaises(signals.TestFailure):
+            parse_attestation_elements(b"\x15" + b"\x00" * 1000)
+
+    def test_rejects_empty_elements(self):
+        with self.assertRaises(signals.TestFailure):
+            parse_attestation_elements(b"")
+
+    def test_accepts_a_matching_nonce(self):
+        assert_attestation_nonce(parse_attestation_elements(self.elements_tlv), self.nonce)
+
+    def test_rejects_a_mismatched_nonce(self):
+        elements = parse_attestation_elements(self.elements_tlv)
+        with self.assertRaises(signals.TestFailure):
+            assert_attestation_nonce(elements, bytes(kAttestationNonceLength))
+
+    def test_verifies_a_genuine_attestation_signature(self):
+        elements = parse_attestation_elements(self.elements_tlv)
+        verify_attestation_signature(self.dac, elements, self._sign(self.elements_tlv, self.challenge),
+                                     self.challenge)
+
+    def test_rejects_a_signature_over_a_different_challenge(self):
+        elements = parse_attestation_elements(self.elements_tlv)
+        other_challenge = bytes(kAttestationChallengeLength)
+        signature = self._sign(self.elements_tlv, other_challenge)
+        with self.assertRaises(signals.TestFailure):
+            verify_attestation_signature(self.dac, elements, signature, self.challenge)
+
+    def test_rejects_a_signature_over_different_elements(self):
+        other_elements = self._build_elements(self.cd_der, bytes(kAttestationNonceLength))
+        signature = self._sign(other_elements, self.challenge)
+        with self.assertRaises(signals.TestFailure):
+            verify_attestation_signature(self.dac, parse_attestation_elements(self.elements_tlv), signature,
+                                         self.challenge)
+
+    def test_rejects_a_wrong_length_challenge(self):
+        elements = parse_attestation_elements(self.elements_tlv)
+        with self.assertRaises(signals.TestFailure):
+            verify_attestation_signature(self.dac, elements, self._sign(self.elements_tlv, self.challenge), b"short")
+
+    def test_rejects_a_wrong_length_signature(self):
+        elements = parse_attestation_elements(self.elements_tlv)
+        with self.assertRaises(signals.TestFailure):
+            verify_attestation_signature(self.dac, elements, b"\x00" * 63, self.challenge)
+
+    def test_validates_the_certification_declaration(self):
+        declaration = validate_certification_declaration(
+            self.cd_der, self.dac, self.pai, _kTestVid, _kTestPid)
+        self.assertEqual(declaration.format_version, 1)
+        self.assertEqual(declaration.security_level, 0)
+        self.assertEqual(declaration.security_information, 0)
+        self.assertIn(declaration.certification_type, list(CertificationType))
+        self.assertIn(self.dac.matter_id(kOidMatterPid), declaration.product_id_array)
+        self.assertEqual(self.dac.matter_id(kOidMatterVid), declaration.vendor_id)
+
+    def test_rejects_a_tampered_certification_declaration(self):
+        tampered = bytearray(self.cd_der)
+        # The last octets are the signature, so flipping one leaves the CMS structure intact.
+        tampered[-1] ^= 0x01
+        with self.assertRaises(signals.TestFailure):
+            validate_certification_declaration(bytes(tampered), self.dac, self.pai, _kTestVid, _kTestPid)
+
+    def test_rejects_a_declaration_that_is_not_cms(self):
+        with self.assertRaises(signals.TestFailure):
+            validate_certification_declaration(
+                b"\x30\x03\x02\x01\x00", self.dac, self.pai, _kTestVid, _kTestPid)
+
+    def test_rejects_a_basic_information_vendor_id_mismatch(self):
+        with self.assertRaises(signals.TestFailure):
+            validate_certification_declaration(
+                self.cd_der, self.dac, self.pai, _kTestVid - 1, _kTestPid)
+
+    def test_rejects_a_basic_information_product_id_mismatch(self):
+        with self.assertRaises(signals.TestFailure):
+            validate_certification_declaration(
+                self.cd_der, self.dac, self.pai, _kTestVid, _kTestPid - 1)
+
+    def test_rejects_an_official_declaration_signed_by_a_test_key(self):
+        vector = json.loads(_OFFICIAL_TEST_VECTOR.read_text())
+        dac = parse_certificate(bytes.fromhex(vector["dac_cert"]), "official vector DAC")
+        pai = parse_certificate(bytes.fromhex(vector["pai_cert"]), "official vector PAI")
+        with self.assertRaises(signals.TestFailure):
+            validate_certification_declaration(
+                bytes.fromhex(vector["certification_declaration"]), dac, pai, _kTestVid, vector["basic_info_pid"])
+
+    def test_provisional_test_signer_requires_the_override(self):
+        vector = json.loads(_PROVISIONAL_TEST_VECTOR.read_text())
+        dac = parse_certificate(bytes.fromhex(vector["dac_cert"]), "provisional vector DAC")
+        pai = parse_certificate(bytes.fromhex(vector["pai_cert"]), "provisional vector PAI")
+        cd_der = bytes.fromhex(vector["certification_declaration"])
+
+        with self.assertRaises(signals.TestFailure):
+            validate_certification_declaration(cd_der, dac, pai, _kTestVid, vector["basic_info_pid"])
+
+        declaration = validate_certification_declaration(
+            cd_der, dac, pai, _kTestVid, vector["basic_info_pid"],
+            allow_provisional_test_signer=True)
+        self.assertEqual(declaration.certification_type, CertificationType.kProvisional)
+
+    def test_authorized_paa_check_is_a_no_op_without_the_list(self):
+        declaration = validate_certification_declaration(
+            self.cd_der, self.dac, self.pai, _kTestVid, _kTestPid)
+        if declaration.authorized_paa_list is None:
+            assert_authorized_paa(declaration, self.pai)
+        else:
+            self.skipTest("the vector CD carries an authorized_paa_list")
 
 
 if __name__ == "__main__":

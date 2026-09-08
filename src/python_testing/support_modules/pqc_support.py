@@ -64,10 +64,16 @@ from pathlib import Path
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.asymmetric import ec, utils
 from mobly import asserts
+from pyasn1.codec.der.decoder import decode as der_decoder
+from pyasn1.error import PyAsn1Error
+from pyasn1.type import univ
+from pyasn1_modules import rfc5652
 
 import matter.clusters as Clusters
+from matter.testing.credentials import CredentialSource, get_cd_certs
+from matter.tlv import TLVReader
 
 logger = logging.getLogger(__name__)
 
@@ -622,3 +628,346 @@ async def retrieve_segmented_document(send_request: SendCertificateChainRequest,
                 total_document_size)
     return SegmentedDocument(der=bytes(document), segment_count=expected_segment_id,
                              total_document_size=total_document_size)
+
+
+# --- AttestationResponse and Certification Declaration -------------------------------------------
+#
+# TC-DA-1.12 validates the same AttestationResponse against both the profile-selected and the
+# legacy certificate chain. Everything below stays in Python for the same reason the certificate
+# checks do: the harness must be able to disagree with the stack.
+
+# AttestationElements TLV tags, from the Attestation Information structure.
+kAttestationElementsTagCertificationDeclaration = 1
+kAttestationElementsTagAttestationNonce = 2
+kAttestationElementsTagTimestamp = 3
+kAttestationElementsTagFirmwareInformation = 4
+
+# The AttestationNonce is always 32 bytes, and the attestation challenge 16.
+kAttestationNonceLength = 32
+kAttestationChallengeLength = 16
+
+# The Device Attestation signature stays ECDSA P-256 during PQC Phase 1, so its raw form is a
+# 32 byte r followed by a 32 byte s.
+kP256SignatureComponentLength = 32
+
+# AttestationElements is capped so it fits a single response.
+kMaxAttestationElementsLength = 900
+
+# Certification Declaration TLV tags.
+kCdTagFormatVersion = 0
+kCdTagVendorId = 1
+kCdTagProductIdArray = 2
+kCdTagDeviceTypeId = 3
+kCdTagCertificateId = 4
+kCdTagSecurityLevel = 5
+kCdTagSecurityInformation = 6
+kCdTagVersionNumber = 7
+kCdTagCertificationType = 8
+kCdTagDacOriginVendorId = 9
+kCdTagDacOriginProductId = 10
+kCdTagAuthorizedPaaList = 11
+
+_kOidSha256 = univ.ObjectIdentifier("2.16.840.1.101.3.4.2.1")
+_kOidPkcs7Data = univ.ObjectIdentifier("1.2.840.113549.1.7.1")
+_kOidEcdsaWithSha256Asn1 = univ.ObjectIdentifier("1.2.840.10045.4.3.2")
+
+# A Certification Declaration certificate_id is a fixed 19 characters.
+kCertificateIdLength = 19
+
+
+class CertificationType(enum.IntEnum):
+    """Mirrors the CD certification_type field."""
+
+    kTest = 0
+    kProvisional = 1
+    kOfficial = 2
+
+
+@dataclass(frozen=True)
+class AttestationElements:
+    """The decoded AttestationElements of an AttestationResponse."""
+
+    raw: bytes
+    certification_declaration: bytes
+    attestation_nonce: bytes
+    timestamp: int
+    firmware_information: bytes | None
+
+
+def parse_attestation_elements(elements: bytes) -> AttestationElements:
+    """Decode the AttestationElements TLV returned in an AttestationResponse."""
+    asserts.assert_greater(len(elements), 0, "DUT returned empty AttestationElements")
+    asserts.assert_less_equal(len(elements), kMaxAttestationElementsLength,
+                              f"AttestationElements is {len(elements)} bytes, more than the "
+                              f"{kMaxAttestationElementsLength} byte maximum")
+
+    try:
+        decoded = TLVReader(elements).get()["Any"]
+    except Exception as e:
+        asserts.fail(f"AttestationElements does not decode as TLV: {type(e).__name__}: {e}")
+
+    for tag, field in ((kAttestationElementsTagCertificationDeclaration, "certification_declaration"),
+                       (kAttestationElementsTagAttestationNonce, "attestation_nonce"),
+                       (kAttestationElementsTagTimestamp, "timestamp")):
+        asserts.assert_in(tag, decoded.keys(), f"AttestationElements is missing {field} (tag {tag})")
+
+    return AttestationElements(
+        raw=elements,
+        certification_declaration=decoded[kAttestationElementsTagCertificationDeclaration],
+        attestation_nonce=decoded[kAttestationElementsTagAttestationNonce],
+        timestamp=decoded[kAttestationElementsTagTimestamp],
+        firmware_information=decoded.get(kAttestationElementsTagFirmwareInformation),
+    )
+
+
+def assert_attestation_nonce(elements: AttestationElements, expected_nonce: bytes) -> None:
+    """Assert that the AttestationElements echo the nonce the TH sent."""
+    asserts.assert_equal(len(elements.attestation_nonce), kAttestationNonceLength,
+                         f"The returned attestation nonce is {len(elements.attestation_nonce)} bytes, not "
+                         f"{kAttestationNonceLength}")
+    asserts.assert_equal(elements.attestation_nonce, expected_nonce,
+                         "The attestation nonce in AttestationElements does not match the one sent in "
+                         "AttestationRequest")
+
+
+def verify_attestation_signature(dac: ParsedCertificate, elements: AttestationElements, signature: bytes,
+                                 attestation_challenge: bytes) -> None:
+    """Verify an AttestationSignature with the public key from `dac`.
+
+    The signature covers the AttestationElements followed by the session's attestation challenge,
+    and stays ECDSA P-256 throughout PQC Phase 1 regardless of the chain's crypto profile.
+    """
+    asserts.assert_equal(dac.algorithms.subject_key_profile, AttestationCryptoProfile.kEcdsaMatterLegacy,
+                         f"{dac.name} must carry an ECDSA P-256 key to verify the Device Attestation "
+                         f"signature, not {dac.algorithms.subject_key_profile.name}")
+    asserts.assert_equal(len(attestation_challenge), kAttestationChallengeLength,
+                         f"The attestation challenge is {len(attestation_challenge)} bytes, not "
+                         f"{kAttestationChallengeLength}")
+    asserts.assert_equal(len(signature), 2 * kP256SignatureComponentLength,
+                         f"AttestationSignature is {len(signature)} bytes; a P-256 signature is "
+                         f"{2 * kP256SignatureComponentLength}")
+
+    attestation_tbs = elements.raw + attestation_challenge
+    # The signature arrives as raw r || s, which has to be re-encoded for cryptography's verify().
+    r = int.from_bytes(signature[:kP256SignatureComponentLength], byteorder="big")
+    s = int.from_bytes(signature[kP256SignatureComponentLength:], byteorder="big")
+
+    try:
+        dac.certificate.public_key().verify(utils.encode_dss_signature(r, s), attestation_tbs,
+                                            ec.ECDSA(hashes.SHA256()))
+    except InvalidSignature:
+        asserts.fail(f"AttestationSignature does not validate with the public key from {dac.name}")
+
+    logger.info("AttestationSignature validates with the public key from %s", dac.name)
+
+
+@dataclass(frozen=True)
+class CertificationDeclaration:
+    """The decoded and signature-checked contents of a Certification Declaration."""
+
+    format_version: int
+    vendor_id: int
+    product_id_array: list[int]
+    device_type_id: int
+    certificate_id: str
+    security_level: int
+    security_information: int
+    version_number: int
+    certification_type: CertificationType
+    dac_origin_vendor_id: int | None
+    dac_origin_product_id: int | None
+    authorized_paa_list: list[bytes] | None
+
+
+def _load_cd_signing_keys(credential_source: CredentialSource | Path) -> dict[bytes, object]:
+    """Return {subjectKeyIdentifier: public key} for every CD signing certificate in a source."""
+    keys = {}
+    for path in get_cd_certs(credential_source).iterdir():
+        if not path.name.endswith(".der"):
+            continue
+        with path.open("rb") as handle:
+            try:
+                certificate = x509.load_der_x509_certificate(handle.read())
+            except ValueError:
+                logger.debug("Skipping CD signing candidate %s: not a certificate", path.name)
+                continue
+        public_key = certificate.public_key()
+        keys[x509.SubjectKeyIdentifier.from_public_key(public_key).digest] = public_key
+    return keys
+
+
+def validate_certification_declaration(cd_der: bytes, dac: ParsedCertificate, pai: ParsedCertificate,
+                                       basic_info_vendor_id: int, basic_info_product_id: int,
+                                       test_cd_signer_source: CredentialSource | Path = CredentialSource.kDevelopment,
+                                       allow_provisional_test_signer: bool = False) -> CertificationDeclaration:
+    """Validate a Certification Declaration and return its contents.
+
+    Checks the CMS SignedData envelope, verifies the signature against an allowed CD signing key,
+    and confirms the declared identifiers are consistent with Basic Information and the DAC chain.
+    """
+    try:
+        content_info, _ = der_decoder(cd_der, asn1Spec=rfc5652.ContentInfo())
+    except PyAsn1Error:
+        asserts.fail("The Certification Declaration is not properly encoded DER")
+
+    content_info = dict(content_info)
+    asserts.assert_equal(content_info["contentType"], rfc5652.id_signedData,
+                         "The Certification Declaration is not a CMS SignedData")
+
+    signed_data, _ = der_decoder(content_info["content"].asOctets(), asn1Spec=rfc5652.SignedData())
+    signed_data = dict(signed_data)
+    asserts.assert_equal(signed_data["version"], 3, "Certification Declaration SignedData version is not 3")
+    asserts.assert_equal(len(signed_data["digestAlgorithms"]), 1,
+                         "Certification Declaration lists more than one digest algorithm")
+    asserts.assert_equal(dict(signed_data["digestAlgorithms"][0])["algorithm"], _kOidSha256,
+                         "Certification Declaration digest algorithm is not SHA-256")
+
+    encapsulated = dict(signed_data["encapContentInfo"])
+    asserts.assert_equal(encapsulated["eContentType"], _kOidPkcs7Data,
+                         "Certification Declaration encapsulated content type is not pkcs7-data")
+    cd_tlv = bytes(encapsulated["eContent"])
+
+    asserts.assert_equal(len(signed_data["signerInfos"]), 1,
+                         "Certification Declaration carries more than one signer info")
+    signer_info = dict(signed_data["signerInfos"][0])
+    asserts.assert_equal(signer_info["version"], 3, "Certification Declaration signer info version is not 3")
+    asserts.assert_equal(dict(signer_info["digestAlgorithm"])["algorithm"], _kOidSha256,
+                         "Certification Declaration signer info digest algorithm is not SHA-256")
+    asserts.assert_equal(dict(signer_info["signatureAlgorithm"])["algorithm"], _kOidEcdsaWithSha256Asn1,
+                         "Certification Declaration signature algorithm is not ecdsa-with-SHA256")
+    subject_key_identifier = bytes(dict(signer_info["sid"])["subjectKeyIdentifier"])
+
+    declaration = _parse_certification_declaration_tlv(cd_tlv)
+    asserts.assert_equal(declaration.vendor_id, basic_info_vendor_id,
+                         "Certification Declaration vendor_id does not match Basic Information VendorID")
+    asserts.assert_in(basic_info_product_id, declaration.product_id_array,
+                      "Basic Information ProductID is not in the Certification Declaration product_id_array")
+
+    # Test CDs may use the test-harness-provided signer set. Official CDs, and provisional CDs
+    # without the explicit certification-test override, must chain to a CSA production CD signer.
+    if (declaration.certification_type == CertificationType.kTest or
+            (declaration.certification_type == CertificationType.kProvisional and
+             allow_provisional_test_signer)):
+        signer_source = test_cd_signer_source
+        if declaration.certification_type == CertificationType.kProvisional:
+            logger.warning("Accepting a provisional Certification Declaration signed by a test key; "
+                           "this credential is not suitable for a production device")
+    else:
+        signer_source = CredentialSource.kProduction
+
+    signing_keys = _load_cd_signing_keys(signer_source)
+    asserts.assert_in(subject_key_identifier, signing_keys,
+                      "The Certification Declaration signer key identifier is not one of the known CD "
+                      "signing certificates")
+    try:
+        signing_keys[subject_key_identifier].verify(bytes(signer_info["signature"]), cd_tlv,
+                                                    ec.ECDSA(hashes.SHA256()))
+    except InvalidSignature:
+        asserts.fail("The Certification Declaration signature does not validate against the known CD signing key")
+
+    _assert_certification_declaration_matches_chain(declaration, dac, pai)
+
+    logger.info("Certification Declaration validated: VID 0x%04X, PIDs %s, certificate id %s, type %s",
+                declaration.vendor_id, [f"0x{pid:04X}" for pid in declaration.product_id_array],
+                declaration.certificate_id, declaration.certification_type.name)
+    return declaration
+
+
+def _parse_certification_declaration_tlv(cd_tlv: bytes) -> CertificationDeclaration:
+    """Decode and range-check the Certification Declaration TLV payload."""
+    try:
+        fields = TLVReader(cd_tlv).get()["Any"]
+    except Exception as e:
+        asserts.fail(f"The Certification Declaration payload does not decode as TLV: {type(e).__name__}: {e}")
+
+    for tag in (kCdTagFormatVersion, kCdTagVendorId, kCdTagProductIdArray, kCdTagDeviceTypeId,
+                kCdTagCertificateId, kCdTagSecurityLevel, kCdTagSecurityInformation, kCdTagVersionNumber,
+                kCdTagCertificationType):
+        asserts.assert_in(tag, fields.keys(), f"The Certification Declaration is missing tag {tag}")
+
+    asserts.assert_equal(fields[kCdTagFormatVersion], 1, "Certification Declaration format_version is not 1")
+    asserts.assert_equal(len(fields[kCdTagCertificateId]), kCertificateIdLength,
+                         f"Certification Declaration certificate_id is not {kCertificateIdLength} characters")
+    asserts.assert_equal(fields[kCdTagSecurityLevel], 0, "Certification Declaration security_level is not 0")
+    asserts.assert_equal(fields[kCdTagSecurityInformation], 0,
+                         "Certification Declaration security_information is not 0")
+    asserts.assert_in(fields[kCdTagDeviceTypeId], range(0, 2**31 - 1),
+                      "Certification Declaration device_type_id is out of range")
+    asserts.assert_in(fields[kCdTagVersionNumber], range(0, 65536),
+                      "Certification Declaration version_number is out of range")
+    asserts.assert_greater(len(fields[kCdTagProductIdArray]), 0,
+                           "Certification Declaration product_id_array is empty")
+
+    certification_type = fields[kCdTagCertificationType]
+    asserts.assert_in(certification_type, [int(value) for value in CertificationType],
+                      f"Certification Declaration certification_type {certification_type} is not a known value")
+
+    dac_origin_vendor_id = fields.get(kCdTagDacOriginVendorId)
+    dac_origin_product_id = fields.get(kCdTagDacOriginProductId)
+    # The dac_origin fields are optional but only meaningful together.
+    asserts.assert_equal(dac_origin_vendor_id is None, dac_origin_product_id is None,
+                         "Certification Declaration must carry both dac_origin_vendor_id and "
+                         "dac_origin_product_id, or neither")
+
+    return CertificationDeclaration(
+        format_version=fields[kCdTagFormatVersion],
+        vendor_id=fields[kCdTagVendorId],
+        product_id_array=list(fields[kCdTagProductIdArray]),
+        device_type_id=fields[kCdTagDeviceTypeId],
+        certificate_id=fields[kCdTagCertificateId],
+        security_level=fields[kCdTagSecurityLevel],
+        security_information=fields[kCdTagSecurityInformation],
+        version_number=fields[kCdTagVersionNumber],
+        certification_type=CertificationType(certification_type),
+        dac_origin_vendor_id=dac_origin_vendor_id,
+        dac_origin_product_id=dac_origin_product_id,
+        authorized_paa_list=list(fields[kCdTagAuthorizedPaaList]) if kCdTagAuthorizedPaaList in fields else None,
+    )
+
+
+def _assert_certification_declaration_matches_chain(declaration: CertificationDeclaration,
+                                                    dac: ParsedCertificate, pai: ParsedCertificate) -> None:
+    """Assert that a CD's identifiers agree with the DAC and PAI it was presented with.
+
+    When the dac_origin fields are present they, rather than vendor_id and product_id_array, are
+    the values the certificates must match.
+    """
+    dac_vid, dac_pid = dac.matter_id(kOidMatterVid), dac.matter_id(kOidMatterPid)
+    pai_vid, pai_pid = pai.matter_id(kOidMatterVid), pai.matter_id(kOidMatterPid)
+
+    if declaration.dac_origin_vendor_id is not None:
+        asserts.assert_equal(dac_vid, declaration.dac_origin_vendor_id,
+                             f"{dac.name} VID must match the CD dac_origin_vendor_id")
+        asserts.assert_equal(pai_vid, declaration.dac_origin_vendor_id,
+                             f"{pai.name} VID must match the CD dac_origin_vendor_id")
+        asserts.assert_equal(dac_pid, declaration.dac_origin_product_id,
+                             f"{dac.name} PID must match the CD dac_origin_product_id")
+        if pai_pid is not None:
+            asserts.assert_equal(pai_pid, declaration.dac_origin_product_id,
+                                 f"{pai.name} PID is present and must match the CD dac_origin_product_id")
+        return
+
+    asserts.assert_equal(dac_vid, declaration.vendor_id,
+                         f"{dac.name} VID 0x{dac_vid:04X} must match the CD vendor_id "
+                         f"0x{declaration.vendor_id:04X}")
+    asserts.assert_equal(pai_vid, declaration.vendor_id,
+                         f"{pai.name} VID 0x{pai_vid:04X} must match the CD vendor_id "
+                         f"0x{declaration.vendor_id:04X}")
+    asserts.assert_in(dac_pid, declaration.product_id_array,
+                      f"{dac.name} PID 0x{dac_pid:04X} is not in the CD product_id_array")
+    if pai_pid is not None:
+        asserts.assert_in(pai_pid, declaration.product_id_array,
+                          f"{pai.name} PID 0x{pai_pid:04X} is not in the CD product_id_array")
+
+
+def assert_authorized_paa(declaration: CertificationDeclaration, pai: ParsedCertificate) -> None:
+    """Assert that the PAI's issuer is in the CD authorized_paa_list, when that list is present."""
+    if declaration.authorized_paa_list is None:
+        logger.info("The Certification Declaration carries no authorized_paa_list; nothing to check")
+        return
+
+    authority_key_identifier = pai.certificate.extensions.get_extension_for_class(
+        x509.AuthorityKeyIdentifier).value.key_identifier
+    asserts.assert_in(authority_key_identifier, [bytes(entry) for entry in declaration.authorized_paa_list],
+                      f"The {pai.name} authorityKeyIdentifier is not in the CD authorized_paa_list")
+    logger.info("The %s issuer appears in the CD authorized_paa_list", pai.name)
