@@ -93,6 +93,10 @@ class TC_ASU_2_1(MatterBaseTest):
         )
         asserts.assert_true(isinstance(unionName_read, str), "UnionName shall be a string.")
         log.info("Rx'd UnionName: %s", unionName_read)
+        string_size = len(unionName_read)
+        # checkvalue between 1 and 128
+        asserts.assert_greater_equal(1, string_size, "The string size needs to be betwween 1 and 128.")
+        asserts.assert_less_equal(string_size, 128, "The string size needs to be betwween 1 and 128.")
 
         self.step("3")
         unionHealth_read = await self.read_single_attribute_check_success(
@@ -115,6 +119,11 @@ class TC_ASU_2_1(MatterBaseTest):
             cluster=cluster,
             attribute=attr.UnionContributorList
         )
+
+        list_size = len(unionlist_read)
+        # checkvalue between 1 and 128
+        asserts.assert_greater_equal(1, list_size, "The string size needs to be betwween 1 and 128.")
+        asserts.assert_less_equal(list_size, 128, "The string size needs to be betwween 1 and 128.")
 
         valid_contributor_status_values = [
             Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline,
@@ -140,9 +149,14 @@ class TC_ASU_2_1(MatterBaseTest):
                     "ContributorName shall not be NullValue when ContributorNodeID is NullValue"
                 )
                 asserts.assert_true(
-                    isinstance(contributor.contributorName, str) and len(contributor.contributorName) > 0,
+                    isinstance(contributor.contributorName, str),
                     "ContributorName shall be a non-empty string when ContributorNodeID is NullValue"
                 )
+                string_size = len(contributor.contributorName)
+                # checkvalue between 1 and 128
+                asserts.assert_greater_equal(1, string_size, "The string size needs to be betwween 1 and 128.")
+                asserts.assert_less_equal(string_size, 128, "The string size needs to be betwween 1 and 128.")
+                
             else:
                 # Matter contributor: NodeID and EndpointID are valid integers
                 asserts.assert_greater_equal(contributor.contributorNodeID, 0,
