@@ -72,6 +72,7 @@ from pathlib import Path
 
 import chiptest.linux
 import click
+import yaml
 from chiptest.log_config import LogConfig
 
 from matter.testing.metadata import extract_runs_args
@@ -113,6 +114,9 @@ PROXY_PASSCODE = 20202021
 # Logged by every example application once it is up and commissionable
 APP_READY_PATTERN = "APP STATUS: Starting event loop"
 APP_READY_TIMEOUT_S = 30
+
+# Used only if script test_metadata.yaml has no dedicated_runner entry for.
+DEFAULT_TEST_TIMEOUT_S = 600
 
 
 class MockRecordsOnly(logging.Filter):
@@ -280,6 +284,19 @@ def declared_test_params(script: str) -> dict[str, int]:
     return params
 
 
+def declared_timeout(script: str) -> int | None:
+    """Timeout the script's `dedicated_runner` entry in test_metadata.yaml declares."""
+    metadata = os.path.join(DEFAULT_CHIP_ROOT, "src/python_testing/test_metadata.yaml")
+    try:
+        with open(metadata) as f:
+            entries = yaml.safe_load(f).get("dedicated_runner") or []
+    except OSError:
+        return None
+    name = os.path.basename(script)
+    return next((e["timeout"] for e in entries
+                 if e.get("name") == name and e.get("timeout") is not None), None)
+
+
 def declared_commissioning_args(script: str) -> list[str]:
     """The commissioning-method arguments the test itself declares.
 
@@ -340,8 +357,9 @@ def ed_app_args(transport: str) -> str:
 @click.option('--proxy-ble/--no-proxy-ble', default=True, show_default=True,
               help='Whether the proxy application was built with BLE. Clear it for a PAF-only build, '
                    'which does not accept --ble-controller.')
-@click.option('--timeout', default=600, show_default=True,
-              help='Seconds allowed for the test script. This bounds the framework '
+@click.option('--timeout', default=None, type=int,
+              help='Seconds allowed for the test script, overriding the timeout the '
+                   'test declares in test_metadata.yaml. This bounds the framework '
                    'commissioning that runs before the test body, which the body\'s own '
                    'default_timeout does not cover.')
 @click.option('--ns-index', default=0, show_default=True, help='Index of the Linux network namespaces.')
@@ -355,7 +373,7 @@ def ed_app_args(transport: str) -> str:
 def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script_args: str, transport: str,
          endpoint: int | None, discriminator: int | None, passcode: int | None,
          ed_discriminator: int | None, ed_passcode: int | None,
-         proxy_ble: bool, timeout: int, ns_index: int, log_level: str, mock_log_level: str | None,
+         proxy_ble: bool, timeout: int | None, ns_index: int, log_level: str, mock_log_level: str | None,
          internal_inside_unshare: bool) -> None:
 
     LogConfig(log_level, log_level, log_level, True).set_fmt()
@@ -394,6 +412,9 @@ def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, scrip
         chiptest.linux.ensure_namespace_availability()
     else:
         chiptest.linux.ensure_private_state()
+
+    if timeout is None:
+        timeout = declared_timeout(script) or DEFAULT_TEST_TIMEOUT_S
 
     sys.exit(run(proxy_app, proxy_args, ed_app, script, script_args, transport, endpoint,
                  discriminator, passcode, ed_discriminator, ed_passcode, proxy_ble, timeout, ns_index))

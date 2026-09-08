@@ -204,22 +204,31 @@ not_automated:
 dedicated_runner:
     - name: TC_COMPRO_2_1.py
       runner: scripts/tests/run_compro_test.py
+      timeout: 100
     - name: TC_COMPRO_2_2.py
       runner: scripts/tests/run_compro_test.py
+      timeout: 100
     - name: TC_COMPRO_2_3.py
       runner: scripts/tests/run_compro_test.py
+      timeout: 600
     - name: TC_COMPRO_2_4.py
       runner: scripts/tests/run_compro_test.py
+      timeout: 100
     - name: TC_COMPRO_2_5.py
       runner: scripts/tests/run_compro_test.py
+      timeout: 100
     - name: TC_COMPRO_2_6.py
       runner: scripts/tests/run_compro_test.py
+      timeout: 100
     - name: TC_COMPRO_2_7.py
       runner: scripts/tests/run_compro_test.py
+      timeout: 100
     - name: TC_COMPRO_2_8.py
       runner: scripts/tests/run_compro_test.py
+      timeout: 100
     - name: TC_COMPRO_2_9.py
       runner: scripts/tests/run_compro_test.py
+      timeout: 100
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
