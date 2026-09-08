@@ -66,6 +66,7 @@ from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+
 class TC_FAN_3_5(MatterBaseTest):
     def desc_TC_FAN_3_5(self) -> str:
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
