@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -138,6 +138,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/commodity-tariff-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-distribution-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-protection-alarm-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/energy-preference-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
@@ -794,7 +795,7 @@ jobs:
         runs-on: namespace-profile-16x32
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -1091,7 +1092,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
