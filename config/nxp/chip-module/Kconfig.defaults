@@ -537,9 +537,6 @@ config WIFI_NM_WPA_SUPPLICANT_THREAD_STACK_SIZE
 config WIFI_NM_WPA_SUPPLICANT_WQ_STACK_SIZE
 	default 5120
 
-config WIFI_NM_WPA_SUPPLICANT_INF_MON
-	default n
-
 config NET_TCP_WORKQ_STACK_SIZE
 	default 2048
 
@@ -550,7 +547,7 @@ config NET_IF_UNICAST_IPV6_ADDR_COUNT
 config NET_IF_MCAST_IPV6_ADDR_COUNT
 	default 8
 
-config NET_SOCKETS_POLL_MAX
+config ZVFS_POLL_MAX
 	default 14
 
 config NET_IPV4_FRAGMENT_MAX_COUNT
@@ -630,7 +627,7 @@ endchoice
 
 if CHIP_ETHERNET
 
-config NET_SOCKETS_POLL_MAX
+config ZVFS_POLL_MAX
 	default 7
 
 endif
