@@ -29,7 +29,7 @@ namespace Uld {
 
 bool KeyResourceRecord::WriteData(RecordWriter & out) const
 {
-    // The PublicKeyLenght should match kP256RawPublicKeySize + 1 byte for the `Uncompressed Marker`
+    // The public key length should match kP256RawPublicKeySize + 1 byte for the uncompressed point marker.
     static_assert(Crypto::kP256_PublicKey_Length == kP256RawPublicKeySize + 1);
     VerifyOrReturnValue(mPublicKey.IsUncompressed(), false);
 
