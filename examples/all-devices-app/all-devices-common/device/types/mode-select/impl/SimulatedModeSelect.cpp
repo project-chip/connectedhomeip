@@ -31,7 +31,10 @@ const Structs::ModeOptionStruct::Type SimulatedModeSelect::kSupportedModes[] = {
 SimulatedModeSelect::SimulatedModeSelect(DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
     ModeSelect(ModeSelect::Config{ *this,
                                    {
-                                       BitMask<Feature>(Feature::kOnOff),
+                                       // No features: the OnOff feature requires a dependent OnOff
+                                       // cluster instance on the same endpoint, which this example
+                                       // does not provide.
+                                       {},
                                        Clusters::ModeSelectCluster::OptionalAttributeSet(),
                                        "Mode Select Simulated Device"_span,
                                        DataModel::NullNullable,
