@@ -67,9 +67,10 @@ public:
     std::string mSentSdp;
     Globals::StreamUsageEnum mSentUsage = Globals::StreamUsageEnum::kUnknownEnumValue;
     EndpointId mSentOriginatingEndpoint = kInvalidEndpointId;
-    Optional<DataModel::Nullable<uint16_t>> mSentVideoStreamId;
-    bool mSentAudioAbsent = false;
-    bool mSentIceAbsent   = false;
+    std::vector<uint16_t> mSentVideoStreams;
+    bool mSentDeprecatedStreamIdAbsent = false;
+    bool mSentAudioAbsent              = false;
+    bool mSentIceAbsent                = false;
 
     // The EndSession payload the client would have sent
     int mEndSendAttempts                        = 0;
@@ -101,15 +102,24 @@ protected:
         mSendAttempts++;
         ReturnErrorOnFailure(mSendResult);
 
+        uint16_t videoStream = 0;
         WebRTCTransportProvider::Commands::ProvideOffer::Type request;
-        ReturnErrorOnFailure(BuildProvideOffer(request));
+        ReturnErrorOnFailure(BuildProvideOffer(request, videoStream));
         mSentSessionIdWasNull    = request.webRTCSessionID.IsNull();
         mSentSdp                 = std::string(request.sdp.data(), request.sdp.size());
         mSentUsage               = request.streamUsage;
         mSentOriginatingEndpoint = request.originatingEndpointID;
-        mSentVideoStreamId       = request.videoStreamID;
-        mSentAudioAbsent         = !request.audioStreamID.HasValue();
-        mSentIceAbsent           = !request.ICEServers.HasValue() && !request.ICETransportPolicy.HasValue();
+        mSentVideoStreams.clear();
+        if (request.videoStreams.HasValue())
+        {
+            for (uint16_t stream : request.videoStreams.Value())
+            {
+                mSentVideoStreams.push_back(stream);
+            }
+        }
+        mSentDeprecatedStreamIdAbsent = !request.videoStreamID.HasValue();
+        mSentAudioAbsent              = !request.audioStreamID.HasValue() && !request.audioStreams.HasValue();
+        mSentIceAbsent                = !request.ICEServers.HasValue() && !request.ICETransportPolicy.HasValue();
 
         MarkSent();
         return CHIP_NO_ERROR;
@@ -353,8 +363,6 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
     // Feeds the camera's ProvideOfferResponse{sessionId, videoStreamId} into the client
     void FeedOfferResponse(uint16_t aWebRTCSessionId) { FeedOfferResponse(aWebRTCSessionId, kVideoStreamId); }
 
-    // The camera's response names the video stream it selected, which need not be the one asked
-    // for; absent means the field was omitted
     void FeedOfferResponse(uint16_t aWebRTCSessionId, std::optional<uint16_t> aVideoStreamId)
     {
         FeedOfferResponseFrom(mClient.Sender(), aWebRTCSessionId, aVideoStreamId);
@@ -783,9 +791,9 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, OfferPayloadFollowsTheNormalFlow)
     EXPECT_EQ(mClient.mSentSdp, "v=0 test offer");
     EXPECT_EQ(mClient.mSentUsage, Globals::StreamUsageEnum::kAnalysis);
     EXPECT_EQ(mClient.mSentOriginatingEndpoint, 1); // Where the requestor cluster is registered
-    ASSERT_TRUE(mClient.mSentVideoStreamId.HasValue());
-    ASSERT_FALSE(mClient.mSentVideoStreamId.Value().IsNull());
-    EXPECT_EQ(mClient.mSentVideoStreamId.Value().Value(), kVideoStreamId);
+    ASSERT_EQ(mClient.mSentVideoStreams.size(), 1u);
+    EXPECT_EQ(mClient.mSentVideoStreams[0], kVideoStreamId);
+    EXPECT_TRUE(mClient.mSentDeprecatedStreamIdAbsent);
     EXPECT_TRUE(mClient.mSentAudioAbsent); // No audio for analysis
     EXPECT_TRUE(mClient.mSentIceAbsent);   // ICE configuration is the camera's default
 }
@@ -1333,23 +1341,7 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnEmptyOfferFailsTheRequest)
     EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
 }
 
-TEST_F(TestDefaultAvAnalysisWebRTCClient, TheRequestorRecordCarriesTheCamerasVideoStreamId)
-{
-    DriveToOffer();
-    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
-    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
-
-    // The camera selects a different stream than the one asked for
-    FeedOfferResponse(55, static_cast<uint16_t>(kVideoStreamId + 1));
-    mClient.OnDone(mClient.Sender());
-
-    auto sessions = mRequestorCluster.GetCurrentSessions();
-    ASSERT_EQ(sessions.size(), 1u);
-    ASSERT_FALSE(sessions[0].videoStreamID.IsNull());
-    EXPECT_EQ(sessions[0].videoStreamID.Value(), kVideoStreamId + 1);
-}
-
-TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferResponseWithoutAVideoStreamIdRecordsNull)
+TEST_F(TestDefaultAvAnalysisWebRTCClient, TheRequestorRecordCarriesTheOfferedVideoStreamId)
 {
     DriveToOffer();
     ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
@@ -1358,10 +1350,26 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferResponseWithoutAVideoStreamIdRe
     FeedOfferResponse(55, std::nullopt);
     mClient.OnDone(mClient.Sender());
 
+    auto sessions = mRequestorCluster.GetCurrentSessions();
+    ASSERT_EQ(sessions.size(), 1u);
+    ASSERT_FALSE(sessions[0].videoStreamID.IsNull());
+    EXPECT_EQ(sessions[0].videoStreamID.Value(), kVideoStreamId);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, TheResponsesDeprecatedVideoStreamIdIsIgnored)
+{
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    FeedOfferResponse(55, static_cast<uint16_t>(kVideoStreamId + 1));
+    mClient.OnDone(mClient.Sender());
+
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
     auto sessions = mRequestorCluster.GetCurrentSessions();
     ASSERT_EQ(sessions.size(), 1u);
-    EXPECT_TRUE(sessions[0].videoStreamID.IsNull());
+    ASSERT_FALSE(sessions[0].videoStreamID.IsNull());
+    EXPECT_EQ(sessions[0].videoStreamID.Value(), kVideoStreamId);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, ASecondOfferResponseIsIgnored)

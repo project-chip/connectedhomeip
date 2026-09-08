@@ -247,15 +247,10 @@ protected:
         }
 
         /**
-         * Records the decoded ProvideOfferResponse: the camera-assigned session id and the video
-         * stream the camera selected.
+         * Records the decoded ProvideOfferResponse: the camera-assigned session id. The session
+         * carries the VideoStreams this request asked for, so the response names no stream.
          */
-        void SetOfferResponse(uint16_t aWebRTCSessionId, const DataModel::Nullable<uint16_t> & aVideoStreamId)
-        {
-            mWebRTCSessionId       = aWebRTCSessionId;
-            mResponseVideoStreamId = aVideoStreamId;
-        }
-        const DataModel::Nullable<uint16_t> & ResponseVideoStreamId() const { return mResponseVideoStreamId; }
+        void SetOfferResponse(uint16_t aWebRTCSessionId) { mWebRTCSessionId = aWebRTCSessionId; }
 
         /**
          * Returns the callback owed the outcome, or nullptr when it was already delivered (or the
@@ -339,7 +334,6 @@ protected:
         // The session record the requestor cluster gets on success
         ScopedNodeId mCameraNode;
         uint16_t mWebRTCSessionId = 0;
-        DataModel::Nullable<uint16_t> mResponseVideoStreamId;
     };
 
     /**
@@ -351,9 +345,10 @@ protected:
      * Fills a ProvideOffer request from the pending request and the buffered SDP, per the WebRTC
      * Normal Flow: a null session id asks for a new session, StreamUsage is Analysis, and the
      * originating endpoint is where our WebRTCTransportRequestor cluster is registered. The sdp
-     * span references mOfferSdp and is only valid while it is unchanged.
+     * span references mOfferSdp and is only valid while it is unchanged. The VideoStreams list
+     * references aVideoStream, which the caller keeps alive until the request is encoded.
      */
-    CHIP_ERROR BuildProvideOffer(WebRTCTransportProvider::Commands::ProvideOffer::Type & aRequest) const;
+    CHIP_ERROR BuildProvideOffer(WebRTCTransportProvider::Commands::ProvideOffer::Type & aRequest, uint16_t & aVideoStream) const;
 
     /**
      * Fills a ProvideICECandidates request for the session this request is about, from the

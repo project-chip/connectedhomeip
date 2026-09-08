@@ -371,24 +371,26 @@ void DefaultAvAnalysisWebRTCClient::OnOfferReady(CHIP_ERROR aError, CharSpan aSd
     }
 }
 
-CHIP_ERROR DefaultAvAnalysisWebRTCClient::BuildProvideOffer(WebRTCTransportProvider::Commands::ProvideOffer::Type & aRequest) const
+CHIP_ERROR DefaultAvAnalysisWebRTCClient::BuildProvideOffer(WebRTCTransportProvider::Commands::ProvideOffer::Type & aRequest,
+                                                            uint16_t & aVideoStream) const
 {
-    // The requestor cluster's registered path is where the camera's answering commands must land
-    VerifyOrReturnError(!mRequestorCluster->GetPaths().empty(), CHIP_ERROR_INCORRECT_STATE);
+    aVideoStream = mRequest.VideoStreamId();
 
     aRequest.webRTCSessionID.SetNull(); // a new session, to be assigned by the camera
-    aRequest.sdp                   = CharSpan(mOfferSdp.data(), mOfferSdp.size());
-    aRequest.streamUsage           = Globals::StreamUsageEnum::kAnalysis;
+    aRequest.sdp         = CharSpan(mOfferSdp.data(), mOfferSdp.size());
+    aRequest.streamUsage = Globals::StreamUsageEnum::kAnalysis;
+    // The requestor cluster's registered path is where the camera's answering commands must land
     aRequest.originatingEndpointID = mRequestorCluster->GetPaths().front().mEndpointId;
-    aRequest.videoStreamID         = MakeOptional(DataModel::MakeNullable(mRequest.VideoStreamId()));
+    aRequest.videoStreams          = MakeOptional(DataModel::List<const uint16_t>(&aVideoStream, 1));
     // No audio for analysis; ICE servers and transport policy are the camera's defaults
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DefaultAvAnalysisWebRTCClient::SendProvideOffer()
 {
+    uint16_t videoStream = 0;
     WebRTCTransportProvider::Commands::ProvideOffer::Type request;
-    ReturnErrorOnFailure(BuildProvideOffer(request));
+    ReturnErrorOnFailure(BuildProvideOffer(request, videoStream));
     return InvokeOnHeldSession(WebRTCTransportProvider::Commands::ProvideOffer::Id,
                                DataModel::EncodableType<WebRTCTransportProvider::Commands::ProvideOffer::Type>(request));
 }
@@ -471,8 +473,7 @@ void DefaultAvAnalysisWebRTCClient::OnResponse(CommandSender * apCommandSender, 
     VerifyOrReturn(DataModel::Decode(*apData, response) == CHIP_NO_ERROR,
                    ChipLogError(Zcl, "AvAnalysisWebRTCClient: ProvideOfferResponse did not decode"));
 
-    mRequest.SetOfferResponse(response.webRTCSessionID,
-                              response.videoStreamID.HasValue() ? response.videoStreamID.Value() : DataModel::NullNullable);
+    mRequest.SetOfferResponse(response.webRTCSessionID);
     mRequest.Advance(Request::Phase::kResponded);
 }
 
@@ -573,7 +574,7 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
     session.fabricIndex    = mRequest.CameraNode().GetFabricIndex();
     session.peerEndpointID = mRequest.WebRTCEndpoint();
     session.streamUsage    = Globals::StreamUsageEnum::kAnalysis;
-    session.videoStreamID  = mRequest.ResponseVideoStreamId();
+    session.videoStreamID  = DataModel::MakeNullable(mRequest.VideoStreamId());
     session.audioStreamID.SetNull();
     mRequestorCluster->UpsertSession(session);
     return CHIP_NO_ERROR;
