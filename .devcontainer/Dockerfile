@@ -13,10 +13,33 @@
 # limitations under the License.
 
 ARG BUILD_VERSION
+ARG NXP_ZEPHYR_REVISION
 
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
 FROM ghcr.io/project-chip/chip-build-vscode:${BUILD_VERSION}
 LABEL org.opencontainers.image.source="https://github.com/project-chip/connectedhomeip"
+
+# Re-declare ARG after FROM so it is available in the build stage
+ARG NXP_ZEPHYR_REVISION
+
+# Initialize NXP Zephyr workspace at devcontainer build time
+# Always reinitialize to ensure upstream Zephyr (not NXP ZSDK) is used
+RUN set -x \
+    && ZEPHYR_WS=/opt/nxp-zephyr/zephyrproject \
+    && rm -rf $ZEPHYR_WS \
+    && mkdir -p $ZEPHYR_WS/zephyr \
+    && cd $ZEPHYR_WS/zephyr \
+    && git init \
+    && git remote add origin https://github.com/zephyrproject-rtos/zephyr.git \
+    && git fetch --depth=1 origin ${NXP_ZEPHYR_REVISION} \
+    && git reset ${NXP_ZEPHYR_REVISION} --hard \
+    && pip3 install --break-system-packages --no-cache-dir -r scripts/requirements-base.txt \
+    && cd $ZEPHYR_WS \
+    && unset ZEPHYR_BASE \
+    && west init -l zephyr \
+    && west update -o=--depth=1 -n \
+    && west zephyr-export \
+    && : # last line
 
 # This Dockerfile contains things useful for an interactive development environment
 ARG USERNAME=vscode
