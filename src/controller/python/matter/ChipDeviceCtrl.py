@@ -37,6 +37,7 @@ import ctypes
 import enum
 import json
 import logging
+import re
 import secrets
 import threading
 import typing
@@ -57,9 +58,9 @@ from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
 from .exceptions import ChipStackError
 from .interaction_model import SessionParameters, SessionParametersStruct
-from .native import PyChipError
+from .native import GetLibraryHandle, HandleFlags, PyChipError
 
-__all__ = ["ChipDeviceController", "CommissioningParameters",
+__all__ = ["ChipDeviceController", "CommissioningParameters", "CommissioningStage",
            "AttributeReadRequest", "AttributeReadRequestList", "SubscriptionTargetList"]
 
 # Type aliases for ReadAttribute method to improve type safety
@@ -148,6 +149,56 @@ class TransportPayloadCapability(ctypes.c_int):
     MRP_PAYLOAD = 0
     LARGE_PAYLOAD = 1
     MRP_OR_TCP_PAYLOAD = 2
+
+
+# Stage names are identifiers; StageToString() returns a placeholder ("???") for anything else.
+_kCommissioningStageName = re.compile(r"[A-Za-z][A-Za-z0-9]*")
+
+_commissioningStage: type[enum.IntEnum] | None = None
+
+if typing.TYPE_CHECKING:
+    # Declared for the benefit of linters; actually produced by __getattr__ below.
+    CommissioningStage: type[enum.IntEnum]
+
+
+def _BuildCommissioningStage() -> type[enum.IntEnum]:
+    '''Mirrors the C++ CommissioningStage enum (src/controller/CommissioningDelegate.h).
+
+    That enum is not a stable interface: stages get inserted and removed as commissioning
+    evolves, which silently invalidates any copy of the numeric values kept over here. So
+    instead of maintaining a copy, ask the library to name each possible value and build the
+    enum from the ones it recognizes. Members are named without the `k` prefix, and a stage
+    that is compiled out (e.g. NFC commissioning) is simply absent.
+    '''
+    handle = GetLibraryHandle(HandleFlags(0))  # StageToString() does not need an initialized stack
+    handle.pychip_CommissioningStageToString.argtypes = [c_uint8]
+    handle.pychip_CommissioningStageToString.restype = c_char_p
+
+    stages: dict[str, int] = {}
+    for value in range(256):
+        name = handle.pychip_CommissioningStageToString(value).decode("utf-8")
+        if not _kCommissioningStageName.fullmatch(name):
+            continue
+        if name in stages:
+            raise RuntimeError(f"CommissioningStage {name} reported for both {stages[name]} and {value}")
+        stages[name] = value
+
+    # The C++ enumerators have implicit values, so the named stages must cover 0..N-1 exactly.
+    # A gap or a stray value means the scan above missed a stage or picked up a non-stage.
+    if not stages or sorted(stages.values()) != list(range(len(stages))):
+        raise RuntimeError(f"Unexpected CommissioningStage values: {sorted(stages.values())}")
+    return enum.IntEnum("CommissioningStage", stages)
+
+
+def __getattr__(name: str):
+    # `CommissioningStage` is built on first access rather than at import time, so that importing
+    # this module does not by itself require the native library to be present and loadable.
+    if name == "CommissioningStage":
+        global _commissioningStage
+        if _commissioningStage is None:
+            _commissioningStage = _BuildCommissioningStage()
+        return _commissioningStage
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 @dataclass
@@ -1132,8 +1183,8 @@ class ChipDeviceControllerBase:
 
         Args:
             stage (int): The commissioning stage where failure will be simulated.
-                         This corresponds to the enum `CommissioningStage` (e.g. kError, kSecurePairing, etc.). For full details
-                         ref https://github.com/project-chip/connectedhomeip/blob/master/src/controller/CommissioningDelegate.h
+                         Use the `CommissioningStage` enum from this module (e.g. CommissioningStage.SendComplete)
+                         rather than a literal number; stage numbers change as the C++ enum evolves.
 
         Returns:
             bool: True if the failure simulate success, False if not.
@@ -1147,8 +1198,8 @@ class ChipDeviceControllerBase:
 
         Args:
             stage (int): The commissioning stage where failure will be simulated.
-                         This corresponds to the enum `CommissioningStage` (e.g. kError, kSecurePairing, etc.). For full details
-                         ref https://github.com/project-chip/connectedhomeip/blob/master/src/controller/CommissioningDelegate.h
+                         Use the `CommissioningStage` enum from this module (e.g. CommissioningStage.SendComplete)
+                         rather than a literal number; stage numbers change as the C++ enum evolves.
 
         Returns:
             bool: True if the failure simulate success, False if not.
@@ -1162,8 +1213,8 @@ class ChipDeviceControllerBase:
 
         Args:
             stage (int): The commissioning stage after a premature completion is simulated.
-                         This corresponds to the enum `CommissioningStage` (e.g. kError, kSecurePairing, etc.). For full details
-                         ref https://github.com/project-chip/connectedhomeip/blob/master/src/controller/CommissioningDelegate.h
+                         Use the `CommissioningStage` enum from this module (e.g. CommissioningStage.SendComplete)
+                         rather than a literal number; stage numbers change as the C++ enum evolves.
 
         Returns:
             bool: True if the premature complete success, False if not.
@@ -1187,7 +1238,9 @@ class ChipDeviceControllerBase:
         Check the test commissioner stage success.
 
         Args:
-            stage (int): The commissioning to simulate.
+            stage (int): The commissioning stage to check.
+                         Use the `CommissioningStage` enum from this module (e.g. CommissioningStage.SendComplete)
+                         rather than a literal number; stage numbers change as the C++ enum evolves.
 
         Returns:
             bool: True if test commissioner stage success, False if not.
