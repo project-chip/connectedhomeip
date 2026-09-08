@@ -14,6 +14,12 @@ To update or validate this list manually, follow these steps:
     - Look at the `DeviceFactory` constructor. Every
       `RegisterCreator("name", ...)` call corresponds to an implemented device
       type.
+    - Some device types are registered from platform-specific
+      `DeviceFactoryPlatformOverride.cpp` files instead of the `DeviceFactory`
+      constructor. For example, `Commissioning By Proxy` (0x0092) is
+      registered from
+      `examples/all-devices-app/posix/linux/DeviceFactoryPlatformOverride.cpp`
+      and is available on the Linux platform only. Check those files as well.
     - Note: `Root Node` (0x0016) is a special device type that is always
       implemented on Endpoint 0, and is represented by `RootNode.h/cpp` under
       `examples/all-devices-app/all-devices-common/device/types/root-node/`.
@@ -43,7 +49,7 @@ To update or validate this list manually, follow these steps:
         - **Blocked**: One or more mandatory clusters are missing (listed in the
           `Missing Clusters` column without an `[O]` suffix).
 
-## Implemented Device Types (47 total)
+## Implemented Device Types (48 total)
 
 | #   | Device Type Name               | ID            | Missing Clusters                                                                                                              | Notes                       |
 | --- | ------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
@@ -94,13 +100,13 @@ To update or validate this list manually, follow these steps:
 | 45  | Water Freeze Detector          | 65 (0x0041)   |                                                                                                                               |                             |
 | 46  | Water Leak Detector            | 67 (0x0043)   |                                                                                                                               |                             |
 | 47  | Water Valve                    | 66 (0x0042)   |                                                                                                                               |                             |
+| 48  | Ambient Context Sensor         | 336 (0x0150)  |                                                                                                                               |                             |
 
-## Unimplemented Device Types (57 total)
+## Unimplemented Device Types (56 total)
 
 | #   | Device Type Name                  | ID            | Ready Clusters                                                                                                                                                                                                                                            | Missing Clusters                                                                                                                                                                                                                     | Notes           |
 | --- | --------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
 | 1   | AV Analysis Node                  | 329 (0x0149)  | None                                                                                                                                                                                                                                                      | None                                                                                                                                                                                                                                 | Ready           |
-| 2   | Ambient Context Sensor            | 336 (0x0150)  | None                                                                                                                                                                                                                                                      | None                                                                                                                                                                                                                                 | Ready           |
 | 3   | Arc Fault Circuit Interrupter     | 1301 (0x0515) | User Label, Power Topology, Identify [O], On/Off [O]                                                                                                                                                                                                      | Electrical Protection Alarm, Electrical Alarm [O], Electrical Distribution [O]                                                                                                                                                       | Blocked         |
 | 4   | Audio Doorbell                    | 321 (0x0141)  | Identify, Switch, Camera AV Stream Management, WebRTC Transport Provider, WebRTC Transport Requestor [O], Push AV Stream Transport [O]                                                                                                                    | None                                                                                                                                                                                                                                 | Ready           |
 | 5   | Basic Video Player                | 40 (0x0028)   | On/Off                                                                                                                                                                                                                                                    | Media Playback, Keypad Input, Messages [O], Wake On LAN [O], Channel [O], Target Navigator [O], Media Input [O], Low Power [O], Audio Output [O], Content Control [O]                                                                | Blocked         |
