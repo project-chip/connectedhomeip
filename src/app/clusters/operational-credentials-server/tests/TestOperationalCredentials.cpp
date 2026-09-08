@@ -46,6 +46,7 @@ using chip::Testing::ClusterTester;
 
 // Mirrors the segment size the cluster serves and the floor the spec puts on MaxSegmentSize.
 constexpr uint16_t kDefaultCertificateSegmentSize = 600;
+constexpr uint16_t kMaxCertificateSegmentSize     = 900;
 
 class TestDACProvider : public Credentials::DeviceAttestationCredentialsProvider
 {
@@ -495,16 +496,19 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     ASSERT_TRUE(undersizedSegmentSizeResult.status.has_value());
     EXPECT_EQ(undersizedSegmentSizeResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
-    // A MaxSegmentSize larger than the application payload a Matter message can carry can never be
-    // honored, so it is rejected instead of being silently served at the default segment size.
-    Commands::CertificateChainRequest::Type oversizedSegmentSize;
-    oversizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    oversizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
-    oversizedSegmentSize.maxSegmentSize.SetValue(std::numeric_limits<uint16_t>::max());
+    // TC-OPCREDS-3.9 step 8 requires INVALID_COMMAND above RESP_MAX, even if
+    // the actual document would fit in a normal 600-byte segment.
+    for (uint16_t maxSegmentSize : { static_cast<uint16_t>(kMaxCertificateSegmentSize + 1), std::numeric_limits<uint16_t>::max() })
+    {
+        Commands::CertificateChainRequest::Type oversizedSegmentSize;
+        oversizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
+        oversizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+        oversizedSegmentSize.maxSegmentSize.SetValue(maxSegmentSize);
 
-    auto oversizedSegmentSizeResult = tester.Invoke(oversizedSegmentSize);
-    ASSERT_TRUE(oversizedSegmentSizeResult.status.has_value());
-    EXPECT_EQ(oversizedSegmentSizeResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+        auto result = tester.Invoke(oversizedSegmentSize);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
 }
 
 TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegmentSizeRange)
@@ -514,7 +518,7 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegm
 
     // Both ends of the permitted MaxSegmentSize range are served, and the response is capped at the
     // default segment size regardless of how much the client is willing to receive.
-    for (uint16_t maxSegmentSize : { kDefaultCertificateSegmentSize, static_cast<uint16_t>(kMaxAppMessageLen) })
+    for (uint16_t maxSegmentSize : { kDefaultCertificateSegmentSize, kMaxCertificateSegmentSize })
     {
         Commands::CertificateChainRequest::Type request;
         request.certificateType = CertificateChainTypeEnum::kDACCertificate;

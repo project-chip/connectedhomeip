@@ -43,18 +43,14 @@ using namespace chip::Protocols::InteractionModel;
 using namespace chip::Transport;
 namespace {
 
-constexpr auto kDACCertificate                       = CertificateChainTypeEnum::kDACCertificate;
-constexpr auto kPAICertificate                       = CertificateChainTypeEnum::kPAICertificate;
-constexpr auto kLegacyAttestationProfile             = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
-constexpr uint16_t kDefaultCertificateSegmentSize    = 600;
+constexpr auto kDACCertificate                    = CertificateChainTypeEnum::kDACCertificate;
+constexpr auto kPAICertificate                    = CertificateChainTypeEnum::kPAICertificate;
+constexpr auto kLegacyAttestationProfile          = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
+constexpr uint16_t kDefaultCertificateSegmentSize = 600;
+// RESP_MAX bounds the requested size even though responses use fixed 600-byte segments.
+constexpr uint16_t kMaxCertificateSegmentSize        = 900;
 constexpr size_t kMaxPqcCertificateChainDocumentSize = 10240;
 constexpr auto kNocResponseMaxDebugTextLength        = 128;
-
-// Largest MaxSegmentSize a client may ask for. A segment has to travel back inside a single
-// message, so anything beyond the application payload a Matter message can carry is unusable.
-constexpr size_t kMaxCertificateSegmentSize = kMaxAppMessageLen;
-static_assert(kMaxCertificateSegmentSize >= kDefaultCertificateSegmentSize,
-              "A Matter message must be able to carry a default-sized certificate segment");
 
 // Get the attestation challenge for the current session in progress. Only valid when called
 // synchronously from inside a CommandHandler. If not called in CASE/PASE session context,
@@ -1003,7 +999,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     Credentials::DeviceAttestationCertProfile requestedProfile = Credentials::DeviceAttestationCertProfile::kEcdsaMatterLegacy;
     // CryptoProfile describes the requested certificate's key. An ECDSA PAI/DAC
     // can belong to an ML-DSA-rooted chain, so choose the stored chain separately.
-    const auto chainProfile                                    = dacProvider.GetPreferredDeviceAttestationChainProfile();
+    const auto chainProfile = dacProvider.GetPreferredDeviceAttestationChainProfile();
     Credentials::DeviceAttestationDocumentType documentType;
     uint8_t documentBuffer[kDefaultCertificateSegmentSize];
     MutableByteSpan documentSpan(documentBuffer);
