@@ -623,12 +623,12 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
 
     // Verify spec constraints, provided list is 50 entries or less if not null
     //
+    size_t triggerCount = 0;
     if (!commandData.contextTriggers.IsNull())
     {
-        size_t size;
-        CHIP_ERROR err = commandData.contextTriggers.Value().ComputeSize(&size);
+        CHIP_ERROR err = commandData.contextTriggers.Value().ComputeSize(&triggerCount);
         VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
-        VerifyOrReturnError(size <= AvAnalysis::kMaxContextTriggers, Status::InvalidCommand);
+        VerifyOrReturnError(triggerCount <= AvAnalysis::kMaxContextTriggers, Status::InvalidCommand);
     }
 
     // Server command logic starts here
@@ -644,6 +644,7 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
             DataModel::Nullable<std::vector<uint16_t>> zoneIDs;
         };
         std::vector<ValidatedTrigger> validatedTriggers;
+        validatedTriggers.reserve(triggerCount);
 
         // First pass: validate every provided trigger, applying nothing
         //

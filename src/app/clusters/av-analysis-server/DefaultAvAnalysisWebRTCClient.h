@@ -394,8 +394,9 @@ private:
         AvAnalysisWebRTCClient::Callback * callback = nullptr;
         ScopedNodeId cameraNode;
         EndpointId providerEndpoint = kInvalidEndpointId;
-        uint16_t videoStreamId      = 0;
-        bool inUse                  = false;
+        // The requestor cluster's record holds its VideoStreams as a span over this field
+        uint16_t videoStreamId = 0;
+        bool inUse             = false;
     };
 
     // Common preconditions of RequestSession/EndSession, checked before Request::Begin* runs
@@ -406,7 +407,7 @@ private:
     void OnProviderCheckComplete();
     // Tracks the camera-assigned session on the requestor cluster; a stale session under the same key is failed first
     CHIP_ERROR RegisterSession(uint16_t aWebRTCSessionId);
-    // Frees the slot, then removes the session from the requestor cluster and releases the peer connection
+    // Removes the borrowing record from the requestor cluster first, then frees the slot and releases the peer connection
     void ReleaseSession(TrackedSession & aSession);
     // Routes NotifyFailed/NotifyEnded: releases the tracked session, then reports OnSessionFailed
     void FailTrackedSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
