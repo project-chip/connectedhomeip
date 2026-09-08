@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-# This test requires a DUT that signals the PQCDeviceAttestation feature of the
+# This test requires a DUT that signals the PQCDA feature of the
 # Operational Credentials cluster. There is no CI test arguments block because
 # no PQC-capable DAC provider fixture is checked in yet; run it manually against
 # a Linux example app started with:
@@ -37,7 +37,7 @@
 # (46.0.0 or newer, linked against OpenSSL 3.5 or newer);
 #
 #   python3 src/python_testing/TC_DA_1_10.py --commissioning-method on-network \
-#       --discriminator 3840 --passcode 20202021 \
+#       --discriminator 1234 --passcode 20202021 \
 #       --paa-trust-store-path <directory holding the legacy and ML-DSA PAA .der files>
 
 import logging
@@ -69,7 +69,7 @@ class TC_DA_1_10(MatterBaseTest):
         return [
             TestStep(0, "Commission DUT to TH", is_commissioning=True),
             TestStep(1, "TH reads the Operational Credentials Cluster FeatureMap attribute from the DUT.",
-                     "TH verifies that the PQCDeviceAttestation feature bit is set."),
+                     "TH verifies that the PQCDA feature bit is set."),
             TestStep(2, "TH reads the PQCDeviceAttestationProfile attribute from the DUT.",
                      "TH stores the advertised profile sets as paaProfiles, paiProfiles and dacProfiles."),
             TestStep(3, "TH selects the highest-security profile in paaProfiles and stores it as selectedPAAProfile. "
@@ -146,7 +146,7 @@ class TC_DA_1_10(MatterBaseTest):
     async def _retrieve_legacy_certificate(self, certificate_type, document_name: str) -> bytes:
         """Send a legacy CertificateChainRequest carrying only CertificateType.
 
-        A DUT that signals PQCDeviceAttestation rejects a request that omits CryptoProfile but
+        A DUT that signals PQCDA rejects a request that omits CryptoProfile but
         supplies SegmentID or MaxSegmentSize, so all three optional fields are left unset.
         """
         opcreds = Clusters.OperationalCredentials
@@ -183,13 +183,13 @@ class TC_DA_1_10(MatterBaseTest):
         feature_map = await self.read_single_attribute_check_success(
             cluster=opcreds, attribute=opcreds.Attributes.FeatureMap, endpoint=self.root_endpoint)
         asserts.assert_true(feature_map & OperationalCredentialsFeature.kPQCDeviceAttestation,
-                            f"DUT FeatureMap (0x{feature_map:08X}) does not have PQCDeviceAttestation set")
+                            f"DUT FeatureMap (0x{feature_map:08X}) does not have PQCDA set")
 
         self.step(2)
         attestation_profile = await self.read_single_attribute_check_success(
             cluster=opcreds, attribute=opcreds.Attributes.PQCDeviceAttestationProfile, endpoint=self.root_endpoint)
         asserts.assert_is_not_none(attestation_profile,
-                                   "DUT signals PQCDeviceAttestation but does not expose PQCDeviceAttestationProfile")
+                                   "DUT signals PQCDA but does not expose PQCDeviceAttestationProfile")
         paa_profiles = attestation_profile.PAASupportedProfiles
         pai_profiles = attestation_profile.PAISupportedProfiles
         dac_profiles = attestation_profile.DACSupportedProfiles
