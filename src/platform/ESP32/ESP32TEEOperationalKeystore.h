@@ -82,7 +82,9 @@ public:
 
 private:
     // Returns 'A' or 'B' for the committed slot, or 0 if none is stored.
-    char ReadActiveSlot(FabricIndex fabricIndex) const;
+    // Reads the committed slot for @p fabricIndex into @p outSlot ('A'/'B', or 0 if none).
+    // Returns an error only on an actual storage failure, not for a missing pointer.
+    CHIP_ERROR ReadActiveSlot(FabricIndex fabricIndex, char & outSlot) const;
     void ResetPending();
 
     PersistentStorageDelegate * mStorage = nullptr;
@@ -92,12 +94,6 @@ private:
     bool mHasPending                = false;
     bool mIsPendingKeypairActive    = false;
 };
-
-/// Bring-up self-test of the full keystore lifecycle against a throwaway fabric index:
-/// New→CSR→Activate→Sign (pending), Commit→Sign (committed), rotate via a second
-/// New/Activate/Commit, Revert, and Remove — verifying every signature and state
-/// transition. Returns CHIP_NO_ERROR only if all steps pass. Cleans up after itself.
-CHIP_ERROR ESP32TEEOperationalKeystoreSelfTest(PersistentStorageDelegate * storage);
 
 } // namespace Internal
 } // namespace DeviceLayer

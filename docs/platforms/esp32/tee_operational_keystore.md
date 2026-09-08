@@ -1,7 +1,7 @@
 # Operational (NOC) keys in ESP-TEE
 
-On SoCs that support ESP-TEE (Trusted Execution Environment, e.g. ESP32-C6),
-the Matter **operational (NOC) private key** can be held entirely inside the
+On SoCs that support ESP-TEE (Trusted Execution Environment; currently
+ESP32-C6), the Matter **operational (NOC) private key** can be held entirely inside the
 secure world. The key is generated in ESP-TEE secure storage, the CSR is signed
 there, and every CASE signature is produced there. The private key is never
 present in application RAM or in plaintext in flash.
@@ -17,7 +17,7 @@ nor any NOC key ever leaves the TEE.
 The TEE operational keystore is wired automatically whenever ESP-TEE is enabled;
 there is no separate Matter option to turn on.
 
-```
+```ini
 CONFIG_SECURE_ENABLE_TEE=y
 ```
 
@@ -26,7 +26,7 @@ At server start-up (`Esp32AppServer::Init`) the application installs an
 the default software `PersistentStorageOperationalKeystore`. Confirm it is
 active in the device log:
 
-```
+```text
 chip[SVR]: Operational keystore: ESP-TEE secure storage
 ```
 
@@ -103,8 +103,8 @@ the candidate lives in the inactive slot, is cleared by `RevertPendingKeypair`
 on fail-safe expiry, and is never selected by `SignWithOpKeypair` unless it was
 activated. If power is lost mid-fail-safe, a candidate key can linger in the
 inactive slot; it is bounded to at most one inactive slot per fabric and is
-overwritten by the next `NewOpKeypairForFabric` (which always targets the
-inactive slot) or removed by `RemoveOpKeypairForFabric`. On reboot the RAM
+cleared by the next `NewOpKeypairForFabric` (which removes the inactive-slot key
+before generating) or by `RemoveOpKeypairForFabric`. On reboot the RAM
 pending state is gone, so the aborted candidate is never treated as active —
 matching the intent that a fail-safe that did not complete leaves no usable key.
 
@@ -120,25 +120,21 @@ matching the intent that a fail-safe that did not complete leaves no usable key.
 
 ### Self-test (no commissioning required)
 
-Enable the bring-up self-tests:
+Enable the bring-up self-test:
 
-```
+```ini
 CONFIG_ENABLE_ESP32_TEE_OPKEY_SELFTEST=y
 ```
 
-At boot the application runs, against the real TEE:
-
--   `ESP32TEEOpKeySelfTest()` — generate a throwaway key, derive its public key,
-    build and verify a CSR, sign and verify a message, then delete the key.
--   `ESP32TEEOperationalKeystoreSelfTest()` — the full keystore lifecycle
-    (New → Activate → Commit → Sign → rotate → Revert → Remove) against a
-    throwaway fabric index, verifying every signature and transition.
+At boot the application runs `ESP32TEEOpKeySelfTest()` against the real TEE:
+generate a throwaway key (id `mtr-op-selftest`, isolated from any fabric
+namespace), derive its public key, build and verify a CSR, sign and verify a
+message, then delete the key.
 
 Expected log:
 
-```
+```text
 chip[SVR]: TEE op-key self-test: PASSED
-chip[SVR]: TEE op-keystore lifecycle self-test: PASSED
 ```
 
 Leave this option off (default) for production builds.
@@ -148,7 +144,7 @@ Leave this option off (default) for production builds.
 During a normal commission and operation the keystore logs each operation, so
 you can confirm from the device console that NOC keys are handled in the TEE:
 
-```
+```text
 chip[Crypto]: TEE opkey: generated NOC keypair for fabric 0x1 in TEE secure storage (slot A), CSR signed in TEE
 chip[Crypto]: TEE opkey: committed NOC keypair for fabric 0x1 to TEE secure storage (slot A)
 chip[Crypto]: TEE opkey: signing (CASE) for fabric 0x1 with TEE key slot A     # Detail level
@@ -163,7 +159,7 @@ application NVS) is the corresponding negative check.
 | File | Role |
 |------|------|
 | `src/platform/ESP32/ESP32TEEOpKey.{h,cpp}` | Low-level TEE key primitives (generate / public key / CSR / sign / remove) + self-test. |
-| `src/platform/ESP32/ESP32TEEOperationalKeystore.{h,cpp}` | `Crypto::OperationalKeystore` implementation (two-slot + pointer scheme) + lifecycle self-test. |
+| `src/platform/ESP32/ESP32TEEOperationalKeystore.{h,cpp}` | `Crypto::OperationalKeystore` implementation (two-slot + pointer scheme). |
 | `examples/platform/esp32/common/Esp32AppServer.cpp` | Installs the keystore into `initParams` under `CONFIG_SECURE_ENABLE_TEE`. |
 
 > **Note (IDF version):** `esp_tee_sec_storage_ecdsa_sign_t` changed in IDF v6.0

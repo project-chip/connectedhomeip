@@ -15,19 +15,15 @@
  *    limitations under the License.
  */
 
+// The feature depends only on ESP-TEE secure storage: keys are generated there and all
+// private-key operations (CSR self-signature, CASE signatures) use the raw secure-storage
+// ECDSA sign primitive. It deliberately avoids the mbedTLS TEE-pk wrapper. These sources are
+// compiled only when chip_enable_esp32_tee (set from CONFIG_SECURE_ENABLE_TEE) is set.
+
 #include <platform/ESP32/ESP32TEEOpKey.h>
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-
-#include <esp_log.h>
-
-#define TAG "tee_opkey"
-
-// The feature depends only on ESP-TEE secure storage: keys are generated there and all
-// private-key operations (CSR self-signature, CASE signatures) use the raw secure-storage
-// ECDSA sign primitive. It deliberately avoids the mbedTLS TEE-pk wrapper.
-#if defined(CONFIG_SECURE_ENABLE_TEE)
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <esp_idf_version.h>
 #include <esp_tee_sec_storage.h>
@@ -58,7 +54,7 @@ CHIP_ERROR ESP32TEEOpKeyGenerate(const char * keyId)
     VerifyOrReturnError(keyId != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     esp_tee_sec_storage_key_cfg_t cfg = MakeKeyCfg(keyId);
     esp_err_t err                     = esp_tee_sec_storage_gen_key(&cfg);
-    VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL, ESP_LOGE(TAG, "gen_key(%s) failed: %d", keyId, err));
+    VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL, ChipLogError(Crypto, "gen_key(%s) failed: %d", keyId, err));
     return CHIP_NO_ERROR;
 }
 
@@ -69,7 +65,7 @@ CHIP_ERROR ESP32TEEOpKeyGetPublicKey(const char * keyId, Crypto::P256PublicKey &
     esp_tee_sec_storage_key_cfg_t cfg     = MakeKeyCfg(keyId);
     esp_tee_sec_storage_ecdsa_pubkey_t pk = {};
     esp_err_t err                         = esp_tee_sec_storage_ecdsa_get_pubkey(&cfg, &pk);
-    VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INVALID_KEY_ID, ESP_LOGE(TAG, "get_pubkey(%s) failed: %d", keyId, err));
+    VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INVALID_KEY_ID, ChipLogError(Crypto, "get_pubkey(%s) failed: %d", keyId, err));
 
     // P256PublicKey holds the uncompressed point: 0x04 || X || Y.
     uint8_t * dst = outPublicKey.Bytes();
@@ -81,8 +77,9 @@ CHIP_ERROR ESP32TEEOpKeyGetPublicKey(const char * keyId, Crypto::P256PublicKey &
 
 namespace {
 
-// Minimal DER INTEGER encoding of a 32-byte big-endian value into @p out (needs >= 34 bytes).
-// Strips leading zero bytes and prepends 0x00 when the top bit is set, so the value stays positive.
+// Minimal DER INTEGER encoding of a 32-byte big-endian value into @p out (needs >= 35 bytes:
+// tag + length + optional 0x00 sign-padding + up to 32 magnitude bytes). Strips leading zero
+// bytes and prepends 0x00 when the top bit is set, so the value stays positive.
 size_t EncodeDerInteger(const uint8_t * val, uint8_t * out)
 {
     size_t i = 0;
@@ -155,14 +152,15 @@ CHIP_ERROR ESP32TEEOpKeyNewCSR(const char * keyId, MutableByteSpan & outCsr)
     VerifyOrReturnError(rawSig.Length() == 2 * kP256FieldLength, CHIP_ERROR_INTERNAL);
 
     // signature: BIT STRING wrapping ECDSA-Sig-Value ::= SEQUENCE { INTEGER r, INTEGER s }.
-    uint8_t rEnc[kP256FieldLength + 2];
-    uint8_t sEnc[kP256FieldLength + 2];
+    // A DER INTEGER for a 32-byte value can be up to 35 bytes (tag + len + sign pad + 32).
+    uint8_t rEnc[kP256FieldLength + 3];
+    uint8_t sEnc[kP256FieldLength + 3];
     const size_t rl     = EncodeDerInteger(rawSig.ConstBytes(), rEnc);
     const size_t sl     = EncodeDerInteger(rawSig.ConstBytes() + kP256FieldLength, sEnc);
     const size_t seqLen = rl + sl;
     VerifyOrReturnError(seqLen < 0x80, CHIP_ERROR_INTERNAL);
 
-    uint8_t sig[8 + 2 * (kP256FieldLength + 2)];
+    uint8_t sig[8 + 2 * (kP256FieldLength + 3)];
     size_t b = 0;
     sig[b++] = 0x03;                                 // BIT STRING
     sig[b++] = static_cast<uint8_t>(seqLen + 2 + 1); // SEQUENCE header (2) + unused-bits byte (1)
@@ -208,7 +206,7 @@ CHIP_ERROR ESP32TEEOpKeySign(const char * keyId, ByteSpan message, Crypto::P256E
     esp_tee_sec_storage_key_cfg_t cfg    = MakeKeyCfg(keyId);
     esp_tee_sec_storage_ecdsa_sign_t sig = {};
     esp_err_t err                        = esp_tee_sec_storage_ecdsa_sign(&cfg, digest, sizeof(digest), &sig);
-    VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL, ESP_LOGE(TAG, "ecdsa_sign(%s) failed: %d", keyId, err));
+    VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL, ChipLogError(Crypto, "ecdsa_sign(%s) failed: %d", keyId, err));
 
     // P256ECDSASignature is the raw R || S (2 * 32 bytes). IDF v6.0 merged the separate
     // sign_r/sign_s fields into a single signature[] holding R||S packed at the field length.
@@ -227,17 +225,7 @@ CHIP_ERROR ESP32TEEOpKeyRemove(const char * keyId)
     esp_err_t err = esp_tee_sec_storage_clear_key(keyId);
     // Treat "not present" as success so Remove is idempotent.
     VerifyOrReturnError(err == ESP_OK || err == ESP_ERR_NOT_FOUND, CHIP_ERROR_INTERNAL,
-                        ESP_LOGE(TAG, "clear_key(%s) failed: %d", keyId, err));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ESP32TEEOpKeyExists(const char * keyId, bool & outExists)
-{
-    VerifyOrReturnError(keyId != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    // Secure storage has no public "exists" API; probe by reading the public key.
-    esp_tee_sec_storage_key_cfg_t cfg     = MakeKeyCfg(keyId);
-    esp_tee_sec_storage_ecdsa_pubkey_t pk = {};
-    outExists                             = (esp_tee_sec_storage_ecdsa_get_pubkey(&cfg, &pk) == ESP_OK);
+                        ChipLogError(Crypto, "clear_key(%s) failed: %d", keyId, err));
     return CHIP_NO_ERROR;
 }
 
@@ -246,7 +234,7 @@ CHIP_ERROR ESP32TEEOpKeySelfTest()
     static const char * kId = "mtr-op-selftest";
     CHIP_ERROR err          = CHIP_NO_ERROR;
 
-    (void) ESP32TEEOpKeyRemove(kId); // start clean, best-effort
+    LogErrorOnFailure(ESP32TEEOpKeyRemove(kId)); // start clean, best-effort
 
     Crypto::P256PublicKey pub;
     uint8_t csrBuf[Crypto::kMIN_CSR_Buffer_Size];
@@ -255,71 +243,29 @@ CHIP_ERROR ESP32TEEOpKeySelfTest()
     Crypto::P256ECDSASignature sig;
     const uint8_t msg[] = "esp-tee-op-key-selftest";
 
-    VerifyOrExit((err = ESP32TEEOpKeyGenerate(kId)) == CHIP_NO_ERROR, ESP_LOGE(TAG, "selftest: gen failed"));
-    VerifyOrExit((err = ESP32TEEOpKeyGetPublicKey(kId, pub)) == CHIP_NO_ERROR, ESP_LOGE(TAG, "selftest: pubkey failed"));
+    VerifyOrExit((err = ESP32TEEOpKeyGenerate(kId)) == CHIP_NO_ERROR, ChipLogError(Crypto, "selftest: gen failed"));
+    VerifyOrExit((err = ESP32TEEOpKeyGetPublicKey(kId, pub)) == CHIP_NO_ERROR, ChipLogError(Crypto, "selftest: pubkey failed"));
 
     // Raw TEE sign path (this is what CASE / SignWithOpKeypair uses) — test it first.
     VerifyOrExit((err = ESP32TEEOpKeySign(kId, ByteSpan(msg, sizeof(msg)), sig)) == CHIP_NO_ERROR,
-                 ESP_LOGE(TAG, "selftest: sign failed"));
+                 ChipLogError(Crypto, "selftest: sign failed"));
     VerifyOrExit((err = pub.ECDSA_validate_msg_signature(msg, sizeof(msg), sig)) == CHIP_NO_ERROR,
-                 ESP_LOGE(TAG, "selftest: signature verify failed"));
-    ESP_LOGI(TAG, "selftest: sign+verify OK");
+                 ChipLogError(Crypto, "selftest: signature verify failed"));
+    ChipLogProgress(Crypto, "selftest: sign+verify OK");
 
-    VerifyOrExit((err = ESP32TEEOpKeyNewCSR(kId, csr)) == CHIP_NO_ERROR, ESP_LOGE(TAG, "selftest: CSR failed"));
+    VerifyOrExit((err = ESP32TEEOpKeyNewCSR(kId, csr)) == CHIP_NO_ERROR, ChipLogError(Crypto, "selftest: CSR failed"));
     // Verifies the CSR self-signature AND recovers the embedded public key.
     VerifyOrExit((err = Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), csrPub)) == CHIP_NO_ERROR,
-                 ESP_LOGE(TAG, "selftest: CSR verify failed"));
-    VerifyOrExit(csrPub.Matches(pub), err = CHIP_ERROR_INTERNAL; ESP_LOGE(TAG, "selftest: CSR pubkey mismatch"));
+                 ChipLogError(Crypto, "selftest: CSR verify failed"));
+    VerifyOrExit(csrPub.Matches(pub), err = CHIP_ERROR_INTERNAL; ChipLogError(Crypto, "selftest: CSR pubkey mismatch"));
 
-    ESP_LOGI(TAG, "TEE operational-key self-test PASSED (gen/pubkey/sign/CSR all verified in TEE)");
+    ChipLogProgress(Crypto, "TEE operational-key self-test PASSED (gen/pubkey/sign/CSR all verified in TEE)");
 
 exit:
-    (void) ESP32TEEOpKeyRemove(kId); // best-effort cleanup
+    LogErrorOnFailure(ESP32TEEOpKeyRemove(kId)); // best-effort cleanup
     return err;
 }
 
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#else // feature disabled
-
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-
-CHIP_ERROR ESP32TEEOpKeyGenerate(const char *)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-CHIP_ERROR ESP32TEEOpKeyGetPublicKey(const char *, Crypto::P256PublicKey &)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-CHIP_ERROR ESP32TEEOpKeyNewCSR(const char *, MutableByteSpan &)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-CHIP_ERROR ESP32TEEOpKeySign(const char *, ByteSpan, Crypto::P256ECDSASignature &)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-CHIP_ERROR ESP32TEEOpKeyRemove(const char *)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-CHIP_ERROR ESP32TEEOpKeyExists(const char *, bool & outExists)
-{
-    outExists = false;
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-CHIP_ERROR ESP32TEEOpKeySelfTest()
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-} // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
-
-#endif // CONFIG_SECURE_ENABLE_TEE

@@ -51,9 +51,6 @@ CHIP_ERROR ESP32TEEOpKeySign(const char * keyId, ByteSpan message, Crypto::P256E
 /// Delete the TEE-stored key @p keyId from secure storage. Not-found is treated as success.
 CHIP_ERROR ESP32TEEOpKeyRemove(const char * keyId);
 
-/// Return whether a key with id @p keyId currently exists in TEE secure storage.
-CHIP_ERROR ESP32TEEOpKeyExists(const char * keyId, bool & outExists);
-
 /// Self-check: generate a throwaway key, derive its public key, build+verify a CSR,
 /// sign+verify a message, then delete the key. Returns CHIP_NO_ERROR only if every
 /// step and cryptographic verification passes. Safe to call at boot for bring-up.

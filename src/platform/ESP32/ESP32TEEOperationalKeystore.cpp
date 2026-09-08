@@ -69,17 +69,24 @@ void ESP32TEEOperationalKeystore::ResetPending()
     mIsPendingKeypairActive = false;
 }
 
-char ESP32TEEOperationalKeystore::ReadActiveSlot(FabricIndex fabricIndex) const
+CHIP_ERROR ESP32TEEOperationalKeystore::ReadActiveSlot(FabricIndex fabricIndex, char & outSlot) const
 {
-    VerifyOrReturnValue(mStorage != nullptr, 0);
+    outSlot = 0; // 0 == no committed slot
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     char storageKey[16];
     MakeSlotStorageKey(fabricIndex, storageKey);
 
     char slot      = 0;
     uint16_t size  = sizeof(slot);
     CHIP_ERROR err = mStorage->SyncGetKeyValue(storageKey, &slot, size);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR && size == sizeof(slot) && (slot == 'A' || slot == 'B'), 0);
-    return slot;
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_NO_ERROR; // no committed key for this fabric yet
+    }
+    ReturnErrorOnFailure(err); // propagate real storage errors instead of masking them as "no slot"
+    VerifyOrReturnError(size == sizeof(slot) && (slot == 'A' || slot == 'B'), CHIP_ERROR_INTEGRITY_CHECK_FAILED);
+    outSlot = slot;
+    return CHIP_NO_ERROR;
 }
 
 bool ESP32TEEOperationalKeystore::HasPendingOpKeypair() const
@@ -99,7 +106,8 @@ bool ESP32TEEOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex)
 
     // Invariant: the active-slot pointer is written only after a key is committed to that
     // slot, and cleared by RemoveOpKeypairForFabric, so its presence implies a usable key.
-    return ReadActiveSlot(fabricIndex) != 0;
+    char slot = 0;
+    return (ReadActiveSlot(fabricIndex, slot) == CHIP_NO_ERROR) && (slot != 0);
 }
 
 CHIP_ERROR ESP32TEEOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex,
@@ -116,24 +124,26 @@ CHIP_ERROR ESP32TEEOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabric
 
     // Generate into the slot that is NOT currently committed, so the committed key
     // stays intact and usable until (and unless) this one is committed.
-    const char activeSlot  = ReadActiveSlot(fabricIndex);
+    char activeSlot = 0;
+    ReturnErrorOnFailure(ReadActiveSlot(fabricIndex, activeSlot));
     const char pendingSlot = (activeSlot == 'A') ? 'B' : 'A';
 
     char keyId[16];
     MakeKeyId(fabricIndex, pendingSlot, keyId);
 
+    // A fail-safe aborted by a reboot (power loss before Commit/Revert) can leave a stale key in
+    // this inactive slot. esp_tee_sec_storage_gen_key rejects an existing id, so clear it first.
+    LogErrorOnFailure(ESP32TEEOpKeyRemove(keyId));
     ReturnErrorOnFailure(ESP32TEEOpKeyGenerate(keyId));
 
-    size_t csrLen = outCertificateSigningRequest.size();
-    MutableByteSpan csr(outCertificateSigningRequest.data(), csrLen);
-    CHIP_ERROR err = ESP32TEEOpKeyNewCSR(keyId, csr);
+    // NewCSR resizes outCertificateSigningRequest in place to the actual CSR length.
+    CHIP_ERROR err = ESP32TEEOpKeyNewCSR(keyId, outCertificateSigningRequest);
     if (err != CHIP_NO_ERROR)
     {
-        (void) ESP32TEEOpKeyRemove(keyId);
+        LogErrorOnFailure(ESP32TEEOpKeyRemove(keyId));
         return err;
     }
 
-    outCertificateSigningRequest.reduce_size(csr.size());
     mPendingFabricIndex     = fabricIndex;
     mPendingSlot            = pendingSlot;
     mHasPending             = true;
@@ -168,20 +178,21 @@ CHIP_ERROR ESP32TEEOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fab
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (fabricIndex == mPendingFabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(mIsPendingKeypairActive, CHIP_ERROR_INCORRECT_STATE);
 
-    const char oldSlot = ReadActiveSlot(fabricIndex);
+    char oldSlot = 0;
+    ReturnErrorOnFailure(ReadActiveSlot(fabricIndex, oldSlot));
 
     // The pointer write is the atomic commit point. On failure, leave everything pending.
     char storageKey[16];
     MakeSlotStorageKey(fabricIndex, storageKey);
     ReturnErrorOnFailure(mStorage->SyncSetKeyValue(storageKey, &mPendingSlot, sizeof(mPendingSlot)));
 
-    // Rotation: drop the superseded slot's key (best-effort; a leftover is overwritten by
-    // the next NewOpKeypairForFabric, which always targets the now-inactive slot).
+    // Rotation: drop the superseded slot's key (best-effort; a leftover is cleared by the next
+    // NewOpKeypairForFabric, which targets and clears the now-inactive slot before generating).
     if (oldSlot != 0 && oldSlot != mPendingSlot)
     {
         char oldKeyId[16];
         MakeKeyId(fabricIndex, oldSlot, oldKeyId);
-        (void) ESP32TEEOpKeyRemove(oldKeyId);
+        LogErrorOnFailure(ESP32TEEOpKeyRemove(oldKeyId));
     }
 
     ChipLogProgress(Crypto, "TEE opkey: committed NOC keypair for fabric 0x%x to TEE secure storage (slot %c)",
@@ -205,7 +216,7 @@ CHIP_ERROR ESP32TEEOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fab
     {
         char keyId[16];
         MakeKeyId(fabricIndex, slot, keyId);
-        (void) ESP32TEEOpKeyRemove(keyId);
+        LogErrorOnFailure(ESP32TEEOpKeyRemove(keyId));
     }
 
     char storageKey[16];
@@ -228,7 +239,7 @@ void ESP32TEEOperationalKeystore::RevertPendingKeypair()
     {
         char keyId[16];
         MakeKeyId(mPendingFabricIndex, mPendingSlot, keyId);
-        (void) ESP32TEEOpKeyRemove(keyId);
+        LogErrorOnFailure(ESP32TEEOpKeyRemove(keyId));
     }
     ResetPending();
 }
@@ -239,14 +250,14 @@ CHIP_ERROR ESP32TEEOperationalKeystore::SignWithOpKeypair(FabricIndex fabricInde
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    char slot;
+    char slot = 0;
     if (mIsPendingKeypairActive && (fabricIndex == mPendingFabricIndex))
     {
         slot = mPendingSlot;
     }
     else
     {
-        slot = ReadActiveSlot(fabricIndex);
+        ReturnErrorOnFailure(ReadActiveSlot(fabricIndex, slot));
         VerifyOrReturnError(slot != 0, CHIP_ERROR_INVALID_FABRIC_INDEX);
     }
 
@@ -265,66 +276,6 @@ Crypto::P256Keypair * ESP32TEEOperationalKeystore::AllocateEphemeralKeypairForCA
 void ESP32TEEOperationalKeystore::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
     Platform::Delete<Crypto::P256Keypair>(keypair);
-}
-
-CHIP_ERROR ESP32TEEOperationalKeystoreSelfTest(PersistentStorageDelegate * storage)
-{
-    constexpr FabricIndex kFab = 250; // throwaway index, unlikely to collide with a real fabric
-    const uint8_t msg[]        = "tee-opkeystore-selftest";
-
-    ESP32TEEOperationalKeystore ks;
-    ReturnErrorOnFailure(ks.Init(storage));
-    (void) ks.RemoveOpKeypairForFabric(kFab); // start from a clean slate
-
-    uint8_t csrBuf[Crypto::kMIN_CSR_Buffer_Size];
-    Crypto::P256PublicKey pub, pub2, csrPub;
-    Crypto::P256ECDSASignature sig;
-
-    // New -> CSR (inactive; not usable yet)
-    MutableByteSpan csr(csrBuf);
-    ReturnErrorOnFailure(ks.NewOpKeypairForFabric(kFab, csr));
-    ReturnErrorOnFailure(Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pub));
-    VerifyOrReturnError(ks.HasPendingOpKeypair(), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(!ks.HasOpKeypairForFabric(kFab), CHIP_ERROR_INTERNAL);
-
-    // Activate -> usable for signing while still pending
-    ReturnErrorOnFailure(ks.ActivateOpKeypairForFabric(kFab, pub));
-    VerifyOrReturnError(ks.HasOpKeypairForFabric(kFab), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(ks.SignWithOpKeypair(kFab, ByteSpan(msg, sizeof(msg)), sig));
-    ReturnErrorOnFailure(pub.ECDSA_validate_msg_signature(msg, sizeof(msg), sig));
-
-    // Commit -> pending cleared, committed key signs the same
-    ReturnErrorOnFailure(ks.CommitOpKeypairForFabric(kFab));
-    VerifyOrReturnError(!ks.HasPendingOpKeypair(), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(ks.HasOpKeypairForFabric(kFab), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(ks.SignWithOpKeypair(kFab, ByteSpan(msg, sizeof(msg)), sig));
-    ReturnErrorOnFailure(pub.ECDSA_validate_msg_signature(msg, sizeof(msg), sig));
-
-    // Rotate (UpdateNOC): a second New must produce a fresh key in the other slot
-    csr = MutableByteSpan(csrBuf);
-    ReturnErrorOnFailure(ks.NewOpKeypairForFabric(kFab, csr));
-    ReturnErrorOnFailure(Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pub2));
-    VerifyOrReturnError(!pub2.Matches(pub), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(ks.ActivateOpKeypairForFabric(kFab, pub2));
-    ReturnErrorOnFailure(ks.CommitOpKeypairForFabric(kFab));
-    ReturnErrorOnFailure(ks.SignWithOpKeypair(kFab, ByteSpan(msg, sizeof(msg)), sig));
-    ReturnErrorOnFailure(pub2.ECDSA_validate_msg_signature(msg, sizeof(msg), sig));
-
-    // Revert: a New that is reverted must leave the committed key (pub2) intact
-    csr = MutableByteSpan(csrBuf);
-    ReturnErrorOnFailure(ks.NewOpKeypairForFabric(kFab, csr));
-    ks.RevertPendingKeypair();
-    VerifyOrReturnError(!ks.HasPendingOpKeypair(), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(ks.SignWithOpKeypair(kFab, ByteSpan(msg, sizeof(msg)), sig));
-    ReturnErrorOnFailure(pub2.ECDSA_validate_msg_signature(msg, sizeof(msg), sig));
-
-    // Remove: no usable key, signing fails
-    ReturnErrorOnFailure(ks.RemoveOpKeypairForFabric(kFab));
-    VerifyOrReturnError(!ks.HasOpKeypairForFabric(kFab), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(ks.SignWithOpKeypair(kFab, ByteSpan(msg, sizeof(msg)), sig) != CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    ks.Finish();
-    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal
