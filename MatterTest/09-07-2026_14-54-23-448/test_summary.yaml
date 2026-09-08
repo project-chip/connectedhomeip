@@ -1,0 +1,31 @@
+---
+Requested Tests:
+- test_endpoints
+Type: TestNameList
+...
+---
+Begin Time: 1788818063646
+Details: null
+End Time: 1788818063647
+Extra Errors: {}
+Extras: null
+Parent: null
+Result: PASS
+Retry Parent: null
+Signature: test_endpoints-1788818063646
+Stacktrace: null
+Termination Signal Type: null
+Test Class: TestDecorators
+Test Name: test_endpoints
+Type: Record
+UID: null
+...
+---
+Error: 0
+Executed: 1
+Failed: 0
+Passed: 1
+Requested: 1
+Skipped: 0
+Type: Summary
+...

@@ -1,0 +1,41 @@
+---
+Requested Tests:
+- test_fail_on_ep0
+Type: TestNameList
+...
+---
+Begin Time: 1788818067480
+Details: Expected failure
+End Time: 1788818067492
+Extra Errors: {}
+Extras: null
+Parent: null
+Result: FAIL
+Retry Parent: null
+Signature: test_fail_on_ep0-1788818067480
+Stacktrace: "Traceback (most recent call last):\n  File \"/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/mobly/base_test.py\"\
+    , line 801, in exec_one_test\n    test_method()\n  File \"/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/matter/testing/decorators.py\"\
+    , line 389, in per_endpoint_runner\n    test_instance.event_loop.run_until_complete(asyncio.wait_for(\n\
+    \  File \"/usr/lib/python3.12/asyncio/base_events.py\", line 687, in run_until_complete\n\
+    \    return future.result()\n           ^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/asyncio/tasks.py\"\
+    , line 520, in wait_for\n    return await fut\n           ^^^^^^^^^\n  File \"\
+    /home/ubuntu/connectedhomeip/src/python_testing/test_testing/TestDecorators.py\"\
+    , line 235, in test_fail_on_ep0\n    asserts.fail(\"Expected failure\")\n  File\
+    \ \"/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/mobly/asserts.py\"\
+    , line 441, in fail\n    raise signals.TestFailure(msg, extras)\nmobly.signals.TestFailure:\
+    \ Details=Expected failure, Extras=None\n"
+Termination Signal Type: TestFailure
+Test Class: TestDecorators
+Test Name: test_fail_on_ep0
+Type: Record
+UID: null
+...
+---
+Error: 0
+Executed: 1
+Failed: 1
+Passed: 0
+Requested: 1
+Skipped: 0
+Type: Summary
+...

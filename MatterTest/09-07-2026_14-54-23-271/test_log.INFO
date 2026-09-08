@@ -1,0 +1,41 @@
+09-07 14:54:23.271 INFO ==========> TestDecorators <==========
+09-07 14:54:23.272 INFO Reading XML clusters from Path('/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/matter/testing/data_model/1.6/allfiles.zip', 'clusters/')
+09-07 14:54:23.445 INFO [Test] test_all_of
+09-07 14:54:23.446 INFO ***** Test Step 1 : Run entire test
+09-07 14:54:23.446 INFO Wildcard subscription shut down
+09-07 14:54:23.446 INFO [Test] test_all_of PASS
+09-07 14:54:23.446 INFO [CLN] No DUT baseline captured during this class run; skipping DUT cleanup. If a commissioned DUT was expected, likely causes: the DUT was unreachable, or it needed more time to establish a CASE session.
+09-07 14:54:23.447 INFO ===== EXECUTION FLAGS SUMMARY BEGIN =====
+09-07 14:54:23.447 INFO Config values:
+09-07 14:54:23.447 INFO   - admin_vendor_id: 65521
+09-07 14:54:23.447 INFO   - app_pid: 0
+09-07 14:54:23.447 INFO   - commission_only: False
+09-07 14:54:23.447 INFO   - commission_only_re_open_window: False
+09-07 14:54:23.447 INFO   - controller_cat_tags: [65537]
+09-07 14:54:23.447 INFO   - controller_node_id: 112233
+09-07 14:54:23.447 INFO   - debug: False
+09-07 14:54:23.447 INFO   - dut_node_ids: [1]
+09-07 14:54:23.447 INFO   - fabric_id: 1
+09-07 14:54:23.447 INFO   - fail_on_skipped_tests: False
+09-07 14:54:23.447 INFO   - legacy: False
+09-07 14:54:23.447 INFO   - logs_path: '.'
+09-07 14:54:23.447 INFO   - maximize_cert_chains: True
+09-07 14:54:23.447 INFO   - no_wildcard_subscription: False
+09-07 14:54:23.447 INFO   - root_of_trust_index: 1
+09-07 14:54:23.447 INFO   - storage_path: 'kvs_admin.json'
+09-07 14:54:23.447 INFO   - tests: ['test_all_of']
+09-07 14:54:23.447 INFO 
+
+Named args:
+09-07 14:54:23.447 INFO   - certificate_authority_manager: 'afcbb10e-ab06-11f1-9824-00155d26459a'
+09-07 14:54:23.447 INFO   - default_controller: 'afcbb0be-ab06-11f1-8fe1-00155d26459a'
+09-07 14:54:23.447 INFO   - hooks: 'afcbb0f4-ab06-11f1-9205-00155d26459a'
+09-07 14:54:23.447 INFO   - matter_stack: 'afcbb047-ab06-11f1-a4b7-00155d26459a'
+09-07 14:54:23.447 INFO   - matter_test_config: 'afcbb0df-ab06-11f1-b038-00155d26459a'
+09-07 14:54:23.447 INFO ===== EXECUTION FLAGS SUMMARY END =====
+09-07 14:54:23.447 INFO Summary for test class TestDecorators: Error 0, Executed 1, Failed 0, Passed 1, Requested 1, Skipped 0
+09-07 14:54:23.447 INFO Summary for test run MatterTest@09-07-2026_14-54-23-271:
+Total time elapsed 0.1760753159996966s
+Artifacts are saved in "./MatterTest/09-07-2026_14-54-23-271"
+Test summary saved in "./MatterTest/09-07-2026_14-54-23-271/test_summary.yaml"
+Test results: Error 0, Executed 1, Failed 0, Passed 1, Requested 1, Skipped 0

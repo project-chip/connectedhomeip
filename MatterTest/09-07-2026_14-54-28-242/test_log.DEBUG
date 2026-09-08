@@ -1,0 +1,68 @@
+09-07 14:54:28.243 DEBUG Test output folder: "./MatterTest/09-07-2026_14-54-28-242"
+09-07 14:54:28.243 DEBUG Executing test class "TestDecorators" with config: {'controller_configs': {},
+ 'log_path': './MatterTest/09-07-2026_14-54-28-242',
+ 'test_bed_name': None,
+ 'test_class_name_suffix': None,
+ 'testbed_name': 'MatterTest',
+ 'user_params': {'certificate_authority_manager': 'b2c24850-ab06-11f1-be1c-00155d26459a',
+                 'default_controller': 'b2c24805-ab06-11f1-9ba1-00155d26459a',
+                 'hooks': 'b2c2483a-ab06-11f1-a305-00155d26459a',
+                 'matter_stack': 'b2c24791-ab06-11f1-98cb-00155d26459a',
+                 'matter_test_config': 'b2c24826-ab06-11f1-8738-00155d26459a'}}
+09-07 14:54:28.243 DEBUG [TestDecorators]#pre_run >>> BEGIN >>>
+09-07 14:54:28.243 DEBUG [TestDecorators]#pre_run <<< END <<<
+09-07 14:54:28.243 INFO ==========> TestDecorators <==========
+09-07 14:54:28.243 DEBUG [TestDecorators]#setup_class >>> BEGIN >>>
+09-07 14:54:28.244 INFO Reading XML clusters from Path('/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/matter/testing/data_model/1.6/allfiles.zip', 'clusters/')
+09-07 14:54:28.438 DEBUG [TestDecorators]#setup_class <<< END <<<
+09-07 14:54:28.438 INFO [Test] test_run_on_singleton_matching_endpoint
+09-07 14:54:28.438 DEBUG [test_run_on_singleton_matching_endpoint]#setup_test >>> BEGIN >>>
+09-07 14:54:28.438 INFO ***** Test Step 1 : Run entire test
+09-07 14:54:28.438 DEBUG [test_run_on_singleton_matching_endpoint]#setup_test <<< END <<<
+09-07 14:54:28.438 INFO Running test on endpoint 1
+09-07 14:54:28.438 DEBUG [test_run_on_singleton_matching_endpoint]#teardown_test >>> BEGIN >>>
+09-07 14:54:28.438 INFO Wildcard subscription shut down
+09-07 14:54:28.438 DEBUG [test_run_on_singleton_matching_endpoint]#teardown_test <<< END <<<
+09-07 14:54:28.438 DEBUG [test_run_on_singleton_matching_endpoint]#on_pass >>> BEGIN >>>
+09-07 14:54:28.438 DEBUG [test_run_on_singleton_matching_endpoint]#on_pass <<< END <<<
+09-07 14:54:28.438 INFO [Test] test_run_on_singleton_matching_endpoint PASS
+09-07 14:54:28.439 DEBUG [TestDecorators]#teardown_class >>> BEGIN >>>
+09-07 14:54:28.439 INFO [CLN] No DUT baseline captured during this class run; skipping DUT cleanup. If a commissioned DUT was expected, likely causes: the DUT was unreachable, or it needed more time to establish a CASE session.
+09-07 14:54:28.439 INFO ===== EXECUTION FLAGS SUMMARY BEGIN =====
+09-07 14:54:28.439 INFO Config values:
+09-07 14:54:28.439 INFO   - admin_vendor_id: 65521
+09-07 14:54:28.439 INFO   - app_pid: 0
+09-07 14:54:28.439 INFO   - commission_only: False
+09-07 14:54:28.439 INFO   - commission_only_re_open_window: False
+09-07 14:54:28.439 INFO   - controller_cat_tags: [65537]
+09-07 14:54:28.439 INFO   - controller_node_id: 112233
+09-07 14:54:28.439 INFO   - debug: False
+09-07 14:54:28.439 INFO   - dut_node_ids: [1]
+09-07 14:54:28.439 INFO   - endpoint: 2
+09-07 14:54:28.439 INFO   - fabric_id: 1
+09-07 14:54:28.439 INFO   - fail_on_skipped_tests: False
+09-07 14:54:28.439 INFO   - legacy: False
+09-07 14:54:28.439 INFO   - logs_path: '.'
+09-07 14:54:28.439 INFO   - maximize_cert_chains: True
+09-07 14:54:28.439 INFO   - no_wildcard_subscription: False
+09-07 14:54:28.439 INFO   - root_of_trust_index: 1
+09-07 14:54:28.439 INFO   - storage_path: 'kvs_admin.json'
+09-07 14:54:28.439 INFO   - tests: ['test_run_on_singleton_matching_endpoint']
+09-07 14:54:28.439 INFO 
+
+Named args:
+09-07 14:54:28.439 INFO   - certificate_authority_manager: 'b2c24850-ab06-11f1-be1c-00155d26459a'
+09-07 14:54:28.439 INFO   - default_controller: 'b2c24805-ab06-11f1-9ba1-00155d26459a'
+09-07 14:54:28.439 INFO   - hooks: 'b2c2483a-ab06-11f1-a305-00155d26459a'
+09-07 14:54:28.439 INFO   - matter_stack: 'b2c24791-ab06-11f1-98cb-00155d26459a'
+09-07 14:54:28.439 INFO   - matter_test_config: 'b2c24826-ab06-11f1-8738-00155d26459a'
+09-07 14:54:28.439 INFO ===== EXECUTION FLAGS SUMMARY END =====
+09-07 14:54:28.439 DEBUG [TestDecorators]#teardown_class <<< END <<<
+09-07 14:54:28.439 DEBUG [TestDecorators]#clean_up >>> BEGIN >>>
+09-07 14:54:28.439 DEBUG [TestDecorators]#clean_up <<< END <<<
+09-07 14:54:28.439 INFO Summary for test class TestDecorators: Error 0, Executed 1, Failed 0, Passed 1, Requested 1, Skipped 0
+09-07 14:54:28.439 INFO Summary for test run MatterTest@09-07-2026_14-54-28-242:
+Total time elapsed 0.196803914001066s
+Artifacts are saved in "./MatterTest/09-07-2026_14-54-28-242"
+Test summary saved in "./MatterTest/09-07-2026_14-54-28-242/test_summary.yaml"
+Test results: Error 0, Executed 1, Failed 0, Passed 1, Requested 1, Skipped 0

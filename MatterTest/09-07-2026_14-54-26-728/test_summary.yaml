@@ -1,0 +1,31 @@
+---
+Requested Tests:
+- test_endpoint_boolean_yes
+Type: TestNameList
+...
+---
+Begin Time: 1788818066894
+Details: null
+End Time: 1788818066894
+Extra Errors: {}
+Extras: null
+Parent: null
+Result: PASS
+Retry Parent: null
+Signature: test_endpoint_boolean_yes-1788818066894
+Stacktrace: null
+Termination Signal Type: null
+Test Class: TestDecorators
+Test Name: test_endpoint_boolean_yes
+Type: Record
+UID: null
+...
+---
+Error: 0
+Executed: 1
+Failed: 0
+Passed: 1
+Requested: 1
+Skipped: 0
+Type: Summary
+...

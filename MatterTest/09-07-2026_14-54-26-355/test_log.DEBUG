@@ -1,0 +1,70 @@
+09-07 14:54:26.356 DEBUG Test output folder: "./MatterTest/09-07-2026_14-54-26-355"
+09-07 14:54:26.356 DEBUG Executing test class "TestDecorators" with config: {'controller_configs': {},
+ 'log_path': './MatterTest/09-07-2026_14-54-26-355',
+ 'test_bed_name': None,
+ 'test_class_name_suffix': None,
+ 'testbed_name': 'MatterTest',
+ 'user_params': {'certificate_authority_manager': 'b1a25651-ab06-11f1-be20-00155d26459a',
+                 'default_controller': 'b1a255fe-ab06-11f1-a006-00155d26459a',
+                 'hooks': 'b1a25637-ab06-11f1-9699-00155d26459a',
+                 'matter_stack': 'b1a2556e-ab06-11f1-a921-00155d26459a',
+                 'matter_test_config': 'b1a25620-ab06-11f1-adb0-00155d26459a'}}
+09-07 14:54:26.356 DEBUG [TestDecorators]#pre_run >>> BEGIN >>>
+09-07 14:54:26.356 DEBUG [TestDecorators]#pre_run <<< END <<<
+09-07 14:54:26.356 INFO ==========> TestDecorators <==========
+09-07 14:54:26.356 DEBUG [TestDecorators]#setup_class >>> BEGIN >>>
+09-07 14:54:26.357 INFO Reading XML clusters from Path('/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/matter/testing/data_model/1.6/allfiles.zip', 'clusters/')
+09-07 14:54:26.526 DEBUG [TestDecorators]#setup_class <<< END <<<
+09-07 14:54:26.526 INFO [Test] test_endpoint_feature_unsupported_cluster_no
+09-07 14:54:26.526 DEBUG [test_endpoint_feature_unsupported_cluster_no]#setup_test >>> BEGIN >>>
+09-07 14:54:26.526 INFO ***** Test Step 1 : Run entire test
+09-07 14:54:26.526 DEBUG [test_endpoint_feature_unsupported_cluster_no]#setup_test <<< END <<<
+09-07 14:54:26.526 INFO Test is not applicable to this endpoint - skipping test
+09-07 14:54:26.526 DEBUG [test_endpoint_feature_unsupported_cluster_no]#teardown_test >>> BEGIN >>>
+09-07 14:54:26.526 INFO Wildcard subscription shut down
+09-07 14:54:26.527 DEBUG [test_endpoint_feature_unsupported_cluster_no]#teardown_test <<< END <<<
+09-07 14:54:26.527 DEBUG [test_endpoint_feature_unsupported_cluster_no]#on_skip >>> BEGIN >>>
+09-07 14:54:26.527 INFO Reason to skip: Endpoint does not match test requirements
+09-07 14:54:26.527 INFO [Test] test_endpoint_feature_unsupported_cluster_no SKIP
+09-07 14:54:26.527 DEBUG [test_endpoint_feature_unsupported_cluster_no]#on_skip <<< END <<<
+09-07 14:54:26.527 INFO [Test] test_endpoint_feature_unsupported_cluster_no SKIP
+09-07 14:54:26.527 DEBUG [TestDecorators]#teardown_class >>> BEGIN >>>
+09-07 14:54:26.527 INFO [CLN] No DUT baseline captured during this class run; skipping DUT cleanup. If a commissioned DUT was expected, likely causes: the DUT was unreachable, or it needed more time to establish a CASE session.
+09-07 14:54:26.527 INFO ===== EXECUTION FLAGS SUMMARY BEGIN =====
+09-07 14:54:26.527 INFO Config values:
+09-07 14:54:26.528 INFO   - admin_vendor_id: 65521
+09-07 14:54:26.528 INFO   - app_pid: 0
+09-07 14:54:26.528 INFO   - commission_only: False
+09-07 14:54:26.528 INFO   - commission_only_re_open_window: False
+09-07 14:54:26.528 INFO   - controller_cat_tags: [65537]
+09-07 14:54:26.528 INFO   - controller_node_id: 112233
+09-07 14:54:26.528 INFO   - debug: False
+09-07 14:54:26.528 INFO   - dut_node_ids: [1]
+09-07 14:54:26.528 INFO   - endpoint: 1
+09-07 14:54:26.528 INFO   - fabric_id: 1
+09-07 14:54:26.528 INFO   - fail_on_skipped_tests: False
+09-07 14:54:26.528 INFO   - legacy: False
+09-07 14:54:26.528 INFO   - logs_path: '.'
+09-07 14:54:26.528 INFO   - maximize_cert_chains: True
+09-07 14:54:26.528 INFO   - no_wildcard_subscription: False
+09-07 14:54:26.528 INFO   - root_of_trust_index: 1
+09-07 14:54:26.528 INFO   - storage_path: 'kvs_admin.json'
+09-07 14:54:26.528 INFO   - tests: ['test_endpoint_feature_unsupported_cluster_no']
+09-07 14:54:26.528 INFO 
+
+Named args:
+09-07 14:54:26.528 INFO   - certificate_authority_manager: 'b1a25651-ab06-11f1-be20-00155d26459a'
+09-07 14:54:26.528 INFO   - default_controller: 'b1a255fe-ab06-11f1-a006-00155d26459a'
+09-07 14:54:26.528 INFO   - hooks: 'b1a25637-ab06-11f1-9699-00155d26459a'
+09-07 14:54:26.528 INFO   - matter_stack: 'b1a2556e-ab06-11f1-a921-00155d26459a'
+09-07 14:54:26.528 INFO   - matter_test_config: 'b1a25620-ab06-11f1-adb0-00155d26459a'
+09-07 14:54:26.528 INFO ===== EXECUTION FLAGS SUMMARY END =====
+09-07 14:54:26.528 DEBUG [TestDecorators]#teardown_class <<< END <<<
+09-07 14:54:26.528 DEBUG [TestDecorators]#clean_up >>> BEGIN >>>
+09-07 14:54:26.528 DEBUG [TestDecorators]#clean_up <<< END <<<
+09-07 14:54:26.528 INFO Summary for test class TestDecorators: Error 0, Executed 0, Failed 0, Passed 0, Requested 1, Skipped 1
+09-07 14:54:26.528 INFO Summary for test run MatterTest@09-07-2026_14-54-26-355:
+Total time elapsed 0.17243715000040538s
+Artifacts are saved in "./MatterTest/09-07-2026_14-54-26-355"
+Test summary saved in "./MatterTest/09-07-2026_14-54-26-355/test_summary.yaml"
+Test results: Error 0, Executed 0, Failed 0, Passed 0, Requested 1, Skipped 1

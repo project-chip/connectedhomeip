@@ -1,0 +1,43 @@
+09-07 14:54:28.044 INFO ==========> TestDecorators <==========
+09-07 14:54:28.045 INFO Reading XML clusters from Path('/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/matter/testing/data_model/1.6/allfiles.zip', 'clusters/')
+09-07 14:54:28.240 INFO [Test] test_run_on_singleton_matching_endpoint
+09-07 14:54:28.240 INFO ***** Test Step 1 : Run entire test
+09-07 14:54:28.240 INFO Running test on endpoint 0
+09-07 14:54:28.241 INFO Wildcard subscription shut down
+09-07 14:54:28.241 INFO [Test] test_run_on_singleton_matching_endpoint PASS
+09-07 14:54:28.241 INFO [CLN] No DUT baseline captured during this class run; skipping DUT cleanup. If a commissioned DUT was expected, likely causes: the DUT was unreachable, or it needed more time to establish a CASE session.
+09-07 14:54:28.241 INFO ===== EXECUTION FLAGS SUMMARY BEGIN =====
+09-07 14:54:28.241 INFO Config values:
+09-07 14:54:28.241 INFO   - admin_vendor_id: 65521
+09-07 14:54:28.241 INFO   - app_pid: 0
+09-07 14:54:28.241 INFO   - commission_only: False
+09-07 14:54:28.241 INFO   - commission_only_re_open_window: False
+09-07 14:54:28.241 INFO   - controller_cat_tags: [65537]
+09-07 14:54:28.241 INFO   - controller_node_id: 112233
+09-07 14:54:28.241 INFO   - debug: False
+09-07 14:54:28.241 INFO   - dut_node_ids: [1]
+09-07 14:54:28.241 INFO   - endpoint: 2
+09-07 14:54:28.241 INFO   - fabric_id: 1
+09-07 14:54:28.241 INFO   - fail_on_skipped_tests: False
+09-07 14:54:28.241 INFO   - legacy: False
+09-07 14:54:28.241 INFO   - logs_path: '.'
+09-07 14:54:28.241 INFO   - maximize_cert_chains: True
+09-07 14:54:28.241 INFO   - no_wildcard_subscription: False
+09-07 14:54:28.241 INFO   - root_of_trust_index: 1
+09-07 14:54:28.241 INFO   - storage_path: 'kvs_admin.json'
+09-07 14:54:28.241 INFO   - tests: ['test_run_on_singleton_matching_endpoint']
+09-07 14:54:28.241 INFO 
+
+Named args:
+09-07 14:54:28.241 INFO   - certificate_authority_manager: 'b2a3e363-ab06-11f1-aa1a-00155d26459a'
+09-07 14:54:28.241 INFO   - default_controller: 'b2a3e317-ab06-11f1-8e1f-00155d26459a'
+09-07 14:54:28.241 INFO   - hooks: 'b2a3e34e-ab06-11f1-82bb-00155d26459a'
+09-07 14:54:28.241 INFO   - matter_stack: 'b2a3e29c-ab06-11f1-9770-00155d26459a'
+09-07 14:54:28.241 INFO   - matter_test_config: 'b2a3e339-ab06-11f1-86cc-00155d26459a'
+09-07 14:54:28.241 INFO ===== EXECUTION FLAGS SUMMARY END =====
+09-07 14:54:28.242 INFO Summary for test class TestDecorators: Error 0, Executed 1, Failed 0, Passed 1, Requested 1, Skipped 0
+09-07 14:54:28.242 INFO Summary for test run MatterTest@09-07-2026_14-54-28-043:
+Total time elapsed 0.19823935499880463s
+Artifacts are saved in "./MatterTest/09-07-2026_14-54-28-043"
+Test summary saved in "./MatterTest/09-07-2026_14-54-28-043/test_summary.yaml"
+Test results: Error 0, Executed 1, Failed 0, Passed 1, Requested 1, Skipped 0

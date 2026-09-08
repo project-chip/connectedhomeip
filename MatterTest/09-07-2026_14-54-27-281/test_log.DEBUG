@@ -1,0 +1,102 @@
+09-07 14:54:27.282 DEBUG Test output folder: "./MatterTest/09-07-2026_14-54-27-281"
+09-07 14:54:27.282 DEBUG Executing test class "TestDecorators" with config: {'controller_configs': {},
+ 'log_path': './MatterTest/09-07-2026_14-54-27-281',
+ 'test_bed_name': None,
+ 'test_class_name_suffix': None,
+ 'testbed_name': 'MatterTest',
+ 'user_params': {'certificate_authority_manager': 'b22fa4c2-ab06-11f1-b619-00155d26459a',
+                 'default_controller': 'b22fa47a-ab06-11f1-b64a-00155d26459a',
+                 'hooks': 'b22fa4ac-ab06-11f1-991c-00155d26459a',
+                 'matter_stack': 'b22fa401-ab06-11f1-a5ee-00155d26459a',
+                 'matter_test_config': 'b22fa499-ab06-11f1-b50a-00155d26459a'}}
+09-07 14:54:27.282 DEBUG [TestDecorators]#pre_run >>> BEGIN >>>
+09-07 14:54:27.282 DEBUG [TestDecorators]#pre_run <<< END <<<
+09-07 14:54:27.282 INFO ==========> TestDecorators <==========
+09-07 14:54:27.282 DEBUG [TestDecorators]#setup_class >>> BEGIN >>>
+09-07 14:54:27.283 INFO Reading XML clusters from Path('/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/matter/testing/data_model/1.6/allfiles.zip', 'clusters/')
+09-07 14:54:27.480 DEBUG [TestDecorators]#setup_class <<< END <<<
+09-07 14:54:27.480 INFO [Test] test_fail_on_ep0
+09-07 14:54:27.480 DEBUG [test_fail_on_ep0]#setup_test >>> BEGIN >>>
+09-07 14:54:27.480 INFO ***** Test Step 1 : Run entire test
+09-07 14:54:27.480 DEBUG [test_fail_on_ep0]#setup_test <<< END <<<
+09-07 14:54:27.480 INFO Running test on endpoint 0
+09-07 14:54:27.480 ERROR Exception occurred in test_fail_on_ep0.
+Traceback (most recent call last):
+  File "/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/mobly/base_test.py", line 801, in exec_one_test
+    test_method()
+  File "/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/matter/testing/decorators.py", line 389, in per_endpoint_runner
+    test_instance.event_loop.run_until_complete(asyncio.wait_for(
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/home/ubuntu/connectedhomeip/src/python_testing/test_testing/TestDecorators.py", line 235, in test_fail_on_ep0
+    asserts.fail("Expected failure")
+  File "/home/ubuntu/connectedhomeip/out/py/lib/python3.12/site-packages/mobly/asserts.py", line 441, in fail
+    raise signals.TestFailure(msg, extras)
+mobly.signals.TestFailure: Details=Expected failure, Extras=None
+09-07 14:54:27.491 DEBUG [test_fail_on_ep0]#teardown_test >>> BEGIN >>>
+09-07 14:54:27.491 INFO Wildcard subscription shut down
+09-07 14:54:27.491 DEBUG [test_fail_on_ep0]#teardown_test <<< END <<<
+09-07 14:54:27.491 DEBUG [test_fail_on_ep0]#on_fail >>> BEGIN >>>
+09-07 14:54:27.492 ERROR 
+
+******************************************************************
+*
+* Test test_fail_on_ep0 failed for the following reason:
+* Details=Expected failure, Extras=None
+*
+* File "/home/ubuntu/connectedhomeip/src/python_testing/test_testing/TestDecorators.py", line 235, in test_fail_on_ep0
+* asserts.fail("Expected failure")
+*
+* Test step:
+*     UNKNOWN - no test steps provided in test script
+*
+* Endpoint: 0
+*
+*******************************************************************
+
+09-07 14:54:27.492 DEBUG [test_fail_on_ep0]#on_fail <<< END <<<
+09-07 14:54:27.492 INFO [Test] test_fail_on_ep0 FAIL
+09-07 14:54:27.492 DEBUG [TestDecorators]#teardown_class >>> BEGIN >>>
+09-07 14:54:27.492 INFO [CLN] No DUT baseline captured during this class run; skipping DUT cleanup. If a commissioned DUT was expected, likely causes: the DUT was unreachable, or it needed more time to establish a CASE session.
+09-07 14:54:27.493 INFO ===== EXECUTION FLAGS SUMMARY BEGIN =====
+09-07 14:54:27.493 INFO Config values:
+09-07 14:54:27.493 INFO   - admin_vendor_id: 65521
+09-07 14:54:27.493 INFO   - app_pid: 0
+09-07 14:54:27.493 INFO   - commission_only: False
+09-07 14:54:27.493 INFO   - commission_only_re_open_window: False
+09-07 14:54:27.493 INFO   - controller_cat_tags: [65537]
+09-07 14:54:27.493 INFO   - controller_node_id: 112233
+09-07 14:54:27.493 INFO   - debug: False
+09-07 14:54:27.493 INFO   - dut_node_ids: [1]
+09-07 14:54:27.493 INFO   - endpoint: 0
+09-07 14:54:27.493 INFO   - fabric_id: 1
+09-07 14:54:27.493 INFO   - fail_on_skipped_tests: False
+09-07 14:54:27.493 INFO   - legacy: False
+09-07 14:54:27.493 INFO   - logs_path: '.'
+09-07 14:54:27.493 INFO   - maximize_cert_chains: True
+09-07 14:54:27.493 INFO   - no_wildcard_subscription: False
+09-07 14:54:27.493 INFO   - root_of_trust_index: 1
+09-07 14:54:27.493 INFO   - storage_path: 'kvs_admin.json'
+09-07 14:54:27.493 INFO   - tests: ['test_fail_on_ep0']
+09-07 14:54:27.493 INFO 
+
+Named args:
+09-07 14:54:27.493 INFO   - certificate_authority_manager: 'b22fa4c2-ab06-11f1-b619-00155d26459a'
+09-07 14:54:27.493 INFO   - default_controller: 'b22fa47a-ab06-11f1-b64a-00155d26459a'
+09-07 14:54:27.493 INFO   - hooks: 'b22fa4ac-ab06-11f1-991c-00155d26459a'
+09-07 14:54:27.493 INFO   - matter_stack: 'b22fa401-ab06-11f1-a5ee-00155d26459a'
+09-07 14:54:27.493 INFO   - matter_test_config: 'b22fa499-ab06-11f1-b50a-00155d26459a'
+09-07 14:54:27.493 INFO ===== EXECUTION FLAGS SUMMARY END =====
+09-07 14:54:27.493 DEBUG [TestDecorators]#teardown_class <<< END <<<
+09-07 14:54:27.493 DEBUG [TestDecorators]#clean_up >>> BEGIN >>>
+09-07 14:54:27.493 DEBUG [TestDecorators]#clean_up <<< END <<<
+09-07 14:54:27.493 INFO Summary for test class TestDecorators: Error 0, Executed 1, Failed 1, Passed 0, Requested 1, Skipped 0
+09-07 14:54:27.493 INFO Summary for test run MatterTest@09-07-2026_14-54-27-281:
+Total time elapsed 0.21150027600015164s
+Artifacts are saved in "./MatterTest/09-07-2026_14-54-27-281"
+Test summary saved in "./MatterTest/09-07-2026_14-54-27-281/test_summary.yaml"
+Test results: Error 0, Executed 1, Failed 1, Passed 0, Requested 1, Skipped 0
