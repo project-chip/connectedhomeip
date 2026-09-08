@@ -75,5 +75,5 @@ class MEDIAPLAYBACKTestBase:
 
         self.wait_for_user_input(
             prompt_msg=f"Start playing the {ordinal} piece of content on the DUT using any available method, "
-                       "then press Enter.\n")
+            "then press Enter.\n")
         return None
