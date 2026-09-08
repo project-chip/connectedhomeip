@@ -51,11 +51,12 @@ from support_modules.pqc_support import (AttestationCertType, AttestationCryptoP
                                          assert_attestation_nonce, assert_authorized_paa, assert_certificate_currently_valid,
                                          assert_dac_and_pai_ids, assert_profile_advertised, certificate_algorithms_for_oids,
                                          find_issuing_paa, is_ml_dsa_supported, is_pqc_profile, kAttestationChallengeLength,
-                                         kAttestationNonceLength, kCertificateSegmentSize, kOidEcdsaWithSha256, kOidEcPublicKey,
-                                         kOidMatterPid, kOidMatterVid, kOidMlDsa44, kOidMlDsa65, parse_attestation_elements,
-                                         parse_certificate, profile_mask, retrieve_segmented_document, select_strongest_profile,
-                                         validate_attestation_chain, validate_certification_declaration,
-                                         verify_attestation_signature, verify_certificate_signature)
+                                         kAttestationNonceLength, kCertificateSegmentSize, kMaxCertificateDocumentSize,
+                                         kOidEcdsaWithSha256, kOidEcPublicKey, kOidMatterPid, kOidMatterVid, kOidMlDsa44,
+                                         kOidMlDsa65, parse_attestation_elements, parse_certificate, profile_mask,
+                                         retrieve_segmented_document, select_strongest_profile, validate_attestation_chain,
+                                         validate_certification_declaration, verify_attestation_signature,
+                                         verify_certificate_signature)
 
 _ML_DSA_VECTORS = _CHIP_ROOT / "src/crypto/tests/MlDsaAttestationChain_test_vectors.h"
 _DEV_VECTOR = (_CHIP_ROOT
@@ -443,10 +444,32 @@ class TestSegmentedRetrieval(unittest.TestCase):
         # SegmentIDs must be requested in order starting at zero.
         self.assertEqual([request[2] for request in source.requests], [0, 1, 2, 3, 4])
 
+    def test_continues_from_an_already_received_first_segment(self):
+        document = b"\xAA" * 1200
+        source = _FakeSegmentSource(document)
+        first_response = asyncio.run(source(
+            AttestationCryptoProfile.kMlDsa65, AttestationCryptoProfile.kMlDsa65, 0, kCertificateSegmentSize))
+
+        result = asyncio.run(retrieve_segmented_document(
+            source, AttestationCryptoProfile.kMlDsa65, AttestationCryptoProfile.kMlDsa65, "PAI",
+            first_response=first_response))
+
+        self.assertEqual(result.der, document)
+        self.assertEqual([request[2] for request in source.requests], [0, 1])
+
     def test_returns_a_single_segment_document_without_further_requests(self):
         document = b"\xAA" * 400
         source = _FakeSegmentSource(document)
         result = self._retrieve(source, document_name="DAC")
+
+        self.assertEqual(result.der, document)
+        self.assertEqual(result.segment_count, 1)
+        self.assertEqual(len(source.requests), 1)
+
+    def test_accepts_a_single_segment_larger_than_the_default_segment_size(self):
+        document = b"\xAA" * 700
+        source = _FakeSegmentSource(document, segment_size=1000)
+        result = self._retrieve(source, document_name="DAC", max_segment_size=1000)
 
         self.assertEqual(result.der, document)
         self.assertEqual(result.segment_count, 1)
@@ -471,6 +494,21 @@ class TestSegmentedRetrieval(unittest.TestCase):
 
         with self.assertRaises(signals.TestFailure):
             self._retrieve(send)
+
+    def test_rejects_an_empty_first_segment(self):
+        async def send(certificate_type, crypto_profile, segment_id, max_segment_size):
+            return _FakeResponse(certificate=b"", totalDocumentSize=100, nextSegmentID=1)
+
+        with self.assertRaises(signals.TestFailure):
+            self._retrieve(send)
+
+    def test_rejects_a_document_larger_than_the_pqc_certificate_maximum(self):
+        source = _FakeSegmentSource(b"\x01" * (kMaxCertificateDocumentSize + 1))
+
+        with self.assertRaises(signals.TestFailure):
+            self._retrieve(source)
+
+        self.assertEqual(len(source.requests), 1)
 
     def test_rejects_a_next_segment_id_that_is_not_monotonic(self):
         async def send(certificate_type, crypto_profile, segment_id, max_segment_size):
@@ -514,13 +552,26 @@ class TestSegmentedRetrieval(unittest.TestCase):
             self._retrieve(send)
 
     def test_rejects_a_segment_larger_than_the_requested_max_segment_size(self):
+        requests = []
+
         async def send(certificate_type, crypto_profile, segment_id, max_segment_size):
+            requests.append(segment_id)
             oversized = b"\x01" * (kCertificateSegmentSize + 1)
             return _FakeResponse(certificate=oversized, totalDocumentSize=4000,
                                  nextSegmentID=segment_id + 1 if segment_id == 0 else None)
 
         with self.assertRaises(signals.TestFailure):
             self._retrieve(send)
+
+        self.assertEqual(requests, [0])
+
+    def test_rejects_a_next_segment_id_that_cannot_be_requested(self):
+        source = _FakeSegmentSource(b"\x01" * 102, segment_size=1)
+
+        with self.assertRaises(signals.TestFailure):
+            self._retrieve(source)
+
+        self.assertEqual(source.requests[-1][2], 100)
 
 
 class TestAttestationResponse(unittest.TestCase):

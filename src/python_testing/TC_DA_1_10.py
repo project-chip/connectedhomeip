@@ -34,8 +34,7 @@
 # All certificate validation runs in Python (see support_modules/pqc_support.py) rather than through
 # the SDK's C++ crypto, so the harness is an independent check on the stack. Verifying ML-DSA
 # signatures therefore needs a cryptography build providing hazmat.primitives.asymmetric.mldsa
-# (46.0.0 or newer, linked against OpenSSL 3.5 or newer); scripts/tests/run_tc_da_1_10.sh
-# installs one into the test venv when it is missing.
+# (46.0.0 or newer, linked against OpenSSL 3.5 or newer);
 #
 #   python3 src/python_testing/TC_DA_1_10.py --commissioning-method on-network \
 #       --discriminator 3840 --passcode 20202021 \
@@ -199,19 +198,11 @@ class TC_DA_1_10(MatterBaseTest):
         selected_paa_profile = select_strongest_profile(paa_profiles, "PAA")
         selected_pai_profile = select_strongest_profile(pai_profiles, "PAI")
 
-        # A profile names a certificate chain variant rather than one algorithm, so the PAA and PAI
-        # bitmaps describe the same chain and their strongest entries must agree. The PAA is
-        # self-signed, which makes its profile the unambiguous identity of the chain.
-        asserts.assert_equal(selected_pai_profile, selected_paa_profile,
-                             f"paaProfiles (0x{paa_profiles:04X}) and paiProfiles (0x{pai_profiles:04X}) select "
-                             f"different chains ({selected_paa_profile.name} and {selected_pai_profile.name}); the PAI "
-                             "is signed by the PAA, so the strongest chain they advertise must be the same")
-        selected_chain_profile = selected_paa_profile
-
         # Pre-condition 2 requires the TH to support the ML-DSA profiles it negotiates. Checking the
         # TH's own crypto backend here keeps a TH build limitation from being reported as a DUT
         # failure in step 11.
-        assert_profile_supported_by_test_harness(selected_chain_profile)
+        assert_profile_supported_by_test_harness(selected_paa_profile)
+        assert_profile_supported_by_test_harness(selected_pai_profile)
 
         self.step(4)
         # kCertificateSegmentSize is both the smallest MaxSegmentSize the spec allows and the
@@ -232,15 +223,13 @@ class TC_DA_1_10(MatterBaseTest):
         profile_pai_cert = parse_certificate(pai_document.der, "profile_pai_cert")
         pai_algorithms = profile_pai_cert.algorithms
 
-        # Test plan deviation: the plan expects the PAI public key algorithm to equal
-        # selectedPAIProfile. A profile is the union of the algorithms that may appear on the
-        # certificate, and step 4 explicitly allows an ECDSA PAI signed by a PQC PAA, so the subject
-        # key is instead required to be one of the algorithms paiProfiles advertises.
-        assert_profile_advertised(pai_profiles, pai_algorithms.subject_key_profile,
-                                  "PAI", "subjectPublicKeyInfo")
-        assert_profile_advertised(pai_profiles, pai_algorithms.signature_profile, "PAI", "signatureAlgorithm")
+        # The PAA and PAI profiles are selected independently: the PAI's subject key follows
+        # selectedPAIProfile, while its issuer signature follows selectedPAAProfile.
+        asserts.assert_equal(pai_algorithms.subject_key_profile, selected_pai_profile,
+                             "profile_pai_cert public key algorithm must match selectedPAIProfile "
+                             f"{selected_pai_profile.name}")
         asserts.assert_equal(pai_algorithms.signature_profile, selected_paa_profile,
-                             "profile_pai_cert must be signed with the selectedPAAProfile "
+                             "profile_pai_cert signature algorithm must match selectedPAAProfile "
                              f"{selected_paa_profile.name} because the self-signed PAA issued it")
 
         self.step(6)
@@ -251,24 +240,13 @@ class TC_DA_1_10(MatterBaseTest):
         selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
 
         self.step(7)
-        # Test plan deviation: the plan requests the DAC with CryptoProfile set to selectedDACProfile
-        # (EcdsaMatterLegacy). CryptoProfile selects which certificate document the DUT serves, so
-        # that value returns the separate legacy DAC rather than the DAC the PQC PAI issued, and step
-        # 8's requirement that the DAC signature match the PAI could never hold. The DAC is therefore
-        # requested with the selected chain profile, and selectedDACProfile is asserted against the
-        # DAC subject key below.
-        assert_profile_advertised(dac_profiles, selected_chain_profile, "DAC", "certificate chain")
         dac_document = await retrieve_segmented_document(
-            self._send_certificate_chain_request, certificate_type.kDACCertificate, selected_chain_profile, "DAC",
+            self._send_certificate_chain_request, certificate_type.kDACCertificate, selected_dac_profile, "DAC",
             kCertificateSegmentSize)
 
-        # What drives the DAC size is the signature the PAI generated over it, so the segmentation
-        # expectation follows the PAI subject key rather than the chain profile. A PQC chain may
-        # legitimately carry a P-256 PAI, and the DAC it issues then still fits one segment: the
-        # smallest ML-DSA signature is 2420 bytes, while an ECDSA-signed DAC is capped at 600.
-        if is_pqc_profile(pai_algorithms.subject_key_profile):
+        if is_pqc_profile(selected_pai_profile):
             asserts.assert_greater(dac_document.segment_count, 1,
-                                   f"A {pai_algorithms.subject_key_profile.name} PAI signature makes the DAC too "
+                                   f"A {selected_pai_profile.name} PAI signature makes the DAC too "
                                    "large for a single 600 byte segment")
         else:
             asserts.assert_equal(dac_document.segment_count, 1,
@@ -278,14 +256,12 @@ class TC_DA_1_10(MatterBaseTest):
         profile_dac_cert = parse_certificate(dac_document.der, "profile_dac_cert")
         dac_algorithms = profile_dac_cert.algorithms
 
-        assert_profile_advertised(dac_profiles, dac_algorithms.subject_key_profile, "DAC", "subjectPublicKeyInfo")
-        assert_profile_advertised(dac_profiles, dac_algorithms.signature_profile, "DAC", "signatureAlgorithm")
         asserts.assert_equal(dac_algorithms.subject_key_profile, selected_dac_profile,
-                             "profile_dac_cert must keep an ECDSA subject key so the Device Attestation signature "
-                             "stays EcdsaMatterLegacy during PQC Phase 1")
-        asserts.assert_equal(dac_algorithms.signature_profile, pai_algorithms.subject_key_profile,
-                             "profile_dac_cert must be signed with the profile_pai_cert subject key profile "
-                             f"{pai_algorithms.subject_key_profile.name}")
+                             "profile_dac_cert public key algorithm must match selectedDACProfile "
+                             f"{selected_dac_profile.name}")
+        asserts.assert_equal(dac_algorithms.signature_profile, selected_pai_profile,
+                             "profile_dac_cert signature algorithm must match selectedPAIProfile "
+                             f"{selected_pai_profile.name}")
 
         self.step(9)
         legacy_pai_cert = parse_certificate(
@@ -299,17 +275,18 @@ class TC_DA_1_10(MatterBaseTest):
         # The externally obtained PAA for selectedPAAProfile: the trust store entry whose key uses
         # that profile and whose signature over the retrieved PAI validates.
         profile_paa_cert = find_issuing_paa(profile_pai_cert, paa_candidates, selected_paa_profile,
-                                            selected_chain_profile.name)
+                                            f"{selected_paa_profile.name}/{selected_pai_profile.name}")
         validate_attestation_chain(profile_paa_cert, profile_pai_cert, profile_dac_cert,
-                                   selected_chain_profile.name)
+                                   f"{selected_paa_profile.name}/{selected_pai_profile.name}")
 
         self.step(12)
         legacy_paa_cert = find_issuing_paa(legacy_pai_cert, paa_candidates,
                                            AttestationCryptoProfile.kEcdsaMatterLegacy, "legacy")
         validate_attestation_chain(legacy_paa_cert, legacy_pai_cert, legacy_dac_cert, "legacy")
 
-        logger.info("Validated the %s chain (PAI %d segment(s), DAC %d segment(s)) and the legacy chain",
-                    selected_chain_profile.name, pai_document.segment_count, dac_document.segment_count)
+        logger.info("Validated the %s PAA / %s PAI chain (PAI %d segment(s), DAC %d segment(s)) and the legacy chain",
+                    selected_paa_profile.name, selected_pai_profile.name,
+                    pai_document.segment_count, dac_document.segment_count)
 
 
 if __name__ == "__main__":

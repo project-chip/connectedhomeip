@@ -80,6 +80,7 @@ logger = logging.getLogger(__name__)
 AttestationCryptoProfile = Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum
 AttestationCryptoProfileBitmap = Clusters.OperationalCredentials.Bitmaps.AttestationCryptoProfileBitmap
 CertificateChainType = Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum
+CertificateChainResponse = Clusters.OperationalCredentials.Commands.CertificateChainResponse
 OperationalCredentialsFeature = Clusters.OperationalCredentials.Bitmaps.Feature
 
 # The DUT slices every profile-selected document on a fixed 600 byte boundary and derives the
@@ -87,6 +88,8 @@ OperationalCredentialsFeature = Clusters.OperationalCredentials.Bitmaps.Feature
 # smallest MaxSegmentSize the spec permits, because it is the payload a Matter transport is
 # always guaranteed to carry.
 kCertificateSegmentSize = 600
+kMaxCertificateDocumentSize = 10240
+kMaxCertificateSegmentId = 100
 
 # X.509 AlgorithmIdentifier OIDs for each attestation crypto profile. An ML-DSA certificate uses
 # its profile-specific OID in whichever of the two AlgorithmIdentifier fields uses ML-DSA.
@@ -572,41 +575,61 @@ class SegmentedDocument:
 
 
 # A callable that issues one CertificateChainRequest and returns the CertificateChainResponse.
-SendCertificateChainRequest = Callable[[CertificateChainType, AttestationCryptoProfile, int, int], Awaitable]
+SendCertificateChainRequest = Callable[
+    [CertificateChainType, AttestationCryptoProfile, int, int], Awaitable[CertificateChainResponse]]
+
+
+def assert_initial_certificate_segment(response: CertificateChainResponse, document_name: str,
+                                       max_segment_size: int) -> None:
+    """Validate segment zero of a profile-selected certificate response."""
+    asserts.assert_is_not_none(response.totalDocumentSize,
+                               f"DUT omitted TotalDocumentSize from the profile-selected {document_name} response")
+    asserts.assert_greater(response.totalDocumentSize, 0, f"DUT reported an empty {document_name} document")
+    asserts.assert_less_equal(response.totalDocumentSize, kMaxCertificateDocumentSize,
+                              f"DUT reported a {document_name} document larger than the "
+                              f"{kMaxCertificateDocumentSize} byte PQC certificate maximum")
+    asserts.assert_greater(len(response.certificate), 0, f"DUT returned an empty {document_name} segment 0")
+    asserts.assert_less_equal(len(response.certificate), max_segment_size,
+                              f"{document_name} segment 0 exceeds the requested MaxSegmentSize")
+    asserts.assert_less_equal(len(response.certificate), response.totalDocumentSize,
+                              f"{document_name} segment 0 is larger than TotalDocumentSize")
+
+    if len(response.certificate) < response.totalDocumentSize:
+        asserts.assert_is_not_none(response.nextSegmentID,
+                                   f"DUT omitted NextSegmentID before the complete {document_name} was returned")
+    else:
+        asserts.assert_is_none(response.nextSegmentID,
+                               f"DUT returned NextSegmentID after the complete {document_name} was returned")
 
 
 async def retrieve_segmented_document(send_request: SendCertificateChainRequest,
                                       certificate_type: CertificateChainType,
                                       crypto_profile: AttestationCryptoProfile,
                                       document_name: str,
-                                      max_segment_size: int = kCertificateSegmentSize) -> SegmentedDocument:
+                                      max_segment_size: int = kCertificateSegmentSize,
+                                      first_response: CertificateChainResponse | None = None) -> SegmentedDocument:
     """Retrieve a profile-selected certificate, following NextSegmentID to the final segment.
 
     Asserts the segmentation rules along the way: SegmentID numbering is monotonic from zero,
     TotalDocumentSize is stable across every segment, NextSegmentID is present until the final
     segment and absent on it, and the reassembled document matches TotalDocumentSize.
     """
-    response = await send_request(certificate_type, crypto_profile, 0, max_segment_size)
-    asserts.assert_is_not_none(response.totalDocumentSize,
-                               f"DUT omitted TotalDocumentSize from the profile-selected {document_name} response")
-    asserts.assert_greater(response.totalDocumentSize, 0, f"DUT reported an empty {document_name} document")
+    response = first_response
+    if response is None:
+        response = await send_request(certificate_type, crypto_profile, 0, max_segment_size)
+    assert_initial_certificate_segment(response, document_name, max_segment_size)
 
     total_document_size = response.totalDocumentSize
-    if total_document_size > kCertificateSegmentSize:
-        asserts.assert_is_not_none(response.nextSegmentID,
-                                   f"DUT omitted NextSegmentID on a {document_name} document that needs more than "
-                                   "one segment")
-    else:
-        asserts.assert_is_none(response.nextSegmentID,
-                               f"DUT returned NextSegmentID on a single-segment {document_name} document")
-
     document = bytearray(response.certificate)
+
     # Segment 0 has been retrieved, so the next expected SegmentID is 1.
     expected_segment_id = 1
 
     while response.nextSegmentID is not None:
         asserts.assert_equal(response.nextSegmentID, expected_segment_id,
                              f"{document_name} NextSegmentID must be monotonic from zero")
+        asserts.assert_less_equal(response.nextSegmentID, kMaxCertificateSegmentId,
+                                  f"{document_name} NextSegmentID exceeds the maximum request SegmentID")
 
         response = await send_request(certificate_type, crypto_profile, expected_segment_id, max_segment_size)
         asserts.assert_equal(response.totalDocumentSize, total_document_size,
@@ -619,6 +642,13 @@ async def retrieve_segmented_document(send_request: SendCertificateChainRequest,
         expected_segment_id += 1
         asserts.assert_less_equal(len(document), total_document_size,
                                   f"{document_name} segments returned more data than TotalDocumentSize")
+
+        if len(document) < total_document_size:
+            asserts.assert_is_not_none(response.nextSegmentID,
+                                       f"DUT omitted NextSegmentID before the complete {document_name} was returned")
+        else:
+            asserts.assert_is_none(response.nextSegmentID,
+                                   f"DUT returned NextSegmentID after the complete {document_name} was returned")
 
     asserts.assert_is_none(response.nextSegmentID, f"{document_name} final segment must omit NextSegmentID")
     asserts.assert_equal(len(document), total_document_size,

@@ -25,69 +25,57 @@ from mobly import signals
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
-from TC_OPCREDS_3_9 import (  # noqa: E402
-    AttestationCryptoProfile,
-    TC_OPCREDS_3_9,
-    _certificate_algorithms_for_oids,
-    _profile_mask,
-    kOidEcPublicKey,
-    kOidEcdsaWithSha256,
-    kOidMlDsa44,
-    kOidMlDsa65,
-    parse_certificate_algorithms,
-)
+from TC_OPCREDS_3_9 import TC_OPCREDS_3_9, AttestationCryptoProfile, CertificateAlgorithms  # noqa: E402
+
+
+def _algorithms(subject_key_profile: AttestationCryptoProfile,
+                signature_profile: AttestationCryptoProfile) -> CertificateAlgorithms:
+    return CertificateAlgorithms(
+        subject_key_profile=subject_key_profile,
+        signature_profile=signature_profile,
+        subject_public_key_algorithm_oid="subject-key-oid",
+        signature_algorithm_oid="signature-oid",
+    )
 
 
 class TestTCOPCREDS39CertificateProfiles(unittest.TestCase):
     def setUp(self):
         self.test_case = TC_OPCREDS_3_9.__new__(TC_OPCREDS_3_9)
 
-    def test_mixed_dac_algorithms_map_to_independent_profiles(self):
-        algorithms = _certificate_algorithms_for_oids(kOidMlDsa65, kOidEcPublicKey)
-
-        self.assertEqual(algorithms.subject_key_profile, AttestationCryptoProfile.kEcdsaMatterLegacy)
-        self.assertEqual(algorithms.signature_profile, AttestationCryptoProfile.kMlDsa65)
-
-    def test_profile_bitmap_is_union_of_certificate_algorithms(self):
-        mixed_dac_profiles = (
-            _profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy)
-            | _profile_mask(AttestationCryptoProfile.kMlDsa65)
+    def test_accepts_independently_selected_paa_and_pai_profiles(self):
+        self.test_case._assert_certificate_profiles(
+            _algorithms(AttestationCryptoProfile.kMlDsa44, AttestationCryptoProfile.kMlDsa65),
+            "PAI",
+            expected_subject_key_profile=AttestationCryptoProfile.kMlDsa44,
+            expected_signature_profile=AttestationCryptoProfile.kMlDsa65,
         )
 
-        self.test_case._assert_profile_advertised(
-            mixed_dac_profiles, AttestationCryptoProfile.kEcdsaMatterLegacy, "DAC", "subjectPublicKeyInfo")
-        self.test_case._assert_profile_advertised(
-            mixed_dac_profiles, AttestationCryptoProfile.kMlDsa65, "DAC", "signatureAlgorithm")
+    def test_accepts_an_ecdsa_dac_signed_by_a_pqc_pai(self):
+        self.test_case._assert_certificate_profiles(
+            _algorithms(AttestationCryptoProfile.kEcdsaMatterLegacy, AttestationCryptoProfile.kMlDsa44),
+            "DAC",
+            expected_subject_key_profile=AttestationCryptoProfile.kEcdsaMatterLegacy,
+            expected_signature_profile=AttestationCryptoProfile.kMlDsa44,
+        )
 
+    def test_rejects_a_subject_key_that_does_not_match_the_selected_profile(self):
         with self.assertRaises(signals.TestFailure):
-            self.test_case._assert_profile_advertised(
-                _profile_mask(AttestationCryptoProfile.kMlDsa65),
-                AttestationCryptoProfile.kEcdsaMatterLegacy,
-                "DAC",
-                "subjectPublicKeyInfo",
+            self.test_case._assert_certificate_profiles(
+                _algorithms(AttestationCryptoProfile.kMlDsa65, AttestationCryptoProfile.kMlDsa44),
+                "PAI",
+                expected_subject_key_profile=AttestationCryptoProfile.kMlDsa44,
+                expected_signature_profile=AttestationCryptoProfile.kMlDsa44,
             )
 
-    def test_strongest_paa_profile_is_selected(self):
-        selected_profile = self.test_case._select_strongest_profile(0x0007, "PAA")
-
-        self.assertEqual(selected_profile, AttestationCryptoProfile.kMlDsa65)
-
-    def test_legacy_certificate_algorithms_parse(self):
-        dac_path = _CHIP_ROOT / "credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-Cert.der"
-
-        algorithms = parse_certificate_algorithms(dac_path.read_bytes())
-
-        self.assertEqual(algorithms.subject_key_profile, AttestationCryptoProfile.kEcdsaMatterLegacy)
-        self.assertEqual(algorithms.signature_profile, AttestationCryptoProfile.kEcdsaMatterLegacy)
-        self.assertEqual(algorithms.subject_public_key_algorithm_oid, kOidEcPublicKey)
-        self.assertEqual(algorithms.signature_algorithm_oid, kOidEcdsaWithSha256)
-
-    def test_unknown_algorithm_oid_is_rejected(self):
+    def test_rejects_a_signature_that_does_not_match_the_issuer_profile(self):
         with self.assertRaises(signals.TestFailure):
-            _certificate_algorithms_for_oids("1.2.3.4", kOidEcPublicKey)
-
-        with self.assertRaises(signals.TestFailure):
-            _certificate_algorithms_for_oids(kOidMlDsa44, "1.2.3.4")
+            self.test_case._assert_certificate_profiles(
+                _algorithms(AttestationCryptoProfile.kEcdsaMatterLegacy,
+                            AttestationCryptoProfile.kEcdsaMatterLegacy),
+                "DAC",
+                expected_subject_key_profile=AttestationCryptoProfile.kEcdsaMatterLegacy,
+                expected_signature_profile=AttestationCryptoProfile.kMlDsa65,
+            )
 
 
 if __name__ == "__main__":
