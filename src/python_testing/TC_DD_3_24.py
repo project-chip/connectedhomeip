@@ -17,7 +17,7 @@
 import asyncio
 import logging
 
-from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.mdns_discovery import DISCOVERY_TIMEOUT_SEC, MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 
 import matter.testing.nfc
@@ -155,8 +155,12 @@ class TC_DD_3_24(MatterTestCommissioner):
         self.step(6)    # Perform DNS-SD Discovery and check that the “_IC” subtype is no more present.
 
         txt_ic_still_present = True
+        retry_query_timeout_sec = 1.0
         for attempt in range(20):
-            txt_ic_still_present = await self.check_operational_service_has_txt_ic()
+            txt_ic_still_present = await self.check_operational_service_has_txt_ic(
+                retry_query_timeout_sec,
+                fail_if_srv_missing=False,
+            )
             if not txt_ic_still_present:
                 break
 
@@ -191,11 +195,23 @@ class TC_DD_3_24(MatterTestCommissioner):
     #         log.info("\n\n\tOperational Subtype: %s\n", operational_subtype)
     #     return operational_subtype
 
-    async def check_operational_service_has_txt_ic(self) -> bool:
+    async def check_operational_service_has_txt_ic(self, query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                                                   fail_if_srv_missing: bool = True) -> bool:
         """Check whether the DUT operational mDNS service advertises TXT key "IC" as "1".
 
-        Returns False when TXT data is missing, absent, or does not contain IC=1.
-        If the operational service lookup fails, this method asserts and fails the test.
+        Args:
+            query_timeout_sec: Per-query timeout, in seconds, used for SRV and TXT lookups.
+            fail_if_srv_missing: When True, missing SRV record is a test failure.
+                When False, missing SRV record is treated as IC not present.
+
+        Returns:
+            True if the TXT record contains ``IC=1``. False if the TXT record is missing,
+            SRV is missing (when fail_if_srv_missing is False), has no TXT payload,
+            or does not contain ``IC=1``.
+
+        Raises:
+            AssertionError: If fail_if_srv_missing is True and the operational SRV record
+                is not found, or TXT payload is not a dictionary.
         """
         # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
         # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
@@ -210,18 +226,21 @@ class TC_DD_3_24(MatterTestCommissioner):
         srv_record = await mdns.get_srv_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
-            log_output=True
+            query_timeout_sec=query_timeout_sec,
+            log_output=True,
         )
 
-        asserts.assert_true(
-            srv_record is not None,
-            f"Operational mDNS service '{instance_qname}' was not found"
-        )
+        if srv_record is None:
+            if fail_if_srv_missing:
+                asserts.fail(f"Operational mDNS service '{instance_qname}' was not found")
+            log.info("Operational mDNS service '%s' was not found", instance_qname)
+            return False
 
         txt_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
-            log_output=True
+            query_timeout_sec=query_timeout_sec,
+            log_output=True,
         )
 
         if txt_record is None:
