@@ -1114,40 +1114,48 @@ TEST_F(TestLocalAvAnalysisCluster, MoreThanFiftyContextTriggersIsAConstraintErro
     ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
     const uint32_t encodedLength = writer.GetLengthWritten();
 
-    // A fresh list per command: each holds a reader positioned in the buffer
-    auto decodeList = [&](DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType> & aList) {
+    // A fresh list per command, since each holds a reader positioned in the buffer. Reports success
+    // rather than asserting: an ASSERT inside a lambda returns from the lambda, not from the test.
+    auto decodeList = [&](DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType> & aList) -> bool {
         TLV::TLVReader reader;
         reader.Init(buffer.Get(), encodedLength);
-        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
-        ASSERT_EQ(aList.Decode(reader), CHIP_NO_ERROR);
+        return reader.Next() == CHIP_NO_ERROR && aList.Decode(reader) == CHIP_NO_ERROR;
     };
+
+    // An active set to be left alone: the rejection ends processing with no other side-effects
+    ASSERT_TRUE(EnableAllTestContexts());
+    const size_t activeBefore = mServer.GetLogic().mActiveAmbientContextTriggers.size();
+    ASSERT_GT(activeBefore, 0u);
 
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
 
     Commands::EnableContextTriggers::DecodableType enableData;
-    decodeList(enableData.contextTriggers.SetNonNull());
+    ASSERT_TRUE(decodeList(enableData.contextTriggers.SetNonNull()));
     ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
     auto enableResponse = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, enablePath, enableData);
     ASSERT_TRUE(enableResponse.has_value());
     EXPECT_EQ(enableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+    EXPECT_EQ(mServer.GetLogic().mActiveAmbientContextTriggers.size(), activeBefore);
 
     Commands::DisableContextTriggers::DecodableType disableData;
-    decodeList(disableData.contextTriggers.SetNonNull());
+    ASSERT_TRUE(decodeList(disableData.contextTriggers.SetNonNull()));
     ConcreteCommandPath disablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
     auto disableResponse = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, disablePath, disableData);
     ASSERT_TRUE(disableResponse.has_value());
     EXPECT_EQ(disableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+    EXPECT_EQ(mServer.GetLogic().mActiveAmbientContextTriggers.size(), activeBefore);
 }
 
-TEST_F(TestLocalAvAnalysisCluster, TheSerializedSizeEstimateHoldsForAWorstCaseTrigger)
+// TLV length of the widest ContextTriggerStruct holding aZoneCount zones: a non-null MfgCode, the
+// longest label the estimate budgets for and zone ids above 255, which take two bytes each.
+// Measured in a buffer far larger than any claim, so the result is the encoder's and not the
+// buffer's. Returns 0 if it could not be encoded at all.
+size_t WorstCaseTriggerLength(uint16_t aZoneCount)
 {
-    // The longest label the estimate budgets for, a non-null MfgCode and a full set of zones have to
-    // fit the size claimed for one entry: too small a buffer fails the store with only a logged error
     std::vector<uint16_t> zones;
-    for (uint16_t zone = 0; zone < kTestMaxZones; zone++)
+    for (uint16_t zone = 0; zone < aZoneCount; zone++)
     {
-        // Above 255 a zone id takes two bytes, its widest encoding
         zones.push_back(static_cast<uint16_t>(0xFF00 + zone));
     }
     const std::string label(64, 'x');
@@ -1157,16 +1165,35 @@ TEST_F(TestLocalAvAnalysisCluster, TheSerializedSizeEstimateHoldsForAWorstCaseTr
     trigger.context.namespaceID = static_cast<uint8_t>(0xFF);
     trigger.context.tag         = static_cast<uint8_t>(0xFF);
     trigger.context.label       = MakeOptional(DataModel::MakeNullable(CharSpan(label.data(), label.size())));
-    trigger.zoneIDs = MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zones.data(), zones.size())));
+    // With no zones the field is still encoded, as null: that is how a restored entry carries it
+    trigger.zoneIDs = zones.empty()
+        ? MakeOptional(DataModel::NullNullable)
+        : MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zones.data(), zones.size())));
 
-    const size_t claimed = ContextTriggerSerializedSize(kTestMaxZones);
+    constexpr size_t kGenerousSize = 4096;
     Platform::ScopedMemoryBuffer<uint8_t> buffer;
-    ASSERT_TRUE(buffer.Alloc(claimed));
-
+    if (!buffer.Alloc(kGenerousSize))
+    {
+        return 0;
+    }
     TLV::TLVWriter writer;
-    writer.Init(buffer.Get(), static_cast<uint32_t>(claimed));
-    EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), trigger), CHIP_NO_ERROR);
-    EXPECT_LE(writer.GetLengthWritten(), claimed);
+    writer.Init(buffer.Get(), static_cast<uint32_t>(kGenerousSize));
+    if (DataModel::Encode(writer, TLV::AnonymousTag(), trigger) != CHIP_NO_ERROR)
+    {
+        return 0;
+    }
+    return writer.GetLengthWritten();
+}
+
+TEST_F(TestLocalAvAnalysisCluster, TheSerializedSizeEstimateHoldsForAWorstCaseTrigger)
+{
+    for (uint16_t zoneCount : { static_cast<uint16_t>(0), static_cast<uint16_t>(kTestMaxZones), static_cast<uint16_t>(255) })
+    {
+        const size_t actual = WorstCaseTriggerLength(zoneCount);
+        ASSERT_GT(actual, 0u) << "could not encode a worst-case trigger for " << zoneCount << " zones";
+        EXPECT_LE(actual, ContextTriggerSerializedSize(static_cast<uint8_t>(zoneCount)))
+            << "the estimate is short for " << zoneCount << " zones";
+    }
 }
 
 } // namespace
