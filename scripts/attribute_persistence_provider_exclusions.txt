@@ -61,6 +61,7 @@ src/app/clusters/zone-management-server/MigrateZoneManagementServerStorage.cpp
 src/app/clusters/zone-management-server/MigrateZoneManagementServerStorage.h
 # CameraAvSettingsUserLevelManagement migration
 src/app/clusters/camera-av-settings-user-level-management-server/CodegenCameraAvSettingsUserLevelManagementCluster.cpp
+src/app/clusters/camera-av-settings-user-level-management-server/CodegenCameraAvSettingsUserLevelManagementCluster.h
 src/app/clusters/camera-av-settings-user-level-management-server/MigrateCameraAvSettingsUserLevelManagementServerStorage.cpp
 src/app/clusters/camera-av-settings-user-level-management-server/MigrateCameraAvSettingsUserLevelManagementServerStorage.h
 src/app/clusters/camera-av-settings-user-level-management-server/tests/TestCameraAvSettingsUserLevelManagementCluster.cpp
