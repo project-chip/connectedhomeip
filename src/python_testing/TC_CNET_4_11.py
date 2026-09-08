@@ -989,6 +989,9 @@ async def verify_operational_network(test, ssid):
 
 
 class TC_CNET_4_11(MatterBaseTest):
+    # Wildcard subscriptions are disabled because this test includes a network swap and a
+    # session expiry where clients would not expect to maintain a long-term subscription
+    disable_wildcard_subscription = True
 
     @classmethod
     def setup_class(cls):

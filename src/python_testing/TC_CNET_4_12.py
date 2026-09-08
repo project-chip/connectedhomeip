@@ -48,6 +48,9 @@ class TC_CNET_4_12(MatterBaseTest):
 
     If any of the above PIXITs are missing, the test will raise an error.
     """
+    # Wildcard subscriptions are disabled because this test includes a network swap and a
+    # session expiry where clients would not expect to maintain a long-term subscription
+    disable_wildcard_subscription = True
 
     CLUSTER_CNET = Clusters.NetworkCommissioning
     CLUSTER_DESC = Clusters.Descriptor
