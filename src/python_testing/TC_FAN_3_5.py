@@ -426,7 +426,7 @@ class TC_FAN_3_5(MatterBaseTest):
         Raises:
             AssertionError: If the write operation fails.
         """
-        log.info(f"[FC] Writing to the {attribute.__name__} attribute, value: {value}")
+        log.info("[FC] Writing to the %s attribute, value: %s", attribute.__name__, value)
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         asserts.assert_equal(result[0].Status, Status.Success, f"[FC] {attribute.__name__} attribute write failed.")
 
@@ -441,7 +441,8 @@ class TC_FAN_3_5(MatterBaseTest):
         """
         try:
             log.info(
-                f"[FC] Sending Step command - direction: {step.direction.name}, wrap: {step.wrap}, lowestOff: {step.lowestOff}")
+                "[FC] Sending Step command - direction: %s, wrap: %s, lowestOff: %s",
+                step.direction.name, step.wrap, step.lowestOff)
             await self.send_single_cmd(step, endpoint=self.endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
@@ -456,7 +457,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AssertionError: If an unexpected error occurs during command execution.
         """
         try:
-            log.info(f"[FC] Sending OnOff command: {cmd}")
+            log.info("[FC] Sending OnOff command: %s", cmd)
             await self.send_single_cmd(cmd, endpoint=self.endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
@@ -558,16 +559,15 @@ class TC_FAN_3_5(MatterBaseTest):
         self.percent_setting_per_step = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
 
         percent_setting_sub.cancel()
-        log.info(f"[FC] PercentSetting range per Step: {self.percent_setting_per_step}")
+        log.info("[FC] PercentSetting range per Step: %s", self.percent_setting_per_step)
 
     def get_expected_percent_setting(self, step: Clusters.FanControl.Commands.Step) -> int:
         cluster = Clusters.FanControl
         sd_enum = cluster.Enums.StepDirectionEnum
 
         min_percent_setting = 0 if step.lowestOff else self.percent_setting_per_step
-        percent_setting_expected = 100 if step.direction == sd_enum.kIncrease else min_percent_setting
+        return 100 if step.direction == sd_enum.kIncrease else min_percent_setting
 
-        return percent_setting_expected
 
     async def lowest_off_field_conditions_test(self, step: Clusters.FanControl.Commands.Step) -> None:
         cluster = Clusters.FanControl
@@ -578,7 +578,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # Get the expected final PercentSetting value based on the Step command parameters
         percent_setting_expected = self.get_expected_percent_setting(step)
         if step.direction == cluster.Enums.StepDirectionEnum.kDecrease and not step.wrap and not step.lowestOff:
-            log.info(f"[FC] Step command: {step}, percent_setting_expected: {percent_setting_expected}")
+            log.info("[FC] Step command: %s, percent_setting_expected: %s", step, percent_setting_expected)
 
         # The minimum PercentSetting increment per step is 1. The loop is written to handle that case, but it
         # won't necessarily run 100 iterations, only as many can fit within the 0–100 PercentSetting range.
@@ -599,7 +599,7 @@ class TC_FAN_3_5(MatterBaseTest):
             else:
                 percent_setting = percent_setting_last
 
-            log.info(f"[FC] PercentSetting attribute report value: {percent_setting}")
+            log.info("[FC] PercentSetting attribute report value: %s", percent_setting)
 
             # Once PercentSetting reaches the expected value, send an extra Step command to verify
             # that the PercentSetting attribute report value stays at the expected value (no wrap)
@@ -622,7 +622,7 @@ class TC_FAN_3_5(MatterBaseTest):
                     f"[FC] The expected PercentSetting attribute value ({percent_setting_expected}) was never reached, the last reported value is ({percent_setting})."
                 )
 
-            log.info(f"[FC] percent_setting_from_queue: {self.percent_setting_from_queue}")
+            log.info("[FC] percent_setting_from_queue: %s", self.percent_setting_from_queue)
 
     def next_step(self) -> None:
         """Advance to the next declared test step, using its declared identifier.
@@ -755,11 +755,11 @@ class TC_FAN_3_5(MatterBaseTest):
                     sub.log_queue()
 
         if not handle_current_values:
-            log.info(f"[FC] fan_mode_values_produced: {fan_mode_values_produced}")
-            log.info(f"[FC] speed_setting_values_produced: {speed_setting_values_produced}")
+            log.info("[FC] fan_mode_values_produced: %s", fan_mode_values_produced)
+            log.info("[FC] speed_setting_values_produced: %s", speed_setting_values_produced)
         else:
-            log.info(f"[FC] percent_current_values_produced: {percent_current_values_produced}")
-            log.info(f"[FC] speed_current_values_produced: {speed_current_values_produced}")
+            log.info("[FC] percent_current_values_produced: %s", percent_current_values_produced)
+            log.info("[FC] speed_current_values_produced: %s", speed_current_values_produced)
 
         if not handle_current_values:
             dependent_values1 = fan_mode_values_produced
@@ -776,7 +776,6 @@ class TC_FAN_3_5(MatterBaseTest):
             fan_mode_remove = fm_enum.kOff if percent_setting_init == 0 else fm_enum.kHigh
             speed_setting_remove = 0 if percent_setting_init == 0 else self.speed_max
         else:
-            percent_current_remove = 0 if percent_setting_init == 0 else 100
             speed_current_remove = 0 if percent_setting_init == 0 else self.speed_max
 
         # Remove initialization attribute values from the full attribute value ranges
@@ -784,8 +783,6 @@ class TC_FAN_3_5(MatterBaseTest):
             fan_modes_init_removed = [x for x in self.fan_modes if x != fan_mode_remove]
             speed_setting_init_removed = [x for x in speed_max_range if x != speed_setting_remove]
         else:
-            percent_current_init_removed = [x for x in list(
-                reversed(percent_current_values_produced)) if x != percent_current_remove]
             speed_current_init_removed = [x for x in speed_max_range if x != speed_current_remove]
 
         # When the Step command has direction=decrease and lowestOff=False, the zero or Off state will never be reached,
@@ -799,17 +796,19 @@ class TC_FAN_3_5(MatterBaseTest):
             speed_setting_expected = speed_setting_init_removed[trim] if step.direction == sd_enum.kIncrease else list(
                 reversed(speed_setting_init_removed))[trim]
         else:
-            percent_current_expected = list(reversed(percent_current_init_removed))[
-                trim] if step.direction == sd_enum.kIncrease else list(reversed(percent_current_init_removed))
+            # PercentCurrent tracks PercentSetting, so the expected values are the PercentSetting
+            # values actually reported during stepping, not a list derived from the PercentCurrent
+            # reports themselves (which would compare the reports against a copy of themselves).
+            percent_current_expected = percent_setting_values_produced
             speed_current_expected = speed_current_init_removed[trim] if step.direction == sd_enum.kIncrease else list(
                 reversed(speed_current_init_removed))[trim]
 
         if not handle_current_values:
-            log.info(f"[FC] fan_modes_expected: {fan_modes_expected}")
-            log.info(f"[FC] speed_setting_expected: {speed_setting_expected}")
+            log.info("[FC] fan_modes_expected: %s", fan_modes_expected)
+            log.info("[FC] speed_setting_expected: %s", speed_setting_expected)
         else:
-            log.info(f"[FC] percent_current_expected: {percent_current_expected}")
-            log.info(f"[FC] speed_current_expected: {speed_current_expected}")
+            log.info("[FC] percent_current_expected: %s", percent_current_expected)
+            log.info("[FC] speed_current_expected: %s", speed_current_expected)
 
         if not handle_current_values:
             # If the number of PercentSetting reports is greater than the number of FanMode reports,
@@ -857,10 +856,10 @@ class TC_FAN_3_5(MatterBaseTest):
                                   dependent_values2, handle_current_values)
 
     def save_baseline_values(self, step: Clusters.FanControl.Commands.Step, percent_setting_values_produced: list, dependent_values_produced1: list, dependent_values_produced2: list, handle_current_values: bool) -> None:
-        """This method saves the baseline PercentSetting, FanMode, and SpeedSetting values 
+        """This method saves the baseline PercentSetting, FanMode, and SpeedSetting values
         in both ascending and descending orders based on the Step command direction for
         future verification.
-        The last element of each list is removed as it represents the initialization 
+        The last element of each list is removed as it represents the initialization
         value from the opposite direction, which is not considered in the reports.
 
         Args:
@@ -894,15 +893,15 @@ class TC_FAN_3_5(MatterBaseTest):
 
     def verify_baseline_values(self, handle_current_values: bool) -> None:
         """
-        Verifies that the baseline values for PercentSetting, FanMode, and SpeedSetting 
+        Verifies that the baseline values for PercentSetting, FanMode, and SpeedSetting
         attributes are consistent after performing Step command decrease/increase operations.
 
-        This method checks if the descending baseline values are the reverse of the 
-        ascending baseline values for each attribute. If the values do not match, 
+        This method checks if the descending baseline values are the reverse of the
+        ascending baseline values for each attribute. If the values do not match,
         an assertion error is raised with a detailed message indicating the mismatch.
 
         Raises:
-            AssertionError: If the descending baseline values do not match the reversed 
+            AssertionError: If the descending baseline values do not match the reversed
                             ascending baseline values for any of the attributes.
         """
         asserts.assert_equal(
