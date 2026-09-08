@@ -23,12 +23,12 @@
 namespace chip {
 namespace app {
 
-void LoggingIdentifyDelegate::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
+void LoggingIdentifyDelegate::OnIdentifyStart(Clusters::IdentifyCluster & /*cluster*/)
 {
     ChipLogProgress(DeviceLayer, "LoggingIdentifyDelegate: Identify START");
 }
 
-void LoggingIdentifyDelegate::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
+void LoggingIdentifyDelegate::OnIdentifyStop(Clusters::IdentifyCluster & /*cluster*/)
 {
     ChipLogProgress(DeviceLayer, "LoggingIdentifyDelegate: Identify STOP");
 }

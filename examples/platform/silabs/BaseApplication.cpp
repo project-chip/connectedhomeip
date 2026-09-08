@@ -175,6 +175,9 @@ int sCodeDrivenIdentifyActiveCount                                 = 0;
 Clusters::Identify::EffectIdentifierEnum sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 Clusters::Identify::EffectVariantEnum sCodeDrivenIdentifyVariant   = Clusters::Identify::EffectVariantEnum::kDefault;
 
+// Protects the three sCodeDrivenIdentify* variables above.
+osSemaphoreId_t sCodeDrivenIdentifyLock = nullptr;
+
 } // namespace
 
 bool BaseApplication::sIsProvisioned                  = false;
@@ -287,6 +290,13 @@ CHIP_ERROR BaseApplication::Init()
 CHIP_ERROR BaseApplication::BaseInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    sCodeDrivenIdentifyLock = osSemaphoreNew(1, 1, nullptr);
+    if (sCodeDrivenIdentifyLock == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to create code-driven identify lock");
+        appError(APP_ERROR_ALLOCATION_FAILED);
+    }
 
 #if SL_MATTER_DISPLAY_ENABLED
     TEMPORARY_RETURN_IGNORED GetLCD().Init((uint8_t *) APP_TASK_NAME);
@@ -418,6 +428,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
     activeEffect = sIdentifyEffect;
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
     if (sCodeDrivenIdentifyActiveCount > 0)
     {
         isIdentifyActive = true;
@@ -427,6 +438,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
     {
         activeEffect = sCodeDrivenIdentifyEffect;
     }
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
 
     if (isIdentifyActive)
     {
@@ -791,16 +803,26 @@ namespace {
 void CodeDrivenTriggerEffectCompleted(chip::System::Layer *, void *)
 {
     ChipLogDetail(Zcl, "Trigger Identify Complete (code-driven)");
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
     sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    BaseApplication::StopStatusLEDTimer();
+    const bool wentIdle = (sCodeDrivenIdentifyActiveCount == 0 && sCodeDrivenIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect);
+#endif
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (wentIdle)
+    {
+        BaseApplication::StopStatusLEDTimer();
+    }
 #endif
 }
 } // namespace
 
 void BaseApplication::NotifyCodeDrivenIdentifyStart()
 {
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
     ++sCodeDrivenIdentifyActiveCount;
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     StartStatusLEDTimer();
 #endif
@@ -808,12 +830,17 @@ void BaseApplication::NotifyCodeDrivenIdentifyStart()
 
 void BaseApplication::NotifyCodeDrivenIdentifyStop()
 {
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
     if (sCodeDrivenIdentifyActiveCount > 0)
     {
         --sCodeDrivenIdentifyActiveCount;
     }
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    if (sCodeDrivenIdentifyActiveCount == 0)
+    const bool wentIdle = (sCodeDrivenIdentifyActiveCount == 0 && sCodeDrivenIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect);
+#endif
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (wentIdle)
     {
         StopStatusLEDTimer();
     }
@@ -823,8 +850,10 @@ void BaseApplication::NotifyCodeDrivenIdentifyStop()
 void BaseApplication::NotifyCodeDrivenTriggerEffect(Clusters::Identify::EffectIdentifierEnum effect,
                                                     Clusters::Identify::EffectVariantEnum variant)
 {
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
     sCodeDrivenIdentifyEffect  = effect;
     sCodeDrivenIdentifyVariant = variant;
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
 
     if (variant != Clusters::Identify::EffectVariantEnum::kDefault)
     {
@@ -856,7 +885,9 @@ void BaseApplication::NotifyCodeDrivenTriggerEffect(Clusters::Identify::EffectId
         (void) chip::DeviceLayer::SystemLayer().CancelTimer(CodeDrivenTriggerEffectCompleted, nullptr);
         break;
     default:
+        osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
         sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+        osSemaphoreRelease(sCodeDrivenIdentifyLock);
         ChipLogDetail(Zcl, "No identifier effect");
     }
 }
