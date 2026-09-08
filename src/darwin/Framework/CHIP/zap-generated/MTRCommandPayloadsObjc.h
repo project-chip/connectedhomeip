@@ -3223,6 +3223,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterCertificateChainRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull certificateType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+@property (nonatomic, copy) NSNumber * _Nullable cryptoProfile MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable segmentID MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable maxSegmentSize MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3253,6 +3259,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterCertificateChainResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSData * _Nonnull certificate MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+@property (nonatomic, copy) NSNumber * _Nullable totalDocumentSize MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable nextSegmentID MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -9464,8 +9474,6 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nullable bandwidth MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull securityMode MTR_PROVISIONALLY_AVAILABLE;
-
 @property (nonatomic, copy) MTRProximityRangingClusterRangingTriggerConditionStruct * _Nonnull trigger MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) MTRProximityRangingClusterReportingConditionStruct * _Nullable reportingCondition MTR_PROVISIONALLY_AVAILABLE;
@@ -9498,9 +9506,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRProximityRangingClusterStartRangingResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull resultCode MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable sessionID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull sessionID MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRProximityRangingClusterStartRangingResponseParams with a response-value dictionary

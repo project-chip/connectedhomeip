@@ -84,6 +84,17 @@ public:
     void SetIgnoreQueryImageCount(uint32_t count) { mIgnoreQueryImageCount = count; }
     void SetIgnoreApplyUpdateCount(uint32_t count) { mIgnoreApplyUpdateCount = count; }
     void SetQueryImageStatus(OTAQueryStatus status) { mQueryImageStatus = status; }
+    // When enabled, the configured QueryImageStatus (and its DelayedActionTime) is kept for
+    // every QueryImageResponse instead of reverting to UpdateAvailable after the first one.
+    void SetPersistQueryImageStatus(bool persist) { mPersistQueryImageStatus = persist; }
+    OTAQueryStatus GetQueryImageStatus() const { return mQueryImageStatus; }
+    uint32_t GetDelayedQueryActionTimeSec() const { return mDelayedQueryActionTimeSec; }
+
+    // Applies the post-response transition of the QueryImage state: unless persistence is
+    // enabled, revert QueryImageStatus to UpdateAvailable and DelayedActionTime to 0 so that
+    // subsequent queries default to UpdateAvailable. Called at the end of HandleQueryImage;
+    // exposed so the persistence behaviour can be unit tested without a full server/BDX stack.
+    void ApplyQueryImageStatusAfterResponse();
     void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
     {
         mUpdateAction = action;
@@ -154,6 +165,7 @@ private:
     char mImageUri[kUriMaxLen];
     bool mImageUriIsSupplied = false;
     OTAQueryStatus mQueryImageStatus;
+    bool mPersistQueryImageStatus = false;
     OTAApplyUpdateAction mUpdateAction;
     uint32_t mIgnoreQueryImageCount;
     uint32_t mIgnoreApplyUpdateCount;
