@@ -210,9 +210,6 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
 
         self.step(4)
         initDuration = 10
-        augDuration = 5
-        maxDuration = 20
-        blindDuration = 1
         preRollLength = 4
         try:
             zoneList = []
