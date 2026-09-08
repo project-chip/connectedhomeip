@@ -104,10 +104,18 @@ CHIP_ERROR AvAnalysisManager::PersistentAttributesLoadedCallback()
 /**
  * Context event handling
  */
-void AvAnalysisManager::OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, bool& triggeredContextEnabled)
+void AvAnalysisManager::OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds, bool& triggeredContextEnabled)
 {
-    // Event generation logic goes here
-    triggeredContextEnabled = true;
+    ChipLogProgress(Camera, "AvAnalysisManager::OnAmbientContextTriggeredEvent. Namespace %d, Tag %d", namespaceId, tagId);
+    // Context defined as semantic tags
+    Globals::Structs::SemanticTagStruct::Type context;
+    
+    context.namespaceID = namespaceId;
+    context.tag         = tagId;
+    
+    // Verify that the triggering context and zones are part of our set of active context triggers
+    triggeredContextEnabled = GetServer()->IsTriggeringContextActive(context, zoneIds);
+    ChipLogProgress(Camera, "AvAnalysisManager::OnAmbientContextTriggeredEvent. ContextEnabled %s.", triggeredContextEnabled ? "true" : "false");
 }
 
 /*

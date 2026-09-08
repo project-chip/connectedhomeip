@@ -73,7 +73,7 @@ public:
     /**
      * Context event detection handling
      */
-    void OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, bool& triggeredContextEnabled);
+    void OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds, bool& triggeredContextEnabled);
 
     /**
      * Camera App interface

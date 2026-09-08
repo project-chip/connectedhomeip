@@ -750,6 +750,82 @@ bool AvAnalysisServerLogic::ZoneIDListContains(const DataModel::DecodableList<ui
     return false;
 }
 
+bool AvAnalysisServerLogic::AreAllZoneIdsFound(const std::vector<uint16_t>& subset, const std::vector<uint16_t>& target) {
+    return std::all_of(subset.begin(), subset.end(), [&](uint16_t val) {
+        return std::find(target.begin(), target.end(), val) != target.end();
+    });
+}
+
+/**
+ * 
+ */
+bool AvAnalysisServerLogic::IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext, 
+                                                      Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds)
+{
+    ChipLogProgress(Zcl, "AvAnalysisServer::IsTriggeringContextActive.");
+
+    // If we have per zone detect, but no provided zones (Null counts as provided), then fail
+    // 
+    if (HasFeature(Feature::kPerZoneContextDetection))
+    {
+        if (!aZoneIds.HasValue())
+        {
+            ChipLogError(Zcl, "AvAnalysisServer::IsTriggeringContextActive. No zone IDs with PerZoneDetect set.");
+            return false;
+        }
+    }
+        
+    // Make sure the context is part of our active set
+    //
+    auto it = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
+                        [&aContext](AmbientContextStorage & acs) {
+                            return acs.GetContext().namespaceID == aContext.namespaceID &&
+                                   acs.GetContext().tag == aContext.tag;
+                        });
+
+
+    // If we have a discovered context, do any provided zoneIds also match.
+    // If the context has Null zones then any zone ID matches
+    //
+    if (it != mActiveAmbientContextTriggers.end())
+    {
+        // If no Per Zone, then no local zones, we have a match
+        if (!HasFeature(Feature::kPerZoneContextDetection))
+        {
+            return true;
+        }
+        
+        // Get the Zone IDs for the context
+        Optional<DataModel::Nullable<std::vector<uint16_t>>> mContextZoneIds = it->GetZoneIDs();
+        
+        // We know that we have local ZoneIDs, check anyway to keep compilers happy
+        if (mContextZoneIds.HasValue())
+        {
+            if (mContextZoneIds.Value().IsNull())
+            {
+                // Null means match on all zones, doesn't matter what was passed in
+                //
+                return true;
+            }
+            
+            // Compare the vectors, what was passed in has to be present in our local set.  If no zones passed in, fail. We
+            // know that there is a value as we have Per Zone Detect, and we verified presence earlier.
+            //
+            if (aZoneIds.Value().IsNull())
+            {
+                return false;
+            }
+
+            if (AreAllZoneIdsFound(aZoneIds.Value().Value(), mContextZoneIds.Value().Value()))
+            {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
 CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
                                                        const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
                                                        ServerClusterContext * aContext)

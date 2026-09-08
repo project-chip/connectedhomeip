@@ -81,9 +81,17 @@ void CameraAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "AmbientContextTriggered")
     {
-        uint16_t namespaceValue = self->mJsonValue["NamespaceId"].asUInt();
-        uint16_t tagValue = self->mJsonValue["TagId"].asUInt(); 
-        self->OnAmbientContextTriggeredHandler(namespaceValue, tagValue);
+        uint8_t namespaceValue = self->mJsonValue["NamespaceId"].asUInt();
+        uint8_t tagValue = self->mJsonValue["TagId"].asUInt(); 
+        const Json::Value & zoneIdValues = self->mJsonValue["ZoneIds"];
+        std::vector<uint16_t> zoneIds;
+        
+        // ZoneIDs is always an array, it may be empty
+        for (const auto & zoneId : zoneIdValues)
+        {
+            zoneIds.push_back(static_cast<uint16_t>(zoneId.asUInt()));
+        }
+        self->OnAmbientContextTriggeredHandler(namespaceValue, tagValue, zoneIds);
     }
     else
     {
@@ -109,9 +117,9 @@ void CameraAppCommandHandler::OnSetHardPrivacyModeOnHandler(bool value)
     TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().SetHardPrivacyModeOn(value);
 }
 
-void CameraAppCommandHandler::OnAmbientContextTriggeredHandler(uint8_t namespaceId, uint8_t tagId)
+void CameraAppCommandHandler::OnAmbientContextTriggeredHandler(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds)
 {
-    mCameraDevice->HandleSimulatedAmbientContextTriggeredEvent(namespaceId, tagId);
+    mCameraDevice->HandleSimulatedAmbientContextTriggeredEvent(namespaceId, tagId, zoneIds);
 }
 
 void CameraAppCommandDelegate::SetCameraDevice(Camera::CameraDevice * aCameraDevice)

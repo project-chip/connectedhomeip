@@ -49,6 +49,7 @@ from TC_PAVSTTestBase import PAVSTTestBase
 from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
@@ -114,7 +115,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
             ),
             TestStep(
                 6,
-                "TH subscribes to the DUT's PushTransportBegin event and Ambient Context Event triggers the DUT to generate PushAV Event",
+                "TH subscribes to the DUT's PushTransportBegin event, then requests an Ambient Context Event trigger.",
                 "Successful completion of steps"
             ),
             TestStep(
@@ -134,11 +135,11 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
             ),
         ]
 
-    async def _trigger_ambient_context_event(self, namespace_id, tag_id, prompt_msg=None):
+    async def _trigger_ambient_context_event(self, namespace_id, tag_id, zone_ids, prompt_msg=None):
         # CI: Use app pipe to trigger ambient context event.
         # Manual: User should trigger an ambient context event from the defined zone.
         if self.is_pics_sdk_ci_only:
-            self.write_to_app_pipe({"Name": "AmbientContextTriggered", "NamespaceId": namespace_id, "TagID": tag_id})
+            self.write_to_app_pipe({"Name": "AmbientContextTriggered", "NamespaceId": namespace_id, "TagId": tag_id, "ZoneIds": zone_ids})
         else:
             if prompt_msg is None:
                 prompt_msg = "Press enter and immediately start a detectable ambient context activity anywhere in the frame."
@@ -149,18 +150,41 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
         endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
+        avcluster = Clusters.AvAnalysis
+        avattr = avcluster.Attributes
         pvcluster = Clusters.PushAvStreamTransport
-        pvattr = Clusters.PushAvStreamTransport.Attributes
+        pvattr = pvcluster.Attributes
         aAllocatedVideoStreams = []
         aAllocatedAudioStreams = []
 
         aConnectionID1 = ""
-
+        feature_map = await self.read_avanaly_attribute_expect_success(endpoint, avattr.FeatureMap)
+        self.has_feature_perzonedetect = (feature_map & avcluster.Bitmaps.Feature.kPerZoneContextDetection) != 0
+        
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
+        # Get the first of our suppported contexts, enable this, and use this as our event trigger
+        supported_ambient_contexts_dut = await self.read_avanaly_attribute_expect_success(endpoint, avattr.SupportedAmbientContexts)
+        
+        # Set ZoneIDs to None if no feature, Null if feature and no zone IDs
+        valid_context_zoneIDs = None
+        if self.has_feature_perzonedetect:
+            valid_context_zoneIDs = await self.get_zoneids_from_zone_management(endpoint)
+            if not valid_context_zoneIDs:
+                valid_context_zoneIDs = NullValue
+
+        valid_context_triggers = []
+        context_trigger = avcluster.Structs.ContextTriggerStruct(context=supported_ambient_contexts_dut[0], zoneIDs=valid_context_zoneIDs)
+        valid_context_triggers.append(context_trigger)
+
+        await self.send_enable_context_triggers_command(endpoint, valid_context_triggers)
+        
+        namespaceID = supported_ambient_contexts_dut[0].namespaceID
+        tagID = supported_ambient_contexts_dut[0].tag
+        
         self.step(1)
         # Commission DUT - already done
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
@@ -226,7 +250,11 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
                                    self.get_endpoint())
-        await self._trigger_ambient_context_event(0x47, 0x48, prompt_msg=f"Press enter and immediately start ambient context activity anywhere in the frame and stop the activity after {initDuration} seconds of pressing enter.")
+                                   
+        # Always send an array for ZoneIds in the command trigger
+        if not isinstance(valid_context_zoneIDs, list):
+            valid_context_zoneIDs = []
+        await self._trigger_ambient_context_event(namespaceID, tagID, valid_context_zoneIDs, prompt_msg=f"Press enter and immediately start ambient context activity anywhere in the frame and stop the activity after {initDuration} seconds of pressing enter.")
 
         self.step(7)
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)

@@ -156,6 +156,13 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(co
     return Status::UnsupportedCommand;
 }
 
+// Attribute interactions
+bool AvAnalysisCluster::IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext, 
+                                                  Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds) 
+{
+    return mLogic.IsTriggeringContextActive(aContext, aZoneIds);
+}
+
 // Context detection
 CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList)
 {
