@@ -237,8 +237,8 @@ public:
     struct OwnedDeviceLocation
     {
         static constexpr size_t kMaxLocationNameLength = 128;
-        char locationName[kMaxLocationNameLength] = {};
-        size_t locationNameLen = 0;
+        char locationName[kMaxLocationNameLength]      = {};
+        size_t locationNameLen                         = 0;
 
         std::optional<int16_t> floorNumber;
         std::optional<Globals::AreaTypeTag> areaType;
@@ -250,12 +250,8 @@ public:
         {
             return {
                 .locationName = CharSpan(locationName, locationNameLen),
-                .floorNumber  = floorNumber.has_value()
-                    ? DataModel::MakeNullable(*floorNumber)
-                    : DataModel::Nullable<int16_t>(),
-                .areaType = areaType.has_value()
-                    ? DataModel::MakeNullable(*areaType)
-                    : DataModel::Nullable<Globals::AreaTypeTag>(),
+                .floorNumber  = floorNumber.has_value() ? DataModel::MakeNullable(*floorNumber) : DataModel::Nullable<int16_t>(),
+                .areaType = areaType.has_value() ? DataModel::MakeNullable(*areaType) : DataModel::Nullable<Globals::AreaTypeTag>(),
             };
         }
 
