@@ -401,7 +401,7 @@ public:
 
         // Does the camera support PerZone analysis for AV triggers
         virtual bool GetCameraSupportsPerZoneDetect() = 0;
-        
+
         // Verify Zone presence
         virtual bool IsValidAnalysisZone(uint16_t zoneId) = 0;
 

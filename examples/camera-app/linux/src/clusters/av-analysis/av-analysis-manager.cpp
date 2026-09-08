@@ -33,38 +33,6 @@ using namespace chip::app::Clusters::AvAnalysis::Structs;
 void AvAnalysisManager::ShutdownApp() {}
 
 /**
- * Delegate command handlers
- */
-
-/**
- */
-Protocols::InteractionModel::Status AvAnalysisManager::EstablishAnalysisStream()
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-/**
- */
-Protocols::InteractionModel::Status AvAnalysisManager::ActivateAnalysisStream()
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-/**
- */
-Protocols::InteractionModel::Status AvAnalysisManager::DeactivateAnalysisStream()
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-/**
- */
-Protocols::InteractionModel::Status AvAnalysisManager::RemoveAnalysisStream()
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
-/**
  * Delegate command assists
  */
 CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs)
@@ -104,18 +72,21 @@ CHIP_ERROR AvAnalysisManager::PersistentAttributesLoadedCallback()
 /**
  * Context event handling
  */
-void AvAnalysisManager::OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds, bool& triggeredContextEnabled)
+void AvAnalysisManager::OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId,
+                                                       Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds,
+                                                       bool & triggeredContextEnabled)
 {
     ChipLogProgress(Camera, "AvAnalysisManager::OnAmbientContextTriggeredEvent. Namespace %d, Tag %d", namespaceId, tagId);
     // Context defined as semantic tags
     Globals::Structs::SemanticTagStruct::Type context;
-    
+
     context.namespaceID = namespaceId;
     context.tag         = tagId;
-    
+
     // Verify that the triggering context and zones are part of our set of active context triggers
     triggeredContextEnabled = GetServer()->IsTriggeringContextActive(context, zoneIds);
-    ChipLogProgress(Camera, "AvAnalysisManager::OnAmbientContextTriggeredEvent. ContextEnabled %s.", triggeredContextEnabled ? "true" : "false");
+    ChipLogProgress(Camera, "AvAnalysisManager::OnAmbientContextTriggeredEvent. ContextEnabled %s.",
+                    triggeredContextEnabled ? "true" : "false");
 }
 
 /*

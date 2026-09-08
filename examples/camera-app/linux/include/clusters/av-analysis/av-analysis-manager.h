@@ -39,29 +39,8 @@ public:
     virtual void ShutdownApp() override;
 
     /**
-     * Delegate command handlers
+     * Delegate command assists
      */
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status ActivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status DeactivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status RemoveAnalysisStream() override;
-
-    /**
-     * Delegate command helpers
-     */
-
     virtual CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override;
 
     virtual bool CanAddContextTriggers() override;
@@ -69,11 +48,13 @@ public:
     void ActiveAmbientContextTriggersUpdated() override;
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
-    
+
     /**
      * Context event detection handling
      */
-    void OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds, bool& triggeredContextEnabled);
+    void OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId,
+                                        Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds,
+                                        bool & triggeredContextEnabled);
 
     /**
      * Camera App interface

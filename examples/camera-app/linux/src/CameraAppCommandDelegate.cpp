@@ -81,11 +81,11 @@ void CameraAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "AmbientContextTriggered")
     {
-        uint8_t namespaceValue = self->mJsonValue["NamespaceId"].asUInt();
-        uint8_t tagValue = self->mJsonValue["TagId"].asUInt(); 
+        uint8_t namespaceValue           = self->mJsonValue["NamespaceId"].asUInt();
+        uint8_t tagValue                 = self->mJsonValue["TagId"].asUInt();
         const Json::Value & zoneIdValues = self->mJsonValue["ZoneIds"];
         std::vector<uint16_t> zoneIds;
-        
+
         // ZoneIDs is always an array, it may be empty
         for (const auto & zoneId : zoneIdValues)
         {

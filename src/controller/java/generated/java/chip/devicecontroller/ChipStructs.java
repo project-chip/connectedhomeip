@@ -3631,6 +3631,82 @@ public static class OperationalCredentialsClusterNOCStruct {
     return output.toString();
   }
 }
+public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStruct {
+  public Integer PAASupportedProfiles;
+  public Integer PAISupportedProfiles;
+  public Integer DACSupportedProfiles;
+  private static final long PAA_SUPPORTED_PROFILES_ID = 0L;
+  private static final long PAI_SUPPORTED_PROFILES_ID = 1L;
+  private static final long DAC_SUPPORTED_PROFILES_ID = 2L;
+
+  public OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
+    Integer PAASupportedProfiles,
+    Integer PAISupportedProfiles,
+    Integer DACSupportedProfiles
+  ) {
+    this.PAASupportedProfiles = PAASupportedProfiles;
+    this.PAISupportedProfiles = PAISupportedProfiles;
+    this.DACSupportedProfiles = DACSupportedProfiles;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PAA_SUPPORTED_PROFILES_ID, new UIntType(PAASupportedProfiles)));
+    values.add(new StructElement(PAI_SUPPORTED_PROFILES_ID, new UIntType(PAISupportedProfiles)));
+    values.add(new StructElement(DAC_SUPPORTED_PROFILES_ID, new UIntType(DACSupportedProfiles)));
+
+    return new StructType(values);
+  }
+
+  public static OperationalCredentialsClusterPQCDeviceAttestationProfileStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer PAASupportedProfiles = null;
+    Integer PAISupportedProfiles = null;
+    Integer DACSupportedProfiles = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PAA_SUPPORTED_PROFILES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          PAASupportedProfiles = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PAI_SUPPORTED_PROFILES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          PAISupportedProfiles = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DAC_SUPPORTED_PROFILES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          DACSupportedProfiles = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
+      PAASupportedProfiles,
+      PAISupportedProfiles,
+      DACSupportedProfiles
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OperationalCredentialsClusterPQCDeviceAttestationProfileStruct {\n");
+    output.append("\tPAASupportedProfiles: ");
+    output.append(PAASupportedProfiles);
+    output.append("\n");
+    output.append("\tPAISupportedProfiles: ");
+    output.append(PAISupportedProfiles);
+    output.append("\n");
+    output.append("\tDACSupportedProfiles: ");
+    output.append(DACSupportedProfiles);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class GroupKeyManagementClusterGroupInfoMapStruct {
   public Integer groupId;
   public ArrayList<Integer> endpoints;

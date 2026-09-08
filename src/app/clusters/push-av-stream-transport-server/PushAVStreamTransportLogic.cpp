@@ -537,7 +537,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
             !triggerOptions.motionTimeControl.HasValue(), Status::InvalidCommand,
             ChipLogError(
                 Zcl, "Transport Options verification from command data[ep=%d]: Found Motion Time Control which is not expected ",
-                mEndpointId));                       
+                mEndpointId));
     }
     else
     {
