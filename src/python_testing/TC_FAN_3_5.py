@@ -569,7 +569,6 @@ class TC_FAN_3_5(MatterBaseTest):
         min_percent_setting = 0 if step.lowestOff else self.percent_setting_per_step
         return 100 if step.direction == sd_enum.kIncrease else min_percent_setting
 
-
     async def lowest_off_field_conditions_test(self, step: Clusters.FanControl.Commands.Step) -> None:
         cluster = Clusters.FanControl
         attr = cluster.Attributes
