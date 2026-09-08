@@ -16,6 +16,7 @@
  */
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <inttypes.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters::WindowCovering;
@@ -27,6 +28,20 @@ namespace {
 
 constexpr System::Clock::Milliseconds32 kTransitionInterval = System::Clock::Milliseconds32(500);
 constexpr Percent100ths kPositionStep                       = 500; // 5% step
+
+// Returns the next position, moved at most kPositionStep towards target.
+Percent100ths ComputeStepToTarget(Percent100ths current, Percent100ths target)
+{
+    if (current < target)
+    {
+        return static_cast<Percent100ths>((target - current > kPositionStep) ? (current + kPositionStep) : target);
+    }
+    else if (current > target)
+    {
+        return static_cast<Percent100ths>((current - target > kPositionStep) ? (current - kPositionStep) : target);
+    }
+    return current;
+}
 
 } // namespace
 
@@ -135,18 +150,21 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
 
     auto & cluster = WindowCoveringCluster();
 
-    // Freeze the covering exactly where it is by updating targets to match current values
-    cluster.SetTargetPositionLiftPercent100ths(cluster.GetCurrentPositionLiftPercent100ths());
-    cluster.SetTargetPositionTiltPercent100ths(cluster.GetCurrentPositionTiltPercent100ths());
+    // No need to freeze targets here: WindowCoveringCluster::HandleStopMotion() already sets
+    // target = current for us right after this returns CHIP_NO_ERROR.
 
-    [[maybe_unused]] auto currentLift = cluster.GetCurrentPositionLiftPercent100ths();
-    [[maybe_unused]] auto currentTilt = cluster.GetCurrentPositionTiltPercent100ths();
-    [[maybe_unused]] auto opStatus    = cluster.GetOperationalStatus();
+    auto currentLift = cluster.GetCurrentPositionLiftPercent100ths();
+    auto currentTilt = cluster.GetCurrentPositionTiltPercent100ths();
+    auto opStatus    = cluster.GetOperationalStatus();
 
-    ChipLogProgress(DeviceLayer,
-                    "WindowCovering: Halted. Frozen State -> Lift: %" PRIu16 ", Tilt: %" PRIu16 " | OpStatus raw=0x%02X",
-                    currentLift.IsNull() ? static_cast<uint16_t>(0) : currentLift.Value(),
-                    currentTilt.IsNull() ? static_cast<uint16_t>(0) : currentTilt.Value(), opStatus.Raw());
+    // Longest content is "65535\0" (max uint16_t), so 6 bytes covers either that or "NULL\0".
+    StringBuilder<6> liftStr;
+    currentLift.IsNull() ? liftStr.Add("NULL") : liftStr.AddFormat("%u", currentLift.Value());
+    StringBuilder<6> tiltStr;
+    currentTilt.IsNull() ? tiltStr.Add("NULL") : tiltStr.AddFormat("%u", currentTilt.Value());
+
+    ChipLogProgress(DeviceLayer, "WindowCovering: Halted. Frozen State -> Lift: %s, Tilt: %s | OpStatus raw=0x%02X",
+                    liftStr.c_str(), tiltStr.c_str(), opStatus.Raw());
 
     return CHIP_NO_ERROR;
 }
@@ -183,84 +201,34 @@ void SimulatedWindowCovering::TimerFired()
     {
         Percent100ths currentVal = cluster.GetCurrentPositionLiftPercent100ths().ValueOr(0);
         Percent100ths targetVal  = cluster.GetTargetPositionLiftPercent100ths().ValueOr(currentVal);
+        Percent100ths nextVal    = ComputeStepToTarget(currentVal, targetVal);
 
-        if (currentVal < targetVal)
-        {
-            if (targetVal - currentVal > kPositionStep)
-            {
-                currentVal = static_cast<Percent100ths>(currentVal + kPositionStep);
-            }
-            else
-            {
-                currentVal = targetVal;
-            }
-        }
-        else if (currentVal > targetVal)
-        {
-            if (currentVal - targetVal > kPositionStep)
-            {
-                currentVal = static_cast<Percent100ths>(currentVal - kPositionStep);
-            }
-            else
-            {
-                currentVal = targetVal;
-            }
-        }
-
-        cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
+        cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(nextVal));
         [[maybe_unused]] BitMask<OperationalStatus> opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
                         "WindowCovering: Simulating Lift -> %" PRIu16 " / Target %" PRIu16
                         " | OpStatus raw=0x%02X (global=%u, lift=%u)",
-                        currentVal, targetVal, opStatus.Raw(), opStatus.GetField(OperationalStatus::kGlobal),
+                        nextVal, targetVal, opStatus.Raw(), opStatus.GetField(OperationalStatus::kGlobal),
                         opStatus.GetField(OperationalStatus::kLift));
 
-        if (currentVal == targetVal)
-        {
-            mMovingLift = false;
-        }
+        mMovingLift = (nextVal != targetVal);
     }
 
     if (mMovingTilt)
     {
         Percent100ths currentVal = cluster.GetCurrentPositionTiltPercent100ths().ValueOr(0);
         Percent100ths targetVal  = cluster.GetTargetPositionTiltPercent100ths().ValueOr(currentVal);
+        Percent100ths nextVal    = ComputeStepToTarget(currentVal, targetVal);
 
-        if (currentVal < targetVal)
-        {
-            if (targetVal - currentVal > kPositionStep)
-            {
-                currentVal = static_cast<Percent100ths>(currentVal + kPositionStep);
-            }
-            else
-            {
-                currentVal = targetVal;
-            }
-        }
-        else if (currentVal > targetVal)
-        {
-            if (currentVal - targetVal > kPositionStep)
-            {
-                currentVal = static_cast<Percent100ths>(currentVal - kPositionStep);
-            }
-            else
-            {
-                currentVal = targetVal;
-            }
-        }
-
-        cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(currentVal));
+        cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(nextVal));
         [[maybe_unused]] BitMask<OperationalStatus> opStatus = cluster.GetOperationalStatus();
         ChipLogProgress(DeviceLayer,
                         "WindowCovering: Simulating Tilt -> %" PRIu16 " / Target %" PRIu16
                         " | OpStatus raw=0x%02X (global=%u, tilt=%u)",
-                        currentVal, targetVal, opStatus.Raw(), opStatus.GetField(OperationalStatus::kGlobal),
+                        nextVal, targetVal, opStatus.Raw(), opStatus.GetField(OperationalStatus::kGlobal),
                         opStatus.GetField(OperationalStatus::kTilt));
 
-        if (currentVal == targetVal)
-        {
-            mMovingTilt = false;
-        }
+        mMovingTilt = (nextVal != targetVal);
     }
 
     if (mMovingLift || mMovingTilt)
