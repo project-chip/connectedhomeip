@@ -49,7 +49,6 @@ AvAnalysisServerLogic::AvAnalysisServerLogic(
 
 AvAnalysisServerLogic::~AvAnalysisServerLogic()
 {
-    VerifyOrReturn(mCameraInteraction.InFlight());
     CancelCameraInteraction();
 }
 
@@ -108,6 +107,14 @@ void AvAnalysisServerLogic::CancelCameraInteraction()
 void AvAnalysisServerLogic::Shutdown()
 {
     CancelCameraInteraction();
+
+    // The WebRTC client forgot every session
+    for (auto & entry : mStreamTable)
+    {
+        entry.webRTCEndpointID.SetNull();
+        entry.webRTCSessionID.SetNull();
+        SetStreamState(entry, AnalysisStreamStateEnum::kPendingInitiation);
+    }
 
     // A command still waiting on a camera interaction can no longer be completed.
     ConcreteCommandPath commandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
@@ -708,7 +715,7 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
             // If the context exists, update the zone IDs, otherwise add a new entry
             //
             auto it2 = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
-                                    [&trigger](AvAnalysis::AmbientContextStorage acs) {
+                                    [&trigger](AvAnalysis::AmbientContextStorage & acs) {
                                         return acs.GetContext().namespaceID == trigger->context.namespaceID &&
                                             acs.GetContext().tag == trigger->context.tag;
                                     });

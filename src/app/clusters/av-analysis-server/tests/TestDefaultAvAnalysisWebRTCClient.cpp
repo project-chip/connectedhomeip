@@ -221,10 +221,15 @@ public:
     {
         mOffersRequested++;
         mLastOfferCallback = &aCallback;
+        if (mDeliverOfferSynchronously)
+        {
+            aCallback.OnOfferReady(CHIP_NO_ERROR, "v=0 synchronous offer"_span);
+        }
         return mCreateOfferResult;
     }
 
-    CHIP_ERROR mCreateOfferResult = CHIP_NO_ERROR;
+    CHIP_ERROR mCreateOfferResult   = CHIP_NO_ERROR;
+    bool mDeliverOfferSynchronously = false;
     void OnSessionAssigned(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override
     {
         mSessionsAssigned++;
@@ -644,6 +649,27 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, OfferHookRefusalFailsTheRequest)
     // Completed: the client accepts a new request again
     mPeerDelegate.mCreateOfferResult = CHIP_NO_ERROR;
     EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferDeliveredBeforeCreateOfferReturnsAnErrorStands)
+{
+    // The application hands the offer over from within CreateOffer, then returns an error anyway
+    mPeerDelegate.mDeliverOfferSynchronously = true;
+    mPeerDelegate.mCreateOfferResult         = CHIP_ERROR_INTERNAL;
+    DriveToOffer();
+
+    // The offer is on the wire: the late error must not fail the request behind it
+    EXPECT_EQ(mClient.mSendAttempts, 1);
+    EXPECT_EQ(mClient.CurrentRequest().GetPhase(), InterceptingWebRTCClient::Request::Phase::kInvoking);
+    EXPECT_EQ(mCallback.mInitiatedCount, 0);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 0);
+
+    // The camera's answer concludes it
+    FeedOfferResponse(55);
+    mClient.OnDone(mClient.Sender());
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+    EXPECT_EQ(mCallback.mLastSession, 55);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, ApplicationOfferFailureFailsTheRequest)

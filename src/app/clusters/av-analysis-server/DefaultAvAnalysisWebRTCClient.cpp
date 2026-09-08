@@ -341,7 +341,8 @@ void DefaultAvAnalysisWebRTCClient::OnProviderCheckComplete()
 
     mRequest.Advance(Request::Phase::kCreatingOffer);
     CHIP_ERROR err = mPeerDelegate->CreateOffer(*this);
-    if (err != CHIP_NO_ERROR)
+    // An offer delivered synchronously has moved the request on; only a request still awaiting one fails here
+    if (err != CHIP_NO_ERROR && mRequest.InPhase(Request::Phase::kCreatingOffer))
     {
         ChipLogError(Zcl, "AvAnalysisWebRTCClient: no SDP offer forthcoming: %" CHIP_ERROR_FORMAT, err.Format());
         FinishRequest(Status::Failure, mRequest.WebRTCSessionId());

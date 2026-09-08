@@ -2150,9 +2150,36 @@ TEST_F(TestRemoteAvAnalysisCluster, ShutdownDuringDeactivateAnswersTheCommandAnd
     pendingCallback->OnSessionEnded(Status::Success, 55);
     ASSERT_EQ(deactivateHandler.GetStatuses().size(), 1u);
 
-    // Restart: the persisted table comes back with its transitional state collapsed
-    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    // The WebRTC client forgot the session, so the stream is settled with it, before any restart
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
+
+    // Restart so the fixture TearDown shuts down a running server
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, ShutdownSettlesActiveStreamsToPendingInitiation)
+{
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+    ActivateStream(0, 2, 55);
+
+    // The client forgets the active session on Shutdown: the stream no longer refers to it
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(mFakeWebRTCClient.mCancelCount, 1);
+
+    Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
+    auto iter = streams.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kPendingInitiation);
+    ASSERT_TRUE(iter.GetValue().webRTCEndpointID.HasValue());
+    ASSERT_TRUE(iter.GetValue().webRTCEndpointID.Value().IsNull());
+
+    // Restart: the stream is activatable again
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ActivateStream(0, 2, 77);
+    ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 2);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableEncodeDecodeTest)
