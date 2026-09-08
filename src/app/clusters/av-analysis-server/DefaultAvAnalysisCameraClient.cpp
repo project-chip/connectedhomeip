@@ -110,8 +110,8 @@ void DefaultAvAnalysisCameraClient::StartProfileDiscovery()
 CHIP_ERROR DefaultAvAnalysisCameraClient::SendDiscoveryRead(AttributePathParams * aPaths, size_t aPathCount)
 {
     VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
-    // A ReadClient may only be destroyed from its OnDone, so it must not be replaced while a
-    // previous one's callbacks can still fire.
+    // A ReadClient may be destroyed outside its callbacks and from its own OnDone, but not from any
+    // other one, so it must not be replaced while a previous one's callbacks can still fire.
     VerifyOrReturnError(!mReadClient, CHIP_ERROR_INCORRECT_STATE);
 
     ReadPrepareParams readParams(mRequest.Session().Value());
@@ -432,8 +432,8 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand()
 {
     VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
 
-    // A CommandSender may only be destroyed from its own OnDone, so it must not be replaced while a
-    // previous one's callbacks can still fire.
+    // A CommandSender may be destroyed at any time except from its own OnResponse or OnError, so it
+    // must not be replaced while a previous one's callbacks can still fire.
     VerifyOrReturnError(!mCommandSender, CHIP_ERROR_INCORRECT_STATE);
 
     mCommandSender = Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager());

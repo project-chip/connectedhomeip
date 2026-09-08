@@ -1054,4 +1054,69 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
         CHIP_ERROR_NOT_FOUND);
 }
 
+TEST_F(TestLocalAvAnalysisCluster, TriggersPersistedWithoutZoneIDsLoadAsTheEntireFrame)
+{
+    // A stored entry carrying no ZoneIDs, as one persisted before this endpoint had
+    // PerZoneContextDetection would: the field is optional, so loading must not read it blindly
+    uint8_t buffer[128];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+
+    Structs::ContextTriggerStruct::Type stored;
+    stored.context.namespaceID = static_cast<uint8_t>(0x49);
+    stored.context.tag         = static_cast<uint8_t>(0x0B);
+    ASSERT_EQ(stored.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+
+    ConcreteAttributePath path(kTestEndpointId, Clusters::AvAnalysis::Id, Attributes::ActiveAmbientContextTriggers::Id);
+    ASSERT_EQ(
+        mClusterTester.GetServerClusterContext().attributeStorage.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())),
+        CHIP_NO_ERROR);
+
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType triggers;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, triggers), CHIP_NO_ERROR);
+    auto iter = triggers.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().context.namespaceID, 0x49);
+    ASSERT_EQ(iter.GetValue().context.tag, 0x0B);
+    // Restored as the entire frame, the meaning a null ZoneIDs list carries
+    ASSERT_TRUE(iter.GetValue().zoneIDs.HasValue());
+    ASSERT_TRUE(iter.GetValue().zoneIDs.Value().IsNull());
+    ASSERT_FALSE(iter.Next());
+}
+
+TEST_F(TestLocalAvAnalysisCluster, TheSerializedSizeEstimateHoldsForAWorstCaseTrigger)
+{
+    // The longest label the estimate budgets for, a non-null MfgCode and a full set of zones have to
+    // fit the size claimed for one entry: too small a buffer fails the store with only a logged error
+    std::vector<uint16_t> zones;
+    for (uint16_t zone = 0; zone < kTestMaxZones; zone++)
+    {
+        // Above 255 a zone id takes two bytes, its widest encoding
+        zones.push_back(static_cast<uint16_t>(0xFF00 + zone));
+    }
+    const std::string label(64, 'x');
+
+    Structs::ContextTriggerStruct::Type trigger;
+    trigger.context.mfgCode     = DataModel::MakeNullable(static_cast<chip::VendorId>(0xFFFE));
+    trigger.context.namespaceID = static_cast<uint8_t>(0xFF);
+    trigger.context.tag         = static_cast<uint8_t>(0xFF);
+    trigger.context.label       = MakeOptional(DataModel::MakeNullable(CharSpan(label.data(), label.size())));
+    trigger.zoneIDs = MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zones.data(), zones.size())));
+
+    const size_t claimed = ContextTriggerSerializedSize(kTestMaxZones);
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    ASSERT_TRUE(buffer.Alloc(claimed));
+
+    TLV::TLVWriter writer;
+    writer.Init(buffer.Get(), static_cast<uint32_t>(claimed));
+    EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), trigger), CHIP_NO_ERROR);
+    EXPECT_LE(writer.GetLengthWritten(), claimed);
+}
+
 } // namespace

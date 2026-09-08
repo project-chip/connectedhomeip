@@ -37,6 +37,16 @@ constexpr int8_t kMaxContextTriggers              = 50;
 constexpr size_t kSemanticTagStructSerializedSize =
     TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), static_cast<size_t>(64)); /* max label length */
 
+// Worst-case TLV size of one persisted ContextTriggerStruct: its Context and a ZoneIDs list of aMaxZones
+// entries, each an array element costing a control byte plus the value.
+constexpr size_t ContextTriggerSerializedSize(uint8_t aMaxZones)
+{
+    return TLV::EstimateStructOverhead(kSemanticTagStructSerializedSize, static_cast<size_t>((1 + sizeof(uint16_t)) * aMaxZones));
+}
+
+// TLV overhead of the array enclosing the persisted context triggers
+constexpr size_t kContextTriggerArrayOverhead = 4;
+
 /**
  * Helper Struct to provide memory backing for the stored contexts given that some attributes use
  * non-owning types (e.g. CharSpan, DataModel::List).

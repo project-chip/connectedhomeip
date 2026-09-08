@@ -346,16 +346,9 @@ CHIP_ERROR AvAnalysisServerLogic::StoreActiveAmbientContextTriggers()
     Platform::ScopedMemoryBuffer<uint8_t> contextTriggers;
     MutableByteSpan bufferSpan;
 
-    size_t maxBufferSize;
-    if (!mMaxZones.IsNull())
-    {
-        size_t zoneIDsSize = static_cast<size_t>(sizeof(uint16_t) * mMaxZones.Value());
-        maxBufferSize = static_cast<size_t>((kSemanticTagStructSerializedSize + zoneIDsSize) * kMaxActiveAmbientContextTriggers);
-    }
-    else
-    {
-        maxBufferSize = static_cast<size_t>(kSemanticTagStructSerializedSize * kMaxActiveAmbientContextTriggers);
-    }
+    size_t maxBufferSize = ContextTriggerSerializedSize(mMaxZones.ValueOr(static_cast<uint8_t>(0))) *
+            static_cast<size_t>(kMaxActiveAmbientContextTriggers) +
+        kContextTriggerArrayOverhead;
 
     if (!contextTriggers.Alloc(maxBufferSize))
     {
@@ -398,16 +391,9 @@ CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
     Platform::ScopedMemoryBuffer<uint8_t> contextTriggers;
     MutableByteSpan bufferSpan;
 
-    size_t maxBufferSize;
-    if (!mMaxZones.IsNull())
-    {
-        size_t zoneIDsSize = static_cast<size_t>(sizeof(uint16_t) * mMaxZones.Value());
-        maxBufferSize = static_cast<size_t>((kSemanticTagStructSerializedSize + zoneIDsSize) * kMaxActiveAmbientContextTriggers);
-    }
-    else
-    {
-        maxBufferSize = static_cast<size_t>(kSemanticTagStructSerializedSize * kMaxActiveAmbientContextTriggers);
-    }
+    size_t maxBufferSize = ContextTriggerSerializedSize(mMaxZones.ValueOr(static_cast<uint8_t>(0))) *
+            static_cast<size_t>(kMaxActiveAmbientContextTriggers) +
+        kContextTriggerArrayOverhead;
 
     if (!contextTriggers.Alloc(maxBufferSize))
     {
@@ -455,7 +441,8 @@ CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
             std::vector<uint16_t> zoneIDs;
             size_t size;
 
-            if (!trigger.zoneIDs.Value().IsNull())
+            // An entry stored without ZoneIDs reads as the entire frame
+            if (trigger.zoneIDs.HasValue() && !trigger.zoneIDs.Value().IsNull())
             {
                 err = trigger.zoneIDs.Value().Value().ComputeSize(&size);
                 VerifyOrReturnError(err == CHIP_NO_ERROR, err);
