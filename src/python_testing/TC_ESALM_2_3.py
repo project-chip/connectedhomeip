@@ -97,19 +97,19 @@ class TC_ESALM_2_3(MatterBaseTest):
         has_modify = cmds.ModifyEnabledAlarms.command_id in accepted_cmds
         has_reset = cmds.Reset.command_id in accepted_cmds
 
-        self.step("2a", "TH reads from the DUT the Supported attribute.",
+        self.step("2a", "TH reads from the DUT the Supported.",
                   expectation="Verify that the DUT response contains an AlarmBitmap (map32) value. Store the "
                               "value as Supported.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
 
-        self.step("2b", "TH reads from the DUT the Mask attribute.",
+        self.step("2b", "TH reads from the DUT the Mask.",
                   expectation="Verify that the DUT response contains an AlarmBitmap (map32) value. Store the "
                               "value as InitialMask.")
         initial_mask = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
 
-        self.step("2c", "TH reads from the DUT the State attribute.",
+        self.step("2c", "TH reads from the DUT the State.",
                   expectation="Verify that the DUT response contains an AlarmBitmap (map32) value. Store the "
                               "value as InitialState.")
         initial_state = await self.read_single_attribute_check_success(
@@ -126,7 +126,7 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(4, "TH reads from the DUT the Mask attribute.",
+        self.step(4, "TH reads from the DUT the Mask.",
                   expectation="Verify that the DUT response contains a value equal to Supported.")
         if has_modify:
             mask_val = await self.read_single_attribute_check_success(
@@ -153,7 +153,7 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(6, "TH reads from the DUT the Mask attribute.",
+        self.step(6, "TH reads from the DUT the Mask.",
                   expectation="Verify that the DUT response contains a value equal to 0 if step 5 succeeded, "
                               "otherwise the value is unchanged. Store the value as MaskAfterDisable.")
         mask_after_disable = 0
@@ -199,7 +199,7 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step("7a", "TH reads from the DUT the Mask attribute.",
+        self.step("7a", "TH reads from the DUT the Mask.",
                   expectation="Verify that the DUT response contains a value equal to MaskAfterDisable.")
         if has_modify:
             mask_val = await self.read_single_attribute_check_success(
@@ -216,7 +216,7 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step("8a", "TH reads from the DUT the Mask attribute.",
+        self.step("8a", "TH reads from the DUT the Mask.",
                   expectation="Verify that the DUT response contains a value equal to InitialMask.")
         if has_modify:
             mask_val = await self.read_single_attribute_check_success(
@@ -239,10 +239,10 @@ class TC_ESALM_2_3(MatterBaseTest):
             self.mark_current_step_skipped()
 
         target_bit = None
-        self.step(10, "TH reads from the DUT the Latch attribute. Store the value as LatchBits. Identify the "
+        self.step(10, "TH reads from the DUT the Latch. Store the value as LatchBits. Identify the "
                   "lowest-numbered bit that is set in LatchBits. Store the value as TargetBit.",
                   expectation="Verify that the DUT response contains a map32 AlarmBitmap. Store the value as "
-                              "LatchBits. If LatchBits equals 0, steps 10a-10d are not applicable; skip to "
+                              "LatchBits. If LatchBits equals 0, steps 10a–10d are not applicable; skip to "
                               "step 11.")
         if has_latch:
             latch = await self.read_single_attribute_check_success(
@@ -258,14 +258,16 @@ class TC_ESALM_2_3(MatterBaseTest):
         can_latch_test = target_bit is not None and target_bit in _SIMULATE_TRIGGER and has_reset
 
         self.step("10a", "Select the TestEventTrigger code from the PIXIT Variable Values table corresponding "
-                  "to TargetBit. TH sends TestEventTrigger with that code.",
+                  "to TargetBit. TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 "
+                  "with EnableKey field set to PIXIT.ESALM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to "
+                  "PIXIT.ESALM.TEST_EVENT_TRIGGER with that code.",
                   expectation="Verify DUT responds w/ status SUCCESS(0x00).")
         if can_latch_test:
             await self.send_test_event_triggers(eventTrigger=_SIMULATE_TRIGGER[target_bit])
         else:
             self.mark_current_step_skipped()
 
-        self.step("10b", "TH reads from the DUT the State attribute.",
+        self.step("10b", "TH reads from the DUT the State.",
                   expectation="Verify that the DUT response contains an AlarmBitmap with TargetBit set.")
         if can_latch_test:
             state = await self.read_single_attribute_check_success(
@@ -281,8 +283,8 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step("10d", "TH reads from the DUT the State attribute.",
-                  expectation="TargetBit is cleared in the State attribute.")
+        self.step("10d", "TH reads from the DUT the State.",
+                  expectation="TargetBit is cleared in State.")
         if can_latch_test:
             state_after = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.State)
@@ -309,7 +311,7 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step("11a", "TH reads from the DUT the State attribute.",
+        self.step("11a", "TH reads from the DUT the State.",
                   expectation="Verify that the DUT response contains an AlarmBitmap (map32) value equal to "
                               "InitialState (step 2c).")
         if has_reset and inactive_bit is not None:
