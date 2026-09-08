@@ -19,6 +19,8 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <lib/core/Optional.h>
 
+#include <istream>
+
 namespace chip {
 namespace Credentials {
 namespace Examples {
@@ -69,6 +71,8 @@ public:
     uint16_t GetPid() { return mPid; }
 
     void Init(const char * filepath);
+    /// Load provider JSON from a stream; malformed JSON leaves the current credentials unchanged.
+    CHIP_ERROR Init(std::istream & json);
     void Init(const TestHarnessDACProviderData & data);
 
 private:

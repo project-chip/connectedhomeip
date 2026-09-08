@@ -249,6 +249,23 @@ TestHarnessDACProvider::TestHarnessDACProvider(bool isPqcReady) : mIsPqcReady(is
 
 void TestHarnessDACProvider::Init(const char * filepath)
 {
+    std::ifstream json(filepath, std::ifstream::binary);
+    if (!json)
+    {
+        ChipLogError(AppServer, "Error opening json file: %s", StringOrNullMarker(filepath));
+        return;
+    }
+
+    // Preserve the file-based API while sharing JSON parsing with in-memory callers.
+    CHIP_ERROR err = Init(json);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Error parsing json file: %s: %" CHIP_ERROR_FORMAT, StringOrNullMarker(filepath), err.Format());
+    }
+}
+
+CHIP_ERROR TestHarnessDACProvider::Init(std::istream & json)
+{
     static constexpr char kDacCertKey[]      = "dac_cert";
     static constexpr char kDacPrivateKey[]   = "dac_private_key";
     static constexpr char kDacPublicKey[]    = "dac_public_key";
@@ -263,20 +280,9 @@ void TestHarnessDACProvider::Init(const char * filepath)
     static constexpr char kDescription[]     = "description";
     static constexpr char kPid[]             = "basic_info_pid";
 
-    std::ifstream json(filepath, std::ifstream::binary);
-    if (!json)
-    {
-        ChipLogError(AppServer, "Error opening json file: %s", StringOrNullMarker(filepath));
-        return;
-    }
-
     Json::Reader reader;
     Json::Value root;
-    if (!reader.parse(json, root))
-    {
-        ChipLogError(AppServer, "Error parsing json file: %s", StringOrNullMarker(filepath));
-        return;
-    }
+    VerifyOrReturnError(reader.parse(json, root), CHIP_ERROR_INVALID_ARGUMENT);
 
     TestHarnessDACProviderData data;
 
@@ -347,6 +353,7 @@ void TestHarnessDACProvider::Init(const char * filepath)
     }
 
     Init(data);
+    return CHIP_NO_ERROR;
 }
 
 void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
@@ -376,7 +383,11 @@ void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
     // one chain with a PAI from a different chain when a fixture is incomplete.
     const bool has44 = !mPqcPaiCertMlDsa44.empty() && !mPqcDacCertMlDsa44.empty();
     const bool has65 = !mPqcPaiCertMlDsa65.empty() && !mPqcDacCertMlDsa65.empty();
-    mProfileSupport  = {
+    // The storage suffix declares the PAA algorithm for that chain. It does not
+    // describe the PAI's own key: pai_profile_ml_dsa_44/65 declare that separately.
+    // For example, a complete _ml_dsa_65 pair with pai_profile_ml_dsa_65 = 0
+    // contributes ML-DSA-65 to PAA support and only ECDSA to PAI/DAC support.
+    mProfileSupport = {
         .paaSupportedProfiles =
             BuildProfileSupport(mPaiCert, has44 ? mPqcPaiCertMlDsa44 : ByteSpan(), has65 ? mPqcPaiCertMlDsa65 : ByteSpan()),
         .paiSupportedProfiles = BuildProfileSupport(mPaiCert, ByteSpan(), ByteSpan()),

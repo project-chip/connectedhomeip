@@ -40,7 +40,7 @@
 
 #include "CHIPAttCert_test_vectors.h"
 
-#include <fstream>
+#include <sstream>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -322,6 +322,73 @@ TEST_F(TestDeviceAttestationCredentials, TestMixedChainSelection)
     provider.Init(data);
     EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), Profile::kEcdsaMatterLegacy);
     EXPECT_FALSE(provider.HasRequiredPqcCredentials());
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestJsonIssuerProfilesAreIndependent)
+{
+    using namespace chip::Credentials::Examples;
+    struct IssuerProfiles
+    {
+        const char * suffix;
+        unsigned paiProfile;
+        uint8_t expectedPaaMask;
+        uint8_t expectedPaiMask;
+        DeviceAttestationCertProfile chain;
+    };
+    // Expected masks include the separate legacy chain supplied by default.
+    const IssuerProfiles cases[] = {
+        { "44", 0, 0x3, 0x1, DeviceAttestationCertProfile::kMlDsa44 },
+        { "44", 1, 0x3, 0x3, DeviceAttestationCertProfile::kMlDsa44 },
+        { "65", 0, 0x5, 0x1, DeviceAttestationCertProfile::kMlDsa65 },
+        { "65", 1, 0x5, 0x3, DeviceAttestationCertProfile::kMlDsa65 },
+        { "65", 2, 0x5, 0x5, DeviceAttestationCertProfile::kMlDsa65 },
+    };
+    for (const auto & testCase : cases)
+    {
+        std::stringstream json;
+        // Opaque document bytes exercise JSON provisioning and metadata, not certificate validation.
+        json << "{\"pai_cert_ml_dsa_" << testCase.suffix << "\":\"010203\","
+             << "\"dac_cert_ml_dsa_" << testCase.suffix << "\":\"040506\","
+             << "\"pai_profile_ml_dsa_" << testCase.suffix << "\":" << testCase.paiProfile << "}";
+        ASSERT_TRUE(json.good());
+
+        TestHarnessDACProvider provider(true);
+        ASSERT_EQ(provider.Init(json), CHIP_NO_ERROR);
+        const auto profiles = provider.GetDeviceAttestationProfileSupport();
+        EXPECT_EQ(profiles.paaSupportedProfiles.Raw(), testCase.expectedPaaMask);
+        EXPECT_EQ(profiles.paiSupportedProfiles.Raw(), testCase.expectedPaiMask);
+        EXPECT_EQ(profiles.dacSupportedProfiles.Raw(), 0x1);
+        EXPECT_TRUE(provider.HasRequiredPqcCredentials());
+        EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), testCase.chain);
+
+        TestHarnessDACProvider legacyProvider(false);
+        json.clear();
+        json.seekg(0);
+        ASSERT_EQ(legacyProvider.Init(json), CHIP_NO_ERROR);
+        const auto legacyProfiles = legacyProvider.GetDeviceAttestationProfileSupport();
+        EXPECT_EQ(legacyProfiles.paaSupportedProfiles.Raw(), 0x1);
+        EXPECT_EQ(legacyProfiles.paiSupportedProfiles.Raw(), 0x1);
+        EXPECT_EQ(legacyProfiles.dacSupportedProfiles.Raw(), 0x1);
+        EXPECT_FALSE(legacyProvider.HasRequiredPqcCredentials());
+    }
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestMalformedJsonPreservesCredentials)
+{
+    using namespace chip::Credentials::Examples;
+    TestHarnessDACProvider provider(true);
+    std::istringstream validJson(R"({"pai_cert_ml_dsa_65":"010203", "dac_cert_ml_dsa_65":"040506",
+                                  "pai_profile_ml_dsa_65":0})");
+    ASSERT_EQ(provider.Init(validJson), CHIP_NO_ERROR);
+    std::istringstream malformedJson("{");
+    // A truncated JSON object cannot be parsed and must not replace the loaded credentials.
+    EXPECT_EQ(provider.Init(malformedJson), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), DeviceAttestationCertProfile::kMlDsa65);
+    uint8_t buffer[3];
+    MutableByteSpan dac(buffer);
+    ASSERT_EQ(provider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa65, dac), CHIP_NO_ERROR);
+    constexpr uint8_t kExpectedDac[] = { 4, 5, 6 };
+    EXPECT_TRUE(dac.data_equal(ByteSpan(kExpectedDac)));
 }
 
 static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
