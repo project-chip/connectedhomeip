@@ -64,10 +64,9 @@ class TC_ESALM_2_1(MatterBaseTest):
         self.step(1, "Commission DUT to TH", is_commissioning=True)
 
         self.step(2, "TH reads FeatureMap attribute",
-                  expectation="DUT returns uint32. Store as FeatureMap.")
+                  expectation="DUT returns a uint32 value. Store as FeatureMap.")
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.FeatureMap)
-        has_reset = bool(feature_map & _F.kReset)
         has_overvolt = bool(feature_map & _F.kOverVoltage)
         has_undervolt = bool(feature_map & _F.kUnderVoltage)
         has_overfreq = bool(feature_map & _F.kOverFrequency)
@@ -79,10 +78,22 @@ class TC_ESALM_2_1(MatterBaseTest):
         has_powerimp = bool(feature_map & _F.kPowerImport)
         has_powerexp = bool(feature_map & _F.kPowerExport)
 
+        # The Latch attribute is optional (PICS_S.A0001), so step 5 is gated on its presence in
+        # the AttributeList rather than on any feature bit.
+        attribute_list = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attrs.AttributeList)
+        has_latch = attrs.Latch.attribute_id in attribute_list
+
         self.step(3, "TH reads Supported attribute",
-                  expectation="DUT returns AlarmBitmap. Each of the ten feature-linked alarms is "
-                              "consistent with FeatureMap in both directions; the five alarms without a "
-                              "feature may appear freely, and no reserved bits (15 and up) are set.")
+                  expectation="DUT returns an AlarmBitmap (map32) value. Store as Supported. Verify "
+                              "bidirectional consistency with FeatureMap: every bit set in Supported has a "
+                              "corresponding feature bit set in FeatureMap, and every feature bit set in "
+                              "FeatureMap has its corresponding bit set in Supported. Mapping: OverVoltage "
+                              "(bit 0) <-> OVERVOLT, UnderVoltage (bit 1) <-> UNDERVOLT, OverFrequency "
+                              "(bit 2) <-> OVERFREQ, UnderFrequency (bit 3) <-> UNDERFREQ, OverPower "
+                              "(bit 4) <-> OVERPOWER, UnderPower (bit 5) <-> UNDERPOWER, OverCurrent "
+                              "(bit 6) <-> OVERCUR, UnderCurrent (bit 7) <-> UNDERCUR, PowerImported "
+                              "(bit 13) <-> POWERIMP, PowerExported (bit 14) <-> POWEREXP.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
         asserts.assert_true(isinstance(supported, int), "Supported must be an integer bitmap")
@@ -146,15 +157,17 @@ class TC_ESALM_2_1(MatterBaseTest):
                              "Supported has reserved bits set outside the defined ESALM AlarmBitmap")
 
         self.step(4, "TH reads Mask attribute",
-                  expectation="DUT returns AlarmBitmap. Every bit set in Mask is also set in Supported.")
+                  expectation="DUT returns an AlarmBitmap (map32) value, where any bit set in Mask is also "
+                              "set in Supported.")
         mask = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
         asserts.assert_true(isinstance(mask, int), "Mask must be an integer bitmap")
         asserts.assert_equal(int(mask) & ~int(supported), 0, "Mask contains bits not set in Supported")
 
-        self.step(5, "TH reads Latch attribute (if RESET supported)",
-                  expectation="DUT returns AlarmBitmap. Every bit set in Latch is also set in Supported.")
-        if has_reset:
+        self.step(5, "TH reads Latch attribute (if PICS_S.A0001 supported)",
+                  expectation="DUT returns an AlarmBitmap (map32) value, where any bit set in Latch is also "
+                              "set in Supported.")
+        if has_latch:
             latch = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Latch)
             asserts.assert_true(isinstance(latch, int), "Latch must be an integer bitmap")
@@ -163,7 +176,8 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(6, "TH reads State attribute",
-                  expectation="DUT returns AlarmBitmap. Every bit set in State is also set in Supported.")
+                  expectation="DUT returns an AlarmBitmap (map32) value, where any bit set in State is also "
+                              "set in Supported.")
         state = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.State)
         asserts.assert_true(isinstance(state, int), "State must be an integer bitmap")
@@ -179,7 +193,8 @@ class TC_ESALM_2_1(MatterBaseTest):
         under_current = None
 
         self.step(7, "TH reads OverVoltageThreshold (if OVERVOLT supported)",
-                  expectation="DUT returns int64. Store as OverVoltageThreshold.")
+                  expectation="DUT returns a voltage-mV (int64) value. If UNDERVOLT is also supported, value "
+                              "is greater than or equal to (UnderVoltageThreshold + 1).")
         if has_overvolt:
             over_voltage = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverVoltageThreshold)
@@ -188,7 +203,8 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(8, "TH reads UnderVoltageThreshold (if UNDERVOLT supported)",
-                  expectation="DUT returns int64. Store as UnderVoltageThreshold. If both supported: OverVoltage >= UnderVoltage + 1.")
+                  expectation="DUT returns a voltage-mV (int64) value. If OVERVOLT is also supported, value "
+                              "is less than or equal to (OverVoltageThreshold - 1).")
         if has_undervolt:
             under_voltage = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderVoltageThreshold)
@@ -200,7 +216,8 @@ class TC_ESALM_2_1(MatterBaseTest):
                                          "OverVoltageThreshold must be >= UnderVoltageThreshold + 1")
 
         self.step(9, "TH reads OverFrequencyThreshold (if OVERFREQ supported)",
-                  expectation="DUT returns int64. Store as OverFrequencyThreshold.")
+                  expectation="DUT returns an int64 value in millihertz. If UNDERFREQ is also supported, "
+                              "value is greater than or equal to (UnderFrequencyThreshold + 1).")
         if has_overfreq:
             over_frequency = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverFrequencyThreshold)
@@ -209,7 +226,8 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(10, "TH reads UnderFrequencyThreshold (if UNDERFREQ supported)",
-                  expectation="DUT returns int64. Store as UnderFrequencyThreshold. If both supported: OverFreq >= UnderFreq + 1.")
+                  expectation="DUT returns an int64 value in millihertz. If OVERFREQ is also supported, "
+                              "value is less than or equal to (OverFrequencyThreshold - 1).")
         if has_underfreq:
             under_frequency = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderFrequencyThreshold)
@@ -221,7 +239,8 @@ class TC_ESALM_2_1(MatterBaseTest):
                                          "OverFrequencyThreshold must be >= UnderFrequencyThreshold + 1")
 
         self.step(11, "TH reads OverPowerThreshold (if OVERPOWER supported)",
-                  expectation="DUT returns int64. Store as OverPowerThreshold.")
+                  expectation="DUT returns a power-mW (int64) value. If UNDERPOWER is also supported, value "
+                              "is greater than or equal to (UnderPowerThreshold + 1).")
         if has_overpower:
             over_power = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverPowerThreshold)
@@ -230,7 +249,8 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(12, "TH reads UnderPowerThreshold (if UNDERPOWER supported)",
-                  expectation="DUT returns int64. If both supported: OverPower >= UnderPower + 1.")
+                  expectation="DUT returns a power-mW (int64) value. If OVERPOWER is also supported, value "
+                              "is less than or equal to (OverPowerThreshold - 1).")
         if has_underpower:
             under_power = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderPowerThreshold)
@@ -242,7 +262,8 @@ class TC_ESALM_2_1(MatterBaseTest):
                                          "OverPowerThreshold must be >= UnderPowerThreshold + 1")
 
         self.step(13, "TH reads OverCurrentThreshold (if OVERCUR supported)",
-                  expectation="DUT returns int64. Store as OverCurrentThreshold.")
+                  expectation="DUT returns an amperage-mA (int64) value. If UNDERCUR is also supported, "
+                              "value is greater than or equal to (UnderCurrentThreshold + 1).")
         if has_overcur:
             over_current = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverCurrentThreshold)
@@ -251,7 +272,8 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(14, "TH reads UnderCurrentThreshold (if UNDERCUR supported)",
-                  expectation="DUT returns int64. If both supported: OverCurrent >= UnderCurrent + 1.")
+                  expectation="DUT returns an amperage-mA (int64) value. If OVERCUR is also supported, "
+                              "value is less than or equal to (OverCurrentThreshold - 1).")
         if has_undercur:
             under_current = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderCurrentThreshold)
@@ -263,7 +285,9 @@ class TC_ESALM_2_1(MatterBaseTest):
                                          "OverCurrentThreshold must be >= UnderCurrentThreshold + 1")
 
         self.step(15, "TH reads PowerImportThreshold (if POWERIMP supported)",
-                  expectation="DUT returns int64 >= 0.")
+                  expectation="DUT returns a power-mW (int64) value. Value is greater than or equal to 0. "
+                              "If POWEREXP is also supported, value is greater than or equal to "
+                              "(PowerExportThreshold + 1).")
         if has_powerimp:
             power_import = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.PowerImportThreshold)
@@ -273,7 +297,9 @@ class TC_ESALM_2_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(16, "TH reads PowerExportThreshold (if POWEREXP supported)",
-                  expectation="DUT returns int64 <= 0.")
+                  expectation="DUT returns a power-mW (int64) value. Value is less than or equal to 0. "
+                              "If POWERIMP is also supported, value is less than or equal to "
+                              "(PowerImportThreshold - 1).")
         if has_powerexp:
             power_export = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.PowerExportThreshold)
