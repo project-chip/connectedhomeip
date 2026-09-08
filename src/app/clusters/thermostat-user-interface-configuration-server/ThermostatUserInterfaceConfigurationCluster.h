@@ -32,12 +32,16 @@ public:
 
     struct Config
     {
-        ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum temperatureDisplayMode =
-            ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum::kCelsius;
-        ThermostatUserInterfaceConfiguration::KeypadLockoutEnum keypadLockout =
-            ThermostatUserInterfaceConfiguration::KeypadLockoutEnum::kNoLockout;
-        ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum scheduleProgrammingVisibility =
-            ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted;
+        Config() :
+            temperatureDisplayMode(ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum::kCelsius),
+            keypadLockout(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum::kNoLockout),
+            scheduleProgrammingVisibility(
+                ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted)
+        {}
+
+        ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum temperatureDisplayMode;
+        ThermostatUserInterfaceConfiguration::KeypadLockoutEnum keypadLockout;
+        ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum scheduleProgrammingVisibility;
         OptionalAttributeSet optionalAttributes{};
     };
 
