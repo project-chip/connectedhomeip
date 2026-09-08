@@ -24,8 +24,8 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-Doorbell::Doorbell(TimerDelegate & timerDelegate, Span<const Sound> sounds) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1)), mTimerDelegate(timerDelegate), mSounds(sounds)
+Doorbell::Doorbell(TimerDelegate & timerDelegate) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1), Span<const ClusterId>(&Chime::Id, 1)), mTimerDelegate(timerDelegate)
 {}
 
 CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -39,20 +39,12 @@ CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProv
     mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kMomentarySwitch), switchConfig);
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 
-    mChimeCluster.Create(endpoint, *this);
-    ReturnErrorOnFailure(provider.AddCluster(mChimeCluster.Registration()));
-
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
 void Doorbell::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
-    if (mChimeCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mChimeCluster.Cluster()));
-        mChimeCluster.Destroy();
-    }
     if (mIdentifyCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
@@ -60,11 +52,6 @@ void Doorbell::Unregister(CodeDrivenDataModelProvider & provider)
     }
 }
 
-Clusters::ChimeCluster & Doorbell::ChimeCluster()
-{
-    VerifyOrDie(mChimeCluster.IsConstructed());
-    return mChimeCluster.Cluster();
-}
 
 Clusters::SwitchCluster & Doorbell::SwitchCluster()
 {
@@ -76,46 +63,6 @@ Clusters::IdentifyCluster & Doorbell::IdentifyCluster()
 {
     VerifyOrDie(mIdentifyCluster.IsConstructed());
     return mIdentifyCluster.Cluster();
-}
-
-CHIP_ERROR Doorbell::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
-{
-    if (chimeIndex >= mSounds.size())
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-
-    const auto & sound = mSounds[chimeIndex];
-    chimeID            = sound.id;
-    return CopyCharSpanToMutableCharSpan(sound.name, name);
-}
-
-CHIP_ERROR Doorbell::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
-{
-    if (chimeIndex >= mSounds.size())
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-
-    chimeID = mSounds[chimeIndex].id;
-    return CHIP_NO_ERROR;
-}
-
-Protocols::InteractionModel::Status Doorbell::PlayChimeSound(uint8_t chimeID)
-{
-    CharSpan soundName = "Unknown"_span;
-    for (const auto & sound : mSounds)
-    {
-        if (sound.id == chimeID)
-        {
-            soundName = sound.name;
-            break;
-        }
-    }
-
-    ChipLogProgress(AppServer, "Doorbell: Playing sound %s", chip::NullTerminated(soundName).c_str());
-
-    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace app

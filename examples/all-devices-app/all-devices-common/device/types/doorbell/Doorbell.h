@@ -27,38 +27,24 @@
 namespace chip {
 namespace app {
 
-class Doorbell : public SingleEndpoint, public Clusters::ChimeDelegate
+class Doorbell : public SingleEndpoint
 {
 public:
-    struct Sound
-    {
-        uint8_t id;
-        CharSpan name;
-    };
 
-    // Note: sounds array must outlive the Chime lifetime (i.e. often static or similar)
-    Doorbell(TimerDelegate & timerDelegate, Span<const Sound> sounds);
+    Doorbell(TimerDelegate & timerDelegate);
     ~Doorbell() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::ChimeCluster & ChimeCluster();
     Clusters::IdentifyCluster & IdentifyCluster();
     Clusters::SwitchCluster & SwitchCluster();
 
-    // ChimeDelegate
-    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name) override;
-    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
-    virtual Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
-
 protected:
     TimerDelegate & mTimerDelegate;
-    Span<const Sound> mSounds;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::SwitchCluster> mSwitchCluster;
-    LazyRegisteredServerCluster<Clusters::ChimeCluster> mChimeCluster;
 };
 
 } // namespace app

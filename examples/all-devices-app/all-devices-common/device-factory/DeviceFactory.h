@@ -349,11 +349,7 @@ private:
         {
             RegisterCreator("doorbell", [this]() {
                 VerifyOrDie(mContext.has_value());
-                static const Doorbell::Sound kDefaultSounds[] = {
-                    { 0, "Ding Dong"_span },
-                    { 1, "Ring Ring"_span },
-                };
-                return std::make_unique<Doorbell>(mContext->timerDelegate, Span<const Doorbell::Sound>(kDefaultSounds));
+                return std::make_unique<Doorbell>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
