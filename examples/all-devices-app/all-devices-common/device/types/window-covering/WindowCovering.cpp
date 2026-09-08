@@ -26,8 +26,8 @@ WindowCovering::WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate 
                                BitFlags<Clusters::WindowCovering::Feature> features,
                                Clusters::WindowCovering::OptionalAttributeSet optionalAttributes) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
-    mTimerDelegate(context.timerDelegate), mOptionalAttributes(optionalAttributes), mContext(context), mFeatures(features),
-    mWindowCoveringDelegate(delegate), mIdentifyDelegate(identifyDelegate)
+    mOptionalAttributes(optionalAttributes), mContext(context), mFeatures(features), mWindowCoveringDelegate(delegate),
+    mIdentifyDelegate(identifyDelegate)
 {
     // Sanity check: the Window Covering device type specification mandates that either Lift or Tilt, or both, be enabled.
     VerifyOrDie(mFeatures.Has(Clusters::WindowCovering::Feature::kLift) || mFeatures.Has(Clusters::WindowCovering::Feature::kTilt));
