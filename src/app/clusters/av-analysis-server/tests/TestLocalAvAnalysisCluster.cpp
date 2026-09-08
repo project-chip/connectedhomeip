@@ -1090,6 +1090,56 @@ TEST_F(TestLocalAvAnalysisCluster, TriggersPersistedWithoutZoneIDsLoadAsTheEntir
     ASSERT_FALSE(iter.Next());
 }
 
+TEST_F(TestLocalAvAnalysisCluster, MoreThanFiftyContextTriggersIsAConstraintError)
+{
+    // ContextTriggers is constrained to 50 entries on both commands, so exceeding it violates the
+    // field constraint rather than making the command malformed
+    constexpr size_t kBufferSize = 4096;
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    ASSERT_TRUE(buffer.Alloc(kBufferSize));
+
+    TLV::TLVWriter writer;
+    writer.Init(buffer.Get(), static_cast<uint32_t>(kBufferSize));
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    for (int entry = 0; entry <= AvAnalysis::kMaxContextTriggers; entry++)
+    {
+        Structs::ContextTriggerStruct::Type trigger;
+        trigger.context.namespaceID = static_cast<uint8_t>(0x49);
+        trigger.context.tag         = static_cast<uint8_t>(0x0B);
+        // PerZoneContextDetection is set on this fixture, so the field has to be present
+        trigger.zoneIDs = MakeOptional(DataModel::NullNullable);
+        ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), trigger), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+    const uint32_t encodedLength = writer.GetLengthWritten();
+
+    // A fresh list per command: each holds a reader positioned in the buffer
+    auto decodeList = [&](DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType> & aList) {
+        TLV::TLVReader reader;
+        reader.Init(buffer.Get(), encodedLength);
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        ASSERT_EQ(aList.Decode(reader), CHIP_NO_ERROR);
+    };
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+
+    Commands::EnableContextTriggers::DecodableType enableData;
+    decodeList(enableData.contextTriggers.SetNonNull());
+    ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    auto enableResponse = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, enablePath, enableData);
+    ASSERT_TRUE(enableResponse.has_value());
+    EXPECT_EQ(enableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+
+    Commands::DisableContextTriggers::DecodableType disableData;
+    decodeList(disableData.contextTriggers.SetNonNull());
+    ConcreteCommandPath disablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
+    auto disableResponse = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, disablePath, disableData);
+    ASSERT_TRUE(disableResponse.has_value());
+    EXPECT_EQ(disableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+}
+
 TEST_F(TestLocalAvAnalysisCluster, TheSerializedSizeEstimateHoldsForAWorstCaseTrigger)
 {
     // The longest label the estimate budgets for, a non-null MfgCode and a full set of zones have to

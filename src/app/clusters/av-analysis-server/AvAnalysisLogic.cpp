@@ -614,7 +614,7 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
     {
         CHIP_ERROR err = commandData.contextTriggers.Value().ComputeSize(&triggerCount);
         VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
-        VerifyOrReturnError(triggerCount <= AvAnalysis::kMaxContextTriggers, Status::InvalidCommand);
+        VerifyOrReturnError(triggerCount <= AvAnalysis::kMaxContextTriggers, Status::ConstraintError);
     }
 
     // Server command logic starts here
@@ -793,7 +793,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
         size_t size;
         CHIP_ERROR err = commandData.contextTriggers.Value().ComputeSize(&size);
         VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
-        VerifyOrReturnError(size <= AvAnalysis::kMaxContextTriggers, Status::InvalidCommand);
+        VerifyOrReturnError(size <= AvAnalysis::kMaxContextTriggers, Status::ConstraintError);
     }
 
     // Server command logic starts here
