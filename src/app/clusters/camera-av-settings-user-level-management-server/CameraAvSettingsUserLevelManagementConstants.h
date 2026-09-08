@@ -59,8 +59,7 @@ constexpr size_t kMaxMPTZPresetStructSerializedSize = TLV::EstimateStructOverhea
 constexpr size_t kSpecMaxMPTZPresets = 255;
 
 // Max TLV size for a full MPTZPresets array at the spec maximum entry count.
-constexpr size_t kMaxMPTZPresetsSerializedSize =
-    kArrayTlvOverhead + (kSpecMaxMPTZPresets * kMaxMPTZPresetStructSerializedSize);
+constexpr size_t kMaxMPTZPresetsSerializedSize = kArrayTlvOverhead + (kSpecMaxMPTZPresets * kMaxMPTZPresetStructSerializedSize);
 
 // Max size for a TLV encoded array of DPTZStruct
 constexpr size_t kViewportStructMaxSerializedSize =

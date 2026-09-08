@@ -15,10 +15,10 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/CommandHandler.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CodegenCameraAvSettingsUserLevelManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -962,7 +962,7 @@ TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPres
 
     Structs::MPTZPresetStruct::Type preset;
     preset.presetID = 2;
-    preset.name   = "TestPreset"_span;
+    preset.name     = "TestPreset"_span;
     preset.settings = settings;
 
     uint8_t buffer[kMaxMPTZPresetStructSerializedSize + kArrayTlvOverhead];
