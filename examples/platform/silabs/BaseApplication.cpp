@@ -806,7 +806,8 @@ void CodeDrivenTriggerEffectCompleted(chip::System::Layer *, void *)
     osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
     sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    const bool wentIdle = (sCodeDrivenIdentifyActiveCount == 0 && sCodeDrivenIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect);
+    const bool wentIdle =
+        (sCodeDrivenIdentifyActiveCount == 0 && sCodeDrivenIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect);
 #endif
     osSemaphoreRelease(sCodeDrivenIdentifyLock);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -836,7 +837,8 @@ void BaseApplication::NotifyCodeDrivenIdentifyStop()
         --sCodeDrivenIdentifyActiveCount;
     }
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    const bool wentIdle = (sCodeDrivenIdentifyActiveCount == 0 && sCodeDrivenIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect);
+    const bool wentIdle =
+        (sCodeDrivenIdentifyActiveCount == 0 && sCodeDrivenIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect);
 #endif
     osSemaphoreRelease(sCodeDrivenIdentifyLock);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
