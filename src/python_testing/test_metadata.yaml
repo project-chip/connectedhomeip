@@ -103,6 +103,8 @@ not_automated:
       reason: Shared code for TC_EGC, not a standalone test
     - name: TC_EPALM_TestBase.py
       reason: Shared code for TC_EPALM, not a standalone test
+    - name: TC_ESALM_TestBase.py
+      reason: Shared code for TC_ESALM, not a standalone test
     - name: TC_OpstateCommon.py
       reason: Shared code for TC_OPSTATE, not a standalone test
     - name: TC_pics_checker.py
