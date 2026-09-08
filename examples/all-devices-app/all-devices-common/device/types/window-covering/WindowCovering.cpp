@@ -21,16 +21,13 @@
 namespace chip {
 namespace app {
 
-WindowCovering::WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate,
-                               Clusters::IdentifyDelegate & identifyDelegate, const Context & context,
-                               BitFlags<Clusters::WindowCovering::Feature> features,
-                               Clusters::WindowCovering::OptionalAttributeSet optionalAttributes) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
-    mOptionalAttributes(optionalAttributes), mContext(context), mFeatures(features), mWindowCoveringDelegate(delegate),
-    mIdentifyDelegate(identifyDelegate)
+WindowCovering::WindowCovering(const Context & context, const Delegates & delegates, const Config & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)), mContext(context),
+    mDelegates(delegates), mConfig(config)
 {
     // Sanity check: the Window Covering device type specification mandates that either Lift or Tilt, or both, be enabled.
-    VerifyOrDie(mFeatures.Has(Clusters::WindowCovering::Feature::kLift) || mFeatures.Has(Clusters::WindowCovering::Feature::kTilt));
+    VerifyOrDie(mConfig.features.Has(Clusters::WindowCovering::Feature::kLift) ||
+                mConfig.features.Has(Clusters::WindowCovering::Feature::kTilt));
 }
 
 CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -42,14 +39,14 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Wire up the mandatory identify delegate
-    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mDelegates.identify));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // The WindowCoveringDelegate is mandatory and must be supplied at construction time.
-    mWindowCoveringDelegate.SetEndpoint(endpoint);
+    mDelegates.windowCovering.SetEndpoint(endpoint);
 
-    Clusters::WindowCovering::WindowCoveringCluster::Config config(mWindowCoveringDelegate);
-    config.WithFeatures(mFeatures).WithOptionalAttributes(mOptionalAttributes);
+    Clusters::WindowCovering::WindowCoveringCluster::Config config(mDelegates.windowCovering);
+    config.WithFeatures(mConfig.features).WithOptionalAttributes(mConfig.optionalAttributes);
     mWindowCoveringCluster.Create(endpoint, config);
 
     ReturnErrorOnFailure(provider.AddCluster(mWindowCoveringCluster.Registration()));
