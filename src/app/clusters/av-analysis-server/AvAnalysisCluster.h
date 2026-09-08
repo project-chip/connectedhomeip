@@ -160,11 +160,11 @@ public:
 
     // Delegate interaction with server stored attributes
     /**
-     * 
+     *
      */
-    bool IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext, 
+    bool IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext,
                                    Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds);
-    
+
     // Context detection and event generation
     /**
      * Invoked by the delegate when a new analysis session is initiated based on its own detection metrics. The server will

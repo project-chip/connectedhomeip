@@ -693,7 +693,8 @@ void PushAvStreamTransportManager::HandleZoneTrigger(const std::vector<uint16_t>
     }
 }
 
-void PushAvStreamTransportManager::HandleAmbientContextTrigger(uint8_t namespaceId, uint8_t tagId, const std::vector<uint16_t> & zoneIds)
+void PushAvStreamTransportManager::HandleAmbientContextTrigger(uint8_t namespaceId, uint8_t tagId,
+                                                               const std::vector<uint16_t> & zoneIds)
 {
     std::vector<int> intZoneIds;
     intZoneIds.reserve(zoneIds.size());
@@ -701,7 +702,7 @@ void PushAvStreamTransportManager::HandleAmbientContextTrigger(uint8_t namespace
     {
         intZoneIds.push_back(static_cast<int>(zoneId));
     }
-    
+
     // Trigger only if we have a transport with an Ambient trigger
     for (auto & pavst : mTransportMap)
     {
@@ -712,7 +713,7 @@ void PushAvStreamTransportManager::HandleAmbientContextTrigger(uint8_t namespace
         {
             pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, intZoneIds, kDefaultSensitivity);
         }
-    }    
+    }
 }
 
 void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,

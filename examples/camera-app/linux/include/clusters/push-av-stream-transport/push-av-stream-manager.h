@@ -116,7 +116,7 @@ public:
     bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) override;
 
     void HandleZoneTrigger(const std::vector<uint16_t> & zoneIds);
-    
+
     void HandleAmbientContextTrigger(uint8_t namespaceId, uint8_t tagId, const std::vector<uint16_t> & aZoneIds);
 
     void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);

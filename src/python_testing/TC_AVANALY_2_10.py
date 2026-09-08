@@ -39,14 +39,12 @@
 #     factory-reset: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
-import time
 
 from mobly import asserts
+from TC_AVANALYTestBase import AVANALYTestBase
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 from TC_PAVSTTestBase import PAVSTTestBase
-from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -139,7 +137,8 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
         # CI: Use app pipe to trigger ambient context event.
         # Manual: User should trigger an ambient context event from the defined zone.
         if self.is_pics_sdk_ci_only:
-            self.write_to_app_pipe({"Name": "AmbientContextTriggered", "NamespaceId": namespace_id, "TagId": tag_id, "ZoneIds": zone_ids})
+            self.write_to_app_pipe({"Name": "AmbientContextTriggered", "NamespaceId": namespace_id,
+                                   "TagId": tag_id, "ZoneIds": zone_ids})
         else:
             if prompt_msg is None:
                 prompt_msg = "Press enter and immediately start a detectable ambient context activity anywhere in the frame."
@@ -160,7 +159,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
         aConnectionID1 = ""
         feature_map = await self.read_avanaly_attribute_expect_success(endpoint, avattr.FeatureMap)
         self.has_feature_perzonedetect = (feature_map & avcluster.Bitmaps.Feature.kPerZoneContextDetection) != 0
-        
+
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
@@ -168,7 +167,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
 
         # Get the first of our suppported contexts, enable this, and use this as our event trigger
         supported_ambient_contexts_dut = await self.read_avanaly_attribute_expect_success(endpoint, avattr.SupportedAmbientContexts)
-        
+
         # Set ZoneIDs to None if no feature, Null if feature and no zone IDs
         valid_context_zoneIDs = None
         if self.has_feature_perzonedetect:
@@ -177,14 +176,15 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
                 valid_context_zoneIDs = NullValue
 
         valid_context_triggers = []
-        context_trigger = avcluster.Structs.ContextTriggerStruct(context=supported_ambient_contexts_dut[0], zoneIDs=valid_context_zoneIDs)
+        context_trigger = avcluster.Structs.ContextTriggerStruct(
+            context=supported_ambient_contexts_dut[0], zoneIDs=valid_context_zoneIDs)
         valid_context_triggers.append(context_trigger)
 
         await self.send_enable_context_triggers_command(endpoint, valid_context_triggers)
-        
+
         namespaceID = supported_ambient_contexts_dut[0].namespaceID
         tagID = supported_ambient_contexts_dut[0].tag
-        
+
         self.step(1)
         # Commission DUT - already done
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
@@ -250,7 +250,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
                                    self.get_endpoint())
-                                   
+
         # Always send an array for ZoneIds in the command trigger
         if not isinstance(valid_context_zoneIDs, list):
             valid_context_zoneIDs = []

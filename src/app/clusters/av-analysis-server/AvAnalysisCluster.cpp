@@ -154,8 +154,8 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(co
 }
 
 // Attribute interactions
-bool AvAnalysisCluster::IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext, 
-                                                  Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds) 
+bool AvAnalysisCluster::IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext,
+                                                  Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds)
 {
     return mLogic.IsTriggeringContextActive(aContext, aZoneIds);
 }
