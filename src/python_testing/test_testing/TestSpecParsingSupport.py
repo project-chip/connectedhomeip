@@ -325,9 +325,8 @@ def _header_constant(name: str) -> int:
     literal = matches[0]
     # Explicit base rather than int(literal, 0), which rejects a zero-padded decimal.
     if literal.lower().startswith("0x"):
-        return int(literal, 16)  
-    else:
-        return int(literal, 10)
+        return int(literal, 16)
+    return int(literal, 10)
 
 
 class TestSpecParsingSupport(CertificationUnitTestNoDevice):
