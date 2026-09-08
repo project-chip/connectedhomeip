@@ -518,6 +518,10 @@ CHIP_ERROR CHIPCommand::LoadCommissionerNOCChain(const CommissionerIdentity & id
 
     ReturnErrorOnFailure(keypair.Deserialize(serializedKeypair));
 
+    chip::Crypto::P256PublicKey nocPubKey;
+    ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(noc, nocPubKey));
+    VerifyOrReturnError(nocPubKey.Matches(keypair.Pubkey()), CHIP_ERROR_KEY_NOT_FOUND);
+
     return CHIP_NO_ERROR;
 }
 
@@ -577,12 +581,16 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         // to every chip-tool command.
         if (LoadCommissionerNOCChain(identity, fabricId, ephemeralKey, rcacSpan, icacSpan, nocSpan) != CHIP_NO_ERROR)
         {
+            // LoadCommissionerNOCChain() may reduce the spans before failing; reset them to full capacity for regeneration.
+            nocSpan  = chip::MutableByteSpan(identity.mNOC);
+            icacSpan = chip::MutableByteSpan(identity.mICAC);
+            rcacSpan = chip::MutableByteSpan(identity.mRCAC);
+
             ReturnLogErrorOnFailure(ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA));
 
             ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(identity.mLocalNodeId, fabricId,
                                                                                 mCommissionerStorage.GetCommissionerCATs(),
                                                                                 ephemeralKey, rcacSpan, icacSpan, nocSpan));
-
             CHIP_ERROR storeErr = StoreCommissionerNOCChain(ephemeralKey, rcacSpan, icacSpan, nocSpan);
             if (storeErr != CHIP_NO_ERROR)
             {
