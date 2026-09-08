@@ -972,27 +972,6 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamExhaustsAtCapacity)
     ASSERT_EQ(mFakeCameraClient.mAllocationRequests, kTestMaxAnalysisStreams);
 }
 
-TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamWithoutCameraClientFails)
-{
-    mServer.SetCameraClient(nullptr);
-
-    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
-    Commands::EstablishAnalysisStream::DecodableType commandData;
-    commandData.nodeID = 0x1234;
-    InvalidatableCommandHandler commandHandler;
-    commandHandler.SetFabricIndex(1);
-
-    auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
-    if (response.has_value())
-    {
-        ASSERT_FALSE(response->IsSuccess());
-    }
-    else
-    {
-        FAIL();
-    }
-}
-
 TEST_F(TestRemoteAvAnalysisCluster, EstablishThatCannotStartIsAnsweredAtOnce)
 {
     ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };

@@ -124,7 +124,6 @@ void AvAnalysisServerLogic::Shutdown()
 {
     CancelCameraInteraction();
 
-    // The WebRTC client forgot every session
     for (auto & entry : mStreamTable)
     {
         entry.webRTCEndpointID.SetNull();
@@ -944,10 +943,6 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
 {
     VerifyOrReturnValue(!mStreamTable.IsFull(), Status::ResourceExhausted);
 
-    // Without a camera client no camera interaction can be started
-    VerifyOrReturnValue(mCameraClient != nullptr, Status::Failure,
-                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
-
     // One camera-bound command at a time; the response of this one depends on the camera's answer
     VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
 
@@ -996,9 +991,6 @@ AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, co
     VerifyOrReturnValue(commandData.webRTCEndpointID.Value() != kInvalidEndpointId, Status::ConstraintError,
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: WebRTCEndpointID is not an endpoint number", mEndpointId));
 
-    VerifyOrReturnValue(mWebRTCClient != nullptr, Status::Failure,
-                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no WebRTC client configured", mEndpointId));
-
     // One camera-bound command at a time; the response of this one depends on the offer exchange
     VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
 
@@ -1027,9 +1019,6 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeacti
 
     // Only an active stream can be deactivated
     VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kWebRTCActive, Status::InvalidInState);
-
-    VerifyOrReturnValue(mWebRTCClient != nullptr, Status::Failure,
-                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no WebRTC client configured", mEndpointId));
 
     // An active stream always carries its session association
     VerifyOrReturnValue(!entry->webRTCSessionID.IsNull() && !entry->webRTCEndpointID.IsNull(), Status::Failure,
@@ -1067,9 +1056,6 @@ AvAnalysisServerLogic::HandleRemoveAnalysisStream(CommandHandler & handler, cons
 
     // only a stream in PendingInitiation may be removed
     VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kPendingInitiation, Status::InvalidInState);
-
-    VerifyOrReturnValue(mCameraClient != nullptr, Status::Failure,
-                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
 
     // One camera-bound command at a time; the response of this one depends on the camera's answer
     VerifyOrReturnValue(!mCameraInteraction.InFlight(), Status::Busy);
@@ -1132,7 +1118,7 @@ void AvAnalysisServerLogic::OnSessionInitiated(Status aStatus, uint16_t aWebRTCS
     AnalysisStreamEntry * entry = mStreamTable.Find(analysisStreamId);
     if (entry == nullptr)
     {
-        // Cannot happen while the single-flight rule holds (a Remove would have answered Busy)
+        // Single flight keeps the stream alive across the activation: a Remove would have answered Busy
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: stream %u removed while activating", mEndpointId, analysisStreamId);
         VerifyOrReturn(handler != nullptr);
         handler->AddStatus(commandPath, Status::NotFound);

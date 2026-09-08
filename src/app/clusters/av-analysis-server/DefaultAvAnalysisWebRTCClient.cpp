@@ -539,8 +539,8 @@ void DefaultAvAnalysisWebRTCClient::OnDone(CommandSender * apCommandSender)
     CHIP_ERROR err = RegisterSession(webRTCSessionId);
     if (err != CHIP_NO_ERROR)
     {
-        // Not reachable, a slot was free when the request started and only this path takes one.
-        // So a failed request rather than an untracked session.
+        // A slot was free when the request started and only this path takes one, so the request
+        // fails rather than leaving the camera holding a session nobody tracks.
         ChipLogError(Zcl, "AvAnalysisWebRTCClient: session %u not tracked: %" CHIP_ERROR_FORMAT, webRTCSessionId, err.Format());
         FinishRequest(Status::ResourceExhausted, webRTCSessionId);
         return;

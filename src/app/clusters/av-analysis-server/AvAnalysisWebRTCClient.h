@@ -108,6 +108,10 @@ public:
 
     /**
      * Abandons the in-flight request and forgets every session, delivering no callbacks. Not for use from a Callback.
+     *
+     * The cluster cancels its client at Shutdown and on destruction. Calling it again is harmless,
+     * so an application may cancel as part of its own teardown; it must do so while whatever the
+     * client records its sessions in is still alive.
      */
     virtual void Cancel() = 0;
 };
