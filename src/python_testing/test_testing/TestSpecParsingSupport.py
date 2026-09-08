@@ -317,15 +317,17 @@ def _header_constant(name: str) -> int:
     # skip the assertion these tests exist to make, which is worse than having no test at all.
     asserts.assert_true(_REVISIONS_HEADER.is_file(), f"Expected the revision constants at {_REVISIONS_HEADER}")
     header = _REVISIONS_HEADER.read_text(encoding="utf-8")
-    # The trailing "=" is what keeps kInteractionModelRevision from also matching
-    # kInteractionModelRevisionTag.
+    # The trailing "=" is what keeps kInteractionModelRevision from also matching kInteractionModelRevisionTag.
     matches = re.findall(rf"\b{name}\s*=\s*(0[xX][0-9a-fA-F]+|[0-9]+)\s*;", header)
     asserts.assert_equal(len(matches), 1,
                          f"Expected exactly one definition of {name} in {_REVISIONS_HEADER_NAME}, found {len(matches)} - "
                          "the header was restructured, update _header_constant in this file")
     literal = matches[0]
     # Explicit base rather than int(literal, 0), which rejects a zero-padded decimal.
-    return int(literal, 16) if literal.lower().startswith("0x") else int(literal, 10)
+    if literal.lower().startswith("0x"):
+        return int(literal, 16)  
+    else:
+        return int(literal, 10)
 
 
 class TestSpecParsingSupport(CertificationUnitTestNoDevice):
