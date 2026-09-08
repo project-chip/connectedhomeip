@@ -52,6 +52,11 @@
 #include <openthread/srp_client.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+#include <lib/dnssd/ServiceNaming.h>
+#include <openthread/mdns.h>
+#endif
+
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -713,6 +718,11 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     otError otErr  = OT_ERROR_NONE;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+    MutableByteSpan mac(macBuffer);
+    char hostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
 
     mOTInst = otInst;
 
@@ -737,6 +747,15 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
     otSrpClientEnableAutoStartMode(mOTInst, &OnSrpClientStateChange, nullptr);
     memset(&mSrpClient, 0, sizeof(mSrpClient));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+    err = DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+    SuccessOrExit(err);
+    err = chip::Dnssd::MakeHostName(hostname, sizeof(hostname), mac);
+    SuccessOrExit(err);
+    otErr = otMdnsSetLocalHostName(mOTInst, hostname);
+    VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.

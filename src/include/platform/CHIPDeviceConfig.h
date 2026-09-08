@@ -1229,6 +1229,15 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+ *
+ * Enable support for OpenThread mDNS for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
  *
  * Enable starting provisioned Thread network automatically after device power-up.
