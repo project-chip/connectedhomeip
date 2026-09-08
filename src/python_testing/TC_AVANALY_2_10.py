@@ -154,7 +154,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
                 has_cluster(Clusters.CameraAvStreamManagement),
             )
         )
-    )    
+    )
     async def test_TC_AVANALY_2_10(self):
         endpoint = self.get_endpoint()
         self.endpoint = endpoint
