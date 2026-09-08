@@ -36,7 +36,6 @@
 
 import logging
 
-import numpy as np
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -47,12 +46,12 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
-min_value_uint8 = np.iinfo(np.uint8).min
-max_value_uint8 = np.iinfo(np.uint8).max
-min_value_uint16 = np.iinfo(np.uint16).min
-max_value_uint16 = np.iinfo(np.uint16).max
-min_value_uint32 = np.iinfo(np.uint32).min
-max_value_uint32 = np.iinfo(np.uint32).max
+min_value_uint8 = 0
+max_value_uint8 = 255
+min_value_uint16 = 0
+max_value_uint16 = 65535
+min_value_uint32 = 0
+max_value_uint32 = 4294967295
 
 HUMAN_ACTIVITY_NAMESPACE_ID = 0x4B
 OBJECT_IDENTIFICATION_NAMESPACE_ID = 0x49
