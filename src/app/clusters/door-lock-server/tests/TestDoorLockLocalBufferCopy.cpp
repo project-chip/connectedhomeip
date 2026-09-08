@@ -176,6 +176,12 @@ TEST(TestDoorLockLocalBufferCopy, CredentialCopyConstructorRebindsSpan)
     EXPECT_EQ(copy.credentialData.data(), copy.credentialDataBuffer);
     ASSERT_EQ(copy.credentialData.size(), sizeof(kCredentialData));
     EXPECT_EQ(memcmp(copy.credentialData.data(), kCredentialData, sizeof(kCredentialData)), 0);
+    EXPECT_EQ(copy.status, DlCredentialStatus::kOccupied);
+    EXPECT_EQ(copy.credentialType, CredentialTypeEnum::kPin);
+    EXPECT_EQ(copy.creationSource, DlAssetSource::kMatterIM);
+    EXPECT_EQ(copy.createdBy, 1);
+    EXPECT_EQ(copy.modificationSource, DlAssetSource::kMatterIM);
+    EXPECT_EQ(copy.lastModifiedBy, 2);
 }
 
 TEST(TestDoorLockLocalBufferCopy, CredentialSelfAssignmentAndEmptySpanAreSafe)
