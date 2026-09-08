@@ -340,6 +340,10 @@ def ed_app_args(transport: str) -> str:
 @click.option('--proxy-ble/--no-proxy-ble', default=True, show_default=True,
               help='Whether the proxy application was built with BLE. Clear it for a PAF-only build, '
                    'which does not accept --ble-controller.')
+@click.option('--timeout', default=600, show_default=True,
+              help='Seconds allowed for the test script. This bounds the framework '
+                   'commissioning that runs before the test body, which the body\'s own '
+                   'default_timeout does not cover.')
 @click.option('--ns-index', default=0, show_default=True, help='Index of the Linux network namespaces.')
 @click.option('--log-level', default='info', show_default=True,
               type=click.Choice(['debug', 'info', 'warn', 'error'], case_sensitive=False))
@@ -351,7 +355,7 @@ def ed_app_args(transport: str) -> str:
 def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script_args: str, transport: str,
          endpoint: int | None, discriminator: int | None, passcode: int | None,
          ed_discriminator: int | None, ed_passcode: int | None,
-         proxy_ble: bool, ns_index: int, log_level: str, mock_log_level: str | None,
+         proxy_ble: bool, timeout: int, ns_index: int, log_level: str, mock_log_level: str | None,
          internal_inside_unshare: bool) -> None:
 
     LogConfig(log_level, log_level, log_level, True).set_fmt()
@@ -392,12 +396,12 @@ def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, scrip
         chiptest.linux.ensure_private_state()
 
     sys.exit(run(proxy_app, proxy_args, ed_app, script, script_args, transport, endpoint,
-                 discriminator, passcode, ed_discriminator, ed_passcode, proxy_ble, ns_index))
+                 discriminator, passcode, ed_discriminator, ed_passcode, proxy_ble, timeout, ns_index))
 
 
 def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script_args: str, transport: str,
         endpoint: int, discriminator: int, passcode: int, ed_discriminator: int, ed_passcode: int,
-        proxy_ble: bool, ns_index: int) -> int:
+        proxy_ble: bool, timeout: int, ns_index: int) -> int:
     with contextlib.ExitStack() as stack:
         net_ns = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
             index=ns_index,
@@ -440,7 +444,11 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
                                 ed_discriminator, ed_passcode, storage_dir, net_ns)
 
         log.info("Running %s", shlex.join(cmd))
-        return subprocess.run(cmd, check=False, cwd=DEFAULT_CHIP_ROOT).returncode
+        try:
+            return subprocess.run(cmd, check=False, cwd=DEFAULT_CHIP_ROOT, timeout=timeout).returncode
+        except subprocess.TimeoutExpired:
+            log.error("%s did not finish within %d s", script, timeout)
+            return 1
 
 
 def test_script_args(script: str, ed_app: str | None, script_args: str, transport: str, endpoint: int,
