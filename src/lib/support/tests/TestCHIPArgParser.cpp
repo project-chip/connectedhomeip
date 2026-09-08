@@ -664,6 +664,29 @@ TEST_F(TestCHIPArgParser, MissingValueTest_MissingLongOptionValue)
     VerifyArgErrorContains(0, "--run");
 }
 
+TEST_F(TestCHIPArgParser, ParseArgsFromStringTest_MoreArgsThanInitialListSize)
+{
+    bool res;
+
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, nullptr };
+
+    // SplitArgs() starts with room for 10 entries and grows from there, so pass enough
+    // arguments to force it to grow more than once.
+    static const char argStr[] = "--foo -s arg-1 arg-2 arg-3 arg-4 arg-5 arg-6 arg-7 arg-8 arg-9 arg-10 arg-11 arg-12";
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    res = ParseArgsFromString(__FUNCTION__, argStr, optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgsFromString() returned false";
+    ASSERT_EQ(sCallbackRecordCount, 15u) << "Invalid value returned for sCallbackRecordCount";
+    VerifyHandleOptionCallback(0, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
+    VerifyHandleOptionCallback(1, __FUNCTION__, &sOptionSetB, 's', "-s", nullptr);
+    VerifyHandleNonOptionArgsCallback(2, __FUNCTION__, 12);
+    VerifyNonOptionArg(3, "arg-1");
+    VerifyNonOptionArg(14, "arg-12");
+}
+
 static void ClearCallbackRecords()
 {
     for (size_t i = 0; i < sCallbackRecordCount; i++)
