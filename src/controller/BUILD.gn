@@ -87,7 +87,11 @@ static_library("controller") {
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
+      "ControllerOperation.cpp",
+      "ControllerOperation.h",
       "ExampleOperationalCredentialsIssuer.cpp",
+      "NetworkIdentityManagementRegistrar.cpp",
+      "NetworkIdentityManagementRegistrar.h",
       "NetworkIdentityRegistrar.h",
       "SetUpCodePairer.cpp",
     ]
