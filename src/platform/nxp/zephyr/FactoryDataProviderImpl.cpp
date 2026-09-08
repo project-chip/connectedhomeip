@@ -28,7 +28,6 @@
 #else
 #include "mbedtls/aes.h"
 #endif // MBEDTLS_VERSION_NUMBER >= 0x04000000
-#include "mbedtls/sha256.h"
 
 #if defined(CONFIG_SOC_SERIES_RW6XX)
 #include "els_pkc_driver.h"
