@@ -1,14 +1,9 @@
 
 
 import logging
-import operator
-from typing import Any, Callable, Optional
-
-from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -35,7 +30,6 @@ class TC_FAN_SB(MatterBaseTest):
         logger.info("[TEF] cluster_present FanControl on EP1: %s", await self.cluster_present(1, Clusters.FanControl))
         logger.info("[TEF] cluster_present OnOff on EP1: %s", await self.cluster_present(1, Clusters.OnOff))
         logger.info("[TEF] cluster_present ColorControl on EP1: %s", await self.cluster_present(1, Clusters.ColorControl))
-
 
 
 if __name__ == "__main__":
