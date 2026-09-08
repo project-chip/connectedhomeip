@@ -253,6 +253,36 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     auto advertiseOperational =
         params.enableServerInteractions ? FabricTable::AdvertiseIdentity::Yes : FabricTable::AdvertiseIdentity::No;
 
+    if (fabricFoundInTable)
+    {
+        // If we found an existing fabric entry which NOC/ICAC chain matches the requested
+        // identity/fabric we can treat this as a no-op and return early. Fabric updates are
+        // treated as an operational identity change, which clears any persisted CASE session
+        // resumption for the fabric and forces a full CASE handshake. Controllers can call
+        // this initialization path on every startup, so if the same operational identity
+        // (NOC + key) is supplied again, the resumption for the fabric should be preserved.
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> existingNocBuf;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> existingIcacBuf;
+        VerifyOrReturnError(existingNocBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(existingIcacBuf.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+
+        MutableByteSpan existingNocSpan(existingNocBuf.Get(), chipCertAllocatedLen);
+        MutableByteSpan existingIcacSpan(existingIcacBuf.Get(), chipCertAllocatedLen);
+
+        bool nocMatches = (fabricTable->FetchNOCCert(fabricIndex, existingNocSpan) == CHIP_NO_ERROR) &&
+            existingNocSpan.data_equal(ByteSpan(nocSpan));
+        bool icacMatches = (fabricTable->FetchICACert(fabricIndex, existingIcacSpan) == CHIP_NO_ERROR) &&
+            existingIcacSpan.data_equal(ByteSpan(icacSpan));
+        if (nocMatches && icacMatches)
+        {
+            mFabricIndex       = fabricIndex;
+            mAdvertiseIdentity = advertiseOperational;
+            ReturnErrorOnFailure(fabricTable->SetShouldAdvertiseIdentity(fabricIndex, advertiseOperational));
+            return CHIP_NO_ERROR;
+        }
+    }
+
     //
     // We permit colliding fabrics when multiple controllers are present on the same logical fabric
     // since each controller is associated with a unique FabricInfo 'identity' object and consequently,

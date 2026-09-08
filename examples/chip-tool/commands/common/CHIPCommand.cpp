@@ -20,6 +20,7 @@
 
 #include <commands/icd/ICDCommand.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <credentials/CHIPCert.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -49,6 +50,12 @@ constexpr chip::FabricId kIdentityGammaFabricId = 3;
 constexpr chip::FabricId kIdentityOtherFabricId = 4;
 constexpr char kPAATrustStorePathVariable[]     = "CHIPTOOL_PAA_TRUST_STORE_PATH";
 constexpr char kCDTrustStorePathVariable[]      = "CHIPTOOL_CD_TRUST_STORE_PATH";
+
+// Keys used to persist the operational key and NOC chain.
+constexpr char kControllerOpKeyStorage[] = "ControllerOpKey";
+constexpr char kControllerRCACStorage[]  = "ControllerRCAC";
+constexpr char kControllerICACStorage[]  = "ControllerICAC";
+constexpr char kControllerNOCStorage[]   = "ControllerNOC";
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore                 = nullptr;
 chip::Credentials::DeviceAttestationRevocationDelegate * CHIPCommand::sRevocationDelegate = nullptr;
@@ -471,6 +478,69 @@ void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
     mCommissioners[key].get()->Shutdown();
 }
 
+CHIP_ERROR CHIPCommand::LoadCommissionerNOCChain(const CommissionerIdentity & identity, const chip::FabricId fabricId,
+                                                 chip::Crypto::P256Keypair & keypair, chip::MutableByteSpan & rcac,
+                                                 chip::MutableByteSpan & icac, chip::MutableByteSpan & noc)
+{
+    chip::Crypto::P256SerializedKeypair serializedKeypair;
+    auto keypairSize = static_cast<uint16_t>(serializedKeypair.Capacity());
+    ReturnErrorOnFailure(mCommissionerStorage.SyncGetKeyValue(kControllerOpKeyStorage, serializedKeypair.Bytes(), keypairSize));
+    ReturnErrorOnFailure(serializedKeypair.SetLength(keypairSize));
+
+    auto rcacLen = static_cast<uint16_t>(rcac.size());
+    ReturnErrorOnFailure(mCommissionerStorage.SyncGetKeyValue(kControllerRCACStorage, rcac.data(), rcacLen));
+    rcac.reduce_size(rcacLen);
+
+    auto icacLen       = static_cast<uint16_t>(icac.size());
+    CHIP_ERROR icacErr = mCommissionerStorage.SyncGetKeyValue(kControllerICACStorage, icac.data(), icacLen);
+    // Some configurations (e.g. mAlwaysOmitIcac) do not have ICAC.
+    if (icacErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        icacErr = CHIP_NO_ERROR;
+        icacLen = 0;
+    }
+    ReturnErrorOnFailure(icacErr);
+    icac.reduce_size(icacLen);
+
+    auto nocLen = static_cast<uint16_t>(noc.size());
+    ReturnErrorOnFailure(mCommissionerStorage.SyncGetKeyValue(kControllerNOCStorage, noc.data(), nocLen));
+    noc.reduce_size(nocLen);
+
+    uint64_t storedNodeId, storedFabricId;
+    chip::Credentials::ChipDN nocSubjectDN;
+    // Make sure the stored NOC still matches the requested identity/fabric before
+    // reusing it. One case of that is when the user changes the commissioner node ID.
+    ReturnErrorOnFailure(chip::Credentials::ExtractSubjectDNFromX509Cert(noc, nocSubjectDN));
+    ReturnErrorOnFailure(nocSubjectDN.GetCertChipId(storedNodeId));
+    ReturnErrorOnFailure(nocSubjectDN.GetCertFabricId(storedFabricId));
+    VerifyOrReturnError(storedNodeId == identity.mLocalNodeId, CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrReturnError(storedFabricId == fabricId, CHIP_ERROR_KEY_NOT_FOUND);
+
+    ReturnErrorOnFailure(keypair.Deserialize(serializedKeypair));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPCommand::StoreCommissionerNOCChain(const chip::Crypto::P256Keypair & keypair, const chip::ByteSpan & rcac,
+                                                  const chip::ByteSpan & icac, const chip::ByteSpan & noc)
+{
+    chip::Crypto::P256SerializedKeypair serializedKeypair;
+    ReturnErrorOnFailure(keypair.Serialize(serializedKeypair));
+    ReturnErrorOnFailure(mCommissionerStorage.SyncSetKeyValue(kControllerOpKeyStorage, serializedKeypair.Bytes(),
+                                                              static_cast<uint16_t>(serializedKeypair.Length())));
+
+    ReturnErrorOnFailure(
+        mCommissionerStorage.SyncSetKeyValue(kControllerRCACStorage, rcac.data(), static_cast<uint16_t>(rcac.size())));
+
+    ReturnErrorOnFailure(
+        mCommissionerStorage.SyncSetKeyValue(kControllerICACStorage, icac.data(), static_cast<uint16_t>(icac.size())));
+
+    ReturnErrorOnFailure(
+        mCommissionerStorage.SyncSetKeyValue(kControllerNOCStorage, noc.data(), static_cast<uint16_t>(noc.size())));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, chip::FabricId fabricId)
 {
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
@@ -487,10 +557,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 
     if (fabricId != chip::kUndefinedFabricId)
     {
-
-        // TODO - OpCreds should only be generated for pairing command
-        //        store the credentials in persistent storage, and
-        //        generate when not available in the storage.
         ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.mName.c_str(), GetStorageDirectory().ValueOr(nullptr)));
         if (mUseMaxSizedCerts.HasValue())
         {
@@ -504,11 +570,25 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         chip::MutableByteSpan icacSpan(identity.mICAC);
         chip::MutableByteSpan rcacSpan(identity.mRCAC);
 
-        ReturnLogErrorOnFailure(ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA));
+        // Try to reuse the operational key and NOC chain persisted from a previous run.
+        // Regenerating a new operational key on every invocation makes the FabricTable
+        // treat it as an identity change, which clears persisted CASE session resumption
+        // for the fabric and forces a full CASE handshake, which adds unnecessary latency
+        // to every chip-tool command.
+        if (LoadCommissionerNOCChain(identity, fabricId, ephemeralKey, rcacSpan, icacSpan, nocSpan) != CHIP_NO_ERROR)
+        {
+            ReturnLogErrorOnFailure(ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA));
 
-        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(identity.mLocalNodeId, fabricId,
-                                                                            mCommissionerStorage.GetCommissionerCATs(),
-                                                                            ephemeralKey, rcacSpan, icacSpan, nocSpan));
+            ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(identity.mLocalNodeId, fabricId,
+                                                                                mCommissionerStorage.GetCommissionerCATs(),
+                                                                                ephemeralKey, rcacSpan, icacSpan, nocSpan));
+
+            CHIP_ERROR storeErr = StoreCommissionerNOCChain(ephemeralKey, rcacSpan, icacSpan, nocSpan);
+            if (storeErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(chipTool, "Failed to store commissioner operational key and NOC chain: %s", storeErr.Format());
+            }
+        }
 
         identity.mRCACLen = rcacSpan.size();
         identity.mICACLen = icacSpan.size();
