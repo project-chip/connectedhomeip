@@ -156,3 +156,14 @@ following guidelines:
 4. **Concrete Naming**: Avoid ambiguous umbrella folders or generic utility
    names. Use specific operational titles (e.g., `DeviceTypeParser.h`,
    `NetworkInfrastructureManager.h`).
+
+---
+
+## 5. Subsystem Design Documents
+
+Detailed architecture specifications for application subsystems:
+
+-   **[Out-of-Band Control Architecture](design/out_of_band_control.md)**:
+    Unified architecture for external control interfaces (Named Pipes, Pigweed
+    RPC, test runners), separating transport translators from cluster execution
+    backends (`OOBAccessor`).

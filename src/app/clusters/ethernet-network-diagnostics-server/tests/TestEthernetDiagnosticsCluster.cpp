@@ -53,7 +53,7 @@ TEST_F(TestEthernetDiagnosticsCluster, CompileTest)
     const EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet;
 
     NullProvider nullProvider;
-    EthernetDiagnosticsServerCluster cluster(nullProvider, {}, optionalAttributeSet);
+    EthernetDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, {}, optionalAttributeSet);
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, EthernetNetworkDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -70,7 +70,7 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
         const EthernetDiagnosticsServerCluster::OptionalAttributeSet optionalAttributeSet;
 
         NullProvider nullProvider;
-        EthernetDiagnosticsServerCluster cluster(nullProvider, {}, optionalAttributeSet);
+        EthernetDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, {}, optionalAttributeSet);
 
         // without any enabled attributes, no commands are accepted
         ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
@@ -102,7 +102,7 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
 
         ResetCountsProvider resetCountsProvider;
         EthernetDiagnosticsServerCluster cluster(
-            resetCountsProvider,
+            kRootEndpointId, resetCountsProvider,
             BitFlags<EthernetNetworkDiagnostics::Feature>{ EthernetNetworkDiagnostics::Feature::kPacketCounts },
             optionalAttributeSet);
 
@@ -179,7 +179,8 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
 
         AllProvider allProvider;
         EthernetDiagnosticsServerCluster cluster(
-            allProvider, { EthernetNetworkDiagnostics::Feature::kPacketCounts, EthernetNetworkDiagnostics::Feature::kErrorCounts },
+            kRootEndpointId, allProvider,
+            { EthernetNetworkDiagnostics::Feature::kPacketCounts, EthernetNetworkDiagnostics::Feature::kErrorCounts },
             optionalAttributeSet);
 
         ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,

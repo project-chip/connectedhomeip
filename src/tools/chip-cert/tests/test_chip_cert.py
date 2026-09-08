@@ -1,0 +1,504 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Tests for the chip-cert tool.
+
+Certificates are generated, converted and validated using chip-cert itself,
+so these tests need nothing beyond the standard library.
+
+Set CHIP_CERT to the binary under test:
+
+    ninja -C out/default chip-cert
+    CHIP_CERT=out/default/chip-cert python3 src/tools/chip-cert/tests/test_chip_cert.py
+"""
+
+import os
+import subprocess
+import tempfile
+import unittest
+from pathlib import Path
+
+CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+OPERATIONAL_CERTS = CHIP_ROOT / "credentials/test/operational-certificates"
+
+# A P-256 private key encoded as generic PKCS#8 DER. Unlike SEC1 DER, this does
+# not have the fixed P-256 prefix historically recognized by chip-cert.
+P256_PKCS8_DER = bytes.fromhex(
+    "308187020100301306072a8648ce3d020106082a8648ce3d030107046d306b0201010420"
+    "dba9924667a24265be1fe8427e8f23ac4e39d062d381c8ae43cb854813569418a1440342"
+    "0004eb11e2ad89309e8bd2a406f98db6414527a9741a565d395c718e97291265fed8c70d"
+    "c961a8899a7dc7a46d52722d9e43736ca51572a1afba5e0cd2ab1b9e1b4e"
+)
+
+P256_PUBLIC_KEY_PEM = b"""-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6xHirYkwnovSpAb5jbZBRSepdBpW
+XTlccY6XKRJl/tjHDclhqImafcekbVJyLZ5Dc2ylFXKhr7peDNKrG54bTg==
+-----END PUBLIC KEY-----
+"""
+
+RSA_PUBLIC_KEY_PEM = b"""-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAompBTEp4SvLx4GS21AgB
+xBco0+zL1x8MARFquj02/BXF+e8kU0ZI8UT4i7lSZ96N2SqenkN3JW+0vOgUvTNF
+Q76F0cef9/c0Jr/6fjv7/yQaTJv8xW4DULjB3hL58Rb4WWBrKdB2NtDM/q+ZGO2n
+lu8g5SC4uzkPOIipprKZdIJUgGxjPv10dzLCGVPJm8ytDCLh2CKd1UsSYZ7nI+5r
+C9nP9j8gAC46bz09vvFDOnfrjegNpdItCgmQwCgPSOAtPHwwxPEIn9WMBs+KUcNV
+2pSUg77YKehq97VqmFPwLaGY4zUg416kAuiRCzhbhYdSrcxriv5obbNgP+nw4mJ3
+wQIDAQAB
+-----END PUBLIC KEY-----
+"""
+
+# The compact-pdc-identity test vector from src/credentials/tests/CHIPCert_test_vectors.cpp
+# (sTestCert_PDCID01_ChipCompact). All fields other than the public key and signature are
+# implied by the specification, so a conforming encoder must reproduce these exact bytes.
+PDCID01_COMPACT = bytes.fromhex(
+    "153009410439ccd4ac7e5968bdf1b080111d92536494fc51624c70aa6d7308daedf3a15e3869"
+    "177b1bf3d09047ebf06be8dd17be23f2fb3d6390c6cf82802f62d05362c008300b40384c1bd0"
+    "8fe4caa0460791660d82145dfbfe97d314d15e000d75c073af5d7c7ecc1a01852126184ad9"
+    "ebec809b4c78fff381fe324baf881cc8249e169259bd5a18"
+)
+
+# Field values mandated for a PDC Identity by the specification, as print-cert renders them.
+PDC_DN = "[[ CommonName = * ]]"
+PDC_NOT_BEFORE = "0x00000001  ( 2000/01/01 00:00:01 )"
+PDC_NOT_AFTER = "0x00000000  ( 9999/12/31 23:59:59 )"
+
+# Reported by chip-cert whenever it takes the compact-pdc-identity encoding path.
+COMPACT_FORMAT_NOTICE = "using compact TLV format"
+
+
+class ChipCertTest(unittest.TestCase):
+    """Base class providing access to the chip-cert binary and a scratch directory."""
+
+    @classmethod
+    def setUpClass(cls):
+        from_env = os.environ.get("CHIP_CERT")
+        if not from_env:
+            raise AssertionError("CHIP_CERT is not set; point it at the chip-cert binary to test")
+        cls.chip_cert = Path(from_env)
+        if not cls.chip_cert.is_file():
+            raise AssertionError(f"chip-cert binary not found at {cls.chip_cert}")
+
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.tmp_path = Path(directory.name)
+
+    def run_chip_cert(self, *args, expect_success=True):
+        """Run chip-cert, assert whether it succeeded, and return the CompletedProcess."""
+        command = [str(self.chip_cert), *map(str, args)]
+        result = subprocess.run(command, capture_output=True, text=True)
+        if expect_success:
+            self.assertEqual(result.returncode, 0, f"{' '.join(command)} failed:\n{result.stderr}")
+        else:
+            self.assertNotEqual(result.returncode, 0, f"{' '.join(command)} unexpectedly succeeded")
+        return result
+
+    def print_cert(self, source):
+        """Return the fields of a certificate as a dict, via the print-cert command.
+
+        Values spanning multiple lines (public key, signature) are not included, since
+        their continuation lines carry no field name.
+        """
+        output = self.run_chip_cert("print-cert", source).stdout
+        fields = {}
+        for line in output.splitlines():
+            name, separator, value = line.partition(":")
+            if separator and value.strip():
+                fields[name.strip()] = value.strip()
+        return fields
+
+    def convert(self, source, name, *options):
+        """Convert a certificate with convert-cert, returning (output path, result)."""
+        out = self.tmp_path / name
+        result = self.run_chip_cert("convert-cert", source, out, *options)
+        return out, result
+
+    def generate_identity(self, out_format, name="identity"):
+        """Generate a PDC Identity with gen-cert, returning the output path."""
+        out = self.tmp_path / name
+        self.run_chip_cert("gen-cert", "--type", "p", "--out", out,
+                           "--out-key", self.tmp_path / f"{name}-key.pem",
+                           "--out-format", out_format)
+        return out
+
+    def generate_ca_cert_with_pdc_subject(self):
+        """Generate a self-signed CA certificate whose subject is CN=*.
+
+        This is a valid certificate that is not a PDC Identity. chip-cert recognises
+        identities by their subject DN alone, so this exercises that heuristic's failure
+        mode. gen-cert normally refuses a subject DN that disagrees with the requested
+        certificate type, so error injection is needed to produce it.
+        """
+        out = self.tmp_path / "ca-with-pdc-subject.pem"
+        self.run_chip_cert("gen-cert", "--type", "r", "--subject-cn-u", "*",
+                           "--out", out, "--out-key", self.tmp_path / "ca-key.pem",
+                           "--out-format", "x509-pem", "--lifetime", "3650",
+                           "--ignore-error", "--error-type", "no-error")
+        return out
+
+
+class KeyConversionTest(ChipCertTest):
+    """Tests covering generic OpenSSL key encodings accepted by chip-cert."""
+
+    def convert_public_key(self, source, name):
+        """Convert a key to generic public-key PEM and return the output path."""
+        out = self.tmp_path / name
+        self.run_chip_cert("convert-key", "--x509-pubkey-pem", source, out)
+        return out
+
+    def test_reads_generic_private_key_der(self):
+        """Generic PKCS#8 DER private keys are detected and parsed."""
+        source = self.tmp_path / "key.der"
+        source.write_bytes(P256_PKCS8_DER)
+
+        converted = self.convert_public_key(source, "key-public.pem")
+
+        self.assertEqual(converted.read_bytes(), P256_PUBLIC_KEY_PEM)
+
+    def test_reads_generic_public_key_pem(self):
+        """Generic PUBLIC KEY PEM blocks are parsed through EVP APIs."""
+        source = self.tmp_path / "key-public.pem"
+        source.write_bytes(P256_PUBLIC_KEY_PEM)
+
+        converted = self.convert_public_key(source, "key-public-round-trip.pem")
+
+        self.assertEqual(converted.read_bytes(), P256_PUBLIC_KEY_PEM)
+
+    def test_rejects_unsupported_generic_public_key(self):
+        """Generic parsing does not permit key algorithms other than EC and ML-DSA."""
+        source = self.tmp_path / "rsa-public.pem"
+        source.write_bytes(RSA_PUBLIC_KEY_PEM)
+
+        result = self.run_chip_cert("convert-key", "--x509-pubkey-pem", source,
+                                    self.tmp_path / "converted.pem", expect_success=False)
+
+        self.assertIn("unsupported key type", result.stderr)
+
+
+class MlDsaTest(ChipCertTest):
+    """Base class for tests that need chip-cert built with ML-DSA support."""
+
+    def gen_att_cert(self, *args: object, expect_success: bool = True) -> subprocess.CompletedProcess[str]:
+        """Run gen-att-cert, skipping the test when the build has no ML-DSA support."""
+        command = [str(self.chip_cert), "gen-att-cert", *map(str, args)]
+        result = subprocess.run(command, capture_output=True, text=True)
+        if "requires chip-cert to be built against OpenSSL 3.5 or later" in result.stderr:
+            self.skipTest("chip-cert was built without ML-DSA support")
+        if expect_success:
+            self.assertEqual(result.returncode, 0, f"{' '.join(command)} failed:\n{result.stderr}")
+        else:
+            self.assertNotEqual(result.returncode, 0, f"{' '.join(command)} unexpectedly succeeded")
+        return result
+
+    def generate_ca_key(self, key_type: str | None = None, name: str = "paa") -> tuple[Path, Path]:
+        """Generate a self-signed PAA, returning its (certificate, key) paths.
+
+        A key_type of None leaves gen-att-cert on its P-256 default.
+        """
+        cert = self.tmp_path / f"{name}.pem"
+        key = self.tmp_path / f"{name}-key.pem"
+        key_options = ("--key-type", key_type) if key_type else ()
+        self.gen_att_cert("--type", "a", "--subject-cn", "Test PAA", *key_options,
+                          "--lifetime", "3650", "--out", cert, "--out-key", key)
+        return cert, key
+
+
+class AttestationKeyTypeTest(MlDsaTest):
+    """Tests covering certificate-type restrictions on attestation keys."""
+
+    def test_dac_rejects_generated_mldsa_key(self):
+        """A DAC cannot select ML-DSA when generating its key."""
+        result = self.gen_att_cert(
+            "--type", "d", "--subject-cn", "Test DAC",
+            "--subject-vid", "FFF1", "--subject-pid", "8000",
+            "--ca-cert", "unused-ca.pem", "--ca-key", "unused-ca-key.pem",
+            "--out", self.tmp_path / "dac.pem", "--out-key", self.tmp_path / "dac-key.pem",
+            "--key-type", "ml-dsa-44", "--lifetime", "3650", expect_success=False)
+
+        self.assertIn("DAC certificates require a P-256 key", result.stderr)
+
+    def test_dac_rejects_imported_mldsa_key(self):
+        """A DAC cannot import an ML-DSA key generated for another certificate type."""
+        _, key = self.generate_ca_key("ml-dsa-44")
+
+        result = self.gen_att_cert(
+            "--type", "d", "--subject-cn", "Test DAC",
+            "--subject-vid", "FFF1", "--subject-pid", "8000", "--key", key,
+            "--ca-cert", "unused-ca.pem", "--ca-key", "unused-ca-key.pem",
+            "--out", self.tmp_path / "dac.pem", "--lifetime", "3650", expect_success=False)
+
+        self.assertIn("DAC certificates require a P-256 key", result.stderr)
+
+
+class MlDsaAttestationChainTest(MlDsaTest):
+    """Tests covering ML-DSA attestation certificate generation and key serialization."""
+
+    # The PAA/PAI algorithm combinations the specification lists as valid for PQC Phase 1.
+    # A PAI either repeats its PAA's algorithm or falls back to a weaker one, and the DAC
+    # is always ECDSA P-256. A PAI key type of None leaves gen-att-cert on its P-256 default.
+    VALID_CHAINS = (
+        ("ml-dsa-65", "ml-dsa-65"),
+        ("ml-dsa-65", "ml-dsa-44"),
+        ("ml-dsa-65", None),
+        ("ml-dsa-44", "ml-dsa-44"),
+        ("ml-dsa-44", None),
+    )
+
+    def generate_chain(self, paa_key_type: str | None, pai_key_type: str | None) -> tuple[Path, Path, Path]:
+        """Generate a PAA and PAI of the given algorithms, plus the P-256 DAC under them.
+
+        Output names carry the algorithms, since chip-cert refuses to overwrite a file.
+        """
+        prefix = f"{paa_key_type}-{pai_key_type or 'p256'}"
+        paa, paa_key = self.generate_ca_key(paa_key_type, name=f"{prefix}-paa")
+        pai = self.tmp_path / f"{prefix}-pai.pem"
+        pai_key = self.tmp_path / f"{prefix}-pai-key.pem"
+        dac = self.tmp_path / f"{prefix}-dac.pem"
+
+        pai_key_options = ("--key-type", pai_key_type) if pai_key_type else ()
+        self.gen_att_cert("--type", "i", "--subject-cn", "Test PAI", "--subject-vid", "FFF1",
+                          *pai_key_options, "--ca-cert", paa, "--ca-key", paa_key,
+                          "--lifetime", "3650", "--out", pai, "--out-key", pai_key)
+        self.gen_att_cert("--type", "d", "--subject-cn", "Test DAC", "--subject-vid", "FFF1",
+                          "--subject-pid", "8000", "--ca-cert", pai, "--ca-key", pai_key,
+                          "--lifetime", "3650", "--out", dac,
+                          "--out-key", self.tmp_path / f"{prefix}-dac-key.pem")
+        return paa, pai, dac
+
+    def convert_key(self, source: Path | str, name: str, out_format: str) -> Path:
+        """Convert a key with convert-key, returning the output path."""
+        out = self.tmp_path / name
+        self.run_chip_cert("convert-key", source, out, out_format)
+        return out
+
+    # A PAI must not be stronger than the PAA that signs it; neither combination is in the
+    # specification's table, and attestation validation rejects the resulting PAI.
+    STRONGER_THAN_ISSUER_CHAINS = (
+        ("ml-dsa-44", "ml-dsa-65"),
+        (None, "ml-dsa-65"),
+        (None, "ml-dsa-44"),
+    )
+
+    def test_validates_every_specified_chain(self):
+        """Each PAA/PAI algorithm combination the specification permits must validate."""
+        for paa_key_type, pai_key_type in self.VALID_CHAINS:
+            with self.subTest(paa=paa_key_type, pai=pai_key_type or "p256"):
+                paa, pai, dac = self.generate_chain(paa_key_type, pai_key_type)
+
+                self.run_chip_cert("validate-att-cert", "--dac", dac, "--pai", pai, "--paa", paa)
+
+    def test_refuses_pai_stronger_than_its_paa(self):
+        """gen-att-cert must not issue a PAI whose key is stronger than the signing PAA's."""
+        for paa_key_type, pai_key_type in self.STRONGER_THAN_ISSUER_CHAINS:
+            with self.subTest(paa=paa_key_type or "p256", pai=pai_key_type):
+                paa, paa_key = self.generate_ca_key(paa_key_type, name=f"{paa_key_type}-{pai_key_type}-paa")
+
+                result = self.gen_att_cert(
+                    "--type", "i", "--subject-cn", "Test PAI", "--subject-vid", "FFF1",
+                    "--key-type", pai_key_type, "--ca-cert", paa, "--ca-key", paa_key,
+                    "--lifetime", "3650", "--out", self.tmp_path / f"{pai_key_type}-pai.pem",
+                    "--out-key", self.tmp_path / f"{pai_key_type}-pai-key.pem", expect_success=False)
+
+                self.assertIn("stronger than the CA key", result.stderr)
+
+    def test_round_trips_mldsa_private_key(self):
+        """An ML-DSA private key survives conversion through the DER and hex formats."""
+        _, key = self.generate_ca_key("ml-dsa-44")
+
+        der = self.convert_key(key, "key.der", "--x509-der")
+        hex_key = self.convert_key(key, "key.hex", "--x509-hex")
+
+        self.assertEqual(self.convert_key(der, "from-der.pem", "--x509-pem").read_bytes(),
+                         key.read_bytes())
+        self.assertEqual(self.convert_key(hex_key, "from-hex.pem", "--x509-pem").read_bytes(),
+                         key.read_bytes())
+
+    def test_round_trips_mldsa_public_key(self):
+        """An ML-DSA public key written as generic PEM can be read back."""
+        _, key = self.generate_ca_key("ml-dsa-44")
+
+        public = self.convert_key(key, "key-public.pem", "--x509-pubkey-pem")
+
+        self.assertEqual(self.convert_key(public, "public-round-trip.pem", "--x509-pubkey-pem").read_bytes(),
+                         public.read_bytes())
+
+    def test_rejects_private_key_output_for_mldsa_public_key(self):
+        """An ML-DSA public key cannot be converted to a private-key format."""
+        _, key = self.generate_ca_key("ml-dsa-44")
+        public = self.convert_key(key, "key-public.pem", "--x509-pubkey-pem")
+
+        result = self.run_chip_cert("convert-key", public, self.tmp_path / "private.pem",
+                                    "--x509-pem", expect_success=False)
+
+        self.assertIn("doesn't include private key", result.stderr)
+
+
+class PDCIdentityTest(ChipCertTest):
+    """Tests covering PDC (Network / Client) Identity certificates."""
+
+    def assert_is_pdc_identity(self, source):
+        """Check the field values the specification mandates for a PDC Identity."""
+        fields = self.print_cert(source)
+        self.assertEqual(fields["Subject"], PDC_DN)
+        # The identity is self-signed, so the issuer must match the subject. Getting this
+        # wrong is not caught by the compact encoding, which always writes the canonical
+        # issuer, so it only shows up as a signature that fails to verify.
+        self.assertEqual(fields["Issuer"], PDC_DN)
+        self.assertEqual(fields["Not Before"], PDC_NOT_BEFORE)
+        self.assertEqual(fields["Not After"], PDC_NOT_AFTER)
+        self.assertEqual(fields["Is CA"], "false")
+        # validate-cert checks the remaining requirements, including the self-signature.
+        self.run_chip_cert("validate-cert", "--pdc-identity", source)
+
+    def test_gen_cert_uses_compact_format(self):
+        """gen-cert writes PDC Identities in the compact-pdc-identity format."""
+        out = self.generate_identity("chip")
+        self.assertEqual(len(out.read_bytes()), len(PDCID01_COMPACT))
+
+    def test_gen_cert_produces_valid_identity(self):
+        """A generated PDC Identity must be well-formed and correctly self-signed.
+
+        Regression test: the self-signed issuer was previously taken from the not-yet-populated
+        subject of the certificate under construction, yielding an empty issuer and a signature
+        computed over a TBSCertificate that no verifier would accept.
+        """
+        self.assert_is_pdc_identity(self.generate_identity("chip"))
+
+    def test_gen_cert_x509_output_is_valid_identity(self):
+        """The same must hold for X.509 output, which has no compact encoding to mask a bad issuer."""
+        self.assert_is_pdc_identity(self.generate_identity("x509-pem"))
+
+    def test_convert_spec_vector_round_trip(self):
+        """compact -> X.509 -> compact must reproduce the spec test vector byte for byte."""
+        compact = self.tmp_path / "vector.chip"
+        compact.write_bytes(PDCID01_COMPACT)
+        self.assert_is_pdc_identity(compact)
+
+        pem_file, _ = self.convert(compact, "vector.pem", "--x509-pem")
+        self.assert_is_pdc_identity(pem_file)
+
+        round_tripped, _ = self.convert(pem_file, "vector-rt.chip", "--chip")
+        self.assertEqual(round_tripped.read_bytes(), PDCID01_COMPACT)
+
+    def test_convert_non_identity_is_unaffected(self):
+        """Certificates that are not PDC Identities must not be re-encoded as compact."""
+        out, result = self.convert(OPERATIONAL_CERTS / "Chip-Test-Root01-Cert.pem",
+                                   "root.chip", "--chip")
+
+        self.assertGreater(len(out.read_bytes()), len(PDCID01_COMPACT))
+        self.assertNotIn(COMPACT_FORMAT_NOTICE, result.stderr)
+
+    def test_convert_ca_cert_with_pdc_subject_is_rewritten(self):
+        """A CA certificate that merely happens to use CN=* is lossily rewritten as an identity.
+
+        Identities are recognised by their subject DN alone, so such a certificate takes the
+        compact path, which retains only the public key and signature. Basic constraints and
+        validity are replaced with the specification's values. chip-cert reports when it does
+        this, since the conversion is not reversible.
+        """
+        source = self.generate_ca_cert_with_pdc_subject()
+        self.assertEqual(self.print_cert(source)["Is CA"], "true")
+
+        compact, result = self.convert(source, "ca.chip", "--chip")
+
+        self.assertIn(COMPACT_FORMAT_NOTICE, result.stderr)
+        self.assertEqual(len(compact.read_bytes()), len(PDCID01_COMPACT))
+
+        # Confirm what the compact encoding discarded.
+        fields = self.print_cert(compact)
+        self.assertEqual(fields["Is CA"], "false")
+        self.assertEqual(fields["Not Before"], PDC_NOT_BEFORE)
+
+    def test_validate_cert_rejects_tampered_identity(self):
+        """A PDC Identity whose signature has been altered must be rejected."""
+        tampered = bytearray(PDCID01_COMPACT)
+        tampered[-5] ^= 0xFF
+        path = self.tmp_path / "tampered.chip"
+        path.write_bytes(bytes(tampered))
+
+        self.run_chip_cert("validate-cert", "--pdc-identity", path, expect_success=False)
+
+    def test_validate_cert_rejects_ca_cert_with_pdc_subject(self):
+        """A CN=* CA certificate is recognised as an identity but fails the remaining checks.
+
+        This is the safety net for the subject-DN heuristic: such a certificate takes the
+        PDC validation path, where the full set of specification requirements rejects it.
+        """
+        source = self.generate_ca_cert_with_pdc_subject()
+
+        self.run_chip_cert("validate-cert", "--pdc-identity", source, expect_success=False)
+
+
+class OperationalCertTest(ChipCertTest):
+    """Tests covering ordinary operational certificates."""
+
+    def generate_chain(self):
+        """Generate a self-signed root and a NOC issued by it, returning both paths."""
+        root = self.tmp_path / "root.pem"
+        root_key = self.tmp_path / "root-key.pem"
+        noc = self.tmp_path / "noc.pem"
+
+        self.run_chip_cert("gen-cert", "--type", "r", "--subject-chip-id", "CACACACA00000001",
+                           "--out", root, "--out-key", root_key,
+                           "--out-format", "x509-pem", "--lifetime", "3650")
+        self.run_chip_cert("gen-cert", "--type", "n", "--subject-chip-id", "DEDEDEDE00010001",
+                           "--subject-fab-id", "FAB000000000001D",
+                           "--ca-cert", root, "--ca-key", root_key,
+                           "--out", noc, "--out-key", self.tmp_path / "noc-key.pem",
+                           "--out-format", "x509-pem", "--lifetime", "3650")
+        return root, noc
+
+    def test_validate_cert_validates_chain(self):
+        """A NOC must validate against the root that issued it.
+
+        Also guards the PDC Identity handling in validate-cert, which must not disturb
+        ordinary chain validation.
+        """
+        root, noc = self.generate_chain()
+
+        self.run_chip_cert("validate-cert", "-t", root, noc)
+
+    def test_validate_cert_rejects_untrusted_chain(self):
+        """A NOC must not validate without the root that issued it."""
+        _, noc = self.generate_chain()
+
+        self.run_chip_cert("validate-cert", noc, expect_success=False)
+
+    def test_convert_between_chip_formats_is_stable(self):
+        """The CHIP TLV encoding must not depend on which container format carries it."""
+        source = OPERATIONAL_CERTS / "Chip-Test-Root01-Cert.pem"
+
+        raw, _ = self.convert(source, "root.chip", "--chip")
+        base64_form, _ = self.convert(source, "root.chip-b64", "--chip-b64")
+        hex_form, _ = self.convert(source, "root.chip-hex", "--chip-hex")
+
+        from_base64, _ = self.convert(base64_form, "from-b64.chip", "--chip")
+        from_hex, _ = self.convert(hex_form, "from-hex.chip", "--chip")
+
+        self.assertEqual(from_base64.read_bytes(), raw.read_bytes())
+        self.assertEqual(from_hex.read_bytes(), raw.read_bytes())
+
+    def test_convert_x509_round_trip_is_stable(self):
+        """Converting TLV to X.509 and back must reproduce the original TLV."""
+        source = OPERATIONAL_CERTS / "Chip-Test-Root01-Cert.pem"
+
+        raw, _ = self.convert(source, "root.chip", "--chip")
+        pem_file, _ = self.convert(raw, "root.pem", "--x509-pem")
+        round_tripped, _ = self.convert(pem_file, "root-rt.chip", "--chip")
+
+        self.assertEqual(round_tripped.read_bytes(), raw.read_bytes())
+
+
+if __name__ == "__main__":
+    unittest.main()

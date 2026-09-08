@@ -26,14 +26,14 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
-#include <lib/dnssd/minimal_mdns/Parser.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/dnssd/minimal_mdns/responders/IP.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/RecordData.h>
 #include <lib/support/CHIPMem.h>
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -46,7 +46,7 @@ using chip::Dnssd::TextEntry;
 
 namespace {
 
-class TestDnssdResolveServerDelegate : public mdns::Minimal::ServerDelegate, public mdns::Minimal::ParserDelegate
+class TestDnssdResolveServerDelegate : public mdns::Minimal::ServerDelegate, public chip::Dnssd::ParserDelegate
 {
 public:
     TestDnssdResolveServerDelegate(mdns::Minimal::ResponseSender * responder) : mResponder(responder) {}
@@ -54,22 +54,22 @@ public:
 
     // Implementation of mdns::Minimal::ServerDelegate
 
-    void OnResponse(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override {}
-    void OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
+    void OnResponse(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) override {}
+    void OnQuery(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
         mCurSrc = info;
-        mdns::Minimal::ParsePacket(data, this);
+        chip::Dnssd::ParsePacket(data, this);
         mCurSrc = nullptr;
     }
 
-    // Implementation of mdns::Minimal::ParserDelegate
+    // Implementation of chip::Dnssd::ParserDelegate
 
-    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override { mMsgId = header.GetMessageId(); }
-    void OnQuery(const mdns::Minimal::QueryData & data) override
+    void OnHeader(chip::Dnssd::ConstHeaderRef & header) override { mMsgId = header.GetMessageId(); }
+    void OnQuery(const chip::Dnssd::QueryData & data) override
     {
         TEMPORARY_RETURN_IGNORED mResponder->Respond(mMsgId, data, mCurSrc, mRespConfig);
     }
-    void OnResource(mdns::Minimal::ResourceType type, const mdns::Minimal::ResourceData & data) override {}
+    void OnResource(chip::Dnssd::ResourceType type, const chip::Dnssd::ResourceData & data) override {}
 
 private:
     mdns::Minimal::ResponseSender * mResponder;
@@ -207,27 +207,27 @@ TEST_F(TestDnssd, TestDnssdBrowse)
     mdns::Minimal::SetDefaultAddressPolicy();
 
     mdns::Minimal::Server<10> server;
-    mdns::Minimal::QNamePart serverName[] = { "resolve-tester", "_mock", chip::Dnssd::kCommissionProtocol,
-                                              chip::Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart serverName[] = { "resolve-tester", "_mock", chip::Dnssd::kCommissionProtocol,
+                                            chip::Dnssd::kLocalDomain };
     mdns::Minimal::ResponseSender responseSender(&server);
 
     mdns::Minimal::QueryResponder<16> queryResponder;
     TEMPORARY_RETURN_IGNORED responseSender.AddQueryResponder(&queryResponder);
 
     // Respond to PTR queries for _mock._udp.local
-    mdns::Minimal::QNamePart serviceName[]       = { "_mock", chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
-    mdns::Minimal::QNamePart serverServiceName[] = { "INSTANCE", chip::Dnssd::kCommissionableServiceName,
-                                                     chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart serviceName[]       = { "_mock", chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart serverServiceName[] = { "INSTANCE", chip::Dnssd::kCommissionableServiceName,
+                                                   chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
     mdns::Minimal::PtrResponder ptrUdpResponder(serviceName, serverServiceName);
     queryResponder.AddResponder(&ptrUdpResponder);
 
     // Respond to SRV queries for INSTANCE._matterc._udp.local
-    mdns::Minimal::SrvResponder srvResponder(mdns::Minimal::SrvResourceRecord(serverServiceName, serverName, CHIP_PORT));
+    mdns::Minimal::SrvResponder srvResponder(chip::Dnssd::SrvResourceRecord(serverServiceName, serverName, CHIP_PORT));
     queryResponder.AddResponder(&srvResponder);
 
     // Respond to TXT queries for INSTANCE._matterc._udp.local
     const char * txtEntries[] = { "key=val" };
-    mdns::Minimal::TxtResponder txtResponder(mdns::Minimal::TxtResourceRecord(serverServiceName, txtEntries));
+    mdns::Minimal::TxtResponder txtResponder(chip::Dnssd::TxtResourceRecord(serverServiceName, txtEntries));
     queryResponder.AddResponder(&txtResponder);
 
     // Respond to A queries

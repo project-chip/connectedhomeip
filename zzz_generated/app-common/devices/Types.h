@@ -239,9 +239,9 @@ constexpr DataModel::DeviceTypeEntry kLaundryDryer = {
     .deviceTypeRevision = kLaundryDryerDeviceTypeRevision,
 };
 
-constexpr DataModel::DeviceTypeEntry kHumidifierDehumidifier = {
-    .deviceTypeId       = kHumidifierDehumidifierDeviceTypeId,
-    .deviceTypeRevision = kHumidifierDehumidifierDeviceTypeRevision,
+constexpr DataModel::DeviceTypeEntry kHumidityConditioner = {
+    .deviceTypeId       = kHumidityConditionerDeviceTypeId,
+    .deviceTypeRevision = kHumidityConditionerDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kNetworkInfrastructureManager = {
@@ -372,6 +372,11 @@ constexpr DataModel::DeviceTypeEntry kCameraController = {
 constexpr DataModel::DeviceTypeEntry kDoorbell = {
     .deviceTypeId       = kDoorbellDeviceTypeId,
     .deviceTypeRevision = kDoorbellDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kAvAnalysisNode = {
+    .deviceTypeId       = kAvAnalysisNodeDeviceTypeId,
+    .deviceTypeRevision = kAvAnalysisNodeDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kAmbientContextSensor = {

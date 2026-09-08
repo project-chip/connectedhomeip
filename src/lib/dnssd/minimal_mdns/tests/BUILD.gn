@@ -26,7 +26,6 @@ chip_test_suite("tests") {
   test_sources = [
     "TestMinimalMdnsAllocator.cpp",
     "TestQueryReplyFilter.cpp",
-    "TestRecordData.cpp",
     "TestResponseSender.cpp",
   ]
   if (chip_mdns == "minimal") {

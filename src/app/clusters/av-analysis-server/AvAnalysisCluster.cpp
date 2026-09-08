@@ -20,9 +20,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/util.h>
-#include <clusters/CameraAvSettingsUserLevelManagement/Commands.h>
-#include <clusters/CameraAvSettingsUserLevelManagement/Ids.h>
-#include <clusters/CameraAvSettingsUserLevelManagement/Metadata.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -38,6 +35,11 @@ CHIP_ERROR AvAnalysisCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return mLogic.AcceptedCommands(builder);
+}
+
+CHIP_ERROR AvAnalysisCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    return mLogic.GeneratedCommands(builder);
 }
 
 CHIP_ERROR AvAnalysisCluster::Attributes(const ConcreteClusterPath & path,
@@ -68,7 +70,7 @@ DataModel::ActionReturnStatus AvAnalysisCluster::ReadAttribute(const DataModel::
     case Attributes::MaxAnalysisStreamCount::Id:
         return aEncoder.Encode(mLogic.mMaxAnalysisStreamCount);
     case Attributes::CurrentAnalysisStreamCount::Id:
-        return aEncoder.Encode(mLogic.mCurrentAnalysisStreamCount);
+        return aEncoder.Encode(mLogic.GetCurrentAnalysisStreamCount());
     case Attributes::AnalysisStreams::Id:
         return mLogic.ReadAndEncodeAnalysisStreams(aEncoder);
     case Attributes::TrackingEnabled::Id:
@@ -95,11 +97,6 @@ DataModel::ActionReturnStatus AvAnalysisCluster::WriteAttribute(const DataModel:
         // Unknown attribute
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
-}
-
-CHIP_ERROR AvAnalysisCluster::SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount)
-{
-    return mLogic.SetMaxAnalysisStreamCount(aMaxAnalysisStreamCount);
 }
 
 std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -154,6 +151,36 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(co
     }
 
     return Status::UnsupportedCommand;
+}
+
+// Context detection
+CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList)
+{
+    return mLogic.AnalysisSessionStart(aSessionId, aZoneList, mContext);
+}
+
+CHIP_ERROR
+AvAnalysisCluster::InitialTriggeringContextDetected(
+    uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext)
+{
+    return mLogic.InitialTriggeringContextDetected(aSessionId, aTriggeringContext, mContext);
+}
+
+CHIP_ERROR AvAnalysisCluster::NewContextDetected(uint16_t aSessionId,
+                                                 const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext)
+{
+    return mLogic.NewContextDetected(aSessionId, aNewContext, mContext);
+}
+
+CHIP_ERROR AvAnalysisCluster::ContextNoLongerDetected(uint16_t aSessionId,
+                                                      const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext)
+{
+    return mLogic.ContextNoLongerDetected(aSessionId, aOldContext, mContext);
+}
+
+CHIP_ERROR AvAnalysisCluster::AnalysisSessionEnd(uint16_t aSessionId)
+{
+    return mLogic.AnalysisSessionEnd(aSessionId, mContext);
 }
 
 } // namespace Clusters

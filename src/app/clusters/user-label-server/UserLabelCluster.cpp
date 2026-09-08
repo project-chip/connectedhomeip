@@ -17,6 +17,7 @@
 #include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/UserLabel/Metadata.h>
+#include <lib/support/AutoRelease.h>
 
 #include <array>
 
@@ -27,32 +28,10 @@ using namespace UserLabel::Attributes;
 
 namespace {
 
-class AutoReleaseIterator
-{
-public:
-    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider & provider, EndpointId endpointId) :
-        mIterator(provider.IterateUserLabel(endpointId))
-    {}
-    ~AutoReleaseIterator()
-    {
-        if (mIterator != nullptr)
-        {
-            mIterator->Release();
-        }
-    }
-
-    bool IsValid() const { return mIterator != nullptr; }
-
-    DeviceLayer::DeviceInfoProvider::UserLabelIterator * operator->() { return mIterator; }
-
-private:
-    DeviceLayer::DeviceInfoProvider::UserLabelIterator * mIterator;
-};
-
 CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, DeviceLayer::DeviceInfoProvider & provider)
 {
-    AutoReleaseIterator it(provider, endpoint);
-    VerifyOrReturnValue(it.IsValid(), encoder.EncodeEmptyList());
+    AutoRelease it(provider.IterateUserLabel(endpoint));
+    VerifyOrReturnValue(!it.IsNull(), encoder.EncodeEmptyList());
 
     return encoder.EncodeList([&it](const auto & encod) -> CHIP_ERROR {
         UserLabel::Structs::LabelStruct::Type userlabel;

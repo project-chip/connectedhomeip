@@ -76,18 +76,11 @@ public:
     };
     std::vector<Call> storeCalls;
     std::vector<Call> recallCalls;
-    int markInvalidCalls        = 0;
     int groupWillBeRemovedCalls = 0;
 
     CHIP_ERROR GroupWillBeRemoved(FabricIndex fabricIndex, GroupId groupId) override
     {
         groupWillBeRemovedCalls++;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR MakeSceneInvalidForAllFabrics() override
-    {
-        markInvalidCalls++;
         return CHIP_NO_ERROR;
     }
 
@@ -453,7 +446,6 @@ TEST_F(TestOnOffLightingCluster, TestOffWithEffect)
     EXPECT_TRUE(mMockEffectDelegate.mCalled);
     EXPECT_EQ(mMockEffectDelegate.mEffectId, EffectIdentifierEnum::kDyingLight);
     EXPECT_FALSE(mMockDelegate.mOnOff);
-    EXPECT_EQ(mMockScenesIntegrationDelegate.markInvalidCalls, 1);
 }
 
 TEST_F(TestOnOffLightingCluster, TestOffWithEffect_DelegateFails)
