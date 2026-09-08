@@ -99,6 +99,22 @@ DeviceAttestationCredentialsProvider::GetProductAttestationIntermediateCertForPr
     return GetProductAttestationIntermediateCert(out_pai_buffer);
 }
 
+bool DeviceAttestationCredentialsProvider::HasRequiredPqcCredentials() const
+{
+    constexpr uint8_t kLegacyProfile = static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
+    constexpr uint8_t kPqcProfiles   = static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44) |
+        static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
+
+    const auto profileSupport = GetDeviceAttestationProfileSupport();
+    const bool hasLegacyChain = (profileSupport.paaSupportedProfiles.Raw() & kLegacyProfile) != 0 &&
+        (profileSupport.paiSupportedProfiles.Raw() & kLegacyProfile) != 0 &&
+        (profileSupport.dacSupportedProfiles.Raw() & kLegacyProfile) != 0;
+    const bool hasPqcIssuer = (profileSupport.paaSupportedProfiles.Raw() & kPqcProfiles) != 0 ||
+        (profileSupport.paiSupportedProfiles.Raw() & kPqcProfiles) != 0;
+
+    return hasLegacyChain && hasPqcIssuer;
+}
+
 DeviceAttestationProfileSupport DeviceAttestationCredentialsProvider::GetDeviceAttestationProfileSupport() const
 {
     return {

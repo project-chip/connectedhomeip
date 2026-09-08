@@ -56,24 +56,6 @@ constexpr size_t kMaxCertificateSegmentSize = kMaxAppMessageLen;
 static_assert(kMaxCertificateSegmentSize >= kDefaultCertificateSegmentSize,
               "A Matter message must be able to carry a default-sized certificate segment");
 
-bool ProviderHasRequiredPqcCredentials(const Credentials::DeviceAttestationCredentialsProvider & provider)
-{
-    using Credentials::DeviceAttestationCertProfileBitmap;
-
-    constexpr uint8_t kLegacyProfile = static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
-    constexpr uint8_t kPqcProfiles   = static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44) |
-        static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
-
-    const auto profileSupport = provider.GetDeviceAttestationProfileSupport();
-    const bool hasLegacyChain = (profileSupport.paaSupportedProfiles.Raw() & kLegacyProfile) != 0 &&
-        (profileSupport.paiSupportedProfiles.Raw() & kLegacyProfile) != 0 &&
-        (profileSupport.dacSupportedProfiles.Raw() & kLegacyProfile) != 0;
-    const bool hasPqcIssuer = (profileSupport.paaSupportedProfiles.Raw() & kPqcProfiles) != 0 ||
-        (profileSupport.paiSupportedProfiles.Raw() & kPqcProfiles) != 0;
-
-    return hasLegacyChain && hasPqcIssuer;
-}
-
 // Get the attestation challenge for the current session in progress. Only valid when called
 // synchronously from inside a CommandHandler. If not called in CASE/PASE session context,
 // return an empty span. This will for sure make the procedures that rely on the challenge
@@ -1256,7 +1238,7 @@ OperationalCredentialsCluster::OperationalCredentialsCluster(EndpointId endpoint
     DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context)
 {
     VerifyOrDieWithMsg(!HasFeature(OperationalCredentials::Feature::kPQCDeviceAttestation) ||
-                           ProviderHasRequiredPqcCredentials(mOpCredsContext.dacProvider),
+                           mOpCredsContext.dacProvider.HasRequiredPqcCredentials(),
                        AppServer, "PQC Device Attestation requires a legacy chain and PQC PAA or PAI credentials");
 }
 

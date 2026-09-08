@@ -474,7 +474,7 @@ const char * sDeviceOptionHelp =
     "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
     "  --dac_provider_pqc_ready\n"
-    "       Enable the PQC Device Attestation feature and load the example DAC provider in PQC-ready mode.\n"
+    "       Enable PQC Device Attestation; requires a DAC provider with a legacy chain and PQC PAA or PAI credentials.\n"
 #if CHIP_ATTESTATION_TRUSTY_OS
     "  --dac_provider_trusty\n"
     "       Invoke Trusty OS to get device attestation from secure storage.\n"

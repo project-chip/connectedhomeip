@@ -49,6 +49,8 @@ public:
         BitFlags<OperationalCredentials::Feature> configuredFeatureMap(featureMap);
         if (RuntimeOptionsProvider::Instance().GetPqcDeviceAttestationFeatureEnabled())
         {
+            VerifyOrDieWithMsg(dacProvider.HasRequiredPqcCredentials(), AppServer,
+                               "PQC Device Attestation requires a legacy chain and PQC PAA or PAI credentials");
             configuredFeatureMap.Set(OperationalCredentials::Feature::kPQCDeviceAttestation);
         }
 

@@ -121,6 +121,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Providers)
     err = example_dac_provider->GetFirmwareInformation(other_data_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(other_data_span.size(), 0u);
+    EXPECT_FALSE(example_dac_provider->HasRequiredPqcCredentials());
     auto profileSupport = example_dac_provider->GetDeviceAttestationProfileSupport();
     EXPECT_EQ(profileSupport.paaSupportedProfiles.Raw(),
               BitMask<DeviceAttestationCertProfileBitmap>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy).Raw());
@@ -192,6 +193,7 @@ TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderPqcReadyGatesProf
 
     TestHarnessDACProvider nonPqcProvider(false);
     nonPqcProvider.Init(data);
+    EXPECT_FALSE(nonPqcProvider.HasRequiredPqcCredentials());
 
     auto nonPqcSupport = nonPqcProvider.GetDeviceAttestationProfileSupport();
     EXPECT_EQ(nonPqcSupport.dacSupportedProfiles.Raw(),
@@ -207,7 +209,10 @@ TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderPqcReadyGatesProf
     EXPECT_EQ(nonPqcProvider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kMlDsa65, span),
               CHIP_ERROR_NOT_IMPLEMENTED);
     TestHarnessDACProvider pqcProvider(true);
+    // PQC-ready mode alone cannot enable the feature without PQC issuer documents.
+    EXPECT_FALSE(pqcProvider.HasRequiredPqcCredentials());
     pqcProvider.Init(data);
+    EXPECT_TRUE(pqcProvider.HasRequiredPqcCredentials());
 
     auto pqcSupport = pqcProvider.GetDeviceAttestationProfileSupport();
     EXPECT_EQ(pqcSupport.dacSupportedProfiles.Raw(),

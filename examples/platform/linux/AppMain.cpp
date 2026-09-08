@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <cstdlib>
 #include <string>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -609,6 +610,21 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     err = ParseArguments(argc, argv, customOptions);
     SuccessOrExit(err);
+
+    if (LinuxDeviceOptions::GetInstance().dacProviderPqcReady)
+    {
+        ResolveDeviceAttestationCredentialsProvider();
+        if (!LinuxDeviceOptions::GetInstance().dacProvider->HasRequiredPqcCredentials())
+        {
+            ChipLogError(
+                AppServer,
+                "Invalid --dac_provider_pqc_ready configuration: the selected DAC provider must supply a legacy chain "
+                "and PQC PAA or PAI credentials. Use --dac_provider with compatible credentials or omit --dac_provider_pqc_ready.");
+            // Reject invalid CLI configuration before starting the stack. Some entry points abort on an init error return.
+            Platform::MemoryShutdown();
+            std::exit(EXIT_FAILURE);
+        }
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (LinuxDeviceOptions::GetInstance().mWiFiPAF)

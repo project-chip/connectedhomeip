@@ -230,6 +230,63 @@ struct TestOperationalCredentials : public ::testing::Test
     TestDACProvider mDacProvider;
 };
 
+TEST_F(TestOperationalCredentials, TestPQCProviderRequirements)
+{
+    using Profile = Credentials::DeviceAttestationCertProfileBitmap;
+    class ProfileProvider : public TestDACProvider
+    {
+    public:
+        Credentials::DeviceAttestationProfileSupport profiles =
+            Credentials::DeviceAttestationCredentialsProvider::GetDeviceAttestationProfileSupport();
+
+        Credentials::DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const override { return profiles; }
+    } provider;
+
+    // The default legacy provider cannot enable PQC, but remains usable without the feature.
+    EXPECT_FALSE(provider.HasRequiredPqcCredentials());
+    auto context       = MakeContext();
+    auto legacyContext = OperationalCredentialsCluster::Context{ context.fabricTable,
+                                                                 context.failSafeContext,
+                                                                 context.sessionManager,
+                                                                 context.dnssdServer,
+                                                                 context.commissioningWindowManager,
+                                                                 provider,
+                                                                 context.groupDataProvider,
+                                                                 context.accessControl,
+                                                                 context.platformManager,
+                                                                 context.eventManagement,
+                                                                 context.featureMap };
+    OperationalCredentialsCluster cluster(kRootEndpointId, legacyContext);
+    ClusterTester tester(cluster);
+    Attributes::FeatureMap::TypeInfo::DecodableType featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, 0u);
+
+    // PQC DAC support alone is insufficient: a PQC issuer is required.
+    provider.profiles.dacSupportedProfiles.Set(Profile::kSupportsMlDsa44);
+    EXPECT_FALSE(provider.HasRequiredPqcCredentials());
+    provider.profiles.dacSupportedProfiles.Clear(Profile::kSupportsMlDsa44);
+
+    for (auto pqcProfile : { Profile::kSupportsMlDsa44, Profile::kSupportsMlDsa65 })
+    {
+        provider.profiles.paaSupportedProfiles.Set(pqcProfile);
+        EXPECT_TRUE(provider.HasRequiredPqcCredentials());
+        provider.profiles.paaSupportedProfiles.Clear(pqcProfile);
+        provider.profiles.paiSupportedProfiles.Set(pqcProfile);
+        EXPECT_TRUE(provider.HasRequiredPqcCredentials());
+
+        // Every chain element must retain legacy support even when a PQC issuer is available.
+        for (auto * profiles : { &provider.profiles.paaSupportedProfiles, &provider.profiles.paiSupportedProfiles,
+                                 &provider.profiles.dacSupportedProfiles })
+        {
+            profiles->Clear(Profile::kSupportsEcdsaMatterLegacy);
+            EXPECT_FALSE(provider.HasRequiredPqcCredentials());
+            profiles->Set(Profile::kSupportsEcdsaMatterLegacy);
+        }
+        provider.profiles.paiSupportedProfiles.Clear(pqcProfile);
+    }
+}
+
 TEST_F(TestOperationalCredentials, TestAttributes)
 {
     OperationalCredentialsCluster cluster(kRootEndpointId, MakeContext());

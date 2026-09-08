@@ -134,6 +134,9 @@ public:
      */
     virtual DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const;
 
+    /// Whether the provider reports a legacy chain and PQC PAA or PAI profiles, as required to enable PQC attestation.
+    bool HasRequiredPqcCredentials() const;
+
     /**
      * @brief Read one segment of a device attestation document for a given profile.
      *
