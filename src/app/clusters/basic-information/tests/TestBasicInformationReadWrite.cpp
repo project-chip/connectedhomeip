@@ -731,7 +731,7 @@ TEST_F(TestBasicInformationReadWrite, TestOwnedDeviceLocationAssignmentWithEmpty
     // This should NOT crash (it was causing UB/crash because of std::string(nullptr, 0))
     ownedLocation = locationStruct;
 
-    EXPECT_TRUE(ownedLocation.locationName.empty());
+    EXPECT_EQ(ownedLocation.locationNameLen, 0u);
 }
 
 } // namespace
