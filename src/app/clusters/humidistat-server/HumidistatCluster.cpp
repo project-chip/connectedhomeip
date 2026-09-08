@@ -210,32 +210,24 @@ void HumidistatCluster::LoadPersistentAttributes()
 
     if (mFeatures.Has(Feature::kHumidifier))
     {
-        DataModel::Nullable<uint8_t> rawMistType = DataModel::NullNullable;
-        if (!mMistType.IsNull())
-        {
-            rawMistType.SetNonNull(mMistType.Value().Raw());
-        }
-        const DataModel::Nullable<uint8_t> defaultRawMistType = rawMistType;
+        uint8_t rawMistType              = mMistType.Raw();
+        const uint8_t defaultRawMistType = rawMistType;
         if (!attrPersistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id),
                                                             rawMistType, defaultRawMistType))
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load MistType attribute, using default");
         }
 
-        DataModel::Nullable<chip::BitMask<MistTypeBitmap>> loadedMistType = DataModel::NullNullable;
-        if (!rawMistType.IsNull())
-        {
-            loadedMistType.SetNonNull(chip::BitMask<MistTypeBitmap>(rawMistType.Value()));
-        }
+        chip::BitMask<MistTypeBitmap> loadedMistType(rawMistType);
 
         // Clear any bits not supported by the current feature set to guard against stale persisted data.
-        if (!loadedMistType.IsNull() && !mFeatures.Has(Feature::kColdMist))
+        if (!mFeatures.Has(Feature::kColdMist))
         {
-            loadedMistType.Value().Clear(MistTypeBitmap::kMistCold);
+            loadedMistType.Clear(MistTypeBitmap::kMistCold);
         }
-        if (!loadedMistType.IsNull() && !mFeatures.Has(Feature::kWarmMist))
+        if (!mFeatures.Has(Feature::kWarmMist))
         {
-            loadedMistType.Value().Clear(MistTypeBitmap::kMistWarm);
+            loadedMistType.Clear(MistTypeBitmap::kMistWarm);
         }
         mMistType = loadedMistType;
     }
@@ -344,25 +336,18 @@ void HumidistatCluster::SyncTargetSetpointToUserSetpoint()
     }
 }
 
-bool HumidistatCluster::IsMistTypeSupportable(DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType) const
+bool HumidistatCluster::IsMistTypeSupportable(chip::BitMask<Humidistat::MistTypeBitmap> mistType) const
 {
-    if (mistType.IsNull())
-    {
-        return true;
-    }
-
-    const auto value = mistType.Value();
-
     // Reject any bits that are not defined in the spec (MistCold=bit0, MistWarm=bit1).
-    if (!value.HasOnly(MistTypeBitmap::kMistCold, MistTypeBitmap::kMistWarm))
+    if (!mistType.HasOnly(MistTypeBitmap::kMistCold, MistTypeBitmap::kMistWarm))
     {
         return false;
     }
-    if (value.Has(MistTypeBitmap::kMistWarm) && !mFeatures.Has(Feature::kWarmMist))
+    if (mistType.Has(MistTypeBitmap::kMistWarm) && !mFeatures.Has(Feature::kWarmMist))
     {
         return false;
     }
-    if (value.Has(MistTypeBitmap::kMistCold) && !mFeatures.Has(Feature::kColdMist))
+    if (mistType.Has(MistTypeBitmap::kMistCold) && !mFeatures.Has(Feature::kColdMist))
     {
         return false;
     }
@@ -505,37 +490,24 @@ CHIP_ERROR HumidistatCluster::SetUserSetpoint(chip::Percent userSetpoint)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR HumidistatCluster::SetMistType(DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType)
+CHIP_ERROR HumidistatCluster::SetMistType(chip::BitMask<Humidistat::MistTypeBitmap> mistType)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kHumidifier), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     // Spec: bits not indicated by the feature map SHALL result in CONSTRAINT_ERROR.
     VerifyOrReturnError(IsMistTypeSupportable(mistType), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    if (mistType.IsNull())
-    {
-        VerifyOrReturnValue(SetAttributeValue(mMistType, DataModel::NullNullable, MistType::Id), CHIP_NO_ERROR);
-    }
-    else
-    {
-        VerifyOrReturnValue(SetAttributeValue(mMistType, mistType.Value(), MistType::Id), CHIP_NO_ERROR);
-    }
+    VerifyOrReturnValue(SetAttributeValue(mMistType, mistType, MistType::Id), CHIP_NO_ERROR);
 
     if (mContext != nullptr)
     {
         AttributePersistence attrPersistence{ mContext->attributeStorage };
-        DataModel::Nullable<uint8_t> persistedMistType = DataModel::NullNullable;
-        if (!mMistType.IsNull())
-        {
-            persistedMistType.SetNonNull(mMistType.Value().Raw());
-        }
-
         LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), persistedMistType));
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), mMistType.Raw()));
     }
 
     if (mDelegate != nullptr)
     {
-        mDelegate->OnMistTypeChanged(mMistType.ValueOr(chip::BitMask<Humidistat::MistTypeBitmap>{ 0 }));
+        mDelegate->OnMistTypeChanged(mMistType);
     }
 
     return CHIP_NO_ERROR;
@@ -791,7 +763,7 @@ DataModel::ActionReturnStatus HumidistatCluster::WriteAttribute(const DataModel:
         return SetUserSetpoint(value);
     }
     case MistType::Id: {
-        DataModel::Nullable<chip::BitMask<MistTypeBitmap>> value;
+        chip::BitMask<MistTypeBitmap> value;
         ReturnErrorOnFailure(decoder.Decode(value));
         return SetMistType(value);
     }

@@ -16,6 +16,7 @@
  */
 
 #include "AllDevicesAppClusterImplementationRegistry.h"
+#include "ClusterRegistryTypes.h"
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
@@ -23,6 +24,8 @@
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
 
 // TODO: We should probably get this to be generated in the header of each
 //       cluster via cluster codegen. This can be done later.
@@ -54,6 +57,30 @@ template <>
 const char * GetClusterTypeName<chip::app::Clusters::BasicInformationCluster>()
 {
     return "chip::app::Clusters::BasicInformationCluster";
+}
+
+template <>
+const char * GetClusterTypeName<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>()
+{
+    return "chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster";
+}
+
+template <>
+const char * GetClusterTypeName<chip::app::Clusters::ServiceArea::ServiceAreaCluster>()
+{
+    return "chip::app::Clusters::ServiceArea::ServiceAreaCluster";
+}
+
+template <>
+const char * GetClusterTypeName<RvcRunModeType>()
+{
+    return "RvcRunModeType";
+}
+
+template <>
+const char * GetClusterTypeName<RvcCleanModeType>()
+{
+    return "RvcCleanModeType";
 }
 
 template <>
