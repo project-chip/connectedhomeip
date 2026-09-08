@@ -148,7 +148,7 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
             supported_mime_types=[shared_mime_type])
         self.wait_for_user_input(
             prompt_msg=f"If the DUT prompts for consent, approve the second share request and select files, "
-                       f"then press Enter. Only files with MimeType '{shared_mime_type}' should be offered.\n")
+            f"then press Enter. Only files with MimeType '{shared_mime_type}' should be offered.\n")
         filtered = self._collect_shared_files_events(event_handler, _REQUEST_ID_2, share_timeout_sec)
         if not filtered:
             log.info("The DUT shared no files under the MIME-filtered request, which is a valid outcome when no "
