@@ -2680,8 +2680,8 @@ endpoint 1 {
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
-    callback attribute temperatureDisplayMode default = 0x00;
-    callback attribute keypadLockout default = 0x00;
+    ram      attribute temperatureDisplayMode default = 0x00;
+    ram      attribute keypadLockout default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

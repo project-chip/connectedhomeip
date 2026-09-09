@@ -1048,8 +1048,6 @@
         "Thermostat User Interface Configuration": [
             "ClusterRevision",
             "FeatureMap",
-            "TemperatureDisplayMode",
-            "KeypadLockout",
             "ScheduleProgrammingVisibility"
         ],
         "Time Format Localization": ["ClusterRevision"],

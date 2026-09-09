@@ -470,7 +470,7 @@ void ThermostaticRadiatorValveManager::SetSystemMode(ThermostaticRadiatorValveMa
 
 ThermostaticRadiatorValveManager::TempDisplayMode_t ThermostaticRadiatorValveManager::GetTemperatureDisplayMode(void)
 {
-    ThermostaticRadiatorValveManager::TempDisplayMode_t value = TempDisplayMode_t::kCelsius;
+    ThermostaticRadiatorValveManager::TempDisplayMode_t value;
 
     ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
 
