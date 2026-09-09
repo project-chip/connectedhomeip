@@ -349,7 +349,8 @@ private:
         {
             RegisterCreator("doorbell", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<Doorbell>(mContext->timerDelegate);
+                return std::make_unique<Doorbell>(mContext->timerDelegate, mContext->platformManager, mContext->bindingTable,
+                                                   mContext->bindingManager);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)

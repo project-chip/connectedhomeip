@@ -16,6 +16,9 @@
  */
 #pragma once
 
+#include <app/clusters/bindings/BindingCluster.h>
+#include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <app/clusters/chime-server/ChimeCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/switch-server/SwitchCluster.h>
@@ -23,6 +26,7 @@
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace app {
@@ -31,7 +35,8 @@ class Doorbell : public SingleEndpoint
 {
 public:
 
-    Doorbell(TimerDelegate & timerDelegate);
+    Doorbell(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
+             Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager);
     ~Doorbell() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -42,11 +47,16 @@ public:
 
     Clusters::IdentifyCluster & IdentifyCluster();
     Clusters::SwitchCluster & SwitchCluster();
+    Clusters::BindingCluster & BindingCluster();
 
 protected:
     TimerDelegate & mTimerDelegate;
+    DeviceLayer::PlatformManager & mPlatformManager;
+    Clusters::Binding::Table & mBindingTable;
+    Clusters::Binding::Manager & mBindingManager;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::SwitchCluster> mSwitchCluster;
+    LazyRegisteredServerCluster<Clusters::BindingCluster> mBindingCluster;
 };
 
 } // namespace app

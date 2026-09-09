@@ -28,8 +28,10 @@ namespace {
     const ClusterId kClientClusters[] = { Chime::Id };
     } // namespace
 
-Doorbell::Doorbell(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1)), mTimerDelegate(timerDelegate)
+Doorbell::Doorbell(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
+                   Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1)),
+    mTimerDelegate(timerDelegate), mPlatformManager(platformManager), mBindingTable(bindingTable), mBindingManager(bindingManager)
 {}
 
 CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -43,12 +45,31 @@ CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProv
     mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kMomentarySwitch), switchConfig);
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 
+    mBindingCluster.Create(
+        BindingCluster::Context{
+            .bindingTable    = mBindingTable,
+            .bindingManager  = mBindingManager,
+            .platformManager = mPlatformManager,
+        },
+        endpoint);
+    ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));
+
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
 void Doorbell::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    if (mBindingCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mBindingCluster.Cluster()));
+        mBindingCluster.Destroy();
+    }
+    if (mSwitchCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mSwitchCluster.Cluster()));
+        mSwitchCluster.Destroy();
+    }
     if (mIdentifyCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
@@ -71,6 +92,12 @@ Clusters::IdentifyCluster & Doorbell::IdentifyCluster()
 {
     VerifyOrDie(mIdentifyCluster.IsConstructed());
     return mIdentifyCluster.Cluster();
+}
+
+Clusters::BindingCluster & Doorbell::BindingCluster()
+{
+    VerifyOrDie(mBindingCluster.IsConstructed());
+    return mBindingCluster.Cluster();
 }
 
 } // namespace app
