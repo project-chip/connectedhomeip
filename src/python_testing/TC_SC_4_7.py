@@ -137,21 +137,19 @@ class TC_SC_4_7(MatterBaseTest):
 
     def steps_TC_SC_4_7(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH is instructed to start advertising its presence as a commissioner in the network"),
+            TestStep(1, "TH acts as a commissioner and starts advertising a 'Commissioner Service' (_matterd._udp) on the network"),
 
-            TestStep(2, """TH browses for the 'Commissioner Service' (_matterd._udp) through DNS-SD""",
+            TestStep(2, """TH confirms its commissioner advertisement by browsing for the 'Commissioner Service' (_matterd._udp) through DNS-SD""",
                      """- Verify that there is one, and only one, commissioner service advertised
-                        - Verify that the DNS-SD instance name is a 64-bit randomly selected ID expressed as a
+                        - Verify that the DNS-SD instance name is a 64-bit ID expressed as a
                           sixteen-char hex string with capital letters
                         - Verify that the service type is _matterd._udp and the service domain is .local"""),
 
-            TestStep(3, """TH performs a 'Commissioner Service' SRV record query against the instance name""",
+            TestStep(3, """TH confirms its commissioner advertisement's SRV record by querying it against the instance name""",
                      """- Verify that the SRV record is returned and its instance name is equal to the browsed instance name
-                        - Verify that the target hostname is derived from the 48bit or 64bit MAC address expressed as a
-                          twelve or sixteen capital letter hex string. If the MAC is randomized for privacy, the randomized
-                          version must be used each time"""),
+                        - Verify that the target hostname is expressed as a twelve or sixteen capital letter hex string."""),
 
-            TestStep(4, """TH performs a 'Commissioner Service' TXT record query against the instance name""",
+            TestStep(4, """TH confirms its commissioner advertisement's TXT record by querying it against the instance name""",
                      """- If the VP key is present, verify that it is non-empty and contains at least Vendor ID, and if
                           Product ID is present, values must be separated by a + sign
                         - If the DT key is present, verify that it is non-empty and contains the device type identifier
@@ -159,14 +157,14 @@ class TC_SC_4_7(MatterBaseTest):
                         - If the DN key is present, verify that it is non-empty and is a UTF-8 encoded string with a
                           maximum length of 32B"""),
 
-            TestStep(5, """If the DT key is present, TH performs a PTR record query against the 'Devtype Subtype' (_T<ddd>) constructed from the DT key""",
+            TestStep(5, """If the DT key is present, TH confirms its commissioner advertisement's 'Devtype Subtype' (_T<ddd>) PTR record constructed from the DT key""",
                      """- Verify that there is one, and only one, 'Devtype Subtype' PTR record, where <ddd> represents the
                           device type from Data Model represented as a variable length decimal number in ASCII without
                           leading zeros
                         - Verify that the 'Devtype Subtype' PTR record's instance name is equal to the commissioner service
                           instance name"""),
 
-            TestStep(6, """TH performs a AAAA record query against the target hostname listed in the SRV record""",
+            TestStep(6, """TH confirms its commissioner advertisement's addressing by querying the AAAA record against the target hostname in the SRV record""",
                      """- Verify that at least 1 AAAA record is returned for each IPv6 address
                         - Verify that each AAAA record contains a valid IPv6 address"""),
 
@@ -200,9 +198,9 @@ class TC_SC_4_7(MatterBaseTest):
                              f"There must only be one commissioner service advertised, found {len(services)}.")
         service = services[0]
 
-        # Verify that the DNS-SD instance name is a 64-bit randomly selected ID
-        # expressed as a sixteen-char hex string with capital letters (the rule is
-        # shared with the commissionable instance name)
+        # Verify that the DNS-SD instance name is a 64-bit ID expressed as a
+        # sixteen-char hex string with capital letters (the rule is shared with
+        # the commissionable instance name)
         assert_valid_commissionable_instance_name(service.instance_name)
 
         # Verify that the service type is '_matterd._udp' and service domain '.local'
@@ -225,8 +223,8 @@ class TC_SC_4_7(MatterBaseTest):
         asserts.assert_equal(srv_record.instance_name, instance_name,
                              "SRV record's instance name must be equal to the commissioner service instance name.")
 
-        # Verify that the target hostname is derived from the 48bit or 64bit MAC
-        # address expressed as a twelve or sixteen capital letter hex string
+        # Verify that the target hostname is expressed as a twelve or sixteen
+        # capital letter hex string
         assert_valid_hostname(srv_record.hostname)
 
         return srv_record.hostname
@@ -312,30 +310,31 @@ class TC_SC_4_7(MatterBaseTest):
     @async_test_body
     async def test_TC_SC_4_7(self):
         # *** STEP 1 ***
-        # TH is instructed to start advertising its presence as a commissioner
-        # in the network: the TH launches the commissioner reference app, which
-        # advertises the '_matterd._udp' service on boot.
+        # TH acts as a commissioner and starts advertising a 'Commissioner Service'
+        # (_matterd._udp) on the network: the TH launches the commissioner reference
+        # app, which advertises the service on boot.
         self.step(1)
         self._start_th_server()
 
         # *** STEP 2 ***
-        # TH browses for the 'Commissioner Service' (_matterd._udp) through DNS-SD
+        # TH confirms its commissioner advertisement by browsing for the
+        # 'Commissioner Service' (_matterd._udp) through DNS-SD
         self.step(2)
         service = await self._get_verify_commissioner_service()
 
         # *** STEP 3 ***
-        # TH performs a 'Commissioner Service' SRV record query against the instance name
+        # TH confirms its commissioner advertisement's SRV record by querying it against the instance name
         self.step(3)
         srv_hostname = await self._get_verify_srv_record(service.instance_name)
 
         # *** STEP 4 ***
-        # TH performs a 'Commissioner Service' TXT record query against the instance name
+        # TH confirms its commissioner advertisement's TXT record by querying it against the instance name
         self.step(4)
         dt_key = await self._verify_txt_record_keys(service.instance_name)
 
         # *** STEP 5 ***
-        # If the DT key is present, TH performs a PTR record query against the
-        # 'Devtype Subtype' (_T<ddd>) constructed from the DT key
+        # If the DT key is present, TH confirms its commissioner advertisement's
+        # 'Devtype Subtype' (_T<ddd>) PTR record constructed from the DT key
         if dt_key is not None:
             self.step(5)
             await self._verify_devtype_subtype(service.instance_name, dt_key)
@@ -343,7 +342,7 @@ class TC_SC_4_7(MatterBaseTest):
             self.skip_step(5)
 
         # *** STEP 6 ***
-        # TH performs a AAAA record query against the target hostname listed in the SRV record
+        # TH confirms its commissioner advertisement's addressing by querying the AAAA record against the target hostname in the SRV record
         self.step(6)
         await self._verify_aaaa_records(srv_hostname)
 
