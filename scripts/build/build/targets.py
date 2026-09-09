@@ -66,6 +66,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'laundry-washer',
     'light-sensor',
     'microwave-oven',
+    'mode-select',
     'mounted-dimmable-load-control',
     'mounted-on-off-control',
     'occupancy-sensor',

@@ -19,6 +19,8 @@
 #pragma once
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 
+class CameraDeviceInterface;
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -38,26 +40,6 @@ public:
     virtual void ShutdownApp() override;
 
     /**
-     * Delegate command handlers
-     */
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status ActivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status DeactivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status RemoveAnalysisStream() override;
-
-    /**
      * Delegate command assists
      */
 
@@ -69,7 +51,28 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
+    void SetCameraDevice(CameraDeviceInterface * aCameraDevice) { mCameraDevice = aCameraDevice; }
+
+    // Simulation triggers for app-pipe commands
+    CHIP_ERROR TriggerSessionStart(const std::vector<uint16_t> & aZoneIds, bool aZoneIdsNull = false,
+                                   chip::Optional<chip::NodeId> aSourceNodeId = chip::NullOptional);
+
+    CHIP_ERROR TriggerPerceivedContext(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContexts,
+                                       const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aExpiredContexts,
+                                       chip::Optional<uint16_t> aSessionId        = chip::NullOptional,
+                                       chip::Optional<chip::NodeId> aSourceNodeId = chip::NullOptional);
+
+    CHIP_ERROR TriggerSessionEnd(chip::Optional<uint16_t> aSessionId        = chip::NullOptional,
+                                 chip::Optional<chip::NodeId> aSourceNodeId = chip::NullOptional);
+
+    uint16_t GetLatestSessionId() const { return mLatestSessionId; }
+    bool HasActiveSession() const { return mHasActiveSession; }
+
 private:
+    CameraDeviceInterface * mCameraDevice = nullptr;
+    uint16_t mLatestSessionId             = 0;
+    bool mHasActiveSession                = false;
+    bool mSessionHasTrackedContexts       = false;
 };
 
 } // namespace AvAnalysis

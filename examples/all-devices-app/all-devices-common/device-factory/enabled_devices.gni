@@ -75,6 +75,10 @@ _available_devices = [
     "CHIME",
   ],
   [
+    "commissioning-proxy",
+    "COMMISSIONING_PROXY",
+  ],
+  [
     "contact-sensor",
     "CONTACT_SENSOR",
   ],
@@ -141,6 +145,10 @@ _available_devices = [
   [
     "microwave-oven",
     "MICROWAVE_OVEN",
+  ],
+  [
+    "mode-select",
+    "MODE_SELECT",
   ],
   [
     "mounted-dimmable-load-control",

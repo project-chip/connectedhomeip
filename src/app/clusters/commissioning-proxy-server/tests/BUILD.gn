@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/ble/ble.gni")
 
 chip_test_suite("tests") {
   output_name = "TestCommissioningProxyCluster"
@@ -51,4 +52,17 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
+
+  # The BLE driver and its tests only exist when BLE is enabled - see the ble-transport
+  # target in ../BUILD.gn. Every test in TestCommissioningProxyBleTransport.cpp drives
+  # that driver, so the whole file goes with it.
+  if (chip_config_network_layer_ble) {
+    test_sources += [ "TestCommissioningProxyBleTransport.cpp" ]
+
+    # Depend on the target rather than listing CommissioningProxyBleTransport.cpp here,
+    # so the driver is compiled once.
+    public_deps += [
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    ]
+  }
 }

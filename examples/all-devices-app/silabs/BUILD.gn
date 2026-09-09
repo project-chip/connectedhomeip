@@ -71,6 +71,7 @@ efr32_sdk("sdk") {
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
     "${examples_common_plat_dir}",
+    "${examples_common_plat_dir}/codeDrivenImp",
     "${examples_common_plat_dir}/freertos_config",
   ]
 
@@ -92,6 +93,8 @@ silabs_executable("all_devices_app") {
   }
 
   sources = [
+    "${examples_common_plat_dir}/codeDrivenImp/SilabsIdentifyDelegate.cpp",
+    "${examples_common_plat_dir}/codeDrivenImp/SilabsIdentifyDelegate.h",
     "include/AppKeys.h",
     "include/AppTask.h",
     "src/AppTask.cpp",
