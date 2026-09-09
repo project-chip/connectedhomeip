@@ -366,9 +366,8 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
 /**
  * Handler for EnableContextTriggers when the local detect feature is set.
  */
-std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalEnableContextTriggers(
-    CommandHandler & handler, const ConcreteCommandPath & commandPath,
-    const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+AvAnalysisServerLogic::ProcessEnableContextTriggers(const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
 {
     // Verify spec constraints, provided list is 50 entries or less if not null
     //
@@ -401,7 +400,11 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
 
             VerifyOrReturnError(it != mSupportedAmbientContexts.end(), Status::ConstraintError);
 
+<<<<<<< HEAD
             // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
+=======
+            // The trigger context is valid, now check the ZoneIDs, which can only be present if PERZONEDETECT is set, likewise,
+>>>>>>> 05ad181 ([Camera] AV Analysis cluster test scripts (TC_AVANALY_2_4 to 2_14) and updates to cluster server and camera-app logic (#73851))
             // if we have the feature, then ZoneIDs have to be present
             //
             bool hasZoneIDs        = contextTrigger.zoneIDs.HasValue();
@@ -420,15 +423,37 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
                 //
                 if (!contextTrigger.zoneIDs.Value().IsNull())
                 {
+<<<<<<< HEAD
                     CHIP_ERROR err = mDelegate->VerifyZoneIDsAreValid(contextTrigger.zoneIDs.Value().Value());
                     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
+=======
+                    CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
+                    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+                    zoneIDs.reserve(size);
+
+                    auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
+
+                    while (zone_iter.Next())
+                    {
+                        zoneIDs.push_back(zone_iter.GetValue());
+                    }
+                    if (!zoneIDs.empty())
+                    {
+                        VerifyOrReturnError(mDelegate != nullptr, Status::Failure);
+                        err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
+                        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
+                    }
+>>>>>>> 05ad181 ([Camera] AV Analysis cluster test scripts (TC_AVANALY_2_4 to 2_14) and updates to cluster server and camera-app logic (#73851))
                     hasNonNullZoneIDs = true;
                 }
             }
 
             // Check with the delegate that additional contexts can be added
             //
-            VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+            if (mDelegate != nullptr)
+            {
+                VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+            }
 
             // Update our active trigger set with this new context.
             // If the context exists, update the zone IDs, otherise add a new entry
@@ -503,7 +528,10 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
         // Provided set is null, meaning all known context triggers should be activated
         // First check with the delegate that additional contexts can be added
         //
-        VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+        if (mDelegate != nullptr)
+        {
+            VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+        }
 
         // Set the active triggers to be the supported triggers
         mActiveAmbientContextTriggers.clear();
@@ -525,21 +553,31 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
     // Inform the delegate of the new active context set. The delegate will read the updated contents
     // of the attribute
     //
-    mDelegate->ActiveAmbientContextTriggersUpdated();
+    if (mDelegate != nullptr)
+    {
+        mDelegate->ActiveAmbientContextTriggersUpdated();
+    }
     MarkDirty(AvAnalysis::Attributes::ActiveAmbientContextTriggers::Id);
     LogErrorOnFailure(StoreActiveAmbientContextTriggers());
 
     return Status::Success;
 }
 
-/**
- * Placeholder method for when the functionality for remote context detection is implemented
- */
+std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalEnableContextTriggers(
+    CommandHandler & handler, const ConcreteCommandPath & commandPath,
+    const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
+{
+    return ProcessEnableContextTriggers(commandData);
+}
+
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleRemoteEnableContextTriggers(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData)
 {
-    return Status::Success;
+    // Remote context detection requires at least one analysis stream to be established
+    VerifyOrReturnValue(mStreamTable.Count() > 0, Status::InvalidInState);
+
+    return ProcessEnableContextTriggers(commandData);
 }
 
 /**
@@ -685,23 +723,62 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
     return Status::Success;
 }
 
+<<<<<<< HEAD
 /**
  * Placeholder method for when the functionality for remote context detection is implemented
  */
+=======
+>>>>>>> 05ad181 ([Camera] AV Analysis cluster test scripts (TC_AVANALY_2_4 to 2_14) and updates to cluster server and camera-app logic (#73851))
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                     const AvAnalysis::Commands::ActivateAnalysisStream::DecodableType & commandData)
 {
+<<<<<<< HEAD
     return Status::Success;
 }
 
 /**
  * Placeholder method for when the functionality for remote context detection is implemented
  */
+=======
+    AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
+    VerifyOrReturnValue(entry != nullptr, Status::NotFound);
+
+    // Spec 11.9.8.5.2: Stream must be in PendingInitiation state to be activated
+    VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kPendingInitiation, Status::InvalidInState);
+
+    if (!entry->pushAVEndpointID.IsNull())
+    {
+        SetStreamState(*entry, AnalysisStreamStateEnum::kPushAVActive);
+    }
+    else
+    {
+        SetStreamState(*entry, AnalysisStreamStateEnum::kWebRTCActive);
+    }
+
+    LogErrorOnFailure(StoreAnalysisStreams());
+    return Status::Success;
+}
+
+>>>>>>> 05ad181 ([Camera] AV Analysis cluster test scripts (TC_AVANALY_2_4 to 2_14) and updates to cluster server and camera-app logic (#73851))
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeactivateAnalysisStream(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::DeactivateAnalysisStream::DecodableType & commandData)
 {
+<<<<<<< HEAD
+=======
+    AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
+    VerifyOrReturnValue(entry != nullptr, Status::NotFound);
+
+    // Spec 11.9.8.6.2: Stream must be in an active state to be deactivated
+    VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kWebRTCActive ||
+                            entry->state == AnalysisStreamStateEnum::kPushAVActive,
+                        Status::InvalidInState);
+
+    SetStreamState(*entry, AnalysisStreamStateEnum::kPendingInitiation);
+
+    LogErrorOnFailure(StoreAnalysisStreams());
+>>>>>>> 05ad181 ([Camera] AV Analysis cluster test scripts (TC_AVANALY_2_4 to 2_14) and updates to cluster server and camera-app logic (#73851))
     return Status::Success;
 }
 
@@ -736,6 +813,309 @@ bool AvAnalysisServerLogic::ZoneIDListContains(const DataModel::DecodableList<ui
     return false;
 }
 
+<<<<<<< HEAD
+=======
+CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, Optional<NodeId> aSourceNodeId,
+                                                      bool aUseSpecificSessionId)
+{
+    if (!aUseSpecificSessionId)
+    {
+        while (std::any_of(mActiveSessions.begin(), mActiveSessions.end(), [this](const ActiveAmbientContextSession & session) {
+            return session.GetSessionId() == mNextAnalysisSessionID;
+        }))
+        {
+            mNextAnalysisSessionID++;
+        }
+        aSessionId = mNextAnalysisSessionID++;
+    }
+
+    auto session_it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    if (session_it != mActiveSessions.end())
+    {
+        if (aSourceNodeId.HasValue())
+        {
+            session_it->SetSourceNodeId(aSourceNodeId);
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    AvAnalysis::ActiveAmbientContextSession newSession;
+    newSession.SetSessionId(aSessionId);
+    newSession.SetSourceNodeId(aSourceNodeId);
+    mActiveSessions.push_back(newSession);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
+                                                       const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
+                                                       ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Validate the information received - are the zoneIDs known (if provided)
+    if (!aZoneList.IsNull())
+    {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(mDelegate->VerifyZoneIDsAreValid(aZoneList.Value()));
+    }
+
+    // Get our current session ID, and increment for next use
+    aSessionId = mNextAnalysisSessionID++;
+
+    // Capture our new active session information
+    AvAnalysis::ActiveAmbientContextSession newSession;
+    newSession.SetSessionId(aSessionId);
+    newSession.SetSourceNodeId(aSourceNodeId);
+    mActiveSessions.push_back(newSession);
+
+    // Create the Initial Event
+    Events::AnalysisSessionStart::Type startEvent;
+
+    startEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        startEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+
+    // The zones could be null, meaning that no zone information is available
+    if (aZoneList.IsNull())
+    {
+        startEvent.triggeredZones = DataModel::NullNullable;
+    }
+    else
+    {
+        startEvent.triggeredZones =
+            DataModel::MakeNullable(DataModel::List<const uint16_t>(aZoneList.Value().data(), aZoneList.Value().size()));
+    }
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(startEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate AnalysisSessionStart event"));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
+    uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
+    ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Make sure the provided session ID is one we know about
+    auto session_it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    // Check if the element was actually found
+    if (session_it == mActiveSessions.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    // Are the contexts part of our active set
+    if (!IsContextPartOfActiveContextTriggers(aTriggeringContext))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    session_it->AddTrackedContext(aTriggeringContext);
+
+    // Now create the first Perceived Context Event with the tiggering context
+    Events::PerceivedContext::Type perceivedEvent;
+
+    perceivedEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (session_it->GetSourceNodeId().HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(session_it->GetSourceNodeId().Value());
+    }
+
+    perceivedEvent.newIdentifiedContexts = chip::MakeOptional(
+        DataModel::List<const Structs::TrackedContext::Type>(aTriggeringContext.data(), aTriggeringContext.size()));
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
+                                                     const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext,
+                                                     ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Make sure the provided session ID is one we know about
+    auto it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    // Check if the element was actually found
+    if (it == mActiveSessions.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    // Are the contexts part of our active set
+    if (!IsContextPartOfActiveContextTriggers(aNewContext))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    // Now create the Perceived Context Event with newly detected context
+    Events::PerceivedContext::Type perceivedEvent;
+
+    perceivedEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (it->GetSourceNodeId().HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(it->GetSourceNodeId().Value());
+    }
+
+    perceivedEvent.newIdentifiedContexts =
+        chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aNewContext.data(), aNewContext.size()));
+    perceivedEvent.currentIdentifiedContexts = chip::MakeOptional(
+        DataModel::List<const Structs::TrackedContext::Type>(it->GetTrackedContexts().data(), it->GetTrackedContexts().size()));
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
+
+    // Add the new context triggers to our current set for the session
+    it->AddTrackedContext(aNewContext);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
+                                               const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext,
+                                               ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Make sure the provided session ID is one we know about
+    auto it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    // Check if the element was actually found
+    if (it == mActiveSessions.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    for (const auto & context : aOldContext)
+    {
+        // Make sure the context actually exists in the session
+        auto context_it =
+            std::find_if(it->GetTrackedContexts().begin(), it->GetTrackedContexts().end(),
+                         [context](const Structs::TrackedContext::Type & mContext) {
+                             return ((context.identifiedContext.namespaceID == mContext.identifiedContext.namespaceID) &&
+                                     (context.identifiedContext.tag == mContext.identifiedContext.tag));
+                         });
+
+        // Check if the element was actually found
+        if (context_it == it->GetTrackedContexts().end())
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+    }
+
+    // Remove the old context triggers from our current set for the session
+    it->RemoveTrackedContext(aOldContext);
+
+    // Now create the Perceived Context Event with newly removed context
+    Events::PerceivedContext::Type perceivedEvent;
+
+    perceivedEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (it->GetSourceNodeId().HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(it->GetSourceNodeId().Value());
+    }
+
+    perceivedEvent.currentIdentifiedContexts = chip::MakeOptional(
+        DataModel::List<const Structs::TrackedContext::Type>(it->GetTrackedContexts().data(), it->GetTrackedContexts().size()));
+    perceivedEvent.expiredContexts =
+        chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aOldContext.data(), aOldContext.size()));
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext,
+                                                     Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Make sure the provided session ID is one we know about
+    auto it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    // Check if the element was actually found
+    if (it == mActiveSessions.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    // Now create the End Session Event
+    Events::AnalysisSessionEnd::Type endSessionEvent;
+    endSessionEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        endSessionEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (it->GetSourceNodeId().HasValue())
+    {
+        endSessionEvent.sourceNodeId.SetValue(it->GetSourceNodeId().Value());
+    }
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(endSessionEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate EndSession event"));
+
+    // Remove the session from our active contexts
+    it = mActiveSessions.erase(it);
+
+    return CHIP_NO_ERROR;
+}
+
+bool AvAnalysisServerLogic::IsContextPartOfActiveContextTriggers(
+    const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext)
+{
+    // Are the contexts part of our active set
+    for (const auto & contextTrigger : aContext)
+    {
+        auto trigger_it = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
+                                       [&contextTrigger](AmbientContextStorage & acs) {
+                                           return acs.GetContext().namespaceID == contextTrigger.identifiedContext.namespaceID &&
+                                               acs.GetContext().tag == contextTrigger.identifiedContext.tag;
+                                       });
+
+        if (trigger_it == mActiveAmbientContextTriggers.end())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+>>>>>>> 05ad181 ([Camera] AV Analysis cluster test scripts (TC_AVANALY_2_4 to 2_14) and updates to cluster server and camera-app logic (#73851))
 } // namespace Clusters
 } // namespace app
 } // namespace chip

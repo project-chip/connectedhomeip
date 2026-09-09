@@ -129,6 +129,55 @@ public:
     void SetZoneIDs(chip::Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIDs) { mZoneIDs = aZoneIDs; }
 };
 
+<<<<<<< HEAD
+=======
+struct ActiveAmbientContextSession
+{
+private:
+    uint16_t mSessionId = 0;
+    Optional<NodeId> mSourceNodeId;
+    std::vector<Structs::TrackedContext::Type> mTrackedContexts;
+
+public:
+    virtual ~ActiveAmbientContextSession() = default;
+    ActiveAmbientContextSession()          = default;
+
+    void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
+    uint16_t GetSessionId() const { return mSessionId; }
+
+    void SetSourceNodeId(const Optional<NodeId> & aSourceNodeId) { mSourceNodeId = aSourceNodeId; }
+    const Optional<NodeId> & GetSourceNodeId() const { return mSourceNodeId; }
+
+    void AddTrackedContext(const std::vector<Structs::TrackedContext::Type> & aTrackedContext)
+    {
+        // Update the current set of tracked contexts with those newly provided
+        //
+        mTrackedContexts.insert(mTrackedContexts.end(), aTrackedContext.begin(), aTrackedContext.end());
+    }
+
+    void RemoveTrackedContext(const std::vector<Structs::TrackedContext::Type> & aTrackedContext)
+    {
+        // Remove the provided contexts from our current set
+        mTrackedContexts.erase(std::remove_if(mTrackedContexts.begin(), mTrackedContexts.end(),
+                                              [&](const Structs::TrackedContext::Type & context1) {
+                                                  for (const auto & context2 : aTrackedContext)
+                                                  {
+                                                      if (context1.identifiedContext.namespaceID ==
+                                                              context2.identifiedContext.namespaceID &&
+                                                          context1.identifiedContext.tag == context2.identifiedContext.tag)
+                                                      {
+                                                          return true; // Match found, remove it
+                                                      }
+                                                  }
+                                                  return false;
+                                              }),
+                               mTrackedContexts.end());
+    }
+
+    const std::vector<Structs::TrackedContext::Type> & GetTrackedContexts() const { return mTrackedContexts; }
+};
+
+>>>>>>> 05ad181 ([Camera] AV Analysis cluster test scripts (TC_AVANALY_2_4 to 2_14) and updates to cluster server and camera-app logic (#73851))
 } // namespace AvAnalysis
 } // namespace Clusters
 } // namespace app
