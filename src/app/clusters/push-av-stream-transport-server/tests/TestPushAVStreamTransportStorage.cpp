@@ -1140,8 +1140,19 @@ TEST_F(TestPushAVStreamTransportStorage, TestUpdateMotionZonesAndSensitivity)
     EXPECT_TRUE(triggerStorage.motionSensitivity.Value().IsNull());
 
     // Test UpdateMotionZones with empty list
+    uint8_t emptyTlvBuf[16];
+    TLV::TLVWriter emptyWriter;
+    emptyWriter.Init(emptyTlvBuf, sizeof(emptyTlvBuf));
+    TLV::TLVWriter emptyArrayWriter;
+    EXPECT_EQ(emptyWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, emptyArrayWriter), CHIP_NO_ERROR);
+    EXPECT_EQ(emptyWriter.CloseContainer(emptyArrayWriter), CHIP_NO_ERROR);
+    TLV::TLVReader emptyReader;
+    emptyReader.Init(emptyTlvBuf, static_cast<uint32_t>(emptyWriter.GetLengthWritten()));
+    EXPECT_EQ(emptyReader.Next(), CHIP_NO_ERROR);
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> emptyList;
-    triggerStorage.UpdateMotionZones(MakeOptional(DataModel::MakeNullable(emptyList)));
+    EXPECT_EQ(emptyList.Decode(emptyReader), CHIP_NO_ERROR);
+
+    EXPECT_EQ(triggerStorage.UpdateMotionZones(MakeOptional(DataModel::MakeNullable(emptyList))), CHIP_NO_ERROR);
     EXPECT_TRUE(triggerStorage.motionZones.HasValue());
     EXPECT_FALSE(triggerStorage.motionZones.Value().IsNull());
     EXPECT_EQ(triggerStorage.motionZones.Value().Value().size(), (size_t) 0);
@@ -1166,7 +1177,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestUpdateMotionZonesAndSensitivity)
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
     EXPECT_EQ(decodedList.Decode(reader), CHIP_NO_ERROR);
 
-    triggerStorage.UpdateMotionZones(MakeOptional(DataModel::MakeNullable(decodedList)));
+    EXPECT_EQ(triggerStorage.UpdateMotionZones(MakeOptional(DataModel::MakeNullable(decodedList))), CHIP_NO_ERROR);
     EXPECT_TRUE(triggerStorage.motionZones.HasValue());
     EXPECT_FALSE(triggerStorage.motionZones.Value().IsNull());
     EXPECT_EQ(triggerStorage.motionZones.Value().Value().size(), (size_t) 1);
@@ -1175,13 +1186,13 @@ TEST_F(TestPushAVStreamTransportStorage, TestUpdateMotionZonesAndSensitivity)
 
     // Test UpdateMotionZones with null
     DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>> nullZones;
-    triggerStorage.UpdateMotionZones(MakeOptional(nullZones));
+    EXPECT_EQ(triggerStorage.UpdateMotionZones(MakeOptional(nullZones)), CHIP_NO_ERROR);
     EXPECT_TRUE(triggerStorage.motionZones.HasValue());
     EXPECT_TRUE(triggerStorage.motionZones.Value().IsNull());
 
     // Test TransportOptionsStorage wrapper
     TransportOptionsStorage optionsStorage;
-    optionsStorage.UpdateMotionZones(MakeOptional(DataModel::MakeNullable(decodedList)));
+    EXPECT_EQ(optionsStorage.UpdateMotionZones(MakeOptional(DataModel::MakeNullable(decodedList))), CHIP_NO_ERROR);
     optionsStorage.UpdateMotionSensitivity(MakeOptional(DataModel::MakeNullable(static_cast<uint8_t>(9))));
 
     EXPECT_TRUE(optionsStorage.triggerOptions.motionZones.HasValue());

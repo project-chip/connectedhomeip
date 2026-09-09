@@ -1659,14 +1659,34 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     // Validate MotionZones
     if (commandData.motionZones.HasValue() && !commandData.motionZones.Value().IsNull())
     {
-        std::set<uint16_t> zoneIDsFound;
-        bool nullFound      = false;
         size_t zoneListSize = 0;
+        auto iterCount      = commandData.motionZones.Value().Value().begin();
+        while (iterCount.Next())
+        {
+            zoneListSize++;
+        }
+
+        if (iterCount.GetStatus() != CHIP_NO_ERROR)
+        {
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
+
+        bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
+        if (!isValidZoneSize)
+        {
+            ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Invalid Motion Zone Size (%u)", mEndpointId,
+                         static_cast<unsigned>(zoneListSize));
+            handler.AddStatus(commandPath, Status::DynamicConstraintError);
+            return std::nullopt;
+        }
+
+        std::set<uint16_t> zoneIDsFound;
+        bool nullFound = false;
 
         auto iterDup = commandData.motionZones.Value().Value().begin();
         while (iterDup.Next())
         {
-            zoneListSize++;
             auto & zoneOpt = iterDup.GetValue();
 
             if (!zoneOpt.zone.IsNull())
@@ -1725,15 +1745,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
             return std::nullopt;
         }
 
-        bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
-        if (!isValidZoneSize)
-        {
-            ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Invalid Motion Zone Size (%u)", mEndpointId,
-                         static_cast<unsigned>(zoneListSize));
-            handler.AddStatus(commandPath, Status::DynamicConstraintError);
-            return std::nullopt;
-        }
-
         auto iterZones = commandData.motionZones.Value().Value().begin();
         while (iterZones.Next())
         {
@@ -1775,7 +1786,14 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
 
     if (commandData.motionZones.HasValue())
     {
-        updatedTransportOptionsPtr->UpdateMotionZones(commandData.motionZones);
+        CHIP_ERROR updateErr = updatedTransportOptionsPtr->UpdateMotionZones(commandData.motionZones);
+        if (updateErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Failed to update motion zones: %" CHIP_ERROR_FORMAT,
+                         mEndpointId, updateErr.Format());
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
     }
 
     Status status = mDelegate->UpdateMotionZoneOptions(connectionID, *updatedTransportOptionsPtr);
@@ -1795,6 +1813,12 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
         ChipLogError(Zcl,
                      "HandleUpdateMotionZoneOptions[ep=%d]: Failed to store modified connection, reverting: %" CHIP_ERROR_FORMAT,
                      mEndpointId, err.Format());
+        Status rollbackStatus = mDelegate->UpdateMotionZoneOptions(connectionID, *transportOptionsPtr);
+        if (rollbackStatus != Status::Success)
+        {
+            ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Delegate rollback failed: %u", mEndpointId,
+                         to_underlying(rollbackStatus));
+        }
         transportConfiguration->SetTransportOptionsPtr(transportOptionsPtr);
         handler.AddStatus(commandPath, Status::Failure);
         return std::nullopt;

@@ -197,31 +197,34 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
         }
     }
 
-    void UpdateMotionZones(
+    CHIP_ERROR UpdateMotionZones(
         const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> &
             newMotionZones)
     {
         if (!newMotionZones.HasValue())
         {
-            return;
+            return CHIP_NO_ERROR;
         }
-
-        mTransportZoneOptions.clear();
 
         if (newMotionZones.Value().IsNull())
         {
+            mTransportZoneOptions.clear();
             motionZones.SetValue(DataModel::NullNullable);
+            return CHIP_NO_ERROR;
         }
-        else
+
+        std::vector<TransportZoneOptionsStruct> tempZones;
+        auto iter = newMotionZones.Value().Value().begin();
+        while (iter.Next())
         {
-            auto iter = newMotionZones.Value().Value().begin();
-            while (iter.Next())
-            {
-                mTransportZoneOptions.push_back(iter.GetValue());
-            }
-            motionZones.SetValue(DataModel::MakeNullable(
-                DataModel::List<const TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
+            tempZones.push_back(iter.GetValue());
         }
+        ReturnErrorOnFailure(iter.GetStatus());
+
+        mTransportZoneOptions = std::move(tempZones);
+        motionZones.SetValue(DataModel::MakeNullable(
+            DataModel::List<const TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
+        return CHIP_NO_ERROR;
     }
 
 private:
@@ -558,12 +561,13 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         triggerOptions = mTriggerOptionsStorage;
     }
 
-    void UpdateMotionZones(
+    CHIP_ERROR UpdateMotionZones(
         const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> &
             newMotionZones)
     {
-        mTriggerOptionsStorage.UpdateMotionZones(newMotionZones);
+        ReturnErrorOnFailure(mTriggerOptionsStorage.UpdateMotionZones(newMotionZones));
         triggerOptions = mTriggerOptionsStorage;
+        return CHIP_NO_ERROR;
     }
 
 private:
