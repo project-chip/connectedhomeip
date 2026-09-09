@@ -26,8 +26,6 @@
 namespace chip {
 namespace Controller {
 
-using namespace chip::app;
-
 /**
  * A helper class that sends Matter WebRTC Transport Provider cluster commands.
  * It extends WebRTCTransportProviderClient to directly handle command responses
@@ -40,8 +38,8 @@ public:
     // Internally, these dynamically allocate (new) an AndroidWebRTCTransportProviderClient
     // object to send commands and wait for asynchronous responses.
     static CHIP_ERROR ProvideOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId,
-                                   Optional<DataModel::Nullable<uint16_t>> videoStreamID,
-                                   Optional<DataModel::Nullable<uint16_t>> audioStreamID, const CharSpan & offerSdp,
+                                   Optional<app::DataModel::Nullable<uint16_t>> videoStreamID,
+                                   Optional<app::DataModel::Nullable<uint16_t>> audioStreamID, const CharSpan & offerSdp,
                                    jobject jcallback);
     static CHIP_ERROR SolicitOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId, jobject jcallback);
 
@@ -59,11 +57,11 @@ private:
     static void HandleCommandDone(void * appContext);
 
     // Internal helper functions responsible for executing JNI callbacks and freeing memory.
-    void NotifyProvideOfferSuccess(uint16_t webRTCSessionID, Optional<DataModel::Nullable<uint16_t>> videoStreamID,
-                                   Optional<DataModel::Nullable<uint16_t>> audioStreamID);
+    void NotifyProvideOfferSuccess(uint16_t webRTCSessionID, Optional<app::DataModel::Nullable<uint16_t>> videoStreamID,
+                                   Optional<app::DataModel::Nullable<uint16_t>> audioStreamID);
     void NotifySolicitOfferSuccess(uint16_t webRTCSessionID, bool deferredOffer,
-                                   Optional<DataModel::Nullable<uint16_t>> videoStreamID,
-                                   Optional<DataModel::Nullable<uint16_t>> audioStreamID);
+                                   Optional<app::DataModel::Nullable<uint16_t>> videoStreamID,
+                                   Optional<app::DataModel::Nullable<uint16_t>> audioStreamID);
     void NotifyError(CHIP_ERROR error);
 
     // Frees its own memory (delete this) when the operation is completed or an error occurs.

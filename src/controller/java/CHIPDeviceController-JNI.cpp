@@ -2437,18 +2437,18 @@ JNI_METHOD(void, webRTCTransportProvideOffer)
     chip::JniUtfString jniOfferSdp(env, offerSdp);
     chip::CharSpan offerSpan(jniOfferSdp.c_str(), jniOfferSdp.size());
 
-    Optional<DataModel::Nullable<uint16_t>> optionalVideoStreamId;
+    Optional<app::DataModel::Nullable<uint16_t>> optionalVideoStreamId;
     if (jVideoStreamId != nullptr)
     {
         jint videoStreamId = chip::JniReferences::GetInstance().IntegerToPrimitive(jVideoStreamId);
-        optionalVideoStreamId.SetValue(DataModel::Nullable<uint16_t>(static_cast<uint16_t>(videoStreamId)));
+        optionalVideoStreamId.SetValue(app::DataModel::Nullable<uint16_t>(static_cast<uint16_t>(videoStreamId)));
     }
 
-    Optional<DataModel::Nullable<uint16_t>> optionalAudioStreamId;
+    Optional<app::DataModel::Nullable<uint16_t>> optionalAudioStreamId;
     if (jAudioStreamId != nullptr)
     {
         jint audioStreamId = chip::JniReferences::GetInstance().IntegerToPrimitive(jAudioStreamId);
-        optionalAudioStreamId.SetValue(DataModel::Nullable<uint16_t>(static_cast<uint16_t>(audioStreamId)));
+        optionalAudioStreamId.SetValue(app::DataModel::Nullable<uint16_t>(static_cast<uint16_t>(audioStreamId)));
     }
 
     err = AndroidWebRTCTransportProviderClient::ProvideOffer(wrapper->Controller(), static_cast<chip::NodeId>(deviceId),

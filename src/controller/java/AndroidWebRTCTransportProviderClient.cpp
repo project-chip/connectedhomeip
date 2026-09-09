@@ -26,6 +26,8 @@
 namespace chip {
 namespace Controller {
 
+using namespace chip::app;
+
 AndroidWebRTCTransportProviderClient::AndroidWebRTCTransportProviderClient(jobject javaCallbackObject, chip::CommandId commandId) :
     mCommandId(commandId)
 {
