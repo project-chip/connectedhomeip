@@ -239,15 +239,6 @@ class TC_ESALM_2_2(MatterBaseTest):
         return await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=getattr(attrs, name))
 
-    async def _read_step(self, step, endpoint: int, name: str, expected: int) -> None:
-        self.step(step)
-        asserts.assert_equal(await self._read(endpoint, name), expected, f"{name} mismatch")
-
-    def _skip(self, first: int, count: int) -> None:
-        for offset in range(count):
-            self.step(first + offset)
-            self.mark_current_step_skipped()
-
     async def _pair_block(self, endpoint: int, base: int, over: str, under: str,
                           orig_over, orig_under) -> None:
         """Execute the fourteen steps declared by _pair_steps for one over/under pair.
@@ -258,45 +249,60 @@ class TC_ESALM_2_2(MatterBaseTest):
         ko, ku = _kwarg(over), _kwarg(under)
         has_over, has_under = orig_over is not None, orig_under is not None
 
+        # base, base+1: raise the over threshold by 1000 and read it back (Over feature only).
         if has_over:
             new_over = orig_over + 1000
             self.step(base)
             await self._set(endpoint, **{ko: new_over})
-            await self._read_step(base + 1, endpoint, over, new_over)
+            self.step(base + 1)
+            asserts.assert_equal(await self._read(endpoint, over), new_over, f"{over} mismatch")
         else:
-            self._skip(base, 2)
+            self.mark_step_range_skipped(base, base + 1)
 
+        # base+2, base+3: lower the under threshold by 1000 and read it back (Under feature only).
         if has_under:
             new_under = orig_under - 1000
             self.step(base + 2)
             await self._set(endpoint, **{ku: new_under})
-            await self._read_step(base + 3, endpoint, under, new_under)
+            self.step(base + 3)
+            asserts.assert_equal(await self._read(endpoint, under), new_under, f"{under} mismatch")
         else:
-            self._skip(base + 2, 2)
+            self.mark_step_range_skipped(base + 2, base + 3)
 
+        # The remaining ten steps exercise the over/under cross-constraint, so both are required.
         if not (has_over and has_under):
-            self._skip(base + 4, 10)
+            self.mark_step_range_skipped(base + 4, base + 13)
             return
 
+        # base+4, base+5: setting over to the current under value violates min = under + 1.
         self.step(base + 4)
         await self._set_expect_constraint_error(endpoint, **{ko: new_under})
-        await self._read_step(base + 5, endpoint, over, new_over)
+        self.step(base + 5)
+        asserts.assert_equal(await self._read(endpoint, over), new_over, f"{over} mismatch")
 
+        # base+6, base+7: setting under to the current over value violates max = over - 1.
         self.step(base + 6)
         await self._set_expect_constraint_error(endpoint, **{ku: new_over})
-        await self._read_step(base + 7, endpoint, under, new_under)
+        self.step(base + 7)
+        asserts.assert_equal(await self._read(endpoint, under), new_under, f"{under} mismatch")
 
-        # Mutually valid values that would violate the constraint if applied one at a time.
+        # base+8..base+10: one command with mutually valid values that would violate the
+        # constraint if applied one at a time; the DUT evaluates the final state atomically.
         both_over, both_under = orig_under - 3000, orig_under - 4000
         self.step(base + 8)
         await self._set(endpoint, **{ko: both_over, ku: both_under})
-        await self._read_step(base + 9, endpoint, over, both_over)
-        await self._read_step(base + 10, endpoint, under, both_under)
+        self.step(base + 9)
+        asserts.assert_equal(await self._read(endpoint, over), both_over, f"{over} mismatch")
+        self.step(base + 10)
+        asserts.assert_equal(await self._read(endpoint, under), both_under, f"{under} mismatch")
 
+        # base+11..base+13: equal over/under values violate over >= under + 1; attributes unchanged.
         self.step(base + 11)
         await self._set_expect_constraint_error(endpoint, **{ko: both_over, ku: both_over})
-        await self._read_step(base + 12, endpoint, over, both_over)
-        await self._read_step(base + 13, endpoint, under, both_under)
+        self.step(base + 12)
+        asserts.assert_equal(await self._read(endpoint, over), both_over, f"{over} mismatch")
+        self.step(base + 13)
+        asserts.assert_equal(await self._read(endpoint, under), both_under, f"{under} mismatch")
 
     @run_if_endpoint_matches(has_feature(cluster, _F.kAdjustableThresholds))
     async def test_TC_ESALM_2_2(self):
@@ -322,60 +328,87 @@ class TC_ESALM_2_2(MatterBaseTest):
                 await self._pair_block(endpoint, base, over, under,
                                        originals.get(over), originals.get(under))
             else:
-                self._skip(base, 14)
+                self.mark_step_range_skipped(base, base + 13)
 
         has_import = "PowerImportThreshold" in originals
         has_export = "PowerExportThreshold" in originals
 
+        # 69-72: PowerImport uses absolute values (constrained to min 0, no relative-delta).
         if has_import:
             self.step(69)
             await self._set(endpoint, powerImportThreshold=1000)
-            await self._read_step(70, endpoint, "PowerImportThreshold", 1000)
+            self.step(70)
+            asserts.assert_equal(await self._read(endpoint, "PowerImportThreshold"), 1000,
+                                 "PowerImportThreshold mismatch")
             self.step(71)
             await self._set_expect_constraint_error(endpoint, powerImportThreshold=-1)
-            await self._read_step(72, endpoint, "PowerImportThreshold", 1000)
+            self.step(72)
+            asserts.assert_equal(await self._read(endpoint, "PowerImportThreshold"), 1000,
+                                 "PowerImportThreshold mismatch")
         else:
-            self._skip(69, 4)
+            self.mark_step_range_skipped(69, 72)
 
+        # 73-76: PowerExport uses absolute values (constrained to max 0).
         if has_export:
             self.step(73)
             await self._set(endpoint, powerExportThreshold=-1000)
-            await self._read_step(74, endpoint, "PowerExportThreshold", -1000)
+            self.step(74)
+            asserts.assert_equal(await self._read(endpoint, "PowerExportThreshold"), -1000,
+                                 "PowerExportThreshold mismatch")
             self.step(75)
             await self._set_expect_constraint_error(endpoint, powerExportThreshold=1)
-            await self._read_step(76, endpoint, "PowerExportThreshold", -1000)
+            self.step(76)
+            asserts.assert_equal(await self._read(endpoint, "PowerExportThreshold"), -1000,
+                                 "PowerExportThreshold mismatch")
         else:
-            self._skip(73, 4)
+            self.mark_step_range_skipped(73, 76)
 
+        # 77-85: import/export cross-constraint (needs both features).
         if has_import and has_export:
+            # 77-79: export=1 violates max 0 in a combined command; neither attribute changes.
             self.step(77)
             await self._set_expect_constraint_error(endpoint, powerImportThreshold=2000,
                                                     powerExportThreshold=1)
-            await self._read_step(78, endpoint, "PowerImportThreshold", 1000)
-            await self._read_step(79, endpoint, "PowerExportThreshold", -1000)
+            self.step(78)
+            asserts.assert_equal(await self._read(endpoint, "PowerImportThreshold"), 1000,
+                                 "PowerImportThreshold mismatch")
+            self.step(79)
+            asserts.assert_equal(await self._read(endpoint, "PowerExportThreshold"), -1000,
+                                 "PowerExportThreshold mismatch")
 
+            # 80-82: a combined command with values that satisfy all constraints succeeds.
             self.step(80)
             await self._set(endpoint, powerImportThreshold=2000, powerExportThreshold=-2000)
-            await self._read_step(81, endpoint, "PowerImportThreshold", 2000)
-            await self._read_step(82, endpoint, "PowerExportThreshold", -2000)
+            self.step(81)
+            asserts.assert_equal(await self._read(endpoint, "PowerImportThreshold"), 2000,
+                                 "PowerImportThreshold mismatch")
+            self.step(82)
+            asserts.assert_equal(await self._read(endpoint, "PowerExportThreshold"), -2000,
+                                 "PowerExportThreshold mismatch")
 
+            # 83-85: (0, 0) violates import >= export + 1; neither attribute changes.
             self.step(83)
             await self._set_expect_constraint_error(endpoint, powerImportThreshold=0,
                                                     powerExportThreshold=0)
-            await self._read_step(84, endpoint, "PowerImportThreshold", 2000)
-            await self._read_step(85, endpoint, "PowerExportThreshold", -2000)
+            self.step(84)
+            asserts.assert_equal(await self._read(endpoint, "PowerImportThreshold"), 2000,
+                                 "PowerImportThreshold mismatch")
+            self.step(85)
+            asserts.assert_equal(await self._read(endpoint, "PowerExportThreshold"), -2000,
+                                 "PowerExportThreshold mismatch")
         else:
-            self._skip(77, 9)
+            self.mark_step_range_skipped(77, 85)
 
-        # Restore every threshold the DUT supports to the value read in steps 3-12.
+        # 86-105: restore every threshold the DUT supports to the value read in steps 3-12.
         for i, (name, _feature) in enumerate(ALL_THRESHOLDS):
             first = 86 + 2 * i
             if name not in originals:
-                self._skip(first, 2)
+                self.mark_step_range_skipped(first, first + 1)
                 continue
             self.step(first)
             await self._set(endpoint, **{_kwarg(name): originals[name]})
-            await self._read_step(first + 1, endpoint, name, originals[name])
+            self.step(first + 1)
+            asserts.assert_equal(await self._read(endpoint, name), originals[name], f"{name} mismatch")
 
 
 if __name__ == "__main__":
