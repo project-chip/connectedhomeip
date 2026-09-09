@@ -103,13 +103,13 @@ bool DeviceAttestationCredentialsProvider::HasRequiredPqcCredentials() const
 {
     const auto profileSupport = GetDeviceAttestationProfileSupport();
     const bool hasLegacyChain =
-        profileSupport.paaSupportedProfiles.HasAll(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy) &&
-        profileSupport.paiSupportedProfiles.HasAll(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy) &&
-        profileSupport.dacSupportedProfiles.HasAll(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
+        profileSupport.PAASupportedProfiles.HasAll(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy) &&
+        profileSupport.PAISupportedProfiles.HasAll(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy) &&
+        profileSupport.DACSupportedProfiles.HasAll(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
     const BitMask<DeviceAttestationCertProfileBitmap> pqcProfiles(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44,
                                                                   DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
     const bool hasPqcIssuer =
-        profileSupport.paaSupportedProfiles.HasAny(pqcProfiles) || profileSupport.paiSupportedProfiles.HasAny(pqcProfiles);
+        profileSupport.PAASupportedProfiles.HasAny(pqcProfiles) || profileSupport.PAISupportedProfiles.HasAny(pqcProfiles);
 
     return hasLegacyChain && hasPqcIssuer;
 }

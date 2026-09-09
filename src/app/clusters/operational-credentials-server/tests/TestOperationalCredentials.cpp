@@ -93,12 +93,12 @@ public:
     Credentials::DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const override
     {
         return {
-            .paaSupportedProfiles = BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
+            .PAASupportedProfiles = BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
                 Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy,
                 Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa44),
-            .paiSupportedProfiles = BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
+            .PAISupportedProfiles = BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
                 Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy),
-            .dacSupportedProfiles = BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
+            .DACSupportedProfiles = BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
                 Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy),
         };
     }
@@ -268,27 +268,27 @@ TEST_F(TestOperationalCredentials, TestPQCProviderRequirements)
     EXPECT_EQ(featureMap, 0u);
 
     // PQC DAC support alone is insufficient: a PQC issuer is required.
-    provider.profiles.dacSupportedProfiles.Set(Profile::kSupportsMlDsa44);
+    provider.profiles.DACSupportedProfiles.Set(Profile::kSupportsMlDsa44);
     EXPECT_FALSE(provider.HasRequiredPqcCredentials());
-    provider.profiles.dacSupportedProfiles.Clear(Profile::kSupportsMlDsa44);
+    provider.profiles.DACSupportedProfiles.Clear(Profile::kSupportsMlDsa44);
 
     for (auto pqcProfile : { Profile::kSupportsMlDsa44, Profile::kSupportsMlDsa65 })
     {
-        provider.profiles.paaSupportedProfiles.Set(pqcProfile);
+        provider.profiles.PAASupportedProfiles.Set(pqcProfile);
         EXPECT_TRUE(provider.HasRequiredPqcCredentials());
-        provider.profiles.paaSupportedProfiles.Clear(pqcProfile);
-        provider.profiles.paiSupportedProfiles.Set(pqcProfile);
+        provider.profiles.PAASupportedProfiles.Clear(pqcProfile);
+        provider.profiles.PAISupportedProfiles.Set(pqcProfile);
         EXPECT_TRUE(provider.HasRequiredPqcCredentials());
 
         // Every chain element must retain legacy support even when a PQC issuer is available.
-        for (auto * profiles : { &provider.profiles.paaSupportedProfiles, &provider.profiles.paiSupportedProfiles,
-                                 &provider.profiles.dacSupportedProfiles })
+        for (auto * profiles : { &provider.profiles.PAASupportedProfiles, &provider.profiles.PAISupportedProfiles,
+                                 &provider.profiles.DACSupportedProfiles })
         {
             profiles->Clear(Profile::kSupportsEcdsaMatterLegacy);
             EXPECT_FALSE(provider.HasRequiredPqcCredentials());
             profiles->Set(Profile::kSupportsEcdsaMatterLegacy);
         }
-        provider.profiles.paiSupportedProfiles.Clear(pqcProfile);
+        provider.profiles.PAISupportedProfiles.Clear(pqcProfile);
     }
 }
 

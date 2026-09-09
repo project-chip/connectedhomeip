@@ -360,7 +360,6 @@ CHIP_ERROR TestHarnessDACProvider::Init(std::istream & json)
         data.pid.SetValue(ReadUint16(root[kPid]));
     }
 
-
     Init(data);
     return CHIP_NO_ERROR;
 }
@@ -397,22 +396,22 @@ void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
     // For example, a complete _ml_dsa_65 pair with pai_profile_ml_dsa_65 = 0
     // contributes ML-DSA-65 to PAA support and only ECDSA to PAI/DAC support.
     mProfileSupport = {
-        .paaSupportedProfiles =
+        .PAASupportedProfiles =
             BuildProfileSupport(mPaiCert, has44 ? mPqcPaiCertMlDsa44 : ByteSpan(), has65 ? mPqcPaiCertMlDsa65 : ByteSpan()),
-        .paiSupportedProfiles = BuildProfileSupport(mPaiCert, ByteSpan(), ByteSpan()),
-        .dacSupportedProfiles = BuildProfileSupport(mDacCert, ByteSpan(), ByteSpan()),
+        .PAISupportedProfiles = BuildProfileSupport(mPaiCert, ByteSpan(), ByteSpan()),
+        .DACSupportedProfiles = BuildProfileSupport(mDacCert, ByteSpan(), ByteSpan()),
     };
     auto addPaiProfile = [this](DeviceAttestationCertProfile profile) {
         switch (profile)
         {
         case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
-            mProfileSupport.paiSupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
+            mProfileSupport.PAISupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
             break;
         case DeviceAttestationCertProfile::kMlDsa44:
-            mProfileSupport.paiSupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44);
+            mProfileSupport.PAISupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44);
             break;
         case DeviceAttestationCertProfile::kMlDsa65:
-            mProfileSupport.paiSupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
+            mProfileSupport.PAISupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
             break;
         case DeviceAttestationCertProfile::kUnknownEnumValue:
             break;

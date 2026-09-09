@@ -68,16 +68,6 @@ ByteSpan GetAttestationChallengeFromCurrentSession(app::CommandHandler * command
     return attestationChallenge;
 }
 
-Structs::PQCDeviceAttestationProfileStruct::Type
-ToOperationalCredentialsProfileSupport(const Credentials::DeviceAttestationProfileSupport & profileSupport)
-{
-    Structs::PQCDeviceAttestationProfileStruct::Type profile;
-    profile.PAASupportedProfiles = profileSupport.paaSupportedProfiles;
-    profile.PAISupportedProfiles = profileSupport.paiSupportedProfiles;
-    profile.DACSupportedProfiles = profileSupport.dacSupportedProfiles;
-    return profile;
-}
-
 BitMask<Credentials::DeviceAttestationCertProfileBitmap>
 ToDeviceAttestationProfileBitmap(Credentials::DeviceAttestationCertProfile profile)
 {
@@ -968,7 +958,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
         profileRequest ? commandData.maxSegmentSize.ValueOr(kDefaultCertificateSegmentSize) : kDefaultCertificateSegmentSize;
     const auto profileSupport = dacProvider.GetDeviceAttestationProfileSupport();
 
-    CHIP_ERROR err                                             = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     // CryptoProfile describes the requested certificate's key. An ECDSA PAI/DAC
     // can belong to an ML-DSA-rooted chain, so choose the stored chain separately.
     const auto chainProfile = dacProvider.GetPreferredDeviceAttestationChainProfile();
@@ -998,7 +988,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for DAC");
         VerifyOrReturnValue(!profileRequest ||
-                                profileSupport.dacSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(cryptoProfile)),
+                                profileSupport.DACSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(cryptoProfile)),
                             Status::InvalidCommand);
         documentType = Credentials::DeviceAttestationDocumentType::kDACCertificate;
         SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, chainProfile, offset,
@@ -1009,7 +999,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for PAI");
         VerifyOrReturnValue(!profileRequest ||
-                                profileSupport.paiSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(cryptoProfile)),
+                                profileSupport.PAISupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(cryptoProfile)),
                             Status::InvalidCommand);
         documentType = Credentials::DeviceAttestationDocumentType::kPAICertificate;
         SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, chainProfile, offset,
@@ -1264,8 +1254,7 @@ DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const
     case OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id:
         VerifyOrReturnError(HasFeature(OperationalCredentials::Feature::kPQCDeviceAttestation),
                             Protocols::InteractionModel::Status::UnsupportedAttribute);
-        return encoder.Encode(
-            ToOperationalCredentialsProfileSupport(mOpCredsContext.dacProvider.GetDeviceAttestationProfileSupport()));
+        return encoder.Encode(mOpCredsContext.dacProvider.GetDeviceAttestationProfileSupport());
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

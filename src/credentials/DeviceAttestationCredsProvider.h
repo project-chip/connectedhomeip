@@ -20,6 +20,7 @@
 #include <cstdint>
 
 #include <clusters/OperationalCredentials/Enums.h>
+#include <clusters/OperationalCredentials/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
@@ -37,12 +38,8 @@ using DeviceAttestationDocumentType      = app::Clusters::OperationalCredentials
 // Each bitmap describes the corresponding certificate's subject public key capabilities,
 // not its issuer's signature algorithm or the profile of the chain containing it.
 // Phase 1 DAC keys (and device attestation signatures) remain ECDSA-P256.
-struct DeviceAttestationProfileSupport
-{
-    BitMask<DeviceAttestationCertProfileBitmap> paaSupportedProfiles;
-    BitMask<DeviceAttestationCertProfileBitmap> paiSupportedProfiles;
-    BitMask<DeviceAttestationCertProfileBitmap> dacSupportedProfiles;
-};
+// Retain the provider type name; callers now use the generated PAA/PAI/DACSupportedProfiles field names.
+using DeviceAttestationProfileSupport = app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type;
 
 class DeviceAttestationCredentialsProvider
 {
