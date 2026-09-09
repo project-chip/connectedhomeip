@@ -171,14 +171,15 @@ CHIP_ERROR WebRTCPeerManager::CreateOffer(OfferCallback & aCallback)
     return CHIP_NO_ERROR;
 }
 
-void WebRTCPeerManager::OnSessionAssigned(uint16_t aWebRTCSessionId)
+void WebRTCPeerManager::OnSessionAssigned(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
     VerifyOrReturn(HasPendingSession(),
                    ChipLogError(AppServer, "AvAnalysisNode: session %u assigned with no offer pending", aWebRTCSessionId));
 
-    ChipLogProgress(AppServer, "AvAnalysisNode: peer connection bound to WebRTC session %u", aWebRTCSessionId);
-    mSessions[aWebRTCSessionId] = std::move(mPendingSession);
-    mPendingSession             = PeerSession{}; // the move already nulled the connection; this flushes the rest
+    ChipLogProgress(AppServer, "AvAnalysisNode: peer connection bound to WebRTC session %u of " ChipLogFormatScopedNodeId,
+                    aWebRTCSessionId, ChipLogValueScopedNodeId(aCameraNode));
+    mSessions[SessionKey(aCameraNode, aWebRTCSessionId)] = std::move(mPendingSession);
+    mPendingSession = PeerSession{}; // the move already nulled the connection; this flushes the rest
 }
 
 void WebRTCPeerManager::OnOfferAbandoned()
@@ -199,12 +200,13 @@ void WebRTCPeerManager::ReleasePendingSession()
     mPendingSession = PeerSession{};
 }
 
-void WebRTCPeerManager::OnSessionClosed(uint16_t aWebRTCSessionId)
+void WebRTCPeerManager::OnSessionClosed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
-    auto it = mSessions.find(aWebRTCSessionId);
+    auto it = mSessions.find(SessionKey(aCameraNode, aWebRTCSessionId));
     VerifyOrReturn(it != mSessions.end());
 
-    ChipLogProgress(AppServer, "AvAnalysisNode: releasing the peer connection of WebRTC session %u", aWebRTCSessionId);
+    ChipLogProgress(AppServer, "AvAnalysisNode: releasing the peer connection of WebRTC session %u of " ChipLogFormatScopedNodeId,
+                    aWebRTCSessionId, ChipLogValueScopedNodeId(aCameraNode));
     if (it->second.peerConnection)
     {
         it->second.peerConnection->close();
@@ -212,27 +214,29 @@ void WebRTCPeerManager::OnSessionClosed(uint16_t aWebRTCSessionId)
     mSessions.erase(it);
 }
 
-CHIP_ERROR WebRTCPeerManager::ApplyAnswer(uint16_t aWebRTCSessionId, const std::string & aSdp)
+CHIP_ERROR WebRTCPeerManager::ApplyAnswer(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId, const std::string & aSdp)
 {
-    auto it = mSessions.find(aWebRTCSessionId);
+    auto it = mSessions.find(SessionKey(aCameraNode, aWebRTCSessionId));
     VerifyOrReturnError(it != mSessions.end(), CHIP_ERROR_NOT_FOUND);
 
     it->second.peerConnection->setRemoteDescription(rtc::Description(aSdp, rtc::Description::Type::Answer));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCPeerManager::AddRemoteCandidate(uint16_t aWebRTCSessionId, const std::string & aCandidate)
+CHIP_ERROR WebRTCPeerManager::AddRemoteCandidate(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId,
+                                                 const std::string & aCandidate)
 {
-    auto it = mSessions.find(aWebRTCSessionId);
+    auto it = mSessions.find(SessionKey(aCameraNode, aWebRTCSessionId));
     VerifyOrReturnError(it != mSessions.end(), CHIP_ERROR_NOT_FOUND);
 
     it->second.peerConnection->addRemoteCandidate(rtc::Candidate(aCandidate));
     return CHIP_NO_ERROR;
 }
 
-std::vector<WebRTCPeerController::LocalICECandidate> WebRTCPeerManager::TakeLocalCandidates(uint16_t aWebRTCSessionId)
+std::vector<WebRTCPeerController::LocalICECandidate> WebRTCPeerManager::TakeLocalCandidates(const ScopedNodeId & aCameraNode,
+                                                                                            uint16_t aWebRTCSessionId)
 {
-    auto it = mSessions.find(aWebRTCSessionId);
+    auto it = mSessions.find(SessionKey(aCameraNode, aWebRTCSessionId));
     if (it == mSessions.end())
     {
         return {};
@@ -254,18 +258,18 @@ void WebRTCPeerManager::OnPeerConnectionStateChanged(const std::shared_ptr<rtc::
 
     if (aState == rtc::PeerConnection::State::Connected)
     {
-        mPeerConnectionObserver->OnPeerConnectionConnected(it->first);
+        mPeerConnectionObserver->OnPeerConnectionConnected(it->first.first, it->first.second);
         return;
     }
 
     // Disconnected is left alone: it may recover, and libdatachannel moves on to Failed if it does not
     if (aState == rtc::PeerConnection::State::Failed || aState == rtc::PeerConnection::State::Closed)
     {
-        mPeerConnectionObserver->OnPeerConnectionFailed(it->first);
+        mPeerConnectionObserver->OnPeerConnectionFailed(it->first.first, it->first.second);
     }
 }
 
-std::map<uint16_t, WebRTCPeerManager::PeerSession>::iterator
+std::map<WebRTCPeerManager::SessionKey, WebRTCPeerManager::PeerSession>::iterator
 WebRTCPeerManager::FindAssignedSession(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection)
 {
     for (auto it = mSessions.begin(); it != mSessions.end(); ++it)
