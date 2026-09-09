@@ -219,6 +219,10 @@ _available_devices = [
     "WATER_FREEZE_DETECTOR",
   ],
   [
+    "water-heater",
+    "WATER_HEATER",
+  ],
+  [
     "water-leak-detector",
     "WATER_LEAK_DETECTOR",
   ],

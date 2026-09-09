@@ -61,6 +61,7 @@
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
+#include <device/types/water-heater/WaterHeater.h>
 #include <device/types/water-valve/WaterValve.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -518,6 +519,10 @@ private:
                 return std::make_unique<BooleanStateSensor>(
                     mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
             });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_WATER_HEATER)
+        {
+            RegisterCreator("water-heater", []() { return std::make_unique<WaterHeater>(); });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)
         {
