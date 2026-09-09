@@ -19,6 +19,12 @@
 #include <esp_wifi.h>
 #include <platform/NetworkCommissioning.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/ScopedMemoryBuffer.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
 using chip::BitFlags;
 using chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
 
@@ -86,6 +92,10 @@ private:
         item.signal.strength = ap_record.rssi;
         memcpy(item.ssid, ap_record.ssid, item.ssidLen);
         memcpy(item.bssid, ap_record.bssid, sizeof(item.bssid));
+
+        // The raw authmode helps debug how the Wi-Fi driver classifies the RSN configuration of a network.
+        ChipLogProgress(NetworkProvisioning, "Scan result: \"%.*s\" authmode %u", static_cast<int>(item.ssidLen),
+                        reinterpret_cast<const char *>(item.ssid), static_cast<unsigned>(ap_record.authmode));
     }
 };
 
@@ -112,6 +122,14 @@ public:
         uint8_t ssidLen = 0;
         char credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
         uint8_t credentialsLen = 0;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+        bool UsingPDC() const { return networkIdentityLen != 0; }
+
+        uint8_t networkIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+        uint8_t networkIdentityLen = 0;
+        uint8_t clientIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+        uint8_t clientIdentityLen = 0;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
 
     // BaseDriver
@@ -140,6 +158,17 @@ public:
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
     uint32_t GetSupportedWiFiBandsMask() const override;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    bool SupportsPerDeviceCredentials() override { return true; };
+    CHIP_ERROR AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan networkIdentity, Optional<uint8_t> clientIdentityNetworkIndex,
+                                         Status & outStatus, MutableCharSpan & outDebugText, MutableByteSpan & outClientIdentity,
+                                         uint8_t & outNetworkIndex) override;
+    CHIP_ERROR GetNetworkIdentity(uint8_t networkIndex, MutableByteSpan & outNetworkIdentity) override;
+    CHIP_ERROR GetClientIdentity(uint8_t networkIndex, MutableByteSpan & outClientIdentity) override;
+    CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
+                                      Crypto::P256ECDSASignature & outSignature) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork();
     void OnConnectWiFiNetworkFailed();
@@ -161,11 +190,33 @@ private:
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
     CHIP_ERROR BackupConfiguration();
 
+    // Disconnects and clears the ESP station configuration, so that a new one can be applied.
+    static CHIP_ERROR DisableStation();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    // Associates with mStagingNetwork using EAP-TLS, authenticating with the Client Identity
+    // and validating the access point against the Network Identity.
+    CHIP_ERROR ConnectWiFiNetworkWithPDC();
+    CHIP_ERROR InstallEapTlsCredentials();
+    void ReleaseEapTlsCredentials();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
     WiFiNetwork mStagingNetwork;
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
     uint16_t mLastDisconnectedReason;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    // Only valid while mStagingNetwork.UsingPDC(); held here rather than in WiFiNetwork
+    // so that copying a WiFiNetwork stays a trivial (heap-free) operation.
+    Crypto::P256Keypair mClientIdentityKeypair;
+
+    // DER encodings of the Network Identity, the Client Identity and its key, laid out back to
+    // back. esp_eap_client retains the pointers it is handed rather than copying, and reads
+    // them again on every (re-)association, so they must outlive the connection. Allocated by
+    // InstallEapTlsCredentials(), which documents the layout.
+    Platform::ScopedMemoryBuffer<uint8_t> mEapTlsCredentials;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 };
 
 class ESPEthernetDriver : public EthernetDriver
