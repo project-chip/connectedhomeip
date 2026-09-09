@@ -587,8 +587,8 @@ CHIP_ERROR EVSEManufacturer::RequestConstraintBasedForecast(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
-                                                                                 const DataModel::Nullable<int64_t> maxPower,
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                                                 const Optional<int64_t> maxPower,
                                                                                  const uint32_t durationS,
                                                                                  AdjustmentCauseEnum cause)
 {

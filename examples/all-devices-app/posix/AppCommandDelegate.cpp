@@ -23,6 +23,7 @@
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
+#include <app/clusters/mode-select-server/ModeSelectCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
@@ -1004,6 +1005,51 @@ public:
     }
 };
 
+class SetModeSelectCurrentModeCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SetModeSelectCurrentMode"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ModeSelectCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "ModeSelectCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("NewMode") || !json["NewMode"].isUInt())
+        {
+            ChipLogError(AppServer, "Invalid SetModeSelectCurrentMode command: missing 'NewMode' field");
+            return;
+        }
+
+        unsigned int newModeVal = json["NewMode"].asUInt();
+        if (newModeVal > UINT8_MAX)
+        {
+            ChipLogError(AppServer, "Invalid mode value (out of range): %u", newModeVal);
+            return;
+        }
+
+        uint8_t newMode = static_cast<uint8_t>(newModeVal);
+        if (!cluster->IsSupportedMode(newMode))
+        {
+            ChipLogError(AppServer, "Invalid mode: %u", newMode);
+            return;
+        }
+
+        Protocols::InteractionModel::Status status = cluster->UpdateCurrentMode(newMode);
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            ChipLogError(AppServer, "Failed to set mode %u on endpoint %d: status %u", newMode, endpointId,
+                         static_cast<unsigned>(to_underlying(status)));
+            return;
+        }
+        ChipLogProgress(AppServer, "SetModeSelectCurrentMode to %d on endpoint %d", newMode, endpointId);
+    }
+};
+
 } // namespace
 
 void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
@@ -1102,4 +1148,5 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<RvcAddAreaCommandHandler>());
     RegisterCommandHandler(std::make_unique<RvcRemoveAreaCommandHandler>());
     RegisterCommandHandler(std::make_unique<GenerateElectricalEnergyMeasurementSnapshotsCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SetModeSelectCurrentModeCommandHandler>());
 }
