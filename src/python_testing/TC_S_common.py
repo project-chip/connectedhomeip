@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from mobly import asserts
@@ -88,6 +89,15 @@ async def select_scenable_attribute(test: MatterBaseTest, scene_endpoint: int) -
 
     fallback: ScenableAttribute | None = None
     for cluster, cluster_data in endpoint_data.items():
+        # AudioControl cluster has scene="true" quality in spec XML for some attributes (e.g. SoftMuted, Volume),
+        # but SceneHandler support for AudioControl is not currently implemented/tested in the SDK.
+        if cluster == Clusters.AudioControl or getattr(cluster, "id", None) == Clusters.AudioControl.id:
+            logging.warning(
+                f"Ignoring AudioControl cluster (0x{Clusters.AudioControl.id:04X}) on endpoint {scene_endpoint} "
+                "for scenable attribute selection because AudioControl SceneHandler is not implemented."
+            )
+            continue
+
         xml_cluster = xml_clusters.get(cluster.id)
         if xml_cluster is None:
             continue
