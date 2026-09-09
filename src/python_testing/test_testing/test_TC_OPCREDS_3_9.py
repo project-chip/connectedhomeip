@@ -28,9 +28,9 @@ import matter.clusters as Clusters
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
+from support_modules.pqc_support import (OperationalCredentialsFeature, is_ml_dsa_supported, kCertificateSegmentSize,  # noqa: E402
+                                         profile_mask)
 from TC_OPCREDS_3_9 import TC_OPCREDS_3_9, AttestationCryptoProfile, CertificateAlgorithms  # noqa: E402
-from support_modules.pqc_support import (OperationalCredentialsFeature, is_ml_dsa_supported,  # noqa: E402
-                                         kCertificateSegmentSize, profile_mask)
 from test_pqc_support import _load_pem_fixtures  # noqa: E402
 
 

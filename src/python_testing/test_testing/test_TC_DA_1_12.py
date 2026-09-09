@@ -24,13 +24,14 @@ from pathlib import Path
 from types import MethodType, SimpleNamespace
 
 from mobly import signals
+
 import matter.clusters as Clusters
 
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
-from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCredentialsFeature,  # noqa: E402
-                                         is_ml_dsa_supported, kCertificateSegmentSize, profile_mask)
+from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCredentialsFeature, is_ml_dsa_supported,  # noqa: E402
+                                         kCertificateSegmentSize, profile_mask)
 from TC_DA_1_12 import TC_DA_1_12  # noqa: E402
 from test_pqc_support import _load_pem_fixtures  # noqa: E402
 

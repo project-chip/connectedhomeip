@@ -31,9 +31,8 @@ import logging
 from mobly import asserts
 from support_modules.pqc_support import (AttestationCryptoProfile, CertificateAlgorithms, OperationalCredentialsFeature,
                                          assert_initial_certificate_segment, assert_profile_advertised,
-                                         assert_profile_supported_by_test_harness,
-                                         kCertificateSegmentSize, parse_certificate_algorithms, retrieve_segmented_document,
-                                         select_strongest_profile)
+                                         assert_profile_supported_by_test_harness, kCertificateSegmentSize,
+                                         parse_certificate_algorithms, retrieve_segmented_document, select_strongest_profile)
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
