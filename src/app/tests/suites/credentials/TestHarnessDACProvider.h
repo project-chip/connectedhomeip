@@ -18,6 +18,7 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <lib/core/Optional.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 #include <istream>
 
@@ -72,11 +73,13 @@ public:
     uint16_t GetPid() { return mPid; }
 
     void Init(const char * filepath);
-    /// Load provider JSON from a stream; malformed JSON leaves the current credentials unchanged.
+    /// Own the decoded JSON data, bounded by each field's size limit. Errors leave the current credentials unchanged.
     CHIP_ERROR Init(std::istream & json);
+    /// Borrow data without allocating; its backing storage must outlive use by this provider.
     void Init(const TestHarnessDACProviderData & data);
 
 private:
+    Platform::ScopedMemoryBuffer<uint8_t> mJsonStorage;
     ByteSpan mDacCert;
     ByteSpan mDacPrivateKey;
     ByteSpan mDacPublicKey;

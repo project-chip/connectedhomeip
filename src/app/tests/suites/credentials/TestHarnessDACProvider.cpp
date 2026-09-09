@@ -24,7 +24,6 @@
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPMemString.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -144,37 +143,13 @@ namespace Examples {
 
 namespace {
 
-ByteSpan ReadValue(Json::Value jsonValue, uint8_t * buffer, size_t bufferLen)
+CHIP_ERROR ReadJsonString(const Json::Value & value, CharSpan & out)
 {
-    const std::string value = jsonValue.asString();
-    if (value.size() == 0)
-    {
-        return ByteSpan();
-    }
-
-    size_t bytesLen = Encoding::HexToBytes(value.c_str(), value.size(), buffer, bufferLen);
-    return ByteSpan(buffer, bytesLen);
-}
-
-template <size_t N>
-void ReadOptionalByteSpan(const Json::Value & root, const char * key, uint8_t (&buffer)[N], Optional<ByteSpan> & value)
-{
-    if (root.isMember(key))
-    {
-        value.SetValue(ReadValue(root[key], buffer, sizeof(buffer)));
-    }
-}
-
-CharSpan ReadValue(Json::Value jsonValue, char * buffer, size_t bufferLen)
-{
-    const std::string value = jsonValue.asString();
-    if (value.size() == 0)
-    {
-        return CharSpan();
-    }
-
-    Platform::CopyString(buffer, bufferLen, value.c_str());
-    return CharSpan::fromCharString(buffer);
+    const char * begin;
+    const char * end;
+    VerifyOrReturnError(value.getString(&begin, &end), CHIP_ERROR_INVALID_ARGUMENT);
+    out = CharSpan(begin, static_cast<size_t>(end - begin));
+    return CHIP_NO_ERROR;
 }
 
 bool ReadValue(Json::Value jsonValue)
@@ -185,11 +160,6 @@ bool ReadValue(Json::Value jsonValue)
         return true;
     }
     return false;
-}
-
-uint16_t ReadUint16(Json::Value jsonValue)
-{
-    return static_cast<uint16_t>(jsonValue.asUInt());
 }
 
 ByteSpan GetProfileDocument(DeviceAttestationCertProfile profile, ByteSpan legacy, ByteSpan pqc44, ByteSpan pqc65)
@@ -268,28 +238,12 @@ void TestHarnessDACProvider::Init(const char * filepath)
 
 CHIP_ERROR TestHarnessDACProvider::Init(std::istream & json)
 {
-    static constexpr char kDacCertKey[]      = "dac_cert";
-    static constexpr char kDacPrivateKey[]   = "dac_private_key";
-    static constexpr char kDacPublicKey[]    = "dac_public_key";
-    static constexpr char kPqcDacCert44Key[] = "dac_cert_ml_dsa_44";
-    static constexpr char kPqcDacCert65Key[] = "dac_cert_ml_dsa_65";
-    static constexpr char kPaiCertKey[]      = "pai_cert";
-    static constexpr char kPqcPaiCert44Key[] = "pai_cert_ml_dsa_44";
-    static constexpr char kPqcPaiCert65Key[] = "pai_cert_ml_dsa_65";
-    static constexpr char kCertDecKey[]      = "certification_declaration";
-    static constexpr char kFirmwareInfoKey[] = "firmware_information";
-    static constexpr char kIsSuccessKey[]    = "is_success_case";
-    static constexpr char kDescription[]     = "description";
-    static constexpr char kPid[]             = "basic_info_pid";
-
     Json::Reader reader;
     Json::Value root;
-    VerifyOrReturnError(reader.parse(json, root), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(reader.parse(json, root) && root.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     TestHarnessDACProviderData data;
 
-    // Validate selectors before writing the static credential buffers so a rejected
-    // fixture cannot overwrite documents referenced by the current provider.
     auto readPaiProfile = [](const Json::Value & value, DeviceAttestationCertProfile & outProfile) -> CHIP_ERROR {
         VerifyOrReturnError(value.isIntegral() && value.isUInt(), CHIP_ERROR_INVALID_ARGUMENT);
         const auto raw = value.asUInt();
@@ -309,63 +263,107 @@ CHIP_ERROR TestHarnessDACProvider::Init(std::istream & json)
         ReturnErrorOnFailure(readPaiProfile(root["pai_profile_ml_dsa_65"], data.paiProfileMlDsa65));
     }
 
-    static uint8_t dacCertBuffer[kMaxDERCertLength];
-    static uint8_t dacPrivateKeyBuffer[Crypto::kP256_PrivateKey_Length];
-    static uint8_t dacPublicKeyBuffer[Crypto::kP256_PublicKey_Length];
-    ReadOptionalByteSpan(root, kDacCertKey, dacCertBuffer, data.dacCert);
-    ReadOptionalByteSpan(root, kDacPrivateKey, dacPrivateKeyBuffer, data.dacPrivateKey);
-    ReadOptionalByteSpan(root, kDacPublicKey, dacPublicKeyBuffer, data.dacPublicKey);
-
-    // The PAI key signs the DAC certificate, so its profile determines the maximum DAC certificate length.
-    static uint8_t dacCertMlDsa44Buffer[kMaxDERCertLengthMlDsa44];
-    static uint8_t dacCertMlDsa65Buffer[kMaxDERCertLengthMlDsa65];
-    ReadOptionalByteSpan(root, kPqcDacCert44Key, dacCertMlDsa44Buffer, data.pqcDacCertMlDsa44);
-    ReadOptionalByteSpan(root, kPqcDacCert65Key, dacCertMlDsa65Buffer, data.pqcDacCertMlDsa65);
-
-    static uint8_t paiCertBuffer[kMaxDERCertLength];
-    ReadOptionalByteSpan(root, kPaiCertKey, paiCertBuffer, data.paiCert);
-
-    static uint8_t paiCertMlDsa44Buffer[kMaxDERCertLengthMlDsa44];
-    static uint8_t paiCertMlDsa65Buffer[kMaxDERCertLengthMlDsa65];
-    ReadOptionalByteSpan(root, kPqcPaiCert44Key, paiCertMlDsa44Buffer, data.pqcPaiCertMlDsa44);
-    ReadOptionalByteSpan(root, kPqcPaiCert65Key, paiCertMlDsa65Buffer, data.pqcPaiCertMlDsa65);
-
-    if (root.isMember(kCertDecKey))
+    struct HexField
     {
-        static uint8_t buf[kMaxCMSSignedCDMessage];
-        data.certificationDeclaration.SetValue(ReadValue(root[kCertDecKey], buf, sizeof(buf)));
+        const char * key;
+        size_t maxSize;
+        Optional<ByteSpan> & destination;
+        CharSpan hex;
+    };
+    HexField fields[] = {
+        { "dac_cert", kMaxDERCertLength, data.dacCert },
+        { "dac_private_key", Crypto::kP256_PrivateKey_Length, data.dacPrivateKey },
+        { "dac_public_key", Crypto::kP256_PublicKey_Length, data.dacPublicKey },
+        { "dac_cert_ml_dsa_44", kMaxDERCertLengthMlDsa44, data.pqcDacCertMlDsa44 },
+        { "dac_cert_ml_dsa_65", kMaxDERCertLengthMlDsa65, data.pqcDacCertMlDsa65 },
+        { "pai_cert", kMaxDERCertLength, data.paiCert },
+        { "pai_cert_ml_dsa_44", kMaxDERCertLengthMlDsa44, data.pqcPaiCertMlDsa44 },
+        { "pai_cert_ml_dsa_65", kMaxDERCertLengthMlDsa65, data.pqcPaiCertMlDsa65 },
+        { "certification_declaration", kMaxCMSSignedCDMessage, data.certificationDeclaration },
+        { "firmware_information", UINT8_MAX, data.firmwareInformation },
+    };
+
+    // Bound and validate every field before allocating the decoded fixture. JsonCpp
+    // owns the strings referenced by hex/description until this method returns.
+    size_t storageSize = 0;
+    for (auto & field : fields)
+    {
+        if (!root.isMember(field.key))
+        {
+            continue;
+        }
+        ReturnErrorOnFailure(ReadJsonString(root[field.key], field.hex));
+        VerifyOrReturnError(field.hex.size() % 2 == 0, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(field.hex.size() / 2 <= field.maxSize, CHIP_ERROR_INVALID_ARGUMENT);
+        for (char c : field.hex)
+        {
+            VerifyOrReturnError((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'),
+                                CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        storageSize += field.hex.size() / 2;
     }
 
-    if (root.isMember(kFirmwareInfoKey))
+    CharSpan description;
+    if (root.isMember("description"))
     {
-        // TODO Use the correct maximum size
-        static uint8_t buf[UINT8_MAX];
-        data.firmwareInformation.SetValue(ReadValue(root[kFirmwareInfoKey], buf, sizeof(buf)));
+        ReturnErrorOnFailure(ReadJsonString(root["description"], description));
+        // The former 256-byte buffer reserved one byte for a null terminator.
+        VerifyOrReturnError(description.size() <= 255, CHIP_ERROR_INVALID_ARGUMENT);
+        storageSize += description.size();
+    }
+    if (root.isMember("is_success_case"))
+    {
+        VerifyOrReturnError(root["is_success_case"].isBool() || root["is_success_case"].isString(), CHIP_ERROR_INVALID_ARGUMENT);
+        data.isSuccessCase.SetValue(ReadValue(root["is_success_case"]));
+    }
+    if (root.isMember("basic_info_pid"))
+    {
+        const auto & pid = root["basic_info_pid"];
+        VerifyOrReturnError(pid.isIntegral() && pid.isUInt() && pid.asUInt() <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+        data.pid.SetValue(static_cast<uint16_t>(pid.asUInt()));
     }
 
-    if (root.isMember(kIsSuccessKey))
+    Platform::ScopedMemoryBuffer<uint8_t> storage;
+    VerifyOrReturnError(storageSize == 0 || storage.Alloc(storageSize), CHIP_ERROR_NO_MEMORY);
+    size_t offset = 0;
+    for (auto & field : fields)
     {
-        data.isSuccessCase.SetValue(ReadValue(root[kIsSuccessKey]));
+        if (!root.isMember(field.key))
+        {
+            continue;
+        }
+        const size_t size = field.hex.size() / 2;
+        ByteSpan bytes;
+        if (size != 0)
+        {
+            uint8_t * dest = storage.Get() + offset;
+            VerifyOrReturnError(Encoding::HexToBytes(field.hex.data(), field.hex.size(), dest, size) == size,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+            bytes = ByteSpan(dest, size);
+            offset += size;
+        }
+        field.destination.SetValue(bytes);
     }
-
-    if (root.isMember(kDescription))
+    if (root.isMember("description"))
     {
-        constexpr size_t kMaxTestCaseDescriptionLen = 256;
-        static char buf[kMaxTestCaseDescriptionLen];
-        data.description.SetValue(ReadValue(root[kDescription], buf, sizeof(buf)));
-    }
-
-    if (root.isMember(kPid))
-    {
-        data.pid.SetValue(ReadUint16(root[kPid]));
+        CharSpan ownedDescription;
+        if (!description.empty())
+        {
+            auto * dest = reinterpret_cast<char *>(storage.Get() + offset);
+            memcpy(dest, description.data(), description.size());
+            ownedDescription = CharSpan(dest, description.size());
+        }
+        data.description.SetValue(ownedDescription);
     }
 
     Init(data);
+    mJsonStorage = std::move(storage);
     return CHIP_NO_ERROR;
 }
 
 void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
 {
+    mJsonStorage.Free();
     mDacCert       = data.dacCert.HasValue() ? data.dacCert.Value() : DevelopmentCerts::kDacCert;
     mDacPrivateKey = data.dacPrivateKey.HasValue() ? data.dacPrivateKey.Value() : DevelopmentCerts::kDacPrivateKey;
     mDacPublicKey  = data.dacPublicKey.HasValue() ? data.dacPublicKey.Value() : DevelopmentCerts::kDacPublicKey;
