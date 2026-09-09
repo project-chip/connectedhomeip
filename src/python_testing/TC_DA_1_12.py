@@ -19,7 +19,7 @@
 # Operational Credentials cluster. There is no CI test arguments block because no PQC-capable DAC
 # provider fixture is checked in yet; run it manually against a Linux example app started with:
 #
-#   ./chip-all-clusters-app --dac_provider <pqc_dac_provider.json> --dac_provider_pqc_ready
+#   ./chip-all-clusters-app --dac_provider <pqc_dac_provider.json>
 #
 # where the JSON carries the dac_cert_ml_dsa_44/65 and pai_cert_ml_dsa_44/65 keys read by
 # TestHarnessDACProvider. Generate the chains with chip-cert gen-att-cert.
