@@ -53,6 +53,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-washer:emulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/light-sensor:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/microwave-oven:emulated",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mode-select:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/network-infrastructure-manager",

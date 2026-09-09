@@ -63,6 +63,8 @@
 #include <oob-accessors/pigweed/PigweedAttributeAccessor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
+
 
 using namespace chip;
 using namespace chip::app;
@@ -81,6 +83,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
+LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -274,6 +277,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .bindingTable             = Binding::Table::GetInstance(),
         .bindingManager           = Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
     });
 
     RegisterDeviceFactoryOverrides(PosixDeviceFactory::GetInstance(), gTimerDelegate, Server::GetInstance().GetFabricTable(),

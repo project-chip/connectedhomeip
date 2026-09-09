@@ -20,6 +20,7 @@
 #include <app/FailSafeContext.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
@@ -43,6 +44,7 @@
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
 #include <device/types/microwave-oven/impl/EmulatedMicrowaveOven.h>
+#include <device/types/mode-select/impl/SimulatedModeSelect.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
 #include <device/types/mounted-on-off-control/MountedOnOffControl.h>
 #include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
@@ -228,6 +230,7 @@ public:
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
         TestEventTriggerDelegate & testEventTriggerDelegate;
+        Clusters::IdentifyDelegate & identifyDelegate;
     };
 
     static DeviceFactory & GetInstance()
@@ -405,6 +408,8 @@ private:
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
+                        .identifyDelegate  = mContext->identifyDelegate,
+
                     },
                     DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
@@ -418,6 +423,7 @@ private:
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
+                        .identifyDelegate  = mContext->identifyDelegate,
                     },
                     DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
@@ -441,6 +447,7 @@ private:
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
+                        .identifyDelegate  = mContext->identifyDelegate,
                     },
                     DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
@@ -453,6 +460,7 @@ private:
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
                 });
             });
         }
@@ -472,6 +480,7 @@ private:
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
                 });
             });
         }
@@ -491,6 +500,7 @@ private:
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
                 });
             });
         }
@@ -666,6 +676,13 @@ private:
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_MODE_SELECT)
+        {
+            RegisterCreator("mode-select", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeCreatedDevice<SimulatedModeSelect>(mContext->diagnosticDataProvider);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)

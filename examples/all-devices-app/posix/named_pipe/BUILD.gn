@@ -29,6 +29,8 @@ source_set("named_pipe") {
     "translators/BooleanStateTranslator.h",
     "translators/ElectricalEnergyMeasurementTranslator.cpp",
     "translators/ElectricalEnergyMeasurementTranslator.h",
+    "translators/ModeSelectTranslator.cpp",
+    "translators/ModeSelectTranslator.h",
     "translators/OccupancyTranslator.cpp",
     "translators/OccupancyTranslator.h",
     "translators/OnOffTranslator.cpp",

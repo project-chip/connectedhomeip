@@ -19,6 +19,7 @@
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
+#include <app/clusters/mode-select-server/ModeSelectCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -29,6 +30,7 @@
 #include <oob-accessors/clusters/BasicInformationOOBAccessor.h>
 #include <oob-accessors/clusters/BooleanStateOOBAccessor.h>
 #include <oob-accessors/clusters/ElectricalEnergyMeasurementOOBAccessor.h>
+#include <oob-accessors/clusters/ModeSelectOOBAccessor.h>
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
 #include <oob-accessors/clusters/RvcOOBAccessor.h>
@@ -559,6 +561,95 @@ TEST_F(TestOOBAccessors, RvcOOBAccessor)
         EXPECT_EQ(mockSimulation.mLastAreaMapId, 42U);
         EXPECT_EQ(mockSimulation.mLastLocationName, "Kitchen");
     }
+}
+
+class MockModeSelectDelegate : public Clusters::ModeSelectCluster::Delegate
+{
+public:
+    Span<const Clusters::ModeSelect::Structs::ModeOptionStruct::Type> GetSupportedModes() const override
+    {
+        return Span<const Clusters::ModeSelect::Structs::ModeOptionStruct::Type>(kModes);
+    }
+    void OnModeChanged(uint8_t newMode) override { mLastMode = newMode; }
+
+    static constexpr Clusters::ModeSelect::Structs::ModeOptionStruct::Type kModes[] = {
+        { "Mode0"_span, 0, {} },
+        { "Mode1"_span, 1, {} },
+    };
+    uint8_t mLastMode = 0xFF;
+};
+
+TEST_F(TestOOBAccessors, ModeSelectOOBAccessor)
+{
+    InMemoryOOBAccessorRegistry registry;
+    MockModeSelectDelegate delegate;
+    Clusters::ModeSelectCluster cluster(1, delegate,
+                                        {
+                                            .featureMap              = {},
+                                            .optionalAttributeSet    = {},
+                                            .description             = "Test Mode Select"_span,
+                                            .standardNamespace       = DataModel::NullNullable,
+                                            .onOffValueForStartUp    = false,
+                                            .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+                                        });
+    EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
+
+    auto accessor = std::make_unique<ModeSelectOOBAccessor>(cluster, 1);
+    EXPECT_EQ(registry.Register(std::move(accessor)), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.GetCurrentMode(), 0);
+
+    // SetModeSelectCurrentMode = 1 on endpoint 1
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint8_t>(1)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("SetModeSelectCurrentMode"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(cluster.GetCurrentMode(), 1);
+        EXPECT_EQ(delegate.mLastMode, 1);
+    }
+
+    // Invalid mode (unsupported mode 99)
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint8_t>(99)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("SetModeSelectCurrentMode"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Wrong endpoint (endpoint 2)
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(2)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint8_t>(0)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("SetModeSelectCurrentMode"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+                  CHIP_ERROR_NOT_FOUND);
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestOOBAccessors, NoopRegistryLifecycle)

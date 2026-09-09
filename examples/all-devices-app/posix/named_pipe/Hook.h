@@ -25,6 +25,7 @@
 #include <device/types/dimmable-light/NamedPipeTranslators.h>
 #include <device/types/dimmable-plug-in-unit/NamedPipeTranslators.h>
 #include <device/types/electrical-sensor/NamedPipeTranslators.h>
+#include <device/types/mode-select/NamedPipeTranslators.h>
 #include <device/types/mounted-dimmable-load-control/NamedPipeTranslators.h>
 #include <device/types/mounted-on-off-control/NamedPipeTranslators.h>
 #include <device/types/occupancy-sensor/NamedPipeTranslators.h>

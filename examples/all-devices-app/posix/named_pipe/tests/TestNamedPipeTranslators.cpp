@@ -24,6 +24,7 @@
 #include <posix/named_pipe/translators/BasicInformationTranslator.h>
 #include <posix/named_pipe/translators/BooleanStateTranslator.h>
 #include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
+#include <posix/named_pipe/translators/ModeSelectTranslator.h>
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 #include <posix/named_pipe/translators/RvcTranslator.h>
@@ -235,6 +236,29 @@ TEST_F(TestNamedPipeTranslators, ElectricalEnergyMeasurementTranslator)
     Json::Value json = ParseJson(R"({"Name": "GenerateElectricalEnergyMeasurementSnapshots"})");
     EXPECT_EQ(translator.TranslateAndExecute(1, json, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "GenerateElectricalEnergyMeasurementSnapshots");
+}
+
+TEST_F(TestNamedPipeTranslators, ModeSelectTranslator)
+{
+    ModeSelectTranslator translator;
+
+    // SetModeSelectCurrentMode with NewMode
+    Json::Value json1 = ParseJson(R"({"Name": "SetModeSelectCurrentMode", "NewMode": 1})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json1, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetModeSelectCurrentMode");
+
+    // SetModeSelectCurrentMode with Mode fallback
+    Json::Value json2 = ParseJson(R"({"Name": "SetModeSelectCurrentMode", "Mode": 2})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetModeSelectCurrentMode");
+
+    // Missing mode field
+    Json::Value invalid = ParseJson(R"({"Name": "SetModeSelectCurrentMode"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, invalid, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Out of range mode field
+    Json::Value outOfRange = ParseJson(R"({"Name": "SetModeSelectCurrentMode", "NewMode": 256})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, outOfRange, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestNamedPipeTranslators, AmbientContextTranslator)
