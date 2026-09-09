@@ -81,7 +81,7 @@ class TC_ASU_2_2(MatterBaseTest):
             TestStep("8", "TH receives UnionContributorRemoved event and reads the RemovedContributor field.",
                      "Verify that the RemovedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the removed contributor(s) from step 6. "
                      "For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string."),
-            TestStep("9", "Change the ContributorStatus value of one contributor from UnionContributorList attribute, and save the contributor's list index value and the ContributorStatus value before the change."),
+            TestStep("9", "Change the ContributorStatus value of one contributor from UnionContributorList attribute, and save its ContributorStatus value before the change."),
             TestStep("10", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute.",
                      "Verify that the ContributorStatus value of the contributor changed from step 9 is updated accordingly."),
             TestStep("11", "TH receives UnionContributorStatusChanged event and reads the ContributorStatusChange field.",
