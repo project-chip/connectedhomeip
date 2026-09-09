@@ -47,7 +47,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     // On linux read first without a buffer which returns the size, and then
     // use a local buffer to read the entire object, which allows partial and
     // offset reads.
-    CHIP_ERROR err = mStorage.ReadValueBin(key, nullptr, 0, read_size);
+    CHIP_ERROR err = ChipLinuxStorageDelegate()->ReadValueBin(key, nullptr, 0, read_size);
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -63,7 +63,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     Platform::ScopedMemoryBuffer<uint8_t> buf;
     VerifyOrReturnError(buf.Alloc(read_size), CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(mStorage.ReadValueBin(key, buf.Get(), read_size, read_size));
+    ReturnErrorOnFailure(ChipLinuxStorageDelegate()->ReadValueBin(key, buf.Get(), read_size, read_size));
 
     size_t total_size_to_read = read_size - offset_bytes;
     size_t copy_size          = std::min(value_size, total_size_to_read);
@@ -80,11 +80,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = mStorage.WriteValueBin(key, reinterpret_cast<const uint8_t *>(value), value_size);
+    err = ChipLinuxStorageDelegate()->WriteValueBin(key, reinterpret_cast<const uint8_t *>(value), value_size);
     SuccessOrExit(err);
 
     // Commit the value to the persistent store.
-    err = mStorage.Commit();
+    err = ChipLinuxStorageDelegate()->Commit();
     SuccessOrExit(err);
 
 exit:
@@ -94,7 +94,7 @@ exit:
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = mStorage.ClearValue(key);
+    err            = ChipLinuxStorageDelegate()->ClearValue(key);
 
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
@@ -103,7 +103,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     SuccessOrExit(err);
 
     // Commit the value to the persistent store.
-    err = mStorage.Commit();
+    err = ChipLinuxStorageDelegate()->Commit();
     SuccessOrExit(err);
 
 exit:
