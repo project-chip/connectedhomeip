@@ -58,7 +58,6 @@ The DUT acts as the commissioner (advertiser of the '_matterd._udp' service)
 and the TH is a passive DNS-SD scanner; the DUT is never commissioned and no
 PASE or CASE session is established. The test expects the DUT to be the only
 commissioner advertising on the test network.
-
 '''
 
 # Timeout for the subtype PTR browse; browses that get an answer end early via
