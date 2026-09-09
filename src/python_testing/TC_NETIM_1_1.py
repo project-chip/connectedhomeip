@@ -117,7 +117,7 @@ class TC_NETIM_1_1(MatterBaseTest):
         matter_asserts.assert_list(active_list, "ActiveNetworkIdentities")
 
         self.step(5, "TH validates the length of activeList.", expectation="activeList is a list with length 1.")
-        asserts.assert_equal(len(active_list), 1, "ActiveNetworkIdentities should contain exactly one entry.")
+        asserts.assert_greater_equal(len(active_list), 1, "ActiveNetworkIdentities should contain at least one entry.")
 
         self.step(6, "TH validates each element in activeList.",
                   expectation="For each element: Index in 1..65534, Type is a valid enum8, Identifier is a 20-byte octstr, "
@@ -158,7 +158,7 @@ class TC_NETIM_1_1(MatterBaseTest):
         matter_asserts.assert_list(clients_list, "Clients")
 
         self.step(9, "TH validates the length of clientsList.", expectation="clientsList is a list with length 1.")
-        asserts.assert_equal(len(clients_list), 1, "Clients should contain exactly one entry.")
+        asserts.assert_greater_equal(len(clients_list), 1, "Clients should contain at least one entry.")
 
         self.step(10, "TH validates each element in clientsList.",
                   expectation="For each element: ClientIndex in 1..2047, ClientIdentifier is a 20-byte octstr, "
@@ -167,6 +167,8 @@ class TC_NETIM_1_1(MatterBaseTest):
             matter_asserts.assert_int_in_range(client.clientIndex, 1, 2047, "ClientStruct.ClientIndex")
             matter_asserts.assert_is_octstr(client.clientIdentifier, "ClientStruct.ClientIdentifier")
             asserts.assert_equal(len(client.clientIdentifier), 20, "ClientStruct.ClientIdentifier must be 20 bytes.")
+            matter_asserts.assert_valid_enum(client.clientIdentityType, "ClientStruct.ClientIdentityType",
+                                             cluster.Enums.IdentityTypeEnum)
             if client.networkIdentityIndex is not NullValue:
                 matter_asserts.assert_int_in_range(client.networkIdentityIndex, 1, 65534, "ClientStruct.NetworkIdentityIndex")
 

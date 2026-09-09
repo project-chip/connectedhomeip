@@ -16,6 +16,8 @@
 #
 
 import base64
+import os
+import sys
 import unittest
 
 from cryptography.exceptions import InvalidSignature
@@ -23,7 +25,11 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
 
-from matter.testing import network_identity as ni
+# The helper under test lives in src/python_testing/support_modules, which is only on
+# sys.path when a test script is launched from src/python_testing. This file is run by
+# path from the repository root, so add the parent directory explicitly.
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from support_modules import network_identity as ni  # noqa: E402 isort:skip
 
 # Known-answer vector taken from the SDK C++ tests. This is a PDCID01 Network
 # Identity: the full X.509 DER (sTestCert_PDCID01_DER) and its 20-byte identifier
