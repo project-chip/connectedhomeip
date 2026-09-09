@@ -59,10 +59,9 @@ public:
      * Context event detection handling
      */
     void OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId,
-                                        Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds,
-                                        uint16_t identifiedContextId,
+                                        Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds, uint16_t identifiedContextId,
                                         bool & triggeredContextEnabled);
-                                        
+
     // Simulation triggers for app-pipe commands
     CHIP_ERROR TriggerSessionStart(const std::vector<uint16_t> & aZoneIds, bool aZoneIdsNull = false,
                                    chip::Optional<chip::NodeId> aSourceNodeId = chip::NullOptional);
