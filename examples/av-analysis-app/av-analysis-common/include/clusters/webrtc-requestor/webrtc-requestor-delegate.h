@@ -46,8 +46,8 @@ public:
     }
 
     // WebRTCPeerController::PeerConnectionObserver
-    void OnPeerConnectionConnected(uint16_t aWebRTCSessionId) override;
-    void OnPeerConnectionFailed(uint16_t aWebRTCSessionId) override;
+    void OnPeerConnectionConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
+    void OnPeerConnectionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
 
     CHIP_ERROR HandleOffer(const Clusters::WebRTCTransportRequestor::WebRTCSessionStruct & aSession,
                            const OfferArgs & aArgs) override;
@@ -61,7 +61,13 @@ public:
 
 private:
     // Sends the candidates gathered for the session to its camera, the trickle phase after the Answer
-    void SendLocalCandidates(uint16_t aWebRTCSessionId);
+    void SendLocalCandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
+
+    // The camera that assigned a session's id, which together identify it
+    static ScopedNodeId CameraOf(const Clusters::WebRTCTransportRequestor::WebRTCSessionStruct & aSession)
+    {
+        return ScopedNodeId(aSession.peerNodeID, aSession.GetFabricIndex());
+    }
 
     WebRTCPeerController * mPeerController                  = nullptr;
     Clusters::DefaultAvAnalysisWebRTCClient * mWebRTCClient = nullptr;
