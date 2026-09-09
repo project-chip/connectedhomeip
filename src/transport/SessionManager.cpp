@@ -26,6 +26,7 @@
 
 #include "SessionManager.h"
 
+#include <algorithm>
 #include <inttypes.h>
 #include <string.h>
 
@@ -191,7 +192,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     if (sessionHandle->AllowsLargePayload())
     {
-        VerifyOrReturnError(message->TotalLength() <= kMaxLargeAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
+        uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+        size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
+        size_t limit        = std::min(remoteLimit, kMaxLargeAppMessageLen);
+        VerifyOrReturnError(message->TotalLength() <= limit, CHIP_ERROR_MESSAGE_TOO_LONG);
     }
     else
     {

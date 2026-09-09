@@ -164,7 +164,7 @@ CharSpan ReadValue(Json::Value jsonValue, char * buffer, size_t bufferLen)
     }
 
     Platform::CopyString(buffer, bufferLen, value.c_str());
-    return CharSpan(buffer, strlen(buffer));
+    return CharSpan::fromCharString(buffer);
 }
 
 bool ReadValue(Json::Value jsonValue)

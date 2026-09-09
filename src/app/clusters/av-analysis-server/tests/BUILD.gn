@@ -21,9 +21,12 @@ chip_test_suite("tests") {
   output_name = "libTestAvAnalysisCluster"
 
   test_sources = [
+    "TestDefaultAvAnalysisCameraClient.cpp",
     "TestLocalAvAnalysisCluster.cpp",
     "TestRemoteAvAnalysisCluster.cpp",
   ]
+
+  sources = [ "MockAvAnalysisDelegate.h" ]
 
   cflags = [ "-Wconversion" ]
 

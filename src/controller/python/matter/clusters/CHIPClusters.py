@@ -3363,6 +3363,9 @@ class ChipClusters:
                 "commandName": "CertificateChainRequest",
                 "args": {
                     "certificateType": "int",
+                    "cryptoProfile": "int",
+                    "segmentID": "int",
+                    "maxSegmentSize": "int",
                 },
             },
             0x00000004: {
@@ -3466,6 +3469,12 @@ class ChipClusters:
                 "attributeName": "CurrentFabricIndex",
                 "attributeId": 0x00000005,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "PQCDeviceAttestationProfile",
+                "attributeId": 0x00000006,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -9354,6 +9363,39 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000059: {
+                "attributeName": "Sensors",
+                "attributeId": 0x00000059,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000005A: {
+                "attributeName": "AvailableSensors",
+                "attributeId": 0x0000005A,
+                "type": "bytes",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000005B: {
+                "attributeName": "EnabledSensors",
+                "attributeId": 0x0000005B,
+                "type": "bytes",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000005C: {
+                "attributeName": "NumberOfSensorScheduleTransitions",
+                "attributeId": 0x0000005C,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000005D: {
+                "attributeName": "SensorSchedule",
+                "attributeId": 0x0000005D,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -12236,7 +12278,6 @@ class ChipClusters:
                     "BLTChannelSoundingDeviceRoleConfig": "BLTChannelSoundingDeviceRoleConfigStruct",
                     "frequencyBand": "int",
                     "bandwidth": "int",
-                    "securityMode": "int",
                     "trigger": "RangingTriggerConditionStruct",
                     "reportingCondition": "ReportingConditionStruct",
                 },
@@ -12290,6 +12331,12 @@ class ChipClusters:
                 "attributeName": "SessionIDList",
                 "attributeId": 0x00000006,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "RangingConstraints",
+                "attributeId": 0x00000007,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -15371,6 +15418,15 @@ class ChipClusters:
                     "connectionID": "int",
                 },
             },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "UpdateMotionZoneOptions",
+                "args": {
+                    "connectionID": "int",
+                    "motionZones": "TransportZoneOptionsStruct",
+                    "motionSensitivity": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -15383,6 +15439,12 @@ class ChipClusters:
                 "attributeName": "CurrentConnections",
                 "attributeId": 0x00000001,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxZones",
+                "attributeId": 0x00000002,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {

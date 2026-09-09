@@ -10346,12 +10346,20 @@ PICS:
     - label: "Can the provided set of endpoints change?"
       id: PWRTL.S.F03
 
+    - label:
+          "Does the associated endpoint provide information about downstream
+          nodes on its circuit?"
+      id: PWRTL.S.F04
+
     #Server attributes
     - label: "Does the device implement the AvailableEndpoints attribute?"
       id: PWRTL.S.A0000
 
     - label: "Does the device implement the ActiveEndpoints attribute?"
       id: PWRTL.S.A0001
+
+    - label: "Does the device implement the ElectricalCircuitNodes attribute?"
+      id: PWRTL.S.A0002
 
     #
     # Thread Border Router Management Cluster

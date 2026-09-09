@@ -38,6 +38,28 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs2
+#       --device dishwasher
+#       --trace-to json:${TRACE_APP}.json
+#       --app-pipe /tmp/dishm_2_1_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --int-arg PIXIT.DISHM.MODE_CHANGE_OK:0
+#       --int-arg PIXIT.DISHM.MODE_CHANGE_FAIL:2
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/dishm_2_1_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 

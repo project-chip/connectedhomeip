@@ -43,6 +43,8 @@ from mobly import asserts
 from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
+from matter import im_capture
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -73,7 +75,7 @@ class TC_IDM_3_2(IDMBaseTest):
             TestStep(3, "TH sends the WriteRequestMessage to the DUT to write an unsupported attribute. DUT responds with the Write Response action",
                      "Verify on the TH that the DUT sends the status code UNSUPPORTED_ATTRIBUTE"),
             TestStep(4, "TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.",
-                     "On the TH verify that the DUT does not send a Write Response message with a success back to the TH."),
+                     "Verify that the DUT modifies the attribute value. For DUTs supporting Matter release 1.7 or later: Verify that the DUT does NOT send a Write Response message back to the TH. For DUTs supporting Matter release 1.6 or earlier: Verify that the DUT does not send a Write Response message back to the TH, or if it does, it responds with a valid WriteResponse or StatusResponse."),
             TestStep(5, "TH sends a ReadRequest message to the DUT to read any attribute on any cluster. DUT returns with a report data action with the attribute values and the dataversion of the cluster. TH sends a WriteRequestMessage to the DUT to modify the value of one attribute with the DataVersion field set to the one received in the prior step.",
                      "Verify that the DUT sends a Write Response message with a success back to the TH. Verify by sending a ReadRequest that the Write Action on DUT was successful."),
             TestStep(6, "TH sends a ReadRequest message to the DUT to read any attribute on any cluster. DUT returns with a report data action with the attribute values and the dataversion of the cluster. TH sends a WriteRequestMessage to the DUT to modify the value of one attribute no DataVersion indicated. TH sends a second WriteRequestMessage to the DUT to modify the value of an attribute with the dataversion field set to the value received earlier.",
@@ -118,44 +120,29 @@ class TC_IDM_3_2(IDMBaseTest):
         self.step(3)
         await self.write_unsupported_attribute()
 
-        self.skip_step(4)
-        # Currently skipping step 4 as we have removed support in the python framework for this functionality currently.
-        # This is now contained in the SuppressResponse test module PR referenced below for TC_IDM_3_2, once this test module merges that PR can then be merged
-        # and this test step will become valid after issues with SuppressResponse mentioned in issue https://github.com/project-chip/connectedhomeip/issues/41227.
-        # SuppressResponse PR Reference: https://github.com/project-chip/connectedhomeip/pull/41590
-        # TODO: Once the SuppressResponse test module PR merges, uncomment the following code and remove the skip_step line above.
-
-        """
         self.step(4)
         # Check if NodeLabel attribute exists for step 4 (SuppressResponse tests)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             '''
             TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
-
-            NOTE: Per Issue #41227, the current spec does not strictly enforce that devices must suppress the response.
-            For now, we just ensure the device doesn't crash. The device MAY respond or may not - either is acceptable.
-            Future spec revisions will enforce no response behavior.
-            Reference: https://github.com/project-chip/connectedhomeip/issues/41227
             '''
 
             test_attribute = Clusters.BasicInformation.Attributes.NodeLabel
             test_value = "SuppressResponse-Test"
 
             log.info("Testing SuppressResponse functionality with NodeLabel attribute")
-            log.info("NOTE: Device may or may not respond - both behaviors are acceptable for now per Issue #41227")
+            im_capture.SetObserver(self.default_controller)
+            im_capture.Reset()
 
             # Send write request with suppressResponse=True
-            # Device may respond or not - we just ensure it doesn't crash
             try:
-                res = await self.default_controller.WriteAttribute(
-                    nodeid=self.dut_node_id,
+                await self.default_controller.WriteAttribute(
+                    nodeId=self.dut_node_id,
                     attributes=[(self.endpoint, test_attribute(test_value))],
                     suppressResponse=True
                 )
-                log.info(f"Device responded to suppressResponse=True request: {res}")
-            except Exception as e:
-                # Device didn't respond (timeout or other error) - this is also acceptable
-                log.info(f"Device did not respond or encountered error: {e}")
+            except (ChipStackError, InteractionModelError) as e:
+                log.info("WriteAttribute with suppressResponse=True raised exception: %s", e)
 
             # Verify the write operation succeeded by reading back the value
             log.info("Verifying that the write operation succeeded")
@@ -167,7 +154,9 @@ class TC_IDM_3_2(IDMBaseTest):
 
             asserts.assert_equal(actual_value, test_value,
                                  f"Attribute should be written. Expected {test_value}, got {actual_value}")
-        """
+
+            snapshot = im_capture.GetSnapshot()
+            await self.verify_suppress_response_message_count(snapshot, "WriteAttribute suppressResponse")
         # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
         self.step(5)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
