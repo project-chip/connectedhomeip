@@ -270,7 +270,7 @@ proxy's own NAN publisher advertises on the whole list, so the proxy can be
 commissioned over Wi-Fi PAF itself.
 
 That publisher stops once the proxy joins a fabric, as the NAN radio is needed
-to subscribe on a commissionee's behalf.
+to subscribe on a Commissionee behalf.
 
 Once the proxy is commissioned (next step), it disconnects the NAN receive
 handler, so the PAF subscribe calls it makes on behalf of commissioners register
@@ -430,8 +430,6 @@ list reaches the radio from `posix/main.cpp`. Transports are registered before
 `Server::Init()`, so the fabric table is empty at that point and the driver's
 `DisconnectPublishReceiveHandler()` call lands on the commissioning-complete
 event instead.
-
-> > > > > > > 951a8aedcd63d45d4a1d89a486d12b24136ddc30
 
 <hr>
 
