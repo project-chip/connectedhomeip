@@ -41,55 +41,10 @@
 #   <label_name>:
 #     - <github_username_1>
 #     - <github_username_2>
+#
+# Example (uncomment and customize to add new SME review labels):
+#   # my-label:
+#   #   - github-username1
+#   #   - github-username2
 # ==============================================================================
 
-# Core architecture & SDK infrastructure
-core:
-  - cecille
-  - andy31415
-
-# Security & Cryptography reviews
-security:
-  - cecille
-  - bzbarsky-apple
-
-crypto:
-  - cecille
-  - woane
-
-# Data Model & Cluster XML specifications
-data-model:
-  - bzbarsky-apple
-  - Boris-Virk
-
-# Certification testing & test harness
-certification:
-  - robfusco
-  - dhrishi
-
-# Device Attestation Credentials (DACs) & PAI/CD verification
-attestation:
-  - cecille
-  - woane
-
-# Build tools & CI scripts
-scripts:
-  - andy31415
-  - cecille
-
-# Platform-specific SME reviews (when tagged by label)
-darwin:
-  - bzbarsky-apple
-  - jwhiting-apple
-
-esp32:
-  - shubhamdp
-  - wqx6
-
-nxp:
-  - doru91
-  - dinabenamar
-
-silabs:
-  - jmartinez-silabs
-  - lpbeliveau-silabs
