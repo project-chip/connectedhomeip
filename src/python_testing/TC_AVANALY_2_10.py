@@ -196,7 +196,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
 
         # Make sure that there is at least one supported context
         asserts.assert_greater_equal(len(supported_ambient_contexts_dut), 1, "SupportedAmbientContexts must not be empty")
-        
+
         self.step(2)
         # Set ZoneIDs to None if no feature, Null if feature and no zone IDs
         valid_context_zoneIDs = None
