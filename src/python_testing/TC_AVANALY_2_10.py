@@ -90,45 +90,60 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(
                 1,
+                "TH Reads SupportedAmbeintContexts from the AvAnalysis Cluster on the DUT",
+                "Verify that there is at least one supported context.  Save these in supported_ambient_contexts_dut."
+            ),
+            TestStep(
+                2,
+                "If PerZoneDetect is supported, TH Reads the current zones from the Zone Management Cluster.",
+                "If no zones are present, the TH attempts to create one, if that is not possible, zones will be an empty list."
+            ),
+            TestStep(
+                3,
+                "TH Sends an EnableContextTriggers command, using the first availabel context from supported_ambient_contexts_dut.",
+                "Verify Success response"
+            ),
+            TestStep(
+                4,
                 "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                 "Verify the number of PushAV Connections is 0. If not 0, deallocate any existing connections.",
             ),
             TestStep(
-                2,
+                5,
                 "TH Reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Store as aAllocatedVideoStreams.",
             ),
             TestStep(
-                3,
+                6,
                 "TH Reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Store as aAllocatedAudioStreams.",
             ),
             TestStep(
-                4,
+                7,
                 "TH sends AllocatePushTransport command with TriggerType = Ambient, MotionZones = []",
                 "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct. Store ConnectionID as aConnectionID1."),
             TestStep(
-                5,
+                8,
                 "TH sends SetTransportStatus command with ConnectionID = aConnectionID1 and TransportStatus = Active",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                6,
+                9,
                 "TH subscribes to the DUT's PushTransportBegin event, then requests an Ambient Context Event trigger.",
                 "Successful completion of steps"
             ),
             TestStep(
-                7,
+                10,
                 "DUT generates a PushTransportBegin event with ConnectionID = aConnectionID1",
                 "TH waits for the events from DUT with timeout of 5 sec, Verifies that the PushTransportBegin event is triggered.",
             ),
             TestStep(
-                8,
+                11,
                 "TH sends DeallocatePushTransport command with ConnectionID = aConnectionID1",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                9,
+                12,
                 "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                 "Verify the number of PushAV Connections is 0. If not 0, deallocate any existing connections.",
             ),
@@ -175,9 +190,14 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
+        self.step(1)
         # Get the first of our suppported contexts, enable this, and use this as our event trigger
         supported_ambient_contexts_dut = await self.read_avanaly_attribute_expect_success(endpoint, avattr.SupportedAmbientContexts)
 
+        # Make sure that there is at least one supported context
+        asserts.assert_greater_equal(len(supported_ambient_contexts_dut), 1, "SupportedAmbientContexts must not be empty")
+        
+        self.step(2)
         # Set ZoneIDs to None if no feature, Null if feature and no zone IDs
         valid_context_zoneIDs = None
         if self.has_feature_perzonedetect:
@@ -185,6 +205,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
             if not valid_context_zoneIDs:
                 valid_context_zoneIDs = NullValue
 
+        self.step(3)
         valid_context_triggers = []
         context_trigger = avcluster.Structs.ContextTriggerStruct(
             context=supported_ambient_contexts_dut[0], zoneIDs=valid_context_zoneIDs)
@@ -195,14 +216,14 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
         namespaceID = supported_ambient_contexts_dut[0].namespaceID
         tagID = supported_ambient_contexts_dut[0].tag
 
-        self.step(1)
+        self.step(4)
         # Commission DUT - already done
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
         asserts.assert_equal(
             status, Status.Success, "Status must be SUCCESS!"
         )
 
-        self.step(2)
+        self.step(5)
         aAllocatedVideoStreams = await self.allocate_one_video_stream()
         asserts.assert_greater_equal(
             len(aAllocatedVideoStreams),
@@ -210,7 +231,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
             "AllocatedVideoStreams must not be empty",
         )
 
-        self.step(3)
+        self.step(6)
         aAllocatedAudioStreams = await self.allocate_one_audio_stream()
         asserts.assert_greater_equal(
             len(aAllocatedAudioStreams),
@@ -218,7 +239,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
             "AllocatedAudioStreams must not be empty",
         )
 
-        self.step(4)
+        self.step(7)
         initDuration = 10
         preRollLength = 4
         try:
@@ -242,7 +263,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
         )
         aConnectionID1 = transportConfigs[0].connectionID
 
-        self.step(5)
+        self.step(8)
         cmd = pvcluster.Commands.SetTransportStatus(
             connectionID=aConnectionID1,
             transportStatus=pvcluster.Enums.TransportStatusEnum.kActive
@@ -252,7 +273,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
 
-        self.step(6)
+        self.step(9)
         event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
@@ -263,12 +284,12 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
             valid_context_zoneIDs = []
         await self._trigger_ambient_context_event(namespaceID, tagID, valid_context_zoneIDs, prompt_msg=f"Press enter and immediately start ambient context activity anywhere in the frame and stop the activity after {initDuration} seconds of pressing enter.")
 
-        self.step(7)
+        self.step(10)
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info("Event data %s", event_data)
         asserts.assert_equal(event_data.connectionID, aConnectionID1, "Unexpected value for ConnectionID returned")
 
-        self.step(8)
+        self.step(11)
         cmd = pvcluster.Commands.DeallocatePushTransport(
             connectionID=aConnectionID1
         )
@@ -277,7 +298,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
 
-        self.step(9)
+        self.step(12)
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
         asserts.assert_equal(
             status, Status.Success, "Status must be SUCCESS!"

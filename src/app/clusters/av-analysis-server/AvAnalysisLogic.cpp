@@ -16,6 +16,8 @@
  *
  */
 
+#include <cstdint>
+
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
@@ -1136,11 +1138,17 @@ CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, Opt
 {
     if (!aUseSpecificSessionId)
     {
+        // Scan at most the full uint16_t ID space (with wraparound). If every ID
+        // is already active there is nothing left to allocate, so fail instead
+        // of looping indefinitely.
+        uint16_t candidatesScanned = 0;
         while (std::any_of(mActiveSessions.begin(), mActiveSessions.end(), [this](const ActiveAmbientContextSession & session) {
             return session.GetSessionId() == mNextAnalysisSessionID;
         }))
         {
+            VerifyOrReturnError(candidatesScanned < UINT16_MAX, CHIP_ERROR_NO_MEMORY);
             mNextAnalysisSessionID++;
+            candidatesScanned++;
         }
         aSessionId = mNextAnalysisSessionID++;
     }
@@ -1179,14 +1187,10 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
         ReturnErrorOnFailure(mDelegate->VerifyZoneIDsAreValid(aZoneList.Value()));
     }
 
-    // Get our current session ID, and increment for next use
-    aSessionId = mNextAnalysisSessionID++;
-
-    // Capture our new active session information
-    AvAnalysis::ActiveAmbientContextSession newSession;
-    newSession.SetSessionId(aSessionId);
-    newSession.SetSourceNodeId(aSourceNodeId);
-    mActiveSessions.push_back(newSession);
+    // Allocate a unique session ID and reserve it in the active set. Automatic
+    // allocation routes through the shared allocator so IDs already reserved by
+    // specific-ID sessions are skipped instead of reused.
+    ReturnErrorOnFailure(CreateActiveSession(aSessionId, aSourceNodeId, /* aUseSpecificSessionId = */ false));
 
     // Create the Initial Event
     Events::AnalysisSessionStart::Type startEvent;
