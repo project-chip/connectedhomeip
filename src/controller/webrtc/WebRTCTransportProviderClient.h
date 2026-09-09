@@ -22,6 +22,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/core/TLV.h>

@@ -129,16 +129,22 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnAnswer(uint16_t sessionId, 
 {
     ChipLogProgress(Controller, "OnAnswer called for sessionId: %u", sessionId);
 
-    JNIEnv * env = nullptr;
-    if (gJvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
-    {
-        ChipLogError(Controller, "Failed to attach current thread for OnAnswer");
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(gJvm != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(Instance().mJavaCallbackObj != nullptr && Instance().mOnAnswerMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     jstring jAnswer = env->NewStringUTF(answer);
     jint status     = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnAnswerMethod, sessionId, jAnswer);
     env->DeleteLocalRef(jAnswer);
+
+    if (env->ExceptionCheck())
+    {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_ERROR_INTERNAL;
+    }
 
     return (status == 0) ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
@@ -147,6 +153,9 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnICECandidates(uint16_t sess
                                                                    int candidateCount)
 {
     ChipLogProgress(Controller, "OnICECandidates called for sessionId: %u, count: %d", sessionId, candidateCount);
+
+    VerifyOrReturnError(gJvm != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(Instance().mJavaCallbackObj != nullptr && Instance().mOnICECandidatesMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = nullptr;
     if (gJvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
@@ -194,14 +203,13 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnEnd(uint16_t sessionId, uin
 {
     ChipLogProgress(Controller, "OnEnd called for sessionId: %u, reason: %u", sessionId, reason);
 
-    JNIEnv * env = nullptr;
-    if (gJvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
-    {
-        ChipLogError(Controller, "Failed to attach current thread for OnEnd");
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(gJvm != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(Instance().mJavaCallbackObj != nullptr && Instance().mOnEndMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     jint status = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnEndMethod, sessionId, static_cast<int>(reason));
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_ERROR_INTERNAL);
 
     return (status == 0) ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
