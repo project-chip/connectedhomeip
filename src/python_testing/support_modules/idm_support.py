@@ -693,10 +693,21 @@ class IDMBaseTest(BasicCompositionTests):
             # violation generation.
             return None
         type_min, type_max = type_range
-        if constraints.max_value is not None and constraints.max_value < type_max:
-            return constraints.max_value + 1
-        if constraints.min_value is not None and constraints.min_value > type_min:
-            return constraints.min_value - 1
+        allowed_values = self._allowed_numeric_values(constraints)
+
+        if constraints.max_value is not None:
+            val = constraints.max_value + 1
+            while val in allowed_values and val <= type_max:
+                val += 1
+            if val not in allowed_values and val <= type_max:
+                return val
+
+        if constraints.min_value is not None:
+            val = constraints.min_value - 1
+            while val in allowed_values and val >= type_min:
+                val -= 1
+            if val not in allowed_values and val >= type_min:
+                return val
 
         return None
 
@@ -953,6 +964,22 @@ class IDMBaseTest(BasicCompositionTests):
         except ValueError:
             return None
 
+    @staticmethod
+    def _allowed_numeric_values(constraints: Constraints) -> set[int | float]:
+        """Parse 'allowed' constraint entries into numeric values, if any."""
+        if not constraints.allowed:
+            return set()
+        values: set[int | float] = set()
+        for v in constraints.allowed:
+            try:
+                values.add(int(v, 0))
+            except ValueError:
+                try:
+                    values.add(float(v))
+                except ValueError:
+                    pass
+        return values
+
     async def _resolved_command_field_constraints(self, info: CommandFieldInfo) -> Constraints:
         """Return a copy of the field's constraints with dynamic references resolved against the DUT."""
         constraints = copy.copy(info.field.constraints)
@@ -1015,12 +1042,22 @@ class IDMBaseTest(BasicCompositionTests):
             # numeric types are out of scope for automated violation generation.
             return violations
         type_min, type_max = type_range
-        if constraints.max_value is not None and constraints.max_value < type_max:
-            violations.append((f"value {constraints.max_value + 1} > max {constraints.max_value}",
-                               constraints.max_value + 1))
-        if constraints.min_value is not None and constraints.min_value > type_min:
-            violations.append((f"value {constraints.min_value - 1} < min {constraints.min_value}",
-                               constraints.min_value - 1))
+        allowed_values = self._allowed_numeric_values(constraints)
+
+        if constraints.max_value is not None:
+            val = constraints.max_value + 1
+            while val in allowed_values and val <= type_max:
+                val += 1
+            if val not in allowed_values and val <= type_max:
+                violations.append((f"value {val} > max {constraints.max_value}", val))
+
+        if constraints.min_value is not None:
+            val = constraints.min_value - 1
+            while val in allowed_values and val >= type_min:
+                val -= 1
+            if val not in allowed_values and val >= type_min:
+                violations.append((f"value {val} < min {constraints.min_value}", val))
+
         return violations
 
     def _generate_valid_command_field_value(self, field: XmlDataTypeComponent) -> Any | None:
@@ -1053,6 +1090,9 @@ class IDMBaseTest(BasicCompositionTests):
                 return constraints.min_value
             if constraints.max_value is not None and constraints.max_value < 0:
                 return constraints.max_value
+            allowed_nums = self._allowed_numeric_values(constraints)
+            if allowed_nums:
+                return next(iter(allowed_nums))
         return None
 
     async def check_command_constraint(self, info: CommandFieldInfo) -> ConstraintProbeResult:
