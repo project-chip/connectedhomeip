@@ -6,6 +6,8 @@ from mobly import asserts
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.spec_parsing import Clusters, XmlAttribute, build_xml_clusters, dm_from_spec_version
 
+log = logging.getLogger(__name__)
+
 # Maps a scenable attribute's spec data type to the typed value field of the
 # Scenes cluster AttributeValuePairStruct used to carry its value.
 _SCENE_VALUE_FIELDS = {
@@ -92,9 +94,10 @@ async def select_scenable_attribute(test: MatterBaseTest, scene_endpoint: int) -
         # AudioControl cluster has scene="true" quality in spec XML for some attributes (e.g. SoftMuted, Volume),
         # but SceneHandler support for AudioControl is not currently implemented/tested in the SDK.
         if cluster == Clusters.AudioControl or getattr(cluster, "id", None) == Clusters.AudioControl.id:
-            logging.warning(
-                f"Ignoring AudioControl cluster (0x{Clusters.AudioControl.id:04X}) on endpoint {scene_endpoint} "
-                "for scenable attribute selection because AudioControl SceneHandler is not implemented."
+            log.warning(
+                "Ignoring AudioControl cluster (0x%04X) on endpoint %d for scenable attribute selection because AudioControl SceneHandler is not implemented.",
+                Clusters.AudioControl.id,
+                scene_endpoint,
             )
             continue
 
