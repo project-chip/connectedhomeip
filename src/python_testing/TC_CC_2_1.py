@@ -46,6 +46,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
+#     quiet: true
 #   run3:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device extended-color-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -59,6 +60,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging

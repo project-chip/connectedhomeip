@@ -414,16 +414,16 @@ ColorControlCluster::SerializeAdd(EndpointId endpoint,
         switch (static_cast<EnhancedColorModeEnum>(*mode))
         {
         case EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation:
-            VerifyOrReturnError(sawCurrentHue | sawSaturation, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(sawCurrentHue || sawSaturation, CHIP_ERROR_INVALID_ARGUMENT);
             break;
         case EnhancedColorModeEnum::kCurrentXAndCurrentY:
-            VerifyOrReturnError(sawX | sawY, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(sawX || sawY, CHIP_ERROR_INVALID_ARGUMENT);
             break;
         case EnhancedColorModeEnum::kColorTemperatureMireds:
             VerifyOrReturnError(sawMireds, CHIP_ERROR_INVALID_ARGUMENT);
             break;
         case EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation:
-            VerifyOrReturnError(sawEnhancedHue | sawSaturation, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(sawEnhancedHue || sawSaturation, CHIP_ERROR_INVALID_ARGUMENT);
             break;
         default:
             break; // an out-of-range mode value is rejected per-pair by the validator
@@ -666,10 +666,20 @@ void ColorControlCluster::OnTick()
         driverActive = TickXY(*xytx, now);
         if (driverActive) // X and Y share one start; RemainingTime is the slower axis
         {
-            remaining  = std::max(RemainingTenths(xytx->startTimeMs, xytx->durationXMs, now),
-                                  RemainingTenths(xytx->startTimeMs, xytx->durationYMs, now));
-            nextTickMs = std::min({ nextTickMs, RemainingMs(xytx->startTimeMs, xytx->durationXMs, now),
-                                    RemainingMs(xytx->startTimeMs, xytx->durationYMs, now) });
+            remaining = std::max(RemainingTenths(xytx->startTimeMs, xytx->durationXMs, now),
+                                 RemainingTenths(xytx->startTimeMs, xytx->durationYMs, now));
+            // An axis that already arrived reports 0 forever; folding that into the min would re-arm the
+            // timer at 0 every tick until the slower axis also finishes. Only still-moving axes count.
+            const uint32_t remXMs = RemainingMs(xytx->startTimeMs, xytx->durationXMs, now);
+            const uint32_t remYMs = RemainingMs(xytx->startTimeMs, xytx->durationYMs, now);
+            if (remXMs > 0)
+            {
+                nextTickMs = std::min(nextTickMs, remXMs);
+            }
+            if (remYMs > 0)
+            {
+                nextTickMs = std::min(nextTickMs, remYMs);
+            }
         }
     }
     else if (auto * cttx = std::get_if<CTTransition>(&mTransition))
@@ -1210,10 +1220,10 @@ Status ColorControlCluster::MoveToSaturation(uint8_t saturation, uint16_t transi
     const uint32_t durationMs = transitionTimeDs * 100u;
     auto & hs                 = EnsureHueSatTransition(); // HueSatTransition; preserves .hue if already one, replaces XY/CT
     hs.sat                    = SatTransition{
-                           .startSat    = GetSaturation(), // read AFTER the mode switch
-                           .targetSat   = std::clamp<uint8_t>(saturation, kMinSaturationValue, kMaxSaturationValue),
-                           .startTimeMs = NowMs(),
-                           .durationMs  = durationMs,
+        .startSat    = GetSaturation(), // read AFTER the mode switch
+        .targetSat   = std::clamp<uint8_t>(saturation, kMinSaturationValue, kMaxSaturationValue),
+        .startTimeMs = NowMs(),
+        .durationMs  = durationMs,
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true);
     NotifySatTransition(*hs.sat);
@@ -1487,10 +1497,10 @@ Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool i
 
     auto & hs = EnsureHueSatTransition(); // preserve a running sat axis (§3.2.5.2)
     hs.hue    = HueTransition{
-           .startHue    = GetEnhancedHue(), // 16-bit canonical current
-           .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
-           .startTimeMs = NowMs(),
-           .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until a Stop command
+        .startHue    = GetEnhancedHue(), // 16-bit canonical current
+        .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
+        .startTimeMs = NowMs(),
+        .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until a Stop command
     };
     SetQuietReportRemainingTime(kMaxInt16uValue, /*isNewTransition=*/true);
     NotifyHueTransition(*hs.hue);
@@ -1612,10 +1622,10 @@ Status ColorControlCluster::MoveSaturation(MoveModeEnum moveMode, uint8_t rate, 
 
     auto & hs = EnsureHueSatTransition(); // preserve a running HUE axis (§3.2.5.2)
     hs.sat    = SatTransition{
-           .startSat    = start,
-           .targetSat   = target, // the boundary — bounded, so it stops here
-           .startTimeMs = NowMs(),
-           .durationMs  = durationMs,
+        .startSat    = start,
+        .targetSat   = target, // the boundary — bounded, so it stops here
+        .startTimeMs = NowMs(),
+        .durationMs  = durationMs,
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true);
     NotifySatTransition(*hs.sat);
@@ -1882,7 +1892,7 @@ DataModel::ActionReturnStatus ColorControlCluster::WriteAttribute(const DataMode
         ReturnErrorOnFailure(decoder.Decode(value));
         // null = "keep previous value on startup"; a concrete value must be a legal mired (<= 0xFEFF).
         VerifyOrReturnError(value.IsNull() || value.Value() <= kMaxColorTemperatureMireds, Status::ConstraintError);
-        ApplyModeSwitch(EnhancedColorModeEnum::kColorTemperatureMireds);
+        // §3.2.11.10 only takes effect on the NEXT power-up (ApplyStartUpColorTemperature().
         mCT.startUpColorTemperatureMireds = value;
         // NVM attribute: the Nullable overload of StoreNativeEndianValue writes the same native-endian
         // storage format (null → sentinel) that Startup()'s Nullable load reads back.
@@ -2032,7 +2042,7 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     // Fixed descriptor readers: a descriptor exists only if the app supplied the table (mStaticConfig) AND
     // the specific optional is engaged; otherwise the attribute is genuinely absent → UnsupportedAttribute.
     // `field` selects one std::optional<ChromaticityPoint>, `proj` picks x / y / intensity off it.
-    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::*field, auto proj) -> DataModel::ActionReturnStatus {
+    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::* field, auto proj) -> DataModel::ActionReturnStatus {
         if (mStaticConfig == nullptr || !(mStaticConfig->*field).has_value())
         {
             return Status::UnsupportedAttribute;
