@@ -62,6 +62,15 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
     once, and each test case supplies its alarm, its bit, and its two trigger codes.
     """
 
+    def _log_notify(self, event, label: str) -> None:
+        """Record the decoded Notify fields so a log reader can check the expected outcome.
+
+        The assertions that follow prove the values; without this the log shows only that an event
+        arrived, and a reviewer can infer success from the absence of a failure rather than see it.
+        """
+        log.info("Notify (%s): Active=0x%08X Inactive=0x%08X State=0x%08X Mask=0x%08X",
+                 label, int(event.active), int(event.inactive), int(event.state), int(event.mask))
+
     async def send_test_event_trigger(self, code: int) -> None:
         await self.send_test_event_triggers(eventTrigger=code)
 
@@ -224,6 +233,7 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
 
         self.step(6)
         notify_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
+        self._log_notify(notify_event, "alarm raised")
         asserts.assert_true(notify_event.active & alarm_bit, f"Notify: {alarm_name} not set in Active")
         asserts.assert_false(notify_event.inactive & alarm_bit, f"Notify: {alarm_name} set in Inactive")
         asserts.assert_true(notify_event.state & alarm_bit, f"Notify: {alarm_name} not set in State")
@@ -251,6 +261,7 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
 
             self.step(10)
             clear_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
+            self._log_notify(clear_event, "condition cleared")
             asserts.assert_true(clear_event.inactive & alarm_bit,
                                 f"Notify: {alarm_name} not set in Inactive on clear")
             asserts.assert_false(clear_event.active & alarm_bit,
@@ -293,6 +304,7 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
             self.step("12b")
             if has_reset:
                 reset_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
+                self._log_notify(reset_event, "reset")
                 asserts.assert_true(reset_event.inactive & alarm_bit,
                                     f"Notify: {alarm_name} not set in Inactive on Reset")
                 asserts.assert_false(reset_event.active & alarm_bit,
