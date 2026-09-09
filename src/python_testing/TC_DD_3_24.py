@@ -111,14 +111,22 @@ class TC_DD_3_24(MatterTestCommissioner):
         self.step(3, "DUT is powered ON.")
         self.wait_for_user_input(prompt_msg="Power ON the device")
 
-        self.step(4, "Perform DNS-SD discovery and verify the DUT operational TXT record advertises IC=1.")
+        self.step(
+            4,
+            "Perform DNS-SD Discovery.",
+            expectation="The DUT is discoverable over DNS-SD, advertises the “_IC” subtype, and includes TXT key `IC=1`"
+        )
 
         asserts.assert_true(
             await self.check_operational_service_has_txt_ic(),
             'TXT key "IC" was not found!'
         )
 
-        self.step(5, "Continue commissioning after network connect request and verify SendComplete is reached.")
+        self.step(
+            5,
+            "Complete commissioning.",
+            expectation="chip-tool application triggers the second phase of commissioning on the operational network. No error reported by Commissioner. Commissioner reports a successful commissioning."
+        )
 
         asserts.assert_not_equal(
             self.commissionee_node_id, 0,
@@ -140,24 +148,27 @@ class TC_DD_3_24(MatterTestCommissioner):
 
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
 
-        self.step(6, "Perform DNS-SD discovery and verify the DUT operational TXT record no longer advertises IC=1.")
+        self.step(
+            6,
+            "Perform DNS-SD Discovery.",
+            expectation="The DUT is discoverable over DNS-SD, no longer advertises the “_IC” subtype, and the TXT key `IC` is absent or set to `0`"
+        )
 
-        txt_ic_still_present = True
+        step_6_conditions_met = False
         retry_query_timeout_sec = 1.0
-        for attempt in range(20):
-            txt_ic_still_present = await self.check_operational_service_has_txt_ic(
+        for attempt in range(10):
+            step_6_conditions_met = await self.check_operational_service_no_longer_advertise_ic(
                 retry_query_timeout_sec,
-                fail_if_srv_missing=False,
             )
-            if not txt_ic_still_present:
+            if step_6_conditions_met:
                 break
 
-            log.info('Attempt %d/20: TXT key "IC" still present, retrying in 1 second', attempt + 1)
+            log.info('Attempt %d/10: Step 6 conditions not met yet, retrying in 1 second', attempt + 1)
             await asyncio.sleep(1)
 
-        asserts.assert_false(
-            txt_ic_still_present,
-            'TXT key "IC" is still present after 20 attempts!'
+        asserts.assert_true(
+            step_6_conditions_met,
+            'Step 6 conditions not met after 10 attempts: expected discoverable operational service, no "_IC" subtype, and IC absent or set to 0.'
         )
 
     def get_dut_instance_name(self, log_result: bool = False) -> str:
@@ -172,34 +183,18 @@ class TC_DD_3_24(MatterTestCommissioner):
             log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
         return instance_name
 
-    # def get_operational_subtype(self, log_result: bool = False) -> str:
-    #     """Return the operational mDNS subtype for the current fabric.
-    #
-    #     The value is "_I<compressed-fabric-id>._sub._matter._tcp.local".
-    #     """
-    #     compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-    #     operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
-    #     if log_result:
-    #         log.info("\n\n\tOperational Subtype: %s\n", operational_subtype)
-    #     return operational_subtype
-
-    async def check_operational_service_has_txt_ic(self, query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                                                   fail_if_srv_missing: bool = True) -> bool:
+    async def check_operational_service_has_txt_ic(self, query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC) -> bool:
         """Check whether the DUT operational mDNS service advertises TXT key "IC" as "1".
 
         Args:
             query_timeout_sec: Per-query timeout, in seconds, used for SRV and TXT lookups.
-            fail_if_srv_missing: When True, missing SRV record is a test failure.
-                When False, missing SRV record is treated as IC not present.
 
         Returns:
             True if the TXT record contains ``IC=1``. False if the TXT record is missing,
-            SRV is missing (when fail_if_srv_missing is False), has no TXT payload,
-            or does not contain ``IC=1``.
+            has no TXT payload, or does not contain ``IC=1``.
 
         Raises:
-            AssertionError: If fail_if_srv_missing is True and the operational SRV record
-                is not found, or TXT payload is not a dictionary.
+            AssertionError: If the operational SRV record is not found, or TXT payload is not a dictionary.
         """
         # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
         # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
@@ -219,10 +214,7 @@ class TC_DD_3_24(MatterTestCommissioner):
         )
 
         if srv_record is None:
-            if fail_if_srv_missing:
-                asserts.fail(f"Operational mDNS service '{instance_qname}' was not found")
-            log.info("Operational mDNS service '%s' was not found", instance_qname)
-            return False
+            asserts.fail(f"Operational mDNS service '{instance_qname}' was not found")
 
         txt_record = await mdns.get_txt_record(
             service_name=instance_qname,
@@ -251,6 +243,85 @@ class TC_DD_3_24(MatterTestCommissioner):
         log.info("Operational TXT record: %s", txt_record.txt)
 
         return "IC" in txt_record.txt and txt_record.txt["IC"] == "1"
+
+
+    async def check_operational_service_no_longer_advertise_ic(
+            self,
+            query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+    ) -> bool:
+        """Check post-commissioning DNS-SD conditions for step 6.
+
+        The expected state is:
+        - The DUT remains discoverable over operational DNS-SD.
+        - The DUT no longer advertises the ``_IC`` subtype.
+        - The operational TXT key ``IC`` is absent or set to ``"0"``.
+
+        Args:
+            query_timeout_sec: Per-query timeout, in seconds, used for SRV/TXT/PTR lookups.
+
+        Returns:
+            True when all step 6 conditions are met, otherwise False.
+
+        Raises:
+            AssertionError: If the operational SRV record is not found, or TXT payload is not a dictionary.
+        """
+        instance_name = self.get_dut_instance_name(log_result=True)
+        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+
+        mdns = MdnsDiscovery()
+
+        # Discoverable over operational DNS-SD.
+        srv_record = await mdns.get_srv_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            query_timeout_sec=query_timeout_sec,
+            log_output=True,
+        )
+
+        asserts.assert_true(
+            srv_record is not None,
+            f"Operational mDNS service '{instance_qname}' was not found"
+        )
+
+        # No longer advertising the _IC subtype.
+        ic_subtype = f"_IC._sub.{MdnsServiceType.OPERATIONAL.value}"
+        ptr_records = await mdns.get_ptr_records(
+            service_types=[ic_subtype],
+            discovery_timeout_sec=query_timeout_sec,
+            log_output=True,
+        )
+
+        advertises_ic_subtype = any(record.instance_name == instance_name for record in ptr_records)
+
+        if advertises_ic_subtype:
+            log.info("Operational mDNS service '%s' still advertises subtype '%s'", instance_qname, ic_subtype)
+
+        txt_record = await mdns.get_txt_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            query_timeout_sec=query_timeout_sec,
+            log_output=True,
+        )
+
+        if txt_record is None:
+            log.info("Operational mDNS service '%s' TXT lookup returned no record", instance_qname)
+            return False
+
+        if not hasattr(txt_record, "txt") or txt_record.txt is None:
+            log.info("Operational mDNS service '%s' TXT payload not available yet", instance_qname)
+            return False
+
+        asserts.assert_true(
+            isinstance(txt_record.txt, dict),
+            f"Operational mDNS service '{instance_qname}' TXT data is not a dictionary: {txt_record.txt}"
+        )
+        ic_value = txt_record.txt.get("IC")
+        ic_absent_or_zero = ic_value is None or ic_value == "0"
+
+        if not ic_absent_or_zero:
+            log.info("Operational TXT IC value is still '%s'", ic_value)
+
+        return (not advertises_ic_subtype) and ic_absent_or_zero
 
 
 if __name__ == "__main__":
