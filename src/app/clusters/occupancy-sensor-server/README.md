@@ -58,7 +58,7 @@ public:
 
     // When the Prediction (PRED) feature is enabled:
     CHIP_ERROR GetPredictedOccupancyAtIndex(
-        size_t index, OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction) override
+        size_t index, chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction) override
     {
         if (index >= mPredictions.size())
         {
