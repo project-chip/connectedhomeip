@@ -162,8 +162,8 @@ class TestProfileSelection(unittest.TestCase):
     def test_advertised_assertion_accepts_a_profile_in_the_bitmap(self):
         bitmap = int(AttestationCryptoProfileBitmap.kSupportsEcdsaMatterLegacy
                      | AttestationCryptoProfileBitmap.kSupportsMlDsa65)
-        # A profile is the union of the algorithms a certificate may carry, so a PQC-chain DAC with
-        # a P-256 subject key satisfies the bitmap on both of its algorithm fields.
+        # Exercise membership for both bits in a synthetic bitmap. The field labels are diagnostic;
+        # this does not imply that a DAC bitmap advertises its issuer's signature algorithm.
         assert_profile_advertised(bitmap, AttestationCryptoProfile.kEcdsaMatterLegacy, "DAC", "subjectPublicKeyInfo")
         assert_profile_advertised(bitmap, AttestationCryptoProfile.kMlDsa65, "DAC", "signatureAlgorithm")
 
@@ -207,8 +207,8 @@ class TestCertificateParsing(FixtureTestCase):
             "kMlDsa65PaaPem": (AttestationCryptoProfile.kMlDsa65, AttestationCryptoProfile.kMlDsa65),
             "kMlDsa65PaiPem": (AttestationCryptoProfile.kMlDsa65, AttestationCryptoProfile.kMlDsa65),
             "kMlDsa65PaiDacPem": (AttestationCryptoProfile.kEcdsaMatterLegacy, AttestationCryptoProfile.kMlDsa65),
-            # An ML-DSA-44 key under an ML-DSA-65 signature, and a P-256 key under an ML-DSA-65
-            # signature: a profile bounds the algorithms a certificate may carry, not just its key.
+            # The subject key and issuer signature can use different algorithms: the PAI's
+            # subject-key profile is independent of the PAA's key profile used to sign it.
             "kMlDsa44PaiUnderMlDsa65PaaPem": (AttestationCryptoProfile.kMlDsa44, AttestationCryptoProfile.kMlDsa65),
             "kP256PaiUnderMlDsa65PaaPem": (AttestationCryptoProfile.kEcdsaMatterLegacy,
                                            AttestationCryptoProfile.kMlDsa65),

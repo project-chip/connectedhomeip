@@ -19,19 +19,18 @@
 
 How a crypto profile is interpreted
 -----------------------------------
-An `AttestationCryptoProfileBitmap` value names the certificate *documents* a device holds,
-not a single algorithm within one certificate. A device that advertises `MlDsa65` for the DAC
-holds a DAC belonging to the ML-DSA-65 attestation chain; during PQC Phase 1 that DAC still
-carries a P-256 subject key so the Device Attestation signature stays `EcdsaMatterLegacy`.
-A profile therefore reads as the union ("OR") of the algorithms that may appear on the
-certificate, and `CryptoProfile` in `CertificateChainRequest` selects which chain variant the
-DUT serves. `TestHarnessDACProvider::GetProfileDocument` and `BuildProfileSupport` in
-src/app/tests/suites/credentials/TestHarnessDACProvider.cpp implement exactly this.
+An `AttestationCryptoProfileBitmap` value names the algorithms the corresponding
+certificate's own subject public key may use, not the algorithm of the signature over it and
+not the chain the certificate belongs to. During PQC Phase 1 a DAC always carries a P-256
+subject key, so `DACSupportedProfiles` advertises `EcdsaMatterLegacy` and the Device
+Attestation signature stays `EcdsaMatterLegacy`; a PAI's signature algorithm follows the
+PAA's key profile instead.
 
-The consequence for the tests is that the profile-selected DAC must be requested with the
-selected *chain* profile rather than with the DAC's own subject-key profile: requesting the
-DAC with `EcdsaMatterLegacy` returns the separate legacy DAC document instead of the DAC that
-the PQC PAI issued.
+`CryptoProfile` in `CertificateChainRequest` names the requested certificate's subject-key
+algorithm. The DUT chooses which stored chain to serve independently, so requesting the
+profile-selected DAC with `EcdsaMatterLegacy` still returns the DAC issued by the PQC PAI.
+Retrieving the separate legacy chain uses a request that omits `CryptoProfile`, `SegmentID`
+and `MaxSegmentSize`.
 
 An independent implementation, on purpose
 -----------------------------------------
