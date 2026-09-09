@@ -471,6 +471,15 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
                 return CHIP_NO_ERROR;
             }
             break;
+        case PafInfoAccess::kAccDisc:
+            // A free slot carries UINT16_MAX, which is outside the 12-bit discriminator
+            // range, so a valid discriminator cannot alias one.
+            if (pPafSession->discriminator == SessionInfo.discriminator)
+            {
+                // Already exist
+                return CHIP_NO_ERROR;
+            }
+            break;
         default:
             return CHIP_ERROR_NOT_IMPLEMENTED;
         };
@@ -496,6 +505,10 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
         case PafInfoAccess::kAccSessionId:
             pPafSession->id = SessionInfo.id;
             ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with id: %u", SessionInfo.id);
+            return CHIP_NO_ERROR;
+        case PafInfoAccess::kAccDisc:
+            pPafSession->discriminator = SessionInfo.discriminator;
+            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with disc: %x", SessionInfo.discriminator);
             return CHIP_NO_ERROR;
         default:
             return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -523,10 +536,10 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
                 return CHIP_NO_ERROR;
             }
             break;
-        case PafInfoAccess::kAccNodeInfo:
-            if (pPafSession->nodeId == SessionInfo.nodeId)
+        case PafInfoAccess::kAccDisc:
+            if (pPafSession->discriminator == SessionInfo.discriminator)
             {
-                ChipLogProgress(WiFiPAF, "Removing session with nodeId: %" PRIu64, pPafSession->nodeId);
+                ChipLogProgress(WiFiPAF, "Removing session with disc: %x", pPafSession->discriminator);
                 CleanPafInfo(*pPafSession);
                 return CHIP_NO_ERROR;
             }

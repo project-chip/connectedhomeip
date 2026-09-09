@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/FixedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
@@ -45,14 +46,11 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <wifipaf/WiFiPAFEndPoint.h>
 #include <wifipaf/WiFiPAFLayer.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-#include <cstring>
-#include <set>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #include <atomic>
+#include <cstring>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
 #include <vector>
@@ -78,16 +76,10 @@ struct NanPeerInfo
     bool hasExtendedData = false;
     uint16_t band        = 0; // WiFiBandBitmap value derived from scan frequency; 0 = unknown
 
-    // Strict weak ordering over (mac, discriminator) so std::set<NanPeerInfo>
-    // treats a peer with the same MAC and discriminator as a duplicate.
-    bool operator<(const NanPeerInfo & o) const
+    /// Two reports are the same peer when the MAC and discriminator match.
+    bool operator==(const NanPeerInfo & o) const
     {
-        int macCmp = memcmp(mac, o.mac, sizeof(mac));
-        if (macCmp != 0)
-        {
-            return macCmp < 0;
-        }
-        return discriminator < o.discriminator;
+        return memcmp(mac, o.mac, sizeof(mac)) == 0 && discriminator == o.discriminator;
     }
 };
 
@@ -200,11 +192,6 @@ public:
     void ScanDiscoveryResult(GVariant * discov_info);
     using PafScanResultsCallback = void (*)(void * context, const std::vector<NanPeerInfo> & results);
     CHIP_ERROR WiFiPAFScan(uint8_t scanMaxTime, PafScanResultsCallback cb, void * cbContext);
-    /** Disconnect the nanreceive signal handler registered by _WiFiPAFPublish.
-     *  Call this after the proxy has been commissioned onto the fabric so that
-     *  a subsequent _WiFiPAFSubscribe registers exactly one handler. */
-    void WiFiPAFDisconnectPublishReceiveHandler();
-
     /** Per-peer callback fired each time a new NAN discovery result arrives
      *  during a background scan (including re-discoveries, to allow TTL reset). */
     using BgScanDiscoveryCallback = void (*)(void * ctx, const NanPeerInfo & peer);
@@ -224,7 +211,12 @@ public:
     void WiFiPAFStopBackgroundScan();
 
 private:
-    std::set<NanPeerInfo> mNanScanPeers;
+    /// Peers seen by the current scan, as a rolling window. Bounded at the same value the
+    /// CommissioningProxy cluster caps a ProxyScanResponse.
+    static constexpr size_t kMaxScanPeers = CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS;
+    std::vector<NanPeerInfo> mNanScanPeers;
+    /// Index of the oldest entry, overwritten next once the window is full.
+    size_t mNanScanPeersNext        = 0;
     PafScanResultsCallback mScanCb  = nullptr;
     void * mScanCbContext           = nullptr;
     uint32_t mActiveScanSubscribeId = 0; // subscribe_id of the current one-shot scan
@@ -240,10 +232,17 @@ private:
     // the scan handlers without disturbing PAF connect-path handlers on the same signals.
     gulong mScanSignalIds[3] = {};
 
-    /** Disconnect the scan GLib signal handlers registered by WiFiPAFScan or
-     *  WiFiPAFStartBackgroundScan.  Uses stored handler IDs so it does not
-     *  accidentally remove connect-path handlers on the same signals. */
+    /** Connect the scan GLib signal handlers.  Must be called before NANSubscribe;
+     *  see the definition for why.  Caller must hold mWpaSupplicantMutex. */
+    void ConnectScanSignals() CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /** Disconnect the scan GLib signal handlers registered by ConnectScanSignals().
+     *  Uses stored handler IDs so it does not accidentally remove connect-path
+     *  handlers on the same signals. */
     void DisconnectScanSignals();
+
+    /** As DisconnectScanSignals(), for callers that already hold mWpaSupplicantMutex. */
+    void DisconnectScanSignalsLocked() CHIP_REQUIRES(mWpaSupplicantMutex);
 #endif
 
 private:

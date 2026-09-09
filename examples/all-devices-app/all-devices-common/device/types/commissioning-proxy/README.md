@@ -254,20 +254,27 @@ PAF channel, permitted in all regulatory regions:
     --discriminator 3947
 ```
 
-| Argument                         | Description                                                                               |
-| -------------------------------- | ----------------------------------------------------------------------------------------- |
-| `--device commissioning-proxy:5` | Instantiate the CP device on endpoint 5                                                   |
-| `--wifi`                         | Enable Wi-Fi management via wpa_supplicant (required for PAF)                             |
-| `--wifipaf "freq_list=<MHz>"`    | NAN operating frequencies in MHz. `2437` = channel 6 (2.4 GHz); add e.g. `5745` for 5 GHz |
-| `--discriminator <value>`        | 12-bit value identifying the proxy during its own commissioning                           |
+| Argument                         | Description                                                                     |
+| -------------------------------- | ------------------------------------------------------------------------------- |
+| `--device commissioning-proxy:5` | Instantiate the CP device on endpoint 5                                         |
+| `--wifi`                         | Enable Wi-Fi management via wpa_supplicant (required for PAF)                   |
+| `--wifipaf "freq_list=<MHz>"`    | NAN frequencies in MHz. `2437` = channel 6 (2.4 GHz); add e.g. `5745` for 5 GHz |
+| `--discriminator <value>`        | 12-bit value identifying the proxy during its own commissioning                 |
 
-The `WiFiBand` attribute advertised by the cluster is derived from `freq_list`
-at startup: 2412–2484 MHz → 2.4 GHz, 5035–5980 MHz → 5 GHz. If no valid
-frequency is parsed the proxy defaults to advertising 2.4 GHz.
+`freq_list` is parsed once at startup and drives three things. The `WiFiBand`
+attribute advertised by the cluster follows the bands it covers: 2412–2484 MHz →
+2.4 GHz, 5035–5980 MHz → 5 GHz, defaulting to 2.4 GHz if no valid frequency is
+parsed. Scans and `ProxyConnectRequest` create a subscribe instance on a single
+channel: 2437 when it is listed, otherwise the first frequency given. The
+proxy's own NAN publisher advertises on the whole list, so the proxy can be
+commissioned over Wi-Fi PAF itself.
 
-Once the proxy is commissioned (next step), it cancels its own NAN publisher and
-disconnects the associated receive handler, so the PAF subscribe calls it makes
-on behalf of commissioners register exactly one handler.
+That publisher stops once the proxy joins a fabric, as the NAN radio is needed
+to subscribe on a Commissionee behalf.
+
+Once the proxy is commissioned (next step), it disconnects the NAN receive
+handler, so the PAF subscribe calls it makes on behalf of commissioners register
+exactly one handler.
 
 <hr>
 
@@ -401,13 +408,12 @@ assigned, both need platform code. That is the `CommissioningProxyPafAdapter`
 interface, which this app implements in
 [`posix/linux/CommissioningProxyPafAdapter.cpp`](../../../../posix/linux/CommissioningProxyPafAdapter.cpp):
 
-| Adapter method                      | Linux implementation                                             |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| `StartForegroundScan()`             | `ConnectivityMgrImpl().WiFiPAFScan()`                            |
-| `StartBackgroundScan()`             | `ConnectivityMgrImpl().WiFiPAFStartBackgroundScan()`             |
-| `StopBackgroundScan()`              | `ConnectivityMgrImpl().WiFiPAFStopBackgroundScan()`              |
-| `PendingConnectSubscribeId()`       | `ConnectivityMgrImpl().GetPendingConnectSubscribeId()`           |
-| `DisconnectPublishReceiveHandler()` | `ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler()` |
+| Adapter method                | Linux implementation                                   |
+| ----------------------------- | ------------------------------------------------------ |
+| `StartForegroundScan()`       | `ConnectivityMgrImpl().WiFiPAFScan()`                  |
+| `StartBackgroundScan()`       | `ConnectivityMgrImpl().WiFiPAFStartBackgroundScan()`   |
+| `StopBackgroundScan()`        | `ConnectivityMgrImpl().WiFiPAFStopBackgroundScan()`    |
+| `PendingConnectSubscribeId()` | `ConnectivityMgrImpl().GetPendingConnectSubscribeId()` |
 
 The adapter is also where the platform's peer descriptor is unpacked.
 `NanPeerInfo` is Linux-only and owns heap storage for its extended data, so the
@@ -418,10 +424,12 @@ Adapter and driver are both constructed in
 `posix/linux/DeviceFactoryPlatformOverride.cpp`, which composes the driver onto
 the single `CommissioningProxyDevice` with `AddTransport()` — a build with BLE
 adds that driver the same way — and derives the advertised `WiFiBand` from
-`--wifipaf freq_list=`, since the device itself reads no command line.
-Transports are registered before `Server::Init()`, so the fabric table is empty
-at that point and the driver's `DisconnectPublishReceiveHandler()` call lands on
-the commissioning-complete event instead.
+`--wifipaf freq_list=`, since the device itself reads no command line. The same
+<<<<<<< HEAD parsed list reaches the radio from `posix/main.cpp`. ======= parsed
+list reaches the radio from `posix/main.cpp`. Transports are registered before
+`Server::Init()`, so the fabric table is empty at that point and the driver's
+`DisconnectPublishReceiveHandler()` call lands on the commissioning-complete
+event instead.
 
 <hr>
 

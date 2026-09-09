@@ -18,6 +18,7 @@
 #include <PosixAudioManager.h>
 #include <PosixChime.h>
 #include <PosixSpeaker.h>
+#include <app/server/Server.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -38,9 +39,6 @@
 #include <CommissioningProxyPafAdapter.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyPafTransport.h> // nogncheck
 #include <app_options/AppOptions.h>
-
-#include <cstdlib>
-#include <cstring>
 #endif
 
 namespace chip {
@@ -59,32 +57,17 @@ BitMask<Clusters::CommissioningProxy::WiFiBandBitmap> ProxyWiFiBands()
     BitMask<WiFiBandBitmap> bands;
 
     const AppOptions::AppConfig * cfg = AppOptions::TryGetConfig();
-    const char * extCmds              = (cfg != nullptr && !cfg->wifipafExtCmds.empty()) ? cfg->wifipafExtCmds.c_str() : nullptr;
-    if (extCmds != nullptr)
+    if (cfg != nullptr)
     {
-        const char * p = std::strstr(extCmds, "freq_list=");
-        if (p != nullptr)
+        for (uint16_t freq : cfg->wifipafFreqList)
         {
-            p += std::strlen("freq_list=");
-            while (*p != '\0' && *p != ' ')
+            if (freq >= 2412 && freq <= 2484)
             {
-                uint32_t freq = static_cast<uint32_t>(std::strtoul(p, nullptr, 10));
-                if (freq >= 2412 && freq <= 2484)
-                {
-                    bands.Set(WiFiBandBitmap::k2g4);
-                }
-                else if (freq >= 5035 && freq <= 5980)
-                {
-                    bands.Set(WiFiBandBitmap::k5g);
-                }
-                while (*p != '\0' && *p != ',' && *p != ' ')
-                {
-                    ++p;
-                }
-                if (*p == ',')
-                {
-                    ++p;
-                }
+                bands.Set(WiFiBandBitmap::k2g4);
+            }
+            else if (freq >= 5035 && freq <= 5980)
+            {
+                bands.Set(WiFiBandBitmap::k5g);
             }
         }
     }
@@ -97,6 +80,29 @@ BitMask<Clusters::CommissioningProxy::WiFiBandBitmap> ProxyWiFiBands()
     }
 
     return bands;
+}
+
+/// Stop advertising this device's own commissioning window over Wi-Fi PAF, from the point
+/// it joins a fabric onwards. Publishing uses the same NAN radio the proxy needs for the
+/// subscribes it makes on a commissionee's behalf.
+void SuppressProxyWiFiPafAdvertising()
+{
+    Server::GetInstance().GetCommissioningWindowManager().SetWiFiPAFAdvertisingAllowed(false);
+}
+
+void OnProxyDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+{
+    // Two ways to arrive on a fabric. kCommissioningComplete: the proxy has just joined
+    // one. kServerReady: the fabric table has been loaded, which is the first point a
+    // proxy commissioned before this boot can be recognised -- the device factory runs
+    // before Server::Init(), so the fabric count is always zero when the device is
+    // created and cannot be tested there.
+    const bool joinedNow = event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete;
+    const bool alreadyOnAFabric =
+        event->Type == DeviceLayer::DeviceEventType::kServerReady && Server::GetInstance().GetFabricTable().FabricCount() > 0;
+    VerifyOrReturn(joinedNow || alreadyOnAFabric);
+
+    SuppressProxyWiFiPafAdvertising();
 }
 
 } // namespace
@@ -127,8 +133,7 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable &
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         static CommissioningProxyPafAdapter sPafProxyAdapter;
-        static Clusters::CommissioningProxy::CommissioningProxyPafTransport sPafProxyTransport(sPafProxyAdapter, timerDelegate,
-                                                                                               &fabricTable);
+        static Clusters::CommissioningProxy::CommissioningProxyPafTransport sPafProxyTransport(sPafProxyAdapter, timerDelegate);
 #endif
 
 #if CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -158,6 +163,14 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable &
                     return nullptr;
                 }
                 sProxyDeviceCreated = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                // A proxy needs its NAN radio to subscribe on a commissionee's behalf, so
+                // it must not publish its own commissioning window once it is on a fabric
+                // and can be asked to proxy. Until then it does advertise over Wi-Fi PAF,
+                // so the proxy itself can be commissioned that way.
+                LogErrorOnFailure(DeviceLayer::PlatformMgr().AddEventHandler(OnProxyDeviceEvent, 0));
+#endif
 
                 auto device = std::make_unique<CommissioningProxyDevice>(proxyContext, proxyConfig);
 #if CONFIG_NETWORK_LAYER_BLE

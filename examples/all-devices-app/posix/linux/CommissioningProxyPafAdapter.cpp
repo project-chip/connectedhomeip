@@ -91,11 +91,6 @@ uint32_t CommissioningProxyPafAdapter::PendingConnectSubscribeId() const
     return DeviceLayer::ConnectivityMgrImpl().GetPendingConnectSubscribeId();
 }
 
-void CommissioningProxyPafAdapter::DisconnectPublishReceiveHandler()
-{
-    DeviceLayer::ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler();
-}
-
 void CommissioningProxyPafAdapter::ReportPeer(DiscoveryCallback cb, void * context, const DeviceLayer::NanPeerInfo & peer)
 {
     // The platform keeps extended data in a heap buffer; hand it across as a span that is

@@ -37,9 +37,9 @@ namespace CommissioningProxy {
 using Protocols::InteractionModel::Status;
 
 CommissioningProxyPafTransport::CommissioningProxyPafTransport(CommissioningProxyPafAdapter & adapter,
-                                                               TimerDelegate & timerDelegate, FabricTable * fabricTable) :
+                                                               TimerDelegate & timerDelegate) :
     mAdapter(adapter),
-    mTimerDelegate(timerDelegate), mBgScan(mBgScanHardware, timerDelegate), mFabricTable(fabricTable)
+    mTimerDelegate(timerDelegate), mBgScan(mBgScanHardware, timerDelegate)
 {}
 
 CommissioningProxyPafTransport::~CommissioningProxyPafTransport()
@@ -215,7 +215,7 @@ CHIP_ERROR CommissioningProxyPafTransport::ProxyPafDelegate::WiFiPAFCloseSession
         }
 
         WiFiPAF::WiFiPAFLayer & layer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-        (void) layer.RmPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, pafSession);
+        LogErrorOnFailure(layer.RmPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, pafSession));
         // Terminate the NAN subscribe (for a subscriber session the WiFiPAFSession id IS
         // the subscribe_id) so it does not linger in wpa_supplicant — the same leak the
         // ProxyDisconnect path guards against. Do NOT CloseEndPoint here: the layer is
@@ -397,6 +397,35 @@ void CommissioningProxyPafTransport::HandleForegroundScanDone(void * context)
 // Connect
 // ==================================================================
 
+void CommissioningProxyPafTransport::RemovePafSessionAndCloseEndpoint(uint16_t discriminator)
+{
+    WiFiPAF::WiFiPAFLayer & pafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    WiFiPAF::WiFiPAFSession key{};
+    key.discriminator = discriminator;
+
+    // Capture the session before RmPafSession clears the slot so we can close any PAFTP
+    // endpoint the handshake created; otherwise it leaks from the 2-slot pool until its
+    // own timer self-closes. CloseEndPoint is a no-op if there is none.
+    WiFiPAF::WiFiPAFSession endpointSession{};
+    bool haveEndpoint               = false;
+    WiFiPAF::WiFiPAFSession * pInfo = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccDisc, key);
+    if (pInfo != nullptr)
+    {
+        endpointSession = *pInfo;
+        haveEndpoint    = true;
+    }
+
+    CHIP_ERROR rmErr = pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccDisc, key);
+    if (rmErr != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "RemovePafSessionAndCloseEndpoint: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
+    }
+    if (haveEndpoint)
+    {
+        pafLayer.CloseEndPoint(endpointSession);
+    }
+}
+
 void CommissioningProxyPafTransport::FailPendingConnect(Status status, bool cancelTimer)
 {
     // Every caller has already verified a connect is pending; the check is repeated here
@@ -423,32 +452,7 @@ void CommissioningProxyPafTransport::FailPendingConnect(Status status, bool canc
                       cancelIncompleteErr.Format());
     }
 
-    WiFiPAF::WiFiPAFLayer & pafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-    WiFiPAF::WiFiPAFSession key{};
-    key.nodeId        = static_cast<NodeId>(ctx.discriminator);
-    key.discriminator = ctx.discriminator;
-
-    // Capture the session before RmPafSession clears the slot so we can close any PAFTP
-    // endpoint the handshake created; otherwise it leaks from the 2-slot pool until its
-    // own timer self-closes. CloseEndPoint is a no-op if there is none.
-    WiFiPAF::WiFiPAFSession endpointSession{};
-    bool haveEndpoint               = false;
-    WiFiPAF::WiFiPAFSession * pInfo = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccDisc, key);
-    if (pInfo != nullptr)
-    {
-        endpointSession = *pInfo;
-        haveEndpoint    = true;
-    }
-
-    CHIP_ERROR rmErr = pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, key);
-    if (rmErr != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(AppServer, "FailPendingConnect: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
-    }
-    if (haveEndpoint)
-    {
-        pafLayer.CloseEndPoint(endpointSession);
-    }
+    RemovePafSessionAndCloseEndpoint(ctx.discriminator);
 
     if (ctx.subscribeId != 0)
     {
@@ -576,39 +580,6 @@ void CommissioningProxyPafTransport::HandleConnectError(void * context, CHIP_ERR
 void CommissioningProxyPafTransport::SetHost(CommissioningProxyCluster * host)
 {
     mHost = host;
-
-    // Teardown passes nullptr, and Shutdown() has already dropped the handler by then.
-    VerifyOrReturn(host != nullptr);
-
-    // A proxy publishes over NAN so it can be commissioned onto a fabric itself. That
-    // publish receive handler has to go once it is commissioned, or a later subscribe
-    // leaves the platform with two handlers for the same traffic. With no fabric table
-    // there is nothing to watch, which is how the unit tests run.
-    VerifyOrReturn(mFabricTable != nullptr);
-
-    if (mFabricTable->FabricCount() > 0)
-    {
-        // Registered after the fabric table was loaded, and already commissioned, so the
-        // proxy will never publish again. Applications that register their transports
-        // before Server::Init() — all-devices-app among them — always take the branch
-        // below instead, because the fabric table is still empty at that point.
-        mAdapter.DisconnectPublishReceiveHandler();
-        return;
-    }
-
-    LogErrorOnFailure(DeviceLayer::PlatformMgr().AddEventHandler(OnDeviceEvent, reinterpret_cast<intptr_t>(this)));
-    mPublishHandlerArmed = true;
-}
-
-void CommissioningProxyPafTransport::OnDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
-{
-    VerifyOrReturn(event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete);
-
-    auto * self = reinterpret_cast<CommissioningProxyPafTransport *>(arg);
-    VerifyOrReturn(self != nullptr);
-
-    ChipLogProgress(AppServer, "CommissioningProxy: commissioning complete, disconnecting publish receive handler");
-    self->mAdapter.DisconnectPublishReceiveHandler();
 }
 
 Status CommissioningProxyPafTransport::Connect(app::CommandHandler * commandObj, const DataModel::InvokeRequest & request,
@@ -641,10 +612,8 @@ Status CommissioningProxyPafTransport::Connect(app::CommandHandler * commandObj,
     // entry by discriminator.
     WiFiPAF::WiFiPAFSession pafSessionInfo{};
     pafSessionInfo.role          = WiFiPAF::kWiFiPafRole_Subscriber;
-    pafSessionInfo.nodeId        = static_cast<NodeId>(discriminator);
     pafSessionInfo.discriminator = discriminator;
-    CHIP_ERROR addErr =
-        WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
+    CHIP_ERROR addErr = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().AddPafSession(WiFiPAF::PafInfoAccess::kAccDisc, pafSessionInfo);
     if (addErr != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ProxyConnectRequest: AddPafSession failed: %" CHIP_ERROR_FORMAT, addErr.Format());
@@ -680,8 +649,7 @@ Status CommissioningProxyPafTransport::Connect(app::CommandHandler * commandObj,
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ProxyConnectRequest: WiFiPAFSubscribe failed: %" CHIP_ERROR_FORMAT, err.Format());
-        CHIP_ERROR rmErr =
-            WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
+        CHIP_ERROR rmErr = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(WiFiPAF::PafInfoAccess::kAccDisc, pafSessionInfo);
         if (rmErr != CHIP_NO_ERROR)
         {
             ChipLogDetail(AppServer, "ProxyConnectRequest cleanup: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
@@ -702,7 +670,7 @@ Status CommissioningProxyPafTransport::Connect(app::CommandHandler * commandObj,
         {
             ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
             CHIP_ERROR rmErr2 =
-                WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
+                WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(WiFiPAF::PafInfoAccess::kAccDisc, pafSessionInfo);
             if (rmErr2 != CHIP_NO_ERROR)
             {
                 ChipLogDetail(AppServer, "ProxyConnectRequest cleanup: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr2.Format());
@@ -877,12 +845,6 @@ bool CommissioningProxyPafTransport::IsConnectPending() const
 
 void CommissioningProxyPafTransport::Shutdown()
 {
-    if (mPublishHandlerArmed)
-    {
-        DeviceLayer::PlatformMgr().RemoveEventHandler(OnDeviceEvent, reinterpret_cast<intptr_t>(this));
-        mPublishHandlerArmed = false;
-    }
-
     // Close any active PAF sessions: fail in-flight messages, close PAFTP endpoints,
     // cancel NAN subscribes, and remove them from the cluster's session manager. Take the
     // sessions out first so the slots are free if a close fires a callback synchronously.
@@ -906,7 +868,7 @@ void CommissioningProxyPafTransport::Shutdown()
             mHost->Sessions().DispatchMessageFailure(closingIds[i], Status::Failure);
             mHost->Sessions().RemoveSession(closingIds[i]);
         }
-        (void) WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, closing[i]);
+        LogErrorOnFailure(WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, closing[i]));
         WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().CloseEndPoint(closing[i]);
         if (closing[i].id != 0)
         {
@@ -940,10 +902,7 @@ void CommissioningProxyPafTransport::Shutdown()
             (void) DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(ctx.subscribeId);
         }
 
-        WiFiPAF::WiFiPAFSession keyInfo{};
-        keyInfo.nodeId        = static_cast<NodeId>(ctx.discriminator);
-        keyInfo.discriminator = ctx.discriminator;
-        (void) WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, keyInfo);
+        RemovePafSessionAndCloseEndpoint(ctx.discriminator);
 
         if (app::CommandHandler * cmd = ctx.handle.Get())
         {

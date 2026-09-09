@@ -72,14 +72,7 @@ public:
      * @param timerDelegate  drives the connect timeout, and is handed to the
      *                       background-scan registry.
      */
-    /**
-     * @p fabricTable is watched so the proxy's own NAN publish receive handler can be
-     * dropped once the proxy is commissioned; a later subscribe would otherwise leave
-     * the platform with two handlers for the same traffic. May be nullptr where no
-     * FabricTable exists (unit tests), in which case the handler is left alone.
-     */
-    CommissioningProxyPafTransport(CommissioningProxyPafAdapter & adapter, TimerDelegate & timerDelegate,
-                                   FabricTable * fabricTable = nullptr);
+    CommissioningProxyPafTransport(CommissioningProxyPafAdapter & adapter, TimerDelegate & timerDelegate);
     ~CommissioningProxyPafTransport() override;
 
     CommissioningProxyPafTransport(const CommissioningProxyPafTransport &)             = delete;
@@ -237,6 +230,12 @@ private:
     SessionSlot * ClaimSlot();
     bool AnySessionOpen() const;
 
+    /// Drop the PAF session keyed on @p discriminator and close any PAFTP endpoint its
+    /// handshake created. The session is captured before it is removed, because
+    /// RmPafSession clears the slot the endpoint is found by; skipping the close leaks
+    /// the endpoint from the 2-slot pool until its own timer self-closes.
+    void RemovePafSessionAndCloseEndpoint(uint16_t discriminator);
+
     /// Tear down an in-flight connect that did not succeed: cancel the subscribe, close
     /// any PAFTP endpoint the handshake created, drop the PAF session, answer the
     /// originating ProxyConnectRequest with @p status, and release the subscribe slot.
@@ -258,11 +257,6 @@ private:
     CommissioningProxyCluster * mHost = nullptr;
 
     /// Drops the publish receive handler as soon as the proxy's own commissioning ends.
-    static void OnDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-    FabricTable * mFabricTable = nullptr;
-    /// Whether OnDeviceEvent is currently registered with the platform manager.
-    bool mPublishHandlerArmed = false;
 
     SessionSlot mSessions[kMaxSessions];
     std::optional<ConnectCtx> mPendingConnect;
