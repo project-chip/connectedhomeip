@@ -34,7 +34,7 @@ Two artifacts are produced here:
   ``src/app/clusters/network-identity-management-server/NetworkAdministratorSecret.cpp``).
 
 The encoders are exercised against the C++ known-answer vectors in
-``test_network_identity.py``.
+``src/python_testing/test_testing/test_network_identity.py``.
 """
 
 from __future__ import annotations

@@ -41,16 +41,16 @@ import logging
 import secrets
 
 from mobly import asserts
+from support_modules.network_identity import (NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH, derive_ecdsa_network_identity,
+                                              encode_network_administrator_secret, generate_network_client_identity,
+                                              matter_epoch_now, network_identity_identifier)
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.network_identity import (NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH, derive_ecdsa_network_identity,
-                                             encode_network_administrator_secret, generate_network_client_identity,
-                                             matter_epoch_now, network_identity_identifier)
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -61,52 +61,17 @@ _TIMED_REQUEST_TIMEOUT_MS = 5000
 
 class TC_NETIM_1_1(MatterBaseTest):
 
-    def desc_TC_NETIM_1_1(self) -> str:
-        return "[TC-NETIM-1.1] Cluster Conformance Verification [DUT-Server]"
-
-    def steps_TC_NETIM_1_1(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commissioning, already done. TH configures the DUT with one known Network Administrator "
-                        "Shared Secret (via ImportAdminSecret) and one known client identity (via AddClient), storing "
-                        "the expected active network identity and client fields.", is_commissioning=True),
-            TestStep(2, "TH reads the ServerList from the Descriptor cluster on the endpoint.",
-                        "Network Identity Management cluster ID 0x0450 is present."),
-            TestStep(3, "TH reads the DeviceTypeList from the Descriptor cluster on the endpoint.",
-                        "Network Infrastructure Manager device type ID 0x0090 is present."),
-            TestStep(4, "TH reads the ActiveNetworkIdentities attribute and stores as activeList.",
-                        "DUT responds with a list."),
-            TestStep(5, "TH validates the length of activeList.", "activeList is a list with length 1."),
-            TestStep(6, "TH validates each element in activeList.",
-                        "For each element: Index in 1..65534, Type is a valid enum8, Identifier is a 20-byte octstr, "
-                        "CreatedTimestamp is epoch-s, Current is a bool, RemainingClients is null when Current is true "
-                        "else a uint16."),
-            TestStep(7, "TH verifies activeList contains the expected active network identity configured during setup.",
-                        "activeList contains an entry with the expected CreatedTimestamp, Type ECDSA, Current true, and "
-                        "the Identifier that TH independently derives from the imported NASS raw secret."),
-            TestStep(8, "TH reads the Clients attribute and stores as clientsList.", "DUT responds with a list."),
-            TestStep(9, "TH validates the length of clientsList.", "clientsList is a list with length 1."),
-            TestStep(10, "TH validates each element in clientsList.",
-                         "For each element: ClientIndex in 1..2047, ClientIdentifier is a 20-byte octstr, "
-                         "NetworkIdentityIndex is null or in range 1..65534."),
-            TestStep(11, "TH verifies clientsList contains the expected client configured during setup.",
-                         "clientsList contains an entry with the expected ClientIndex and ClientIdentifier."),
-            TestStep(12, "TH reads the ClientTableSize attribute and stores as clientTableSize.",
-                         "DUT responds with a value."),
-            TestStep(13, "TH validates the ClientTableSize value.", "clientTableSize is a uint16 in range 500..2047."),
-        ]
-
-    def pics_TC_NETIM_1_1(self) -> list[str]:
-        return [
-            "NETIM.S",
-        ]
-
+    @pics('NETIM.S')
     @run_if_endpoint_matches(has_cluster(Clusters.NetworkIdentityManagement))
     async def test_TC_NETIM_1_1(self):
+        """[TC-NETIM-1.1] Cluster Conformance Verification [DUT-Server]"""
         cluster = Clusters.NetworkIdentityManagement
         attributes = cluster.Attributes
         endpoint = self.get_endpoint()
 
-        self.step(1)
+        self.step(1, "Commissioning, already done. TH configures the DUT with one known Network Administrator "
+                     "Shared Secret (via ImportAdminSecret) and one known client identity (via AddClient), storing "
+                     "the expected active network identity and client fields.", is_commissioning=True)
         # Test Setup: configure one known active network identity and one known client.
         # The active identity's CreatedTimestamp is taken verbatim from the imported NASS, and its
         # Identifier is the identifier of the ECDSA identity the DUT must derive from the NASS raw
@@ -131,27 +96,33 @@ class TC_NETIM_1_1(MatterBaseTest):
         expected_client_index = add_client_response.clientIndex
         matter_asserts.assert_int_in_range(expected_client_index, 1, 2047, "AddClientResponse.ClientIndex")
 
-        self.step(2)
+        self.step(2, "TH reads the ServerList from the Descriptor cluster on the endpoint.",
+                  expectation="Network Identity Management cluster ID 0x0450 is present.")
         server_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.ServerList)
         asserts.assert_in(cluster.id, server_list, "Network Identity Management cluster (0x0450) not in the ServerList.")
 
-        self.step(3)
+        self.step(3, "TH reads the DeviceTypeList from the Descriptor cluster on the endpoint.",
+                  expectation="Network Infrastructure Manager device type ID 0x0090 is present.")
         device_type_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
         asserts.assert_true(
             any(dt.deviceType == _NETWORK_INFRASTRUCTURE_MANAGER_DEVICE_TYPE_ID for dt in device_type_list),
             "Network Infrastructure Manager device type (0x0090) not in the DeviceTypeList.")
 
-        self.step(4)
+        self.step(4, "TH reads the ActiveNetworkIdentities attribute and stores as activeList.",
+                  expectation="DUT responds with a list.")
         active_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.ActiveNetworkIdentities)
         matter_asserts.assert_list(active_list, "ActiveNetworkIdentities")
 
-        self.step(5)
+        self.step(5, "TH validates the length of activeList.", expectation="activeList is a list with length 1.")
         asserts.assert_equal(len(active_list), 1, "ActiveNetworkIdentities should contain exactly one entry.")
 
-        self.step(6)
+        self.step(6, "TH validates each element in activeList.",
+                  expectation="For each element: Index in 1..65534, Type is a valid enum8, Identifier is a 20-byte octstr, "
+                              "CreatedTimestamp is epoch-s, Current is a bool, RemainingClients is null when Current is true "
+                              "else a uint16.")
         for identity in active_list:
             matter_asserts.assert_int_in_range(identity.index, 1, 65534, "ActiveNetworkIdentityStruct.Index")
             matter_asserts.assert_valid_enum(identity.type, "ActiveNetworkIdentityStruct.Type", cluster.Enums.IdentityTypeEnum)
@@ -165,7 +136,9 @@ class TC_NETIM_1_1(MatterBaseTest):
             else:
                 matter_asserts.assert_valid_uint16(identity.remainingClients, "ActiveNetworkIdentityStruct.RemainingClients")
 
-        self.step(7)
+        self.step(7, "TH verifies activeList contains the expected active network identity configured during setup.",
+                  expectation="activeList contains an entry with the expected CreatedTimestamp, Type ECDSA, Current true, and "
+                              "the Identifier that TH independently derives from the imported NASS raw secret.")
         matching = [identity for identity in active_list
                     if identity.createdTimestamp == expected_created_timestamp and identity.current]
         asserts.assert_equal(len(matching), 1,
@@ -179,15 +152,17 @@ class TC_NETIM_1_1(MatterBaseTest):
             "The active network identity Identifier does not match the identity derived from the imported NASS; the DUT "
             "did not perform the expected HKDF/ECDSA Network Identity derivation.")
 
-        self.step(8)
+        self.step(8, "TH reads the Clients attribute and stores as clientsList.", expectation="DUT responds with a list.")
         clients_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
         matter_asserts.assert_list(clients_list, "Clients")
 
-        self.step(9)
+        self.step(9, "TH validates the length of clientsList.", expectation="clientsList is a list with length 1.")
         asserts.assert_equal(len(clients_list), 1, "Clients should contain exactly one entry.")
 
-        self.step(10)
+        self.step(10, "TH validates each element in clientsList.",
+                  expectation="For each element: ClientIndex in 1..2047, ClientIdentifier is a 20-byte octstr, "
+                              "NetworkIdentityIndex is null or in range 1..65534.")
         for client in clients_list:
             matter_asserts.assert_int_in_range(client.clientIndex, 1, 2047, "ClientStruct.ClientIndex")
             matter_asserts.assert_is_octstr(client.clientIdentifier, "ClientStruct.ClientIdentifier")
@@ -195,7 +170,8 @@ class TC_NETIM_1_1(MatterBaseTest):
             if client.networkIdentityIndex is not NullValue:
                 matter_asserts.assert_int_in_range(client.networkIdentityIndex, 1, 65534, "ClientStruct.NetworkIdentityIndex")
 
-        self.step(11)
+        self.step(11, "TH verifies clientsList contains the expected client configured during setup.",
+                  expectation="clientsList contains an entry with the expected ClientIndex and ClientIdentifier.")
         matching_clients = [client for client in clients_list
                             if client.clientIndex == expected_client_index
                             and client.clientIdentifier == expected_client_identifier]
@@ -203,11 +179,13 @@ class TC_NETIM_1_1(MatterBaseTest):
                              "clientsList does not contain the expected client (matching ClientIndex and "
                              "ClientIdentifier configured during setup).")
 
-        self.step(12)
+        self.step(12, "TH reads the ClientTableSize attribute and stores as clientTableSize.",
+                  expectation="DUT responds with a value.")
         client_table_size = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.ClientTableSize)
 
-        self.step(13)
+        self.step(13, "TH validates the ClientTableSize value.",
+                  expectation="clientTableSize is a uint16 in range 500..2047.")
         matter_asserts.assert_valid_uint16(client_table_size, "ClientTableSize")
         matter_asserts.assert_int_in_range(client_table_size, 500, 2047, "ClientTableSize")
 

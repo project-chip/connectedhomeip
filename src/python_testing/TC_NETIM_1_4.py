@@ -43,16 +43,16 @@ import secrets
 from dataclasses import dataclass
 
 from mobly import asserts
+from support_modules.network_identity import (NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH, encode_network_administrator_secret,
+                                              generate_network_client_identity, matter_epoch_now)
 
 import matter.clusters as Clusters
 from matter import ChipUtility
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.network_identity import (NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH, encode_network_administrator_secret,
-                                             generate_network_client_identity, matter_epoch_now)
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -74,64 +74,6 @@ class _ImportAdminSecretNoTimedInvoke(Clusters.NetworkIdentityManagement.Command
 
 
 class TC_NETIM_1_4(MatterBaseTest):
-
-    def desc_TC_NETIM_1_4(self) -> str:
-        return "[TC-NETIM-1.4] ImportAdminSecret and ExportAdminSecret Command Verification [DUT-Server]"
-
-    def steps_TC_NETIM_1_4(self) -> list[TestStep]:
-        return [
-            TestStep("precondition-1", "Commissioning, already done. TH generates the Network Administrator Shared "
-                                       "Secrets used by this test with strictly increasing timestamps.",
-                     is_commissioning=True),
-            TestStep(1, "TH opens a commissioning window and establishes a PASE session to the DUT.",
-                        "DUT and TH can communicate over PASE."),
-            TestStep(2, "TH sends ImportAdminSecret with a valid NASS using a Timed Interaction over PASE.",
-                        "DUT responds with UNSUPPORTED_ACCESS."),
-            TestStep(3, "TH confirms it can communicate with the DUT over CASE.", "DUT is reachable over CASE."),
-            TestStep(4, "TH reads TestEventTriggersEnabled from the General Diagnostics cluster.",
-                        "TestEventTriggersEnabled is true."),
-            TestStep(5, "Over CASE, TH sends ExportAdminSecret before any secret has been imported.",
-                        "DUT responds with NOT_FOUND."),
-            TestStep(6, "Over CASE, TH sends ImportAdminSecret with a valid NASS without using a Timed Interaction.",
-                        "DUT responds with NEEDS_TIMED_INTERACTION."),
-            TestStep(7, "Over CASE, TH sends ImportAdminSecret with a malformed NASS using a Timed Interaction.",
-                        "DUT responds with INVALID_COMMAND."),
-            TestStep(8, "Over CASE, TH sends ImportAdminSecret with NASSa using a Timed Interaction.",
-                        "DUT responds with SUCCESS; TimeStampA is stored."),
-            TestStep(9, "TH adds a client and, via the test event trigger, authenticates it against the current "
-                        "Network Identity (NASSa's) so it is not retired later.",
-                        "AddClient responds with AddClientResponse and the trigger succeeds."),
-            TestStep(10, "Over CASE, TH sends ImportAdminSecret with NASSa again using a Timed Interaction.",
-                         "DUT responds with SUCCESS (idempotent)."),
-            TestStep(11, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is greater than TimeStampA "
-                         "using a Timed Interaction.", "DUT responds with SUCCESS; TimeStampB is stored."),
-            TestStep(12, "TH adds a client and, via the test event trigger, authenticates it against the current "
-                         "Network Identity (NASSb's) so it is not retired later.",
-                         "AddClient responds with AddClientResponse and the trigger succeeds."),
-            TestStep(13, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is less than TimeStampB "
-                         "using a Timed Interaction.", "DUT responds with DYNAMIC_CONSTRAINT_ERROR."),
-            TestStep(14, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is greater than TimeStampB "
-                         "using a Timed Interaction.", "DUT responds with SUCCESS; TimeStampC is stored."),
-            TestStep(15, "TH adds a client and, via the test event trigger, authenticates it against the current "
-                         "Network Identity (NASSc's) so it is not retired later.",
-                         "AddClient responds with AddClientResponse and the trigger succeeds."),
-            TestStep(16, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is greater than TimeStampC "
-                         "using a Timed Interaction.", "DUT responds with SUCCESS; TimeStampD is stored."),
-            TestStep(17, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is greater than TimeStampD "
-                         "using a Timed Interaction.", "DUT responds with RESOURCE_EXHAUSTED."),
-            TestStep(18, "Over CASE, TH sends ExportAdminSecret.",
-                         "DUT responds with ExportAdminSecretResponse containing NASSd."),
-            TestStep(19, "TH reads ActiveNetworkIdentities.",
-                         "Exactly one entry has Current=true with CreatedTimestamp equal to TimeStampD; the three "
-                         "prior identities are Current=false with RemainingClients equal to 1."),
-        ]
-
-    def pics_TC_NETIM_1_4(self) -> list[str]:
-        return [
-            "NETIM.S",
-            "NETIM.S.C40.Rsp",
-            "NETIM.S.C41.Rsp",
-        ]
 
     async def _import_timed(self, nass: bytes, endpoint):
         """Sends ImportAdminSecret using a Timed Interaction over CASE; raises InteractionModelError on failure."""
@@ -158,14 +100,18 @@ class TC_NETIM_1_4(MatterBaseTest):
                                    "AddClient did not return an AddClientResponse.")
         await self.send_test_event_triggers(eventTrigger=_TRIGGER_AUTHENTICATE_CLIENT | add_response.clientIndex)
 
+    @pics('NETIM.S', 'NETIM.S.C40.Rsp', 'NETIM.S.C41.Rsp')
     @run_if_endpoint_matches(has_cluster(Clusters.NetworkIdentityManagement))
     async def test_TC_NETIM_1_4(self):
+        """[TC-NETIM-1.4] ImportAdminSecret and ExportAdminSecret Command Verification [DUT-Server]"""
         cluster = Clusters.NetworkIdentityManagement
         commands = cluster.Commands
         attributes = cluster.Attributes
         endpoint = self.get_endpoint()
 
-        self.step("precondition-1")
+        self.step("precondition-1", "Commissioning, already done. TH generates the Network Administrator Shared Secrets used by "
+                                    "this test with strictly increasing timestamps.",
+                  is_commissioning=True)
         # Timestamps are spaced a few seconds apart, strictly increasing, and close to "now" so the DUT's
         # (optional) future-timestamp check is satisfied. Each NASS uses a distinct random raw secret, so
         # each derives a distinct Network Identity; NASSa is reused verbatim for the idempotent re-import.
@@ -187,13 +133,15 @@ class TC_NETIM_1_4(MatterBaseTest):
         # Not a valid NASS TLV; DecodeNetworkAdministratorSecret must reject it.
         malformed_nass = b"\xde\xad\xbe\xef"
 
-        self.step(1)
+        self.step(1, "TH opens a commissioning window and establishes a PASE session to the DUT.",
+                  expectation="DUT and TH can communicate over PASE.")
         params = await self.open_commissioning_window()
         pase_node_id = self.dut_node_id + 1
         await self.default_controller.FindOrEstablishPASESession(
             setupCode=params.commissioningParameters.setupQRCode, nodeId=pase_node_id)
 
-        self.step(2)
+        self.step(2, "TH sends ImportAdminSecret with a valid NASS using a Timed Interaction over PASE.",
+                  expectation="DUT responds with UNSUPPORTED_ACCESS.")
         try:
             await self.send_single_cmd(cmd=commands.ImportAdminSecret(networkAdministratorSharedSecret=nass_a),
                                        node_id=pase_node_id, endpoint=endpoint,
@@ -203,19 +151,22 @@ class TC_NETIM_1_4(MatterBaseTest):
             asserts.assert_equal(e.status, Status.UnsupportedAccess,
                                  "ImportAdminSecret over PASE should fail with UnsupportedAccess.")
 
-        self.step(3)
+        self.step(3, "TH confirms it can communicate with the DUT over CASE.",
+                  expectation="DUT is reachable over CASE.")
         # A successful CASE read confirms communication over CASE.
         await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.ClientTableSize)
 
-        self.step(4)
+        self.step(4, "TH reads TestEventTriggersEnabled from the General Diagnostics cluster.",
+                  expectation="TestEventTriggersEnabled is true.")
         test_event_triggers_enabled = await self.read_single_attribute_check_success(
             endpoint=0, cluster=Clusters.GeneralDiagnostics,
             attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled)
         asserts.assert_true(test_event_triggers_enabled,
                             "TestEventTriggersEnabled must be true; start the DUT with a matching --enable-key.")
 
-        self.step(5)
+        self.step(5, "Over CASE, TH sends ExportAdminSecret before any secret has been imported.",
+                  expectation="DUT responds with NOT_FOUND.")
         try:
             await self.send_single_cmd(cmd=commands.ExportAdminSecret(), endpoint=endpoint,
                                        timedRequestTimeoutMs=_TIMED_REQUEST_TIMEOUT_MS)
@@ -223,7 +174,8 @@ class TC_NETIM_1_4(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound, "ExportAdminSecret before any import should fail with NotFound.")
 
-        self.step(6)
+        self.step(6, "Over CASE, TH sends ImportAdminSecret with a valid NASS without using a Timed Interaction.",
+                  expectation="DUT responds with NEEDS_TIMED_INTERACTION.")
         try:
             await self.default_controller.SendCommand(
                 self.dut_node_id, endpoint, _ImportAdminSecretNoTimedInvoke(networkAdministratorSharedSecret=nass_a))
@@ -232,45 +184,65 @@ class TC_NETIM_1_4(MatterBaseTest):
             asserts.assert_equal(e.status, Status.NeedsTimedInteraction,
                                  "ImportAdminSecret without a Timed Interaction should fail with NeedsTimedInteraction.")
 
-        self.step(7)
+        self.step(7, "Over CASE, TH sends ImportAdminSecret with a malformed NASS using a Timed Interaction.",
+                  expectation="DUT responds with INVALID_COMMAND.")
         await self._import_expect_status(malformed_nass, endpoint, Status.InvalidCommand,
                                          "ImportAdminSecret with a malformed NASS should fail with InvalidCommand.")
 
-        self.step(8)
+        self.step(8, "Over CASE, TH sends ImportAdminSecret with NASSa using a Timed Interaction.",
+                  expectation="DUT responds with SUCCESS; TimeStampA is stored.")
         await self._import_timed(nass_a, endpoint)
 
-        self.step(9)
+        self.step(9, "TH adds a client and, via the test event trigger, authenticates it against the current Network Identity "
+                     "(NASSa's) so it is not retired later.",
+                  expectation="AddClient responds with AddClientResponse and the trigger succeeds.")
         await self._pin_current_network_identity(endpoint)
 
-        self.step(10)
+        self.step(10, "Over CASE, TH sends ImportAdminSecret with NASSa again using a Timed Interaction.",
+                  expectation="DUT responds with SUCCESS (idempotent).")
         await self._import_timed(nass_a, endpoint)
 
-        self.step(11)
+        self.step(11, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is greater than TimeStampA using a Timed "
+                      "Interaction.",
+                  expectation="DUT responds with SUCCESS; TimeStampB is stored.")
         await self._import_timed(nass_b, endpoint)
 
-        self.step(12)
+        self.step(12, "TH adds a client and, via the test event trigger, authenticates it against the current Network Identity "
+                      "(NASSb's) so it is not retired later.",
+                  expectation="AddClient responds with AddClientResponse and the trigger succeeds.")
         await self._pin_current_network_identity(endpoint)
 
-        self.step(13)
+        self.step(13, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is less than TimeStampB using a Timed "
+                      "Interaction.",
+                  expectation="DUT responds with DYNAMIC_CONSTRAINT_ERROR.")
         await self._import_expect_status(nass_older_than_b, endpoint, Status.DynamicConstraintError,
                                          "ImportAdminSecret with a non-increasing timestamp should fail with "
                                          "DynamicConstraintError.")
 
-        self.step(14)
+        self.step(14, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is greater than TimeStampB using a Timed "
+                      "Interaction.",
+                  expectation="DUT responds with SUCCESS; TimeStampC is stored.")
         await self._import_timed(nass_c, endpoint)
 
-        self.step(15)
+        self.step(15, "TH adds a client and, via the test event trigger, authenticates it against the current Network Identity "
+                      "(NASSc's) so it is not retired later.",
+                  expectation="AddClient responds with AddClientResponse and the trigger succeeds.")
         await self._pin_current_network_identity(endpoint)
 
-        self.step(16)
+        self.step(16, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is greater than TimeStampC using a Timed "
+                      "Interaction.",
+                  expectation="DUT responds with SUCCESS; TimeStampD is stored.")
         await self._import_timed(nass_d, endpoint)
 
-        self.step(17)
+        self.step(17, "Over CASE, TH sends ImportAdminSecret with a NASS whose timestamp is greater than TimeStampD using a Timed "
+                      "Interaction.",
+                  expectation="DUT responds with RESOURCE_EXHAUSTED.")
         await self._import_expect_status(nass_e, endpoint, Status.ResourceExhausted,
                                          "ImportAdminSecret beyond the Network Identity capacity should fail with "
                                          "ResourceExhausted.")
 
-        self.step(18)
+        self.step(18, "Over CASE, TH sends ExportAdminSecret.",
+                  expectation="DUT responds with ExportAdminSecretResponse containing NASSd.")
         export_response = await self.send_single_cmd(cmd=commands.ExportAdminSecret(), endpoint=endpoint,
                                                      timedRequestTimeoutMs=_TIMED_REQUEST_TIMEOUT_MS)
         asserts.assert_is_instance(export_response, commands.ExportAdminSecretResponse,
@@ -278,7 +250,9 @@ class TC_NETIM_1_4(MatterBaseTest):
         asserts.assert_equal(export_response.networkAdministratorSharedSecret, nass_d,
                              "ExportAdminSecret did not return the most recently imported NASS (NASSd).")
 
-        self.step(19)
+        self.step(19, "TH reads ActiveNetworkIdentities.",
+                  expectation="Exactly one entry has Current=true with CreatedTimestamp equal to TimeStampD; the three prior "
+                              "identities are Current=false with RemainingClients equal to 1.")
         # Four Network Identities remain: NASSa/b/c (non-current, each pinned by one authenticated client)
         # and NASSd (current). The failed import in step 13 left the table unchanged.
         active_list = await self.read_single_attribute_check_success(
