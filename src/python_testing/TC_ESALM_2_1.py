@@ -193,8 +193,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         under_current = None
 
         self.step(7, "TH reads from the DUT the OverVoltageThreshold attribute.",
-                  expectation="Verify that the DUT response contains a voltage-mV (int64) value. If UNDERVOLT "
-                              "is also supported, value is greater than or equal to (UnderVoltageThreshold + 1).")
+                  expectation="Verify that the DUT response contains a voltage-mV (int64) value.")
         if has_overvolt:
             over_voltage = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverVoltageThreshold)
@@ -211,13 +210,12 @@ class TC_ESALM_2_1(MatterBaseTest):
             asserts.assert_true(isinstance(under_voltage, int), "UnderVoltageThreshold must be int64")
         else:
             self.mark_current_step_skipped()
-        if has_overvolt and has_undervolt and isinstance(over_voltage, int) and isinstance(under_voltage, int):
-            asserts.assert_greater_equal(over_voltage, under_voltage + 1,
-                                         "OverVoltageThreshold must be >= UnderVoltageThreshold + 1")
+        if has_overvolt and has_undervolt:
+            asserts.assert_less_equal(under_voltage, over_voltage - 1,
+                                      "UnderVoltageThreshold must be <= OverVoltageThreshold - 1")
 
         self.step(9, "TH reads from the DUT the OverFrequencyThreshold attribute.",
-                  expectation="Verify that the DUT response contains an int64 value in millihertz. If UNDERFREQ is also supported, "
-                              "value is greater than or equal to (UnderFrequencyThreshold + 1).")
+                  expectation="Verify that the DUT response contains an int64 value in millihertz.")
         if has_overfreq:
             over_frequency = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverFrequencyThreshold)
@@ -234,13 +232,12 @@ class TC_ESALM_2_1(MatterBaseTest):
             asserts.assert_true(isinstance(under_frequency, int), "UnderFrequencyThreshold must be int64")
         else:
             self.mark_current_step_skipped()
-        if has_overfreq and has_underfreq and isinstance(over_frequency, int) and isinstance(under_frequency, int):
-            asserts.assert_greater_equal(over_frequency, under_frequency + 1,
-                                         "OverFrequencyThreshold must be >= UnderFrequencyThreshold + 1")
+        if has_overfreq and has_underfreq:
+            asserts.assert_less_equal(under_frequency, over_frequency - 1,
+                                      "UnderFrequencyThreshold must be <= OverFrequencyThreshold - 1")
 
         self.step(11, "TH reads from the DUT the OverPowerThreshold attribute.",
-                  expectation="Verify that the DUT response contains a power-mW (int64) value. If UNDERPOWER "
-                              "is also supported, value is greater than or equal to (UnderPowerThreshold + 1).")
+                  expectation="Verify that the DUT response contains a power-mW (int64) value.")
         if has_overpower:
             over_power = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverPowerThreshold)
@@ -257,13 +254,12 @@ class TC_ESALM_2_1(MatterBaseTest):
             asserts.assert_true(isinstance(under_power, int), "UnderPowerThreshold must be int64")
         else:
             self.mark_current_step_skipped()
-        if has_overpower and has_underpower and isinstance(over_power, int) and isinstance(under_power, int):
-            asserts.assert_greater_equal(over_power, under_power + 1,
-                                         "OverPowerThreshold must be >= UnderPowerThreshold + 1")
+        if has_overpower and has_underpower:
+            asserts.assert_less_equal(under_power, over_power - 1,
+                                      "UnderPowerThreshold must be <= OverPowerThreshold - 1")
 
         self.step(13, "TH reads from the DUT the OverCurrentThreshold attribute.",
-                  expectation="Verify that the DUT response contains an amperage-mA (int64) value. If UNDERCUR is also supported, "
-                              "value is greater than or equal to (UnderCurrentThreshold + 1).")
+                  expectation="Verify that the DUT response contains an amperage-mA (int64) value.")
         if has_overcur:
             over_current = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverCurrentThreshold)
@@ -280,14 +276,13 @@ class TC_ESALM_2_1(MatterBaseTest):
             asserts.assert_true(isinstance(under_current, int), "UnderCurrentThreshold must be int64")
         else:
             self.mark_current_step_skipped()
-        if has_overcur and has_undercur and isinstance(over_current, int) and isinstance(under_current, int):
-            asserts.assert_greater_equal(over_current, under_current + 1,
-                                         "OverCurrentThreshold must be >= UnderCurrentThreshold + 1")
+        if has_overcur and has_undercur:
+            asserts.assert_less_equal(under_current, over_current - 1,
+                                      "UnderCurrentThreshold must be <= OverCurrentThreshold - 1")
 
         self.step(15, "TH reads from the DUT the PowerImportThreshold attribute.",
                   expectation="Verify that the DUT response contains a power-mW (int64) value. Value is greater "
-                              "than or equal to 0. If POWEREXP is also supported, value is greater than or equal "
-                              "to (PowerExportThreshold + 1).")
+                              "than or equal to 0.")
         if has_powerimp:
             power_import = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.PowerImportThreshold)
@@ -308,12 +303,11 @@ class TC_ESALM_2_1(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        # PowerImportThreshold is constrained to min maxOf(0, PowerExportThreshold + 1) and
-        # PowerExportThreshold to max minOf(0, PowerImportThreshold - 1), so import must exceed
-        # export, exactly as the over/under pairs above do.
-        if has_powerimp and has_powerexp and isinstance(power_import, int) and isinstance(power_export, int):
-            asserts.assert_greater_equal(power_import, power_export + 1,
-                                         "PowerImportThreshold must be >= PowerExportThreshold + 1")
+        # PowerExportThreshold is constrained to max minOf(0, PowerImportThreshold - 1), so export
+        # must stay below import, matching the retained step 16 wording.
+        if has_powerimp and has_powerexp:
+            asserts.assert_less_equal(power_export, power_import - 1,
+                                      "PowerExportThreshold must be <= PowerImportThreshold - 1")
 
 
 if __name__ == "__main__":
