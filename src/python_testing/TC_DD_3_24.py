@@ -119,7 +119,7 @@ class TC_DD_3_24(MatterTestCommissioner):
 
         asserts.assert_true(
             await self.check_operational_service_has_txt_ic(),
-            'TXT key "IC" was not found!'
+            'Incomplete commissioning mDNS advertisement not found (expected "_IC" subtype and TXT key IC=1)'
         )
 
         self.step(
