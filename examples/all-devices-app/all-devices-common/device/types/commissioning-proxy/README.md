@@ -408,13 +408,12 @@ assigned, both need platform code. That is the `CommissioningProxyPafAdapter`
 interface, which this app implements in
 [`posix/linux/CommissioningProxyPafAdapter.cpp`](../../../../posix/linux/CommissioningProxyPafAdapter.cpp):
 
-| Adapter method                      | Linux implementation                                             |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| `StartForegroundScan()`             | `ConnectivityMgrImpl().WiFiPAFScan()`                            |
-| `StartBackgroundScan()`             | `ConnectivityMgrImpl().WiFiPAFStartBackgroundScan()`             |
-| `StopBackgroundScan()`              | `ConnectivityMgrImpl().WiFiPAFStopBackgroundScan()`              |
-| `PendingConnectSubscribeId()`       | `ConnectivityMgrImpl().GetPendingConnectSubscribeId()`           |
-| `DisconnectPublishReceiveHandler()` | `ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler()` |
+| Adapter method                | Linux implementation                                   |
+| ----------------------------- | ------------------------------------------------------ |
+| `StartForegroundScan()`       | `ConnectivityMgrImpl().WiFiPAFScan()`                  |
+| `StartBackgroundScan()`       | `ConnectivityMgrImpl().WiFiPAFStartBackgroundScan()`   |
+| `StopBackgroundScan()`        | `ConnectivityMgrImpl().WiFiPAFStopBackgroundScan()`    |
+| `PendingConnectSubscribeId()` | `ConnectivityMgrImpl().GetPendingConnectSubscribeId()` |
 
 The adapter is also where the platform's peer descriptor is unpacked.
 `NanPeerInfo` is Linux-only and owns heap storage for its extended data, so the
@@ -427,9 +426,6 @@ the single `CommissioningProxyDevice` with `AddTransport()` — a build with BLE
 adds that driver the same way — and derives the advertised `WiFiBand` from
 `--wifipaf freq_list=`, since the device itself reads no command line. The same
 parsed list reaches the radio from `posix/main.cpp`.
-Transports are registered before `Server::Init()`, so the fabric table is empty
-at that point and the driver's `DisconnectPublishReceiveHandler()` call lands on
-the commissioning-complete event instead.
 
 <hr>
 

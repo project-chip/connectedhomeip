@@ -672,22 +672,6 @@ struct BgScanWorkCtx
 };
 } // namespace
 
-void ConnectivityManagerImpl::WiFiPAFDisconnectPublishReceiveHandler()
-{
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    if (!mWpaSupplicant.iface)
-        return;
-
-    // Disconnect all "nanreceive" handlers on the interface that were registered
-    // with this ConnectivityManagerImpl as user-data.  This removes the handler
-    // added by _WiFiPAFPublish so that a subsequent _WiFiPAFSubscribe call
-    // registers exactly one handler and packets are not delivered twice.
-    guint sig = g_signal_lookup("nanreceive", G_OBJECT_TYPE(mWpaSupplicant.iface.get()));
-    g_signal_handlers_disconnect_matched(mWpaSupplicant.iface.get(),
-                                         static_cast<GSignalMatchType>(G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DATA), sig, 0, nullptr,
-                                         nullptr, this);
-}
-
 void ConnectivityManagerImpl::DisconnectScanSignals()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);

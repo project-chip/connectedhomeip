@@ -109,8 +109,7 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable &
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         static CommissioningProxyPafAdapter sPafProxyAdapter;
-        static Clusters::CommissioningProxy::CommissioningProxyPafTransport sPafProxyTransport(sPafProxyAdapter, timerDelegate,
-                                                                                               &fabricTable);
+        static Clusters::CommissioningProxy::CommissioningProxyPafTransport sPafProxyTransport(sPafProxyAdapter, timerDelegate);
 #endif
 
 #if CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF

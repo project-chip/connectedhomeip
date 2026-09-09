@@ -54,7 +54,6 @@ public:
     CHIP_ERROR StartBackgroundScan(DiscoveryCallback cb, void * context) override;
     void StopBackgroundScan() override;
     uint32_t PendingConnectSubscribeId() const override;
-    void DisconnectPublishReceiveHandler() override;
 
 private:
     /// Trampolines matching the platform callback shapes; they re-report each peer in the

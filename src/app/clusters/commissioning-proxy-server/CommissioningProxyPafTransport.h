@@ -72,14 +72,7 @@ public:
      * @param timerDelegate  drives the connect timeout, and is handed to the
      *                       background-scan registry.
      */
-    /**
-     * @p fabricTable is watched so the proxy's own NAN publish receive handler can be
-     * dropped once the proxy is commissioned; a later subscribe would otherwise leave
-     * the platform with two handlers for the same traffic. May be nullptr where no
-     * FabricTable exists (unit tests), in which case the handler is left alone.
-     */
-    CommissioningProxyPafTransport(CommissioningProxyPafAdapter & adapter, TimerDelegate & timerDelegate,
-                                   FabricTable * fabricTable = nullptr);
+    CommissioningProxyPafTransport(CommissioningProxyPafAdapter & adapter, TimerDelegate & timerDelegate);
     ~CommissioningProxyPafTransport() override;
 
     CommissioningProxyPafTransport(const CommissioningProxyPafTransport &)             = delete;
@@ -258,11 +251,6 @@ private:
     CommissioningProxyCluster * mHost = nullptr;
 
     /// Drops the publish receive handler as soon as the proxy's own commissioning ends.
-    static void OnDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-    FabricTable * mFabricTable = nullptr;
-    /// Whether OnDeviceEvent is currently registered with the platform manager.
-    bool mPublishHandlerArmed = false;
 
     SessionSlot mSessions[kMaxSessions];
     std::optional<ConnectCtx> mPendingConnect;

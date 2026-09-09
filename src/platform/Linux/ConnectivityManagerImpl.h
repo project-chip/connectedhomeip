@@ -200,11 +200,6 @@ public:
     void ScanDiscoveryResult(GVariant * discov_info);
     using PafScanResultsCallback = void (*)(void * context, const std::vector<NanPeerInfo> & results);
     CHIP_ERROR WiFiPAFScan(uint8_t scanMaxTime, PafScanResultsCallback cb, void * cbContext);
-    /** Disconnect the nanreceive signal handler registered by _WiFiPAFPublish.
-     *  Call this after the proxy has been commissioned onto the fabric so that
-     *  a subsequent _WiFiPAFSubscribe registers exactly one handler. */
-    void WiFiPAFDisconnectPublishReceiveHandler();
-
     /** Per-peer callback fired each time a new NAN discovery result arrives
      *  during a background scan (including re-discoveries, to allow TTL reset). */
     using BgScanDiscoveryCallback = void (*)(void * ctx, const NanPeerInfo & peer);
