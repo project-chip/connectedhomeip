@@ -159,11 +159,9 @@ class TC_NETIM_1_4(MatterBaseTest):
 
         self.step(4, "TH reads TestEventTriggersEnabled from the General Diagnostics cluster.",
                   expectation="TestEventTriggersEnabled is true.")
-        test_event_triggers_enabled = await self.read_single_attribute_check_success(
-            endpoint=0, cluster=Clusters.GeneralDiagnostics,
-            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled)
-        asserts.assert_true(test_event_triggers_enabled,
-                            "TestEventTriggersEnabled must be true; start the DUT with a matching --enable-key.")
+        # Steps 12 and 15 need the client-authentication trigger, so the DUT must have been started
+        # with a matching --enable-key.
+        await self.check_test_event_triggers_enabled()
 
         self.step(5, "Over CASE, TH sends ExportAdminSecret before any secret has been imported.",
                   expectation="DUT responds with NOT_FOUND.")

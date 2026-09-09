@@ -77,7 +77,10 @@ class _RemoveClientNoTimedInvoke(Clusters.NetworkIdentityManagement.Commands.Rem
 
 class TC_NETIM_1_2(MatterBaseTest):
 
-    disable_wildcard_filtering = True  # Disable wildcard filtering to ensure all commands are sent to the DUT.
+    # Step 9 fills the Client Table to capacity, one AddClient at a time. A background wildcard
+    # subscription would report the Clients attribute after every one of those hundreds of writes,
+    # which is pure overhead for a test that reads the attribute directly when it needs it.
+    disable_wildcard_subscription = True
 
     @property
     def default_timeout(self) -> int:
