@@ -23,5 +23,17 @@ source_set("color-temperature-light") {
     "ColorTemperatureLight.h",
   ]
 
-  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/color-light:logging" ]
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/color-light" ]
+}
+
+source_set("logging") {
+  sources = [
+    "impl/LoggingColorTemperatureLight.cpp",
+    "impl/LoggingColorTemperatureLight.h",
+  ]
+
+  public_deps = [
+    ":color-temperature-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/color-light:logging",
+  ]
 }

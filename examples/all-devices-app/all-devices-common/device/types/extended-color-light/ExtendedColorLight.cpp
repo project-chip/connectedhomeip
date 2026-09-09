@@ -29,19 +29,19 @@ namespace app {
 //
 // XY and ColorTemperature are mandatory for 0x010D; HueSaturation, EnhancedHue and ColorLoop are
 // optional and advertised here too, so the device exercises all three representations. That is what
-// obliges ColorConverter to supply every pairwise conversion: once more than one
-// representation is advertised, the cluster asks the delegate to convert between them on every mode
-// switch and on every read of an inactive mode's attribute.
-ExtendedColorLight::ExtendedColorLight(const Context & context) :
-    LoggingLightDriver(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kExtendedColorLight, 1), context,
-                       Conformance{
-                           .colorFeatures = BitMask<Clusters::ColorControl::Feature>(
-                               Clusters::ColorControl::Feature::kXy, Clusters::ColorControl::Feature::kColorTemperature,
-                               Clusters::ColorControl::Feature::kHueAndSaturation, Clusters::ColorControl::Feature::kEnhancedHue,
-                               Clusters::ColorControl::Feature::kColorLoop),
-                           // XY is the mode this device type powers up in.
-                           .initialColor = Clusters::ColorControl::XYColor{},
-                       })
+// obliges ColorConverter to supply every pairwise conversion: once more than one representation is
+// advertised, the cluster asks the delegate to convert between them on every mode switch and on
+// every read of an inactive mode's attribute.
+ExtendedColorLight::ExtendedColorLight(const Delegates & delegates, const Context & context) :
+    ColorLight(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kExtendedColorLight, 1), context, delegates,
+               Conformance{
+                   .colorFeatures = BitMask<Clusters::ColorControl::Feature>(
+                       Clusters::ColorControl::Feature::kXy, Clusters::ColorControl::Feature::kColorTemperature,
+                       Clusters::ColorControl::Feature::kHueAndSaturation, Clusters::ColorControl::Feature::kEnhancedHue,
+                       Clusters::ColorControl::Feature::kColorLoop),
+                   // XY is the mode this device type powers up in.
+                   .initialColor = Clusters::ColorControl::XYColor{},
+               })
 {}
 
 } // namespace app

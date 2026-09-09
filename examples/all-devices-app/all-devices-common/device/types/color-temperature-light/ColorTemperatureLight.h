@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <device/capabilities/color-light/impl/LoggingLightDriver.h>
+#include <device/capabilities/color-light/ColorLight.h>
 
 namespace chip {
 namespace app {
@@ -29,11 +29,15 @@ namespace app {
  * it shares with the Extended Color Light is applied by ColorLight::Register(); what this device
  * type adds - Color Control with ColorTemperature only - is the Conformance passed from
  * ColorTemperatureLight.cpp.
+ *
+ * This class only wires a product's own Delegates into ColorLight; impl/LoggingColorTemperatureLight
+ * is the simulator's implementation. Its Conformance is intentionally mirrored, not shared, in that
+ * file - see the note there if it ever needs to change.
  */
-class ColorTemperatureLight : public LoggingLightDriver
+class ColorTemperatureLight : public ColorLight
 {
 public:
-    explicit ColorTemperatureLight(const Context & context);
+    ColorTemperatureLight(const Delegates & delegates, const Context & context);
     ~ColorTemperatureLight() override = default;
 };
 

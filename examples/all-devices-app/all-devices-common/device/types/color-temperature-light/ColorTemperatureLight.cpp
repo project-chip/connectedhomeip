@@ -27,13 +27,15 @@ namespace app {
 // element requirements it shares with the Extended Color Light are applied by ColorLight::Register()
 // and documented there. ColorTemperature is the sole mandatory feature here, so it is also the mode
 // the endpoint powers up in.
-ColorTemperatureLight::ColorTemperatureLight(const Context & context) :
-    LoggingLightDriver(
-        Span<const DataModel::DeviceTypeEntry>(&Device::Type::kColorTemperatureLight, 1), context,
-        Conformance{
-            .colorFeatures = BitMask<Clusters::ColorControl::Feature>(Clusters::ColorControl::Feature::kColorTemperature),
-            .initialColor  = Clusters::ColorControl::CTColor{},
-        })
+//
+// NOTE: impl/LoggingColorTemperatureLight.cpp builds the same Conformance for device type 0x010C
+// against LoggingLightDriver. Keep the two literals in sync if this ever changes.
+ColorTemperatureLight::ColorTemperatureLight(const Delegates & delegates, const Context & context) :
+    ColorLight(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kColorTemperatureLight, 1), context, delegates,
+               Conformance{
+                   .colorFeatures = BitMask<Clusters::ColorControl::Feature>(Clusters::ColorControl::Feature::kColorTemperature),
+                   .initialColor  = Clusters::ColorControl::CTColor{},
+               })
 {}
 
 } // namespace app

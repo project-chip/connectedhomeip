@@ -17,24 +17,21 @@
 
 #pragma once
 
-#include <device/capabilities/color-light/ColorLight.h>
+#include <device/capabilities/color-light/impl/LoggingLightDriver.h>
 
 namespace chip {
 namespace app {
 
 /**
- * Extended Color Light (device type 0x010D).
- *
- * Registers the ColorLight cluster set with the conformance this device type requires. Everything
- * it shares with the Color Temperature Light is applied by ColorLight::Register(); what this device
- * type adds - Color Control with both XY and ColorTemperature - is the Conformance passed from
- * ExtendedColorLight.cpp.
+ * Color Temperature Light (device type 0x010C) whose output side only logs, so the device can be
+ * exercised without anything behind it. See LoggingLightDriver for the delegate implementations;
+ * this class only supplies the device type and its Conformance.
  */
-class ExtendedColorLight : public ColorLight
+class LoggingColorTemperatureLight : public LoggingLightDriver
 {
 public:
-    ExtendedColorLight(const Delegates & delegates, const Context & context);
-    ~ExtendedColorLight() override = default;
+    explicit LoggingColorTemperatureLight(const Context & context);
+    ~LoggingColorTemperatureLight() override = default;
 };
 
 } // namespace app

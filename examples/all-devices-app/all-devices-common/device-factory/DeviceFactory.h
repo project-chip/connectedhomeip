@@ -28,14 +28,14 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
-#include <device/types/color-temperature-light/ColorTemperatureLight.h>
+#include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
-#include <device/types/extended-color-light/ExtendedColorLight.h>
+#include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
@@ -218,7 +218,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
@@ -247,7 +247,7 @@ private:
         {
             RegisterCreator("color-temperature-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<ColorTemperatureLight>(ColorTemperatureLight::Context{
+                return std::make_unique<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -348,7 +348,7 @@ private:
         {
             RegisterCreator("extended-color-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<ExtendedColorLight>(ExtendedColorLight::Context{
+                return std::make_unique<LoggingExtendedColorLight>(LoggingExtendedColorLight::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
