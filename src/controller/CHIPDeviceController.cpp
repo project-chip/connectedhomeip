@@ -3340,9 +3340,10 @@ CHIP_ERROR DeviceCommissioner::VerifyNetworkClientIdentity(ByteSpan clientIdenti
 void DeviceCommissioner::ReportUnrevokedNetworkClientIdentity(Credentials::CertificateKeyId clientIdentifier, const char * reason,
                                                               CHIP_ERROR error)
 {
-    bool haveError = (error != CHIP_NO_ERROR);
     ChipLogError(Controller, "Network Client Identity " ChipLogFormatKeyId " left registered: %s%s%s",
-                 ChipLogValueKeyId(clientIdentifier), reason, (haveError ? " - " : ""), (haveError ? error.AsString() : ""));
+                 ChipLogValueKeyId(clientIdentifier), reason, //
+                 (error != CHIP_NO_ERROR ? " - " : ""),       //
+                 (error != CHIP_NO_ERROR ? error.AsString() : ""));
 }
 
 bool DeviceCommissioner::RollBackNetworkClientIdentity()
