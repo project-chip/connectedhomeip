@@ -49,7 +49,7 @@ public:
         }
 
         TemperatureControlledCabinetPart::Config cabinetConfig = DefaultCabinetConfig();
-        uint8_t cabinetCount = 1;
+        uint8_t cabinetCount                                   = 1;
         /// Semantic tags applied to the refrigerator root endpoint descriptor (e.g. to
         /// disambiguate variants under wildcard allocation).
         Span<const EndpointComposition::SemanticTag> tagList = {};
