@@ -157,7 +157,7 @@ class TC_DD_3_24(MatterTestCommissioner):
         step_6_conditions_met = False
         retry_query_timeout_sec = 1.0
         for attempt in range(10):
-            step_6_conditions_met = await self.check_operational_service_no_longer_advertise_ic(
+            step_6_conditions_met = await self.check_operational_service_no_longer_advertises_ic(
                 retry_query_timeout_sec,
             )
             if step_6_conditions_met:
@@ -256,7 +256,7 @@ class TC_DD_3_24(MatterTestCommissioner):
 
         return "IC" in txt_record.txt and txt_record.txt["IC"] == "1"
 
-    async def check_operational_service_no_longer_advertise_ic(
+    async def check_operational_service_no_longer_advertises_ic(
             self,
             query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
     ) -> bool:
@@ -272,9 +272,8 @@ class TC_DD_3_24(MatterTestCommissioner):
 
         Returns:
             True when all step 6 conditions are met, otherwise False.
-
-        Raises:
-            AssertionError: If the operational SRV record is not found, or TXT payload is not a dictionary.
+            False when the operational SRV or TXT record is temporarily missing, when TXT payload
+            is not yet available, or when the DUT still advertises ``_IC`` or ``IC=1``.
         """
         instance_name = self.get_dut_instance_name(log_result=True)
         instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
