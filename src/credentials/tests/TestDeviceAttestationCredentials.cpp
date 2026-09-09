@@ -167,7 +167,7 @@ TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Signature)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
-TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderPqcReadyGatesProfileSpecificDocuments)
+TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderDetectsProfileSpecificDocuments)
 {
     using chip::Credentials::DeviceAttestationCertProfile;
     using chip::Credentials::DeviceAttestationDocumentType;
@@ -191,8 +191,7 @@ TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderPqcReadyGatesProf
     data.pqcPaiCertMlDsa65.SetValue(ByteSpan(kPqcPai65, sizeof(kPqcPai65)));
     data.certificationDeclaration.SetValue(ByteSpan(kLegacyCd, sizeof(kLegacyCd)));
 
-    TestHarnessDACProvider nonPqcProvider(false);
-    nonPqcProvider.Init(data);
+    TestHarnessDACProvider nonPqcProvider;
     EXPECT_FALSE(nonPqcProvider.HasRequiredPqcCredentials());
 
     auto nonPqcSupport = nonPqcProvider.GetDeviceAttestationProfileSupport();
@@ -208,8 +207,8 @@ TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderPqcReadyGatesProf
               CHIP_ERROR_NOT_IMPLEMENTED);
     EXPECT_EQ(nonPqcProvider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kMlDsa65, span),
               CHIP_ERROR_NOT_IMPLEMENTED);
-    TestHarnessDACProvider pqcProvider(true);
-    // PQC-ready mode alone cannot enable the feature without PQC issuer documents.
+    TestHarnessDACProvider pqcProvider;
+    // The default credentials remain legacy-only until PQC issuer documents are loaded.
     EXPECT_FALSE(pqcProvider.HasRequiredPqcCredentials());
     pqcProvider.Init(data);
     EXPECT_TRUE(pqcProvider.HasRequiredPqcCredentials());
@@ -275,7 +274,7 @@ TEST_F(TestDeviceAttestationCredentials, TestMixedChainSelection)
     data.pqcDacCertMlDsa44.SetValue(ByteSpan(kDac44));
     data.pqcPaiCertMlDsa44.SetValue(ByteSpan(kPai44));
     data.pqcDacCertMlDsa65.SetValue(ByteSpan(kDac65));
-    TestHarnessDACProvider provider(true);
+    TestHarnessDACProvider provider;
     provider.Init(data);
 
     // An incomplete stronger chain must not displace a complete pair.
@@ -352,7 +351,7 @@ TEST_F(TestDeviceAttestationCredentials, TestJsonIssuerProfilesAreIndependent)
              << "\"pai_profile_ml_dsa_" << testCase.suffix << "\":" << testCase.paiProfile << "}";
         ASSERT_TRUE(json.good());
 
-        TestHarnessDACProvider provider(true);
+        TestHarnessDACProvider provider;
         ASSERT_EQ(provider.Init(json), CHIP_NO_ERROR);
         const auto profiles = provider.GetDeviceAttestationProfileSupport();
         EXPECT_EQ(profiles.paaSupportedProfiles.Raw(), testCase.expectedPaaMask);
@@ -361,22 +360,22 @@ TEST_F(TestDeviceAttestationCredentials, TestJsonIssuerProfilesAreIndependent)
         EXPECT_TRUE(provider.HasRequiredPqcCredentials());
         EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), testCase.chain);
 
-        TestHarnessDACProvider legacyProvider(false);
-        json.clear();
-        json.seekg(0);
-        ASSERT_EQ(legacyProvider.Init(json), CHIP_NO_ERROR);
-        const auto legacyProfiles = legacyProvider.GetDeviceAttestationProfileSupport();
+        // Replacing the inventory with legacy credentials must clear PQC capability and selection.
+        std::istringstream legacyJson("{}");
+        ASSERT_EQ(provider.Init(legacyJson), CHIP_NO_ERROR);
+        const auto legacyProfiles = provider.GetDeviceAttestationProfileSupport();
         EXPECT_EQ(legacyProfiles.paaSupportedProfiles.Raw(), 0x1);
         EXPECT_EQ(legacyProfiles.paiSupportedProfiles.Raw(), 0x1);
         EXPECT_EQ(legacyProfiles.dacSupportedProfiles.Raw(), 0x1);
-        EXPECT_FALSE(legacyProvider.HasRequiredPqcCredentials());
+        EXPECT_FALSE(provider.HasRequiredPqcCredentials());
+        EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), DeviceAttestationCertProfile::kEcdsaMatterLegacy);
     }
 }
 
 TEST_F(TestDeviceAttestationCredentials, TestMalformedJsonPreservesCredentials)
 {
     using namespace chip::Credentials::Examples;
-    TestHarnessDACProvider provider(true);
+    TestHarnessDACProvider provider;
     std::istringstream validJson(R"({"pai_cert_ml_dsa_65":"010203", "dac_cert_ml_dsa_65":"040506",
                                   "pai_profile_ml_dsa_65":0})");
     ASSERT_EQ(provider.Init(validJson), CHIP_NO_ERROR);

@@ -241,7 +241,7 @@ CHIP_ERROR CopyDocumentSegment(ByteSpan document, size_t offset, MutableByteSpan
 
 } // namespace
 
-TestHarnessDACProvider::TestHarnessDACProvider(bool isPqcReady) : mIsPqcReady(isPqcReady)
+TestHarnessDACProvider::TestHarnessDACProvider()
 {
     TestHarnessDACProviderData data;
     Init(data);
@@ -293,25 +293,19 @@ CHIP_ERROR TestHarnessDACProvider::Init(std::istream & json)
     ReadOptionalByteSpan(root, kDacPrivateKey, dacPrivateKeyBuffer, data.dacPrivateKey);
     ReadOptionalByteSpan(root, kDacPublicKey, dacPublicKeyBuffer, data.dacPublicKey);
 
-    if (mIsPqcReady)
-    {
-        // The PAI key signs the DAC certificate, so its profile determines the maximum DAC certificate length.
-        static uint8_t dacCertMlDsa44Buffer[kMaxDERCertLengthMlDsa44];
-        static uint8_t dacCertMlDsa65Buffer[kMaxDERCertLengthMlDsa65];
-        ReadOptionalByteSpan(root, kPqcDacCert44Key, dacCertMlDsa44Buffer, data.pqcDacCertMlDsa44);
-        ReadOptionalByteSpan(root, kPqcDacCert65Key, dacCertMlDsa65Buffer, data.pqcDacCertMlDsa65);
-    }
+    // The PAI key signs the DAC certificate, so its profile determines the maximum DAC certificate length.
+    static uint8_t dacCertMlDsa44Buffer[kMaxDERCertLengthMlDsa44];
+    static uint8_t dacCertMlDsa65Buffer[kMaxDERCertLengthMlDsa65];
+    ReadOptionalByteSpan(root, kPqcDacCert44Key, dacCertMlDsa44Buffer, data.pqcDacCertMlDsa44);
+    ReadOptionalByteSpan(root, kPqcDacCert65Key, dacCertMlDsa65Buffer, data.pqcDacCertMlDsa65);
 
     static uint8_t paiCertBuffer[kMaxDERCertLength];
     ReadOptionalByteSpan(root, kPaiCertKey, paiCertBuffer, data.paiCert);
 
-    if (mIsPqcReady)
-    {
-        static uint8_t paiCertMlDsa44Buffer[kMaxDERCertLengthMlDsa44];
-        static uint8_t paiCertMlDsa65Buffer[kMaxDERCertLengthMlDsa65];
-        ReadOptionalByteSpan(root, kPqcPaiCert44Key, paiCertMlDsa44Buffer, data.pqcPaiCertMlDsa44);
-        ReadOptionalByteSpan(root, kPqcPaiCert65Key, paiCertMlDsa65Buffer, data.pqcPaiCertMlDsa65);
-    }
+    static uint8_t paiCertMlDsa44Buffer[kMaxDERCertLengthMlDsa44];
+    static uint8_t paiCertMlDsa65Buffer[kMaxDERCertLengthMlDsa65];
+    ReadOptionalByteSpan(root, kPqcPaiCert44Key, paiCertMlDsa44Buffer, data.pqcPaiCertMlDsa44);
+    ReadOptionalByteSpan(root, kPqcPaiCert65Key, paiCertMlDsa65Buffer, data.pqcPaiCertMlDsa65);
 
     if (root.isMember(kCertDecKey))
     {
@@ -363,11 +357,11 @@ void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
     mDacPublicKey  = data.dacPublicKey.HasValue() ? data.dacPublicKey.Value() : DevelopmentCerts::kDacPublicKey;
     mPaiCert       = data.paiCert.HasValue() ? data.paiCert.Value() : DevelopmentCerts::kPaiCert;
 
-    mPqcDacCertMlDsa44 = mIsPqcReady && data.pqcDacCertMlDsa44.HasValue() ? data.pqcDacCertMlDsa44.Value() : ByteSpan();
-    mPqcDacCertMlDsa65 = mIsPqcReady && data.pqcDacCertMlDsa65.HasValue() ? data.pqcDacCertMlDsa65.Value() : ByteSpan();
+    mPqcDacCertMlDsa44 = data.pqcDacCertMlDsa44.HasValue() ? data.pqcDacCertMlDsa44.Value() : ByteSpan();
+    mPqcDacCertMlDsa65 = data.pqcDacCertMlDsa65.HasValue() ? data.pqcDacCertMlDsa65.Value() : ByteSpan();
 
-    mPqcPaiCertMlDsa44 = mIsPqcReady && data.pqcPaiCertMlDsa44.HasValue() ? data.pqcPaiCertMlDsa44.Value() : ByteSpan();
-    mPqcPaiCertMlDsa65 = mIsPqcReady && data.pqcPaiCertMlDsa65.HasValue() ? data.pqcPaiCertMlDsa65.Value() : ByteSpan();
+    mPqcPaiCertMlDsa44 = data.pqcPaiCertMlDsa44.HasValue() ? data.pqcPaiCertMlDsa44.Value() : ByteSpan();
+    mPqcPaiCertMlDsa65 = data.pqcPaiCertMlDsa65.HasValue() ? data.pqcPaiCertMlDsa65.Value() : ByteSpan();
 
     mCertificationDeclaration =
         data.certificationDeclaration.HasValue() ? data.certificationDeclaration.Value() : ByteSpan{ kCdForAllExamples };

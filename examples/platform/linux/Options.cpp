@@ -120,7 +120,6 @@ enum
 #if defined(PW_RPC_ENABLED)
     kOptionRpcServerPort,
 #endif
-    kDeviceOption_DacProviderPqcReady,
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     kDeviceOption_SubscriptionCapacity,
 #endif
@@ -253,7 +252,6 @@ OptionDef sDeviceOptionDefs[] = {
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
     { "dac_provider", kArgumentRequired, kDeviceOption_DacProvider },
-    { "dac_provider_pqc_ready", kNoArgument, kDeviceOption_DacProviderPqcReady },
 #if CHIP_ATTESTATION_TRUSTY_OS
     { "dac_provider_trusty", kNoArgument, kDeviceOption_TrustyDacProvider },
 #endif
@@ -473,8 +471,7 @@ const char * sDeviceOptionHelp =
 #endif
     "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
-    "  --dac_provider_pqc_ready\n"
-    "       Enable PQC Device Attestation; requires a DAC provider with a legacy chain and PQC PAA or PAI credentials.\n"
+    "       PQC Device Attestation is enabled automatically when the provider reports compatible credentials.\n"
 #if CHIP_ATTESTATION_TRUSTY_OS
     "  --dac_provider_trusty\n"
     "       Invoke Trusty OS to get device attestation from secure storage.\n"
@@ -929,9 +926,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().dacProviderFile.SetValue(aValue);
         break;
     }
-    case kDeviceOption_DacProviderPqcReady:
-        LinuxDeviceOptions::GetInstance().dacProviderPqcReady = true;
-        break;
 #if CHIP_ATTESTATION_TRUSTY_OS
     case kDeviceOption_TrustyDacProvider: {
         LinuxDeviceOptions::GetInstance().dacProvider = &chip::Credentials::Trusty::TrustyDACProvider::GetTrustyDACProvider();
@@ -1086,7 +1080,7 @@ void ResolveDeviceAttestationCredentialsProvider()
 
     if (gDeviceOptions.dacProviderFile.HasValue())
     {
-        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider(gDeviceOptions.dacProviderPqcReady);
+        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
         testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
         gDeviceOptions.dacProvider = &testDacProvider;
         return;

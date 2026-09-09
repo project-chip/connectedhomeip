@@ -25,7 +25,6 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/GroupDataProvider.h>
-#include <platform/RuntimeOptionsProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -47,12 +46,7 @@ public:
     {
         auto & dacProvider = *Credentials::GetDeviceAttestationCredentialsProvider();
         BitFlags<OperationalCredentials::Feature> configuredFeatureMap(featureMap);
-        if (RuntimeOptionsProvider::Instance().GetPqcDeviceAttestationFeatureEnabled())
-        {
-            VerifyOrDieWithMsg(dacProvider.HasRequiredPqcCredentials(), AppServer,
-                               "PQC Device Attestation requires a legacy chain and PQC PAA or PAI credentials");
-            configuredFeatureMap.Set(OperationalCredentials::Feature::kPQCDeviceAttestation);
-        }
+        configuredFeatureMap.Set(OperationalCredentials::Feature::kPQCDeviceAttestation, dacProvider.HasRequiredPqcCredentials());
 
         OperationalCredentialsCluster::Context context = {
             .fabricTable                = Server::GetInstance().GetFabricTable(),

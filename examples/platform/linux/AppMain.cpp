@@ -611,21 +611,6 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     err = ParseArguments(argc, argv, customOptions);
     SuccessOrExit(err);
 
-    if (LinuxDeviceOptions::GetInstance().dacProviderPqcReady)
-    {
-        ResolveDeviceAttestationCredentialsProvider();
-        if (!LinuxDeviceOptions::GetInstance().dacProvider->HasRequiredPqcCredentials())
-        {
-            ChipLogError(
-                AppServer,
-                "Invalid --dac_provider_pqc_ready configuration: the selected DAC provider must supply a legacy chain "
-                "and PQC PAA or PAI credentials. Use --dac_provider with compatible credentials or omit --dac_provider_pqc_ready.");
-            // Reject invalid CLI configuration before starting the stack. Some entry points abort on an init error return.
-            Platform::MemoryShutdown();
-            std::exit(EXIT_FAILURE);
-        }
-    }
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (LinuxDeviceOptions::GetInstance().mWiFiPAF)
     {
@@ -1030,8 +1015,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.
     SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
-    chip::app::RuntimeOptionsProvider::Instance().SetPqcDeviceAttestationFeatureEnabled(
-        LinuxDeviceOptions::GetInstance().dacProviderPqcReady);
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);

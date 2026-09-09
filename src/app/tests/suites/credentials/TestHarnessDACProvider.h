@@ -51,7 +51,8 @@ struct TestHarnessDACProviderData
 class TestHarnessDACProvider : public DeviceAttestationCredentialsProvider
 {
 public:
-    explicit TestHarnessDACProvider(bool isPqcReady = false);
+    // Capability is derived from loaded credentials; no separate PQC opt-in is needed.
+    TestHarnessDACProvider();
 
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_cd_buffer) override;
     CHIP_ERROR GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile profile, MutableByteSpan & out_dac_buffer) override;
@@ -90,7 +91,6 @@ private:
     DeviceAttestationProfileSupport mProfileSupport;
     bool mIsSuccessCase;
     uint16_t mPid;
-    bool mIsPqcReady;
 };
 
 } // namespace Examples
