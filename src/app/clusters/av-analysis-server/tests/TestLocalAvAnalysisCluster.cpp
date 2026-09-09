@@ -1134,16 +1134,28 @@ TEST_F(TestLocalAvAnalysisCluster, MoreThanFiftyContextTriggersIsAConstraintErro
     ASSERT_TRUE(decodeList(enableData.contextTriggers.SetNonNull()));
     ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
     auto enableResponse = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, enablePath, enableData);
-    ASSERT_TRUE(enableResponse.has_value());
-    EXPECT_EQ(enableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+    if (enableResponse.has_value())
+    {
+        EXPECT_EQ(enableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+    }
+    else
+    {
+        FAIL();
+    }
     EXPECT_EQ(mServer.GetLogic().mActiveAmbientContextTriggers.size(), activeBefore);
 
     Commands::DisableContextTriggers::DecodableType disableData;
     ASSERT_TRUE(decodeList(disableData.contextTriggers.SetNonNull()));
     ConcreteCommandPath disablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
     auto disableResponse = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, disablePath, disableData);
-    ASSERT_TRUE(disableResponse.has_value());
-    EXPECT_EQ(disableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+    if (disableResponse.has_value())
+    {
+        EXPECT_EQ(disableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+    }
+    else
+    {
+        FAIL();
+    }
     EXPECT_EQ(mServer.GetLogic().mActiveAmbientContextTriggers.size(), activeBefore);
 }
 
