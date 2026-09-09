@@ -59,7 +59,6 @@ and the TH is a passive DNS-SD scanner; the DUT is never commissioned and no
 PASE or CASE session is established. The test expects the DUT to be the only
 commissioner advertising on the test network.
 
-https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#tc-sc-4-6commissioner-discovery-dut_commissioner
 '''
 
 # Timeout for the subtype PTR browse; browses that get an answer end early via
