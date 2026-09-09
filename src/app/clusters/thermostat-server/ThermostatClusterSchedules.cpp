@@ -130,34 +130,38 @@ CHIP_ERROR MatchingPendingScheduleExists(ThermostatSchedules::Delegate & delegat
  * @param[in] delegate The delegate to use.
  * @param[in] scheduleHandle The schedule handle to match with.
  * @param[out] matchingSchedule The schedule in the Schedules attribute list that has the same ScheduleHandle as scheduleHandle.
+ *             Only meaningful when the returned error is CHIP_NO_ERROR and found is true.
+ * @param[out] found true if a matching entry was found in the schedules attribute list, false otherwise.
  *
- * @return true if a matching entry was found in the schedules attribute list, false otherwise.
+ * @return CHIP_NO_ERROR if the schedules attribute list was searched successfully (whether or not a match was found), or the
+ *         CHIP_ERROR returned by the delegate if the search could not be completed.
  */
-bool GetMatchingScheduleInSchedules(ThermostatSchedules::Delegate & delegate, const ByteSpan & scheduleHandle,
-                                    ScheduleStructWithOwnedMembers & matchingSchedule)
+CHIP_ERROR GetMatchingScheduleInSchedules(ThermostatSchedules::Delegate & delegate, const ByteSpan & scheduleHandle,
+                                          ScheduleStructWithOwnedMembers & matchingSchedule, bool & found)
 {
+    found = false;
     for (uint8_t i = 0; true; i++)
     {
         CHIP_ERROR err = delegate.GetScheduleAtIndex(i, matchingSchedule);
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            break;
+            return CHIP_NO_ERROR;
         }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "GetMatchingScheduleInSchedules: GetScheduleAtIndex failed with error %" CHIP_ERROR_FORMAT,
                          err.Format());
-            return false;
+            return err;
         }
 
         if (!matchingSchedule.GetScheduleHandle().IsNull() &&
             scheduleHandle.data_equal(matchingSchedule.GetScheduleHandle().Value()))
         {
-            return true;
+            found = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
 }
 
 /**
@@ -197,21 +201,23 @@ CHIP_ERROR MaximumScheduleTypeCount(ThermostatSchedules::Delegate & delegate, Sy
  * @brief Returns the count of schedule entries in the pending schedules list that have the matching scheduleHandle.
  * @param[in] delegate The delegate to use.
  * @param[in] scheduleHandleToMatch The schedule handle to match.
+ * @param[out] count Count of the number of schedules found with the matching scheduleHandle. Only meaningful when the
+ *             returned error is CHIP_NO_ERROR.
  *
- * @return count of the number of schedules found with the matching scheduleHandle. Returns 0 if no matching schedules were
- * found.
+ * @return CHIP_NO_ERROR if the pending schedules list was scanned to completion, or the CHIP_ERROR returned by the delegate
+ *         if the scan could not be completed.
  */
-uint8_t CountSchedulesInPendingListWithScheduleHandle(ThermostatSchedules::Delegate & delegate,
-                                                      const ByteSpan & scheduleHandleToMatch)
+CHIP_ERROR CountSchedulesInPendingListWithScheduleHandle(ThermostatSchedules::Delegate & delegate,
+                                                          const ByteSpan & scheduleHandleToMatch, uint8_t & count)
 {
-    uint8_t count = 0;
+    count = 0;
     for (uint8_t i = 0; true; i++)
     {
         ScheduleStructWithOwnedMembers schedule;
         auto err = delegate.GetPendingScheduleAtIndex(i, schedule);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            return count;
+            return CHIP_NO_ERROR;
         }
         if (err != CHIP_NO_ERROR)
         {
@@ -219,7 +225,7 @@ uint8_t CountSchedulesInPendingListWithScheduleHandle(ThermostatSchedules::Deleg
                          "CountSchedulesInPendingListWithScheduleHandle: GetPendingScheduleAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
-            return count;
+            return err;
         }
 
         DataModel::Nullable<ByteSpan> scheduleHandle = schedule.GetScheduleHandle();
@@ -228,7 +234,6 @@ uint8_t CountSchedulesInPendingListWithScheduleHandle(ThermostatSchedules::Deleg
             count++;
         }
     }
-    return count;
 }
 
 /**
@@ -488,11 +493,15 @@ std::optional<System::Clock::Milliseconds16> ThermostatSchedules::GetMaxAtomicWr
 /**
  * @brief Checks if the given schedule handle is present in the schedules attribute
  * @param[in] scheduleHandleToMatch The schedule handle to match with.
+ * @param[out] found true if the given schedule handle is present in the schedules attribute list, false otherwise. Only
+ *             meaningful when the returned error is CHIP_NO_ERROR.
  *
- * @return true if the given schedule handle is present in the schedules attribute list, false otherwise.
+ * @return CHIP_NO_ERROR if the schedules attribute list was searched successfully (whether or not a match was found), or the
+ *         CHIP_ERROR returned by the delegate if the search could not be completed.
  */
-bool ThermostatSchedules::IsScheduleHandlePresentInSchedules(const ByteSpan & scheduleHandleToMatch)
+CHIP_ERROR ThermostatSchedules::IsScheduleHandlePresentInSchedules(const ByteSpan & scheduleHandleToMatch, bool & found)
 {
+    found = false;
     ScheduleStructWithOwnedMembers matchingSchedule;
     for (uint8_t i = 0; true; i++)
     {
@@ -500,31 +509,43 @@ bool ThermostatSchedules::IsScheduleHandlePresentInSchedules(const ByteSpan & sc
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            return false;
+            return CHIP_NO_ERROR;
         }
 
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "IsScheduleHandlePresentInSchedules: GetScheduleAtIndex failed with error %" CHIP_ERROR_FORMAT,
                          err.Format());
-            return false;
+            return err;
         }
 
         if (!matchingSchedule.GetScheduleHandle().IsNull() &&
             matchingSchedule.GetScheduleHandle().Value().data_equal(scheduleHandleToMatch))
         {
-            return true;
+            found = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
 }
 
 Status ThermostatSchedules::SetActiveSchedule(DataModel::Nullable<ByteSpan> scheduleHandle)
 {
     // If the schedule handle passed in the command is not present in the Schedules attribute, return INVALID_COMMAND.
-    if (!scheduleHandle.IsNull() && !IsScheduleHandlePresentInSchedules(scheduleHandle.Value()))
+    // A real delegate error while searching must not be reported as InvalidCommand.
+    if (!scheduleHandle.IsNull())
     {
-        return Status::InvalidCommand;
+        bool present   = false;
+        CHIP_ERROR err = IsScheduleHandlePresentInSchedules(scheduleHandle.Value(), present);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "SetActiveSchedule: IsScheduleHandlePresentInSchedules failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            return StatusIB(err).mStatus;
+        }
+        if (!present)
+        {
+            return Status::InvalidCommand;
+        }
     }
 
     uint8_t buffer[kScheduleHandleSize];
@@ -623,13 +644,24 @@ CHIP_ERROR ThermostatSchedules::AppendPendingSchedule(const ScheduleStruct::Deco
         // Per spec we need to check that:
         // (a) There is an existing non-pending schedule with this handle.
         ScheduleStructWithOwnedMembers matchingSchedule;
-        if (!GetMatchingScheduleInSchedules(mDelegate, schedule.GetScheduleHandle().Value(), matchingSchedule))
+        bool matchingScheduleFound = false;
+        CHIP_ERROR matchErr =
+            GetMatchingScheduleInSchedules(mDelegate, schedule.GetScheduleHandle().Value(), matchingSchedule, matchingScheduleFound);
+        if (matchErr != CHIP_NO_ERROR)
+        {
+            // A real delegate error must be propagated, not turned into NotFound.
+            return matchErr;
+        }
+        if (!matchingScheduleFound)
         {
             return CHIP_IM_GLOBAL_STATUS(NotFound);
         }
 
         // (b) There is no existing pending schedule with this handle.
-        if (CountSchedulesInPendingListWithScheduleHandle(mDelegate, schedule.GetScheduleHandle().Value()) > 0)
+        uint8_t pendingCountWithHandle = 0;
+        ReturnErrorOnFailure(CountSchedulesInPendingListWithScheduleHandle(mDelegate, schedule.GetScheduleHandle().Value(),
+                                                                           pendingCountWithHandle));
+        if (pendingCountWithHandle > 0)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
@@ -788,7 +820,15 @@ Status ThermostatSchedules::PrecommitSchedules()
 
     if (!activeScheduleHandle.IsNull())
     {
-        uint8_t count = CountSchedulesInPendingListWithScheduleHandle(mDelegate, activeScheduleHandle.Value());
+        uint8_t count = 0;
+        err = CountSchedulesInPendingListWithScheduleHandle(mDelegate, activeScheduleHandle.Value(), count);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl,
+                         "PrecommitSchedules: CountSchedulesInPendingListWithScheduleHandle failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            return Status::InvalidInState;
+        }
         if (count == 0)
         {
             return Status::InvalidInState;
