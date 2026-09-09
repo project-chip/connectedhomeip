@@ -90,9 +90,7 @@ public:
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 
->>>>>>> d07927e ([all-device-app] Add OTA Requestor device type to RootNode (#73879)):examples/all-devices-app/all-devices-common/device/types/root-node/RootNode.h
-protected:
-    Context mContext;
+    >>>>>>> d07927e ([all-device-app] Add OTA Requestor device type to RootNode (#73879)):examples/all-devices-app/all-devices-common/device/types/root-node/RootNode.h protected : Context mContext;
 
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
