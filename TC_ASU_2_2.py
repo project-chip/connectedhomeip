@@ -265,7 +265,8 @@ class TC_ASU_2_2(MatterBaseTest):
 
         for contributor in reported_list:
             if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == contnode:
-                asserts.fail(f"Removed contributor (NodeID={contnode_str}) is still found in UnionContributorList subscription report.")
+                asserts.fail(
+                    f"Removed contributor (NodeID={contnode_str}) is still found in UnionContributorList subscription report.")
 
         attrib_listener.reset()
 
