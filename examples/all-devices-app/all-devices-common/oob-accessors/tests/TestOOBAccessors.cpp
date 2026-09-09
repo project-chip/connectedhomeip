@@ -585,11 +585,11 @@ TEST_F(TestOOBAccessors, ModeSelectOOBAccessor)
     MockModeSelectDelegate delegate;
     Clusters::ModeSelectCluster cluster(1, delegate,
                                         {
-                                            .featureMap              = {},
-                                            .optionalAttributeSet    = {},
-                                            .description             = "Test Mode Select"_span,
-                                            .standardNamespace       = DataModel::NullNullable,
-                                            .onOffValueForStartUp    = false,
+                                            .featureMap             = {},
+                                            .optionalAttributeSet   = {},
+                                            .description            = "Test Mode Select"_span,
+                                            .standardNamespace      = DataModel::NullNullable,
+                                            .onOffValueForStartUp   = false,
                                             .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
                                         });
     EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);

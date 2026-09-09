@@ -65,7 +65,6 @@
 #endif // PW_RPC_ENABLED
 #include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Platform;

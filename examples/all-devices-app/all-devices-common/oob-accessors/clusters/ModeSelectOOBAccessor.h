@@ -25,8 +25,7 @@ namespace chip::app {
 class ModeSelectOOBAccessor : public OOBAccessor
 {
 public:
-    ModeSelectOOBAccessor(Clusters::ModeSelectCluster & cluster, EndpointId endpointId) :
-        mCluster(cluster), mEndpointId(endpointId)
+    ModeSelectOOBAccessor(Clusters::ModeSelectCluster & cluster, EndpointId endpointId) : mCluster(cluster), mEndpointId(endpointId)
     {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
