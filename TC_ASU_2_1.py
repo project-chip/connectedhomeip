@@ -167,7 +167,7 @@ class TC_ASU_2_1(MatterBaseTest):
                                              "ContributorEndpointID shall be >= 0")
                 asserts.assert_less_equal(contributor.contributorEndpointID, MAX_UINT16,
                                           "ContributorEndpointID shall be <= MAX_UINT16")
-                if contributor.contributorName == NullValue:
+                if contributor.contributorName != NullValue:
                     string_size = len(contributor.contributorName)
                     # checkvalue between 1 and 128
                     asserts.assert_greater_equal(string_size, 1, "The string size needs to be betwween 1 and 128.")
