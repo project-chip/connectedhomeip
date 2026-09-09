@@ -46,7 +46,8 @@ CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProv
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kMomentarySwitch), SwitchCluster::StartupConfiguration{ .numberOfPositions = kSwitchNumberOfPositions });
+    mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kMomentarySwitch),
+                          SwitchCluster::StartupConfiguration{ .numberOfPositions = kSwitchNumberOfPositions });
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 
     mBindingCluster.Create(
@@ -59,7 +60,7 @@ CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProv
     ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
- 
+
     transaction.Commit();
     return CHIP_NO_ERROR;
 }
