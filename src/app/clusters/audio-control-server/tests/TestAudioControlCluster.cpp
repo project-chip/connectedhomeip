@@ -3504,6 +3504,27 @@ CHIP_ERROR EncodePairs(AudioControlCluster & cluster, const app::DataModel::List
     return cluster.EncodeAttributeValueList(pairs, out);
 }
 
+// Builds the decodable extension field set that ScenesServer hands to SerializeAdd (the AddScene
+// path), round-tripping the given cluster id and pairs through TLV.
+CHIP_ERROR MakeDecodableEfs(ClusterId clusterId, chip::Span<const ScenePair> pairs, MutableByteSpan & backing,
+                            ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & out)
+{
+    ScenesManagement::Structs::ExtensionFieldSetStruct::Type in;
+    in.clusterID          = clusterId;
+    in.attributeValueList = app::DataModel::List<const ScenePair>(pairs.data(), pairs.size());
+
+    TLV::TLVWriter writer;
+    writer.Init(backing);
+    ReturnErrorOnFailure(in.Encode(writer, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(writer.Finalize());
+    backing.reduce_size(writer.GetLengthWritten());
+
+    TLV::TLVReader reader;
+    reader.Init(backing);
+    ReturnErrorOnFailure(reader.Next());
+    return out.Decode(reader);
+}
+
 } // namespace
 
 TEST_F(TestAudioControlCluster, SceneSupportsClusterOnlyOwnEndpointAndCluster)
@@ -3784,6 +3805,68 @@ TEST_F(TestAudioControlCluster, SceneApplyDelegateRejectionLeavesAttributesUncha
     EXPECT_EQ(cluster.GetBass(), 1);
     EXPECT_EQ(cluster.GetMid(), 2);
     EXPECT_EQ(cluster.GetTreble(), 3);
+}
+
+// The AddScene path (SerializeAdd) runs every pair through AudioControlSceneValidator: the five
+// scene-able attributes on the AudioControl cluster are accepted, and anything else - a
+// non-scene-able attribute or a foreign cluster id - is rejected.
+TEST_F(TestAudioControlCluster, SceneSerializeAddValidatesAttributesAndCluster)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    uint8_t backing[192];
+    uint8_t out[192];
+
+    // All five scene-able attributes, correct cluster -> accepted.
+    {
+        ScenePair pairs[5];
+        pairs[0].attributeID = Attributes::SoftMuted::Id;
+        pairs[0].valueUnsigned8.SetValue(1);
+        pairs[1].attributeID = Attributes::Volume::Id;
+        pairs[1].valueUnsigned16.SetValue(40);
+        pairs[2].attributeID = Attributes::Bass::Id;
+        pairs[2].valueSigned16.SetValue(1);
+        pairs[3].attributeID = Attributes::Mid::Id;
+        pairs[3].valueSigned16.SetValue(-1);
+        pairs[4].attributeID = Attributes::Treble::Id;
+        pairs[4].valueSigned16.SetValue(2);
+
+        MutableByteSpan backingSpan(backing);
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType efs;
+        ASSERT_EQ(MakeDecodableEfs(AudioControl::Id, chip::Span<const ScenePair>(pairs), backingSpan, efs), CHIP_NO_ERROR);
+
+        MutableByteSpan outSpan(out);
+        EXPECT_EQ(cluster.SerializeAdd(kRootEndpointId, efs, outSpan), CHIP_NO_ERROR);
+    }
+
+    // A non-scene-able AudioControl attribute -> rejected.
+    {
+        ScenePair pairs[1];
+        pairs[0].attributeID = Attributes::MaxUserVolume::Id;
+        pairs[0].valueUnsigned16.SetValue(50);
+
+        MutableByteSpan backingSpan(backing);
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType efs;
+        ASSERT_EQ(MakeDecodableEfs(AudioControl::Id, chip::Span<const ScenePair>(pairs), backingSpan, efs), CHIP_NO_ERROR);
+
+        MutableByteSpan outSpan(out);
+        EXPECT_EQ(cluster.SerializeAdd(kRootEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // A scene-able attribute id but a foreign cluster id -> rejected.
+    {
+        ScenePair pairs[1];
+        pairs[0].attributeID = Attributes::Volume::Id;
+        pairs[0].valueUnsigned16.SetValue(40);
+
+        MutableByteSpan backingSpan(backing);
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType efs;
+        ASSERT_EQ(MakeDecodableEfs(OnOff::Id, chip::Span<const ScenePair>(pairs), backingSpan, efs), CHIP_NO_ERROR);
+
+        MutableByteSpan outSpan(out);
+        EXPECT_EQ(cluster.SerializeAdd(kRootEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT);
+    }
 }
 
 } // namespace
