@@ -37,24 +37,12 @@ MANUAL_ALLOWLIST:
 
 INCOMPLETE_METADATA_ALLOWLIST:
     - commodity-price-cluster.xml
-    - dishwasher-alarm-cluster.xml
     - electrical-energy-measurement-cluster.xml
-    - electrical-grid-conditions-cluster.xml
     - electrical-power-measurement-cluster.xml
-    - energy-evse-cluster.xml
     - energy-evse-mode-cluster.xml
-    - energy-preference-cluster.xml
-    - ethernet-network-diagnostics-cluster.xml
     - fan-control-cluster.xml
-    - flow-measurement-cluster.xml
     - general-commissioning-cluster.xml
-    - general-diagnostics-cluster.xml
     - global-structs.xml
-    - group-key-mgmt-cluster.xml
-    - groupcast-cluster.xml
-    - illuminance-measurement-cluster.xml
-    - joint-fabric-administrator-cluster.xml
-    - joint-fabric-datastore-cluster.xml
     - laundry-dryer-controls-cluster.xml
     - localization-configuration-cluster.xml
     - media-input-cluster.xml

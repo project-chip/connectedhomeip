@@ -1129,8 +1129,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::Groupcast::Commands::LeaveGroup::Id:
             return true;
-        case Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
-            return true;
         case Clusters::Groupcast::Commands::UpdateGroupKey::Id:
             return true;
         case Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
