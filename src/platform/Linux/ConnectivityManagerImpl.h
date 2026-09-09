@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/FixedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
@@ -45,14 +46,11 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <wifipaf/WiFiPAFEndPoint.h>
 #include <wifipaf/WiFiPAFLayer.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-#include <cstring>
-#include <set>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #include <atomic>
+#include <cstring>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
 #include <vector>
@@ -78,16 +76,10 @@ struct NanPeerInfo
     bool hasExtendedData = false;
     uint16_t band        = 0; // WiFiBandBitmap value derived from scan frequency; 0 = unknown
 
-    // Strict weak ordering over (mac, discriminator) so std::set<NanPeerInfo>
-    // treats a peer with the same MAC and discriminator as a duplicate.
-    bool operator<(const NanPeerInfo & o) const
+    /// Two reports are the same peer when the MAC and discriminator match.
+    bool operator==(const NanPeerInfo & o) const
     {
-        int macCmp = memcmp(mac, o.mac, sizeof(mac));
-        if (macCmp != 0)
-        {
-            return macCmp < 0;
-        }
-        return discriminator < o.discriminator;
+        return memcmp(mac, o.mac, sizeof(mac)) == 0 && discriminator == o.discriminator;
     }
 };
 
@@ -219,7 +211,12 @@ public:
     void WiFiPAFStopBackgroundScan();
 
 private:
-    std::set<NanPeerInfo> mNanScanPeers;
+    /// Peers seen by the current scan, as a rolling window. Bounded at the same value the
+    /// CommissioningProxy cluster caps a ProxyScanResponse.
+    static constexpr size_t kMaxScanPeers = CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS;
+    std::vector<NanPeerInfo> mNanScanPeers;
+    /// Index of the oldest entry, overwritten next once the window is full.
+    size_t mNanScanPeersNext        = 0;
     PafScanResultsCallback mScanCb  = nullptr;
     void * mScanCbContext           = nullptr;
     uint32_t mActiveScanSubscribeId = 0; // subscribe_id of the current one-shot scan

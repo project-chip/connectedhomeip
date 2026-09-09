@@ -17,6 +17,7 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
 #include <mutex>
 
 #include <stdint.h>
@@ -787,11 +788,23 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
         }
     }
 
-    // Do not log if already present
-    auto [it, inserted] = mNanScanPeers.insert(peer);
-    if (!inserted)
+    // A peer already in the window is not logged again: a single device produces a
+    // discovery event every few hundred ms
+    if (std::find(mNanScanPeers.begin(), mNanScanPeers.end(), peer) != mNanScanPeers.end())
     {
         return;
+    }
+
+    // Rolling window. A background scan runs with no timeout, so the window is bounded.
+    // Once full, a new peer overwrites the oldest rather than being dropped, so a device.
+    if (mNanScanPeers.size() < kMaxScanPeers)
+    {
+        mNanScanPeers.push_back(peer);
+    }
+    else
+    {
+        mNanScanPeers[mNanScanPeersNext] = peer;
+        mNanScanPeersNext                = (mNanScanPeersNext + 1) % kMaxScanPeers;
     }
 
     ChipLogProgress(DeviceLayer, "Discovered Device: %s() Subscribe_id:%u peer_publish_id:%u srv_proto_type:%u", __func__,
@@ -863,6 +876,7 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResu
         // Drop peers left over from a previous scan so this one-shot response
         // reports only devices discovered within this scan window.
         mNanScanPeers.clear();
+        mNanScanPeersNext = 0;
     }
 
     CHIP_ERROR result = StartWiFiManagementSync();
@@ -1044,6 +1058,7 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
         for (auto & p : mNanScanPeers)
             results.push_back(p);
         mNanScanPeers.clear();
+        mNanScanPeersNext      = 0;
         mActiveScanSubscribeId = 0;
         mScanFreq              = 0;
     }
@@ -1184,6 +1199,7 @@ void ConnectivityManagerImpl::WiFiPAFStopBackgroundScan()
         // scan's ProxyScanResponse (and so a long-lived bg scan does not grow the
         // set without bound).
         mNanScanPeers.clear();
+        mNanScanPeersNext = 0;
     }
 
     ChipLogProgress(DeviceLayer, "WiFiPAFStopBackgroundScan: stopping subscribe_id=%u", subscribeId);
