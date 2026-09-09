@@ -157,7 +157,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
 
     ReturnErrorOnFailure(CreateAndRegisterRootNode(initParams));
 
-    SimpleDeviceFactory::GetInstance().Init(SimpleDeviceFactory::Context{
+    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
         .groupDataProvider        = gGroupDataProvider,
         .fabricTable              = Server::GetInstance().GetFabricTable(),
         .timerDelegate            = gTimerDelegate,
@@ -173,7 +173,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto & deviceFactory = SimpleDeviceFactory::GetInstance();
+    auto & deviceFactory = NoHooksDeviceFactory::GetInstance();
 
     if (!deviceFactory.IsValidDevice(gDeviceType))
     {

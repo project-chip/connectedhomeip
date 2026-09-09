@@ -116,29 +116,14 @@ public:
     static std::optional<T> ExtractUInt(const Json::Value & json, const char * key)
     {
         static_assert(std::is_unsigned_v<T>, "ExtractUInt requires an unsigned integer type");
-        if (!json.isObject() || !json.isMember(key) || !json[key].isIntegral())
+        if (!json.isObject() || !json.isMember(key) || !json[key].isIntegral() ||
+            (json[key].isInt64() && json[key].asInt64() < 0) ||
+            json[key].asUInt64() > std::numeric_limits<T>::max())
         {
             return std::nullopt;
         }
-        if (json[key].isUInt64())
-        {
-            auto val = json[key].asUInt64();
-            if (val > std::numeric_limits<T>::max())
-            {
-                return std::nullopt;
-            }
-            return static_cast<T>(val);
-        }
-        if (json[key].isInt64())
-        {
-            auto val = json[key].asInt64();
-            if (val < 0 || static_cast<uint64_t>(val) > std::numeric_limits<T>::max())
-            {
-                return std::nullopt;
-            }
-            return static_cast<T>(val);
-        }
-        return std::nullopt;
+
+        return static_cast<T>(json[key].asUInt64());
     }
 
     static CHIP_ERROR DispatchAction(OOBAccessorRegistry & registry, CharSpan actionName, EndpointId endpointId)
