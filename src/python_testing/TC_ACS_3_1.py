@@ -498,7 +498,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 log.info("Three events weren't completed within HoldTime input.")
             else:
                 log.info("Waiting for the HoldTime input to expire.")
-                await asyncio.sleep(holdTime_input - elapsed_time + 1)
+                await asyncio.sleep(holdTime_input - elapsed_time + 3)
 
             # The last end event
             event = event_listener.get_last_event()
@@ -509,17 +509,17 @@ class TC_ACS_3_1(MatterBaseTest):
         # Check the boolean attributes are set to False
         if humanActivityDetected & self.HumanActivitySupported:
             subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-            humanActivityDetected = subscription_bool_expected[0].value
+            humanActivityDetected = subscription_bool_expected[-1].value
             asserts.assert_true(not humanActivityDetected, "Failed to get HumanActivityDetected being False.")
 
         if objectIdentified & self.ObjectIdentificationSupported:
             subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-            objectIdentified = subscription_bool_expected[0].value
+            objectIdentified = subscription_bool_expected[-1].value
             asserts.assert_true(not objectIdentified, "Failed to get ObjectIdentified being False.")
 
         if audioContextDetected & self.SoundIdentificationSupported:
             subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-            audioContextDetected = subscription_bool_expected[0].value
+            audioContextDetected = subscription_bool_expected[-1].value
             asserts.assert_true(not audioContextDetected, "Failed to get audioContextDetected being False.")
 
         # check the subscription of AmbientContextType attribute (to be empty list)
