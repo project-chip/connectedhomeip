@@ -18,6 +18,7 @@
 #include <PosixAudioManager.h>
 #include <PosixChime.h>
 #include <PosixSpeaker.h>
+#include <app/server/Server.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -81,6 +82,29 @@ BitMask<Clusters::CommissioningProxy::WiFiBandBitmap> ProxyWiFiBands()
     return bands;
 }
 
+/// Stop advertising this device's own commissioning window over Wi-Fi PAF, from the point
+/// it joins a fabric onwards. Publishing uses the same NAN radio the proxy needs for the
+/// subscribes it makes on a commissionee's behalf.
+void SuppressProxyWiFiPafAdvertising()
+{
+    Server::GetInstance().GetCommissioningWindowManager().SetWiFiPAFAdvertisingAllowed(false);
+}
+
+void OnProxyDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+{
+    // Two ways to arrive on a fabric. kCommissioningComplete: the proxy has just joined
+    // one. kServerReady: the fabric table has been loaded, which is the first point a
+    // proxy commissioned before this boot can be recognised -- the device factory runs
+    // before Server::Init(), so the fabric count is always zero when the device is
+    // created and cannot be tested there.
+    const bool joinedNow = event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete;
+    const bool alreadyOnAFabric =
+        event->Type == DeviceLayer::DeviceEventType::kServerReady && Server::GetInstance().GetFabricTable().FabricCount() > 0;
+    VerifyOrReturn(joinedNow || alreadyOnAFabric);
+
+    SuppressProxyWiFiPafAdvertising();
+}
+
 } // namespace
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
@@ -139,6 +163,14 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable &
                     return nullptr;
                 }
                 sProxyDeviceCreated = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                // A proxy needs its NAN radio to subscribe on a commissionee's behalf, so
+                // it must not publish its own commissioning window once it is on a fabric
+                // and can be asked to proxy. Until then it does advertise over Wi-Fi PAF,
+                // so the proxy itself can be commissioned that way.
+                LogErrorOnFailure(DeviceLayer::PlatformMgr().AddEventHandler(OnProxyDeviceEvent, 0));
+#endif
 
                 auto device = std::make_unique<CommissioningProxyDevice>(proxyContext, proxyConfig);
 #if CONFIG_NETWORK_LAYER_BLE

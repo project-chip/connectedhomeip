@@ -342,7 +342,7 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 co
     SetBLE(false);
 #endif // CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    SetWiFiPAF(advertisementMode == chip::CommissioningWindowAdvertisement::kAllSupported);
+    SetWiFiPAF(advertisementMode == chip::CommissioningWindowAdvertisement::kAllSupported && mWiFiPAFAdvertisingAllowed);
 #endif
 
     mFailedCommissioningAttempts = 0;
