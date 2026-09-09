@@ -95,7 +95,7 @@ class TC_SC_4_6(MatterBaseTest):
                      """- Verify that the SRV record is returned and its instance name is equal to the browsed instance name
                         - Verify that the target hostname is expressed as a
                           twelve or sixteen capital letter hex string. 
-                          version must be used each time"""),
+                          """),
 
             TestStep(4, """TH performs a 'Commissioner Service' TXT record query against the instance name""",
                      """- If the VP key is present, verify that it is non-empty and contains at least Vendor ID, and if
