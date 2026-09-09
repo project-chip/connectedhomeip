@@ -10493,11 +10493,9 @@ private:
 | * ThermostatSuggestions                                             | 0x0054 |
 | * CurrentThermostatSuggestion                                       | 0x0055 |
 | * ThermostatSuggestionNotFollowingReason                            | 0x0056 |
-| * CriticalFreezeProtection                                          | 0x0057 |
-| * CriticalOverheatProtection                                        | 0x0058 |
 | * Sensors                                                           | 0x0059 |
-| * AvailableSensorHandles                                            | 0x005A |
-| * EnabledSensorHandles                                              | 0x005B |
+| * AvailableSensors                                                  | 0x005A |
+| * EnabledSensors                                                    | 0x005B |
 | * NumberOfSensorScheduleTransitions                                 | 0x005C |
 | * SensorSchedule                                                    | 0x005D |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -12502,6 +12500,7 @@ private:
 | * BLTCSSecurityLevel                                                | 0x0004 |
 | * BLTCSModeCapability                                               | 0x0005 |
 | * SessionIDList                                                     | 0x0006 |
+| * RangingConstraints                                                | 0x0007 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -12532,7 +12531,6 @@ public:
         AddArgument("BLTChannelSoundingDeviceRoleConfig", &mComplex_BLTChannelSoundingDeviceRoleConfig, "", Argument::kOptional);
         AddArgument("FrequencyBand", 0, UINT16_MAX, &mRequest.frequencyBand);
         AddArgument("Bandwidth", 0, UINT32_MAX, &mRequest.bandwidth);
-        AddArgument("SecurityMode", 0, UINT8_MAX, &mRequest.securityMode);
         AddArgument("Trigger", &mComplex_Trigger);
         AddArgument("ReportingCondition", &mComplex_ReportingCondition, "", Argument::kOptional);
         ClusterCommand::AddArguments();
@@ -29702,14 +29700,10 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "thermostat-suggestion-not-following-reason",
-                                   Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
-                                   credsIssuerConfig),                                                                         //
-        make_unique<ReadAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                                 //
-        make_unique<ReadAttribute>(Id, "available-sensor-handles", Attributes::AvailableSensorHandles::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "enabled-sensor-handles", Attributes::EnabledSensorHandles::Id, credsIssuerConfig),     //
+                                   Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "available-sensors", Attributes::AvailableSensors::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "enabled-sensors", Attributes::EnabledSensors::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "number-of-sensor-schedule-transitions", Attributes::NumberOfSensorScheduleTransitions::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "sensor-schedule", Attributes::SensorSchedule::Id, credsIssuerConfig),              //
@@ -29894,17 +29888,13 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
             chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>>>>(
             Id, "thermostat-suggestion-not-following-reason", 0, UINT16_MAX, Attributes::ThermostatSuggestionNotFollowingReason::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "critical-freeze-protection", 0, 1, Attributes::CriticalFreezeProtection::Id,
-                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "critical-overheat-protection", 0, 1, Attributes::CriticalOverheatProtection::Id,
-                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::Type>>>(
             Id, "sensors", Attributes::Sensors::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
-            Id, "available-sensor-handles", Attributes::AvailableSensorHandles::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "available-sensors", Attributes::AvailableSensors::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
-            Id, "enabled-sensor-handles", Attributes::EnabledSensorHandles::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "enabled-sensors", Attributes::EnabledSensors::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-sensor-schedule-transitions", 0, UINT8_MAX,
                                              Attributes::NumberOfSensorScheduleTransitions::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
@@ -30010,15 +30000,10 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "thermostat-suggestion-not-following-reason",
-                                        Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
-                                        credsIssuerConfig),                                         //
-        make_unique<SubscribeAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "available-sensor-handles", Attributes::AvailableSensorHandles::Id,
-                                        credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "enabled-sensor-handles", Attributes::EnabledSensorHandles::Id, credsIssuerConfig), //
+                                        Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "available-sensors", Attributes::AvailableSensors::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "enabled-sensors", Attributes::EnabledSensors::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "number-of-sensor-schedule-transitions",
                                         Attributes::NumberOfSensorScheduleTransitions::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "sensor-schedule", Attributes::SensorSchedule::Id, credsIssuerConfig),              //
@@ -30266,7 +30251,7 @@ void registerClusterHumidistat(Commands & commands, CredentialIssuerCommands * c
                                                    credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent>>(Id, "target-setpoint", 0, UINT8_MAX, Attributes::TargetSetpoint::Id,
                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>>(
             Id, "mist-type", 0, UINT8_MAX, Attributes::MistType::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "continuous", 0, 1, Attributes::Continuous::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig),                                                                     //
@@ -32610,6 +32595,7 @@ void registerClusterProximityRanging(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "bltcssecurity-level", Attributes::BLTCSSecurityLevel::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "bltcsmode-capability", Attributes::BLTCSModeCapability::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "session-idlist", Attributes::SessionIDList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "ranging-constraints", Attributes::RangingConstraints::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -32631,8 +32617,11 @@ void registerClusterProximityRanging(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>>(
             Id, "bltcsmode-capability", 0, UINT8_MAX, Attributes::BLTCSModeCapability::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint8_t>>>(
             Id, "session-idlist", Attributes::SessionIDList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type>>>(
+            Id, "ranging-constraints", Attributes::RangingConstraints::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -32652,6 +32641,7 @@ void registerClusterProximityRanging(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "bltcssecurity-level", Attributes::BLTCSSecurityLevel::Id, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, "bltcsmode-capability", Attributes::BLTCSModeCapability::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "session-idlist", Attributes::SessionIDList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "ranging-constraints", Attributes::RangingConstraints::Id, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

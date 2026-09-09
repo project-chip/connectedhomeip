@@ -9486,18 +9486,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
-            0x00000057: {
-                "attributeName": "CriticalFreezeProtection",
-                "attributeId": 0x00000057,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x00000058: {
-                "attributeName": "CriticalOverheatProtection",
-                "attributeId": 0x00000058,
-                "type": "bool",
-                "reportable": True,
-            },
             0x00000059: {
                 "attributeName": "Sensors",
                 "attributeId": 0x00000059,
@@ -9505,14 +9493,14 @@ class ChipClusters:
                 "reportable": True,
             },
             0x0000005A: {
-                "attributeName": "AvailableSensorHandles",
+                "attributeName": "AvailableSensors",
                 "attributeId": 0x0000005A,
                 "type": "bytes",
                 "reportable": True,
                 "writable": True,
             },
             0x0000005B: {
-                "attributeName": "EnabledSensorHandles",
+                "attributeName": "EnabledSensors",
                 "attributeId": 0x0000005B,
                 "type": "bytes",
                 "reportable": True,
@@ -12413,7 +12401,6 @@ class ChipClusters:
                     "BLTChannelSoundingDeviceRoleConfig": "BLTChannelSoundingDeviceRoleConfigStruct",
                     "frequencyBand": "int",
                     "bandwidth": "int",
-                    "securityMode": "int",
                     "trigger": "RangingTriggerConditionStruct",
                     "reportingCondition": "ReportingConditionStruct",
                 },
@@ -12467,6 +12454,12 @@ class ChipClusters:
                 "attributeName": "SessionIDList",
                 "attributeId": 0x00000006,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "RangingConstraints",
+                "attributeId": 0x00000007,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

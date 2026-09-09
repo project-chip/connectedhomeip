@@ -2427,14 +2427,6 @@ CHIP_ERROR DataModelLogger::LogValue(
             return err;
         }
     }
-    {
-        CHIP_ERROR err = LogValue("CDSupportedProfiles", indent + 1, value.CDSupportedProfiles);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CDSupportedProfiles'");
-            return err;
-        }
-    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -5125,10 +5117,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("EnabledSensorHandles", indent + 1, value.enabledSensorHandles);
+        CHIP_ERROR err = LogValue("EnabledSensors", indent + 1, value.enabledSensors);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnabledSensorHandles'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnabledSensors'");
             return err;
         }
     }
@@ -5848,6 +5840,22 @@ CHIP_ERROR DataModelLogger::LogValue(
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("BLERBCSecurityMode", indent + 1, value.BLERBCSecurityMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BLERBCSecurityMode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SessionKey", indent + 1, value.sessionKey);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SessionKey'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -5925,10 +5933,100 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
+        CHIP_ERROR err = LogValue("Bandwidth", indent + 1, value.bandwidth);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Bandwidth'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SupportedRangingRoles", indent + 1, value.supportedRangingRoles);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SupportedRangingRoles'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RDRCapability", indent + 1, value.RDRCapability);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RDRCapability'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("PeriodicRangingSupport", indent + 1, value.periodicRangingSupport);
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeriodicRangingSupport'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxConcurrentSessions", indent + 1, value.maxConcurrentSessions);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxConcurrentSessions'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Technology", indent + 1, value.technology);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Technology'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Role", indent + 1, value.role);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Role'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Enabled", indent + 1, value.enabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Enabled'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MinRangingInterval", indent + 1, value.minRangingInterval);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinRangingInterval'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxSessionDuration", indent + 1, value.maxSessionDuration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxSessionDuration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxRangingInstances", indent + 1, value.maxRangingInstances);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxRangingInstances'");
             return err;
         }
     }
@@ -14782,7 +14880,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const ProximityRanging::Commands::StartRangingResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("resultCode", indent + 1, value.resultCode));
     ReturnErrorOnFailure(DataModelLogger::LogValue("sessionID", indent + 1, value.sessionID));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
@@ -21845,31 +21942,21 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ThermostatSuggestionNotFollowingReason", 1, value);
         }
-        case Thermostat::Attributes::CriticalFreezeProtection::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CriticalFreezeProtection", 1, value);
-        }
-        case Thermostat::Attributes::CriticalOverheatProtection::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CriticalOverheatProtection", 1, value);
-        }
         case Thermostat::Attributes::Sensors::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Sensors", 1, value);
         }
-        case Thermostat::Attributes::AvailableSensorHandles::Id: {
+        case Thermostat::Attributes::AvailableSensors::Id: {
             chip::app::DataModel::DecodableList<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AvailableSensorHandles", 1, value);
+            return DataModelLogger::LogValue("AvailableSensors", 1, value);
         }
-        case Thermostat::Attributes::EnabledSensorHandles::Id: {
+        case Thermostat::Attributes::EnabledSensors::Id: {
             chip::app::DataModel::DecodableList<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EnabledSensorHandles", 1, value);
+            return DataModelLogger::LogValue("EnabledSensors", 1, value);
         }
         case Thermostat::Attributes::NumberOfSensorScheduleTransitions::Id: {
             uint8_t value;
@@ -22093,7 +22180,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("TargetSetpoint", 1, value);
         }
         case Humidistat::Attributes::MistType::Id: {
-            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>> value;
+            chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MistType", 1, value);
         }
@@ -24076,9 +24163,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BLTCSModeCapability", 1, value);
         }
         case ProximityRanging::Attributes::SessionIDList::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint8_t>> value;
+            chip::app::DataModel::DecodableList<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SessionIDList", 1, value);
+        }
+        case ProximityRanging::Attributes::RangingConstraints::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RangingConstraints", 1, value);
         }
         case ProximityRanging::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

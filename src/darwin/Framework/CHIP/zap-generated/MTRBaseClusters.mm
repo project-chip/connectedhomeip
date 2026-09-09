@@ -69940,78 +69940,6 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeCriticalFreezeProtectionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-{
-    using TypeInfo = Thermostat::Attributes::CriticalFreezeProtection::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
-}
-
-- (void)subscribeAttributeCriticalFreezeProtectionWithParams:(MTRSubscribeParams * _Nonnull)params
-                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    using TypeInfo = Thermostat::Attributes::CriticalFreezeProtection::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
-}
-
-+ (void)readAttributeCriticalFreezeProtectionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-{
-    using TypeInfo = Thermostat::Attributes::CriticalFreezeProtection::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
-}
-
-- (void)readAttributeCriticalOverheatProtectionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-{
-    using TypeInfo = Thermostat::Attributes::CriticalOverheatProtection::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:nil
-                                             queue:self.callbackQueue
-                                        completion:completion];
-}
-
-- (void)subscribeAttributeCriticalOverheatProtectionWithParams:(MTRSubscribeParams * _Nonnull)params
-                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    using TypeInfo = Thermostat::Attributes::CriticalOverheatProtection::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
-}
-
-+ (void)readAttributeCriticalOverheatProtectionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-{
-    using TypeInfo = Thermostat::Attributes::CriticalOverheatProtection::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
-}
-
 - (void)readAttributeSensorsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = Thermostat::Attributes::Sensors::TypeInfo;
@@ -70048,9 +69976,9 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeAvailableSensorHandlesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeAvailableSensorsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Thermostat::Attributes::AvailableSensorHandles::TypeInfo;
+    using TypeInfo = Thermostat::Attributes::AvailableSensors::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
@@ -70059,11 +69987,11 @@ public:
                                         completion:completion];
 }
 
-- (void)writeAttributeAvailableSensorHandlesWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion
+- (void)writeAttributeAvailableSensorsWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion
 {
-    [self writeAttributeAvailableSensorHandlesWithValue:(NSArray * _Nonnull) value params:nil completion:completion];
+    [self writeAttributeAvailableSensorsWithValue:(NSArray * _Nonnull) value params:nil completion:completion];
 }
-- (void)writeAttributeAvailableSensorHandlesWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+- (void)writeAttributeAvailableSensorsWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -70078,7 +70006,7 @@ public:
         }
 
         ListFreer listFreer;
-        using TypeInfo = Thermostat::Attributes::AvailableSensorHandles::TypeInfo;
+        using TypeInfo = Thermostat::Attributes::AvailableSensors::TypeInfo;
         TypeInfo::Type cppValue;
           {
             using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -70109,11 +70037,11 @@ public:
     std::move(*bridge).DispatchAction(self.device);
 }
 
-- (void)subscribeAttributeAvailableSensorHandlesWithParams:(MTRSubscribeParams * _Nonnull)params
-                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                             reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeAvailableSensorsWithParams:(MTRSubscribeParams * _Nonnull)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = Thermostat::Attributes::AvailableSensorHandles::TypeInfo;
+    using TypeInfo = Thermostat::Attributes::AvailableSensors::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
@@ -70123,9 +70051,9 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeAvailableSensorHandlesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeAvailableSensorsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Thermostat::Attributes::AvailableSensorHandles::TypeInfo;
+    using TypeInfo = Thermostat::Attributes::AvailableSensors::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -70134,9 +70062,9 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeEnabledSensorHandlesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeEnabledSensorsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Thermostat::Attributes::EnabledSensorHandles::TypeInfo;
+    using TypeInfo = Thermostat::Attributes::EnabledSensors::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
@@ -70145,11 +70073,11 @@ public:
                                         completion:completion];
 }
 
-- (void)writeAttributeEnabledSensorHandlesWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion
+- (void)writeAttributeEnabledSensorsWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion
 {
-    [self writeAttributeEnabledSensorHandlesWithValue:(NSArray * _Nonnull) value params:nil completion:completion];
+    [self writeAttributeEnabledSensorsWithValue:(NSArray * _Nonnull) value params:nil completion:completion];
 }
-- (void)writeAttributeEnabledSensorHandlesWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+- (void)writeAttributeEnabledSensorsWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -70164,7 +70092,7 @@ public:
         }
 
         ListFreer listFreer;
-        using TypeInfo = Thermostat::Attributes::EnabledSensorHandles::TypeInfo;
+        using TypeInfo = Thermostat::Attributes::EnabledSensors::TypeInfo;
         TypeInfo::Type cppValue;
           {
             using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -70195,11 +70123,11 @@ public:
     std::move(*bridge).DispatchAction(self.device);
 }
 
-- (void)subscribeAttributeEnabledSensorHandlesWithParams:(MTRSubscribeParams * _Nonnull)params
-                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeEnabledSensorsWithParams:(MTRSubscribeParams * _Nonnull)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = Thermostat::Attributes::EnabledSensorHandles::TypeInfo;
+    using TypeInfo = Thermostat::Attributes::EnabledSensors::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
@@ -70209,9 +70137,9 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeEnabledSensorHandlesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeEnabledSensorsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Thermostat::Attributes::EnabledSensorHandles::TypeInfo;
+    using TypeInfo = Thermostat::Attributes::EnabledSensors::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -70307,26 +70235,26 @@ public:
                      listHolder_0->mList[i_0].dayOfWeek = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].dayOfWeek)>>(element_0.dayOfWeek.unsignedCharValue);
      listHolder_0->mList[i_0].transitionTime = element_0.transitionTime.unsignedShortValue;
      {
-       using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].enabledSensorHandles)>;
+       using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].enabledSensors)>;
        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-       if (element_0.enabledSensorHandles.count != 0) {
-         auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.enabledSensorHandles.count);
+       if (element_0.enabledSensors.count != 0) {
+         auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.enabledSensors.count);
          if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
            return CHIP_ERROR_INVALID_ARGUMENT;
          }
          listFreer.add(listHolder_2);
-         for (size_t i_2 = 0; i_2 < element_0.enabledSensorHandles.count; ++i_2) {
-           auto element_2 = MTR_SAFE_CAST(element_0.enabledSensorHandles[i_2], NSData);
+         for (size_t i_2 = 0; i_2 < element_0.enabledSensors.count; ++i_2) {
+           auto element_2 = MTR_SAFE_CAST(element_0.enabledSensors[i_2], NSData);
            if (!element_2) {
              // Wrong kind of value.
-             MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.enabledSensorHandles[i_2], NSStringFromClass(NSData.class));
+             MTR_LOG_ERROR("%@ incorrectly present in list of %@", element_0.enabledSensors[i_2], NSStringFromClass(NSData.class));
              return CHIP_ERROR_INVALID_ARGUMENT;
            }
              listHolder_2->mList[i_2] = AsByteSpan(element_2);
          }
-         listHolder_0->mList[i_0].enabledSensorHandles = ListType_2(listHolder_2->mList, element_0.enabledSensorHandles.count);
+         listHolder_0->mList[i_0].enabledSensors = ListType_2(listHolder_2->mList, element_0.enabledSensors.count);
        } else {
-         listHolder_0->mList[i_0].enabledSensorHandles = ListType_2();
+         listHolder_0->mList[i_0].enabledSensors = ListType_2();
        }
      }
       }
@@ -75236,11 +75164,11 @@ public:
                                         completion:completion];
 }
 
-- (void)writeAttributeMistTypeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion
+- (void)writeAttributeMistTypeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
 {
-    [self writeAttributeMistTypeWithValue:(NSNumber * _Nullable) value params:nil completion:completion];
+    [self writeAttributeMistTypeWithValue:(NSNumber * _Nonnull) value params:nil completion:completion];
 }
-- (void)writeAttributeMistTypeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+- (void)writeAttributeMistTypeWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -75257,12 +75185,7 @@ public:
         ListFreer listFreer;
         using TypeInfo = Humidistat::Attributes::MistType::TypeInfo;
         TypeInfo::Type cppValue;
-          if (value == nil) {
-            cppValue.SetNull();
-          } else {
-            auto & nonNullValue_0 = cppValue.SetNonNull();
-              nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
-  }
+          cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
         chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
@@ -95361,6 +95284,42 @@ public:
 + (void)readAttributeSessionIDListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = ProximityRanging::Attributes::SessionIDList::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeRangingConstraintsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ProximityRanging::Attributes::RangingConstraints::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeRangingConstraintsWithParams:(MTRSubscribeParams * _Nonnull)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = ProximityRanging::Attributes::RangingConstraints::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeRangingConstraintsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = ProximityRanging::Attributes::RangingConstraints::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()

@@ -12927,11 +12927,9 @@ public class ClusterIDMapping {
             ThermostatSuggestions(84L),
             CurrentThermostatSuggestion(85L),
             ThermostatSuggestionNotFollowingReason(86L),
-            CriticalFreezeProtection(87L),
-            CriticalOverheatProtection(88L),
             Sensors(89L),
-            AvailableSensorHandles(90L),
-            EnabledSensorHandles(91L),
+            AvailableSensors(90L),
+            EnabledSensors(91L),
             NumberOfSensorScheduleTransitions(92L),
             SensorSchedule(93L),
             GeneratedCommandList(65528L),
@@ -16338,6 +16336,7 @@ public class ClusterIDMapping {
             BLTCSSecurityLevel(4L),
             BLTCSModeCapability(5L),
             SessionIDList(6L),
+            RangingConstraints(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -16404,7 +16403,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum StartRangingRequestCommandField {Technology(0),WiFiRangingDeviceRoleConfig(1),BLERangingDeviceRoleConfig(2),BLTChannelSoundingDeviceRoleConfig(3),FrequencyBand(4),Bandwidth(5),SecurityMode(6),Trigger(7),ReportingCondition(8),;
+        }public enum StartRangingRequestCommandField {Technology(0),WiFiRangingDeviceRoleConfig(1),BLERangingDeviceRoleConfig(2),BLTChannelSoundingDeviceRoleConfig(3),FrequencyBand(4),Bandwidth(5),Trigger(6),ReportingCondition(7),;
                     private final int id;
                     StartRangingRequestCommandField(int id) {
                         this.id = id;

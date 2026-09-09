@@ -4314,19 +4314,13 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
         return YES;
     }
-    case Attributes::CriticalFreezeProtection::Id: {
-        return YES;
-    }
-    case Attributes::CriticalOverheatProtection::Id: {
-        return YES;
-    }
     case Attributes::Sensors::Id: {
         return YES;
     }
-    case Attributes::AvailableSensorHandles::Id: {
+    case Attributes::AvailableSensors::Id: {
         return YES;
     }
-    case Attributes::EnabledSensorHandles::Id: {
+    case Attributes::EnabledSensors::Id: {
         return YES;
     }
     case Attributes::NumberOfSensorScheduleTransitions::Id: {
@@ -5805,6 +5799,9 @@ static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::SessionIDList::Id: {
+        return YES;
+    }
+    case Attributes::RangingConstraints::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

@@ -2017,7 +2017,6 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
-    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -2138,11 +2137,6 @@ cluster OperationalCredentials = 62 {
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
   revision 4;
-
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -2585,11 +2579,6 @@ cluster JointFabricDatastore = 1874 {
     kAdminister = 5;
   }
 
-  enum DatastoreGroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
-
   enum DatastoreGroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
   }
@@ -2866,7 +2855,7 @@ cluster JointFabricDatastore = 1874 {
 }
 
 /** An instance of the Joint Fabric Administrator Cluster only applies to Joint Fabric Administrator nodes fulfilling the role of Anchor CA. */
-provisional cluster JointFabricAdministrator = 1875 {
+cluster JointFabricAdministrator = 1875 {
   revision 1;
 
   enum ICACCSRResponseStatusCodeEnum : enum8 {
@@ -2890,7 +2879,7 @@ provisional cluster JointFabricAdministrator = 1875 {
     kTransferAnchorStatusNoUserConsent = 2;
   }
 
-  provisional readonly attribute access(read: administer) nullable fabric_idx administratorFabricIndex = 0;
+  readonly attribute access(read: administer) nullable fabric_idx administratorFabricIndex = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

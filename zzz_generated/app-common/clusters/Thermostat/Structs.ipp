@@ -275,7 +275,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kDayOfWeek), dayOfWeek);
     encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
-    encoder.Encode(to_underlying(Fields::kEnabledSensorHandles), enabledSensorHandles);
+    encoder.Encode(to_underlying(Fields::kEnabledSensors), enabledSensors);
     return encoder.Finalize();
 }
 
@@ -297,9 +297,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transitionTime);
         }
-        else if (__context_tag == to_underlying(Fields::kEnabledSensorHandles))
+        else if (__context_tag == to_underlying(Fields::kEnabledSensors))
         {
-            err = DataModel::Decode(reader, enabledSensorHandles);
+            err = DataModel::Decode(reader, enabledSensors);
         }
 
         ReturnErrorOnFailure(err);

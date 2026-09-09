@@ -312,26 +312,24 @@ class ThermostatCluster(private val controller: MatterController, private val en
     object SubscriptionEstablished : SensorsAttributeSubscriptionState()
   }
 
-  class AvailableSensorHandlesAttribute(val value: List<ByteArray>?)
+  class AvailableSensorsAttribute(val value: List<ByteArray>?)
 
-  sealed class AvailableSensorHandlesAttributeSubscriptionState {
-    data class Success(val value: List<ByteArray>?) :
-      AvailableSensorHandlesAttributeSubscriptionState()
+  sealed class AvailableSensorsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) : AvailableSensorsAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : AvailableSensorHandlesAttributeSubscriptionState()
+    data class Error(val exception: Exception) : AvailableSensorsAttributeSubscriptionState()
 
-    object SubscriptionEstablished : AvailableSensorHandlesAttributeSubscriptionState()
+    object SubscriptionEstablished : AvailableSensorsAttributeSubscriptionState()
   }
 
-  class EnabledSensorHandlesAttribute(val value: List<ByteArray>?)
+  class EnabledSensorsAttribute(val value: List<ByteArray>?)
 
-  sealed class EnabledSensorHandlesAttributeSubscriptionState {
-    data class Success(val value: List<ByteArray>?) :
-      EnabledSensorHandlesAttributeSubscriptionState()
+  sealed class EnabledSensorsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) : EnabledSensorsAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : EnabledSensorHandlesAttributeSubscriptionState()
+    data class Error(val exception: Exception) : EnabledSensorsAttributeSubscriptionState()
 
-    object SubscriptionEstablished : EnabledSensorHandlesAttributeSubscriptionState()
+    object SubscriptionEstablished : EnabledSensorsAttributeSubscriptionState()
   }
 
   class SensorScheduleAttribute(val value: List<ThermostatClusterSensorScheduleTransitionStruct>?)
@@ -8137,192 +8135,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readCriticalFreezeProtectionAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 87u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Criticalfreezeprotection attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeCriticalFreezeProtectionAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 87u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            BooleanSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Criticalfreezeprotection attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(BooleanSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readCriticalOverheatProtectionAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 88u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Criticaloverheatprotection attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeCriticalOverheatProtectionAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 88u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            BooleanSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Criticaloverheatprotection attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(BooleanSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
   suspend fun readSensorsAttribute(): SensorsAttribute {
     val ATTRIBUTE_ID: UInt = 89u
 
@@ -8426,7 +8238,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readAvailableSensorHandlesAttribute(): AvailableSensorHandlesAttribute {
+  suspend fun readAvailableSensorsAttribute(): AvailableSensorsAttribute {
     val ATTRIBUTE_ID: UInt = 90u
 
     val attributePath =
@@ -8448,7 +8260,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Availablesensorhandles attribute not found in response" }
+    requireNotNull(attributeData) { "Availablesensors attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -8465,10 +8277,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
         null
       }
 
-    return AvailableSensorHandlesAttribute(decodedValue)
+    return AvailableSensorsAttribute(decodedValue)
   }
 
-  suspend fun writeAvailableSensorHandlesAttribute(
+  suspend fun writeAvailableSensorsAttribute(
     value: List<ByteArray>,
     timedWriteTimeout: Duration? = null,
   ) {
@@ -8515,10 +8327,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun subscribeAvailableSensorHandlesAttribute(
+  suspend fun subscribeAvailableSensorsAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<AvailableSensorHandlesAttributeSubscriptionState> {
+  ): Flow<AvailableSensorsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 90u
     val attributePaths =
       listOf(
@@ -8537,7 +8349,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            AvailableSensorHandlesAttributeSubscriptionState.Error(
+            AvailableSensorsAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -8551,7 +8363,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Availablesensorhandles attribute not found in Node State update"
+            "Availablesensors attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -8569,16 +8381,16 @@ class ThermostatCluster(private val controller: MatterController, private val en
               null
             }
 
-          decodedValue?.let { emit(AvailableSensorHandlesAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(AvailableSensorsAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(AvailableSensorHandlesAttributeSubscriptionState.SubscriptionEstablished)
+          emit(AvailableSensorsAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readEnabledSensorHandlesAttribute(): EnabledSensorHandlesAttribute {
+  suspend fun readEnabledSensorsAttribute(): EnabledSensorsAttribute {
     val ATTRIBUTE_ID: UInt = 91u
 
     val attributePath =
@@ -8600,7 +8412,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Enabledsensorhandles attribute not found in response" }
+    requireNotNull(attributeData) { "Enabledsensors attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -8617,10 +8429,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
         null
       }
 
-    return EnabledSensorHandlesAttribute(decodedValue)
+    return EnabledSensorsAttribute(decodedValue)
   }
 
-  suspend fun writeEnabledSensorHandlesAttribute(
+  suspend fun writeEnabledSensorsAttribute(
     value: List<ByteArray>,
     timedWriteTimeout: Duration? = null,
   ) {
@@ -8667,10 +8479,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun subscribeEnabledSensorHandlesAttribute(
+  suspend fun subscribeEnabledSensorsAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<EnabledSensorHandlesAttributeSubscriptionState> {
+  ): Flow<EnabledSensorsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 91u
     val attributePaths =
       listOf(
@@ -8689,7 +8501,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            EnabledSensorHandlesAttributeSubscriptionState.Error(
+            EnabledSensorsAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -8703,7 +8515,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Enabledsensorhandles attribute not found in Node State update"
+            "Enabledsensors attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -8721,10 +8533,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
               null
             }
 
-          decodedValue?.let { emit(EnabledSensorHandlesAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(EnabledSensorsAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(EnabledSensorHandlesAttributeSubscriptionState.SubscriptionEstablished)
+          emit(EnabledSensorsAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

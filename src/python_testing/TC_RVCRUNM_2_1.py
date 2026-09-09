@@ -37,6 +37,23 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcrunm_2_1_fifo
+#     script-args: >
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:0
+#       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2
+#       --app-pipe /tmp/rvcrunm_2_1_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -105,7 +122,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
 
         self.print_step(2, "Read SupportedModes attribute")
         supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)

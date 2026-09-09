@@ -299,33 +299,22 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
-namespace CriticalFreezeProtection {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalFreezeProtection::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
-} // namespace CriticalFreezeProtection
-namespace CriticalOverheatProtection {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalOverheatProtection::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
-} // namespace CriticalOverheatProtection
 namespace Sensors {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Sensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace Sensors
-namespace AvailableSensorHandles {
+namespace AvailableSensors {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(AvailableSensorHandles::Id,
+    kMetadataEntry(AvailableSensors::Id,
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, Access::Privilege::kManage);
-} // namespace AvailableSensorHandles
-namespace EnabledSensorHandles {
+} // namespace AvailableSensors
+namespace EnabledSensors {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(EnabledSensorHandles::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(EnabledSensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, Access::Privilege::kManage);
-} // namespace EnabledSensorHandles
+} // namespace EnabledSensors
 namespace NumberOfSensorScheduleTransitions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfSensorScheduleTransitions::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
@@ -381,7 +370,7 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RemoveThermostatSuggestion
 namespace AtomicRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AtomicRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+                                                                Access::Privilege::kOperate);
 } // namespace AtomicRequest
 
 } // namespace Commands

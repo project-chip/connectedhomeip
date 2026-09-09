@@ -3288,16 +3288,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentThermostatSuggestion";
         case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestionNotFollowingReason::Id:
             return "ThermostatSuggestionNotFollowingReason";
-        case chip::app::Clusters::Thermostat::Attributes::CriticalFreezeProtection::Id:
-            return "CriticalFreezeProtection";
-        case chip::app::Clusters::Thermostat::Attributes::CriticalOverheatProtection::Id:
-            return "CriticalOverheatProtection";
         case chip::app::Clusters::Thermostat::Attributes::Sensors::Id:
             return "Sensors";
-        case chip::app::Clusters::Thermostat::Attributes::AvailableSensorHandles::Id:
-            return "AvailableSensorHandles";
-        case chip::app::Clusters::Thermostat::Attributes::EnabledSensorHandles::Id:
-            return "EnabledSensorHandles";
+        case chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id:
+            return "AvailableSensors";
+        case chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id:
+            return "EnabledSensors";
         case chip::app::Clusters::Thermostat::Attributes::NumberOfSensorScheduleTransitions::Id:
             return "NumberOfSensorScheduleTransitions";
         case chip::app::Clusters::Thermostat::Attributes::SensorSchedule::Id:
@@ -4292,6 +4288,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "BLTCSModeCapability";
         case chip::app::Clusters::ProximityRanging::Attributes::SessionIDList::Id:
             return "SessionIDList";
+        case chip::app::Clusters::ProximityRanging::Attributes::RangingConstraints::Id:
+            return "RangingConstraints";
         case chip::app::Clusters::ProximityRanging::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ProximityRanging::Attributes::AcceptedCommandList::Id:
@@ -8052,7 +8050,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x0000007C:
         return "Laundry Dryer";
     case 0x0000007D:
-        return "Humidifier/Dehumidifier";
+        return "Humidity Conditioner";
     case 0x00000090:
         return "Network Infrastructure Manager";
     case 0x00000091:

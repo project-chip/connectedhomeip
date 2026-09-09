@@ -1406,7 +1406,6 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
-    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -1527,11 +1526,6 @@ cluster OperationalCredentials = 62 {
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
   revision 4;
-
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -1852,7 +1846,7 @@ cluster Thermostat = 513 {
   struct SensorScheduleTransitionStruct {
     ScheduleDayOfWeekBitmap dayOfWeek = 0;
     int16u transitionTime = 1;
-    octet_string enabledSensorHandles[] = 2;
+    octet_string enabledSensors[] = 2;
   }
 
   struct ThermostatSensorStruct {
@@ -1982,11 +1976,9 @@ cluster Thermostat = 513 {
   readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
   readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
   readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
-  provisional readonly attribute optional boolean criticalFreezeProtection = 87;
-  provisional readonly attribute optional boolean criticalOverheatProtection = 88;
   provisional readonly attribute optional ThermostatSensorStruct sensors[] = 89;
-  provisional attribute access(write: manage) optional octet_string availableSensorHandles[] = 90;
-  provisional attribute access(write: manage) optional octet_string enabledSensorHandles[] = 91;
+  provisional attribute access(write: manage) optional octet_string availableSensors[] = 90;
+  provisional attribute access(write: manage) optional octet_string enabledSensors[] = 91;
   provisional readonly attribute optional int8u numberOfSensorScheduleTransitions = 92;
   provisional attribute access(write: manage) optional SensorScheduleTransitionStruct sensorSchedule[] = 93;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2070,7 +2062,7 @@ cluster Thermostat = 513 {
   /** This command will remove the specified suggestion. */
   command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
-  command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
+  command AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */

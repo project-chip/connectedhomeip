@@ -78685,17 +78685,17 @@ public:
         __auto_type * params = [[MTRDeviceEnergyManagementClusterPowerRangeAdjustRequestParams alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
 #if MTR_ENABLE_PROVISIONAL
-        if (mRequest.minPower.IsNull()) {
-            params.minPower = nil;
-        } else {
+        if (mRequest.minPower.HasValue()) {
             params.minPower = [NSNumber numberWithLongLong:mRequest.minPower.Value()];
+        } else {
+            params.minPower = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        if (mRequest.maxPower.IsNull()) {
-            params.maxPower = nil;
-        } else {
+        if (mRequest.maxPower.HasValue()) {
             params.maxPower = [NSNumber numberWithLongLong:mRequest.maxPower.Value()];
+        } else {
+            params.maxPower = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
@@ -107076,11 +107076,9 @@ public:
 | * ThermostatSuggestions                                             | 0x0054 |
 | * CurrentThermostatSuggestion                                       | 0x0055 |
 | * ThermostatSuggestionNotFollowingReason                            | 0x0056 |
-| * CriticalFreezeProtection                                          | 0x0057 |
-| * CriticalOverheatProtection                                        | 0x0058 |
 | * Sensors                                                           | 0x0059 |
-| * AvailableSensorHandles                                            | 0x005A |
-| * EnabledSensorHandles                                              | 0x005B |
+| * AvailableSensors                                                  | 0x005A |
+| * EnabledSensors                                                    | 0x005B |
 | * NumberOfSensorScheduleTransitions                                 | 0x005C |
 | * SensorSchedule                                                    | 0x005D |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -114184,176 +114182,6 @@ public:
 #if MTR_ENABLE_PROVISIONAL
 
 /*
- * Attribute CriticalFreezeProtection
- */
-class ReadThermostatCriticalFreezeProtection : public ReadAttribute {
-public:
-    ReadThermostatCriticalFreezeProtection()
-        : ReadAttribute("critical-freeze-protection")
-    {
-    }
-
-    ~ReadThermostatCriticalFreezeProtection()
-    {
-    }
-
-    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::CriticalFreezeProtection::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        [cluster readAttributeCriticalFreezeProtectionWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"Thermostat.CriticalFreezeProtection response %@", [value description]);
-            if (error == nil) {
-                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
-            } else {
-                LogNSError("Thermostat CriticalFreezeProtection read Error", error);
-                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
-            }
-            SetCommandExitStatus(error);
-        }];
-        return CHIP_NO_ERROR;
-    }
-};
-
-class SubscribeAttributeThermostatCriticalFreezeProtection : public SubscribeAttribute {
-public:
-    SubscribeAttributeThermostatCriticalFreezeProtection()
-        : SubscribeAttribute("critical-freeze-protection")
-    {
-    }
-
-    ~SubscribeAttributeThermostatCriticalFreezeProtection()
-    {
-    }
-
-    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::CriticalFreezeProtection::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
-        if (mKeepSubscriptions.HasValue()) {
-            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
-        }
-        if (mFabricFiltered.HasValue()) {
-            params.filterByFabric = mFabricFiltered.Value();
-        }
-        if (mAutoResubscribe.HasValue()) {
-            params.resubscribeAutomatically = mAutoResubscribe.Value();
-        }
-        [cluster subscribeAttributeCriticalFreezeProtectionWithParams:params
-            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
-            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Thermostat.CriticalFreezeProtection response %@", [value description]);
-                if (error == nil) {
-                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
-                } else {
-                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
-                }
-                SetCommandExitStatus(error);
-            }];
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
-
-/*
- * Attribute CriticalOverheatProtection
- */
-class ReadThermostatCriticalOverheatProtection : public ReadAttribute {
-public:
-    ReadThermostatCriticalOverheatProtection()
-        : ReadAttribute("critical-overheat-protection")
-    {
-    }
-
-    ~ReadThermostatCriticalOverheatProtection()
-    {
-    }
-
-    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::CriticalOverheatProtection::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        [cluster readAttributeCriticalOverheatProtectionWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"Thermostat.CriticalOverheatProtection response %@", [value description]);
-            if (error == nil) {
-                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
-            } else {
-                LogNSError("Thermostat CriticalOverheatProtection read Error", error);
-                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
-            }
-            SetCommandExitStatus(error);
-        }];
-        return CHIP_NO_ERROR;
-    }
-};
-
-class SubscribeAttributeThermostatCriticalOverheatProtection : public SubscribeAttribute {
-public:
-    SubscribeAttributeThermostatCriticalOverheatProtection()
-        : SubscribeAttribute("critical-overheat-protection")
-    {
-    }
-
-    ~SubscribeAttributeThermostatCriticalOverheatProtection()
-    {
-    }
-
-    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::CriticalOverheatProtection::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
-        if (mKeepSubscriptions.HasValue()) {
-            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
-        }
-        if (mFabricFiltered.HasValue()) {
-            params.filterByFabric = mFabricFiltered.Value();
-        }
-        if (mAutoResubscribe.HasValue()) {
-            params.resubscribeAutomatically = mAutoResubscribe.Value();
-        }
-        [cluster subscribeAttributeCriticalOverheatProtectionWithParams:params
-            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
-            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Thermostat.CriticalOverheatProtection response %@", [value description]);
-                if (error == nil) {
-                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
-                } else {
-                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
-                }
-                SetCommandExitStatus(error);
-            }];
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
-
-/*
  * Attribute Sensors
  */
 class ReadThermostatSensors : public ReadAttribute {
@@ -114439,34 +114267,34 @@ public:
 #if MTR_ENABLE_PROVISIONAL
 
 /*
- * Attribute AvailableSensorHandles
+ * Attribute AvailableSensors
  */
-class ReadThermostatAvailableSensorHandles : public ReadAttribute {
+class ReadThermostatAvailableSensors : public ReadAttribute {
 public:
-    ReadThermostatAvailableSensorHandles()
-        : ReadAttribute("available-sensor-handles")
+    ReadThermostatAvailableSensors()
+        : ReadAttribute("available-sensors")
     {
     }
 
-    ~ReadThermostatAvailableSensorHandles()
+    ~ReadThermostatAvailableSensors()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensorHandles::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        [cluster readAttributeAvailableSensorHandlesWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"Thermostat.AvailableSensorHandles response %@", [value description]);
+        [cluster readAttributeAvailableSensorsWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Thermostat.AvailableSensors response %@", [value description]);
             if (error == nil) {
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
             } else {
-                LogNSError("Thermostat AvailableSensorHandles read Error", error);
+                LogNSError("Thermostat AvailableSensors read Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -114475,25 +114303,25 @@ public:
     }
 };
 
-class WriteThermostatAvailableSensorHandles : public WriteAttribute {
+class WriteThermostatAvailableSensors : public WriteAttribute {
 public:
-    WriteThermostatAvailableSensorHandles()
-        : WriteAttribute("available-sensor-handles")
+    WriteThermostatAvailableSensors()
+        : WriteAttribute("available-sensors")
         , mComplex(&mValue)
     {
-        AddArgument("attr-name", "available-sensor-handles");
+        AddArgument("attr-name", "available-sensors");
         AddArgument("attr-value", &mComplex);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAvailableSensorHandles()
+    ~WriteThermostatAvailableSensors()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensorHandles::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") WriteAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -114512,9 +114340,9 @@ public:
             value = array_0;
         }
 
-        [cluster writeAttributeAvailableSensorHandlesWithValue:value params:params completion:^(NSError * _Nullable error) {
+        [cluster writeAttributeAvailableSensorsWithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
-                LogNSError("Thermostat AvailableSensorHandles write Error", error);
+                LogNSError("Thermostat AvailableSensors write Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -114527,21 +114355,21 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
 };
 
-class SubscribeAttributeThermostatAvailableSensorHandles : public SubscribeAttribute {
+class SubscribeAttributeThermostatAvailableSensors : public SubscribeAttribute {
 public:
-    SubscribeAttributeThermostatAvailableSensorHandles()
-        : SubscribeAttribute("available-sensor-handles")
+    SubscribeAttributeThermostatAvailableSensors()
+        : SubscribeAttribute("available-sensors")
     {
     }
 
-    ~SubscribeAttributeThermostatAvailableSensorHandles()
+    ~SubscribeAttributeThermostatAvailableSensors()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensorHandles::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -114556,10 +114384,10 @@ public:
         if (mAutoResubscribe.HasValue()) {
             params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
-        [cluster subscribeAttributeAvailableSensorHandlesWithParams:params
+        [cluster subscribeAttributeAvailableSensorsWithParams:params
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Thermostat.AvailableSensorHandles response %@", [value description]);
+                NSLog(@"Thermostat.AvailableSensors response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -114576,34 +114404,34 @@ public:
 #if MTR_ENABLE_PROVISIONAL
 
 /*
- * Attribute EnabledSensorHandles
+ * Attribute EnabledSensors
  */
-class ReadThermostatEnabledSensorHandles : public ReadAttribute {
+class ReadThermostatEnabledSensors : public ReadAttribute {
 public:
-    ReadThermostatEnabledSensorHandles()
-        : ReadAttribute("enabled-sensor-handles")
+    ReadThermostatEnabledSensors()
+        : ReadAttribute("enabled-sensors")
     {
     }
 
-    ~ReadThermostatEnabledSensorHandles()
+    ~ReadThermostatEnabledSensors()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensorHandles::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        [cluster readAttributeEnabledSensorHandlesWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"Thermostat.EnabledSensorHandles response %@", [value description]);
+        [cluster readAttributeEnabledSensorsWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Thermostat.EnabledSensors response %@", [value description]);
             if (error == nil) {
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
             } else {
-                LogNSError("Thermostat EnabledSensorHandles read Error", error);
+                LogNSError("Thermostat EnabledSensors read Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -114612,25 +114440,25 @@ public:
     }
 };
 
-class WriteThermostatEnabledSensorHandles : public WriteAttribute {
+class WriteThermostatEnabledSensors : public WriteAttribute {
 public:
-    WriteThermostatEnabledSensorHandles()
-        : WriteAttribute("enabled-sensor-handles")
+    WriteThermostatEnabledSensors()
+        : WriteAttribute("enabled-sensors")
         , mComplex(&mValue)
     {
-        AddArgument("attr-name", "enabled-sensor-handles");
+        AddArgument("attr-name", "enabled-sensors");
         AddArgument("attr-value", &mComplex);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatEnabledSensorHandles()
+    ~WriteThermostatEnabledSensors()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensorHandles::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") WriteAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -114649,9 +114477,9 @@ public:
             value = array_0;
         }
 
-        [cluster writeAttributeEnabledSensorHandlesWithValue:value params:params completion:^(NSError * _Nullable error) {
+        [cluster writeAttributeEnabledSensorsWithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
-                LogNSError("Thermostat EnabledSensorHandles write Error", error);
+                LogNSError("Thermostat EnabledSensors write Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -114664,21 +114492,21 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
 };
 
-class SubscribeAttributeThermostatEnabledSensorHandles : public SubscribeAttribute {
+class SubscribeAttributeThermostatEnabledSensors : public SubscribeAttribute {
 public:
-    SubscribeAttributeThermostatEnabledSensorHandles()
-        : SubscribeAttribute("enabled-sensor-handles")
+    SubscribeAttributeThermostatEnabledSensors()
+        : SubscribeAttribute("enabled-sensors")
     {
     }
 
-    ~SubscribeAttributeThermostatEnabledSensorHandles()
+    ~SubscribeAttributeThermostatEnabledSensors()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensorHandles::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -114693,10 +114521,10 @@ public:
         if (mAutoResubscribe.HasValue()) {
             params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
-        [cluster subscribeAttributeEnabledSensorHandlesWithParams:params
+        [cluster subscribeAttributeEnabledSensorsWithParams:params
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Thermostat.EnabledSensorHandles response %@", [value description]);
+                NSLog(@"Thermostat.EnabledSensors response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -114870,12 +114698,12 @@ public:
                 newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
-                    for (auto & entry_2 : entry_0.enabledSensorHandles) {
+                    for (auto & entry_2 : entry_0.enabledSensors) {
                         NSData * newElement_2;
                         newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
                         [array_2 addObject:newElement_2];
                     }
-                    newElement_0.enabledSensorHandles = array_2;
+                    newElement_0.enabledSensors = array_2;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -118849,10 +118677,7 @@ public:
         __auto_type * params = [[MTRWriteParams alloc] init];
         params.timedWriteTimeout = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
-        NSNumber * _Nullable value = nil;
-        if (!mValue.IsNull()) {
-            value = [NSNumber numberWithUnsignedChar:mValue.Value()];
-        }
+        NSNumber * _Nonnull value = [NSNumber numberWithUnsignedChar:mValue];
 
         [cluster writeAttributeMistTypeWithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
@@ -118865,7 +118690,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
+    uint8_t mValue;
 };
 
 class SubscribeAttributeHumidistatMistType : public SubscribeAttribute {
@@ -151522,6 +151347,7 @@ public:
 | * BLTCSSecurityLevel                                                | 0x0004 |
 | * BLTCSModeCapability                                               | 0x0005 |
 | * SessionIDList                                                     | 0x0006 |
+| * RangingConstraints                                                | 0x0007 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -151566,9 +151392,6 @@ public:
         AddArgument("Bandwidth", 0, UINT32_MAX, &mRequest.bandwidth);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("SecurityMode", 0, UINT8_MAX, &mRequest.securityMode);
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
         AddArgument("Trigger", &mComplex_Trigger);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
@@ -151596,11 +151419,7 @@ public:
             params.wiFiRangingDeviceRoleConfig = [MTRProximityRangingClusterWiFiRangingDeviceRoleConfigStruct new];
             params.wiFiRangingDeviceRoleConfig.role = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.wiFiRangingDeviceRoleConfig.Value().role)];
             params.wiFiRangingDeviceRoleConfig.peerWiFiDevIK = [NSData dataWithBytes:mRequest.wiFiRangingDeviceRoleConfig.Value().peerWiFiDevIK.data() length:mRequest.wiFiRangingDeviceRoleConfig.Value().peerWiFiDevIK.size()];
-            if (mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.HasValue()) {
-                params.wiFiRangingDeviceRoleConfig.pmk = [NSData dataWithBytes:mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.Value().data() length:mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.Value().size()];
-            } else {
-                params.wiFiRangingDeviceRoleConfig.pmk = nil;
-            }
+            params.wiFiRangingDeviceRoleConfig.pmk = [NSData dataWithBytes:mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.data() length:mRequest.wiFiRangingDeviceRoleConfig.Value().pmk.size()];
         } else {
             params.wiFiRangingDeviceRoleConfig = nil;
         }
@@ -151610,6 +151429,12 @@ public:
             params.bleRangingDeviceRoleConfig = [MTRProximityRangingClusterBLERangingDeviceRoleConfigStruct new];
             params.bleRangingDeviceRoleConfig.role = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.BLERangingDeviceRoleConfig.Value().role)];
             params.bleRangingDeviceRoleConfig.peerBLEDeviceID = [NSNumber numberWithUnsignedLongLong:mRequest.BLERangingDeviceRoleConfig.Value().peerBLEDeviceID];
+            params.bleRangingDeviceRoleConfig.blerbcSecurityMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.BLERangingDeviceRoleConfig.Value().BLERBCSecurityMode)];
+            if (mRequest.BLERangingDeviceRoleConfig.Value().sessionKey.HasValue()) {
+                params.bleRangingDeviceRoleConfig.sessionKey = [NSData dataWithBytes:mRequest.BLERangingDeviceRoleConfig.Value().sessionKey.Value().data() length:mRequest.BLERangingDeviceRoleConfig.Value().sessionKey.Value().size()];
+            } else {
+                params.bleRangingDeviceRoleConfig.sessionKey = nil;
+            }
         } else {
             params.bleRangingDeviceRoleConfig = nil;
         }
@@ -151624,16 +151449,8 @@ public:
             } else {
                 params.bltChannelSoundingDeviceRoleConfig.bltcsMode = nil;
             }
-            if (mRequest.BLTChannelSoundingDeviceRoleConfig.Value().BLTCSSecurityLevel.HasValue()) {
-                params.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.BLTChannelSoundingDeviceRoleConfig.Value().BLTCSSecurityLevel.Value())];
-            } else {
-                params.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel = nil;
-            }
-            if (mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.HasValue()) {
-                params.bltChannelSoundingDeviceRoleConfig.ltk = [NSData dataWithBytes:mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.Value().data() length:mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.Value().size()];
-            } else {
-                params.bltChannelSoundingDeviceRoleConfig.ltk = nil;
-            }
+            params.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.BLTChannelSoundingDeviceRoleConfig.Value().BLTCSSecurityLevel)];
+            params.bltChannelSoundingDeviceRoleConfig.ltk = [NSData dataWithBytes:mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.data() length:mRequest.BLTChannelSoundingDeviceRoleConfig.Value().ltk.size()];
         } else {
             params.bltChannelSoundingDeviceRoleConfig = nil;
         }
@@ -151651,9 +151468,6 @@ public:
         } else {
             params.bandwidth = nil;
         }
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
-        params.securityMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.securityMode)];
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         params.trigger = [MTRProximityRangingClusterRangingTriggerConditionStruct new];
@@ -152358,6 +152172,91 @@ public:
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                 NSLog(@"ProximityRanging.SessionIDList response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+
+/*
+ * Attribute RangingConstraints
+ */
+class ReadProximityRangingRangingConstraints : public ReadAttribute {
+public:
+    ReadProximityRangingRangingConstraints()
+        : ReadAttribute("ranging-constraints")
+    {
+    }
+
+    ~ReadProximityRangingRangingConstraints()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ProximityRanging::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::ProximityRanging::Attributes::RangingConstraints::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterProximityRanging alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributeRangingConstraintsWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"ProximityRanging.RangingConstraints response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("ProximityRanging RangingConstraints read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class SubscribeAttributeProximityRangingRangingConstraints : public SubscribeAttribute {
+public:
+    SubscribeAttributeProximityRangingRangingConstraints()
+        : SubscribeAttribute("ranging-constraints")
+    {
+    }
+
+    ~SubscribeAttributeProximityRangingRangingConstraints()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ProximityRanging::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::ProximityRanging::Attributes::RangingConstraints::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterProximityRanging alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributeRangingConstraintsWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"ProximityRanging.RangingConstraints response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -222881,26 +222780,18 @@ void registerClusterThermostat(Commands & commands)
         make_unique<SubscribeAttributeThermostatThermostatSuggestionNotFollowingReason>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        make_unique<ReadThermostatCriticalFreezeProtection>(), //
-        make_unique<SubscribeAttributeThermostatCriticalFreezeProtection>(), //
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
-        make_unique<ReadThermostatCriticalOverheatProtection>(), //
-        make_unique<SubscribeAttributeThermostatCriticalOverheatProtection>(), //
-#endif // MTR_ENABLE_PROVISIONAL
-#if MTR_ENABLE_PROVISIONAL
         make_unique<ReadThermostatSensors>(), //
         make_unique<SubscribeAttributeThermostatSensors>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        make_unique<ReadThermostatAvailableSensorHandles>(), //
-        make_unique<WriteThermostatAvailableSensorHandles>(), //
-        make_unique<SubscribeAttributeThermostatAvailableSensorHandles>(), //
+        make_unique<ReadThermostatAvailableSensors>(), //
+        make_unique<WriteThermostatAvailableSensors>(), //
+        make_unique<SubscribeAttributeThermostatAvailableSensors>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        make_unique<ReadThermostatEnabledSensorHandles>(), //
-        make_unique<WriteThermostatEnabledSensorHandles>(), //
-        make_unique<SubscribeAttributeThermostatEnabledSensorHandles>(), //
+        make_unique<ReadThermostatEnabledSensors>(), //
+        make_unique<WriteThermostatEnabledSensors>(), //
+        make_unique<SubscribeAttributeThermostatEnabledSensors>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadThermostatNumberOfSensorScheduleTransitions>(), //
@@ -224340,6 +224231,10 @@ void registerClusterProximityRanging(Commands & commands)
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadProximityRangingSessionIDList>(), //
         make_unique<SubscribeAttributeProximityRangingSessionIDList>(), //
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadProximityRangingRangingConstraints>(), //
+        make_unique<SubscribeAttributeProximityRangingRangingConstraints>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadProximityRangingGeneratedCommandList>(), //

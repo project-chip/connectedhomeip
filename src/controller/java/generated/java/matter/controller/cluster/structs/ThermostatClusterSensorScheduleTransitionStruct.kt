@@ -26,13 +26,13 @@ import matter.tlv.TlvWriter
 class ThermostatClusterSensorScheduleTransitionStruct(
   val dayOfWeek: UByte,
   val transitionTime: UShort,
-  val enabledSensorHandles: List<ByteArray>,
+  val enabledSensors: List<ByteArray>,
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterSensorScheduleTransitionStruct {\n")
     append("\tdayOfWeek : $dayOfWeek\n")
     append("\ttransitionTime : $transitionTime\n")
-    append("\tenabledSensorHandles : $enabledSensorHandles\n")
+    append("\tenabledSensors : $enabledSensors\n")
     append("}\n")
   }
 
@@ -41,8 +41,8 @@ class ThermostatClusterSensorScheduleTransitionStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_DAY_OF_WEEK), dayOfWeek)
       put(ContextSpecificTag(TAG_TRANSITION_TIME), transitionTime)
-      startArray(ContextSpecificTag(TAG_ENABLED_SENSOR_HANDLES))
-      for (item in enabledSensorHandles.iterator()) {
+      startArray(ContextSpecificTag(TAG_ENABLED_SENSORS))
+      for (item in enabledSensors.iterator()) {
         put(AnonymousTag, item)
       }
       endArray()
@@ -53,7 +53,7 @@ class ThermostatClusterSensorScheduleTransitionStruct(
   companion object {
     private const val TAG_DAY_OF_WEEK = 0
     private const val TAG_TRANSITION_TIME = 1
-    private const val TAG_ENABLED_SENSOR_HANDLES = 2
+    private const val TAG_ENABLED_SENSORS = 2
 
     fun fromTlv(
       tlvTag: Tag,
@@ -62,9 +62,9 @@ class ThermostatClusterSensorScheduleTransitionStruct(
       tlvReader.enterStructure(tlvTag)
       val dayOfWeek = tlvReader.getUByte(ContextSpecificTag(TAG_DAY_OF_WEEK))
       val transitionTime = tlvReader.getUShort(ContextSpecificTag(TAG_TRANSITION_TIME))
-      val enabledSensorHandles =
+      val enabledSensors =
         buildList<ByteArray> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ENABLED_SENSOR_HANDLES))
+          tlvReader.enterArray(ContextSpecificTag(TAG_ENABLED_SENSORS))
           while (!tlvReader.isEndOfContainer()) {
             add(tlvReader.getByteArray(AnonymousTag))
           }
@@ -76,7 +76,7 @@ class ThermostatClusterSensorScheduleTransitionStruct(
       return ThermostatClusterSensorScheduleTransitionStruct(
         dayOfWeek,
         transitionTime,
-        enabledSensorHandles,
+        enabledSensors,
       )
     }
   }

@@ -1360,7 +1360,6 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
-    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -1481,11 +1480,6 @@ cluster OperationalCredentials = 62 {
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
   revision 4;
-
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
