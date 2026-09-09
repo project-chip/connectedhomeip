@@ -58,6 +58,9 @@ log = logging.getLogger(__name__)
 _TIMED_REQUEST_TIMEOUT_MS = 5000
 # A compact-pdc-identity for an ECDSA key is at most 140 octets.
 _MAX_ECDSA_IDENTITY_LENGTH = 140
+# Valid ranges for the table indices, used to pick an index no entry occupies.
+_MAX_CLIENT_INDEX = 2047
+_MAX_NETWORK_IDENTITY_INDEX = 65534
 
 
 class TC_NETIM_1_3(MatterBaseTest):
@@ -173,11 +176,15 @@ class TC_NETIM_1_3(MatterBaseTest):
                              "QueryIdentity by ClientIndex returned an Identity that does not match ClientIdentifierA.")
         returned_identities.append(response.identity)
 
-        self.step(11, "TH sends QueryIdentity with only ClientIndex=clientIndex+1.",
+        self.step(11, "TH sends QueryIdentity with only ClientIndex set to an index no entry in Clients occupies.",
                   expectation="DUT responds with NOT_FOUND.")
+        # Incrementing clientIndex is not enough: on a DUT that already holds another client at that index
+        # the query would succeed and fail the step for an unrelated reason.
+        allocated_client_indices = {c.clientIndex for c in clients_list}
+        unknown_client_index = next(i for i in range(1, _MAX_CLIENT_INDEX + 1) if i not in allocated_client_indices)
         await self._expect_query_status(
             endpoint, Status.NotFound, "QueryIdentity with an unallocated ClientIndex should fail with NotFound.",
-            clientIndex=client_index + 1)
+            clientIndex=unknown_client_index)
 
         self.step(12, "TH sends QueryIdentity with no fields present.",
                   expectation="DUT responds with INVALID_COMMAND.")
@@ -193,7 +200,9 @@ class TC_NETIM_1_3(MatterBaseTest):
 
         self.step(14, "TH sends QueryIdentity with an unknown NetworkIdentityIndex.",
                   expectation="DUT responds with NOT_FOUND.")
-        unknown_ni_index = ani_index + 1 if ani_index < 65534 else ani_index - 1
+        # A retired identity may still occupy aniIndex+1, so pick an index absent from ActiveNetworkIdentities.
+        allocated_ni_indices = {identity.index for identity in active_list}
+        unknown_ni_index = next(i for i in range(1, _MAX_NETWORK_IDENTITY_INDEX + 1) if i not in allocated_ni_indices)
         await self._expect_query_status(
             endpoint, Status.NotFound, "QueryIdentity with an unknown NetworkIdentityIndex should fail with NotFound.",
             networkIdentityIndex=unknown_ni_index)

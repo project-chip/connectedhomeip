@@ -112,10 +112,12 @@ class TC_NETIM_1_4(MatterBaseTest):
         self.step("precondition-1", "Commissioning, already done. TH generates the Network Administrator Shared Secrets used by "
                                     "this test with strictly increasing timestamps.",
                   is_commissioning=True)
-        # Timestamps are spaced a few seconds apart, strictly increasing, and close to "now" so the DUT's
-        # (optional) future-timestamp check is satisfied. Each NASS uses a distinct random raw secret, so
-        # each derives a distinct Network Identity; NASSa is reused verbatim for the idempotent re-import.
-        base = matter_epoch_now()
+        # Timestamps are spaced a few seconds apart, strictly increasing, and all in the past (the newest is
+        # "now"), so a DUT with a trusted real-time clock cannot see one more than a minute ahead of its own
+        # time and reject the import with DYNAMIC_CONSTRAINT_ERROR. Only ordering against the stored NASS
+        # matters here. Each NASS uses a distinct random raw secret, so each derives a distinct Network
+        # Identity; NASSa is reused verbatim for the idempotent re-import.
+        base = matter_epoch_now() - 40
         raw_a = secrets.token_bytes(NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH)
         timestamp_d = base + 30
         nass_a = encode_network_administrator_secret(created=base, raw_secret=raw_a)
