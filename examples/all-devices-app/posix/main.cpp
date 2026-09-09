@@ -311,6 +311,12 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
                 .RegisterClusterInstance<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>(
                     &electricalSensorDevice->ElectricalEnergyMeasurementCluster());
         }
+        else if (config.type == "mode-select")
+        {
+            auto * modeSelectDevice = static_cast<chip::app::ModeSelect *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ModeSelectCluster>(&modeSelectDevice->ModeSelectCluster());
+        }
     }
 
     gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()

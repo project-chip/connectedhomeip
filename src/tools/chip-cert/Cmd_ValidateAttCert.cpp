@@ -154,9 +154,10 @@ AttestationVerificationResult MapError(CertificateChainValidationResult certific
 
 bool Cmd_ValidateAttCert(int argc, char * argv[])
 {
-    uint8_t dacBuf[kMaxDERCertLength] = { 0 };
-    uint8_t paiBuf[kMaxDERCertLength] = { 0 };
-    uint8_t paaBuf[kMaxDERCertLength] = { 0 };
+    // PAI/PAA may be ML-DSA signed (PQC Phase 1) and exceed the legacy 600-byte limit.
+    uint8_t dacBuf[kMaxPQCDERCertLength] = { 0 };
+    uint8_t paiBuf[kMaxPQCDERCertLength] = { 0 };
+    uint8_t paaBuf[kMaxPQCDERCertLength] = { 0 };
     MutableByteSpan dac(dacBuf);
     MutableByteSpan pai(paiBuf);
     MutableByteSpan paa(paaBuf);
