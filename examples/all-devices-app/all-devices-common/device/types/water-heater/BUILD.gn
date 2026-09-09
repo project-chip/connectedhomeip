@@ -23,6 +23,7 @@ source_set("water-heater") {
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/src/app/clusters/water-heater-management-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",

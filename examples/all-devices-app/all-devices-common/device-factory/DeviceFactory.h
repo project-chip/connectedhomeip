@@ -532,7 +532,10 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_HEATER)
         {
-            RegisterCreator("water-heater", []() { return std::make_unique<WaterHeater>(); });
+            RegisterCreator("water-heater", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<WaterHeater>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)
         {

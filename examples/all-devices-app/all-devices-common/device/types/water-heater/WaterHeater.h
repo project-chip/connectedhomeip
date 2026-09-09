@@ -16,19 +16,54 @@
  */
 #pragma once
 
+#include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <device/api/SingleEndpoint.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class WaterHeater : public SingleEndpoint
+class WaterHeater : public SingleEndpoint, public Clusters::WaterHeaterManagement::Delegate, public TimerContext
 {
 public:
-    WaterHeater();
-    ~WaterHeater() override = default;
+    explicit WaterHeater(TimerDelegate & timerDelegate);
+    ~WaterHeater() override;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeaterManagementCluster();
+
+    // TimerContext
+    void TimerFired() override;
+
+    // Clusters::WaterHeaterManagement::Delegate
+    Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                                    Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
+                                                    Optional<Percent> targetReheat) override;
+    Protocols::InteractionModel::Status HandleCancelBoost() override;
+    BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> GetHeaterTypes() override;
+    BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> GetHeatDemand() override;
+    uint16_t GetTankVolume() override;
+    Energy_mWh GetEstimatedHeatRequired() override;
+    Percent GetTankPercentage() override;
+    Clusters::WaterHeaterManagement::BoostStateEnum GetBoostState() override;
+
+private:
+    void EndBoost();
+    void NotifyHeatDemandAndBoostStateChanged();
+
+    TimerDelegate & mTimerDelegate;
+    CodeDrivenDataModelProvider * mProvider = nullptr;
+
+    BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeaterTypes{
+        Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap::kImmersionElement1
+    };
+    BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeatDemand;
+    Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
+
+    LazyRegisteredServerCluster<Clusters::WaterHeaterManagement::WaterHeaterManagementCluster> mWaterHeaterManagementCluster;
 };
 
 } // namespace chip::app
