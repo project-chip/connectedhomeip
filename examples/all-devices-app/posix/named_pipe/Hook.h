@@ -51,6 +51,7 @@ struct HasNamedPipeTranslators<
 
 } // namespace detail
 
+/// Static hook for DeviceFactory that registers Named Pipe translators for devices supporting named pipe control.
 class Hook
 {
 public:

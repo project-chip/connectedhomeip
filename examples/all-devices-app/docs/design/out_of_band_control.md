@@ -84,7 +84,7 @@ flowchart LR
 examples/all-devices-app/
 ├── all-devices-common/
 │   ├── device-factory/
-│   │   ├── DeviceFactory.h                             # Variadic DeviceFactory<Hooks...> & SimpleDeviceFactory
+│   │   ├── DeviceFactory.h                             # Variadic DeviceFactory<Hooks...> & NoHooksDeviceFactory
 │   │   └── BUILD.gn
 │   ├── device/
 │   │   └── types/
@@ -119,22 +119,17 @@ examples/all-devices-app/
 
 ## 3. Interfaces & Core Types
 
-### `CreatedDevice` Struct
+### `DeviceRegistrationEntry` Struct
 
 ```cpp
 namespace chip::app {
 
-struct CreatedDevice
+/// Bundles an allocated device with its post-registration hook callback.
+struct DeviceRegistrationEntry
 {
     std::unique_ptr<DeviceInterface> device;
 
-    /**
-     * @brief Optional callback to execute actions after endpoint registration.
-     *
-     * This callback MUST be invoked after `device->Register(...)` completes so that
-     * any actions requiring a valid allocated EndpointId (such as registering OOB
-     * cluster accessors or named pipe translators) have access to `device->GetEndpointId()`.
-     */
+    /// Hook callback that must be invoked after `device->Register(...)` completes while the device remains valid.
     std::function<void()> onDeviceRegistered;
 };
 
@@ -518,7 +513,7 @@ In `DeviceFactory.h` (creator registration):
 ```cpp
 RegisterCreator("on-off-light", [this]() {
     VerifyOrDie(mContext.has_value());
-    return MakeCreatedDevice<LoggingOnOffLight>(LoggingOnOffLight::Context{
+    return MakeDevice<LoggingOnOffLight>(LoggingOnOffLight::Context{
         .groupDataProvider = mContext->groupDataProvider,
         .fabricTable       = mContext->fabricTable,
         .timerDelegate     = mContext->timerDelegate,

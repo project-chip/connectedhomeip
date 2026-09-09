@@ -209,7 +209,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
-    chip::app::SimpleDeviceFactory::GetInstance().Init(chip::app::SimpleDeviceFactory::Context{
+    chip::app::NoHooksDeviceFactory::GetInstance().Init(chip::app::NoHooksDeviceFactory::Context{
         .groupDataProvider        = *groupDataProvider,
         .fabricTable              = chip::Server::GetInstance().GetFabricTable(),
         .timerDelegate            = sTimerDelegate,
@@ -223,7 +223,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .identifyDelegate         = sIdentifyDelegate,
     });
 
-    auto & deviceFactory = chip::app::SimpleDeviceFactory::GetInstance();
+    auto & deviceFactory = chip::app::NoHooksDeviceFactory::GetInstance();
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
 

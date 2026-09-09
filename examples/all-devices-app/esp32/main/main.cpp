@@ -264,7 +264,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    auto & deviceFactory = SimpleDeviceFactory::GetInstance();
+    auto & deviceFactory = NoHooksDeviceFactory::GetInstance();
 
     // figure out the default
     if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
@@ -309,7 +309,7 @@ void InitServer(intptr_t context)
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    SimpleDeviceFactory::GetInstance().Init(SimpleDeviceFactory::Context{
+    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
         .groupDataProvider        = gGroupDataProvider,                     //
         .fabricTable              = Server::GetInstance().GetFabricTable(), //
         .timerDelegate            = gTimerDelegate,                         //
@@ -325,8 +325,8 @@ void InitServer(intptr_t context)
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
-    SimpleDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
-        return SimpleDeviceFactory::MakeCreatedDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
+    NoHooksDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return NoHooksDeviceFactory::MakeDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,

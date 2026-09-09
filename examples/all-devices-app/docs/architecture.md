@@ -140,7 +140,7 @@ sequenceDiagram
 
     App->>Factory: Create(deviceType, label)
     Factory->>Device: new ConcreteDevice(...)
-    Factory-->>App: CreatedDevice { device, onDeviceRegistered }
+    Factory-->>App: DeviceRegistrationEntry { device, onDeviceRegistered }
 
     App->>Device: Register(endpointIdAllocator, Provider)
     Device->>Provider: AddEndpoint / AddCluster (assigns EndpointId)
@@ -154,7 +154,7 @@ sequenceDiagram
    the `DeviceFactory` constructor.
 2. **Hook Specialization**: Platforms instantiate `DeviceFactory` with
    target-specific static hooks:
-    - **`SimpleDeviceFactory`** (`DeviceFactory<>`): Default specialization with
+    - **`NoHooksDeviceFactory`** (`DeviceFactory<>`): Default specialization with
       no hooks, used by embedded targets (ESP32, SiLabs, Telink) to minimize
       binary footprint.
     - **`PosixDeviceFactory`**
@@ -163,11 +163,11 @@ sequenceDiagram
       translators only for instantiated devices.
 3. **Creation & Registration Lifecycle**:
     - `factory.Create(type, label)` instantiates the device and returns a
-      `CreatedDevice` struct containing the `std::unique_ptr<DeviceInterface>`
+      `DeviceRegistrationEntry` struct containing the `std::unique_ptr<DeviceInterface>`
       and a `std::function<void()> onDeviceRegistered` callback.
     - The application registers the endpoint with the
       `CodeDrivenDataModelProvider`, allocating its valid runtime `EndpointId`.
-    - The application invokes `created.onDeviceRegistered()`, which expands the
+    - The application invokes `entry.onDeviceRegistered()`, which expands the
       `variadic` fold expression `(Hooks::OnDeviceRegistered(*rawDevice), ...)`
       statically for each configured hook.
 

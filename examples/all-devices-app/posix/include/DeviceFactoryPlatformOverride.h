@@ -61,7 +61,7 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
 
         const Clusters::CommissioningProxy::CommissioningProxyCluster::Config proxyConfig(proxyFeatures);
 
-        factory.RegisterCreator("commissioning-proxy", [proxyContext, proxyConfig]() -> typename Factory::CreatedDevice {
+        factory.RegisterCreator("commissioning-proxy", [proxyContext, proxyConfig]() -> typename Factory::DeviceRegistrationEntry {
             // Refuse a second proxy. The driver above is a single instance because
             // the radio it drives is: one BLE scanner. Handing it to a second device
             // would take it over from the first, leaving it registered but
@@ -70,14 +70,14 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
             if (sProxyDeviceCreated)
             {
                 ChipLogError(AppServer, "Only one commissioning-proxy device is supported: its transports drive single radios");
-                return typename Factory::CreatedDevice{};
+                return typename Factory::DeviceRegistrationEntry{};
             }
             sProxyDeviceCreated = true;
 
             auto device = std::make_unique<CommissioningProxyDevice>(proxyContext, proxyConfig);
             device->AddTransport(sBleProxyTransport);
             auto * rawDevice = device.get();
-            return typename Factory::CreatedDevice{
+            return typename Factory::DeviceRegistrationEntry{
                 std::move(device), Factory::template MakeOnDeviceRegisteredCallback<CommissioningProxyDevice>(rawDevice)
             };
         });
@@ -87,14 +87,14 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
         factory.RegisterCreator("speaker", [&timerDelegate, &audioManager]() {
-            return Factory::template MakeCreatedDevice<PosixSpeaker>(PosixSpeaker::Context{ timerDelegate }, audioManager);
+            return Factory::template MakeDevice<PosixSpeaker>(PosixSpeaker::Context{ timerDelegate }, audioManager);
         });
     }
 
     if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {
         factory.RegisterCreator("chime", [&timerDelegate, &audioManager]() {
-            return Factory::template MakeCreatedDevice<PosixChime>(timerDelegate, audioManager);
+            return Factory::template MakeDevice<PosixChime>(timerDelegate, audioManager);
         });
     }
 }

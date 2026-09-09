@@ -51,6 +51,7 @@ struct HasOOBAccessors<T, std::void_t<decltype(RegisterOOBAccessors(std::declval
 
 } // namespace detail
 
+/// Static hook for DeviceFactory that registers Out-of-Band (OOB) accessors for devices supporting OOB actions.
 class OOBAccessorHook
 {
 public:

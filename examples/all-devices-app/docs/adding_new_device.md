@@ -324,7 +324,7 @@ your self-contained **logging mock** in
     {
         RegisterCreator("my-sensor", [this]() {
             VerifyOrDie(mContext.has_value());
-            return MakeCreatedDevice<LoggingMySensor>(mContext->timerDelegate);
+            return MakeDevice<LoggingMySensor>(mContext->timerDelegate);
         });
     }
     ```
