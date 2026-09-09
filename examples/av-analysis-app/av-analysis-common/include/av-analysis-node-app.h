@@ -54,12 +54,15 @@ private:
     WebRTCPeerController * mPeerController = nullptr;
 
     AvAnalysisNodeDelegate mAvAnalysisDelegate;
+    WebRTCRequestorDelegate mRequestorDelegate;
+
+    // The receiving end of the WebRTC sessions the AV Analysis cluster initiates.
+    LazyRegisteredServerCluster<Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster> mWebRTCRequestorServer;
+
     Clusters::DefaultAvAnalysisCameraClient mCameraClient;
     Clusters::DefaultAvAnalysisWebRTCClient mWebRTCClient;
-    WebRTCRequestorDelegate mRequestorDelegate;
+
     LazyRegisteredServerCluster<Clusters::AvAnalysisCluster> mAvAnalysisServer;
-    // The receiving end of the WebRTC sessions the AV Analysis cluster initiates
-    LazyRegisteredServerCluster<Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster> mWebRTCRequestorServer;
 };
 
 } // namespace app
