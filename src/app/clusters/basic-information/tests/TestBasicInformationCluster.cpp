@@ -143,9 +143,9 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
     // check with default optional attributes (unique ID forced on)
     {
         const BasicInformationOptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
-                                        chip::DeviceLayer::PlatformMgr(),
-                                        app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+        BasicInformationClusterNoDeviceLocation cluster(
+            optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(), chip::DeviceLayer::PlatformMgr(),
+            app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
         EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster,
                                                      {
@@ -171,9 +171,9 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
     // Check that disabling unique id works
     {
         BasicInformationOptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster2(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
-                                         chip::DeviceLayer::PlatformMgr(),
-                                         app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+        BasicInformationClusterNoDeviceLocation cluster2(
+            optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(), chip::DeviceLayer::PlatformMgr(),
+            app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
         // Forcing unique id to off is done for backwards compatibility testing.
         // It is NOT a valid configuration for new devices.
@@ -210,11 +210,12 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
                                                                                .template Set<LocalConfigDisabled::Id>()
                                                                                .template Set<Reachable::Id>()
                                                                                .template Set<ProductAppearance::Id>()
-                                                                               .template Set<UniqueID::Id>();
+                                                                               .template Set<UniqueID::Id>()
+                                                                               .template Set<DeviceLocation::Id>();
 
-        BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
-                                        chip::DeviceLayer::PlatformMgr(),
-                                        app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+        BasicInformationClusterWithDeviceLocation cluster(
+            optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(), chip::DeviceLayer::PlatformMgr(),
+            app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
         EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster,
 
@@ -243,6 +244,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
                                                          LocalConfigDisabled::kMetadataEntry,   //
                                                          Reachable::kMetadataEntry,             //
                                                          ProductAppearance::kMetadataEntry,     //
+                                                         DeviceLocation::kMetadataEntry,        //
                                                      }));
     }
 }

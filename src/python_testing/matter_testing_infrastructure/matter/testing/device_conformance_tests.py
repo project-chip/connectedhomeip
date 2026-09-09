@@ -125,7 +125,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
             in_progress_attributes = {
                 Clusters.ThreadNetworkDiagnostics.id: [0x3F, 0x40],
-                Clusters.BasicInformation.id: [0x18],
+                Clusters.BasicInformation.id: [0x17, 0x18],
             }
             ignore_attributes.update(in_progress_attributes)
 
