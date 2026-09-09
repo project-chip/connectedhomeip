@@ -102,33 +102,10 @@ ThreadMeshcopCommissionProxy::ThreadMeshcopCommissionProxy() : mState(State::kCo
 ThreadMeshcopCommissionProxy::~ThreadMeshcopCommissionProxy()
 {
     std::unique_lock<std::recursive_mutex> lock(mMutex);
+    mStopProxyThread = true;
     if (mProxyFd != -1)
     {
-        if (shutdown(mProxyFd, SHUT_RDWR) == 0 || errno != EBADF)
-        {
-            close(mProxyFd);
-        }
-
-        mProxyFd = -1;
-    }
-
-    if (mProxyThread.joinable())
-    {
-        lock.unlock();
-        mProxyThread.join();
-    }
-}
-
-void ThreadMeshcopCommissionProxy::ResetCommissionerForDiscovery()
-{
-    std::unique_lock<std::recursive_mutex> lock(mMutex);
-    if (mProxyFd != -1)
-    {
-        if (shutdown(mProxyFd, SHUT_RDWR) == 0 || errno != EBADF)
-        {
-            close(mProxyFd);
-        }
-        mProxyFd = -1;
+        shutdown(mProxyFd, SHUT_RDWR);
     }
 
     if (mProxyThread.joinable())
@@ -136,6 +113,36 @@ void ThreadMeshcopCommissionProxy::ResetCommissionerForDiscovery()
         lock.unlock();
         mProxyThread.join();
         lock.lock();
+    }
+
+    // The receiver must stop using the descriptor before it can be closed or reused.
+    if (mProxyFd != -1)
+    {
+        close(mProxyFd);
+        mProxyFd = -1;
+    }
+}
+
+void ThreadMeshcopCommissionProxy::ResetCommissionerForDiscovery()
+{
+    std::unique_lock<std::recursive_mutex> lock(mMutex);
+    mStopProxyThread = true;
+    if (mProxyFd != -1)
+    {
+        shutdown(mProxyFd, SHUT_RDWR);
+    }
+
+    if (mProxyThread.joinable())
+    {
+        lock.unlock();
+        mProxyThread.join();
+        lock.lock();
+    }
+
+    if (mProxyFd != -1)
+    {
+        close(mProxyFd);
+        mProxyFd = -1;
     }
 
     mServicePort  = 0;
@@ -404,13 +411,16 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
         mProxyThread.join();
     }
 
-    mProxyThread = std::thread([id = joinerIdBytes, this]() {
+    mStopProxyThread = false;
+    mProxyThread     = std::thread([id = joinerIdBytes, this]() {
         struct sockaddr_storage addr;
         socklen_t len = sizeof(addr);
         uint8_t buf[chip::detail::kMaxIPPacketSizeBytes];
         ssize_t received;
 
-        while ((received = recvfrom(mProxyFd, buf, sizeof(buf), 0, reinterpret_cast<struct sockaddr *>(&addr), &len)) > 0)
+        while (!mStopProxyThread &&
+               (received = recvfrom(mProxyFd, buf, sizeof(buf), 0, reinterpret_cast<struct sockaddr *>(&addr), &len)) > 0 &&
+               !mStopProxyThread)
         {
             switch (mState)
             {
