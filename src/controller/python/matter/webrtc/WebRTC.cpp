@@ -54,7 +54,7 @@ WebRTCClientHandle webrtc_client_create()
 {
     auto client               = std::make_shared<WebRTCClient>();
     WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(client.get());
-    
+
     std::lock_guard<std::mutex> lock(g_mutex);
     g_clients[handle] = client;
     return handle;
@@ -186,10 +186,10 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
 
 WebRTCClientHandle webrtc_provider_client_create()
 {
-    auto wrapper = std::make_unique<ProviderClientWrapper>();
-    wrapper->client = std::make_unique<WebRTCTransportProviderClient>();
+    auto wrapper              = std::make_unique<ProviderClientWrapper>();
+    wrapper->client           = std::make_unique<WebRTCTransportProviderClient>();
     WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(wrapper->client.get());
-    
+
     std::lock_guard<std::mutex> lock(g_mutex);
     g_provider_clients[handle] = std::move(wrapper);
     return handle;
@@ -220,22 +220,21 @@ void OnCommandResponseCallback(void * appContext, chip::EndpointId endpointId, c
         return;
 
     OnCommandSenderResponseCallback cb = nullptr;
-    void * pythonCtx = nullptr;
+    void * pythonCtx                   = nullptr;
 
     {
         std::lock_guard<std::mutex> lock(g_mutex);
         auto it = g_provider_clients.find(ctx->handle);
         if (it != g_provider_clients.end())
         {
-            cb = it->second->onResponse;
+            cb        = it->second->onResponse;
             pythonCtx = ctx->pythonAppContext;
         }
     }
 
     if (cb)
     {
-        cb(pythonCtx, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus,
-           payload, length);
+        cb(pythonCtx, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus, payload, length);
     }
 }
 
@@ -247,14 +246,14 @@ void OnCommandErrorCallback(void * appContext, chip::Protocols::InteractionModel
         return;
 
     OnCommandSenderErrorCallback cb = nullptr;
-    void * pythonCtx = nullptr;
+    void * pythonCtx                = nullptr;
 
     {
         std::lock_guard<std::mutex> lock(g_mutex);
         auto it = g_provider_clients.find(ctx->handle);
         if (it != g_provider_clients.end())
         {
-            cb = it->second->onError;
+            cb        = it->second->onError;
             pythonCtx = ctx->pythonAppContext;
         }
     }
@@ -272,14 +271,14 @@ void OnCommandDoneCallback(void * appContext)
         return;
 
     OnCommandSenderDoneCallback cb = nullptr;
-    void * pythonCtx = nullptr;
+    void * pythonCtx               = nullptr;
 
     {
         std::lock_guard<std::mutex> lock(g_mutex);
         auto it = g_provider_clients.find(ctx->handle);
         if (it != g_provider_clients.end())
         {
-            cb = it->second->onDone;
+            cb        = it->second->onDone;
             pythonCtx = ctx->pythonAppContext;
         }
     }
