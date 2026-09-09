@@ -26,8 +26,8 @@
 namespace chip {
 namespace Controller {
 
-AndroidWebRTCTransportProviderClient::AndroidWebRTCTransportProviderClient(jobject javaCallbackObject, chip::CommandId commandId)
-    : mCommandId(commandId)
+AndroidWebRTCTransportProviderClient::AndroidWebRTCTransportProviderClient(jobject javaCallbackObject, chip::CommandId commandId) :
+    mCommandId(commandId)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -49,7 +49,7 @@ AndroidWebRTCTransportProviderClient::AndroidWebRTCTransportProviderClient(jobje
     {
         mOnResponseMethod = env->GetMethodID(callbackClass, "onResponse", "(IZLjava/lang/Integer;Ljava/lang/Integer;)V");
     }
-    mOnErrorMethod       = env->GetMethodID(callbackClass, "onError", "(I)V");
+    mOnErrorMethod = env->GetMethodID(callbackClass, "onError", "(I)V");
 }
 
 AndroidWebRTCTransportProviderClient::~AndroidWebRTCTransportProviderClient()
@@ -57,9 +57,13 @@ AndroidWebRTCTransportProviderClient::~AndroidWebRTCTransportProviderClient()
     // mJavaCallback is automatically released by the JniGlobalReference destructor.
 }
 
-CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId, Optional<DataModel::Nullable<uint16_t>> videoStreamID, Optional<DataModel::Nullable<uint16_t>> audioStreamID, const CharSpan & offerSdp, jobject jcallback)
+CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId,
+                                                              Optional<DataModel::Nullable<uint16_t>> videoStreamID,
+                                                              Optional<DataModel::Nullable<uint16_t>> audioStreamID,
+                                                              const CharSpan & offerSdp, jobject jcallback)
 {
-    auto * client = new AndroidWebRTCTransportProviderClient(jcallback, Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id);
+    auto * client =
+        new AndroidWebRTCTransportProviderClient(jcallback, Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
 
     client->InitCallbacks(HandleCommandResponse, HandleCommandError, HandleCommandDone);
@@ -67,17 +71,17 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
 
     Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type value;
 
-    value.webRTCSessionID = app::DataModel::NullNullable;
-    value.sdp = offerSdp;
-    value.streamUsage = StreamUsageEnum::kLiveView;
+    value.webRTCSessionID       = app::DataModel::NullNullable;
+    value.sdp                   = offerSdp;
+    value.streamUsage           = StreamUsageEnum::kLiveView;
     value.originatingEndpointID = WebRTCTransportRequestorManager::Instance().GetEndpointId();
-    value.videoStreamID = videoStreamID;
-    value.audioStreamID = audioStreamID;
-    value.ICEServers = NullOptional;
-    value.metadataEnabled = NullOptional;
-    value.SFrameConfig = NullOptional;
-    value.videoStreams = NullOptional;
-    value.audioStreams = NullOptional;
+    value.videoStreamID         = videoStreamID;
+    value.audioStreamID         = audioStreamID;
+    value.ICEServers            = NullOptional;
+    value.metadataEnabled       = NullOptional;
+    value.SFrameConfig          = NullOptional;
+    value.videoStreams          = NullOptional;
+    value.audioStreams          = NullOptional;
 
     size_t requiredBufferSize = offerSdp.size() + 256;
 
@@ -102,11 +106,8 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
         return err;
     }
 
-    err = client->SendCommand(client, 
-                              endpointId, 
-                              Clusters::WebRTCTransportProvider::Id, 
-                              Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id, 
-                              payloadBuffer.Get(), 
+    err = client->SendCommand(client, endpointId, Clusters::WebRTCTransportProvider::Id,
+                              Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id, payloadBuffer.Get(),
                               writer.GetLengthWritten());
 
     if (err != CHIP_NO_ERROR)
@@ -118,9 +119,11 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId, jobject jcallback)
+CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId,
+                                                              jobject jcallback)
 {
-    auto * client = new AndroidWebRTCTransportProviderClient(jcallback, Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id);
+    auto * client =
+        new AndroidWebRTCTransportProviderClient(jcallback, Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
 
     client->InitCallbacks(HandleCommandResponse, HandleCommandError, HandleCommandDone);
@@ -128,24 +131,24 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController *
 
     Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Type value;
 
-    value.streamUsage = StreamUsageEnum::kLiveView;
+    value.streamUsage           = StreamUsageEnum::kLiveView;
     value.originatingEndpointID = WebRTCTransportRequestorManager::Instance().GetEndpointId();
-    value.videoStreamID = NullOptional;
-    value.audioStreamID = NullOptional;
-    value.ICEServers = NullOptional;
-    value.metadataEnabled = NullOptional;
-    value.SFrameConfig = NullOptional;
-    value.videoStreams = NullOptional;
-    value.audioStreams = NullOptional;
+    value.videoStreamID         = NullOptional;
+    value.audioStreamID         = NullOptional;
+    value.ICEServers            = NullOptional;
+    value.metadataEnabled       = NullOptional;
+    value.SFrameConfig          = NullOptional;
+    value.videoStreams          = NullOptional;
+    value.audioStreams          = NullOptional;
 
-    constexpr size_t kPayloadSize = 256; 
+    constexpr size_t kPayloadSize = 256;
     chip::Platform::ScopedMemoryBuffer<uint8_t> payloadBuffer;
     if (!payloadBuffer.Alloc(kPayloadSize))
     {
         client->Cleanup();
         return CHIP_ERROR_NO_MEMORY;
     }
-    
+
     chip::TLV::TLVWriter writer;
     writer.Init(payloadBuffer.Get(), kPayloadSize);
 
@@ -161,11 +164,8 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController *
         return err;
     }
 
-    err = client->SendCommand(client, 
-                              endpointId, 
-                              Clusters::WebRTCTransportProvider::Id, 
-                              Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id, 
-                              payloadBuffer.Get(), 
+    err = client->SendCommand(client, endpointId, Clusters::WebRTCTransportProvider::Id,
+                              Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id, payloadBuffer.Get(),
                               writer.GetLengthWritten());
 
     if (err != CHIP_NO_ERROR)
@@ -177,10 +177,11 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController *
     return CHIP_NO_ERROR;
 }
 
-void AndroidWebRTCTransportProviderClient::HandleCommandResponse(void * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                 chip::CommandId commandId, size_t index,
+void AndroidWebRTCTransportProviderClient::HandleCommandResponse(void * appContext, chip::EndpointId endpointId,
+                                                                 chip::ClusterId clusterId, chip::CommandId commandId, size_t index,
                                                                  chip::Protocols::InteractionModel::Status status,
-                                                                 chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length)
+                                                                 chip::ClusterStatus clusterStatus, const uint8_t * payload,
+                                                                 uint32_t length)
 {
     auto * self = static_cast<AndroidWebRTCTransportProviderClient *>(appContext);
     VerifyOrReturn(self != nullptr);
@@ -215,7 +216,8 @@ void AndroidWebRTCTransportProviderClient::HandleCommandResponse(void * appConte
         CHIP_ERROR err = chip::app::DataModel::Decode(reader, response);
         if (err == CHIP_NO_ERROR)
         {
-            self->NotifySolicitOfferSuccess(response.webRTCSessionID, response.deferredOffer, response.videoStreamID, response.audioStreamID);
+            self->NotifySolicitOfferSuccess(response.webRTCSessionID, response.deferredOffer, response.videoStreamID,
+                                            response.audioStreamID);
         }
         else
         {
@@ -254,14 +256,16 @@ static jobject CreateJavaInteger(JNIEnv * env, Optional<DataModel::Nullable<uint
     {
         return nullptr;
     }
-    jclass integerClass = env->FindClass("java/lang/Integer");
+    jclass integerClass     = env->FindClass("java/lang/Integer");
     jmethodID valueOfMethod = env->GetStaticMethodID(integerClass, "valueOf", "(I)Ljava/lang/Integer;");
-    jobject integerObj = env->CallStaticObjectMethod(integerClass, valueOfMethod, static_cast<jint>(value.Value().Value()));
+    jobject integerObj      = env->CallStaticObjectMethod(integerClass, valueOfMethod, static_cast<jint>(value.Value().Value()));
     env->DeleteLocalRef(integerClass);
     return integerObj;
 }
 
-void AndroidWebRTCTransportProviderClient::NotifyProvideOfferSuccess(uint16_t webRTCSessionID, Optional<DataModel::Nullable<uint16_t>> videoStreamID, Optional<DataModel::Nullable<uint16_t>> audioStreamID)
+void AndroidWebRTCTransportProviderClient::NotifyProvideOfferSuccess(uint16_t webRTCSessionID,
+                                                                     Optional<DataModel::Nullable<uint16_t>> videoStreamID,
+                                                                     Optional<DataModel::Nullable<uint16_t>> audioStreamID)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -271,15 +275,19 @@ void AndroidWebRTCTransportProviderClient::NotifyProvideOfferSuccess(uint16_t we
         jobject jVideoStreamID = CreateJavaInteger(env, videoStreamID);
         jobject jAudioStreamID = CreateJavaInteger(env, audioStreamID);
 
-        env->CallVoidMethod(mJavaCallback.ObjectRef(), mOnResponseMethod, 
-                            static_cast<jint>(webRTCSessionID), jVideoStreamID, jAudioStreamID);
+        env->CallVoidMethod(mJavaCallback.ObjectRef(), mOnResponseMethod, static_cast<jint>(webRTCSessionID), jVideoStreamID,
+                            jAudioStreamID);
 
-        if (jVideoStreamID != nullptr) env->DeleteLocalRef(jVideoStreamID);
-        if (jAudioStreamID != nullptr) env->DeleteLocalRef(jAudioStreamID);
+        if (jVideoStreamID != nullptr)
+            env->DeleteLocalRef(jVideoStreamID);
+        if (jAudioStreamID != nullptr)
+            env->DeleteLocalRef(jAudioStreamID);
     }
 }
 
-void AndroidWebRTCTransportProviderClient::NotifySolicitOfferSuccess(uint16_t webRTCSessionID, bool deferredOffer, Optional<DataModel::Nullable<uint16_t>> videoStreamID, Optional<DataModel::Nullable<uint16_t>> audioStreamID)
+void AndroidWebRTCTransportProviderClient::NotifySolicitOfferSuccess(uint16_t webRTCSessionID, bool deferredOffer,
+                                                                     Optional<DataModel::Nullable<uint16_t>> videoStreamID,
+                                                                     Optional<DataModel::Nullable<uint16_t>> audioStreamID)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -289,11 +297,13 @@ void AndroidWebRTCTransportProviderClient::NotifySolicitOfferSuccess(uint16_t we
         jobject jVideoStreamID = CreateJavaInteger(env, videoStreamID);
         jobject jAudioStreamID = CreateJavaInteger(env, audioStreamID);
 
-        env->CallVoidMethod(mJavaCallback.ObjectRef(), mOnResponseMethod, 
-                            static_cast<jint>(webRTCSessionID), static_cast<jboolean>(deferredOffer), jVideoStreamID, jAudioStreamID);
+        env->CallVoidMethod(mJavaCallback.ObjectRef(), mOnResponseMethod, static_cast<jint>(webRTCSessionID),
+                            static_cast<jboolean>(deferredOffer), jVideoStreamID, jAudioStreamID);
 
-        if (jVideoStreamID != nullptr) env->DeleteLocalRef(jVideoStreamID);
-        if (jAudioStreamID != nullptr) env->DeleteLocalRef(jAudioStreamID);
+        if (jVideoStreamID != nullptr)
+            env->DeleteLocalRef(jVideoStreamID);
+        if (jAudioStreamID != nullptr)
+            env->DeleteLocalRef(jAudioStreamID);
     }
 }
 

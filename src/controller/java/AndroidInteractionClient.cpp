@@ -704,7 +704,8 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
 
     ChipLogDetail(Controller, "Allow Large Payload : %u", device->GetSecureSession().Value()->AllowsLargePayload());
 
-    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0, false, device->GetSecureSession().Value()->AllowsLargePayload()); 
+    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0, false,
+                                                      device->GetSecureSession().Value()->AllowsLargePayload());
 
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getEndpointId", "(J)J", &getEndpointIdMethod));
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getClusterId", "(J)J", &getClusterIdMethod));

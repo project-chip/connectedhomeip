@@ -37,30 +37,35 @@ class AndroidWebRTCTransportProviderClient : public WebRTCTransportProviderClien
 {
 public:
     // Static methods to be called from JNI.
-    // Internally, these dynamically allocate (new) an AndroidWebRTCTransportProviderClient 
+    // Internally, these dynamically allocate (new) an AndroidWebRTCTransportProviderClient
     // object to send commands and wait for asynchronous responses.
-    static CHIP_ERROR ProvideOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId, Optional<DataModel::Nullable<uint16_t>> videoStreamID, Optional<DataModel::Nullable<uint16_t>> audioStreamID, const CharSpan & offerSdp, jobject jcallback);
+    static CHIP_ERROR ProvideOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId,
+                                   Optional<DataModel::Nullable<uint16_t>> videoStreamID,
+                                   Optional<DataModel::Nullable<uint16_t>> audioStreamID, const CharSpan & offerSdp,
+                                   jobject jcallback);
     static CHIP_ERROR SolicitOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId, jobject jcallback);
 
 private:
-    // Constructors and destructors are set to private because the object lifecycle 
+    // Constructors and destructors are set to private because the object lifecycle
     // is managed internally for asynchronous operations.
     AndroidWebRTCTransportProviderClient(jobject javaCallbackObject, chip::CommandId commandId);
     ~AndroidWebRTCTransportProviderClient();
 
     static void HandleCommandResponse(void * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                      chip::CommandId commandId, size_t index,
-                                      chip::Protocols::InteractionModel::Status status,
+                                      chip::CommandId commandId, size_t index, chip::Protocols::InteractionModel::Status status,
                                       chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
     static void HandleCommandError(void * appContext, chip::Protocols::InteractionModel::Status status,
                                    chip::ClusterStatus clusterStatus, CHIP_ERROR error);
     static void HandleCommandDone(void * appContext);
 
     // Internal helper functions responsible for executing JNI callbacks and freeing memory.
-    void NotifyProvideOfferSuccess(uint16_t webRTCSessionID, Optional<DataModel::Nullable<uint16_t>> videoStreamID, Optional<DataModel::Nullable<uint16_t>> audioStreamID);
-    void NotifySolicitOfferSuccess(uint16_t webRTCSessionID, bool deferredOffer, Optional<DataModel::Nullable<uint16_t>> videoStreamID, Optional<DataModel::Nullable<uint16_t>> audioStreamID);
+    void NotifyProvideOfferSuccess(uint16_t webRTCSessionID, Optional<DataModel::Nullable<uint16_t>> videoStreamID,
+                                   Optional<DataModel::Nullable<uint16_t>> audioStreamID);
+    void NotifySolicitOfferSuccess(uint16_t webRTCSessionID, bool deferredOffer,
+                                   Optional<DataModel::Nullable<uint16_t>> videoStreamID,
+                                   Optional<DataModel::Nullable<uint16_t>> audioStreamID);
     void NotifyError(CHIP_ERROR error);
-    
+
     // Frees its own memory (delete this) when the operation is completed or an error occurs.
     void Cleanup();
 
@@ -68,7 +73,7 @@ private:
     chip::CommandId mCommandId;
 
     jmethodID mOnResponseMethod = nullptr;
-    jmethodID mOnErrorMethod = nullptr;
+    jmethodID mOnErrorMethod    = nullptr;
 };
 
 } // Namespace Controller

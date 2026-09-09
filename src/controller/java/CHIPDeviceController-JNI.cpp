@@ -2405,20 +2405,17 @@ JNI_METHOD(void, stopDnssd)(JNIEnv * env, jobject self, jlong handle)
     wrapper->StopDnssd();
 }
 
-JNI_METHOD(void, webRTCTransportSolicitOffer)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject callback)
+JNI_METHOD(void, webRTCTransportSolicitOffer)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "webRTCTransportSolicitOffer() called with device ID and callback object");
 
-    err = AndroidWebRTCTransportProviderClient::SolicitOffer(
-        wrapper->Controller(), 
-        static_cast<chip::NodeId>(deviceId), 
-        static_cast<chip::EndpointId>(endpointId), 
-        callback
-    );
+    err = AndroidWebRTCTransportProviderClient::SolicitOffer(wrapper->Controller(), static_cast<chip::NodeId>(deviceId),
+                                                             static_cast<chip::EndpointId>(endpointId), callback);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -2427,10 +2424,12 @@ JNI_METHOD(void, webRTCTransportSolicitOffer)(JNIEnv * env, jobject self, jlong 
     }
 }
 
-JNI_METHOD(void, webRTCTransportProvideOffer)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject jVideoStreamId, jobject jAudioStreamId, jstring offerSdp, jobject callback)
+JNI_METHOD(void, webRTCTransportProvideOffer)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject jVideoStreamId, jobject jAudioStreamId,
+ jstring offerSdp, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "webRTCTransportProvideOffer() called with device ID and callback object");
@@ -2452,15 +2451,9 @@ JNI_METHOD(void, webRTCTransportProvideOffer)(JNIEnv * env, jobject self, jlong 
         optionalAudioStreamId.SetValue(DataModel::Nullable<uint16_t>(static_cast<uint16_t>(audioStreamId)));
     }
 
-    err = AndroidWebRTCTransportProviderClient::ProvideOffer(
-        wrapper->Controller(), 
-        static_cast<chip::NodeId>(deviceId), 
-        static_cast<chip::EndpointId>(endpointId),
-        optionalVideoStreamId,
-        optionalAudioStreamId,
-        offerSpan, 
-        callback
-    );
+    err = AndroidWebRTCTransportProviderClient::ProvideOffer(wrapper->Controller(), static_cast<chip::NodeId>(deviceId),
+                                                             static_cast<chip::EndpointId>(endpointId), optionalVideoStreamId,
+                                                             optionalAudioStreamId, offerSpan, callback);
 
     if (err != CHIP_NO_ERROR)
     {

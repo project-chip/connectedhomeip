@@ -51,8 +51,8 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
         bool isOtaEndpoint =
             (requestPath.endpoint == kOtaProviderDynamicEndpointId && requestPath.cluster == OtaSoftwareUpdateProvider::Id);
 
-        bool isCameraEndpoint =
-            (requestPath.endpoint == kWebRTCTransportRequestorDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
+        bool isCameraEndpoint = (requestPath.endpoint == kWebRTCTransportRequestorDynamicEndpointId &&
+                                 requestPath.cluster == WebRTCTransportRequestor::Id);
 
         // Only allow these specific endpoints
         if (!isOtaEndpoint && !isCameraEndpoint)

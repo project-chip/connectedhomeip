@@ -17,9 +17,9 @@
 
 #pragma once
 
+#include <controller/webrtc/WebRTCTransportRequestorManager.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
-#include <controller/webrtc/WebRTCTransportRequestorManager.h>
 
 namespace chip {
 namespace Controller {
@@ -45,7 +45,7 @@ public:
     void Shutdown(JNIEnv * env);
 
 private:
-    AndroidWebRTCTransportRequestorManager() = default;
+    AndroidWebRTCTransportRequestorManager()  = default;
     ~AndroidWebRTCTransportRequestorManager() = default;
 
     // Static callback functions to be passed to the existing C++ Manager (InitCallbacks).
@@ -58,10 +58,10 @@ private:
     jobject mJavaCallbackObj = nullptr;
 
     // Caches the Java callback method IDs to improve JNI call performance.
-    jmethodID mOnOfferMethod = nullptr;
-    jmethodID mOnAnswerMethod = nullptr;
+    jmethodID mOnOfferMethod         = nullptr;
+    jmethodID mOnAnswerMethod        = nullptr;
     jmethodID mOnICECandidatesMethod = nullptr;
-    jmethodID mOnEndMethod = nullptr;
+    jmethodID mOnEndMethod           = nullptr;
 
     jclass mIceCandidateClass = nullptr;
 };

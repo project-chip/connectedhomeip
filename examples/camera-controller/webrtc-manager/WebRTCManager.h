@@ -55,13 +55,14 @@ public:
 
     CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session, const std::vector<ICECandidateStruct> & candidates);
 
-    CHIP_ERROR InitWebRTCProviderClient(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
+    CHIP_ERROR InitWebRTCProviderClient(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId,
+                                        chip::EndpointId endpointId);
 
     CHIP_ERROR Connect();
 
-    CHIP_ERROR SendProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp, StreamUsageEnum streamUsage,
-                chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+    CHIP_ERROR SendProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp,
+                                StreamUsageEnum streamUsage, chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                                chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
     CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage,
                             chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
@@ -74,7 +75,7 @@ public:
 
     CHIP_ERROR ProvideICECandidates(uint16_t sessionId);
 
-    void SetClientICECandidates(const std::string& clientSdp);
+    void SetClientICECandidates(const std::string & clientSdp);
 
     /**
      * @brief Close the WebRTC connection and clean up resources
@@ -96,9 +97,8 @@ private:
     void OnGatheringStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection,
                                  rtc::PeerConnection::GatheringState state);
 
-    std::vector<ICECandidateInfo> ParseClientICECandidates(const std::string& clientSdp);
-    std::string MergeICECandidatesIntoSDP(const std::string& originalSdp,
-                                                     const std::vector<ICECandidateStruct>& candidates);
+    std::vector<ICECandidateInfo> ParseClientICECandidates(const std::string & clientSdp);
+    std::string MergeICECandidatesIntoSDP(const std::string & originalSdp, const std::vector<ICECandidateStruct> & candidates);
 
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster>
         mWebRTCRegisteredServerCluster;

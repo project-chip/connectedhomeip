@@ -40,7 +40,7 @@ void AndroidWebRTCTransportRequestorManager::Init(JNIEnv * env, jobject javaCall
     {
         env->DeleteGlobalRef(mJavaCallbackObj);
     }
-    
+
     // Creates a global reference so the Java object is not destroyed by the GC.
     mJavaCallbackObj = env->NewGlobalRef(javaCallbackObj);
 
@@ -48,10 +48,10 @@ void AndroidWebRTCTransportRequestorManager::Init(JNIEnv * env, jobject javaCall
 
     // Caches the IDs of the callback methods to be implemented on the Java side.
     // Changed return type from 'V' (void) to 'I' (integer)
-    mOnOfferMethod         = env->GetMethodID(cbClass, "onOffer", "(ILjava/lang/String;)I");
-    mOnAnswerMethod        = env->GetMethodID(cbClass, "onAnswer", "(ILjava/lang/String;)I");
-    mOnEndMethod           = env->GetMethodID(cbClass, "onEnd", "(II)I");
-    
+    mOnOfferMethod  = env->GetMethodID(cbClass, "onOffer", "(ILjava/lang/String;)I");
+    mOnAnswerMethod = env->GetMethodID(cbClass, "onAnswer", "(ILjava/lang/String;)I");
+    mOnEndMethod    = env->GetMethodID(cbClass, "onEnd", "(II)I");
+
     // Assumes a Java method signature that receives an array of IceCandidate objects and returns an integer.
     mOnICECandidatesMethod = env->GetMethodID(cbClass, "onIceCandidates", "(I[Lchip/devicecontroller/IceCandidate;)I");
 
@@ -114,7 +114,7 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnOffer(uint16_t sessionId, c
     }
 
     jstring jOffer = env->NewStringUTF(offer);
-    jint status = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnOfferMethod, sessionId, jOffer);
+    jint status    = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnOfferMethod, sessionId, jOffer);
     env->DeleteLocalRef(jOffer);
 
     return (status == 0) ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
@@ -132,13 +132,14 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnAnswer(uint16_t sessionId, 
     }
 
     jstring jAnswer = env->NewStringUTF(answer);
-    jint status = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnAnswerMethod, sessionId, jAnswer);
+    jint status     = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnAnswerMethod, sessionId, jAnswer);
     env->DeleteLocalRef(jAnswer);
 
     return (status == 0) ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnICECandidates(uint16_t sessionId, const IceCandidate * candidates, int candidateCount)
+CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnICECandidates(uint16_t sessionId, const IceCandidate * candidates,
+                                                                   int candidateCount)
 {
     ChipLogProgress(Controller, "OnICECandidates called for sessionId: %u, count: %d", sessionId, candidateCount);
 
@@ -165,13 +166,15 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnICECandidates(uint16_t sess
     for (int i = 0; i < candidateCount; ++i)
     {
         jstring jCandidateStr = env->NewStringUTF(candidates[i].candidate);
-        jstring jSdpMidStr = candidates[i].sdpMid ? env->NewStringUTF(candidates[i].sdpMid) : nullptr;
-        
-        jobject jCandidateObj = env->NewObject(iceCandidateClass, constructorId, jCandidateStr, jSdpMidStr, candidates[i].sdpMLineIndex);
+        jstring jSdpMidStr    = candidates[i].sdpMid ? env->NewStringUTF(candidates[i].sdpMid) : nullptr;
+
+        jobject jCandidateObj =
+            env->NewObject(iceCandidateClass, constructorId, jCandidateStr, jSdpMidStr, candidates[i].sdpMLineIndex);
         env->SetObjectArrayElement(jCandidatesArray, i, jCandidateObj);
 
         env->DeleteLocalRef(jCandidateStr);
-        if (jSdpMidStr) env->DeleteLocalRef(jSdpMidStr);
+        if (jSdpMidStr)
+            env->DeleteLocalRef(jSdpMidStr);
         env->DeleteLocalRef(jCandidateObj);
     }
 

@@ -23,7 +23,7 @@
 #include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
- 
+
 #include <arpa/inet.h>
 #include <cstdio>
 #include <memory>
@@ -166,9 +166,8 @@ CHIP_ERROR WebRTCManager::HandleAnswer(const WebRTCSessionStruct & session, cons
     if (mClientMode)
     {
         mClientSDP = sdp;
-        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-            LogErrorOnFailure(ProvideICECandidates(mPendingSdpContext.sessionId));
-        }));
+        SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda(
+            [this]() { LogErrorOnFailure(ProvideICECandidates(mPendingSdpContext.sessionId)); }));
         return CHIP_NO_ERROR;
     }
 
@@ -208,11 +207,8 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(const WebRTCSessionStruct & sessio
         size_t maxBase64Len = BASE64_ENCODED_LEN(mClientSDP.length());
         std::vector<char> base64SdpBuf(maxBase64Len + 1);
 
-        uint16_t base64SdpLen = chip::Base64Encode(
-            reinterpret_cast<const uint8_t*>(mClientSDP.data()),
-            static_cast<uint16_t>(mClientSDP.length()),
-            base64SdpBuf.data()
-        );
+        uint16_t base64SdpLen = chip::Base64Encode(reinterpret_cast<const uint8_t *>(mClientSDP.data()),
+                                                   static_cast<uint16_t>(mClientSDP.length()), base64SdpBuf.data());
         std::string base64Sdp(base64SdpBuf.data(), base64SdpLen);
 
         ChipLogDetail(Camera, "SDP(Base64) : \n%s", base64Sdp.c_str());
@@ -292,12 +288,13 @@ void WebRTCManager::Disconnect()
     mICECandidates.clear();
 }
 
-CHIP_ERROR WebRTCManager::InitWebRTCProviderClient(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)
+CHIP_ERROR WebRTCManager::InitWebRTCProviderClient(Controller::DeviceCommissioner & commissioner, NodeId nodeId,
+                                                   EndpointId endpointId)
 {
     ChipLogProgress(Camera, "Attempting to initialize WebRTC Provider client to node 0x" ChipLogFormatX64 " on endpoint 0x%x",
-                ChipLogValueX64(nodeId), endpointId);
+                    ChipLogValueX64(nodeId), endpointId);
 
-    mClientMode = false;
+    mClientMode                   = false;
     FabricIndex fabricIndex       = commissioner.GetFabricIndex();
     const FabricInfo * fabricInfo = commissioner.GetFabricTable()->FindFabricWithIndex(fabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -580,11 +577,13 @@ void WebRTCManager::OnLocalDescriptionGenerated(const std::shared_ptr<rtc::PeerC
     }
 }
 
-CHIP_ERROR WebRTCManager::SendProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp, StreamUsageEnum streamUsage,
-                chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
-                chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId)
+CHIP_ERROR WebRTCManager::SendProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp,
+                                           StreamUsageEnum streamUsage,
+                                           chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                                           chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId)
 {
-    return mWebRTCProviderClient.ProvideOffer(webRTCSessionId, sdp, streamUsage, kWebRTCRequesterDynamicEndpointId, videoStreamId, audioStreamId);
+    return mWebRTCProviderClient.ProvideOffer(webRTCSessionId, sdp, streamUsage, kWebRTCRequesterDynamicEndpointId, videoStreamId,
+                                              audioStreamId);
 }
 
 void WebRTCManager::OnLocalCandidateGathered(const std::shared_ptr<rtc::PeerConnection> & connection,
@@ -646,43 +645,48 @@ void WebRTCManager::OnGatheringStateChanged(const std::shared_ptr<rtc::PeerConne
     ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
 }
 
-void WebRTCManager::SetClientICECandidates(const std::string &clientSdp)
+void WebRTCManager::SetClientICECandidates(const std::string & clientSdp)
 {
     mICECandidates.clear();
-    mClientMode = true;
+    mClientMode    = true;
     mICECandidates = ParseClientICECandidates(clientSdp);
-    for (const auto& info : mICECandidates) {
+    for (const auto & info : mICECandidates)
+    {
         ChipLogProgress(Camera, "RemoteICECandidate : %s(mid : %s)", info.candidate.c_str(), info.mid.c_str());
     }
 }
 
-std::vector<ICECandidateInfo> WebRTCManager::ParseClientICECandidates(const std::string& clientSdp)
+std::vector<ICECandidateInfo> WebRTCManager::ParseClientICECandidates(const std::string & clientSdp)
 {
     std::vector<ICECandidateInfo> candidates;
     std::istringstream stream(clientSdp);
     std::string line;
 
-    std::string currentMid = "";
-    const std::string midPrefix = "a=mid:";
+    std::string currentMid            = "";
+    const std::string midPrefix       = "a=mid:";
     const std::string candidatePrefix = "a=candidate:";
 
     while (std::getline(stream, line))
     {
-        if (!line.empty() && line.back() == '\r') {
+        if (!line.empty() && line.back() == '\r')
+        {
             line.pop_back();
         }
 
-        if (line.empty()) {
+        if (line.empty())
+        {
             continue;
         }
 
-        if (line.find(midPrefix) == 0) {
+        if (line.find(midPrefix) == 0)
+        {
             currentMid = line.substr(midPrefix.length());
         }
-        else if (line.find(candidatePrefix) == 0) {
+        else if (line.find(candidatePrefix) == 0)
+        {
             ICECandidateInfo info;
-            info.candidate = line;
-            info.mid = currentMid;
+            info.candidate  = line;
+            info.mid        = currentMid;
             info.mlineIndex = -1;
 
             candidates.push_back(info);
@@ -692,8 +696,8 @@ std::vector<ICECandidateInfo> WebRTCManager::ParseClientICECandidates(const std:
     return candidates;
 }
 
-std::string WebRTCManager::MergeICECandidatesIntoSDP(const std::string& originalSdp,
-                                                     const std::vector<ICECandidateStruct>& candidates)
+std::string WebRTCManager::MergeICECandidatesIntoSDP(const std::string & originalSdp,
+                                                     const std::vector<ICECandidateStruct> & candidates)
 {
     std::istringstream stream(originalSdp);
     std::string line;
@@ -715,11 +719,13 @@ std::string WebRTCManager::MergeICECandidatesIntoSDP(const std::string& original
     const std::string midPrefix = "a=mid:";
     while (std::getline(stream, line))
     {
-        if (!line.empty() && line.back() == '\r') {
+        if (!line.empty() && line.back() == '\r')
+        {
             line.pop_back();
         }
 
-        if (line.empty()) {
+        if (line.empty())
+        {
             continue;
         }
 
@@ -731,7 +737,7 @@ std::string WebRTCManager::MergeICECandidatesIntoSDP(const std::string& original
 
             if (candidatesByMid.find(currentMid) != candidatesByMid.end())
             {
-                for (const auto& candStr : candidatesByMid[currentMid])
+                for (const auto & candStr : candidatesByMid[currentMid])
                 {
                     mergedSdp += candStr + "\n";
                 }

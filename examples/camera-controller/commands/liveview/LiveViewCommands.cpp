@@ -42,8 +42,9 @@ CHIP_ERROR LiveViewStartCommand::RunCommand()
         std::string base64Sdp(mClientSdp.Value());
 
         std::vector<uint8_t> decodedSdpBuf(base64Sdp.length());
-        uint16_t decodedSdpLen = chip::Base64Decode(base64Sdp.c_str(), static_cast<uint16_t>(base64Sdp.length()), decodedSdpBuf.data());
-        std::string clientSdp(reinterpret_cast<char*>(decodedSdpBuf.data()), decodedSdpLen);
+        uint16_t decodedSdpLen =
+            chip::Base64Decode(base64Sdp.c_str(), static_cast<uint16_t>(base64Sdp.length()), decodedSdpBuf.data());
+        std::string clientSdp(reinterpret_cast<char *>(decodedSdpBuf.data()), decodedSdpLen);
 
         camera::DeviceManager::Instance().SetClientSdp(clientSdp);
     }

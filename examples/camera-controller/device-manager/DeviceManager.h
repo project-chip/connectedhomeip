@@ -90,7 +90,7 @@ public:
      */
     void OnWebRTCSessionEstablished(uint16_t streamId);
 
-    void SetClientSdp(const std::string& sdp) { mClientSdp.SetValue(sdp); }
+    void SetClientSdp(const std::string & sdp) { mClientSdp.SetValue(sdp); }
 
 private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;

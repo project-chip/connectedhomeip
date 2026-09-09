@@ -57,10 +57,7 @@ public:
         return instance;
     }
 
-    chip::EndpointId GetEndpointId() const
-    {
-        return kWebRTCRequesterDynamicEndpointId;
-    }
+    chip::EndpointId GetEndpointId() const { return kWebRTCRequesterDynamicEndpointId; }
 
     void Init();
 

@@ -46,7 +46,7 @@ void WebRTCTransportProviderClient::InitCallbacks(OnCommandResponseCallback onCo
 }
 
 CHIP_ERROR WebRTCTransportProviderClient::SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId,
-                                                       uint32_t commandId, const uint8_t * payload, size_t length)
+                                                      uint32_t commandId, const uint8_t * payload, size_t length)
 {
     CHIP_ERROR error     = CHIP_NO_ERROR;
     ClusterId aClusterID = static_cast<ClusterId>(clusterId);
@@ -134,9 +134,9 @@ void WebRTCTransportProviderClient::OnResponse(chip::app::CommandSender * client
     }
     if (gOnCommandResponseCallback != nullptr && mAppContext != nullptr)
     {
-        gOnCommandResponseCallback(
-            mAppContext, path.mEndpointId, path.mClusterId, path.mCommandId, 0, status.mStatus,
-            status.mClusterStatus.has_value() ? *status.mClusterStatus : kUndefinedClusterStatus, buffer, size);
+        gOnCommandResponseCallback(mAppContext, path.mEndpointId, path.mClusterId, path.mCommandId, 0, status.mStatus,
+                                   status.mClusterStatus.has_value() ? *status.mClusterStatus : kUndefinedClusterStatus, buffer,
+                                   size);
     }
 }
 
@@ -147,13 +147,12 @@ void WebRTCTransportProviderClient::OnError(const chip::app::CommandSender * cli
     StatusIB status(error);
     if (gOnCommandErrorCallback != nullptr && mAppContext != nullptr)
     {
-        gOnCommandErrorCallback(mAppContext, status.mStatus,
-                                      status.mClusterStatus.value_or(kUndefinedClusterStatus),
-                                      // If we have an actual IM status, pass 0
-                                      // for the error code, because otherwise
-                                      // the callee will think we have a stack
-                                      // exception.
-                                      error.IsIMStatus() ? CHIP_NO_ERROR : error);
+        gOnCommandErrorCallback(mAppContext, status.mStatus, status.mClusterStatus.value_or(kUndefinedClusterStatus),
+                                // If we have an actual IM status, pass 0
+                                // for the error code, because otherwise
+                                // the callee will think we have a stack
+                                // exception.
+                                error.IsIMStatus() ? CHIP_NO_ERROR : error);
     }
 }
 

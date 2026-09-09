@@ -27,12 +27,11 @@
 #include <lib/core/TLV.h>
 
 using OnCommandResponseCallback = void (*)(void * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                 chip::CommandId commandId, size_t index,
-                                                 chip::Protocols::InteractionModel::Status status,
-                                                 chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
-using OnCommandErrorCallback    = void (*)(void * appContext,
-                                              chip::Protocols::InteractionModel::Status status,
-                                              chip::ClusterStatus clusterStatus, CHIP_ERROR error);
+                                           chip::CommandId commandId, size_t index,
+                                           chip::Protocols::InteractionModel::Status status, chip::ClusterStatus clusterStatus,
+                                           const uint8_t * payload, uint32_t length);
+using OnCommandErrorCallback    = void (*)(void * appContext, chip::Protocols::InteractionModel::Status status,
+                                        chip::ClusterStatus clusterStatus, CHIP_ERROR error);
 using OnCommandDoneCallback     = void (*)(void * appContext);
 
 class WebRTCTransportProviderClient : public chip::app::CommandSender::Callback
@@ -48,10 +47,9 @@ public:
     void Init(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
 
     CHIP_ERROR SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId, const uint8_t * payload,
-                            size_t length);
+                           size_t length);
 
-    void InitCallbacks(OnCommandResponseCallback onCommandResponseCallback,
-                       OnCommandErrorCallback onCommandErrorCallback,
+    void InitCallbacks(OnCommandResponseCallback onCommandResponseCallback, OnCommandErrorCallback onCommandErrorCallback,
                        OnCommandDoneCallback onCommandDoneCallback);
 
     /////////// CommandSender Callback Interface /////////
@@ -87,7 +85,7 @@ private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
     StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
-    void * mAppContext                = nullptr;
+    void * mAppContext                  = nullptr;
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;

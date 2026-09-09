@@ -193,19 +193,18 @@ void webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uin
     }
 }
 
-void OnCommandResponseCallback(void * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                 chip::CommandId commandId, size_t index,
-                                                 chip::Protocols::InteractionModel::Status status,
-                                                 chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length)
+void OnCommandResponseCallback(void * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
+                               size_t index, chip::Protocols::InteractionModel::Status status, chip::ClusterStatus clusterStatus,
+                               const uint8_t * payload, uint32_t length)
 {
     if (gOnCommandSenderResponseCallback != nullptr)
     {
-        gOnCommandSenderResponseCallback(appContext, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus, payload, length);
+        gOnCommandSenderResponseCallback(appContext, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus,
+                                         payload, length);
     }
 }
-void OnCommandErrorCallback(void * appContext,
-                            chip::Protocols::InteractionModel::Status status,
-                            chip::ClusterStatus clusterStatus, CHIP_ERROR error)
+void OnCommandErrorCallback(void * appContext, chip::Protocols::InteractionModel::Status status, chip::ClusterStatus clusterStatus,
+                            CHIP_ERROR error)
 {
     if (gOnCommandSenderErrorCallback != nullptr)
     {
