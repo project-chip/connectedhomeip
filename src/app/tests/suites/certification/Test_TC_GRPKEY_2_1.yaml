@@ -82,6 +82,12 @@ tests:
     - label:
           "Step 0: Groupcast is adopted when the GCAST feature bit is set and
           the Groups cluster revision is 5 or higher."
+      # UnsignedNumberEquals is used deliberately here. The YAML parser coerces
+      # each argument to its declared type at parse time, before runtime variable
+      # substitution.
+      # UnsignedNumberEquals declares numeric args, which leaves the expression
+      # intact so IsGCASTFeatureSet and GroupsClusterRevision are substituted and
+      # evaluated at runtime.
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
       arguments:
