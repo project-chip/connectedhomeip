@@ -57,8 +57,8 @@ public:
     }
 
     // When the Prediction (PRED) feature is enabled:
-    CHIP_ERROR GetPredictedOccupancyAtIndex(size_t index,
-                                            chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction) override
+    CHIP_ERROR GetPredictedOccupancyAtIndex(
+        size_t index, OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction) override
     {
         if (index >= mPredictions.size())
         {
@@ -67,6 +67,9 @@ public:
         prediction = mPredictions[index];
         return CHIP_NO_ERROR;
     }
+
+private:
+    std::vector<chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type> mPredictions;
 };
 ```
 

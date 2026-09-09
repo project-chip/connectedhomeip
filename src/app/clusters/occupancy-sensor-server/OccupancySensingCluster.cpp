@@ -156,7 +156,7 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
     case Attributes::HoldTimeLimits::Id:
         return encoder.Encode(mHoldTimeLimits);
     case Attributes::PredictedOccupancy::Id: {
-        VerifyOrReturnError(mFeatureMap.Has(Feature::kPrediction), Protocols::InteractionModel::Status::UnsupportedAttribute);
+        VerifyOrReturnError(IsPredictionEnabled(), Protocols::InteractionModel::Status::UnsupportedAttribute);
         auto * delegate = mDelegate;
         if (delegate == nullptr)
         {
@@ -220,7 +220,7 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { IsHoldTimeEnabled(), Attributes::HoldTime::kMetadataEntry },
         { IsHoldTimeEnabled(), Attributes::HoldTimeLimits::kMetadataEntry },
-        { mFeatureMap.Has(Feature::kPrediction), Attributes::PredictedOccupancy::kMetadataEntry },
+        { IsPredictionEnabled(), Attributes::PredictedOccupancy::kMetadataEntry },
         { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPassiveInfrared),
           Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
         { IsHoldTimeEnabled() && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kUltrasonic),
@@ -392,7 +392,7 @@ const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & OccupancySensingCl
 
 bool OccupancySensingCluster::IsPredictionEnabled() const
 {
-    return mFeatureMap.Has(OccupancySensing::Feature::kPrediction);
+    return mFeatureMap.Has(Feature::kPrediction);
 }
 
 void OccupancySensingCluster::NotifyPredictedOccupancyChanged()

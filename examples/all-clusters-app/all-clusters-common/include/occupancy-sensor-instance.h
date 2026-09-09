@@ -27,6 +27,13 @@ namespace Clusters {
 class OccupancySensingDelegateImpl : public OccupancySensingDelegate
 {
 public:
+    /**
+     * @brief Get the predicted occupancy entry at the given index.
+     * 
+     * @param index The 0-based index of the predicted occupancy entry.
+     * @param[out] prediction The predicted occupancy struct to populate.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if index is out of range, or another error.
+     */
     CHIP_ERROR GetPredictedOccupancyAtIndex(size_t index,
                                             OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction) override;
 };

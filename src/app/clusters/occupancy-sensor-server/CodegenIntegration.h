@@ -24,6 +24,10 @@ namespace chip::app::Clusters::OccupancySensing {
 
 OccupancySensingCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+/**
+ * @brief Set the default delegate for the OccupancySensing cluster on a specific endpoint.
+ * @note This is intended to be called by the application code that instantiates the cluster.
+ */
 void SetDefaultDelegate(EndpointId endpointId, OccupancySensingDelegate * delegate);
 
 } // namespace chip::app::Clusters::OccupancySensing
