@@ -631,6 +631,14 @@ TEST_F(TestHumidistatCluster, SetMistTypeAllowsEmptyValueInHumidifierMode)
     EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
     EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
 
+    ASSERT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold)), CHIP_NO_ERROR);
+    tester.GetDirtyList().clear();
+
+    // Exercise the WriteAttribute path as well, not just the direct setter.
+    EXPECT_EQ(tester.WriteAttribute(MistType::Id, chip::BitMask<MistTypeBitmap>()), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
+    EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
+
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 

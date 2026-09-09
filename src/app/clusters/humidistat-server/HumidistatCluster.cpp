@@ -218,9 +218,10 @@ void HumidistatCluster::LoadPersistentAttributes()
             ChipLogDetail(Zcl, "Humidistat: Unable to load MistType attribute, using default");
         }
 
-        chip::BitMask<MistTypeBitmap> loadedMistType(rawMistType);
+        // Discard unknown bits before feature-based clearing to guard against stale/corrupt persisted data.
+        chip::BitMask<MistTypeBitmap> loadedMistType = chip::BitMask<MistTypeBitmap>(rawMistType) &
+            chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold, MistTypeBitmap::kMistWarm);
 
-        // Clear any bits not supported by the current feature set to guard against stale persisted data.
         if (!mFeatures.Has(Feature::kColdMist))
         {
             loadedMistType.Clear(MistTypeBitmap::kMistCold);
