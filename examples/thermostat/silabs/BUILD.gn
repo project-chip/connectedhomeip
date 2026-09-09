@@ -122,6 +122,7 @@ silabs_executable("thermostat_app") {
   deps = [
     ":sdk",
     "${chip_root}/src/platform/logging:default",
+    "${thermostat_common_dir}:thermostat-delegate-impl",
     app_data_model,
   ]
 
@@ -152,7 +153,7 @@ silabs_executable("thermostat_app") {
       "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
-      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/config/efr32/lib/pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
