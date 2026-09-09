@@ -116,7 +116,7 @@ class TC_NETIM_1_1(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attributes.ActiveNetworkIdentities)
         matter_asserts.assert_list(active_list, "ActiveNetworkIdentities")
 
-        self.step(5, "TH validates the length of activeList.", expectation="activeList is a list with length 1.")
+        self.step(5, "TH validates the length of activeList.", expectation="activeList is a list with length greater or equal to 1.")
         asserts.assert_greater_equal(len(active_list), 1, "ActiveNetworkIdentities should contain at least one entry.")
 
         self.step(6, "TH validates each element in activeList.",
@@ -157,7 +157,8 @@ class TC_NETIM_1_1(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
         matter_asserts.assert_list(clients_list, "Clients")
 
-        self.step(9, "TH validates the length of clientsList.", expectation="clientsList is a list with length 1.")
+        self.step(9, "TH validates the length of clientsList.",
+                  expectation="clientsList is a list with length greater or equal to 1.")
         asserts.assert_greater_equal(len(clients_list), 1, "Clients should contain at least one entry.")
 
         self.step(10, "TH validates each element in clientsList.",
