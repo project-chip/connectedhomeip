@@ -43,13 +43,13 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVSM_Snapshot_Simple(MatterBaseTest):
+class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
     @async_test_body
     async def test_snapshot(self):
         endpoint = self.user_params.get("endpoint", 1)

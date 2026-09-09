@@ -675,6 +675,10 @@ class COMPROBaseTest(MatterBaseTest):
 
     Provides helpers for reading cluster attributes, checking feature flags,
     sending cluster commands, and managing the ED fixture.
+
+    Intentionally carries no device-requirement marker: the tests using it differ in
+    their DUT starting state (TC-COMPRO-2.6 commissions an uncommissioned DUT in-test,
+    the rest run against an already-commissioned one), so each declares its own marker.
     """
 
     # ------------------------------------------------------------------

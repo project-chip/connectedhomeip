@@ -41,13 +41,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class HelloTest(MatterBaseTest):
+class HelloTest(MatterTestCommissionedDevice):
     # This example test does not include the step_ and desc_ markers
     # The MatterBaseTest will assume a single step and create a description
     # based on the test name

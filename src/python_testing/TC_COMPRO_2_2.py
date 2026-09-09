@@ -77,6 +77,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -89,7 +90,7 @@ logger = logging.getLogger(__name__)
 SCAN_TIMEOUT_MARGIN = 1.10
 
 
-class TC_COMPRO_2_2(COMPROBaseTest):
+class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def desc_TC_COMPRO_2_2(self) -> str:
         return "[TC-COMPRO-2.2] Proxy Scan feature functionality"

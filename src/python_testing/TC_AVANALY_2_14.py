@@ -46,13 +46,13 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_14(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_14(self) -> str:
         return "[TC-AVANALY-2.14] Validate RemoteZones integration and SourceNodeId consistency with Server as DUT"
