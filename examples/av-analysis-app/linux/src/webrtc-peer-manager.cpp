@@ -176,10 +176,23 @@ void WebRTCPeerManager::OnSessionAssigned(const ScopedNodeId & aCameraNode, uint
     VerifyOrReturn(HasPendingSession(),
                    ChipLogError(AppServer, "AvAnalysisNode: session %u assigned with no offer pending", aWebRTCSessionId));
 
-    ChipLogProgress(AppServer, "AvAnalysisNode: peer connection bound to WebRTC session %u of " ChipLogFormatScopedNodeId,
-                    aWebRTCSessionId, ChipLogValueScopedNodeId(aCameraNode));
+    const rtc::PeerConnection::State state = mPendingSession.peerConnection->state();
+    const bool diedWhilePending = (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed);
+
     mSessions[SessionKey(aCameraNode, aWebRTCSessionId)] = std::move(mPendingSession);
     mPendingSession = PeerSession{}; // the move already nulled the connection; this flushes the rest
+
+    if (!diedWhilePending)
+    {
+        ChipLogProgress(AppServer, "AvAnalysisNode: peer connection bound to WebRTC session %u of " ChipLogFormatScopedNodeId,
+                        aWebRTCSessionId, ChipLogValueScopedNodeId(aCameraNode));
+        return;
+    }
+
+    // Unreported, the stream would sit in WebRTCInitiated with no command able to move it
+    ChipLogError(AppServer, "AvAnalysisNode: WebRTC session %u was assigned to a connection that had already failed",
+                 aWebRTCSessionId);
+    mPeerConnectionObserver->OnPeerConnectionFailed(aCameraNode, aWebRTCSessionId);
 }
 
 void WebRTCPeerManager::OnOfferAbandoned()
@@ -253,19 +266,20 @@ void WebRTCPeerManager::OnPeerConnectionStateChanged(const std::shared_ptr<rtc::
     ChipLogProgress(AppServer, "AvAnalysisNode: peer connection state %s", PeerConnectionStateName(aState));
     VerifyOrReturn(mPeerConnectionObserver != nullptr);
 
+    // Disconnected is left alone: it may recover, and libdatachannel moves on to Failed if it does not
+    const bool failed = (aState == rtc::PeerConnection::State::Failed || aState == rtc::PeerConnection::State::Closed);
+    VerifyOrReturn(failed || aState == rtc::PeerConnection::State::Connected);
+
     auto it = FindAssignedSession(aPeerConnection);
     VerifyOrReturn(it != mSessions.end());
 
-    if (aState == rtc::PeerConnection::State::Connected)
-    {
-        mPeerConnectionObserver->OnPeerConnectionConnected(it->first.first, it->first.second);
-        return;
-    }
-
-    // Disconnected is left alone: it may recover, and libdatachannel moves on to Failed if it does not
-    if (aState == rtc::PeerConnection::State::Failed || aState == rtc::PeerConnection::State::Closed)
+    if (failed)
     {
         mPeerConnectionObserver->OnPeerConnectionFailed(it->first.first, it->first.second);
+    }
+    else
+    {
+        mPeerConnectionObserver->OnPeerConnectionConnected(it->first.first, it->first.second);
     }
 }
 
