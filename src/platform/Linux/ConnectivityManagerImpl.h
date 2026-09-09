@@ -232,10 +232,17 @@ private:
     // the scan handlers without disturbing PAF connect-path handlers on the same signals.
     gulong mScanSignalIds[3] = {};
 
-    /** Disconnect the scan GLib signal handlers registered by WiFiPAFScan or
-     *  WiFiPAFStartBackgroundScan.  Uses stored handler IDs so it does not
-     *  accidentally remove connect-path handlers on the same signals. */
+    /** Connect the scan GLib signal handlers.  Must be called before NANSubscribe;
+     *  see the definition for why.  Caller must hold mWpaSupplicantMutex. */
+    void ConnectScanSignals() CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /** Disconnect the scan GLib signal handlers registered by ConnectScanSignals().
+     *  Uses stored handler IDs so it does not accidentally remove connect-path
+     *  handlers on the same signals. */
     void DisconnectScanSignals();
+
+    /** As DisconnectScanSignals(), for callers that already hold mWpaSupplicantMutex. */
+    void DisconnectScanSignalsLocked() CHIP_REQUIRES(mWpaSupplicantMutex);
 #endif
 
 private:
