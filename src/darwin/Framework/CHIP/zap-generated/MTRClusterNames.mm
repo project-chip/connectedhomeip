@@ -2548,6 +2548,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentFabricIndex";
             break;
 
+        case MTRAttributeIDTypeClusterOperationalCredentialsAttributePQCDeviceAttestationProfileID:
+            result = @"PQCDeviceAttestationProfile";
+            break;
+
         case MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

@@ -24,9 +24,13 @@
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
-                                    PosixAudioManager & audioManager)
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable & fabricTable,
+                                    PersistentStorageDelegate * storageDelegate, PosixAudioManager & audioManager)
 {
+    // No commissioning-proxy registration, unlike the linux override: Darwin's
+    // BLEManagerImpl has neither a central-role switch nor a commissionable-device
+    // scan, so there is no BLE adapter to give the proxy.  See posix/darwin/BUILD.gn.
+
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
         DeviceFactory::GetInstance().RegisterCreator("speaker", [&timerDelegate, &audioManager]() {
