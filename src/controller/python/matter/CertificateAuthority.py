@@ -151,7 +151,10 @@ class CertificateAuthority:
         if (caList is not None):
             replFabricEntry = {'fabricId': fabricId, 'vendorId': vendorId}
 
-            if (replFabricEntry not in caList[str(self._caIndex)]):
+            if (caList[str(self._caIndex)] == {}):
+                # If we're here, it's likely because we're loading .ini files
+                caList[str(self._caIndex)] = replFabricEntry
+            elif (replFabricEntry not in caList[str(self._caIndex)]):
                 caList[str(self._caIndex)].append(replFabricEntry)
 
             self._persistentStorage.SetKey(key='caList', value=caList)
