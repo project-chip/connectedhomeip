@@ -646,8 +646,8 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
 
             VerifyOrReturnError(it != mSupportedAmbientContexts.end(), Status::ConstraintError);
 
-            // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
-            // if we have the feature, then ZoneIDs have to be present (note, they could be Null)
+            // The trigger context is valid, now check the ZoneIDs, which can only be present if PERZONEDETECT is set, likewise,
+            // if we have the feature, then ZoneIDs have to be present
             //
             bool hasZoneIDs = contextTrigger.zoneIDs.HasValue();
 
@@ -680,8 +680,12 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
                     {
                         zoneIDs.push_back(zone_iter.GetValue());
                     }
-                    err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
-                    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
+                    if (!zoneIDs.empty())
+                    {
+                        VerifyOrReturnError(mDelegate != nullptr, Status::Failure);
+                        err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
+                        VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
+                    }
                     validated.zoneIDs.SetNonNull(std::move(zoneIDs));
                 }
             }
@@ -691,7 +695,10 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
 
         // Check with the delegate that additional contexts can be added
         //
-        VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+        if (mDelegate != nullptr)
+        {
+            VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+        }
 
         // Second pass: apply the validated triggers; duplicates in the list are ignored, the first occurrence wins
         //
@@ -746,7 +753,10 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
         // Provided set is null, meaning all known context triggers should be activated
         // First check with the delegate that additional contexts can be added
         //
-        VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+        if (mDelegate != nullptr)
+        {
+            VerifyOrReturnError(mDelegate->CanAddContextTriggers(), Status::ResourceExhausted);
+        }
 
         // Set the active triggers to be the supported triggers
         mActiveAmbientContextTriggers.clear();
@@ -768,7 +778,10 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
     // Inform the delegate of the new active context set. The delegate will read the updated contents
     // of the attribute
     //
-    mDelegate->ActiveAmbientContextTriggersUpdated();
+    if (mDelegate != nullptr)
+    {
+        mDelegate->ActiveAmbientContextTriggersUpdated();
+    }
     MarkDirty(AvAnalysis::Attributes::ActiveAmbientContextTriggers::Id);
     LogErrorOnFailure(StoreActiveAmbientContextTriggers());
 
@@ -1217,6 +1230,45 @@ AnalysisStreamEntry * AvAnalysisServerLogic::FindByWebRTCSession(const ScopedNod
     return nullptr;
 }
 
+CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId, bool aUseSpecificSessionId)
+{
+    // Every event of a RemoteContextDetection session reports its source, so it cannot start without one
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        VerifyOrReturnError(aSourceNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    if (!aUseSpecificSessionId)
+    {
+        while (std::any_of(mActiveSessions.begin(), mActiveSessions.end(),
+                           [this](const AvAnalysis::ActiveAmbientContextSession & session) {
+                               return session.GetSessionId() == mNextAnalysisSessionID;
+                           }))
+        {
+            mNextAnalysisSessionID++;
+        }
+        aSessionId = mNextAnalysisSessionID++;
+    }
+
+    auto session_it = std::find_if(
+        mActiveSessions.begin(), mActiveSessions.end(),
+        [aSessionId](const AvAnalysis::ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    if (session_it != mActiveSessions.end())
+    {
+        // Only the source node is known here, so a timestamp recorded at session start stays
+        session_it->SetSource(aSourceNodeId, session_it->GetSourceStartTimestampUs());
+        return CHIP_NO_ERROR;
+    }
+
+    AvAnalysis::ActiveAmbientContextSession newSession;
+    newSession.SetSessionId(aSessionId);
+    newSession.SetSource(aSourceNodeId, 0);
+    mActiveSessions.push_back(newSession);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
                                                        const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
                                                        ServerClusterContext * aContext, NodeId aSourceNodeId,
@@ -1234,6 +1286,7 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
     // Validate the information received - are the zoneIDs known (if provided)
     if (!aZoneList.IsNull())
     {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(mDelegate->VerifyZoneIDsAreValid(aZoneList.Value()));
     }
 

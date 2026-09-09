@@ -52,8 +52,6 @@ public:
      */
 
     /**
-     * The delegate realizing this method needs to ensure that, 1) the Zone ID is known, and 2) the zone is NOT a privacy zone.
-     *
      * @param  aZoneIDs  the set of ZoneIDs to be validated against what is defined in the Zone Management Cluster instance
      */
     virtual CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) = 0;
@@ -161,6 +159,13 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     // Context detection and event generation
+    /**
+     * Records an active session without generating an AnalysisSessionStart event, for a delegate reporting
+     * contexts of a session it started itself. Source argument as for AnalysisSessionStart.
+     */
+    CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId = kUndefinedNodeId,
+                                   bool aUseSpecificSessionId = false);
+
     /**
      * Invoked by the delegate when a new analysis session is initiated based on its own detection metrics. The server will
      * provide the session ID to be used over the lifetime of the session.  The server will generate the AnalysisSessionStart event.
