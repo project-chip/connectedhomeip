@@ -93,7 +93,7 @@ class TC_SC_4_6(MatterBaseTest):
 
             TestStep(3, """TH performs a 'Commissioner Service' SRV record query against the instance name""",
                      """- Verify that the SRV record is returned and its instance name is equal to the browsed instance name
-                        - Verify that the target hostname is derived from the 48bit or 64bit MAC address expressed as a
+                        - Verify that the target hostname is expressed as a
                           twelve or sixteen capital letter hex string. If the MAC is randomized for privacy, the randomized
                           version must be used each time"""),
 
