@@ -739,7 +739,7 @@ def action_merge_platform(context: PRContext) -> None:
         log.info("Merging PR #%d", context.pr.number)
         context.pr.merge(
             merge_method="squash",
-            commit_title=f"{context.pr.title} (Auto-merged by platform-bot)",
+            commit_title=f"{context.pr.title} (Auto-merged by platform-bot) (#{context.pr.number})",
             sha=context.pr.head.sha,
         )
         log.info("Posting merge explanation comment to PR #%d", context.pr.number)

@@ -20,7 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/util/attribute-storage.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include "Setpoint.h"
@@ -47,7 +47,6 @@ public:
     bool heatSupported      = false;
     bool coolSupported      = false;
     bool occupancySupported = false;
-    bool eventsSupported    = false;
 
     AbsoluteSetpointLimits absoluteHeatLimits;
     AbsoluteSetpointLimits absoluteCoolLimits;
@@ -78,8 +77,8 @@ public:
 
     Setpoints(const Setpoints & spl) :
         autoSupported(spl.autoSupported), heatSupported(spl.heatSupported), coolSupported(spl.coolSupported),
-        occupancySupported(spl.occupancySupported), eventsSupported(spl.eventsSupported),
-        absoluteHeatLimits(spl.absoluteHeatLimits), absoluteCoolLimits(spl.absoluteCoolLimits),
+        occupancySupported(spl.occupancySupported), absoluteHeatLimits(spl.absoluteHeatLimits),
+        absoluteCoolLimits(spl.absoluteCoolLimits),
         userHeatLimits(OptionalSetpoint(spl.userHeatLimits.minimum, absoluteHeatLimits.minimum),
                        OptionalSetpoint(spl.userHeatLimits.maximum, absoluteHeatLimits.maximum)),
         userCoolLimits(OptionalSetpoint(spl.userCoolLimits.minimum, absoluteCoolLimits.minimum),
@@ -98,7 +97,6 @@ public:
         heatSupported      = other.heatSupported;
         coolSupported      = other.coolSupported;
         occupancySupported = other.occupancySupported;
-        eventsSupported    = other.eventsSupported;
 
         absoluteHeatLimits = other.absoluteHeatLimits;
         absoluteCoolLimits = other.absoluteCoolLimits;
@@ -115,11 +113,10 @@ public:
 
         return *this;
     }
-
     /*
     Checks to make sure that the setpoints follow the rules from the Matter spec
     */
-    bool Valid();
+    bool Valid() const;
 
     /*
     Get the appropriate setpoint range, based on occupancy.
@@ -143,8 +140,8 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
-                                                           SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
+                                                     SetpointAttributes & changedAttributes);
 
     /**
      * Change the cooling value of a given setpoint range.
@@ -155,8 +152,8 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
-                                                           SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
+                                                     SetpointAttributes & changedAttributes);
 
     /**
      * Change either or both of the values of a given setpoint range.
@@ -168,8 +165,8 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool,
-                                                    ClampMode clamp, SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool,
+                                              ClampMode clamp, SetpointAttributes & changedAttributes);
 
     /**
      * Change the minimum value of a given setpoint limit
@@ -179,8 +176,8 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeLimitMinimum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
-                                                           temperature min, SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus ChangeLimitMinimum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
+                                                     temperature min, SetpointAttributes & changedAttributes);
 
     /**
      * Change the maximum value of a given setpoint limit
@@ -190,8 +187,8 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    Protocols::InteractionModel::Status ChangeLimitMaximum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
-                                                           temperature max, SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus ChangeLimitMaximum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
+                                                     temperature max, SetpointAttributes & changedAttributes);
 
     /**
      * Attempt to fix any violations of the setpoint rules
@@ -199,7 +196,7 @@ public:
      * @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix
      * them
      */
-    Protocols::InteractionModel::Status Fix(SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus Fix(SetpointAttributes & changedAttributes);
 
 private:
     /*
@@ -210,9 +207,9 @@ private:
     @param changedAttributes The set of attributes changed by this operation.
     @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix them
     */
-    Protocols::InteractionModel::Status ChangeLimits(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
-                                                     Optional<temperature> min, Optional<temperature> max,
-                                                     SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus ChangeLimits(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
+                                               Optional<temperature> min, Optional<temperature> max,
+                                               SetpointAttributes & changedAttributes);
 
     /*
     Attempt to fix the user setpoint limits to comply with the deadband
@@ -250,40 +247,6 @@ private:
         return (max.Temperature() - min.Temperature()) < static_cast<int32_t>(deadBand);
     }
 };
-
-/*
-Load setpoints from the Matter Data Storage
-
-@param endpoint The endpoint to load setpoints from
-@param setpoints The Setpoints object to load setpoints into
-@return The status of the operation
-*/
-Protocols::InteractionModel::Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints);
-
-/*
-Save setpoints to the Matter Data Storage
-
-@param endpoint The endpoint to save setpoints to
-@param setpoints The Setpoints object to save setpoints from
-@param changedAttributes The set of attributes changed by this operation
-@return The status of the operation
-*/
-Protocols::InteractionModel::Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints,
-                                                  SetpointAttributes & changedAttributes);
-
-/*
-Save first dirty setpoint to the Matter Data Storage.
-
-This method is temporary until the conversion to code-driven cluster. See MatterThermostatClusterServerPreAttributeChangedCallback
-for details.
-
-@param endpoint The endpoint to save first dirty setpoint to
-@param setpoints The Setpoints object to save first dirty setpoint from
-@param changedAttributes The set of attributes changed by this operation
-@return The status of the operation
-*/
-Protocols::InteractionModel::Status SaveFirstDirtySetpoint(EndpointId endpoint, Setpoints & setpoints,
-                                                           SetpointAttributes & changedAttributes);
 
 } // namespace Thermostat
 } // namespace Clusters
