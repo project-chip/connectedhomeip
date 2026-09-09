@@ -64,15 +64,12 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
             echo "pr_number=" >> "$GITHUB_OUTPUT"
             echo "sync_labels=true" >> "$GITHUB_OUTPUT"
-            echo "dry_run_flag=" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.event_name }}" = "issue_comment" ]; then
             echo "pr_number=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
             echo "sync_labels=false" >> "$GITHUB_OUTPUT"
-            echo "dry_run_flag=" >> "$GITHUB_OUTPUT"
           else
             echo "pr_number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
             echo "sync_labels=false" >> "$GITHUB_OUTPUT"
-            echo "dry_run_flag=" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Execute SME Reviewer Check
@@ -90,6 +87,5 @@ jobs:
             python3 scripts/tools/check_label_reviewers.py \
               --pr "${{ steps.params.outputs.pr_number }}" \
               --repo "${{ github.repository }}" \
-              --config .github/label_reviewers.yaml \
-              ${{ steps.params.outputs.dry_run_flag }}
+              --config .github/label_reviewers.yaml
           fi

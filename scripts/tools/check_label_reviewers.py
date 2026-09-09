@@ -427,11 +427,6 @@ def main() -> int:
         help="Ensure all configured labels exist on GitHub, creating any that are missing.",
     )
     parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Evaluate and report status, but always exit with code 0",
-    )
-    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
@@ -556,10 +551,6 @@ def main() -> int:
 
     if all_passed:
         print("✅ SUCCESS: All required SME reviews have been satisfied.\n")
-        return 0
-
-    if args.dry_run:
-        print("⚠️  DRY RUN: Missing SME approvals, but exiting 0 due to --dry-run.\n")
         return 0
 
     print("❌ FAILURE: Missing required SME review approval(s).\n")

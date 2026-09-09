@@ -146,9 +146,6 @@ The underlying verification script can also be run locally on a developer workst
 # Basic check on a specific PR
 python3 scripts/tools/check_label_reviewers.py --pr 30000
 
-# Dry-run check (inspect status without failing)
-python3 scripts/tools/check_label_reviewers.py --pr 30000 --dry-run
-
 # Test with a custom config file
 python3 scripts/tools/check_label_reviewers.py --pr 30000 --config /path/to/custom_reviewers.yaml
 ```
