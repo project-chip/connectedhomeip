@@ -19,7 +19,9 @@
 #include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include "tls-certificate-management-instance.h"
 #include "tls-client-management-instance.h"
+#include <Options.h>
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
+#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -93,13 +95,40 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
 
     // Fetch all initialization paramaters for the AV Analysis Server
-    BitFlags<AvAnalysis::Feature, uint32_t> avAnalysisFeatures(AvAnalysis::Feature::kLocalContextDetection,
-                                                               AvAnalysis::Feature::kPerZoneContextDetection);
+    BitFlags<AvAnalysis::Feature, uint32_t> avAnalysisFeatures;
+    uint8_t maxAnalysisStreams = 0;
+    if (LinuxDeviceOptions::GetInstance().cameraRemoteAnalysis)
+    {
+        avAnalysisFeatures.Set(AvAnalysis::Feature::kRemoteContextDetection);
+        avAnalysisFeatures.Set(AvAnalysis::Feature::kPerZoneContextDetection);
+        maxAnalysisStreams = 8;
+    }
+    else
+    {
+        avAnalysisFeatures.Set(AvAnalysis::Feature::kLocalContextDetection);
+        avAnalysisFeatures.Set(AvAnalysis::Feature::kPerZoneContextDetection);
+        maxAnalysisStreams = 0;
+    }
+
     std::vector<Descriptor::Structs::SemanticTagStruct::Type> appSupportedAmbientContexts =
         mCameraDevice->GetCameraHALInterface().GetSupportedAmbientContexts();
 
     // Instantiate the AV Analysis Server
-    mAVAnalysisServer.Create(mEndpoint, avAnalysisFeatures, appSupportedAmbientContexts, DataModel::MakeNullable(appMaxZones));
+    mAVAnalysisServer.Create(mEndpoint, avAnalysisFeatures, appSupportedAmbientContexts, DataModel::MakeNullable(appMaxZones),
+                             maxAnalysisStreams);
+
+    if (LinuxDeviceOptions::GetInstance().cameraRemoteAnalysis)
+    {
+        CHIP_ERROR clientErr = mAVAnalysisCameraClient.Init(Server::GetInstance().GetCASESessionManager());
+        if (clientErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Camera, "Failed to init AvAnalysisCameraClient: %" CHIP_ERROR_FORMAT, clientErr.Format());
+        }
+        else
+        {
+            mAVAnalysisServer.Cluster().SetCameraClient(&mAVAnalysisCameraClient);
+        }
+    }
 
     // The delegate must be set before registering the server
     mAVAnalysisServer.Cluster().SetDelegate(&mCameraDevice->GetAVAnalysisDelegate());

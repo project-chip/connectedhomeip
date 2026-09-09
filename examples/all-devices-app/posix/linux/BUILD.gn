@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("includes") {
   include_dirs = [
@@ -40,6 +41,13 @@ source_set("linux") {
     ]
   }
 
+  if (chip_device_config_enable_wifipaf) {
+    sources += [
+      "CommissioningProxyPafAdapter.cpp",
+      "CommissioningProxyPafAdapter.h",
+    ]
+  }
+
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
@@ -49,22 +57,38 @@ source_set("linux") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/data-model-providers/codedriven/endpoint",
     "${chip_root}/src/platform/Linux",
-    "${chip_root}/third_party/miniaudio:miniaudio",
+    "${chip_root}/third_party/miniaudio",
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 
   deps += [ "${chip_root}/third_party/jsoncpp" ]
 
+  public_deps = []
+
+  # The proxy device itself is here rather than in the unconditional list
+  # because a build with no transport does not register it with the factory, and
+  # linking the cluster into a binary that cannot reach it only costs flash.
+  # Either transport is enough to make it reachable, so this tracks both.
+  if (chip_config_network_layer_ble || chip_device_config_enable_wifipaf) {
+    public_deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/commissioning-proxy" ]
+  }
+
   if (chip_config_network_layer_ble) {
-    # CommissioningProxyBleAdapter implements the cluster's BLE adapter interface, and
-    # this target owns the BLE transport driver it is composed onto the proxy device with.
-    #
-    # The proxy device itself is here rather than in the unconditional list because a
-    # build with no transport does not register it with the factory, and linking the
-    # cluster into a binary that cannot reach it only costs flash.
-    public_deps = [
-      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/commissioning-proxy",
+    # CommissioningProxyBleAdapter implements the cluster's BLE adapter
+    # interface, and this target owns the BLE transport driver it is composed
+    # onto the proxy device with.
+    public_deps += [
       "${chip_root}/src/app/clusters/commissioning-proxy-server:ble-transport",
+    ]
+  }
+
+  if (chip_device_config_enable_wifipaf) {
+    # CommissioningProxyPafAdapter implements the cluster's PAF adapter
+    # interface, and the band the proxy advertises is derived here from the
+    # app's command line.
+    public_deps += [
+      "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
+      "${chip_root}/src/app/clusters/commissioning-proxy-server:paf-transport",
     ]
   }
 
