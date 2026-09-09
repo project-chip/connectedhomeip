@@ -18,14 +18,18 @@
 #include <app/clusters/audio-control-server/AudioControlCluster.h>
 
 #include <algorithm>
+#include <optional>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/data-model/Decode.h>
+#include <app/data-model/List.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/AudioControl/Commands.h>
 #include <clusters/AudioControl/Metadata.h>
+#include <clusters/ScenesManagement/Structs.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 namespace chip::app::Clusters {
 
@@ -44,10 +48,41 @@ uint16_t AddCappedAtMax(uint16_t volume, uint16_t stepSize, uint16_t effectiveMa
     return static_cast<uint16_t>(std::min<uint32_t>(static_cast<uint32_t>(volume) + static_cast<uint32_t>(stepSize), effectiveMax));
 }
 
+// Restricts scene extension field sets to the AudioControl cluster and its scene-able
+// attributes. Per-attribute enablement (BEQ / optional bands) is enforced by the setters in
+// ApplyScene(); this only rejects clearly out-of-cluster IDs.
+class AudioControlSceneValidator : public scenes::AttributeValuePairValidator
+{
+public:
+    CHIP_ERROR Validate(const app::ConcreteClusterPath & clusterPath,
+                        AttributeValuePairValidator::AttributeValuePairType & value) override
+    {
+        VerifyOrReturnError(clusterPath.mClusterId == AudioControl::Id, CHIP_ERROR_INVALID_ARGUMENT);
+        switch (value.attributeID)
+        {
+        case SoftMuted::Id:
+        case Volume::Id:
+        case Bass::Id:
+        case Mid::Id:
+        case Treble::Id:
+            return CHIP_NO_ERROR;
+        default:
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+};
+
+AudioControlSceneValidator & GlobalSceneValidator()
+{
+    static AudioControlSceneValidator sValidator;
+    return sValidator;
+}
+
 } // namespace
 
 AudioControlCluster::AudioControlCluster(EndpointId endpointId, AudioControlDelegate & delegate, const Config & config) :
-    DefaultServerCluster({ endpointId, AudioControl::Id }), mDelegate(delegate), mFeatures(config.mFeatures),
+    DefaultServerCluster({ endpointId, AudioControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalSceneValidator()),
+    mDelegate(delegate), mFeatures(config.mFeatures),
     mOptionalAttributeSet(config.mOptionalAttributeSet), mMinDeviceVolume(delegate.GetMinDeviceVolume()),
     mMaxDeviceVolume(delegate.GetMaxDeviceVolume()), mMaxDeviceVolumeDB(delegate.GetMaxDeviceVolumeDB()),
     mMinCorrection(delegate.GetMinCorrection()), mMaxCorrection(delegate.GetMaxCorrection())
@@ -939,6 +974,172 @@ CHIP_ERROR AudioControlCluster::SetTreble(int16_t treble)
     {
         StoreTreble();
     }
+    return CHIP_NO_ERROR;
+}
+
+// ---------------------------------------------------------------------------------------
+// scenes::SceneHandler
+// ---------------------------------------------------------------------------------------
+
+bool AudioControlCluster::SupportsCluster(EndpointId endpoint, ClusterId cluster)
+{
+    return (cluster == AudioControl::Id) && (endpoint == mPath.mEndpointId);
+}
+
+CHIP_ERROR AudioControlCluster::SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes)
+{
+    using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
+
+    VerifyOrReturnError(SupportsCluster(endpoint, cluster), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // SoftMuted and Volume are mandatory scene-able attributes; Bass/Mid/Treble are added only
+    // when the BasicEqualizer feature and the matching band attribute are enabled.
+    AttributeValuePair pairs[5];
+    size_t count = 0;
+
+    pairs[count].attributeID = SoftMuted::Id;
+    pairs[count].valueUnsigned8.SetValue(static_cast<uint8_t>(mSoftMuted));
+    count++;
+
+    pairs[count].attributeID = Volume::Id;
+    pairs[count].valueUnsigned16.SetValue(mVolume);
+    count++;
+
+    if (mFeatures.Has(Feature::kBasicEqualizer))
+    {
+        if (mOptionalAttributeSet.IsSet(Bass::Id))
+        {
+            pairs[count].attributeID = Bass::Id;
+            pairs[count].valueSigned16.SetValue(mBass);
+            count++;
+        }
+        if (mOptionalAttributeSet.IsSet(Mid::Id))
+        {
+            pairs[count].attributeID = Mid::Id;
+            pairs[count].valueSigned16.SetValue(mMid);
+            count++;
+        }
+        if (mOptionalAttributeSet.IsSet(Treble::Id))
+        {
+            pairs[count].attributeID = Treble::Id;
+            pairs[count].valueSigned16.SetValue(mTreble);
+            count++;
+        }
+    }
+
+    app::DataModel::List<AttributeValuePair> attributeValueList(pairs, count);
+    return EncodeAttributeValueList(attributeValueList, serializedBytes);
+}
+
+CHIP_ERROR AudioControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                                          scenes::TransitionTimeMs timeMs)
+{
+    // Transition time is intentionally ignored: the stored values are applied immediately, as
+    // there is no meaningful hardware ramp for mute or tone controls.
+    (void) timeMs;
+
+    VerifyOrReturnError(SupportsCluster(endpoint, cluster), CHIP_ERROR_INVALID_ARGUMENT);
+
+    app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
+    ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
+
+    // Pass 1: decode each pair into an optional, so an extension field set carrying only a subset
+    // of the attributes leaves the rest untouched. Values outside the current constraints are
+    // saturated to the closest legal value (Scenes spec: a non-boolean non-nullable attribute
+    // takes the valid value closest to the one provided), so a scene stays recallable after
+    // MaxUserVolume or the correction range shrinks. Bands not enabled on this instance are
+    // skipped - the attribute does not exist here, and the shared scene validator is stateless so
+    // it cannot make that per-instance check at AddScene time.
+    const bool equalizer = mFeatures.Has(Feature::kBasicEqualizer);
+
+    std::optional<uint16_t> volume;
+    std::optional<bool> softMuted;
+    std::optional<int16_t> bass, mid, treble;
+
+    auto pairIterator = attributeValueList.begin();
+    while (pairIterator.Next())
+    {
+        const auto & pair = pairIterator.GetValue();
+        switch (pair.attributeID)
+        {
+        case SoftMuted::Id:
+            VerifyOrReturnError(pair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+            softMuted = pair.valueUnsigned8.Value() != 0;
+            break;
+        case Volume::Id:
+            VerifyOrReturnError(pair.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+            volume = std::clamp(pair.valueUnsigned16.Value(), mMinDeviceVolume, EffectiveMaxVolume());
+            break;
+        case Bass::Id:
+            VerifyOrReturnError(pair.valueSigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+            if (equalizer && mOptionalAttributeSet.IsSet(Bass::Id))
+            {
+                bass = std::clamp(pair.valueSigned16.Value(), mMinCorrection, mMaxCorrection);
+            }
+            break;
+        case Mid::Id:
+            VerifyOrReturnError(pair.valueSigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+            if (equalizer && mOptionalAttributeSet.IsSet(Mid::Id))
+            {
+                mid = std::clamp(pair.valueSigned16.Value(), mMinCorrection, mMaxCorrection);
+            }
+            break;
+        case Treble::Id:
+            VerifyOrReturnError(pair.valueSigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+            if (equalizer && mOptionalAttributeSet.IsSet(Treble::Id))
+            {
+                treble = std::clamp(pair.valueSigned16.Value(), mMinCorrection, mMaxCorrection);
+            }
+            break;
+        default:
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+    ReturnErrorOnFailure(pairIterator.GetStatus());
+
+    // Pass 2: notify the delegate before committing, matching the command handlers and
+    // SetMaxUserVolume, so a rejection leaves the cluster unchanged. Volume and SoftMuted are one
+    // atomic call (the absent side taken from current state), made only when the scene carries at
+    // least one of them; the equalizer bands mirror the write path (guarded by an actual-change
+    // check).
+    if (volume.has_value() || softMuted.has_value())
+    {
+        const uint16_t newVolume = volume.value_or(mVolume);
+        const bool newSoftMuted  = softMuted.value_or(mSoftMuted);
+        Status s                 = mDelegate.HandleVolumeAndMuteChange(newVolume, newSoftMuted);
+        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError());
+        if (SetAttributeValue(mVolume, newVolume, Volume::Id))
+        {
+            StoreVolume();
+        }
+        if (SetAttributeValue(mSoftMuted, newSoftMuted, SoftMuted::Id))
+        {
+            StoreSoftMuted();
+        }
+    }
+
+    if (bass.has_value() && *bass != mBass)
+    {
+        Status s = mDelegate.HandleBassChanged(*bass);
+        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError());
+        SetAttributeValue(mBass, *bass, Bass::Id);
+        StoreBass();
+    }
+    if (mid.has_value() && *mid != mMid)
+    {
+        Status s = mDelegate.HandleMidChanged(*mid);
+        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError());
+        SetAttributeValue(mMid, *mid, Mid::Id);
+        StoreMid();
+    }
+    if (treble.has_value() && *treble != mTreble)
+    {
+        Status s = mDelegate.HandleTrebleChanged(*treble);
+        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError());
+        SetAttributeValue(mTreble, *treble, Treble::Id);
+        StoreTreble();
+    }
+
     return CHIP_NO_ERROR;
 }
 
