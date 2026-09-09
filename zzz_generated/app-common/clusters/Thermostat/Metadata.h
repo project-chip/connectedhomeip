@@ -299,22 +299,33 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
+namespace CriticalFreezeProtection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalFreezeProtection::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CriticalFreezeProtection
+namespace CriticalOverheatProtection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalOverheatProtection::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CriticalOverheatProtection
 namespace Sensors {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Sensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace Sensors
-namespace AvailableSensors {
+namespace AvailableSensorHandles {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(AvailableSensors::Id,
+    kMetadataEntry(AvailableSensorHandles::Id,
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, Access::Privilege::kManage);
-} // namespace AvailableSensors
-namespace EnabledSensors {
+} // namespace AvailableSensorHandles
+namespace EnabledSensorHandles {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(EnabledSensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(EnabledSensorHandles::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, Access::Privilege::kManage);
-} // namespace EnabledSensors
+} // namespace EnabledSensorHandles
 namespace NumberOfSensorScheduleTransitions {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfSensorScheduleTransitions::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,

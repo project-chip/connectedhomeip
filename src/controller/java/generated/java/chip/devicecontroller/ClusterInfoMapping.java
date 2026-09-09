@@ -13891,7 +13891,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThermostatClusterAvailableSensorsAttributeCallback implements ChipClusters.ThermostatCluster.AvailableSensorsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedThermostatClusterAvailableSensorHandlesAttributeCallback implements ChipClusters.ThermostatCluster.AvailableSensorHandlesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -13912,7 +13912,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThermostatClusterEnabledSensorsAttributeCallback implements ChipClusters.ThermostatCluster.EnabledSensorsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedThermostatClusterEnabledSensorHandlesAttributeCallback implements ChipClusters.ThermostatCluster.EnabledSensorHandlesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {

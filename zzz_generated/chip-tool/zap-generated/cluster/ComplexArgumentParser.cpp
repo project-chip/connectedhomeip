@@ -2674,6 +2674,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(
                                                                   "PAISupportedProfiles", value.isMember("PAISupportedProfiles")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.DACSupportedProfiles",
                                                                   "DACSupportedProfiles", value.isMember("DACSupportedProfiles")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.CDSupportedProfiles",
+                                                                  "CDSupportedProfiles", value.isMember("CDSupportedProfiles")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "PAASupportedProfiles");
@@ -2691,6 +2693,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(
         ComplexArgumentParser::Setup(labelWithMember, request.DACSupportedProfiles, value["DACSupportedProfiles"]));
     valueCopy.removeMember("DACSupportedProfiles");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "CDSupportedProfiles");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.CDSupportedProfiles, value["CDSupportedProfiles"]));
+    valueCopy.removeMember("CDSupportedProfiles");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -2700,6 +2706,7 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.PAASupportedProfiles);
     ComplexArgumentParser::Finalize(request.PAISupportedProfiles);
     ComplexArgumentParser::Finalize(request.DACSupportedProfiles);
+    ComplexArgumentParser::Finalize(request.CDSupportedProfiles);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -5766,8 +5773,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("dayOfWeek")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorScheduleTransitionStruct.transitionTime", "transitionTime",
                                                                   value.isMember("transitionTime")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorScheduleTransitionStruct.enabledSensors", "enabledSensors",
-                                                                  value.isMember("enabledSensors")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorScheduleTransitionStruct.enabledSensorHandles",
+                                                                  "enabledSensorHandles", value.isMember("enabledSensorHandles")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeek");
@@ -5778,9 +5785,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTime, value["transitionTime"]));
     valueCopy.removeMember("transitionTime");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enabledSensors");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enabledSensors, value["enabledSensors"]));
-    valueCopy.removeMember("enabledSensors");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enabledSensorHandles");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.enabledSensorHandles, value["enabledSensorHandles"]));
+    valueCopy.removeMember("enabledSensorHandles");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -5789,7 +5797,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::S
 {
     ComplexArgumentParser::Finalize(request.dayOfWeek);
     ComplexArgumentParser::Finalize(request.transitionTime);
-    ComplexArgumentParser::Finalize(request.enabledSensors);
+    ComplexArgumentParser::Finalize(request.enabledSensorHandles);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

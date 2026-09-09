@@ -14326,41 +14326,51 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionNotFollowingReasonID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCriticalFreezeProtectionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeCriticalFreezeProtectionID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCriticalOverheatProtectionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeCriticalOverheatProtectionID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSensorsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeSensorsID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAvailableSensorsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAvailableSensorHandlesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorsID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorHandlesID) params:params];
 }
 
-- (void)writeAttributeAvailableSensorsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+- (void)writeAttributeAvailableSensorHandlesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributeAvailableSensorsWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    [self writeAttributeAvailableSensorHandlesWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
 }
-- (void)writeAttributeAvailableSensorsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+- (void)writeAttributeAvailableSensorHandlesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorsID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorHandlesID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEnabledSensorsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEnabledSensorHandlesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorsID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorHandlesID) params:params];
 }
 
-- (void)writeAttributeEnabledSensorsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+- (void)writeAttributeEnabledSensorHandlesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributeEnabledSensorsWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    [self writeAttributeEnabledSensorHandlesWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
 }
-- (void)writeAttributeEnabledSensorsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+- (void)writeAttributeEnabledSensorHandlesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorsID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorHandlesID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfSensorScheduleTransitionsWithParams:(MTRReadParams * _Nullable)params

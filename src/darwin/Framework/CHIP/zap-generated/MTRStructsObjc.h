@@ -872,6 +872,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull paaSupportedProfiles MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull paiSupportedProfiles MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull dacSupportedProfiles MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull cdSupportedProfiles MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -2032,7 +2033,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRThermostatClusterSensorScheduleTransitionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull dayOfWeek MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull enabledSensors MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull enabledSensorHandles MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

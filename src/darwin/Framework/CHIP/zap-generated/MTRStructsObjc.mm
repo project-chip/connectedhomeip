@@ -3258,6 +3258,8 @@ NS_ASSUME_NONNULL_BEGIN
         _paiSupportedProfiles = @(0);
 
         _dacSupportedProfiles = @(0);
+
+        _cdSupportedProfiles = @(0);
     }
     return self;
 }
@@ -3269,13 +3271,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.paaSupportedProfiles = self.paaSupportedProfiles;
     other.paiSupportedProfiles = self.paiSupportedProfiles;
     other.dacSupportedProfiles = self.dacSupportedProfiles;
+    other.cdSupportedProfiles = self.cdSupportedProfiles;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaSupportedProfiles:%@; paiSupportedProfiles:%@; dacSupportedProfiles:%@; >", NSStringFromClass([self class]), _paaSupportedProfiles, _paiSupportedProfiles, _dacSupportedProfiles];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaSupportedProfiles:%@; paiSupportedProfiles:%@; dacSupportedProfiles:%@; cdSupportedProfiles:%@; >", NSStringFromClass([self class]), _paaSupportedProfiles, _paiSupportedProfiles, _dacSupportedProfiles, _cdSupportedProfiles];
     return descriptionString;
 }
 
@@ -8691,7 +8694,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _enabledSensors = [NSArray array];
+        _enabledSensorHandles = [NSArray array];
     }
     return self;
 }
@@ -8702,14 +8705,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.dayOfWeek = self.dayOfWeek;
     other.transitionTime = self.transitionTime;
-    other.enabledSensors = self.enabledSensors;
+    other.enabledSensorHandles = self.enabledSensorHandles;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; enabledSensors:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, _enabledSensors];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; enabledSensorHandles:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, _enabledSensorHandles];
     return descriptionString;
 }
 

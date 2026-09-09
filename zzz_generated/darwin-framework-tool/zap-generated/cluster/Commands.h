@@ -107076,9 +107076,11 @@ public:
 | * ThermostatSuggestions                                             | 0x0054 |
 | * CurrentThermostatSuggestion                                       | 0x0055 |
 | * ThermostatSuggestionNotFollowingReason                            | 0x0056 |
+| * CriticalFreezeProtection                                          | 0x0057 |
+| * CriticalOverheatProtection                                        | 0x0058 |
 | * Sensors                                                           | 0x0059 |
-| * AvailableSensors                                                  | 0x005A |
-| * EnabledSensors                                                    | 0x005B |
+| * AvailableSensorHandles                                            | 0x005A |
+| * EnabledSensorHandles                                              | 0x005B |
 | * NumberOfSensorScheduleTransitions                                 | 0x005C |
 | * SensorSchedule                                                    | 0x005D |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -114182,6 +114184,176 @@ public:
 #if MTR_ENABLE_PROVISIONAL
 
 /*
+ * Attribute CriticalFreezeProtection
+ */
+class ReadThermostatCriticalFreezeProtection : public ReadAttribute {
+public:
+    ReadThermostatCriticalFreezeProtection()
+        : ReadAttribute("critical-freeze-protection")
+    {
+    }
+
+    ~ReadThermostatCriticalFreezeProtection()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::CriticalFreezeProtection::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributeCriticalFreezeProtectionWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Thermostat.CriticalFreezeProtection response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("Thermostat CriticalFreezeProtection read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class SubscribeAttributeThermostatCriticalFreezeProtection : public SubscribeAttribute {
+public:
+    SubscribeAttributeThermostatCriticalFreezeProtection()
+        : SubscribeAttribute("critical-freeze-protection")
+    {
+    }
+
+    ~SubscribeAttributeThermostatCriticalFreezeProtection()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::CriticalFreezeProtection::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributeCriticalFreezeProtectionWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"Thermostat.CriticalFreezeProtection response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+
+/*
+ * Attribute CriticalOverheatProtection
+ */
+class ReadThermostatCriticalOverheatProtection : public ReadAttribute {
+public:
+    ReadThermostatCriticalOverheatProtection()
+        : ReadAttribute("critical-overheat-protection")
+    {
+    }
+
+    ~ReadThermostatCriticalOverheatProtection()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::CriticalOverheatProtection::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributeCriticalOverheatProtectionWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Thermostat.CriticalOverheatProtection response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("Thermostat CriticalOverheatProtection read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class SubscribeAttributeThermostatCriticalOverheatProtection : public SubscribeAttribute {
+public:
+    SubscribeAttributeThermostatCriticalOverheatProtection()
+        : SubscribeAttribute("critical-overheat-protection")
+    {
+    }
+
+    ~SubscribeAttributeThermostatCriticalOverheatProtection()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::CriticalOverheatProtection::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributeCriticalOverheatProtectionWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"Thermostat.CriticalOverheatProtection response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+
+/*
  * Attribute Sensors
  */
 class ReadThermostatSensors : public ReadAttribute {
@@ -114267,34 +114439,34 @@ public:
 #if MTR_ENABLE_PROVISIONAL
 
 /*
- * Attribute AvailableSensors
+ * Attribute AvailableSensorHandles
  */
-class ReadThermostatAvailableSensors : public ReadAttribute {
+class ReadThermostatAvailableSensorHandles : public ReadAttribute {
 public:
-    ReadThermostatAvailableSensors()
-        : ReadAttribute("available-sensors")
+    ReadThermostatAvailableSensorHandles()
+        : ReadAttribute("available-sensor-handles")
     {
     }
 
-    ~ReadThermostatAvailableSensors()
+    ~ReadThermostatAvailableSensorHandles()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensorHandles::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        [cluster readAttributeAvailableSensorsWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"Thermostat.AvailableSensors response %@", [value description]);
+        [cluster readAttributeAvailableSensorHandlesWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Thermostat.AvailableSensorHandles response %@", [value description]);
             if (error == nil) {
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
             } else {
-                LogNSError("Thermostat AvailableSensors read Error", error);
+                LogNSError("Thermostat AvailableSensorHandles read Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -114303,25 +114475,25 @@ public:
     }
 };
 
-class WriteThermostatAvailableSensors : public WriteAttribute {
+class WriteThermostatAvailableSensorHandles : public WriteAttribute {
 public:
-    WriteThermostatAvailableSensors()
-        : WriteAttribute("available-sensors")
+    WriteThermostatAvailableSensorHandles()
+        : WriteAttribute("available-sensor-handles")
         , mComplex(&mValue)
     {
-        AddArgument("attr-name", "available-sensors");
+        AddArgument("attr-name", "available-sensor-handles");
         AddArgument("attr-value", &mComplex);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatAvailableSensors()
+    ~WriteThermostatAvailableSensorHandles()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensorHandles::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") WriteAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -114340,9 +114512,9 @@ public:
             value = array_0;
         }
 
-        [cluster writeAttributeAvailableSensorsWithValue:value params:params completion:^(NSError * _Nullable error) {
+        [cluster writeAttributeAvailableSensorHandlesWithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
-                LogNSError("Thermostat AvailableSensors write Error", error);
+                LogNSError("Thermostat AvailableSensorHandles write Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -114355,21 +114527,21 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
 };
 
-class SubscribeAttributeThermostatAvailableSensors : public SubscribeAttribute {
+class SubscribeAttributeThermostatAvailableSensorHandles : public SubscribeAttribute {
 public:
-    SubscribeAttributeThermostatAvailableSensors()
-        : SubscribeAttribute("available-sensors")
+    SubscribeAttributeThermostatAvailableSensorHandles()
+        : SubscribeAttribute("available-sensor-handles")
     {
     }
 
-    ~SubscribeAttributeThermostatAvailableSensors()
+    ~SubscribeAttributeThermostatAvailableSensorHandles()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::AvailableSensorHandles::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -114384,10 +114556,10 @@ public:
         if (mAutoResubscribe.HasValue()) {
             params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
-        [cluster subscribeAttributeAvailableSensorsWithParams:params
+        [cluster subscribeAttributeAvailableSensorHandlesWithParams:params
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Thermostat.AvailableSensors response %@", [value description]);
+                NSLog(@"Thermostat.AvailableSensorHandles response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -114404,34 +114576,34 @@ public:
 #if MTR_ENABLE_PROVISIONAL
 
 /*
- * Attribute EnabledSensors
+ * Attribute EnabledSensorHandles
  */
-class ReadThermostatEnabledSensors : public ReadAttribute {
+class ReadThermostatEnabledSensorHandles : public ReadAttribute {
 public:
-    ReadThermostatEnabledSensors()
-        : ReadAttribute("enabled-sensors")
+    ReadThermostatEnabledSensorHandles()
+        : ReadAttribute("enabled-sensor-handles")
     {
     }
 
-    ~ReadThermostatEnabledSensors()
+    ~ReadThermostatEnabledSensorHandles()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensorHandles::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         __auto_type * cluster = [[MTRBaseClusterThermostat alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        [cluster readAttributeEnabledSensorsWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"Thermostat.EnabledSensors response %@", [value description]);
+        [cluster readAttributeEnabledSensorHandlesWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Thermostat.EnabledSensorHandles response %@", [value description]);
             if (error == nil) {
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
             } else {
-                LogNSError("Thermostat EnabledSensors read Error", error);
+                LogNSError("Thermostat EnabledSensorHandles read Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -114440,25 +114612,25 @@ public:
     }
 };
 
-class WriteThermostatEnabledSensors : public WriteAttribute {
+class WriteThermostatEnabledSensorHandles : public WriteAttribute {
 public:
-    WriteThermostatEnabledSensors()
-        : WriteAttribute("enabled-sensors")
+    WriteThermostatEnabledSensorHandles()
+        : WriteAttribute("enabled-sensor-handles")
         , mComplex(&mValue)
     {
-        AddArgument("attr-name", "enabled-sensors");
+        AddArgument("attr-name", "enabled-sensor-handles");
         AddArgument("attr-value", &mComplex);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteThermostatEnabledSensors()
+    ~WriteThermostatEnabledSensorHandles()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensorHandles::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") WriteAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -114477,9 +114649,9 @@ public:
             value = array_0;
         }
 
-        [cluster writeAttributeEnabledSensorsWithValue:value params:params completion:^(NSError * _Nullable error) {
+        [cluster writeAttributeEnabledSensorHandlesWithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
-                LogNSError("Thermostat EnabledSensors write Error", error);
+                LogNSError("Thermostat EnabledSensorHandles write Error", error);
                 TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
@@ -114492,21 +114664,21 @@ private:
     TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
 };
 
-class SubscribeAttributeThermostatEnabledSensors : public SubscribeAttribute {
+class SubscribeAttributeThermostatEnabledSensorHandles : public SubscribeAttribute {
 public:
-    SubscribeAttributeThermostatEnabledSensors()
-        : SubscribeAttribute("enabled-sensors")
+    SubscribeAttributeThermostatEnabledSensorHandles()
+        : SubscribeAttribute("enabled-sensor-handles")
     {
     }
 
-    ~SubscribeAttributeThermostatEnabledSensors()
+    ~SubscribeAttributeThermostatEnabledSensorHandles()
     {
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::Thermostat::Id;
-        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::Thermostat::Attributes::EnabledSensorHandles::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
@@ -114521,10 +114693,10 @@ public:
         if (mAutoResubscribe.HasValue()) {
             params.resubscribeAutomatically = mAutoResubscribe.Value();
         }
-        [cluster subscribeAttributeEnabledSensorsWithParams:params
+        [cluster subscribeAttributeEnabledSensorHandlesWithParams:params
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"Thermostat.EnabledSensors response %@", [value description]);
+                NSLog(@"Thermostat.EnabledSensorHandles response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -114698,12 +114870,12 @@ public:
                 newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
-                    for (auto & entry_2 : entry_0.enabledSensors) {
+                    for (auto & entry_2 : entry_0.enabledSensorHandles) {
                         NSData * newElement_2;
                         newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
                         [array_2 addObject:newElement_2];
                     }
-                    newElement_0.enabledSensors = array_2;
+                    newElement_0.enabledSensorHandles = array_2;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -222780,18 +222952,26 @@ void registerClusterThermostat(Commands & commands)
         make_unique<SubscribeAttributeThermostatThermostatSuggestionNotFollowingReason>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadThermostatCriticalFreezeProtection>(), //
+        make_unique<SubscribeAttributeThermostatCriticalFreezeProtection>(), //
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadThermostatCriticalOverheatProtection>(), //
+        make_unique<SubscribeAttributeThermostatCriticalOverheatProtection>(), //
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
         make_unique<ReadThermostatSensors>(), //
         make_unique<SubscribeAttributeThermostatSensors>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        make_unique<ReadThermostatAvailableSensors>(), //
-        make_unique<WriteThermostatAvailableSensors>(), //
-        make_unique<SubscribeAttributeThermostatAvailableSensors>(), //
+        make_unique<ReadThermostatAvailableSensorHandles>(), //
+        make_unique<WriteThermostatAvailableSensorHandles>(), //
+        make_unique<SubscribeAttributeThermostatAvailableSensorHandles>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        make_unique<ReadThermostatEnabledSensors>(), //
-        make_unique<WriteThermostatEnabledSensors>(), //
-        make_unique<SubscribeAttributeThermostatEnabledSensors>(), //
+        make_unique<ReadThermostatEnabledSensorHandles>(), //
+        make_unique<WriteThermostatEnabledSensorHandles>(), //
+        make_unique<SubscribeAttributeThermostatEnabledSensorHandles>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadThermostatNumberOfSensorScheduleTransitions>(), //

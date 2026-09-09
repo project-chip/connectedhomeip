@@ -3288,12 +3288,16 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentThermostatSuggestion";
         case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestionNotFollowingReason::Id:
             return "ThermostatSuggestionNotFollowingReason";
+        case chip::app::Clusters::Thermostat::Attributes::CriticalFreezeProtection::Id:
+            return "CriticalFreezeProtection";
+        case chip::app::Clusters::Thermostat::Attributes::CriticalOverheatProtection::Id:
+            return "CriticalOverheatProtection";
         case chip::app::Clusters::Thermostat::Attributes::Sensors::Id:
             return "Sensors";
-        case chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id:
-            return "AvailableSensors";
-        case chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id:
-            return "EnabledSensors";
+        case chip::app::Clusters::Thermostat::Attributes::AvailableSensorHandles::Id:
+            return "AvailableSensorHandles";
+        case chip::app::Clusters::Thermostat::Attributes::EnabledSensorHandles::Id:
+            return "EnabledSensorHandles";
         case chip::app::Clusters::Thermostat::Attributes::NumberOfSensorScheduleTransitions::Id:
             return "NumberOfSensorScheduleTransitions";
         case chip::app::Clusters::Thermostat::Attributes::SensorSchedule::Id:

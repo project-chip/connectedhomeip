@@ -12993,11 +12993,13 @@ class OperationalCredentials(Cluster):
                         ClusterObjectFieldDescriptor(Label="PAASupportedProfiles", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="PAISupportedProfiles", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="DACSupportedProfiles", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="CDSupportedProfiles", Tag=3, Type=uint),
                     ])
 
             PAASupportedProfiles: 'uint' = 0
             PAISupportedProfiles: 'uint' = 0
             DACSupportedProfiles: 'uint' = 0
+            CDSupportedProfiles: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -34402,9 +34404,11 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="thermostatSuggestions", Tag=0x00000054, Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]]),
                 ClusterObjectFieldDescriptor(Label="currentThermostatSuggestion", Tag=0x00000055, Type=typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct]),
                 ClusterObjectFieldDescriptor(Label="thermostatSuggestionNotFollowingReason", Tag=0x00000056, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="criticalFreezeProtection", Tag=0x00000057, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="criticalOverheatProtection", Tag=0x00000058, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="sensors", Tag=0x00000059, Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]]),
-                ClusterObjectFieldDescriptor(Label="availableSensors", Tag=0x0000005A, Type=typing.Optional[typing.List[bytes]]),
-                ClusterObjectFieldDescriptor(Label="enabledSensors", Tag=0x0000005B, Type=typing.Optional[typing.List[bytes]]),
+                ClusterObjectFieldDescriptor(Label="availableSensorHandles", Tag=0x0000005A, Type=typing.Optional[typing.List[bytes]]),
+                ClusterObjectFieldDescriptor(Label="enabledSensorHandles", Tag=0x0000005B, Type=typing.Optional[typing.List[bytes]]),
                 ClusterObjectFieldDescriptor(Label="numberOfSensorScheduleTransitions", Tag=0x0000005C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="sensorSchedule", Tag=0x0000005D, Type=typing.Optional[typing.List[Thermostat.Structs.SensorScheduleTransitionStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -34478,9 +34482,11 @@ class Thermostat(Cluster):
     thermostatSuggestions: typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]] = None
     currentThermostatSuggestion: typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct] = None
     thermostatSuggestionNotFollowingReason: typing.Union[None, Nullable, uint] = None
+    criticalFreezeProtection: typing.Optional[bool] = None
+    criticalOverheatProtection: typing.Optional[bool] = None
     sensors: typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]] = None
-    availableSensors: typing.Optional[typing.List[bytes]] = None
-    enabledSensors: typing.Optional[typing.List[bytes]] = None
+    availableSensorHandles: typing.Optional[typing.List[bytes]] = None
+    enabledSensorHandles: typing.Optional[typing.List[bytes]] = None
     numberOfSensorScheduleTransitions: typing.Optional[uint] = None
     sensorSchedule: typing.Optional[typing.List[Thermostat.Structs.SensorScheduleTransitionStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -34826,12 +34832,12 @@ class Thermostat(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="enabledSensors", Tag=2, Type=typing.List[bytes]),
+                        ClusterObjectFieldDescriptor(Label="enabledSensorHandles", Tag=2, Type=typing.List[bytes]),
                     ])
 
             dayOfWeek: 'uint' = 0
             transitionTime: 'uint' = 0
-            enabledSensors: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            enabledSensorHandles: 'typing.List[bytes]' = field(default_factory=lambda: [])
 
         @dataclass
         class ThermostatSensorStruct(ClusterObject):
@@ -36130,6 +36136,38 @@ class Thermostat(Cluster):
             value: typing.Union[None, Nullable, uint] = None
 
         @dataclass
+        class CriticalFreezeProtection(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000057
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class CriticalOverheatProtection(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000058
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
         class Sensors(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -36146,7 +36184,7 @@ class Thermostat(Cluster):
             value: typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]] = None
 
         @dataclass
-        class AvailableSensors(ClusterAttributeDescriptor):
+        class AvailableSensorHandles(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000201
@@ -36162,7 +36200,7 @@ class Thermostat(Cluster):
             value: typing.Optional[typing.List[bytes]] = None
 
         @dataclass
-        class EnabledSensors(ClusterAttributeDescriptor):
+        class EnabledSensorHandles(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000201

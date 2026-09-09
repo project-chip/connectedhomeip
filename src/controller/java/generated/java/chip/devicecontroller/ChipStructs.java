@@ -3635,18 +3635,22 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
   public Integer PAASupportedProfiles;
   public Integer PAISupportedProfiles;
   public Integer DACSupportedProfiles;
+  public Integer CDSupportedProfiles;
   private static final long PAA_SUPPORTED_PROFILES_ID = 0L;
   private static final long PAI_SUPPORTED_PROFILES_ID = 1L;
   private static final long DAC_SUPPORTED_PROFILES_ID = 2L;
+  private static final long CD_SUPPORTED_PROFILES_ID = 3L;
 
   public OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
     Integer PAASupportedProfiles,
     Integer PAISupportedProfiles,
-    Integer DACSupportedProfiles
+    Integer DACSupportedProfiles,
+    Integer CDSupportedProfiles
   ) {
     this.PAASupportedProfiles = PAASupportedProfiles;
     this.PAISupportedProfiles = PAISupportedProfiles;
     this.DACSupportedProfiles = DACSupportedProfiles;
+    this.CDSupportedProfiles = CDSupportedProfiles;
   }
 
   public StructType encodeTlv() {
@@ -3654,6 +3658,7 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
     values.add(new StructElement(PAA_SUPPORTED_PROFILES_ID, new UIntType(PAASupportedProfiles)));
     values.add(new StructElement(PAI_SUPPORTED_PROFILES_ID, new UIntType(PAISupportedProfiles)));
     values.add(new StructElement(DAC_SUPPORTED_PROFILES_ID, new UIntType(DACSupportedProfiles)));
+    values.add(new StructElement(CD_SUPPORTED_PROFILES_ID, new UIntType(CDSupportedProfiles)));
 
     return new StructType(values);
   }
@@ -3665,6 +3670,7 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
     Integer PAASupportedProfiles = null;
     Integer PAISupportedProfiles = null;
     Integer DACSupportedProfiles = null;
+    Integer CDSupportedProfiles = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PAA_SUPPORTED_PROFILES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -3681,12 +3687,18 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
           UIntType castingValue = element.value(UIntType.class);
           DACSupportedProfiles = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == CD_SUPPORTED_PROFILES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          CDSupportedProfiles = castingValue.value(Integer.class);
+        }
       }
     }
     return new OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
       PAASupportedProfiles,
       PAISupportedProfiles,
-      DACSupportedProfiles
+      DACSupportedProfiles,
+      CDSupportedProfiles
     );
   }
 
@@ -3702,6 +3714,9 @@ public static class OperationalCredentialsClusterPQCDeviceAttestationProfileStru
     output.append("\n");
     output.append("\tDACSupportedProfiles: ");
     output.append(DACSupportedProfiles);
+    output.append("\n");
+    output.append("\tCDSupportedProfiles: ");
+    output.append(CDSupportedProfiles);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -12068,26 +12083,26 @@ public static class ThermostatClusterScheduleTypeStruct {
 public static class ThermostatClusterSensorScheduleTransitionStruct {
   public Integer dayOfWeek;
   public Integer transitionTime;
-  public ArrayList<byte[]> enabledSensors;
+  public ArrayList<byte[]> enabledSensorHandles;
   private static final long DAY_OF_WEEK_ID = 0L;
   private static final long TRANSITION_TIME_ID = 1L;
-  private static final long ENABLED_SENSORS_ID = 2L;
+  private static final long ENABLED_SENSOR_HANDLES_ID = 2L;
 
   public ThermostatClusterSensorScheduleTransitionStruct(
     Integer dayOfWeek,
     Integer transitionTime,
-    ArrayList<byte[]> enabledSensors
+    ArrayList<byte[]> enabledSensorHandles
   ) {
     this.dayOfWeek = dayOfWeek;
     this.transitionTime = transitionTime;
-    this.enabledSensors = enabledSensors;
+    this.enabledSensorHandles = enabledSensorHandles;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(DAY_OF_WEEK_ID, new UIntType(dayOfWeek)));
     values.add(new StructElement(TRANSITION_TIME_ID, new UIntType(transitionTime)));
-    values.add(new StructElement(ENABLED_SENSORS_ID, ArrayType.generateArrayType(enabledSensors, (elementenabledSensors) -> new ByteArrayType(elementenabledSensors))));
+    values.add(new StructElement(ENABLED_SENSOR_HANDLES_ID, ArrayType.generateArrayType(enabledSensorHandles, (elementenabledSensorHandles) -> new ByteArrayType(elementenabledSensorHandles))));
 
     return new StructType(values);
   }
@@ -12098,7 +12113,7 @@ public static class ThermostatClusterSensorScheduleTransitionStruct {
     }
     Integer dayOfWeek = null;
     Integer transitionTime = null;
-    ArrayList<byte[]> enabledSensors = null;
+    ArrayList<byte[]> enabledSensorHandles = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == DAY_OF_WEEK_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -12110,17 +12125,17 @@ public static class ThermostatClusterSensorScheduleTransitionStruct {
           UIntType castingValue = element.value(UIntType.class);
           transitionTime = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == ENABLED_SENSORS_ID) {
+      } else if (element.contextTagNum() == ENABLED_SENSOR_HANDLES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          enabledSensors = castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class));
+          enabledSensorHandles = castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class));
         }
       }
     }
     return new ThermostatClusterSensorScheduleTransitionStruct(
       dayOfWeek,
       transitionTime,
-      enabledSensors
+      enabledSensorHandles
     );
   }
 
@@ -12134,8 +12149,8 @@ public static class ThermostatClusterSensorScheduleTransitionStruct {
     output.append("\ttransitionTime: ");
     output.append(transitionTime);
     output.append("\n");
-    output.append("\tenabledSensors: ");
-    output.append(enabledSensors);
+    output.append("\tenabledSensorHandles: ");
+    output.append(enabledSensorHandles);
     output.append("\n");
     output.append("}\n");
     return output.toString();

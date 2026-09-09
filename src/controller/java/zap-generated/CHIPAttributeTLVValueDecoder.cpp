@@ -10813,6 +10813,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_DACSupportedProfilesClassName.c_str(), value_DACSupportedProfilesCtorSignature.c_str(),
                 jnivalue_DACSupportedProfiles, value_DACSupportedProfiles);
+            jobject value_CDSupportedProfiles;
+            std::string value_CDSupportedProfilesClassName     = "java/lang/Integer";
+            std::string value_CDSupportedProfilesCtorSignature = "(I)V";
+            jint jnivalue_CDSupportedProfiles                  = static_cast<jint>(cppValue.CDSupportedProfiles.Raw());
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_CDSupportedProfilesClassName.c_str(), value_CDSupportedProfilesCtorSignature.c_str(),
+                jnivalue_CDSupportedProfiles, value_CDSupportedProfiles);
 
             {
                 jclass PQCDeviceAttestationProfileStructStructClass_0;
@@ -10827,9 +10834,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jmethodID PQCDeviceAttestationProfileStructStructCtor_0;
-                err = chip::JniReferences::GetInstance().FindMethod(env, PQCDeviceAttestationProfileStructStructClass_0, "<init>",
-                                                                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                                                                    &PQCDeviceAttestationProfileStructStructCtor_0);
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, PQCDeviceAttestationProfileStructStructClass_0, "<init>",
+                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                    &PQCDeviceAttestationProfileStructStructCtor_0);
                 if (err != CHIP_NO_ERROR || PQCDeviceAttestationProfileStructStructCtor_0 == nullptr)
                 {
                     ChipLogError(
@@ -10838,9 +10846,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                value =
-                    env->NewObject(PQCDeviceAttestationProfileStructStructClass_0, PQCDeviceAttestationProfileStructStructCtor_0,
-                                   value_PAASupportedProfiles, value_PAISupportedProfiles, value_DACSupportedProfiles);
+                value = env->NewObject(PQCDeviceAttestationProfileStructStructClass_0,
+                                       PQCDeviceAttestationProfileStructStructCtor_0, value_PAASupportedProfiles,
+                                       value_PAISupportedProfiles, value_DACSupportedProfiles, value_CDSupportedProfiles);
             }
             return value;
         }
@@ -33179,6 +33187,38 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
+        case Attributes::CriticalFreezeProtection::Id: {
+            using TypeInfo = Attributes::CriticalFreezeProtection::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            jboolean jnivalue              = static_cast<jboolean>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::CriticalOverheatProtection::Id: {
+            using TypeInfo = Attributes::CriticalOverheatProtection::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            jboolean jnivalue              = static_cast<jboolean>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
         case Attributes::Sensors::Id: {
             using TypeInfo = Attributes::Sensors::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -33293,8 +33333,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::AvailableSensors::Id: {
-            using TypeInfo = Attributes::AvailableSensors::TypeInfo;
+        case Attributes::AvailableSensorHandles::Id: {
+            using TypeInfo = Attributes::AvailableSensorHandles::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -33317,8 +33357,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::EnabledSensors::Id: {
-            using TypeInfo = Attributes::EnabledSensors::TypeInfo;
+        case Attributes::EnabledSensorHandles::Id: {
+            using TypeInfo = Attributes::EnabledSensorHandles::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -33387,19 +33427,19 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_transitionTimeClassName.c_str(), newElement_0_transitionTimeCtorSignature.c_str(),
                     jninewElement_0_transitionTime, newElement_0_transitionTime);
-                jobject newElement_0_enabledSensors;
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(newElement_0_enabledSensors);
+                jobject newElement_0_enabledSensorHandles;
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(newElement_0_enabledSensorHandles);
 
-                auto iter_newElement_0_enabledSensors_2 = entry_0.enabledSensors.begin();
-                while (iter_newElement_0_enabledSensors_2.Next())
+                auto iter_newElement_0_enabledSensorHandles_2 = entry_0.enabledSensorHandles.begin();
+                while (iter_newElement_0_enabledSensorHandles_2.Next())
                 {
-                    auto & entry_2 = iter_newElement_0_enabledSensors_2.GetValue();
+                    auto & entry_2 = iter_newElement_0_enabledSensorHandles_2.GetValue();
                     jobject newElement_2;
                     jbyteArray newElement_2ByteArray = env->NewByteArray(static_cast<jsize>(entry_2.size()));
                     env->SetByteArrayRegion(newElement_2ByteArray, 0, static_cast<jsize>(entry_2.size()),
                                             reinterpret_cast<const jbyte *>(entry_2.data()));
                     newElement_2 = newElement_2ByteArray;
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(newElement_0_enabledSensors,
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(newElement_0_enabledSensorHandles,
                                                                                           newElement_2);
                 }
 
@@ -33427,7 +33467,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 =
                         env->NewObject(sensorScheduleTransitionStructStructClass_1, sensorScheduleTransitionStructStructCtor_1,
-                                       newElement_0_dayOfWeek, newElement_0_transitionTime, newElement_0_enabledSensors);
+                                       newElement_0_dayOfWeek, newElement_0_transitionTime, newElement_0_enabledSensorHandles);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

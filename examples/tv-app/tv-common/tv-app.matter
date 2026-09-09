@@ -2204,6 +2204,7 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -2380,6 +2381,7 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;

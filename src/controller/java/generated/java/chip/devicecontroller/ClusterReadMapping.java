@@ -12749,6 +12749,28 @@ public class ClusterReadMapping {
           readThermostatThermostatSuggestionNotFollowingReasonCommandParams
         );
         result.put("readThermostatSuggestionNotFollowingReasonAttribute", readThermostatThermostatSuggestionNotFollowingReasonAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatCriticalFreezeProtectionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatCriticalFreezeProtectionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatCluster) cluster).readCriticalFreezeProtectionAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readThermostatCriticalFreezeProtectionCommandParams
+        );
+        result.put("readCriticalFreezeProtectionAttribute", readThermostatCriticalFreezeProtectionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatCriticalOverheatProtectionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatCriticalOverheatProtectionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatCluster) cluster).readCriticalOverheatProtectionAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readThermostatCriticalOverheatProtectionCommandParams
+        );
+        result.put("readCriticalOverheatProtectionAttribute", readThermostatCriticalOverheatProtectionAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatSensorsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatSensorsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -12760,28 +12782,28 @@ public class ClusterReadMapping {
           readThermostatSensorsCommandParams
         );
         result.put("readSensorsAttribute", readThermostatSensorsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatAvailableSensorsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatAvailableSensorsAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readThermostatAvailableSensorHandlesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatAvailableSensorHandlesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readAvailableSensorsAttribute(
-              (ChipClusters.ThermostatCluster.AvailableSensorsAttributeCallback) callback
+            ((ChipClusters.ThermostatCluster) cluster).readAvailableSensorHandlesAttribute(
+              (ChipClusters.ThermostatCluster.AvailableSensorHandlesAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedThermostatClusterAvailableSensorsAttributeCallback(),
-          readThermostatAvailableSensorsCommandParams
+          () -> new ClusterInfoMapping.DelegatedThermostatClusterAvailableSensorHandlesAttributeCallback(),
+          readThermostatAvailableSensorHandlesCommandParams
         );
-        result.put("readAvailableSensorsAttribute", readThermostatAvailableSensorsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatEnabledSensorsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatEnabledSensorsAttributeInteractionInfo = new InteractionInfo(
+        result.put("readAvailableSensorHandlesAttribute", readThermostatAvailableSensorHandlesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatEnabledSensorHandlesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatEnabledSensorHandlesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readEnabledSensorsAttribute(
-              (ChipClusters.ThermostatCluster.EnabledSensorsAttributeCallback) callback
+            ((ChipClusters.ThermostatCluster) cluster).readEnabledSensorHandlesAttribute(
+              (ChipClusters.ThermostatCluster.EnabledSensorHandlesAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedThermostatClusterEnabledSensorsAttributeCallback(),
-          readThermostatEnabledSensorsCommandParams
+          () -> new ClusterInfoMapping.DelegatedThermostatClusterEnabledSensorHandlesAttributeCallback(),
+          readThermostatEnabledSensorHandlesCommandParams
         );
-        result.put("readEnabledSensorsAttribute", readThermostatEnabledSensorsAttributeInteractionInfo);
+        result.put("readEnabledSensorHandlesAttribute", readThermostatEnabledSensorHandlesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatNumberOfSensorScheduleTransitionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatNumberOfSensorScheduleTransitionsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

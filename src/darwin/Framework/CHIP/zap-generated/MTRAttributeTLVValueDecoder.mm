@@ -5097,6 +5097,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
         value.paaSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAASupportedProfiles.Raw()];
         value.paiSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAISupportedProfiles.Raw()];
         value.dacSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.DACSupportedProfiles.Raw()];
+        value.cdSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.CDSupportedProfiles.Raw()];
         return value;
     }
     default: {
@@ -14187,6 +14188,28 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
+    case Attributes::CriticalFreezeProtection::Id: {
+        using TypeInfo = Attributes::CriticalFreezeProtection::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::CriticalOverheatProtection::Id: {
+        using TypeInfo = Attributes::CriticalOverheatProtection::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
     case Attributes::Sensors::Id: {
         using TypeInfo = Attributes::Sensors::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -14236,8 +14259,8 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::AvailableSensors::Id: {
-        using TypeInfo = Attributes::AvailableSensors::TypeInfo;
+    case Attributes::AvailableSensorHandles::Id: {
+        using TypeInfo = Attributes::AvailableSensorHandles::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -14262,8 +14285,8 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::EnabledSensors::Id: {
-        using TypeInfo = Attributes::EnabledSensors::TypeInfo;
+    case Attributes::EnabledSensorHandles::Id: {
+        using TypeInfo = Attributes::EnabledSensorHandles::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -14318,7 +14341,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                 newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.enabledSensors.begin();
+                    auto iter_2 = entry_0.enabledSensorHandles.begin();
                     while (iter_2.Next()) {
                         auto & entry_2 = iter_2.GetValue();
                         NSData * newElement_2;
@@ -14330,7 +14353,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                         *aError = err;
                         return nil;
                     }
-                    newElement_0.enabledSensors = array_2;
+                    newElement_0.enabledSensorHandles = array_2;
                 }
                 [array_0 addObject:newElement_0];
             }

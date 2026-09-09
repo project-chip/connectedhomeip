@@ -2427,6 +2427,14 @@ CHIP_ERROR DataModelLogger::LogValue(
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("CDSupportedProfiles", indent + 1, value.CDSupportedProfiles);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CDSupportedProfiles'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -5117,10 +5125,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("EnabledSensors", indent + 1, value.enabledSensors);
+        CHIP_ERROR err = LogValue("EnabledSensorHandles", indent + 1, value.enabledSensorHandles);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnabledSensors'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnabledSensorHandles'");
             return err;
         }
     }
@@ -21942,21 +21950,31 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ThermostatSuggestionNotFollowingReason", 1, value);
         }
+        case Thermostat::Attributes::CriticalFreezeProtection::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CriticalFreezeProtection", 1, value);
+        }
+        case Thermostat::Attributes::CriticalOverheatProtection::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CriticalOverheatProtection", 1, value);
+        }
         case Thermostat::Attributes::Sensors::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Sensors", 1, value);
         }
-        case Thermostat::Attributes::AvailableSensors::Id: {
+        case Thermostat::Attributes::AvailableSensorHandles::Id: {
             chip::app::DataModel::DecodableList<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AvailableSensors", 1, value);
+            return DataModelLogger::LogValue("AvailableSensorHandles", 1, value);
         }
-        case Thermostat::Attributes::EnabledSensors::Id: {
+        case Thermostat::Attributes::EnabledSensorHandles::Id: {
             chip::app::DataModel::DecodableList<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EnabledSensors", 1, value);
+            return DataModelLogger::LogValue("EnabledSensorHandles", 1, value);
         }
         case Thermostat::Attributes::NumberOfSensorScheduleTransitions::Id: {
             uint8_t value;
