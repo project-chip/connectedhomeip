@@ -75,6 +75,7 @@ jobs:
       - name: Execute SME Reviewer Check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "${{ steps.params.outputs.sync_labels }}" = "true" ]; then
             python3 scripts/tools/check_label_reviewers.py \

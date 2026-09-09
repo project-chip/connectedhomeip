@@ -19,7 +19,7 @@
 
 Verifies that for each designated label attached to a pull request, at least one
 designated SME username from the corresponding configuration has approved the PR.
-Can be executed manually or as part of a GitHub Actions workflow.
+Uses the GitHub CLI (`gh`) to fetch PR reviews and labels.
 """
 
 from __future__ import annotations
@@ -28,9 +28,8 @@ import argparse
 import json
 import logging
 import os
+import subprocess
 import sys
-import urllib.error
-import urllib.request
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -58,77 +57,28 @@ class LabelEvaluation:
         return not self.present_on_pr or len(self.approvers) > 0
 
 
-class GitHubApiClient:
-    """Lightweight GitHub REST API client using standard library urllib."""
+def fetch_pull_request_data(repo: str, pr_number: int) -> dict[str, Any]:
+    """Fetches pull request details and latest reviews using the gh CLI."""
+    cmd = [
+        "gh",
+        "pr",
+        "view",
+        str(pr_number),
+        "--repo",
+        repo,
+        "--json",
+        "author,title,state,labels,latestReviews",
+    ]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        return json.loads(proc.stdout)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(
+            f"gh pr view failed (exit code {e.returncode}): {e.stderr.strip()}"
+        ) from e
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"Failed to parse gh output as JSON: {e}") from e
 
-    def __init__(self, token: str) -> None:
-        self.token = token
-
-    def request(self, url: str) -> Any:
-        headers = {
-            "Accept": "application/vnd.github+json",
-            "User-Agent": "chip-label-reviewer-action",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "Authorization": f"Bearer {self.token}",
-        }
-
-        req = urllib.request.Request(url, headers=headers)
-        try:
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                content = resp.read().decode("utf-8")
-                return json.loads(content)
-        except urllib.error.HTTPError as e:
-            err_msg = e.read().decode("utf-8", errors="replace")
-            if e.code == 404:
-                raise RuntimeError(f"Resource not found at {url}") from e
-            if e.code in (401, 403):
-                raise RuntimeError(
-                    f"GitHub API authorization/rate limit error (HTTP {e.code}): {err_msg}"
-                ) from e
-            raise RuntimeError(
-                f"GitHub API request failed (HTTP {e.code}) for {url}: {err_msg}"
-            ) from e
-        except urllib.error.URLError as e:
-            raise RuntimeError(f"Failed to reach GitHub API: {e.reason}") from e
-
-    def get_pull_request(self, repo: str, pr_number: int) -> dict[str, Any]:
-        url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}"
-        return self.request(url)
-
-    def get_pull_request_reviews(
-        self, repo: str, pr_number: int
-    ) -> list[dict[str, Any]]:
-        reviews = []
-        page = 1
-        while True:
-            url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}/reviews?per_page=100&page={page}"
-            data = self.request(url)
-            if not isinstance(data, list) or not data:
-                break
-            reviews.extend(data)
-            if len(data) < 100:
-                break
-            page += 1
-        return reviews
-
-    def post(self, url: str, data: dict[str, Any]) -> Any:
-        headers = {
-            "Accept": "application/vnd.github+json",
-            "User-Agent": "chip-label-reviewer-action",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.token}",
-        }
-
-        body = json.dumps(data).encode("utf-8")
-        req = urllib.request.Request(url, data=body, headers=headers, method="POST")
-        try:
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                content = resp.read().decode("utf-8")
-                return json.loads(content)
-        except urllib.error.HTTPError as e:
-            err_msg = e.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"GitHub API POST failed (HTTP {e.code}): {err_msg}") from e
 
 
 def parse_label_config(config_path: str) -> dict[str, LabelRule]:
@@ -190,40 +140,6 @@ def parse_label_config(config_path: str) -> dict[str, LabelRule]:
     return mapping
 
 
-def compute_effective_approvers(
-    reviews: list[dict[str, Any]], author: str
-) -> set[str]:
-    """Computes currently approving users from chronological PR reviews.
-
-    Respects state transitions: APPROVED -> CHANGES_REQUESTED -> APPROVED.
-    PR author cannot approve their own pull request.
-    """
-    approvers: set[str] = set()
-    change_requesters: set[str] = set()
-    author_lower = author.lower() if author else ""
-
-    for review in reviews:
-        user_info = review.get("user")
-        if not user_info or not user_info.get("login"):
-            continue
-        user = user_info["login"].lower()
-        state = review.get("state")
-
-        if state == "APPROVED":
-            approvers.add(user)
-            change_requesters.discard(user)
-        elif state == "CHANGES_REQUESTED":
-            change_requesters.add(user)
-            approvers.discard(user)
-        elif state == "DISMISSED":
-            approvers.discard(user)
-            change_requesters.discard(user)
-
-    # Discard author from approvers
-    approvers.discard(author_lower)
-    return approvers
-
-
 def evaluate_pr_labels(
     pr_labels: list[str],
     config_mapping: dict[str, LabelRule],
@@ -245,40 +161,6 @@ def evaluate_pr_labels(
             )
 
     return evaluations
-
-
-def extract_pr_number_from_environment() -> int | None:
-    """Tries to extract PR number from environment or GitHub event payload."""
-    env_pr = os.environ.get("PR_NUMBER")
-    if env_pr and env_pr.isdigit():
-        return int(env_pr)
-
-    event_path = os.environ.get("GITHUB_EVENT_PATH")
-    if event_path and os.path.exists(event_path):
-        try:
-            with open(event_path, encoding="utf-8") as f:
-                event_data = json.load(f)
-            # From pull_request or pull_request_target event
-            if "pull_request" in event_data and "number" in event_data["pull_request"]:
-                return int(event_data["pull_request"]["number"])
-            # From issue_comment event on a pull request
-            if (
-                "issue" in event_data
-                and "pull_request" in event_data["issue"]
-                and "number" in event_data["issue"]
-            ):
-                return int(event_data["issue"]["number"])
-            # From workflow_dispatch inputs
-            if (
-                "inputs" in event_data
-                and "pr_number" in event_data["inputs"]
-                and str(event_data["inputs"]["pr_number"]).isdigit()
-            ):
-                return int(event_data["inputs"]["pr_number"])
-        except Exception as e:
-            logging.debug(f"Could not parse GITHUB_EVENT_PATH: {e}")
-
-    return None
 
 
 def generate_step_summary(
@@ -350,26 +232,18 @@ def write_step_summary(summary_path: str, summary_markdown: str) -> None:
         logging.warning(f"Failed writing to GITHUB_STEP_SUMMARY: {e}")
 
 
-def sync_labels_to_github(
-    repo: str, config_mapping: dict[str, LabelRule], client: GitHubApiClient
-) -> list[str]:
-    """Ensures all configured labels exist in the GitHub repository.
-
-    Fetches existing labels and creates any missing ones via POST /repos/:owner/:repo/labels.
-    """
-    existing_labels = set()
-    page = 1
-    while True:
-        url = f"https://api.github.com/repos/{repo}/labels?per_page=100&page={page}"
-        data = client.request(url)
-        if not isinstance(data, list) or not data:
-            break
-        for item in data:
-            if isinstance(item, dict) and "name" in item:
-                existing_labels.add(item["name"].strip().lower())
-        if len(data) < 100:
-            break
-        page += 1
+def sync_labels_to_github(repo: str, config_mapping: dict[str, LabelRule]) -> list[str]:
+    """Ensures all configured labels exist in the GitHub repository using gh CLI."""
+    cmd = ["gh", "label", "list", "--repo", repo, "--limit", "1000", "--json", "name"]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        data = json.loads(proc.stdout)
+        existing_labels = {
+            item["name"].strip().lower() for item in data if "name" in item
+        }
+    except Exception as e:
+        logging.warning(f"Could not list existing labels on {repo}: {e}")
+        existing_labels = set()
 
     created: list[str] = []
     for key, rule in config_mapping.items():
@@ -377,20 +251,28 @@ def sync_labels_to_github(
             logging.info(
                 f"Label '{rule.display_name}' does not exist on {repo}. Creating..."
             )
-            url = f"https://api.github.com/repos/{repo}/labels"
-            payload = {
-                "name": rule.display_name,
-                "description": f"Requires SME review: {rule.display_name}",
-                "color": "ededed",
-            }
+            create_cmd = [
+                "gh",
+                "label",
+                "create",
+                rule.display_name,
+                "--repo",
+                repo,
+                "--description",
+                f"Requires SME review: {rule.display_name}",
+                "--color",
+                "ededed",
+            ]
             try:
-                client.post(url, payload)
+                subprocess.run(create_cmd, capture_output=True, text=True, check=True)
                 created.append(rule.display_name)
                 logging.info(
                     f"✅ Successfully created label '{rule.display_name}' on GitHub."
                 )
-            except Exception as e:
-                logging.warning(f"Could not create label '{rule.display_name}': {e}")
+            except subprocess.CalledProcessError as e:
+                logging.warning(
+                    f"Could not create label '{rule.display_name}': {e.stderr.strip()}"
+                )
 
     return created
 
@@ -402,7 +284,7 @@ def main() -> int:
     parser.add_argument(
         "--pr",
         type=int,
-        help="Pull request number (auto-detected if omitted in GitHub Actions)",
+        help="Pull request number",
     )
     parser.add_argument(
         "--repo",
@@ -413,11 +295,6 @@ def main() -> int:
         "--config",
         default=DEFAULT_CONFIG_PATH,
         help=f"Path to the YAML label reviewers file (default: {DEFAULT_CONFIG_PATH})",
-    )
-    parser.add_argument(
-        "--token",
-        default=os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN"),
-        help="GitHub API token (reads GITHUB_TOKEN or GH_TOKEN env if not specified)",
     )
     parser.add_argument(
         "--sync-labels",
@@ -449,39 +326,30 @@ def main() -> int:
     for key, rule in config_mapping.items():
         logging.debug(f"  - '{rule.display_name}': {sorted(rule.smes)}")
 
-    if not args.token:
-        logging.error(
-            "GitHub API token is required. Set GITHUB_TOKEN environment variable or pass --token."
-        )
-        return 2
-
-    client = GitHubApiClient(token=args.token)
-
     if args.sync_labels:
         logging.info(f"Syncing labels from {args.config} to repository {args.repo}...")
-        created = sync_labels_to_github(args.repo, config_mapping, client)
+        created = sync_labels_to_github(args.repo, config_mapping)
         if created:
             print(f"Created {len(created)} new label(s) on GitHub: {', '.join(created)}")
         else:
             print("All configured labels already exist on GitHub.")
-        if not args.pr and not extract_pr_number_from_environment():
+        if not args.pr:
             return 0
 
-    pr_number = args.pr or extract_pr_number_from_environment()
-    if not pr_number:
-        logging.error(
-            "PR number not provided. Pass --pr <number> or run within a GitHub Action PR context."
-        )
+    if not args.pr:
+        logging.error("PR number not provided. Pass --pr <number>.")
         return 2
+
+    pr_number = args.pr
     logging.info(f"Fetching PR #{pr_number} from {args.repo}...")
     try:
-        pr_data = client.get_pull_request(args.repo, pr_number)
+        pr_data = fetch_pull_request_data(args.repo, pr_number)
     except Exception as e:
         logging.error(f"Failed to fetch PR #{pr_number}: {e}")
         return 2
 
     pr_title = pr_data.get("title", "")
-    pr_author = pr_data.get("user", {}).get("login", "")
+    pr_author = pr_data.get("author", {}).get("login", "")
     pr_state = pr_data.get("state", "")
     pr_labels = [l.get("name", "") for l in pr_data.get("labels", [])]
 
@@ -491,14 +359,14 @@ def main() -> int:
     print("=" * 72)
     print(f"Active PR labels: {pr_labels}\n")
 
-    logging.info(f"Fetching reviews for PR #{pr_number}...")
-    try:
-        raw_reviews = client.get_pull_request_reviews(args.repo, pr_number)
-    except Exception as e:
-        logging.error(f"Failed to fetch reviews for PR #{pr_number}: {e}")
-        return 2
-
-    approvers = compute_effective_approvers(raw_reviews, author=pr_author)
+    # Author cannot approve their own PR
+    author_lower = pr_author.lower()
+    approvers = {
+        r.get("author", {}).get("login", "").lower()
+        for r in pr_data.get("latestReviews", [])
+        if r.get("state") == "APPROVED"
+        and r.get("author", {}).get("login", "").lower() != author_lower
+    }
     logging.info(f"Active approved reviews from: {sorted(approvers) or 'None'}")
 
     evaluations = evaluate_pr_labels(pr_labels, config_mapping, approvers)

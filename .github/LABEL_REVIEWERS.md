@@ -140,11 +140,11 @@ To prevent pull requests from merging until the SME review check passes:
 
 ## 5. Local CLI Verification
 
-The underlying verification script can also be run locally on a developer workstation or cloudtop:
+The underlying verification script uses the GitHub CLI (`gh`) and can also be run locally on a developer workstation or cloudtop:
 
 ```bash
-# Set your GitHub personal access token
-export GITHUB_TOKEN="ghp_xxx"
+# Ensure GitHub CLI is authenticated (via gh auth login or GH_TOKEN)
+gh auth status
 
 # Run check on a specific PR
 python3 scripts/tools/check_label_reviewers.py --pr 30000
