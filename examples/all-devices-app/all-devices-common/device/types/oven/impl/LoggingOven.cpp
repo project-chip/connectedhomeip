@@ -18,7 +18,32 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include <array>
+
 namespace chip::app {
+
+namespace {
+
+// Distinct positional tags: sibling endpoints of the same device type under one tree root
+// must carry mutually-distinct TagList entries (checked by Descriptor 2.2).
+constexpr std::array<EndpointComposition::SemanticTag, 7> kCavityTags = { {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kMiddle) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRow) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kColumn) },
+} };
+
+} // namespace
 
 LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDelegate, Config{}) {}
 
@@ -28,6 +53,8 @@ LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) : mSurfac
 
     // The MA-oven device type requires at least one cavity endpoint.
     VerifyOrDie(config.cavityCount >= 1);
+    // Cavities beyond one need a distinct positional tag each (see kCavityTags).
+    VerifyOrDie(config.cavityCount <= kCavityTags.size());
 
     // Reserve up front: the parts capture the name pointers at construction, so the
     // name strings must not move afterwards.
@@ -43,9 +70,17 @@ LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) : mSurfac
 
 CHIP_ERROR LoggingOven::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
 {
-    for (auto & cavity : mCavities)
+    // A single cavity needs no tag; multiple cavities of the same device type under one
+    // tree root each need a distinct one.
+    const bool tagCavities = mCavities.size() > 1;
+    for (size_t i = 0; i < mCavities.size(); i++)
     {
-        ReturnErrorOnFailure(cavity->Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
+        EndpointComposition composition = EndpointComposition::WithParent(GetEndpointId());
+        if (tagCavities)
+        {
+            composition.tagList = Span(&kCavityTags[i], 1);
+        }
+        ReturnErrorOnFailure(mCavities[i]->Register(allocator, provider, composition));
     }
     ReturnErrorOnFailure(mSurface.Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
     return CHIP_NO_ERROR;
