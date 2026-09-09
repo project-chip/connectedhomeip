@@ -126,6 +126,12 @@ class TC_ASU_3_1(MatterBaseTest):
         attrib_listener.reset()
 
         self.step("5")
+        # Read the current UnionHealth before the mutation so we can verify the report reflects the change.
+        union_health_before = await self.read_single_attribute_check_success(
+            cluster=cluster, attribute=attr.UnionHealth, endpoint=endpoint)
+        log.info("UnionHealth before contributor add: %s", union_health_before)
+        # Adding an online contributor is expected to transition health to kFullyFunctional.
+        expected_union_health = Clusters.AmbientSensingUnion.Enums.UnionHealthEnum.kFullyFunctional
         # UnionHealth is read-only and derived from contributor statuses. Adding an online contributor
         # will cause the cluster to recalculate and report a new UnionHealth value.
         if self.is_ci:
@@ -146,14 +152,10 @@ class TC_ASU_3_1(MatterBaseTest):
         asserts.assert_true(reports is not None and len(reports) > 0,
                             "No subscription report received for UnionHealth after the change.")
         union_health_sub = reports[-1].value
-        log.info("Verified UnionHealth subscription report: %s", union_health_sub)
-        valid_union_health_values = [
-            Clusters.AmbientSensingUnion.Enums.UnionHealthEnum.kFullyFunctional,
-            Clusters.AmbientSensingUnion.Enums.UnionHealthEnum.kLimitedDegraded,
-            Clusters.AmbientSensingUnion.Enums.UnionHealthEnum.kNonFunctional,
-        ]
-        asserts.assert_in(union_health_sub, valid_union_health_values,
-                          "UnionHealth subscription report is not a valid UnionHealthEnum value.")
+        log.info("UnionHealth subscription report after contributor add: %s", union_health_sub)
+        asserts.assert_equal(union_health_sub, expected_union_health,
+                             f"UnionHealth subscription report ({union_health_sub}) does not match expected value "
+                             f"({expected_union_health}) after adding an online contributor.")
         attrib_listener.reset()
 
         self.step("7")
