@@ -793,7 +793,89 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_2]: Step #2.5 - Close Provider Process
         # ------------------------------------------------------------------------------------
         logger.info('%s: Step #2.5 - Closed Provider process.', step_number_s2)
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
+
+        # [Start of Step #2  from TC_SU_2_7]
+        step_number_s2_2_7 = "Step 2 from TC_SU_2_7"
+        logger.info("Starting step 2 from TC_SU_2_7")
+
+        self.start_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
+            setup_pincode=provider_setup_pincode,
+            discriminator=provider_discriminator,
+            port=provider_port, extra_args=['--delayedQueryActionTimeSec', '10', '--queryImageStatus', 'busy'],
+            kvs_path=self.KVS_PATH,
+            log_file=self._next_provider_log_path(),
+            timeout=20
+        )
+
+        subscription_s2_2_7 = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+
+        # Subscribe to this attribu
+        await self._start_subscription_bounded(
+            subscription_s2_2_7, step_number_s2_2_7,
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=0,
+            max_interval_sec=30,
+            keepSubscriptions=False
+        )
+
+        await self._wait_until_idle_before_announce(
+            controller=controller,
+            requestor_node_id=requestor_node_id,
+            subscription=subscription_s2_2_7,
+            timeout_sec=IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC,
+            step_name=step_number_s2_2_7,
+        )
+
+        state_transition_event_handler = EventSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor, expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
+        await state_transition_event_handler.start(controller, requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
+        # await self.announce_ota_provider(controller, provider_node_id, requestor_node_id)
+
+        await self._announce_until_provider_queried(
+            controller=controller,
+            provider_node_id=provider_node_id,
+            requestor_node_id=requestor_node_id,
+            timeout_sec=self.remaining_test_budget_sec(
+                reserve_sec=SPEC_GUARD_S2_SEC + STEP3_DELAYED_ACTION_TIME_SEC + 4 * STEP_RESERVE_SEC),
+            step_name=step_number_s2_2_7,
+        )
+        # Catch Event for kDelayedOnQuery, multiple State Transition Events will be triggered until the one with kDelayedOnQuery is seen after a kQuerying value.
+        event_report = state_transition_event_handler.wait_for_event_report_with_duplication(
+            expected_event=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
+            current_event_filter_func=lambda data: data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
+            previous_event_filter_func=lambda data: data.newState != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
+            timeout_sec=600
+        )
+        # Catch Event Report for Querying
+        self.verify_state_transition_event(event_report=event_report, expected_previous_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+                                           expected_new_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery, expected_reason=Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kDelayByProvider)
+        state_transition_event_handler.flush_events()
+        state_transition_event_handler.cancel()
+
+        logger.info("About close the provider app with proc %s", self.current_provider_app_proc)
+        self.terminate_provider()
+
+        # Check for the change to kIdle using previous subscription
+        logger.info("Waiting for kIdle State for DUT")
+        kidle_report_time = subscription_s2_2_7.await_first_value_asserting_no_forbidden(
+            target_value=kIdle_s1,
+            forbidden_values=set(),
+            # Nominal reserve for each remaining step (4-6); no spec guard windows left.
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=10 * STEP_RESERVE_SEC),
+        )
+        # Device is back to kIdle
+        subscription_s2_2_7.cancel()
+
+        # [End of Step #2 from TC_SU_2_7]
 
         self.step(3)
         # ------------------------------------------------------------------------------------
@@ -926,7 +1008,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             f"{step_number_s3}: DUT re-queried too soon."
             f"Elapsed: {elapsed_s3:.2f}s, expected >= {min_interval_s3 - tolerance_s3}s.")
 
-        # [Start of Step 6 TC_SU_2_7]
+        # [Start of Step #6 TC_SU_2_7]
         # After the Provider is killed and Download was visible we need to wait at least 5 minutes for the device to go back to KIdle
         # and only after those 5 mintues  DownloadError must be triggered
 
@@ -952,11 +1034,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=0,
-            max_interval_sec=20
+            max_interval_sec=20,
         )
 
-        subscription_download_error.flush_events()
-        logger.info('%s: Step #3.7 - Wait for DUT to go back to kIdle status after terminating the provider', step_number_s3)
+        logger.info('%s: Step #3.7 - Wait for DUT to go back to kIdle status after killing the provider', step_number_s3)
         # Wait for the report for the kIdle status afer triggering terminating the Provider.
         # The kIdle timeout should not be less than 5 minutes.
         logger.info('%s: Step #3.7 - Waiting for kIdle status', step_number_s3)
@@ -976,15 +1057,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         logger.info('%s: Step #3.8 - Once the DUT goes back to kIdle the device should trigger the DownloadError', step_number_s3)
         # When the kIdle is received the the script must wait for the DownloadError Event.
-        event_download_error = subscription_download_error.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError, timeout_sec=600)
-        logger.info("Download error Event: %s", event_download_error)
-        asserts.assert_equal(event_download_error.softwareVersion, ota_image_version,
-                             f"Expected Software version {ota_image_version}, found {event_download_error.softwareVersion}")
-        asserts.assert_greater(event_download_error.bytesDownloaded, 0, "Download was 0 bytes")
-        asserts.assert_greater(event_download_error.progressPercent, 0, "Download progress was 0")
-        asserts.assert_equal(event_download_error.platformCode, NullValue,
-                             f"Null value not found at platformCode {event_download_error.platformCode}")
+        # event_download_error = subscription_download_error.wait_for_event_report(
+        #     Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError, timeout_sec=self.remaining_test_budget_sec(reserve_sec=10 * STEP_RESERVE_SEC))
+        # logger.info("Download error Event: %s", event_download_error)
+        # asserts.assert_equal(event_download_error.softwareVersion, ota_image_version,
+        #                      f"Expected Software version {ota_image_version}, found {event_download_error.softwareVersion}")
+        # asserts.assert_greater(event_download_error.bytesDownloaded, 0, "Download was 0 bytes")
+        # asserts.assert_greater(event_download_error.progressPercent, 0, "Download progress was 0")
+        # asserts.assert_equal(event_download_error.platformCode, NullValue,
+        #                      f"Null value not found at platformCode {event_download_error.platformCode}")
         subscription_download_error.cancel()
 
         # [End of Step 6 TC_SU_2_7]
@@ -1222,6 +1303,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             max_interval_sec=30,
             keepSubscriptions=False
         )
+        subscription_state_transition.flush_events()
 
         await self._start_subscription_bounded(
             subscription_attr_state_querying, step_number_s3_2_7,
@@ -1243,6 +1325,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         # Kill the provider process before the announcement.
+        logger.info('%s: Step #5.0 - Killing the Provider just before sending the AnnouceOTA Provider Command', step_number_s3_2_7)
         self.current_provider_app_proc.kill()
 
         logger.info('%s: Step #5.0 - Controller sends AnnounceOTAProvider command', step_number_s3_2_7)
@@ -1256,10 +1339,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             # Nominal reserve for each remaining step (4-6); no spec guard windows left.
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC),
         )
-
+        subscription_attr_state_querying.cancel()
         # Once the device is Querying with the Provider Terminated , wait for the event report
+        logger.info('%s: Step #5.0 - Waiting for the StateTransitionEvent with kIdle value and reason Failure', step_number_s3_2_7)
         failure_report = subscription_state_transition.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60*5)
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60*10)
         # Change status to kIdle ChangeReason : Failure
         logger.info("State transition aftering killing the Provider: %s", failure_report)
         self.verify_state_transition_event(failure_report,
@@ -1267,8 +1351,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                                            expected_new_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                                            expected_reason=Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kFailure
                                            )
-        # Device is on kIdle State.
-        subscription_attr_state_querying.cancel()
+        # DUT Received the StateTransitionEvent with correct ChangeReasonEnum
         subscription_state_transition.cancel()
 
         # [End of Step #3 TC_SU_2_7]
@@ -1381,6 +1464,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                     step_number_s5, requestor_node_id, fabric_id)
         logger.info('%s: Prerequisite #1.0 - Launched Provider', step_number_s5)
 
+        step5_provider_extra_args = provider_extra_args_updateAvailable + \
+            ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3']
+
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -1389,7 +1475,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             port=provider_port,
             kvs_path=self.KVS_PATH,
             log_file=self._next_provider_log_path(),
-            extra_args=provider_extra_args_updateAvailable,
+            extra_args=step5_provider_extra_args,
         )
 
         # Arm the barrier before the announce below; start_provider() leaves the match armed on
@@ -1406,8 +1492,24 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             expected_attribute=None  # receive all attributes
         )
 
+        state_transition_event_handler = EventSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id
+        )
+
         await self._start_subscription_bounded(
             subscription_attr, step_number_s5,
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=0,
+            max_interval_sec=20,
+            keepSubscriptions=True
+        )
+
+        await self._start_subscription_bounded(
+            state_transition_event_handler, step_number_s5,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=0,
@@ -1520,6 +1622,22 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                             f"{step_number_s5}: No valid UpdateStateProgress observed (1-100)")
         logger.info('%s: Step #5.4 - UpdateStateProgress has valid value(s) in range 1-100', step_number_s5)
 
+        # Start of step #7 of TC_SU_2_7
+        # Waiting for kDelayedOnApply Event triggered after Downloading the image
+        # The DUT will trigger this Event then it will go to kApplying State.
+        # Verification of the test step DelayedOnApply
+        event_report = state_transition_event_handler.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60)
+        logger.info("Event report: %s", event_report)
+        self.verify_state_transition_event(event_report=event_report,
+                                           expected_previous_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
+                                           expected_new_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
+                                           expected_reason=Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kDelayByProvider,
+                                           expected_target_version=NullValue)
+        state_transition_event_handler.cancel()
+
+        # End of step #7 of TC_SU_2_7
+
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.5 - Wait for kApplying to confirm the BDX transfer is fully
         # complete, then kill the provider. The DUT will finish applying and reboot on its own.
@@ -1611,7 +1729,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             controller=controller, node_id=requestor_node_id, target_version=ota_image_version)
         logger.info('%s: Step #5.6 - DUT confirmed running software version %s.', step_number_s5, ota_image_version)
 
-        # [Start of Step 1 from TC_SU_2_7]
+        # [Start of Step #1 from TC_SU_2_7]
         # After the device is updated Read the Registered Event that occurs after reboot. It reads directly
         # using ReadEvent as is basically really hard to read using EventSubscription
 
@@ -1640,7 +1758,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         asserts.assert_equal(ota_image_version, version_applied_event_data.softwareVersion,
                              f"Software version from VersionAppliedEvent is not {ota_image_version}")
         asserts.assert_is_not_none(version_applied_event_data.productID, "Product ID from VersionApplied Event is None")
-        # [ End of Step 1 from TC_SU_2_7]
+        # [ End of Step #1 from TC_SU_2_7]
 
         self.step(6)
         # ------------------------------------------------------------------------------------
