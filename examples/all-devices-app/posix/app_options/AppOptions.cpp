@@ -22,6 +22,7 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 
@@ -58,10 +59,57 @@ constexpr uint16_t kOptionGroupcast     = 0xffda;
 constexpr uint16_t kOptionAppPipe       = 0xffdb;
 constexpr uint16_t kOptionTraceTo       = 0xffdc;
 constexpr uint16_t kOptionDacProvider   = 0xffdd;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+constexpr uint16_t kOptionWiFiPAF = 0xffdf;
+#endif
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
 bool AppOptions::sIsConfigValidated = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+std::vector<uint16_t> AppOptions::ParseWiFiPafFreqList(const std::string & extCmds)
+{
+    static constexpr char kFreqListKey[] = "freq_list=";
+
+    std::vector<uint16_t> freqs;
+    const auto pos = extCmds.find(kFreqListKey);
+    if (pos == std::string::npos)
+    {
+        return freqs;
+    }
+
+    const char * p = extCmds.c_str() + pos + strlen(kFreqListKey);
+    while (*p != '\0' && *p != ' ')
+    {
+        char * end              = nullptr;
+        const unsigned long val = strtoul(p, &end, 10);
+        if (end == p)
+        {
+            // Stop rather than spin, but say so: silently keeping a prefix of what was
+            // asked for would leave the proxy advertising bands it was not told to use.
+            ChipLogError(AppServer, "--wifipaf freq_list: ignoring unparsable frequency at \"%s\"", p);
+            break;
+        }
+        if (val == 0 || val > UINT16_MAX)
+        {
+            ChipLogError(AppServer, "--wifipaf freq_list: ignoring out-of-range frequency %lu", val);
+        }
+        else
+        {
+            freqs.push_back(static_cast<uint16_t>(val));
+        }
+        p = end;
+        if (*p != ',')
+        {
+            break;
+        }
+        ++p;
+    }
+
+    return freqs;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
 {
@@ -177,6 +225,12 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.dacProvider = value;
         ChipLogProgress(AppServer, "DAC provider file set to %s", value);
         return true;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case kOptionWiFiPAF:
+        mConfig.wifipafExtCmds  = value ? value : "";
+        mConfig.wifipafFreqList = ParseWiFiPafFreqList(mConfig.wifipafExtCmds);
+        return true;
+#endif
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -205,6 +259,9 @@ OptionSet * AppOptions::GetOptions()
         { "app-pipe", kArgumentRequired, kOptionAppPipe },
         { "trace-to", kArgumentRequired, kOptionTraceTo },
         { "dac_provider", kArgumentRequired, kOptionDacProvider },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        { "wifipaf", kArgumentRequired, kOptionWiFiPAF },
+#endif
         {}, // need empty terminator
     };
 
@@ -269,6 +326,15 @@ OptionSet * AppOptions::GetOptions()
 
         result += "  --dac_provider <path>\n";
         result += "       Path to JSON file containing device attestation credentials\n\n";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        result += "  --wifipaf freq_list=<freq_1>,<freq_2>...\n";
+        result += "       Enable Wi-Fi PAF via wpa_supplicant, on these NAN frequencies in MHz.\n";
+        result += "       2437 is channel 6, the default publish channel. The list sets the\n";
+        result += "       advertised WiFiBand and the channels published on; scans and connects\n";
+        result += "       subscribe on 2437 when listed, otherwise on the first frequency given.\n";
+        result += "       Give an empty string if not setting freq_list: \"\"\n\n";
+#endif
 
         return result;
     }();
