@@ -347,13 +347,7 @@ void CameraAppCommandHandler::OnAvAnalysisSessionEndHandler()
         }
     }
 
-    Optional<NodeId> sourceNodeId;
-    if (mJsonValue.isMember("SourceNodeId") && !mJsonValue["SourceNodeId"].isNull())
-    {
-        sourceNodeId.SetValue(static_cast<NodeId>(mJsonValue["SourceNodeId"].asUInt64()));
-    }
-
-    TEMPORARY_RETURN_IGNORED mCameraDevice->GetAVAnalysisManager().TriggerSessionEnd(sessionId, sourceNodeId);
+    TEMPORARY_RETURN_IGNORED mCameraDevice->GetAVAnalysisManager().TriggerSessionEnd(sessionId);
 }
 
 void CameraAppCommandDelegate::SetCameraDevice(Camera::CameraDevice * aCameraDevice)
