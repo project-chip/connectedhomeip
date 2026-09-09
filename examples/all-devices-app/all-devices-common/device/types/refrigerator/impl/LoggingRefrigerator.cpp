@@ -16,23 +16,46 @@
 
 #include "LoggingRefrigerator.h"
 
+#include <lib/support/CodeUtils.h>
+
 namespace chip::app {
 
 LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate) : LoggingRefrigerator(timerDelegate, Config{}) {}
 
-LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, Config config) :
-    mCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
-{}
+LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, Config config)
+{
+    mTagList = config.tagList;
+
+    // The MA-refrigerator device type requires at least one cabinet endpoint.
+    VerifyOrDie(config.cabinetCount >= 1);
+
+    // Reserve up front: the parts capture the name pointers at construction, so the
+    // name strings must not move afterwards.
+    mCabinetNames.reserve(config.cabinetCount);
+    mCabinets.reserve(config.cabinetCount);
+    for (uint8_t i = 0; i < config.cabinetCount; i++)
+    {
+        mCabinetNames.push_back("Cabinet " + std::to_string(i + 1));
+        mCabinets.push_back(std::make_unique<LoggingTemperatureControlledCabinetPart>(timerDelegate, config.cabinetConfig,
+                                                                                      mCabinetNames.back().c_str()));
+    }
+}
 
 CHIP_ERROR LoggingRefrigerator::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
 {
-    ReturnErrorOnFailure(mCabinet.Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
+    for (auto & cabinet : mCabinets)
+    {
+        ReturnErrorOnFailure(cabinet->Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
+    }
     return CHIP_NO_ERROR;
 }
 
 void LoggingRefrigerator::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
-    mCabinet.Unregister(provider);
+    for (auto it = mCabinets.rbegin(); it != mCabinets.rend(); ++it)
+    {
+        (*it)->Unregister(provider);
+    }
 }
 
 } // namespace chip::app

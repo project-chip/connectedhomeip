@@ -19,6 +19,13 @@
 #include <device/types/refrigerator/Refrigerator.h>
 #include <device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.h>
 
+#include <lib/support/CodeUtils.h>
+
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace chip::app {
 
 class LoggingRefrigerator : public Refrigerator
@@ -42,20 +49,31 @@ public:
         }
 
         TemperatureControlledCabinetPart::Config cabinetConfig = DefaultCabinetConfig();
+        uint8_t cabinetCount = 1;
+        /// Semantic tags applied to the refrigerator root endpoint descriptor (e.g. to
+        /// disambiguate variants under wildcard allocation).
+        Span<const EndpointComposition::SemanticTag> tagList = {};
     };
 
     explicit LoggingRefrigerator(TimerDelegate & timerDelegate);
     LoggingRefrigerator(TimerDelegate & timerDelegate, Config config);
     ~LoggingRefrigerator() override = default;
 
-    LoggingTemperatureControlledCabinetPart & Cabinet() { return mCabinet; }
+    size_t GetCabinetCount() const { return mCabinets.size(); }
+    LoggingTemperatureControlledCabinetPart & GetCabinet(size_t index)
+    {
+        VerifyOrDie(index < mCabinets.size());
+        return *mCabinets[index];
+    }
 
 protected:
     CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) override;
     void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    LoggingTemperatureControlledCabinetPart mCabinet;
+    // Cabinet names are owned here because the parts keep only a const char pointer to them.
+    std::vector<std::string> mCabinetNames;
+    std::vector<std::unique_ptr<LoggingTemperatureControlledCabinetPart>> mCabinets;
 };
 
 } // namespace chip::app

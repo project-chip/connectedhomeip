@@ -30,9 +30,14 @@ CHIP_ERROR Refrigerator::Register(EndpointIdAllocator & allocator, CodeDrivenDat
 
     mEndpointId = allocator.Allocate();
 
+    // An explicit caller-provided tag list wins; otherwise the device falls back to
+    // its own default tags (used to disambiguate variants under wildcard allocation).
+    Span<const EndpointComposition::SemanticTag> tagList =
+        composition.tagList.empty() ? mTagList : composition.tagList;
+
     ReturnErrorOnFailure(RegisterDescriptor(
         mEndpointId, provider,
-        EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
+        EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, tagList)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     ReturnErrorOnFailure(RegisterParts(allocator, provider));
