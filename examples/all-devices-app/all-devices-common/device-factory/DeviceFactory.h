@@ -345,23 +345,23 @@ private:
                 sBridgedNodeCount++;
                 std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
                 return MakeDevice<BridgedNode>(mContext->timerDelegate,
-                                                      "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
+                                               "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
         {
             RegisterCreator("contact-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<BooleanStateSensor>(
-                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
+                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
         {
             RegisterCreator("water-leak-detector", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<BooleanStateSensor>(
-                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
+                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
+                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
@@ -466,7 +466,7 @@ private:
             RegisterCreator("network-infrastructure-manager", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<NetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
-                                                                       mContext->platformManager, mContext->failSafeContext);
+                                                                mContext->platformManager, mContext->failSafeContext);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -485,8 +485,8 @@ private:
         {
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager,
-                                                           mContext->bindingTable, mContext->bindingManager);
+                return MakeDevice<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager, mContext->bindingTable,
+                                                    mContext->bindingManager);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)
@@ -616,7 +616,7 @@ private:
             RegisterCreator("rain-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
-                                                             Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
+                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_FREEZE_DETECTOR)

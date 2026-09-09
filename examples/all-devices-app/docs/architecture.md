@@ -154,17 +154,18 @@ sequenceDiagram
    the `DeviceFactory` constructor.
 2. **Hook Specialization**: Platforms instantiate `DeviceFactory` with
    target-specific static hooks:
-    - **`NoHooksDeviceFactory`** (`DeviceFactory<>`): Default specialization with
-      no hooks, used by embedded targets (ESP32, SiLabs, Telink) to minimize
-      binary footprint.
+    - **`NoHooksDeviceFactory`** (`DeviceFactory<>`): Default specialization
+      with no hooks, used by embedded targets (ESP32, SiLabs, Telink) to
+      minimize binary footprint.
     - **`PosixDeviceFactory`**
       (`DeviceFactory<OOBAccessorHook, NamedPipe::Hook>`): Specialized for
       POSIX, dynamically registering OOB cluster accessors and named pipe JSON
       translators only for instantiated devices.
 3. **Creation & Registration Lifecycle**:
     - `factory.Create(type, label)` instantiates the device and returns a
-      `DeviceRegistrationEntry` struct containing the `std::unique_ptr<DeviceInterface>`
-      and a `std::function<void()> onDeviceRegistered` callback.
+      `DeviceRegistrationEntry` struct containing the
+      `std::unique_ptr<DeviceInterface>` and a
+      `std::function<void()> onDeviceRegistered` callback.
     - The application registers the endpoint with the
       `CodeDrivenDataModelProvider`, allocating its valid runtime `EndpointId`.
     - The application invokes `entry.onDeviceRegistered()`, which expands the
