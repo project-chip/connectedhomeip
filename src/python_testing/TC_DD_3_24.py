@@ -244,7 +244,6 @@ class TC_DD_3_24(MatterTestCommissioner):
 
         return "IC" in txt_record.txt and txt_record.txt["IC"] == "1"
 
-
     async def check_operational_service_no_longer_advertise_ic(
             self,
             query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
