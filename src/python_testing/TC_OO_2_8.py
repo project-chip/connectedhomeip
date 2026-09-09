@@ -58,7 +58,7 @@ import test_plan_support
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -67,6 +67,14 @@ log = logging.getLogger(__name__)
 
 
 class TC_OO_2_8(MatterBaseTest):
+
+    def desc_TC_OO_2_8(self) -> str:
+        """Returns a description of this test"""
+        return "[TC-OO-2.8] Reporting requirements with (DUT as Server)"
+
+    def pics_TC_OO_2_8(self):
+        """This function returns a list of PICS for this test case that must be True for the test to be run"""
+        return ["OO.S", "OO.S.F00"]
 
     def steps_TC_OO_2_8(self) -> list[TestStep]:
         THcommand = "TH sends the command"
@@ -79,7 +87,7 @@ class TC_OO_2_8(MatterBaseTest):
                 TestStep(5, f"	{THcommand} OnWithTimedOff command with AcceptOnlyWhenOn field set to 0, OnTime field set to 100 (10s) and OffWaitTime set to 20 (2s)",
                          test_plan_support.verify_success()),
                 TestStep(6, "Wait for 5 seconds"),
-                TestStep(7, f"{THcommand} OnWithTimedOff command with AcceptOnlyWhenOn field set to 0, OnTime field set to 150 (15s) and OffWaitTime set to 50 (5s)",
+                TestStep(7, f"{THcommand} OnWithTimedOff command with AcceptOnlyWhenOn field set to 0, OnTime field set to 150 (15s) and OffWaitTime set to 100 (10s)",
                          test_plan_support.verify_success()),
                 TestStep(8, "Wait for 20 seconds"),
                 TestStep(9, "TH stores the reported values of OnTime in all incoming reports for OnTime attribute, that contains data in reportedOnTimeValuesList and verifies reportedOnTimeValueList contains three entries",
@@ -118,7 +126,7 @@ class TC_OO_2_8(MatterBaseTest):
                          "The second entry in reportedOffWaitTimeValueList is equal to 0"),
                 ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
+    @run_if_endpoint_matches(has_feature(Clusters.OnOff, Clusters.OnOff.Bitmaps.Feature.kLighting))
     async def test_TC_OO_2_8(self):
         # Commissioning - already done
         self.step(1)
@@ -217,7 +225,7 @@ class TC_OO_2_8(MatterBaseTest):
         asserts.assert_almost_equal(reportedOnTimeValueList[0].value, 100, delta=10, msg="Unexpected first OnTime report")
 
         self.step(24)
-        asserts.assert_equal(reportedOnTimeValueList[1].value, 0, "Unexpected last OffWaitTime report")
+        asserts.assert_equal(reportedOnTimeValueList[1].value, 0, "Unexpected last OnTime report")
 
         self.step(25)
         count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OffWaitTime]
