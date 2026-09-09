@@ -31,7 +31,7 @@ SilabsBatteryPowerSource::~SilabsBatteryPowerSource()
 }
 
 CHIP_ERROR SilabsBatteryPowerSource::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                  EndpointComposition composition)
+                                              EndpointComposition composition)
 {
     ReturnErrorOnFailure(BatteryPowerSource::Register(endpoint, provider, composition));
     // Kick off the timer loop to decrease battery level every few seconds
