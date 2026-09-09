@@ -242,6 +242,8 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
 
 using HKDF_sha_crypto = HKDF_sha;
 
+#if !CHIP_CRYPTO_SPAKE2P_PSA
+
 CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
 {
     const uint64_t u64_len = in_len;
@@ -550,28 +552,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeW0(uint8_t * w0out, size_t * w0
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized) const
-{
-    VerifyOrReturnError(outSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
-
-    memcpy(&outSerialized.data()[0], mW0, sizeof(mW0));
-    memcpy(&outSerialized.data()[sizeof(mW0)], mL, sizeof(mL));
-
-    outSerialized.reduce_size(kSpake2p_VerifierSerialized_Length);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Spake2pVerifier::Deserialize(const ByteSpan & inSerialized)
-{
-    VerifyOrReturnError(inSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
-
-    memcpy(mW0, &inSerialized.data()[0], sizeof(mW0));
-    memcpy(mL, &inSerialized.data()[sizeof(mW0)], sizeof(mL));
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin)
 {
     SensitiveDataFixedBuffer<kSpake2p_WS_Length * 2> serializedWS;
@@ -598,6 +578,30 @@ CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & 
 exit:
     spake2p.Clear();
     return err;
+}
+
+#endif // !CHIP_CRYPTO_PSA_SPAKE2P
+
+CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized) const
+{
+    VerifyOrReturnError(outSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(&outSerialized.data()[0], mW0, sizeof(mW0));
+    memcpy(&outSerialized.data()[sizeof(mW0)], mL, sizeof(mL));
+
+    outSerialized.reduce_size(kSpake2p_VerifierSerialized_Length);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2pVerifier::Deserialize(const ByteSpan & inSerialized)
+{
+    VerifyOrReturnError(inSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(mW0, &inSerialized.data()[0], sizeof(mW0));
+    memcpy(mL, &inSerialized.data()[sizeof(mW0)], sizeof(mL));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin, uint8_t * ws,
