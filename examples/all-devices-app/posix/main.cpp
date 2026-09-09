@@ -55,6 +55,7 @@
 
 #include <AppCommandDelegate.h>
 #include <BleInit.h>
+#include <ClusterRegistryTypes.h>
 #include <TermHandling.h>
 #if PW_RPC_ENABLED
 #include <Rpc.h>
@@ -62,9 +63,11 @@
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
 #include <device/api/SingleEndpoint.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
+#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -81,6 +84,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
+LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -289,12 +293,31 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
                 .RegisterClusterInstance<chip::app::Clusters::AmbientContextSensingCluster>(
                     &ambientContextSensorDevice->AmbientContextSensingCluster());
         }
+        else if (config.type == "robotic-vacuum-cleaner")
+        {
+            auto * rvcDevice = static_cast<SimulatedRoboticVacuumCleaner *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+                    &rvcDevice->OperationalState());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(&rvcDevice->GetServiceAreaCluster());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<RvcRunModeType>(
+                &rvcDevice->RunMode());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<RvcCleanModeType>(
+                &rvcDevice->CleanMode());
+        }
         else if (config.type == "electrical-sensor")
         {
             auto * electricalSensorDevice = static_cast<ElectricalSensor *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>(
                     &electricalSensorDevice->ElectricalEnergyMeasurementCluster());
+        }
+        else if (config.type == "mode-select")
+        {
+            auto * modeSelectDevice = static_cast<chip::app::ModeSelect *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ModeSelectCluster>(&modeSelectDevice->ModeSelectCluster());
         }
     }
 
@@ -334,9 +357,11 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .bindingTable             = Binding::Table::GetInstance(),
         .bindingManager           = Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
     });
 
-    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
+    RegisterDeviceFactoryOverrides(gTimerDelegate, Server::GetInstance().GetFabricTable(), initParams.persistentStorageDelegate,
+                                   gAudioManager);
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.
