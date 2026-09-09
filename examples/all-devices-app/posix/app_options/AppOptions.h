@@ -44,13 +44,33 @@ public:
         std::optional<uint32_t> interfaceId;
         std::string kvsPath;
         std::optional<std::string> dacProvider;
+<<<<<<< HEAD
         bool enableWiFi        = false;
         uint32_t bleController = 0;
+=======
+        uint8_t testEventTriggerEnableKey[16] = { 0 };
+        bool enableWiFi                       = false;
+        uint32_t bleController                = 0;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        std::string wifipafExtCmds;
+        // Frequencies in MHz parsed out of "--wifipaf freq_list=", in the order given.
+        std::vector<uint16_t> wifipafFreqList;
+#endif
+>>>>>>> 9d5d6b7 (Commissioning Proxy PR4: Add PAF to all-devices-app (#72818))
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
 
     static const AppConfig & GetConfig();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    /// Parse the frequencies out of a "--wifipaf" argument of the form
+    /// "freq_list=<freq_1>,<freq_2>...".  Returns an empty list when the key is absent
+    /// or carries nothing parsable, and skips entries outside a uint16_t.
+    static std::vector<uint16_t> ParseWiFiPafFreqList(const std::string & extCmds);
+#endif
+
+    static const AppConfig * TryGetConfig() { return sIsConfigValidated ? &mConfig : nullptr; }
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
     static CHIP_ERROR ValidateConfig();
 
