@@ -364,7 +364,7 @@ public:
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
 
-    void HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds, 
+    void HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
                                                      uint16_t identifiedContextId);
 
     uint8_t GetMaxAnalysisStreams() override { return mMaxAnalysisStreams; }

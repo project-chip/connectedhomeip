@@ -90,15 +90,16 @@ void CameraAppCommandHandler::HandleCommand(intptr_t context)
         const Json::Value & namespaceValue        = self->mJsonValue["NamespaceId"];
         const Json::Value & tagValue              = self->mJsonValue["TagId"];
         const Json::Value & zoneIdValues          = self->mJsonValue["ZoneIds"];
-        const Json::Value & identifedContextValue = self->mJsonValue["IdentifiedContextId"]; 
+        const Json::Value & identifedContextValue = self->mJsonValue["IdentifiedContextId"];
 
         VerifyOrExit(namespaceValue.isUInt() && namespaceValue.asUInt() <= UINT8_MAX,
                      ChipLogError(NotSpecified, "Camera App: NamespaceId is missing, invalid or out of unsigned 8-bit range"));
         VerifyOrExit(tagValue.isUInt() && tagValue.asUInt() <= UINT8_MAX,
                      ChipLogError(NotSpecified, "Camera App: TagId is missing, invalid or out of unsigned 8-bit range"));
-        VerifyOrExit(identifedContextValue.isUInt() && identifedContextValue.asUInt() <= UINT16_MAX,
-                     ChipLogError(NotSpecified, "Camera App: IdentifiedContextId is missing, invalid or out of unsigned 16-bit range"));
-                     
+        VerifyOrExit(
+            identifedContextValue.isUInt() && identifedContextValue.asUInt() <= UINT16_MAX,
+            ChipLogError(NotSpecified, "Camera App: IdentifiedContextId is missing, invalid or out of unsigned 16-bit range"));
+
         // ZoneIds is always an array, it may be empty
         VerifyOrExit(zoneIdValues.isArray(), ChipLogError(NotSpecified, "Camera App: ZoneIds must be an array"));
 

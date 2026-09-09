@@ -42,7 +42,7 @@ private:
 
     void OnZoneTriggeredHandler(const std::vector<uint16_t> & zoneIds);
     void OnSetHardPrivacyModeOnHandler(bool value);
-    void OnAmbientContextTriggeredHandler(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds, 
+    void OnAmbientContextTriggeredHandler(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
                                           uint16_t identifiedContextId);
     void OnAvAnalysisSessionStartHandler();
     void OnAvAnalysisPerceivedContextHandler();
