@@ -48,6 +48,12 @@ void WebRTCTransportProviderClient::InitCallbacks(OnCommandResponseCallback onCo
 CHIP_ERROR WebRTCTransportProviderClient::SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId,
                                                       uint32_t commandId, const uint8_t * payload, size_t length)
 {
+    if (mState != State::Idle)
+    {
+        ChipLogError(Camera, "Operation NOT POSSIBLE: another sync is in progress");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     CHIP_ERROR error     = CHIP_NO_ERROR;
     ClusterId aClusterID = static_cast<ClusterId>(clusterId);
     VerifyOrReturnValue(aClusterID == Clusters::WebRTCTransportProvider::Id, CHIP_ERROR_INTERNAL,
@@ -67,6 +73,11 @@ CHIP_ERROR WebRTCTransportProviderClient::SendCommand(void * appContext, uint16_
         ChipLogError(Camera, "Unexpected command ID: 0x%" PRIx32, aCommandID);
         error = CHIP_ERROR_INTERNAL;
         break;
+    }
+
+    if (error != CHIP_NO_ERROR)
+    {
+        mAppContext = nullptr;
     }
 
     return error;

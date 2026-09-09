@@ -52,19 +52,18 @@ static std::map<WebRTCClientHandle, std::unique_ptr<ProviderClientWrapper>> g_pr
 
 WebRTCClientHandle webrtc_client_create()
 {
-    auto wrapper              = std::make_unique<ProviderClientWrapper>();
-    wrapper->client           = std::make_unique<WebRTCTransportProviderClient>();
-    WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(wrapper->client.get());
-
+    auto client               = std::make_shared<WebRTCClient>();
+    WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(client.get());
+    
     std::lock_guard<std::mutex> lock(g_mutex);
-    g_provider_clients[handle] = std::move(wrapper);
+    g_clients[handle] = client;
     return handle;
 }
 
 void webrtc_client_destroy(WebRTCClientHandle handle)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    g_provider_clients.erase(handle);
+    g_clients.erase(handle);
 }
 
 PyChipError webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url)
@@ -187,10 +186,10 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
 
 WebRTCClientHandle webrtc_provider_client_create()
 {
-    auto wrapper              = std::make_unique<ProviderClientWrapper>();
-    wrapper->client           = std::make_unique<WebRTCTransportProviderClient>();
+    auto wrapper = std::make_unique<ProviderClientWrapper>();
+    wrapper->client = std::make_unique<WebRTCTransportProviderClient>();
     WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(wrapper->client.get());
-
+    
     std::lock_guard<std::mutex> lock(g_mutex);
     g_provider_clients[handle] = std::move(wrapper);
     return handle;
@@ -220,12 +219,23 @@ void OnCommandResponseCallback(void * appContext, chip::EndpointId endpointId, c
     if (!ctx)
         return;
 
-    std::lock_guard<std::mutex> lock(g_mutex);
-    auto it = g_provider_clients.find(ctx->handle);
-    if (it != g_provider_clients.end() && it->second->onResponse)
+    OnCommandSenderResponseCallback cb = nullptr;
+    void * pythonCtx = nullptr;
+
     {
-        it->second->onResponse(ctx->pythonAppContext, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus,
-                               payload, length);
+        std::lock_guard<std::mutex> lock(g_mutex);
+        auto it = g_provider_clients.find(ctx->handle);
+        if (it != g_provider_clients.end())
+        {
+            cb = it->second->onResponse;
+            pythonCtx = ctx->pythonAppContext;
+        }
+    }
+
+    if (cb)
+    {
+        cb(pythonCtx, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus,
+           payload, length);
     }
 }
 
@@ -236,11 +246,22 @@ void OnCommandErrorCallback(void * appContext, chip::Protocols::InteractionModel
     if (!ctx)
         return;
 
-    std::lock_guard<std::mutex> lock(g_mutex);
-    auto it = g_provider_clients.find(ctx->handle);
-    if (it != g_provider_clients.end() && it->second->onError)
+    OnCommandSenderErrorCallback cb = nullptr;
+    void * pythonCtx = nullptr;
+
     {
-        it->second->onError(ctx->pythonAppContext, to_underlying(status), clusterStatus, ToPyChipError(error));
+        std::lock_guard<std::mutex> lock(g_mutex);
+        auto it = g_provider_clients.find(ctx->handle);
+        if (it != g_provider_clients.end())
+        {
+            cb = it->second->onError;
+            pythonCtx = ctx->pythonAppContext;
+        }
+    }
+
+    if (cb)
+    {
+        cb(pythonCtx, to_underlying(status), clusterStatus, ToPyChipError(error));
     }
 }
 
@@ -250,14 +271,24 @@ void OnCommandDoneCallback(void * appContext)
     if (!ctx)
         return;
 
+    OnCommandSenderDoneCallback cb = nullptr;
+    void * pythonCtx = nullptr;
+
     {
         std::lock_guard<std::mutex> lock(g_mutex);
         auto it = g_provider_clients.find(ctx->handle);
-        if (it != g_provider_clients.end() && it->second->onDone)
+        if (it != g_provider_clients.end())
         {
-            it->second->onDone(ctx->pythonAppContext);
+            cb = it->second->onDone;
+            pythonCtx = ctx->pythonAppContext;
         }
     }
+
+    if (cb)
+    {
+        cb(pythonCtx);
+    }
+
     delete ctx;
 }
 

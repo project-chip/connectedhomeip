@@ -180,9 +180,11 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnICECandidates(uint16_t sess
     }
 
     jmethodID constructorId = env->GetMethodID(iceCandidateClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;I)V");
+    VerifyOrReturnError(constructorId != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Creates a Java object array to pass.
     jobjectArray jCandidatesArray = env->NewObjectArray(candidateCount, iceCandidateClass, nullptr);
+    VerifyOrReturnError(jCandidatesArray != nullptr, CHIP_ERROR_NO_MEMORY);
 
     for (int i = 0; i < candidateCount; ++i)
     {
@@ -202,6 +204,13 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnICECandidates(uint16_t sess
     jint status = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnICECandidatesMethod, sessionId, jCandidatesArray);
 
     env->DeleteLocalRef(jCandidatesArray);
+
+    if (env->ExceptionCheck())
+    {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_ERROR_INTERNAL;
+    }
 
     return (status == 0) ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }

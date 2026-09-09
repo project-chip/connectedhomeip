@@ -40,6 +40,11 @@ CHIP_ERROR LiveViewStartCommand::RunCommand()
     if (mClientSdp.HasValue())
     {
         std::string base64Sdp(mClientSdp.Value());
+        if (base64Sdp.size() > UINT16_MAX)
+        {
+            ChipLogError(Camera, "Base64 SDP length exceeds UINT16_MAX");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
 
         std::vector<uint8_t> decodedSdpBuf(base64Sdp.size());
         uint16_t decodedSdpLen =
