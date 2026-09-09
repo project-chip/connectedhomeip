@@ -24,8 +24,12 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
+namespace {
+    const ClusterId kClientClusters[] = { Chime::Id };
+    } // namespace
+
 Doorbell::Doorbell(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1), Span<const ClusterId>(&Chime::Id, 1)), mTimerDelegate(timerDelegate)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1)), mTimerDelegate(timerDelegate)
 {}
 
 CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -52,6 +56,10 @@ void Doorbell::Unregister(CodeDrivenDataModelProvider & provider)
     }
 }
 
+CHIP_ERROR Doorbell::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
+{
+    return out.ReferenceExisting(Span<const ClusterId>(kClientClusters));
+}
 
 Clusters::SwitchCluster & Doorbell::SwitchCluster()
 {

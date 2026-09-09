@@ -38,6 +38,8 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
+
     Clusters::IdentifyCluster & IdentifyCluster();
     Clusters::SwitchCluster & SwitchCluster();
 
