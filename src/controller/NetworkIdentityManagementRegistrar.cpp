@@ -183,7 +183,7 @@ void NetworkIdentityManagementRegistrar::AddClientOperation::Start(DeviceControl
     VerifyOrReturn(!clientIdentity.empty() && clientIdentity.size() <= sizeof(mClientIdentity),
                    onCompletion.Invoke(CHIP_ERROR_INVALID_ARGUMENT));
     memcpy(mClientIdentity, clientIdentity.data(), clientIdentity.size());
-    mClientIdentityLength = static_cast<uint8_t>(clientIdentity.size());
+    mClientIdentityLength = static_cast<decltype(mClientIdentityLength)>(clientIdentity.size()); // range asserted at declaration
 
     Base::Start(controller, nodeId, endpoint, std::move(onCompletion));
 }

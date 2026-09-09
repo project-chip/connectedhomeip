@@ -30,6 +30,7 @@
 #include <lib/support/Span.h>
 #include <system/SystemClock.h>
 
+#include <limits>
 #include <utility>
 
 namespace chip {
@@ -220,6 +221,7 @@ private:
 
         uint8_t mClientIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
         uint8_t mClientIdentityLength = 0;
+        static_assert(std::numeric_limits<decltype(mClientIdentityLength)>::max() >= sizeof(mClientIdentity));
     };
 
     class RemoveClientOperation final : public Callback::TypedOperation<Operation, CHIP_ERROR>

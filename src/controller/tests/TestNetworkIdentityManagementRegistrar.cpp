@@ -29,6 +29,7 @@
 #include <credentials/CHIPCert.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <memory>
 #include <optional>
@@ -92,12 +93,16 @@ protected:
     // Records a status the registrar reported, so a test can tell "not yet" from "reported".
     struct StatusRecorder
     {
-        bool Called() const { return mStatus.has_value(); }
-        CHIP_ERROR Status() const { return mStatus.value(); }
+        bool Called() const { return status.has_value(); }
+        CHIP_ERROR Status() const
+        {
+            VerifyOrDie(status.has_value());
+            return status.value();
+        }
 
-        std::optional<CHIP_ERROR> mStatus;
+        std::optional<CHIP_ERROR> status;
         Callback::Callback<OnClientUnregisteredFunct> callback{
-            [](void * context, CHIP_ERROR status) { static_cast<StatusRecorder *>(context)->mStatus = status; }, this
+            [](void * context, CHIP_ERROR aStatus) { static_cast<StatusRecorder *>(context)->status = aStatus; }, this
         };
     };
 
@@ -112,24 +117,24 @@ protected:
     };
 
     StubDeviceController mController;
-    std::optional<NetworkIdentityManagementRegistrar> mRegistrar{ std::in_place, mController, kNimNodeId, kNimEndpoint };
+    NetworkIdentityManagementRegistrar mRegistrar{ mController, kNimNodeId, kNimEndpoint };
 };
 
 TEST_F(TestNetworkIdentityManagementRegistrar, StartsIdle)
 {
-    EXPECT_TRUE(mRegistrar->IsIdle());
+    EXPECT_TRUE(mRegistrar.IsIdle());
 }
 
 TEST_F(TestNetworkIdentityManagementRegistrar, IsBusyWhileARevocationIsInFlight)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
-    EXPECT_FALSE(mRegistrar->IsIdle());
+    EXPECT_FALSE(mRegistrar.IsIdle());
     EXPECT_FALSE(revocation.Called());
 
     mController.FailPendingConnection(CHIP_ERROR_TIMEOUT);
-    EXPECT_TRUE(mRegistrar->IsIdle());
+    EXPECT_TRUE(mRegistrar.IsIdle());
     ASSERT_TRUE(revocation.Called());
     EXPECT_EQ(revocation.Status(), CHIP_ERROR_TIMEOUT);
 }
@@ -142,20 +147,20 @@ TEST_F(TestNetworkIdentityManagementRegistrar, AControllerRefusalIsReportedThrou
     mController.RefuseConnections();
 
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
     ASSERT_TRUE(revocation.Called());
     EXPECT_EQ(revocation.Status(), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_TRUE(mRegistrar->IsIdle());
+    EXPECT_TRUE(mRegistrar.IsIdle());
 }
 
 TEST_F(TestNetworkIdentityManagementRegistrar, RefusesAnOverlappingRevocation)
 {
     StatusRecorder first, second;
-    mRegistrar->UnregisterClient(kClientIdentifier, &first.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &first.callback);
 
     // A refusal is delivered through the callback, synchronously, and leaves the request that is
     // already in flight alone.
-    mRegistrar->UnregisterClient(kClientIdentifier, &second.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &second.callback);
     ASSERT_TRUE(second.Called());
     EXPECT_EQ(second.Status(), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_FALSE(first.Called());
@@ -166,20 +171,20 @@ TEST_F(TestNetworkIdentityManagementRegistrar, RefusesAnOverlappingRevocation)
 TEST_F(TestNetworkIdentityManagementRegistrar, ShutdownReportsAnOperationInFlightAsCancelled)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
-    mRegistrar->Shutdown();
+    mRegistrar.Shutdown();
     ASSERT_TRUE(revocation.Called());
     EXPECT_EQ(revocation.Status(), CHIP_ERROR_CANCELLED);
-    EXPECT_TRUE(mRegistrar->IsIdle());
+    EXPECT_TRUE(mRegistrar.IsIdle());
 }
 
 TEST_F(TestNetworkIdentityManagementRegistrar, RefusesCallsAfterShutdown)
 {
-    mRegistrar->Shutdown();
+    mRegistrar.Shutdown();
 
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
     ASSERT_TRUE(revocation.Called());
     EXPECT_EQ(revocation.Status(), CHIP_ERROR_INCORRECT_STATE);
 }
@@ -187,7 +192,7 @@ TEST_F(TestNetworkIdentityManagementRegistrar, RefusesCallsAfterShutdown)
 TEST_F(TestNetworkIdentityManagementRegistrar, WaitForIdleCompletesImmediatelyWhenThereIsNothingToWaitFor)
 {
     IdleRecorder idle;
-    mRegistrar->WaitForIdle(&idle.callback);
+    mRegistrar.WaitForIdle(&idle.callback);
     EXPECT_TRUE(idle.called);
 }
 
@@ -195,14 +200,14 @@ TEST_F(TestNetworkIdentityManagementRegistrar, WaitForIdleCompletesImmediatelyWh
 TEST_F(TestNetworkIdentityManagementRegistrar, StopAcceptingRequestsLeavesAnOperationInFlight)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
-    mRegistrar->StopAcceptingRequests();
+    mRegistrar.StopAcceptingRequests();
     EXPECT_FALSE(revocation.Called());
-    EXPECT_FALSE(mRegistrar->IsIdle());
+    EXPECT_FALSE(mRegistrar.IsIdle());
 
     StatusRecorder refused;
-    mRegistrar->UnregisterClient(kClientIdentifier, &refused.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &refused.callback);
     ASSERT_TRUE(refused.Called());
     EXPECT_EQ(refused.Status(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -215,10 +220,10 @@ TEST_F(TestNetworkIdentityManagementRegistrar, StopAcceptingRequestsLeavesAnOper
 TEST_F(TestNetworkIdentityManagementRegistrar, WaitForIdleWaitsForAnOperationInFlight)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
     IdleRecorder idle;
-    mRegistrar->WaitForIdle(&idle.callback);
+    mRegistrar.WaitForIdle(&idle.callback);
     EXPECT_FALSE(idle.called);
     EXPECT_FALSE(revocation.Called());
 
@@ -226,17 +231,17 @@ TEST_F(TestNetworkIdentityManagementRegistrar, WaitForIdleWaitsForAnOperationInF
     EXPECT_TRUE(idle.called);
     ASSERT_TRUE(revocation.Called());
     EXPECT_EQ(revocation.Status(), CHIP_ERROR_TIMEOUT);
-    EXPECT_TRUE(mRegistrar->IsIdle());
+    EXPECT_TRUE(mRegistrar.IsIdle());
 }
 
 TEST_F(TestNetworkIdentityManagementRegistrar, ReleasesEveryWaitingCaller)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
     IdleRecorder first, second;
-    mRegistrar->WaitForIdle(&first.callback);
-    mRegistrar->WaitForIdle(&second.callback);
+    mRegistrar.WaitForIdle(&first.callback);
+    mRegistrar.WaitForIdle(&second.callback);
 
     mController.FailPendingConnection(CHIP_ERROR_TIMEOUT);
     EXPECT_TRUE(first.called);
@@ -248,7 +253,7 @@ TEST_F(TestNetworkIdentityManagementRegistrar, ReleasesEveryWaitingCaller)
 TEST_F(TestNetworkIdentityManagementRegistrar, TheIdleNotificationFollowsTheCompletion)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
     struct OrderObserver
     {
@@ -262,7 +267,7 @@ TEST_F(TestNetworkIdentityManagementRegistrar, TheIdleNotificationFollowsTheComp
                                                                           this };
     };
     OrderObserver observer{ revocation };
-    mRegistrar->WaitForIdle(&observer.callback);
+    mRegistrar.WaitForIdle(&observer.callback);
 
     mController.FailPendingConnection(CHIP_ERROR_TIMEOUT);
     EXPECT_TRUE(observer.sawCompletion);
@@ -289,15 +294,15 @@ TEST_F(TestNetworkIdentityManagementRegistrar, ARequestStartedFromACompletionSup
                                                                },
                                                                 this };
     };
-    ChainedRequest chained{ *mRegistrar };
-    mRegistrar->UnregisterClient(kClientIdentifier, &chained.callback);
+    ChainedRequest chained{ mRegistrar };
+    mRegistrar.UnregisterClient(kClientIdentifier, &chained.callback);
 
     IdleRecorder idle;
-    mRegistrar->WaitForIdle(&idle.callback);
+    mRegistrar.WaitForIdle(&idle.callback);
 
     mController.FailPendingConnection(CHIP_ERROR_TIMEOUT);
     ASSERT_EQ(chained.completions, 1);
-    EXPECT_FALSE(mRegistrar->IsIdle()); // the second revocation was accepted
+    EXPECT_FALSE(mRegistrar.IsIdle()); // the second revocation was accepted
     EXPECT_FALSE(idle.called);
 
     // The second revocation finishing is what finally releases the waiter.
@@ -311,13 +316,13 @@ TEST_F(TestNetworkIdentityManagementRegistrar, ARequestStartedFromACompletionSup
 TEST_F(TestNetworkIdentityManagementRegistrar, ShutdownReleasesAWaitingCaller)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
     IdleRecorder idle;
-    mRegistrar->WaitForIdle(&idle.callback);
+    mRegistrar.WaitForIdle(&idle.callback);
     ASSERT_FALSE(idle.called);
 
-    mRegistrar->Shutdown();
+    mRegistrar.Shutdown();
     EXPECT_TRUE(idle.called);
     ASSERT_TRUE(revocation.Called());
     EXPECT_EQ(revocation.Status(), CHIP_ERROR_CANCELLED);
@@ -325,14 +330,16 @@ TEST_F(TestNetworkIdentityManagementRegistrar, ShutdownReleasesAWaitingCaller)
 
 TEST_F(TestNetworkIdentityManagementRegistrar, DestructionReleasesAWaitingCaller)
 {
+    auto owner = std::make_unique<NetworkIdentityManagementRegistrar>(mController, kNimNodeId, kNimEndpoint);
+
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    owner->UnregisterClient(kClientIdentifier, &revocation.callback);
 
     IdleRecorder idle;
-    mRegistrar->WaitForIdle(&idle.callback);
+    owner->WaitForIdle(&idle.callback);
     ASSERT_FALSE(idle.called);
 
-    mRegistrar.reset();
+    owner.reset();
     EXPECT_TRUE(idle.called);
     EXPECT_TRUE(revocation.Called());
 }
@@ -342,10 +349,10 @@ TEST_F(TestNetworkIdentityManagementRegistrar, DestructionReleasesAWaitingCaller
 TEST_F(TestNetworkIdentityManagementRegistrar, CancellingTheIdleCallbackSuppressesIt)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
     IdleRecorder idle;
-    mRegistrar->WaitForIdle(&idle.callback);
+    mRegistrar.WaitForIdle(&idle.callback);
     idle.callback.Cancel();
 
     mController.FailPendingConnection(CHIP_ERROR_TIMEOUT);
@@ -358,7 +365,7 @@ TEST_F(TestNetworkIdentityManagementRegistrar, CancellingTheIdleCallbackSuppress
 TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterCanCancelAnotherFromItsCallback)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
     IdleRecorder second;
     struct Canceller
@@ -375,8 +382,8 @@ TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterCanCancelAnotherFromItsCal
     };
     Canceller first{ second };
 
-    mRegistrar->WaitForIdle(&first.callback);
-    mRegistrar->WaitForIdle(&second.callback);
+    mRegistrar.WaitForIdle(&first.callback);
+    mRegistrar.WaitForIdle(&second.callback);
 
     mController.FailPendingConnection(CHIP_ERROR_TIMEOUT);
     EXPECT_TRUE(first.called);
@@ -387,8 +394,8 @@ TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterCanCancelAnotherFromItsCal
 // touch the registrar after the callback returns, and a waiter queued behind the one that destroyed
 // it is still owed its callback, which the destructor delivers on the way out.
 //
-// The registrar is on the heap here rather than in the fixture's std::optional so that the read of a
-// destroyed registrar this guards against lands in freed memory, where ASAN can see it.
+// The registrar is on the heap here rather than the fixture's member so that the read of a destroyed
+// registrar this guards against lands in freed memory, where ASAN can see it.
 TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterCanDestroyTheRegistrar)
 {
     auto owner = std::make_unique<NetworkIdentityManagementRegistrar>(mController, kNimNodeId, kNimEndpoint);
@@ -425,7 +432,7 @@ TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterCanDestroyTheRegistrar)
 TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterThatStartsARequestKeepsTheOthersWaiting)
 {
     StatusRecorder first;
-    mRegistrar->UnregisterClient(kClientIdentifier, &first.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &first.callback);
 
     struct Restarter
     {
@@ -440,15 +447,15 @@ TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterThatStartsARequestKeepsThe
                                                                           this };
     };
     StatusRecorder second;
-    Restarter restarter{ *mRegistrar, second };
+    Restarter restarter{ mRegistrar, second };
     IdleRecorder behind;
 
-    mRegistrar->WaitForIdle(&restarter.callback);
-    mRegistrar->WaitForIdle(&behind.callback);
+    mRegistrar.WaitForIdle(&restarter.callback);
+    mRegistrar.WaitForIdle(&behind.callback);
 
     mController.FailPendingConnection(CHIP_ERROR_TIMEOUT);
     ASSERT_FALSE(second.Called()); // the request the waiter started is in flight
-    EXPECT_FALSE(mRegistrar->IsIdle());
+    EXPECT_FALSE(mRegistrar.IsIdle());
     EXPECT_FALSE(behind.called);
 
     // The request the waiter started finishing is what makes the registrar idle again.
@@ -462,7 +469,7 @@ TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterThatStartsARequestKeepsThe
 TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterCanShutDownTheRegistrar)
 {
     StatusRecorder revocation;
-    mRegistrar->UnregisterClient(kClientIdentifier, &revocation.callback);
+    mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
 
     struct Shutter
     {
@@ -476,16 +483,16 @@ TEST_F(TestNetworkIdentityManagementRegistrar, AWaiterCanShutDownTheRegistrar)
                                                                          },
                                                                           this };
     };
-    Shutter shutter{ *mRegistrar };
+    Shutter shutter{ mRegistrar };
     IdleRecorder behind;
 
-    mRegistrar->WaitForIdle(&shutter.callback);
-    mRegistrar->WaitForIdle(&behind.callback);
+    mRegistrar.WaitForIdle(&shutter.callback);
+    mRegistrar.WaitForIdle(&behind.callback);
 
     mController.FailPendingConnection(CHIP_ERROR_TIMEOUT);
     EXPECT_TRUE(shutter.called);
     EXPECT_TRUE(behind.called);
-    EXPECT_TRUE(mRegistrar->IsIdle());
+    EXPECT_TRUE(mRegistrar.IsIdle());
 }
 
 // The awkward combination: a waiter starts a request and then destroys the registrar anyway. What
@@ -540,9 +547,9 @@ TEST_F(TestNetworkIdentityManagementRegistrar, ACompletionCanDestroyARegistrarNo
         std::unique_ptr<NetworkIdentityManagementRegistrar> & owner;
         std::optional<CHIP_ERROR> status;
 
-        Callback::Callback<OnClientUnregisteredFunct> callback{ [](void * context, CHIP_ERROR status) {
+        Callback::Callback<OnClientUnregisteredFunct> callback{ [](void * context, CHIP_ERROR aStatus) {
                                                                    auto * self  = static_cast<Destroyer *>(context);
-                                                                   self->status = status;
+                                                                   self->status = aStatus;
                                                                    self->owner.reset();
                                                                },
                                                                 this };
