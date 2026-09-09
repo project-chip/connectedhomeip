@@ -92,7 +92,6 @@ static_library("controller") {
       "ExampleOperationalCredentialsIssuer.cpp",
       "NetworkIdentityManagementRegistrar.cpp",
       "NetworkIdentityManagementRegistrar.h",
-      "NetworkIdentityRegistrar.h",
       "SetUpCodePairer.cpp",
     ]
 

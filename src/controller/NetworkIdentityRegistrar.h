@@ -54,7 +54,7 @@ typedef void (*OnClientUnregisteredFunct)(void * context, CHIP_ERROR status);
  *
  * Asynchronous methods do not return a status to their caller: they must invoke their callback
  * exactly once. Completing the callback synchronously, i.e. before returning from the method, is
- * allowed, and is the expected way signal errors that prevent the operation from starting.
+ * allowed, and is the expected way to signal errors that prevent the operation from starting.
  *
  * Callbacks are passed as Owned tokens, so a pending callback is cancellable per the usual Callback
  * contract: cancelling it makes the registrar relinquish it, and a cancelled request must never be
