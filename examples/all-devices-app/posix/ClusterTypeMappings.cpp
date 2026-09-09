@@ -22,6 +22,7 @@
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
+#include <app/clusters/mode-select-server/ModeSelectCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
@@ -87,6 +88,12 @@ template <>
 const char * GetClusterTypeName<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>()
 {
     return "chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster";
+}
+
+template <>
+const char * GetClusterTypeName<chip::app::Clusters::ModeSelectCluster>()
+{
+    return "chip::app::Clusters::ModeSelectCluster";
 }
 
 chip::app::ServerClusterInterface *

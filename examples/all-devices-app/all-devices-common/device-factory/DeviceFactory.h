@@ -43,6 +43,7 @@
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
 #include <device/types/microwave-oven/impl/EmulatedMicrowaveOven.h>
+#include <device/types/mode-select/impl/SimulatedModeSelect.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
 #include <device/types/mounted-on-off-control/MountedOnOffControl.h>
 #include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
@@ -565,6 +566,13 @@ private:
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_MODE_SELECT)
+        {
+            RegisterCreator("mode-select", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<SimulatedModeSelect>(mContext->diagnosticDataProvider);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
