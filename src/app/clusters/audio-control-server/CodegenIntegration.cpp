@@ -97,8 +97,9 @@ public:
         gServers[clusterInstanceIndex].Create(endpointId, *delegate, config);
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-        // Register the cluster as a scene handler. RegisterSceneHandler is a no-op on endpoints
-        // without a Scenes Management cluster, so this is safe on every AudioControl endpoint.
+        // Register the cluster as a scene handler. The scene table is shared across endpoints; scene
+        // save/recall calls SupportsCluster() first, so registering on an endpoint that has no
+        // Scenes Management cluster is harmless - the handler is simply never invoked there.
         ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpointId, &gServers[clusterInstanceIndex].Cluster());
 #endif
 

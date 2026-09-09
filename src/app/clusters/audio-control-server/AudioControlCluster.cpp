@@ -29,6 +29,7 @@
 #include <clusters/ScenesManagement/Structs.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <optional>
 
 namespace chip::app::Clusters {
@@ -1101,7 +1102,8 @@ CHIP_ERROR AudioControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
     // SetMaxUserVolume, so a rejection leaves the cluster unchanged. Volume and SoftMuted are one
     // atomic call (the absent side taken from current state), made only when the scene carries at
     // least one of them; the equalizer bands mirror the write path (guarded by an actual-change
-    // check).
+    // check). The bands are committed after Volume/SoftMuted, so a band delegate that rejects
+    // leaves the recall partially applied - logged below so that is diagnosable.
     if (volume.has_value() || softMuted.has_value())
     {
         const uint16_t newVolume = volume.value_or(mVolume);
@@ -1121,21 +1123,24 @@ CHIP_ERROR AudioControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
     if (bass.has_value() && *bass != mBass)
     {
         Status s = mDelegate.HandleBassChanged(*bass);
-        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError());
+        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError(),
+                            ChipLogError(Zcl, "AudioControl scene recall: Bass rejected; recall partially applied"));
         SetAttributeValue(mBass, *bass, Bass::Id);
         StoreBass();
     }
     if (mid.has_value() && *mid != mMid)
     {
         Status s = mDelegate.HandleMidChanged(*mid);
-        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError());
+        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError(),
+                            ChipLogError(Zcl, "AudioControl scene recall: Mid rejected; recall partially applied"));
         SetAttributeValue(mMid, *mid, Mid::Id);
         StoreMid();
     }
     if (treble.has_value() && *treble != mTreble)
     {
         Status s = mDelegate.HandleTrebleChanged(*treble);
-        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError());
+        VerifyOrReturnError(s == Status::Success, StatusIB(s).ToChipError(),
+                            ChipLogError(Zcl, "AudioControl scene recall: Treble rejected; recall partially applied"));
         SetAttributeValue(mTreble, *treble, Treble::Id);
         StoreTreble();
     }

@@ -3535,6 +3535,8 @@ TEST_F(TestAudioControlCluster, SceneSupportsClusterOnlyOwnEndpointAndCluster)
     EXPECT_TRUE(cluster.SupportsCluster(kRootEndpointId, AudioControl::Id));
     EXPECT_FALSE(cluster.SupportsCluster(kRootEndpointId + 1, AudioControl::Id));
     EXPECT_FALSE(cluster.SupportsCluster(kRootEndpointId, OnOff::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestAudioControlCluster, SceneSerializeMandatoryAttributesOnly)
@@ -3572,6 +3574,8 @@ TEST_F(TestAudioControlCluster, SceneSerializeMandatoryAttributesOnly)
     EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
     EXPECT_TRUE(sawSoftMuted);
     EXPECT_TRUE(sawVolume);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestAudioControlCluster, SceneSerializeIncludesEnabledEqualizerBands)
@@ -3613,6 +3617,8 @@ TEST_F(TestAudioControlCluster, SceneSerializeIncludesEnabledEqualizerBands)
     EXPECT_EQ(bass, -3);
     EXPECT_EQ(mid, 1);
     EXPECT_EQ(treble, 4);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestAudioControlCluster, SceneApplyRoundTrip)
@@ -3646,6 +3652,8 @@ TEST_F(TestAudioControlCluster, SceneApplyRoundTrip)
     EXPECT_EQ(cluster.GetBass(), 5);
     EXPECT_EQ(cluster.GetMid(), -5);
     EXPECT_EQ(cluster.GetTreble(), 2);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestAudioControlCluster, SceneApplyRejectsUnsupportedAttribute)
@@ -3663,6 +3671,8 @@ TEST_F(TestAudioControlCluster, SceneApplyRejectsUnsupportedAttribute)
     ASSERT_EQ(EncodePairs(cluster, list, blob), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_ERROR_INVALID_ARGUMENT);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestAudioControlCluster, SceneApplyWrongClusterFails)
@@ -3676,6 +3686,8 @@ TEST_F(TestAudioControlCluster, SceneApplyWrongClusterFails)
 
     EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, OnOff::Id, saved, 0), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(cluster.SerializeSave(kRootEndpointId, OnOff::Id, saved), CHIP_ERROR_INVALID_ARGUMENT);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // A scene captured while Volume was legal must still recall after MaxUserVolume shrinks: the
@@ -3700,6 +3712,8 @@ TEST_F(TestAudioControlCluster, SceneApplyClampsVolumeToReducedMaxUserVolume)
     EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, saved, 0), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetVolume(), 60u);
     EXPECT_EQ(mMockDelegate.lastNewVolume, 60u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // Likewise for an equalizer band whose stored value falls outside a correction range that
@@ -3725,6 +3739,8 @@ TEST_F(TestAudioControlCluster, SceneApplyClampsEqualizerBandToCorrectionRange)
     EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetBass(), 5);
     EXPECT_EQ(mMockDelegate.lastBass, 5);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // A band that is not enabled on this instance is silently skipped, not treated as an error.
@@ -3749,6 +3765,8 @@ TEST_F(TestAudioControlCluster, SceneApplySkipsDisabledEqualizerBand)
     EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_NO_ERROR);
     EXPECT_EQ(mMockDelegate.bassChangedCalls, 0);
     EXPECT_EQ(cluster.GetBass(), 0); // unchanged
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // A scene carrying only an equalizer band must not notify HandleVolumeAndMuteChange.
@@ -3770,6 +3788,8 @@ TEST_F(TestAudioControlCluster, SceneApplyBandOnlySceneDoesNotNotifyVolumeMute)
     EXPECT_EQ(mMockDelegate.volumeAndMuteCalls, 0);
     EXPECT_EQ(mMockDelegate.bassChangedCalls, 1);
     EXPECT_EQ(cluster.GetBass(), 3);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // The delegate is notified before any commit, so a rejection leaves every attribute untouched.
@@ -3805,6 +3825,45 @@ TEST_F(TestAudioControlCluster, SceneApplyDelegateRejectionLeavesAttributesUncha
     EXPECT_EQ(cluster.GetBass(), 1);
     EXPECT_EQ(cluster.GetMid(), 2);
     EXPECT_EQ(cluster.GetTreble(), 3);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A band delegate rejecting a recall propagates the error and leaves that band unchanged (a
+// band-only scene skips the Volume/SoftMuted delegate call, so its status alone decides the result).
+TEST_F(TestAudioControlCluster, SceneApplyBandDelegateRejectionPropagates)
+{
+    struct BandCase
+    {
+        AttributeId id;
+        int16_t (AudioControlCluster::*get)() const;
+    };
+    const BandCase cases[] = {
+        { Attributes::Bass::Id, &AudioControlCluster::GetBass },
+        { Attributes::Mid::Id, &AudioControlCluster::GetMid },
+        { Attributes::Treble::Id, &AudioControlCluster::GetTreble },
+    };
+
+    for (const auto & c : cases)
+    {
+        AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        ScenePair pairs[1];
+        pairs[0].attributeID = c.id;
+        pairs[0].valueSigned16.SetValue(3); // differs from the initial 0
+        app::DataModel::List<ScenePair> list(pairs);
+
+        uint8_t buffer[128];
+        MutableByteSpan blob(buffer);
+        ASSERT_EQ(EncodePairs(cluster, list, blob), CHIP_NO_ERROR);
+
+        mMockDelegate.nextStatus = Status::Busy;
+        EXPECT_NE(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_NO_ERROR);
+        EXPECT_EQ((cluster.*c.get)(), 0); // band unchanged
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
 }
 
 // The AddScene path (SerializeAdd) runs every pair through AudioControlSceneValidator: the five
@@ -3867,6 +3926,8 @@ TEST_F(TestAudioControlCluster, SceneSerializeAddValidatesAttributesAndCluster)
         MutableByteSpan outSpan(out);
         EXPECT_EQ(cluster.SerializeAdd(kRootEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT);
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace
