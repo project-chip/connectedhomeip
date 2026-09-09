@@ -38,7 +38,10 @@ public:
 
     void SetCommissioningStage(Controller::CommissioningStage stage) { mCommissioner->mCommissioningStage = stage; }
 
-    void SetCommissioningDelegate(Controller::CommissioningDelegate * delegate) { mCommissioner->mCommissioningDelegate = delegate; }
+    void SetCommissioningDelegate(Controller::CommissioningDelegate * delegate)
+    {
+        mCommissioner->mCommissioningDelegate = delegate;
+    }
 
     void SetDeviceBeingCommissioned(DeviceProxy * device) { mCommissioner->mDeviceBeingCommissioned = device; }
 
