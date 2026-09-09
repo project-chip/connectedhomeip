@@ -18,7 +18,32 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include <array>
+
 namespace chip::app {
+
+namespace {
+
+// Distinct positional tags: sibling endpoints of the same device type under one tree root
+// must carry mutually-distinct TagList entries (checked by Descriptor 2.2).
+constexpr std::array<EndpointComposition::SemanticTag, 7> kCabinetTags = { {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kMiddle) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRow) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kColumn) },
+} };
+
+} // namespace
 
 LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate) : LoggingRefrigerator(timerDelegate, Config{}) {}
 
@@ -28,6 +53,8 @@ LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, Config c
 
     // The MA-refrigerator device type requires at least one cabinet endpoint.
     VerifyOrDie(config.cabinetCount >= 1);
+    // Cabinets beyond one need a distinct positional tag each (see kCabinetTags).
+    VerifyOrDie(config.cabinetCount <= kCabinetTags.size());
 
     // Reserve up front: the parts capture the name pointers at construction, so the
     // name strings must not move afterwards.
@@ -43,9 +70,17 @@ LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, Config c
 
 CHIP_ERROR LoggingRefrigerator::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
 {
-    for (auto & cabinet : mCabinets)
+    // A single cabinet needs no tag; multiple cabinets of the same device type under one
+    // tree root each need a distinct one.
+    const bool tagCabinets = mCabinets.size() > 1;
+    for (size_t i = 0; i < mCabinets.size(); i++)
     {
-        ReturnErrorOnFailure(cabinet->Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
+        EndpointComposition composition = EndpointComposition::WithParent(GetEndpointId());
+        if (tagCabinets)
+        {
+            composition.tagList = Span(&kCabinetTags[i], 1);
+        }
+        ReturnErrorOnFailure(mCabinets[i]->Register(allocator, provider, composition));
     }
     return CHIP_NO_ERROR;
 }
