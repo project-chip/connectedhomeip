@@ -19,6 +19,7 @@ package com.matter.casting.core;
 import android.util.Log;
 import com.matter.casting.support.ConnectionCallbacks;
 import com.matter.casting.support.IdentificationDeclarationOptions;
+import com.matter.casting.support.MatterCleaner;
 import com.matter.casting.support.MatterError;
 import java.net.InetAddress;
 import java.util.List;
@@ -144,6 +145,33 @@ public class MatterCastingPlayer implements CastingPlayer {
 
   @Override
   public native List<Endpoint> getEndpoints();
+
+  /**
+   * Sets the native pointer backing this casting player and registers a cleanup action to free it
+   * when this object becomes phantom-reachable.
+   *
+   * <p>Called by JNI immediately after the Java object is constructed. The cleanup action captures
+   * {@code nativePtr} as a primitive to avoid retaining a reference to {@code this}, which would
+   * prevent GC from ever collecting this object.
+   *
+   * @param nativePtr pointer to the native heap allocation backing this casting player
+   */
+  void setNativeCastingPlayer(long nativePtr) {
+    try {
+      // Register cleanup before assigning so _cppCastingPlayer stays 0 if registration fails.
+      // SAFETY: The cleanup action does not zero _cppCastingPlayer after freeing the native handle.
+      // This is safe because phantom-reference cleanup can only fire when this object is no longer
+      // strongly reachable. Any JNI method executing on this object holds a strong reference via
+      // its receiver, so the cleanup and a concurrent JNI read of _cppCastingPlayer cannot race.
+      MatterCleaner.getInstance().register(this, () -> nativeReleaseCastingPlayer(nativePtr));
+      this._cppCastingPlayer = nativePtr;
+    } catch (RuntimeException e) {
+      this._cppCastingPlayer = 0;
+      throw e;
+    }
+  }
+
+  private static native void nativeReleaseCastingPlayer(long nativePtr);
 
   @Override
   public String toString() {
@@ -303,24 +331,30 @@ public class MatterCastingPlayer implements CastingPlayer {
 
   /**
    * @brief Get CastingPlayer's current ConnectionState.
-   * @throws IllegalArgumentException or NullPointerException when native layer returns invalid
-   *     state.
-   * @return Current ConnectionState.
+   * @return Current ConnectionState, or NOT_CONNECTED if the native player is no longer valid.
    */
   @Override
   public ConnectionState getConnectionState() {
-    return ConnectionState.valueOf(getConnectionStateNative());
+    try {
+      return ConnectionState.valueOf(getConnectionStateNative());
+    } catch (IllegalArgumentException | NullPointerException e) {
+      Log.w(
+          TAG,
+          "getConnectionState(): native returned invalid state, defaulting to NOT_CONNECTED: "
+              + e.getMessage());
+      return ConnectionState.NOT_CONNECTED;
+    }
   }
 
   /*
    * @brief Get the Current ConnectionState of a CastingPlayer from the native layer.
    *
-   * @returns A String representation of the CastingPlayer's current connectation.
+   * @return A String representation of the CastingPlayer's current connection state.
    *          Possible return values are
    *            - "NOT_CONNECTED"
    *            - "CONNECTING"
    *            - "CONNECTED"
-   *            - Error message or NULL on error
+   *            - NULL on error
    */
   @Override
   public native String getConnectionStateNative();

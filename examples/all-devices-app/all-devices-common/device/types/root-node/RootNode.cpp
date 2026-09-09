@@ -51,8 +51,7 @@ CHIP_ERROR RootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider
             .template Set<BasicInformation::Attributes::DeviceLocation::Id>();
 
     mBasicInformationCluster.Create(optionalAttributeSet, mContext.deviceInstanceInfoProvider, mContext.configurationManager,
-                                    mContext.platformManager,
-                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+                                    mContext.platformManager, mContext.minGuaranteedSubscriptionsPerFabric);
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(

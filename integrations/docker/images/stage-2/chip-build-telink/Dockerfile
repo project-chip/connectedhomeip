@@ -18,14 +18,14 @@ RUN set -x \
     && : # last line
 
 # Setup Zephyr version: 4.1.0; branch: develop
-ARG ZEPHYR_REVISION=2383bfa7d5ef20bdb1fc79a292690a9ac2cb10a3
+ARG ZEPHYR_REVISION=5421d0e59ace7fe4a3c7b5d8013760a5fae4d06c
 ARG N22_BIN_REVISION=cb408c3fa44bfe97af6df70516b4882ea639939c
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install --break-system-packages -U --no-cache-dir west \
     && git init zephyr \
     && cd zephyr \
-    && git remote add origin https://github.com/telink-semi/zephyr \
+    && git remote add origin https://github.com/telink-semi/tl_zephyr \
     && git fetch --depth=1 origin ${ZEPHYR_REVISION} \
     && git reset ${ZEPHYR_REVISION} --hard \
     && west init -l \

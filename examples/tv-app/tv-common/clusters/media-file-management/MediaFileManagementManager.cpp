@@ -22,6 +22,7 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <fstream>
 #include <sstream>
@@ -42,6 +43,10 @@ const std::vector<std::string> MediaFileManagementManager::kSupportedMimeTypes =
 };
 
 namespace {
+
+// Upper bound for a bdx:// thumbnail URI: "bdx://" (6) + 16 hex node-id chars +
+// '/' + a file-designator (bounded by the 128-char Name field) + NUL.
+constexpr size_t kMaxBdxUriLength = 160;
 
 // The index file stores one record per line, tab-separated, in the form:
 //   <fileID>\t<size>\t<mimeType>\t<imageUri>\t<name>
@@ -197,7 +202,52 @@ CHIP_ERROR MediaFileManagementManager::GetSupportedMimeTypeAtIndex(size_t index,
     return CopyCharSpanToMutableCharSpan(CharSpan(kSupportedMimeTypes[index].data(), kSupportedMimeTypes[index].size()), mimeType);
 }
 
-Status MediaFileManagementManager::HandleAddFile(const CharSpan & name, uint64_t size, const CharSpan & mimeType,
+uint64_t MediaFileManagementManager::AppendEntry(CharSpan name, uint64_t size, CharSpan mimeType, CharSpan imageUri)
+{
+    FileEntry entry;
+    entry.fileID   = mNextFileID++;
+    entry.name     = Sanitize(name);
+    entry.size     = size;
+    entry.mimeType = Sanitize(mimeType);
+    entry.imageUri = Sanitize(imageUri);
+
+    // Create an (empty) data blob for the file. The bytes themselves are
+    // delivered out-of-band over BDX by the coordinator (if any).
+    std::ofstream data(DataFilePath(entry.fileID), std::ios::trunc | std::ios::binary);
+    if (!data.is_open())
+    {
+        ChipLogError(Zcl, "MediaFileManagementManager: failed to create data file for id %llu",
+                     static_cast<unsigned long long>(entry.fileID));
+        // Roll back the id allocation so it can be reused.
+        mNextFileID--;
+        return 0;
+    }
+    data.close();
+
+    const uint64_t assignedID = entry.fileID;
+    mFiles.push_back(std::move(entry));
+    SaveIndex();
+    return assignedID;
+}
+
+bool MediaFileManagementManager::GetFileById(uint64_t fileID, Structs::FileDescriptionStruct::Type & file) const
+{
+    for (const FileEntry & entry : mFiles)
+    {
+        if (entry.fileID == fileID)
+        {
+            file.fileID   = entry.fileID;
+            file.name     = CharSpan(entry.name.data(), entry.name.size());
+            file.size     = entry.size;
+            file.mimeType = CharSpan(entry.mimeType.data(), entry.mimeType.size());
+            file.imageUri = CharSpan(entry.imageUri.data(), entry.imageUri.size());
+            return true;
+        }
+    }
+    return false;
+}
+
+Status MediaFileManagementManager::HandleAddFile(ScopedNodeId peer, const CharSpan & name, uint64_t size, const CharSpan & mimeType,
                                                  const CharSpan & imageUri, Commands::AddFileResponse::Type & response)
 {
     // Reject files that would exceed the advertised capacity.
@@ -207,31 +257,26 @@ Status MediaFileManagementManager::HandleAddFile(const CharSpan & name, uint64_t
         return Status::Success;
     }
 
-    FileEntry entry;
-    entry.fileID   = mNextFileID++;
-    entry.name     = Sanitize(name);
-    entry.size     = size;
-    entry.mimeType = Sanitize(mimeType);
-    entry.imageUri = Sanitize(imageUri);
-
-    // Create an (empty) data blob for the file. Actual bytes would be delivered
-    // out-of-band (BDX) in a full implementation.
-    std::ofstream data(DataFilePath(entry.fileID), std::ios::trunc | std::ios::binary);
-    if (!data.is_open())
+    const uint64_t assignedID = AppendEntry(name, size, mimeType, imageUri);
+    if (assignedID == 0)
     {
-        ChipLogError(Zcl, "MediaFileManagementManager: failed to create data file for id %llu",
-                     static_cast<unsigned long long>(entry.fileID));
         response.status = FileStatusEnum::kInsufficientStorage;
         return Status::Success;
     }
-    data.close();
-
-    const uint64_t assignedID = entry.fileID;
-    mFiles.push_back(std::move(entry));
-    SaveIndex();
 
     ChipLogProgress(Zcl, "MediaFileManagementManager: added file id %llu (%llu bytes)", static_cast<unsigned long long>(assignedID),
                     static_cast<unsigned long long>(size));
+
+    // Kick off the out-of-band download of the file (and thumbnail) from the
+    // client. The metadata entry already exists; bytes land asynchronously.
+    if (mBdxCoordinator != nullptr)
+    {
+        CHIP_ERROR err = mBdxCoordinator->StartIncomingFileTransfer(peer, assignedID, name, size, imageUri);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "MediaFileManagementManager: AddFile BDX start failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
 
     response.status = FileStatusEnum::kSuccess;
     response.fileID.SetNonNull(assignedID);
@@ -256,28 +301,113 @@ Status MediaFileManagementManager::HandleDeleteFile(uint64_t fileID)
 }
 
 Status MediaFileManagementManager::HandleRequestSharedFiles(
-    const CharSpan & clientName, uint16_t requestID,
+    ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
     const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes)
 {
-    // Example app does not implement cross-device sharing; accept and report no
-    // shared files. A full implementation would emit SharedFilesAdded once
-    // matching files are located.
     ChipLogProgress(Zcl, "MediaFileManagementManager: RequestSharedFiles requestID=%u", requestID);
+
+    // Without a BDX coordinator this example cannot actually serve bytes, so it
+    // accepts the request but shares nothing (no SharedFilesAdded events).
+    VerifyOrReturnValue(mBdxCoordinator != nullptr, Status::Success);
+
+    // Collect the requested MIME filter, if the client supplied one. An absent or
+    // null list means "no restriction": share every file. A present list shares
+    // only files whose MIME type the requester declared it can handle.
+    std::vector<std::string> mimeFilter;
+    bool haveFilter = false;
+    if (supportedMimeTypes.HasValue() && !supportedMimeTypes.Value().IsNull())
+    {
+        haveFilter    = true;
+        auto iterator = supportedMimeTypes.Value().Value().begin();
+        while (iterator.Next())
+        {
+            const CharSpan & mime = iterator.GetValue();
+            mimeFilter.emplace_back(mime.data(), mime.size());
+        }
+        // A malformed list is a client error; reject rather than share everything.
+        VerifyOrReturnValue(iterator.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
+    }
+
+    // Share the locally stored files that match the requested MIME filter (or all
+    // of them when no filter was supplied). Each ShareFileWithClient arms the BDX
+    // sender and emits a SharedFilesAdded event for that file.
+    for (const FileEntry & entry : mFiles)
+    {
+        if (haveFilter && std::find(mimeFilter.begin(), mimeFilter.end(), entry.mimeType) == mimeFilter.end())
+        {
+            continue;
+        }
+        CHIP_ERROR err =
+            mBdxCoordinator->ShareFileWithClient(peer, requestID, entry.fileID, CharSpan(entry.name.data(), entry.name.size()));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "MediaFileManagementManager: ShareFileWithClient failed for id %llu: %" CHIP_ERROR_FORMAT,
+                         static_cast<unsigned long long>(entry.fileID), err.Format());
+        }
+    }
     return Status::Success;
 }
 
-Status MediaFileManagementManager::HandleGetSharedFile(uint16_t responseID, Commands::GetSharedFileResponse::Type & response)
+Status MediaFileManagementManager::HandleGetSharedFile(ScopedNodeId peer, uint16_t responseID,
+                                                       Commands::GetSharedFileResponse::Type & response)
 {
-    // No shared files are offered by the example app.
     ChipLogProgress(Zcl, "MediaFileManagementManager: GetSharedFile responseID=%u", responseID);
-    response.status = FileStatusEnum::kFileNotAvailable;
+
+    uint64_t fileID = 0;
+    if (mBdxCoordinator == nullptr || !mBdxCoordinator->LookupSharedFile(peer, responseID, fileID))
+    {
+        response.status = FileStatusEnum::kFileNotAvailable;
+        return Status::Success;
+    }
+
+    Structs::FileDescriptionStruct::Type file;
+    if (!GetFileById(fileID, file))
+    {
+        response.status = FileStatusEnum::kFileNotAvailable;
+        return Status::Success;
+    }
+
+    // Rewrite the ImageUri to a bdx:// URI pointing at this device so the client
+    // can fetch the file/thumbnail from us. The response's CharSpan is encoded by
+    // the cluster after this handler returns, so the URI must be backed by
+    // storage that outlives this call (a member string), not a stack buffer.
+    // Fits "bdx://" + 16-hex node id + '/' + a file-designator name.
+    char uriBuffer[kMaxBdxUriLength] = {};
+    MutableCharSpan uri(uriBuffer);
+    if (mBdxCoordinator->MakeSelfBdxUri(fileID, file.name, uri) == CHIP_NO_ERROR)
+    {
+        mSharedFileUri.assign(uri.data(), uri.size());
+        file.imageUri = CharSpan(mSharedFileUri.data(), mSharedFileUri.size());
+    }
+
+    response.status = FileStatusEnum::kSuccess;
+    response.fileDescription.SetValue(DataModel::MakeNullable(file));
     return Status::Success;
 }
 
-Status MediaFileManagementManager::HandleOfferFile(const CharSpan & clientName, const CharSpan & name, uint64_t size,
-                                                   const CharSpan & mimeType, const CharSpan & imageUri)
+Status MediaFileManagementManager::HandleOfferFile(ScopedNodeId peer, const CharSpan & clientName, const CharSpan & name,
+                                                   uint64_t size, const CharSpan & mimeType, const CharSpan & imageUri)
 {
     ChipLogProgress(Zcl, "MediaFileManagementManager: OfferFile from client, size %llu", static_cast<unsigned long long>(size));
+
+    // Reject files that would exceed the advertised capacity.
+    VerifyOrReturnValue(size <= GetAvailableStorage(), Status::ResourceExhausted);
+
+    // Record the metadata first so the file appears in AvailableFiles, matching
+    // HandleAddFile. Without a coordinator we simply skip the byte transfer.
+    const uint64_t assignedID = AppendEntry(name, size, mimeType, imageUri);
+    VerifyOrReturnValue(assignedID != 0, Status::Failure);
+
+    // Kick off the out-of-band download of the file from the client. The metadata
+    // entry already exists; bytes land asynchronously (if a coordinator is set).
+    if (mBdxCoordinator != nullptr)
+    {
+        CHIP_ERROR err = mBdxCoordinator->StartIncomingFileTransfer(peer, assignedID, name, size, imageUri);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "MediaFileManagementManager: OfferFile BDX start failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
     return Status::Success;
 }
 

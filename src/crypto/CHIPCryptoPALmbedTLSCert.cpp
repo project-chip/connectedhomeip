@@ -28,9 +28,16 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+#include <mbedtls/version.h>
+
+// mbedtls/ecp.h (mbedtls_ecp_* symbols) is only used by the legacy non-PSA path
+// and became private in mbedTLS 4.1.0, so include it only before 4.1.0.
+#if (MBEDTLS_VERSION_NUMBER < 0x04010000)
+#include <mbedtls/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER < 0x04010000)
+
 #include <mbedtls/oid.h>
 #include <mbedtls/pk.h>
-#include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
@@ -220,6 +227,17 @@ constexpr uint8_t sOID_Extension_CRLDistributionPoint[]   = { 0x55, 0x1D, 0x1F }
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
 } // anonymous namespace
+
+// ML-DSA attestation operations are not implemented by this backend.
+bool IsMlDsa44Supported()
+{
+    return false;
+}
+
+bool IsMlDsa65Supported()
+{
+    return false;
+}
 
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
 {

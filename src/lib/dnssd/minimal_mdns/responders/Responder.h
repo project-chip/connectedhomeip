@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
 #include <lib/dnssd/wire/QName.h>
+#include <lib/dnssd/wire/records/ResourceRecord.h>
 
 #include <inet/IPPacketInfo.h>
 
@@ -48,7 +48,7 @@ public:
 
     /// Applies any adjustments to resource records before they are being serialized
     /// to some form of reply.
-    void Adjust(ResourceRecord & record) const
+    void Adjust(chip::Dnssd::ResourceRecord & record) const
     {
         VerifyOrReturn(mTtlSecondsOverride.has_value());
         record.SetTtl(*mTtlSecondsOverride);
@@ -65,15 +65,15 @@ class ResponderDelegate;
 class Responder
 {
 public:
-    Responder(QType qType, const FullQName & qName) : mQType(qType), mQName(qName) {}
+    Responder(chip::Dnssd::QType qType, const chip::Dnssd::FullQName & qName) : mQType(qType), mQName(qName) {}
     virtual ~Responder() {}
 
-    QClass GetQClass() const { return QClass::IN; }
-    QType GetQType() const { return mQType; }
+    chip::Dnssd::QClass GetQClass() const { return chip::Dnssd::QClass::IN; }
+    chip::Dnssd::QType GetQType() const { return mQType; }
 
     /// Full name as: "Instance"."Servicer"."Domain"
     /// Domain name is generally just 'local'
-    FullQName GetQName() const { return mQName; }
+    chip::Dnssd::FullQName GetQName() const { return mQName; }
 
     /// Report all responses maintained by this responder
     ///
@@ -82,8 +82,8 @@ public:
                                  const ResponseConfiguration & configuration) = 0;
 
 private:
-    const QType mQType;
-    const FullQName mQName;
+    const chip::Dnssd::QType mQType;
+    const chip::Dnssd::FullQName mQName;
 };
 
 class ResponderDelegate
@@ -92,7 +92,7 @@ public:
     virtual ~ResponderDelegate() {}
 
     /// Add the specified resource record to the response
-    virtual void AddResponse(const ResourceRecord & record) = 0;
+    virtual void AddResponse(const chip::Dnssd::ResourceRecord & record) = 0;
 
     /// Accept to add responses for the particular responder.
     ///

@@ -803,14 +803,12 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
         {
-            // don't attempt to erase if vector has been cleared
-            if (context->mServices.size())
-            {
-                context->mServices.erase(std::remove_if(
-                    context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
-                        return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
-                    }));
-            }
+            context->mServices.erase(std::remove_if(context->mServices.begin(), context->mServices.end(),
+                                                    [name, type](const DnssdService & service) {
+                                                        return strcmp(name, service.mName) == 0 &&
+                                                            type == GetFullType(service.mType, service.mProtocol);
+                                                    }),
+                                     context->mServices.end());
 
             if (context->mReceivedAllCached)
             {

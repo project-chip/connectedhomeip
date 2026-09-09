@@ -18,17 +18,17 @@ Casting App on Android (arm64-v8a).
 
 ### What drives the reduction
 
-| Optimization                           | Mechanism                                                                                                | Impact                                                                                                    |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Slim cluster-objects override          | Compile ~29 casting clusters instead of ~200+ via `chip_data_model_overrides_dir`                        | Major `.so` reduction                                                                                     |
-| Slim TLV decoder overrides             | Compile TLV decoders for 18 casting clusters only via `chip_data_model_overrides_dir`                    | Removes link-time deps on ~200+ clusters while keeping `ChipClusters.java` read/subscribe APIs functional |
-| Remove legacy chip-tool sources        | Exclude ~20 source files + tracing/JSON deps                                                             | Further `.so` reduction                                                                                   |
-| Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO                                                              | Eliminates separate 8.9 MB `libc++_shared.so`; only referenced symbols survive                            |
-| Compiler / linker flags                | `-Os`, `-g0`, `-flto=thin`, `--icf=safe`, `-fvisibility=hidden`                                          | ~10–20 % further `.so` reduction                                                                          |
-| R8 Java shrinking                      | `minifyEnabled true` in Gradle debug build                                                               | Reduces DEX size (Java / Kotlin)                                                                          |
-| Cluster server exclusion (phase 3)     | Compile only 13 cluster server dirs via `chip_data_model_overrides_dir` + `cluster-servers-override.gni` | ~1.1 MB `.o` savings                                                                                      |
-| Slim Accessors.cpp (phase 3)           | Compile accessors for 29 clusters only via `chip_data_model_overrides_dir` + `Accessors-override.cpp`    | ~826 KB `.o` savings                                                                                      |
-| jsoncpp/jsontlv removal (phase 3)      | Not feasible — `AndroidCallbacks.cpp` and `AndroidInteractionClient.cpp` use jsontlv at runtime          | ~350 KB (not achievable)                                                                                  |
+| Optimization                           | Mechanism                                                                                                | Impact                                                                                                      |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Slim cluster-objects override          | Compile ~29 casting clusters instead of ~200+ via `chip_data_model_overrides_dir`                        | Major `.so` reduction                                                                                       |
+| Slim TLV decoder overrides             | Compile TLV decoders for 19 casting clusters only via `chip_data_model_overrides_dir`                    | Removes link-time deps on ~200+ clusters while keeping `ChipClusters.java` read/subscribe APIs functional   |
+| Remove legacy chip-tool sources        | Exclude ~20 source files + tracing/JSON deps                                                             | Further `.so` reduction                                                                                     |
+| Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO                                                              | Eliminates separate 8.9 MB `libc++_shared.so`; only referenced symbols survive                              |
+| Compiler / linker flags                | `-Os`, `-g0`, `-flto=thin`, `--icf=safe`, `-fvisibility=hidden`                                          | ~10–20 % further `.so` reduction                                                                            |
+| R8 Java shrinking                      | `minifyEnabled true` + cluster-scoped proguard keeps for the 19 slim-decoder clusters                    | Prunes ~6,500 unused classes from `CHIPInteractionModel.jar`; chip.\* method count reduced from 29K to 2.5K |
+| Cluster server exclusion (phase 3)     | Compile only 13 cluster server dirs via `chip_data_model_overrides_dir` + `cluster-servers-override.gni` | ~1.1 MB `.o` savings                                                                                        |
+| Slim Accessors.cpp (phase 3)           | Compile accessors for 29 clusters only via `chip_data_model_overrides_dir` + `Accessors-override.cpp`    | ~826 KB `.o` savings                                                                                        |
+| jsoncpp/jsontlv removal (phase 3)      | Not feasible — `AndroidCallbacks.cpp` and `AndroidInteractionClient.cpp` use jsontlv at runtime          | ~350 KB (not achievable)                                                                                    |
 
 ---
 
@@ -166,9 +166,9 @@ overhead is removed.
 | Compressed in APK (ZIP deflate, single ABI)            | ~2–3 MB        |
 
 The `CHIPInteractionModel.jar` (7.3 MB) is the largest Java component, but it
-contains classes for all ~200+ clusters. When the host app applies R8 shrinking,
-only the classes actually referenced by the casting API survive, reducing its
-contribution to well under 1 MB.
+contains classes for all ~200+ clusters. The proguard rules keep only the 19
+clusters present in the slim TLV decoder overrides; R8 prunes the rest, reducing
+`CHIPInteractionModel.jar`'s contribution to well under 1 MB.
 
 For a production app shipping a single ABI (arm64-v8a), the casting SDK adds an
 estimated **2–3 MB compressed** to the APK — down from **27.9 MB** of native
@@ -176,7 +176,41 @@ libraries in the default non-optimized build.
 
 ---
 
-## 4. Build Instructions
+## 4. Casting SDK Size Impact (Measured)
+
+Measured on the size-optimized build (`optimize_apk_size=true`, arm64-v8a) using
+the following methodology:
+
+1. Build an AAB: `./gradlew bundleRelease`
+2. Convert to APK set:
+   `bundletool build-apks --bundle=app-release.aab --output=app.apks`
+3. Measure download size: `bundletool get-size total --apks=app.apks`
+4. Inspect DEX, resources, and native breakdown in Android Studio APK Analyzer
+
+Three scenarios were measured to isolate the SDK contribution and the proguard
+impact:
+
+| Scenario                                          | Download size | DEX    | Resources | Native | Method count     |
+| ------------------------------------------------- | ------------- | ------ | --------- | ------ | ---------------- |
+| Without libs — app only (baseline)                | 1 MB          | 637 KB | 357 KB    | 0      | 8K               |
+| With libs — broad `chip.devicecontroller.**` keep | 2.77–2.85 MB  | 1.5 MB | 371 KB    | 1 MB   | 38K (chip: 29K)  |
+| With libs — cluster-scoped keeps (this change)    | 2.1 MB        | 757 KB | 357 KB    | 1 MB   | 11K (chip: 2.5K) |
+
+### Key findings
+
+-   _*chip.* method count: 29K → 2.5K_\* — 91% reduction from scoping proguard
+    keeps to the 19 casting clusters in the slim TLV decoders.
+-   **DEX: 1.5 MB → 757 KB** — ~750 KB reduction; R8 pruned ~6,500 unused
+    cluster classes from `CHIPInteractionModel.jar`.
+-   **Download size: 2.77–2.85 MB → 2.1 MB** — ~700 KB reduction from proguard
+    alone, on top of the native `.so` optimizations already applied.
+
+The net SDK contribution (download size minus the app-only baseline) is **~1.1
+MB** with cluster-scoped keeps, down from **~1.77–1.85 MB** with the broad keep.
+
+---
+
+## 5. Build Instructions
 
 ### Prerequisites
 
@@ -290,7 +324,7 @@ Android build.
 
 ---
 
-## 5. Property Tests
+## 6. Property Tests
 
 The `examples/tv-casting-app/tests/` directory contains property-based tests
 (Python, using `hypothesis` + `pytest`) that guard the slim decoder files and
@@ -330,7 +364,7 @@ and phase 3 optimizations._ _Validates: Requirements 2.1, 2.2, 2.3, 2.4_
 
 ---
 
-## 6. Phase 2 Optimizations (~2.8 MB → ~2.6 MB)
+## 7. Phase 2 Optimizations (~2.8 MB → ~2.6 MB)
 
 Phase 1 reduced `libTvCastingApp.so` from 19 MB to 2.8 MB. Phase 2 targets an
 additional ~200 KB reduction by trimming non-essential infrastructure from the
@@ -419,7 +453,7 @@ unit-test hooks, RTTI, and ICD removal._
 
 ---
 
-## 7. Phase 3 Optimizations (~2.6 MB → ~2.3 MB estimated)
+## 8. Phase 3 Optimizations (~2.6 MB → ~2.3 MB estimated)
 
 Phase 2 reduced `libTvCastingApp.so` from 2.8 MB to 2.6 MB. Phase 3 targets an
 additional ~2.3 MB of `.o` file bloat identified through binary analysis of the

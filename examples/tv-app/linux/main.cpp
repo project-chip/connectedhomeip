@@ -19,6 +19,9 @@
 #include "AppMain.h"
 #include "AppTv.h"
 
+#include "media-file-management/MediaFileManagementBdxCoordinator.h"
+#include "media-file-management/MediaFileManagementBdxProvider.h"
+#include "media-file-management/MediaFileManagementBdxRequestor.h"
 #include "media-file-management/MediaFileManagementManager.h"
 
 #include <access/AccessControl.h>
@@ -27,8 +30,19 @@
 #include <app/CommandHandler.h>
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/clusters/media-file-management-server/CodegenIntegration.h>
+#include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <devices/Types.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <platform/ConfigurationManager.h>
+#include <protocols/Protocols.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include <controller/CHIPDeviceController.h> // nogncheck
+#endif                                       // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+#include <cstring>
 #include <optional>
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -40,6 +54,12 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+// Defined in CommissionerMain.cpp; the combined server/commissioner tv-app runs
+// a commissioner stack with its own ExchangeManager (see ApplicationInit).
+extern Controller::DeviceCommissioner * GetDeviceCommissioner();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 namespace {
 
@@ -56,6 +76,114 @@ constexpr EndpointId kMediaFileManagementEndpointId = 1;
 std::optional<MediaFileManagement::MediaFileManagementManager> gMediaFileManagementManager;
 std::optional<MediaFileManagement::MediaFileManagementServer> gMediaFileManagementServer;
 
+// BDX endpoints that move the actual file/thumbnail bytes for the sharing
+// commands (the cluster itself only carries metadata). The provider serves
+// GetSharedFile pulls; the requestor downloads for AddFile/OfferFile. The
+// coordinator ties them to the manager and owns the RequestID/ResponseID map.
+std::optional<MediaFileManagement::MediaFileManagementBdxProvider> gMediaFileManagementBdxProvider;
+std::optional<MediaFileManagement::MediaFileManagementBdxRequestor> gMediaFileManagementBdxRequestor;
+std::optional<MediaFileManagement::MediaFileManagementBdxCoordinator> gMediaFileManagementBdxCoordinator;
+
+// ---------------------------------------------------------------------------
+// --device-type flag: choose which media device type endpoint 1 presents as.
+//
+// tv-app is built as a Casting Video Player (0x0023) in tv-app.zap, but
+// endpoint 1 hosts a superset of clusters that also satisfies the mandatory set
+// of the other three media player device types. This flag makes the app present
+// as any of the four without a rebuild by, at boot:
+//   - overriding the device type id used for DNS-SD "_T<id>" commissioning
+//     advertising (ConfigurationMgr().SetDeviceTypeId, applied during argument
+//     parsing so it is in place before the server starts advertising), and
+//   - rewriting endpoint 1's Descriptor DeviceTypeList (emberAfSetDeviceTypeList,
+//     applied in ApplicationInit once the endpoint table is populated).
+// See examples/tv-app/README.md.
+//
+// NOTE: this changes the advertised and declared device type only. The
+// commissioner role (Casting players are Commissioners) and the cluster set are
+// as compiled; the build-time variant documented in the README is the path to a
+// fully faithful data model.
+constexpr EndpointId kVideoPlayerEndpointId = 1;
+
+struct MediaDeviceTypeOption
+{
+    const char * name;
+    EmberAfDeviceType deviceType; // { deviceTypeId, deviceTypeRevision }
+};
+
+// EmberAfDeviceType is DataModel::DeviceTypeEntry, so the generated
+// devices/Types.h entries can be used directly for the ids/revisions that exist
+// there (they track the data model automatically). The two audio player types
+// are recent spec additions that are not yet emitted into devices/Types.h (they
+// are absent from matter-devices.xml), so they are spelled out (revision 1)
+// until they are generated.
+constexpr MediaDeviceTypeOption kMediaDeviceTypes[] = {
+    { "casting-video", app::Device::Type::kCastingVideoPlayer }, // 0x0023 (tv-app.zap default)
+    { "basic-video", app::Device::Type::kBasicVideoPlayer },     // 0x0028
+    { "casting-audio", { 0x0021, 1 } },                          // Casting Audio Player
+    { "streaming-audio", { 0x0020, 1 } },                        // Streaming Audio Player
+};
+
+// Backing storage for the runtime override; emberAfSetDeviceTypeList stores the
+// span (not a copy), so this must outlive the endpoint - hence file scope.
+EmberAfDeviceType gMediaDeviceTypeList[1];
+bool gMediaDeviceTypeOverridden = false;
+
+constexpr uint16_t kOptionDeviceType = 0xffe0;
+
+bool TvAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier, const char * name,
+                        const char * value)
+{
+    if (identifier != kOptionDeviceType)
+    {
+        ChipLogError(DeviceLayer, "%s: INTERNAL ERROR: Unhandled option: %s", program, name);
+        return false;
+    }
+
+    for (const MediaDeviceTypeOption & option : kMediaDeviceTypes)
+    {
+        if (strcmp(value, option.name) == 0)
+        {
+            // Override the DNS-SD advertised device type now, before the server
+            // starts advertising. Only record the override (which also drives
+            // the Descriptor DeviceTypeList update in ApplicationInit) once this
+            // succeeds, so a failure does not leave us claiming an override that
+            // did not take effect.
+            CHIP_ERROR err = ConfigurationMgr().SetDeviceTypeId(option.deviceType.deviceTypeId);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "%s: failed to override advertised device type: %" CHIP_ERROR_FORMAT, program,
+                             err.Format());
+                return false;
+            }
+            gMediaDeviceTypeList[0]    = option.deviceType;
+            gMediaDeviceTypeOverridden = true;
+            ChipLogProgress(DeviceLayer, "TV Linux App: endpoint 1 device type selected: %s (0x%04X revision %u)", option.name,
+                            static_cast<unsigned>(option.deviceType.deviceTypeId), option.deviceType.deviceTypeRevision);
+            return true;
+        }
+    }
+
+    ChipLogError(DeviceLayer, "%s: unknown --device-type '%s' (expected casting-video|basic-video|casting-audio|streaming-audio)",
+                 program, value);
+    return false;
+}
+
+chip::ArgParser::OptionDef sTvAppOptionDefs[] = {
+    { "device-type", chip::ArgParser::kArgumentRequired, kOptionDeviceType },
+    { nullptr },
+};
+
+chip::ArgParser::OptionSet sTvAppOptions = {
+    TvAppOptionHandler,
+    sTvAppOptionDefs,
+    "TV APP OPTIONS",
+    "  --device-type <casting-video|basic-video|casting-audio|streaming-audio>\n"
+    "       Present endpoint 1 as the given media device type: sets both the DNS-SD\n"
+    "       _T advertising subtype and the Descriptor cluster DeviceTypeList.\n"
+    "       Defaults to casting-video, as built into tv-app.zap. The commissioner\n"
+    "       role and cluster set are unchanged. See examples/tv-app/README.md.\n",
+};
+
 } // namespace
 
 void ApplicationInit()
@@ -71,6 +199,43 @@ void ApplicationInit()
         ChipLogError(Zcl, "TV Linux App: MediaFileManagement init failed: %" CHIP_ERROR_FORMAT, err.Format());
         gMediaFileManagementServer.reset();
         gMediaFileManagementManager.reset();
+    }
+    else
+    {
+        // Bring up the BDX byte-transfer layer for the sharing commands.
+        gMediaFileManagementBdxProvider.emplace();
+        gMediaFileManagementBdxRequestor.emplace();
+        gMediaFileManagementBdxCoordinator.emplace(*gMediaFileManagementManager, *gMediaFileManagementBdxProvider,
+                                                   *gMediaFileManagementBdxRequestor, gMediaFileManagementServer->Cluster());
+        gMediaFileManagementManager->SetBdxCoordinator(&*gMediaFileManagementBdxCoordinator);
+
+        // The provider serves incoming (client-initiated) BDX pulls, so it must
+        // be the unsolicited handler for the BDX protocol. This tv-app is a
+        // combined server + commissioner: the commissioner owns a *separate*
+        // ExchangeManager, and clients commission via UDC onto the commissioner's
+        // fabric, so their GetSharedFile BDX ReceiveInit arrives on the
+        // commissioner's EM - not the server's. Register on both so the provider
+        // is found regardless of which stack terminates the client's session.
+        err = Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(
+            Protocols::BDX::Id, &*gMediaFileManagementBdxProvider);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "TV Linux App: BDX handler registration (server) failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+        if (Controller::DeviceCommissioner * commissioner = GetDeviceCommissioner();
+            commissioner != nullptr && commissioner->ExchangeMgr() != nullptr)
+        {
+            err = commissioner->ExchangeMgr()->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id,
+                                                                                            &*gMediaFileManagementBdxProvider);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "TV Linux App: BDX handler registration (commissioner) failed: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
@@ -102,13 +267,54 @@ void ApplicationInit()
     constexpr uint16_t kApp4VendorId  = 1111;
     constexpr uint16_t kApp4ProductId = 22;
     factory->InstallContentApp(kApp4VendorId, kApp4ProductId);
+
+    // Content App 5 - OAuth-only login (see OAuthAccountLoginManager)
+    constexpr uint16_t kApp5VendorId  = 4242;
+    constexpr uint16_t kApp5ProductId = 1;
+    factory->InstallContentApp(kApp5VendorId, kApp5ProductId);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+    // Apply the --device-type override (if any) to endpoint 1's declared device
+    // type. Done here, after the server has populated the endpoint table.
+    if (gMediaDeviceTypeOverridden)
+    {
+        CHIP_ERROR err2 = emberAfSetDeviceTypeList(kVideoPlayerEndpointId, Span<const EmberAfDeviceType>(gMediaDeviceTypeList, 1));
+        if (err2 != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "TV Linux App: failed to set endpoint 1 device type: %" CHIP_ERROR_FORMAT, err2.Format());
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "TV Linux App: endpoint 1 now declares device type 0x%04X (DNS-SD _T subtype set to match).",
+                            static_cast<unsigned>(gMediaDeviceTypeList[0].deviceTypeId));
+        }
+    }
 }
 
 void ApplicationShutdown()
 {
     // Unregister the cluster from the data model provider. Shutdown() mirrors
     // Init(); the optionals are left intact and torn down at process exit.
+    if (gMediaFileManagementBdxProvider.has_value())
+    {
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(
+            Protocols::BDX::Id);
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+        // The provider was also registered on the commissioner's separate
+        // ExchangeManager in ApplicationInit; unregister it there too.
+        if (Controller::DeviceCommissioner * commissioner = GetDeviceCommissioner();
+            commissioner != nullptr && commissioner->ExchangeMgr() != nullptr)
+        {
+            TEMPORARY_RETURN_IGNORED commissioner->ExchangeMgr()->UnregisterUnsolicitedMessageHandlerForProtocol(
+                Protocols::BDX::Id);
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+        gMediaFileManagementBdxProvider->AbortTransfer();
+    }
+    if (gMediaFileManagementBdxRequestor.has_value())
+    {
+        gMediaFileManagementBdxRequestor->AbortTransfer();
+    }
     if (gMediaFileManagementServer.has_value())
     {
         gMediaFileManagementServer->Shutdown();
@@ -118,7 +324,7 @@ void ApplicationShutdown()
 int main(int argc, char * argv[])
 {
 
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &sTvAppOptions) == 0);
 
     TEMPORARY_RETURN_IGNORED AppTvInit();
 
