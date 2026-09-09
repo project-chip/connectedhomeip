@@ -262,11 +262,11 @@ PAF channel, permitted in all regulatory regions:
 | `--discriminator <value>`        | 12-bit value identifying the proxy during its own commissioning                 |
 
 `freq_list` is parsed once at startup and drives three things. The `WiFiBand`
-attribute advertised by the cluster follows the bands it covers: 2412–2484 MHz
-→ 2.4 GHz, 5035–5980 MHz → 5 GHz, defaulting to 2.4 GHz if no valid frequency
-is parsed. Scans and `ProxyConnectRequest` create a subscribe instance on a
-single channel: 2437 when it is listed, otherwise the first frequency given.
-The proxy's own NAN publisher advertises on the whole list, so the proxy can be
+attribute advertised by the cluster follows the bands it covers: 2412–2484 MHz →
+2.4 GHz, 5035–5980 MHz → 5 GHz, defaulting to 2.4 GHz if no valid frequency is
+parsed. Scans and `ProxyConnectRequest` create a subscribe instance on a single
+channel: 2437 when it is listed, otherwise the first frequency given. The
+proxy's own NAN publisher advertises on the whole list, so the proxy can be
 commissioned over Wi-Fi PAF itself.
 
 That publisher stops once the proxy joins a fabric, as the NAN radio is needed
@@ -425,14 +425,13 @@ Adapter and driver are both constructed in
 the single `CommissioningProxyDevice` with `AddTransport()` — a build with BLE
 adds that driver the same way — and derives the advertised `WiFiBand` from
 `--wifipaf freq_list=`, since the device itself reads no command line. The same
-<<<<<<< HEAD
-parsed list reaches the radio from `posix/main.cpp`.
-=======
-parsed list reaches the radio from `posix/main.cpp`. Transports are registered
-before `Server::Init()`, so the fabric table is empty at that point and the
-driver's `DisconnectPublishReceiveHandler()` call lands on the
-commissioning-complete event instead.
->>>>>>> 951a8aedcd63d45d4a1d89a486d12b24136ddc30
+<<<<<<< HEAD parsed list reaches the radio from `posix/main.cpp`. ======= parsed
+list reaches the radio from `posix/main.cpp`. Transports are registered before
+`Server::Init()`, so the fabric table is empty at that point and the driver's
+`DisconnectPublishReceiveHandler()` call lands on the commissioning-complete
+event instead.
+
+> > > > > > > 951a8aedcd63d45d4a1d89a486d12b24136ddc30
 
 <hr>
 
