@@ -174,6 +174,9 @@ class TC_WEBRTCP_2_17(MatterBaseTest, WEBRTCPTestBase):
 
         log.info("SDP answer validated successfully. Answer length: %s bytes", len(answer_sdp))
         log.info("SDP answer preview: %s...", answer_sdp[:400])
+        
+        # SDP valid, set it as the remote
+        webrtc_peer.set_remote_answer(answer_sdp)
 
         self.step(5)
         # Send EndSession command to terminate the WebRTC session
