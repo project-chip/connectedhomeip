@@ -16,21 +16,6 @@
 
 rsource "../common/cmake/Kconfig"
 
-# Workaround to pass the nRF compliance check
-config CHIP_NXP_PLATFORM
-	bool
-	help
-	  States that the configuration uses Matter NXP platform,
-	  what can be used to conditionally deviate from Zephyr generic configuration
-	  for NXP platform related purposes.
-
-config CHIP_TELINK_PLATFORM
-	bool
-	help
-	  States that the configuration uses Matter Telink platform,
-	  what can be used to conditionally deviate from Zephyr generic configuration
-	  for Telink platform related purposes.
-
 config CHIP
 	select CPP
 	imply REQUIRES_FULL_LIBCPP
@@ -146,6 +131,7 @@ config CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT
 
 config CHIP_MALLOC_SYS_HEAP_DEBUG
 	bool "Log every allocated or freed memory block"
+	depends on CHIP_SYSTEM_THREAD_LOCAL_STORAGE
 	help
 	  Enables debug logs printed whenever a heap memory block is allocated or
 	  freed. The logs can be used to trace the source of memory leaks in the
