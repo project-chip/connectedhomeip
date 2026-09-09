@@ -19,6 +19,7 @@ Support module for IDM (Interaction Data Model) test modules containing shared f
 """
 
 import asyncio
+import contextlib
 import copy
 import inspect
 import logging
@@ -971,13 +972,11 @@ class IDMBaseTest(BasicCompositionTests):
             return set()
         values: set[int | float] = set()
         for v in constraints.allowed:
-            try:
+            with contextlib.suppress(ValueError):
                 values.add(int(v, 0))
-            except ValueError:
-                try:
-                    values.add(float(v))
-                except ValueError:
-                    pass
+                continue
+            with contextlib.suppress(ValueError):
+                values.add(float(v))
         return values
 
     async def _resolved_command_field_constraints(self, info: CommandFieldInfo) -> Constraints:
