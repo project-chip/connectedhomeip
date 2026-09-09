@@ -119,7 +119,7 @@ class TC_DD_3_24(MatterTestCommissioner):
 
         asserts.assert_true(
             await self.check_operational_service_has_txt_ic(),
-            'TXT key "IC" was not found!'
+            'Incomplete commissioning mDNS advertisement not found (expected "_IC" subtype and TXT key IC=1)'
         )
 
         self.step(
@@ -255,7 +255,6 @@ class TC_DD_3_24(MatterTestCommissioner):
         log.info("Operational TXT record: %s", txt_record.txt)
 
         return "IC" in txt_record.txt and txt_record.txt["IC"] == "1"
-
 
     async def check_operational_service_no_longer_advertise_ic(
             self,
