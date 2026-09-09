@@ -318,6 +318,11 @@ public:
     // The AutoCommissioner populates this from the PDCNetworkIdentityInfo report returned
     // by kPDCGetNetworkIdentity, but a CommissioningDelegate is free to obtain the Network Identity
     // in some other way and bypass that step entirely.
+    // Note: The CommissioningDelegate is responsible for checking that the commissionee supports
+    // PDC (generally via the network.wifi.supportsPerDeviceCredentials flag of the
+    // ReadCommissioningInfo report returned by kReadCommissioningInfo), since a commissionee that
+    // does not support PDC could otherwise misinterpret a PDC AddOrUpdateWiFiNetwork command as
+    // configuring a connection to an open network.
     const Optional<ByteSpan> GetPDCNetworkIdentity() const { return mPDCNetworkIdentity; }
 
     // The nonce sent to the commissionee during kWiFiNetworkSetup, and signed by it to prove
