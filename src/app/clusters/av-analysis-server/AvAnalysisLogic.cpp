@@ -430,13 +430,10 @@ CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
         AvAnalysis::AmbientContextStorage triggerStorage;
         triggerStorage.SetContext(trigger.context);
 
-        // If we have no max zones then we have no zone triggers, set to Null. Otherwise convert List to Vector.
+        // ZoneIDs conforms to PerZoneContextDetection, so without the feature the field stays unset
+        // and goes unencoded, as HandleEnableContextTriggers leaves it. Otherwise convert List to Vector.
         //
-        if (mMaxZones.IsNull())
-        {
-            triggerStorage.SetZoneIDs(MakeOptional(DataModel::NullNullable));
-        }
-        else
+        if (!mMaxZones.IsNull())
         {
             std::vector<uint16_t> zoneIDs;
             size_t size;
@@ -798,9 +795,14 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
 
     // Server command logic starts here
     //
+    Status outcome = Status::Success;
+
     if (!commandData.contextTriggers.IsNull())
     {
-        // Applied per trigger, not atomically: the spec nests the removal inside this loop, unlike Enable's after it
+        // Each failure below ends processing with no other side-effects, so the whole list is worked
+        // through on a copy and the result installed only once every trigger has passed.
+        std::vector<AvAnalysis::AmbientContextStorage> updated = mActiveAmbientContextTriggers;
+
         auto iter = commandData.contextTriggers.Value().begin();
 
         while (iter.Next())
@@ -809,15 +811,15 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
 
             // Make sure the context is part of our active set
             //
-            auto it = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
-                                   [&contextTrigger](AmbientContextStorage & acs) {
-                                       return acs.GetContext().namespaceID == contextTrigger.context.namespaceID &&
-                                           acs.GetContext().tag == contextTrigger.context.tag;
-                                   });
+            auto it = std::find_if(updated.begin(), updated.end(), [&contextTrigger](AmbientContextStorage & acs) {
+                return acs.GetContext().namespaceID == contextTrigger.context.namespaceID &&
+                    acs.GetContext().tag == contextTrigger.context.tag;
+            });
 
-            if (it == mActiveAmbientContextTriggers.end())
+            if (it == updated.end())
             {
-                return Status::DynamicConstraintError;
+                outcome = Status::DynamicConstraintError;
+                break;
             }
 
             // The trigger context is valid, now check the ZoneIDs, which can only be present if PERZONEDETECT is set, likewise,
@@ -828,7 +830,8 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
             if ((hasZoneIDs && !HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)) ||
                 (!hasZoneIDs && HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)))
             {
-                return Status::InvalidCommand;
+                outcome = Status::InvalidCommand;
+                break;
             }
 
             if (hasZoneIDs)
@@ -842,7 +845,11 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                     size_t size;
 
                     CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
-                    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        outcome = Status::Failure;
+                        break;
+                    }
                     zoneIDs.reserve(size);
 
                     auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
@@ -852,7 +859,11 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                         zoneIDs.push_back(zone_iter.GetValue());
                     }
                     err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
-                    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        outcome = Status::NotFound;
+                        break;
+                    }
                 }
             }
 
@@ -860,7 +871,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
             //
             if (!HasFeature(AvAnalysis::Feature::kPerZoneContextDetection))
             {
-                mActiveAmbientContextTriggers.erase(it);
+                updated.erase(it);
             }
             else
             {
@@ -869,7 +880,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                 //
                 if (contextTrigger.zoneIDs.Value().IsNull())
                 {
-                    mActiveAmbientContextTriggers.erase(it);
+                    updated.erase(it);
                 }
                 else
                 {
@@ -877,7 +888,8 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                     //
                     if (it->GetZoneIDs().Value().IsNull())
                     {
-                        return Status::DynamicConstraintError;
+                        outcome = Status::DynamicConstraintError;
+                        break;
                     }
 
                     // Remove the ZoneIds provided from the current set, if this results in an empty list, remove the entry
@@ -897,7 +909,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                     //
                     if (updatedZoneIDList.size() == 0)
                     {
-                        mActiveAmbientContextTriggers.erase(it);
+                        updated.erase(it);
                     }
                     else
                     {
@@ -906,6 +918,10 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                 }
             }
         }
+
+        VerifyOrReturnError(outcome == Status::Success, outcome);
+
+        mActiveAmbientContextTriggers = std::move(updated);
     }
     else
     {
@@ -921,7 +937,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
     MarkDirty(AvAnalysis::Attributes::ActiveAmbientContextTriggers::Id);
     LogErrorOnFailure(StoreActiveAmbientContextTriggers());
 
-    return Status::Success;
+    return outcome;
 }
 
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstablishAnalysisStream(
