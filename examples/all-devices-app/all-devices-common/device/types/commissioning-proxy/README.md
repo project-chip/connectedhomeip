@@ -254,12 +254,12 @@ PAF channel, permitted in all regulatory regions:
     --discriminator 3947
 ```
 
-| Argument                         | Description                                                                               |
-| -------------------------------- | ----------------------------------------------------------------------------------------- |
-| `--device commissioning-proxy:5` | Instantiate the CP device on endpoint 5                                                   |
-| `--wifi`                         | Enable Wi-Fi management via wpa_supplicant (required for PAF)                             |
-| `--wifipaf "freq_list=<MHz>"`    | NAN frequencies in MHz. `2437` = channel 6 (2.4 GHz); add e.g. `5745` for 5 GHz           |
-| `--discriminator <value>`        | 12-bit value identifying the proxy during its own commissioning                           |
+| Argument                         | Description                                                                     |
+| -------------------------------- | ------------------------------------------------------------------------------- |
+| `--device commissioning-proxy:5` | Instantiate the CP device on endpoint 5                                         |
+| `--wifi`                         | Enable Wi-Fi management via wpa_supplicant (required for PAF)                   |
+| `--wifipaf "freq_list=<MHz>"`    | NAN frequencies in MHz. `2437` = channel 6 (2.4 GHz); add e.g. `5745` for 5 GHz |
+| `--discriminator <value>`        | 12-bit value identifying the proxy during its own commissioning                 |
 
 `freq_list` is parsed once at startup and drives three things. The `WiFiBand`
 attribute advertised by the cluster follows the bands it covers: 2412–2484 MHz
@@ -425,7 +425,14 @@ Adapter and driver are both constructed in
 the single `CommissioningProxyDevice` with `AddTransport()` — a build with BLE
 adds that driver the same way — and derives the advertised `WiFiBand` from
 `--wifipaf freq_list=`, since the device itself reads no command line. The same
+<<<<<<< HEAD
 parsed list reaches the radio from `posix/main.cpp`.
+=======
+parsed list reaches the radio from `posix/main.cpp`. Transports are registered
+before `Server::Init()`, so the fabric table is empty at that point and the
+driver's `DisconnectPublishReceiveHandler()` call lands on the
+commissioning-complete event instead.
+>>>>>>> 951a8aedcd63d45d4a1d89a486d12b24136ddc30
 
 <hr>
 
