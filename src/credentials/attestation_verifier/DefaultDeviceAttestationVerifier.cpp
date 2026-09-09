@@ -321,6 +321,8 @@ bool SupportsAttestationVerificationProfile(DeviceAttestationCertProfile profile
         return Crypto::IsMlDsa44Supported();
     case DeviceAttestationCertProfile::kMlDsa65:
         return Crypto::IsMlDsa65Supported();
+    case DeviceAttestationCertProfile::kUnknownEnumValue:
+        return false;
     }
 
     return false;
@@ -334,6 +336,7 @@ constexpr size_t GetPaaCertificateAllocationSize(DeviceAttestationCertProfile pr
     case DeviceAttestationCertProfile::kMlDsa65:
         return kMaxDERCertLengthMlDsa65;
     case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
+    case DeviceAttestationCertProfile::kUnknownEnumValue:
         return kMaxDERCertLength;
     }
 

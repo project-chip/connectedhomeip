@@ -68,47 +68,20 @@ ByteSpan GetAttestationChallengeFromCurrentSession(app::CommandHandler * command
     return attestationChallenge;
 }
 
-BitMask<AttestationCryptoProfileBitmap>
-ToOperationalCredentialsProfileBitmap(BitMask<Credentials::DeviceAttestationCertProfileBitmap> profileBitmap)
-{
-    return BitMask<AttestationCryptoProfileBitmap>(profileBitmap.Raw());
-}
-
 Structs::PQCDeviceAttestationProfileStruct::Type
 ToOperationalCredentialsProfileSupport(const Credentials::DeviceAttestationProfileSupport & profileSupport)
 {
     Structs::PQCDeviceAttestationProfileStruct::Type profile;
-    profile.PAASupportedProfiles = ToOperationalCredentialsProfileBitmap(profileSupport.paaSupportedProfiles);
-    profile.PAISupportedProfiles = ToOperationalCredentialsProfileBitmap(profileSupport.paiSupportedProfiles);
-    profile.DACSupportedProfiles = ToOperationalCredentialsProfileBitmap(profileSupport.dacSupportedProfiles);
+    profile.PAASupportedProfiles = profileSupport.paaSupportedProfiles;
+    profile.PAISupportedProfiles = profileSupport.paiSupportedProfiles;
+    profile.DACSupportedProfiles = profileSupport.dacSupportedProfiles;
     return profile;
-}
-
-static_assert(to_underlying(AttestationCryptoProfileEnum::kEcdsaMatterLegacy) ==
-                  to_underlying(Credentials::DeviceAttestationCertProfile::kEcdsaMatterLegacy),
-              "Attestation profile enums must stay numerically aligned");
-static_assert(to_underlying(AttestationCryptoProfileEnum::kMlDsa44) ==
-                  to_underlying(Credentials::DeviceAttestationCertProfile::kMlDsa44),
-              "Attestation profile enums must stay numerically aligned");
-static_assert(to_underlying(AttestationCryptoProfileEnum::kMlDsa65) ==
-                  to_underlying(Credentials::DeviceAttestationCertProfile::kMlDsa65),
-              "Attestation profile enums must stay numerically aligned");
-
-CHIP_ERROR ToDeviceAttestationProfile(AttestationCryptoProfileEnum profile, Credentials::DeviceAttestationCertProfile & outProfile)
-{
-    if (profile == AttestationCryptoProfileEnum::kUnknownEnumValue)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    outProfile = static_cast<Credentials::DeviceAttestationCertProfile>(to_underlying(profile));
-    return CHIP_NO_ERROR;
 }
 
 BitMask<Credentials::DeviceAttestationCertProfileBitmap>
 ToDeviceAttestationProfileBitmap(Credentials::DeviceAttestationCertProfile profile)
 {
-    return BitMask<Credentials::DeviceAttestationCertProfileBitmap>(static_cast<uint8_t>(1u << to_underlying(profile)));
+    return BitMask<Credentials::DeviceAttestationCertProfileBitmap>(static_cast<uint16_t>(1u << to_underlying(profile)));
 }
 
 CHIP_ERROR BuildSegmentedCertificateResponse(const ByteSpan & segment, size_t documentSize, size_t offset, uint16_t segmentId,
@@ -996,7 +969,6 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     const auto profileSupport = dacProvider.GetDeviceAttestationProfileSupport();
 
     CHIP_ERROR err                                             = CHIP_NO_ERROR;
-    Credentials::DeviceAttestationCertProfile requestedProfile = Credentials::DeviceAttestationCertProfile::kEcdsaMatterLegacy;
     // CryptoProfile describes the requested certificate's key. An ECDSA PAI/DAC
     // can belong to an ML-DSA-rooted chain, so choose the stored chain separately.
     const auto chainProfile = dacProvider.GetPreferredDeviceAttestationChainProfile();
@@ -1015,7 +987,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
 
     if (profileRequest)
     {
-        VerifyOrReturnValue(ToDeviceAttestationProfile(cryptoProfile, requestedProfile) == CHIP_NO_ERROR, Status::InvalidCommand);
+        VerifyOrReturnValue(cryptoProfile != AttestationCryptoProfileEnum::kUnknownEnumValue, Status::InvalidCommand);
         VerifyOrReturnValue(requestedSegmentSize >= kDefaultCertificateSegmentSize &&
                                 requestedSegmentSize <= kMaxCertificateSegmentSize,
                             Status::InvalidCommand);
@@ -1026,7 +998,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for DAC");
         VerifyOrReturnValue(!profileRequest ||
-                                profileSupport.dacSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(requestedProfile)),
+                                profileSupport.dacSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(cryptoProfile)),
                             Status::InvalidCommand);
         documentType = Credentials::DeviceAttestationDocumentType::kDACCertificate;
         SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, chainProfile, offset,
@@ -1037,7 +1009,7 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for PAI");
         VerifyOrReturnValue(!profileRequest ||
-                                profileSupport.paiSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(requestedProfile)),
+                                profileSupport.paiSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(cryptoProfile)),
                             Status::InvalidCommand);
         documentType = Credentials::DeviceAttestationDocumentType::kPAICertificate;
         SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, chainProfile, offset,

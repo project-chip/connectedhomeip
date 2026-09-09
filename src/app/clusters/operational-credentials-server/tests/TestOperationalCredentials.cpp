@@ -153,6 +153,7 @@ private:
         case Credentials::DeviceAttestationCertProfile::kMlDsa44:
             return ByteSpan(pqc.data(), pqc.size());
         case Credentials::DeviceAttestationCertProfile::kMlDsa65:
+        case Credentials::DeviceAttestationCertProfile::kUnknownEnumValue:
             return ByteSpan();
         }
 
@@ -466,6 +467,15 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     auto outOfBoundsResult = tester.Invoke(outOfBoundsSegment);
     ASSERT_TRUE(outOfBoundsResult.status.has_value());
     EXPECT_EQ(outOfBoundsResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+
+    // Unknown generated enum values must be rejected before profile-to-bitmap conversion.
+    Commands::CertificateChainRequest::Type unknownProfile;
+    unknownProfile.certificateType = CertificateChainTypeEnum::kDACCertificate;
+    // The encoder rejects the sentinel itself; decoding 0xff maps it to kUnknownEnumValue.
+    unknownProfile.cryptoProfile.SetValue(static_cast<AttestationCryptoProfileEnum>(0xff));
+    auto unknownProfileResult = tester.Invoke(unknownProfile);
+    ASSERT_TRUE(unknownProfileResult.status.has_value());
+    EXPECT_EQ(unknownProfileResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     Commands::CertificateChainRequest::Type unsupportedPqcProfile;
     unsupportedPqcProfile.certificateType = CertificateChainTypeEnum::kPAICertificate;

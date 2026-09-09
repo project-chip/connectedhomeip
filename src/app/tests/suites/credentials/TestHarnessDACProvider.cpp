@@ -202,6 +202,8 @@ ByteSpan GetProfileDocument(DeviceAttestationCertProfile profile, ByteSpan legac
         return pqc44;
     case DeviceAttestationCertProfile::kMlDsa65:
         return pqc65;
+    case DeviceAttestationCertProfile::kUnknownEnumValue:
+        return ByteSpan();
     }
 
     return ByteSpan();
@@ -398,6 +400,8 @@ void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
             break;
         case DeviceAttestationCertProfile::kMlDsa65:
             mProfileSupport.paiSupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
+            break;
+        case DeviceAttestationCertProfile::kUnknownEnumValue:
             break;
         }
     };

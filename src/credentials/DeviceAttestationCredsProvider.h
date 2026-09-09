@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <clusters/OperationalCredentials/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
@@ -26,25 +27,12 @@
 namespace chip {
 namespace Credentials {
 
-enum class DeviceAttestationCertProfile : uint8_t
-{
-    kEcdsaMatterLegacy = 0,
-    kMlDsa44           = 1,
-    kMlDsa65           = 2,
-};
-
-enum class DeviceAttestationCertProfileBitmap : uint8_t
-{
-    kSupportsEcdsaMatterLegacy = 0x1,
-    kSupportsMlDsa44           = 0x2,
-    kSupportsMlDsa65           = 0x4,
-};
-
-enum class DeviceAttestationDocumentType : uint8_t
-{
-    kDACCertificate,
-    kPAICertificate,
-};
+// Keep the provider's source-level names while sharing the generated enum definitions.
+// This changes ABI: profile bitmaps now use uint16_t, and document types use the
+// generated certificate values (DAC = 1, PAI = 2) instead of the former 0/1 values.
+using DeviceAttestationCertProfile       = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+using DeviceAttestationCertProfileBitmap = app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap;
+using DeviceAttestationDocumentType      = app::Clusters::OperationalCredentials::CertificateChainTypeEnum;
 
 // Each bitmap describes the corresponding certificate's subject public key capabilities,
 // not its issuer's signature algorithm or the profile of the chain containing it.

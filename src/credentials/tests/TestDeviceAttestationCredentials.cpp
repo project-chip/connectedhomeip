@@ -260,6 +260,27 @@ TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderDetectsProfileSpe
     EXPECT_EQ(pqcProvider.SignWithDeviceAttestationKey(ByteSpan(kMessageToSign), signatureSpan), CHIP_NO_ERROR);
 }
 
+TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderRejectsUnknownEnums)
+{
+    using namespace chip::Credentials;
+    Examples::TestHarnessDACProvider provider;
+    uint8_t buffer[32];
+    MutableByteSpan span(buffer);
+    size_t documentSize = 0;
+
+    // Generated unknown sentinels do not identify a stored chain or a certificate document.
+    EXPECT_EQ(provider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kUnknownEnumValue, span),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(provider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kUnknownEnumValue, span),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(provider.GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType::kUnknownEnumValue,
+                                                           DeviceAttestationCertProfile::kEcdsaMatterLegacy, 0, span, documentSize),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(provider.GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType::kDACCertificate,
+                                                           DeviceAttestationCertProfile::kUnknownEnumValue, 0, span, documentSize),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
 TEST_F(TestDeviceAttestationCredentials, TestMixedChainSelection)
 {
     using namespace chip::Credentials::Examples;

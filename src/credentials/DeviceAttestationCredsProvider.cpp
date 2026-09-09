@@ -101,16 +101,15 @@ DeviceAttestationCredentialsProvider::GetProductAttestationIntermediateCertForPr
 
 bool DeviceAttestationCredentialsProvider::HasRequiredPqcCredentials() const
 {
-    constexpr uint8_t kLegacyProfile = static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
-    constexpr uint8_t kPqcProfiles   = static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44) |
-        static_cast<uint8_t>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
-
     const auto profileSupport = GetDeviceAttestationProfileSupport();
-    const bool hasLegacyChain = (profileSupport.paaSupportedProfiles.Raw() & kLegacyProfile) != 0 &&
-        (profileSupport.paiSupportedProfiles.Raw() & kLegacyProfile) != 0 &&
-        (profileSupport.dacSupportedProfiles.Raw() & kLegacyProfile) != 0;
-    const bool hasPqcIssuer = (profileSupport.paaSupportedProfiles.Raw() & kPqcProfiles) != 0 ||
-        (profileSupport.paiSupportedProfiles.Raw() & kPqcProfiles) != 0;
+    const bool hasLegacyChain =
+        profileSupport.paaSupportedProfiles.HasAll(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy) &&
+        profileSupport.paiSupportedProfiles.HasAll(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy) &&
+        profileSupport.dacSupportedProfiles.HasAll(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
+    const BitMask<DeviceAttestationCertProfileBitmap> pqcProfiles(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44,
+                                                                  DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
+    const bool hasPqcIssuer =
+        profileSupport.paaSupportedProfiles.HasAny(pqcProfiles) || profileSupport.paiSupportedProfiles.HasAny(pqcProfiles);
 
     return hasLegacyChain && hasPqcIssuer;
 }
