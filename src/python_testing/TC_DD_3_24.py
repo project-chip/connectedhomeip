@@ -216,6 +216,18 @@ class TC_DD_3_24(MatterTestCommissioner):
         if srv_record is None:
             asserts.fail(f"Operational mDNS service '{instance_qname}' was not found")
 
+        ic_subtype = f"_IC._sub.{MdnsServiceType.OPERATIONAL.value}"
+        ptr_records = await mdns.get_ptr_records(
+            service_types=[ic_subtype],
+            discovery_timeout_sec=query_timeout_sec,
+            log_output=True,
+        )
+
+        asserts.assert_true(
+            any(record.instance_name == instance_name for record in ptr_records),
+            f"Operational mDNS service '{instance_qname}' does not advertise subtype '{ic_subtype}'"
+        )
+
         txt_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
@@ -278,10 +290,9 @@ class TC_DD_3_24(MatterTestCommissioner):
             log_output=True,
         )
 
-        asserts.assert_true(
-            srv_record is not None,
-            f"Operational mDNS service '{instance_qname}' was not found"
-        )
+        if srv_record is None:
+            log.info("Operational mDNS service '%s' was not found yet", instance_qname)
+            return False
 
         # No longer advertising the _IC subtype.
         ic_subtype = f"_IC._sub.{MdnsServiceType.OPERATIONAL.value}"
