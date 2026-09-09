@@ -124,8 +124,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value)
 {
     auto * cluster = FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
