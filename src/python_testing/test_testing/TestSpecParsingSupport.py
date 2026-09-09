@@ -300,7 +300,14 @@ def _spec_version_from_dirname(dirname: str) -> int:
     # SpecificationVersion is 1 byte major, 1 byte minor, 1 byte dot and 1 reserved byte, so it is
     # derivable from the directory name. A newly added data_model directory may not have a
     # PrebuiltDataModelDirectory member yet, so this cannot go through _SPEC_VERSION_TO_DM.
-    parts = list(_version_key(dirname)) + [0, 0]
+    parts = list(_version_key(dirname))
+    # There is no field for a fourth component, so a longer name is not encodable. Reject it rather
+    # than truncate: _version_key sorts 1.6.1.1 above 1.6.1, so a silently truncated directory would
+    # become the newest one and then satisfy a header claiming only 1.6.1.
+    asserts.assert_in(len(parts), (2, 3),
+                      f"data_model/{dirname}/ is not a major.minor[.dot] version - SpecificationVersion "
+                      "has no field to encode it")
+    parts += [0, 0]
     return (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8)
 
 
@@ -871,13 +878,14 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         newest_spec_version = _spec_version_from_dirname(newest_dirname)
 
         # Where the mapping already exists it is authoritative, so use it to confirm the version
-        # arithmetic above at the one point these tests depend on it.
+        # arithmetic above. Checking every entry rather than only the newest costs nothing and
+        # covers the encoding before a new directory is the one being relied on.
         for spec_version, data_model in _SPEC_VERSION_TO_DM.items():
-            if data_model.dirname == newest_dirname:
-                asserts.assert_equal(newest_spec_version, spec_version,
-                                     f"_SPEC_VERSION_TO_DM maps 0x{spec_version:08X} to {data_model.name} "
-                                     f"(data_model/{newest_dirname}/), but that version encodes as "
-                                     f"0x{newest_spec_version:08X} - fix the key in {_SPEC_PARSING_NAME}")
+            derived_spec_version = _spec_version_from_dirname(data_model.dirname)
+            asserts.assert_equal(derived_spec_version, spec_version,
+                                 f"_SPEC_VERSION_TO_DM maps 0x{spec_version:08X} to {data_model.name} "
+                                 f"(data_model/{data_model.dirname}/), but that version encodes as "
+                                 f"0x{derived_spec_version:08X} - fix the key in {_SPEC_PARSING_NAME}")
 
         header_spec_version = _header_constant("kSpecificationVersion")
         asserts.assert_greater_equal(header_spec_version, newest_spec_version,
