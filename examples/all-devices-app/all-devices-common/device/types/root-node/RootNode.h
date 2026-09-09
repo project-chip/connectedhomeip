@@ -29,12 +29,18 @@
 #include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <credentials/GroupDataProvider.h>
 #include <device/api/SingleEndpoint.h>
 #include <devices/Types.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/clusters/icd-management-server/ICDManagementCluster.h>
+#include <crypto/SessionKeystore.h>
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 namespace chip {
 namespace app {
@@ -63,6 +69,11 @@ public:
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
         uint16_t minGuaranteedSubscriptionsPerFabric;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // Optional. When non-null, the RootNode registers the ICDManagement cluster on the
+        // root endpoint using this keystore so the device advertises as an ICD.
+        Crypto::SessionKeystore * icdSymmetricKeystore = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -95,6 +106,13 @@ private:
     LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
     LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
     LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    LazyRegisteredServerCluster<Clusters::ICDManagementClusterWithCIP> mIcdManagementCluster;
+#else
+    LazyRegisteredServerCluster<Clusters::ICDManagementCluster> mIcdManagementCluster;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 };
 
 } // namespace app

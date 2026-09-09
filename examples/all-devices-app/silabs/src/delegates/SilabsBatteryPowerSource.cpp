@@ -14,23 +14,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "DecreasingBatteryPowerSource.h"
+#include "SilabsBatteryPowerSource.h"
 
 namespace chip::app {
 
-constexpr System::Clock::Seconds16 kDecreaseBatteryLevelInterval = System::Clock::Seconds16(1);
+constexpr System::Clock::Seconds16 kDecreaseBatteryLevelInterval = System::Clock::Seconds16(30);
 
-DecreasingBatteryPowerSource::DecreasingBatteryPowerSource() :
+SilabsBatteryPowerSource::SilabsBatteryPowerSource() :
     BatteryPowerSource("Decreasing Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
                        mTimerDelegate)
 {}
 
-DecreasingBatteryPowerSource::~DecreasingBatteryPowerSource()
+SilabsBatteryPowerSource::~SilabsBatteryPowerSource()
 {
     mTimerDelegate.CancelTimer(this);
 }
 
-CHIP_ERROR DecreasingBatteryPowerSource::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+CHIP_ERROR SilabsBatteryPowerSource::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                   EndpointComposition composition)
 {
     ReturnErrorOnFailure(BatteryPowerSource::Register(endpoint, provider, composition));
@@ -38,14 +38,17 @@ CHIP_ERROR DecreasingBatteryPowerSource::Register(EndpointId endpoint, CodeDrive
     return mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
 }
 
-void DecreasingBatteryPowerSource::Unregister(CodeDrivenDataModelProvider & provider)
+void SilabsBatteryPowerSource::Unregister(CodeDrivenDataModelProvider & provider)
 {
     BatteryPowerSource::Unregister(provider);
     mTimerDelegate.CancelTimer(this);
 }
 
-void DecreasingBatteryPowerSource::TimerFired()
+void SilabsBatteryPowerSource::TimerFired()
 {
+
+    // TODO @jepenven-silabs
+    // Add VMCU power sampling
     auto & batteryCluster = BatteryPowerSourceCluster();
     auto batteryLevel     = batteryCluster.GetBatPercentRemaining();
 

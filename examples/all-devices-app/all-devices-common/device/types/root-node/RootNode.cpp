@@ -21,9 +21,14 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/groupcast/GroupcastContext.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDConfigurationData.h>
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 using namespace chip;
 using namespace chip::app;
@@ -134,6 +139,33 @@ CHIP_ERROR RootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider
                                           });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Register the ICD Management cluster on the root endpoint so this device advertises as
+    // an Intermittently Connected Device. The ICDManager itself lives on Server::GetInstance()
+    // and is initialized automatically by the CHIP application server when
+    // CHIP_CONFIG_ENABLE_ICD_SERVER=1.
+    if (mContext.icdSymmetricKeystore != nullptr)
+    {
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        using ClusterType = ICDManagementClusterWithCIP;
+#else
+        using ClusterType = ICDManagementCluster;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+        constexpr ClusterType::OptionalCommandSet enabledCommands =
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+            ClusterType::OptionalCommandSet().Set<IcdManagement::Commands::StayActiveRequest::Id>();
+#else
+            ClusterType::OptionalCommandSet();
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
+
+        mIcdManagementCluster.Create(endpointId, *mContext.icdSymmetricKeystore, mContext.fabricTable,
+                                     ICDConfigurationData::GetInstance(), ClusterType::OptionalAttributeSet(0),
+                                     enabledCommands, BitMask<IcdManagement::UserActiveModeTriggerBitmap>(0), CharSpan());
+        ReturnErrorOnFailure(provider.AddCluster(mIcdManagementCluster.Registration()));
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
@@ -142,6 +174,13 @@ void RootNode::Unregister(CodeDrivenDataModelProvider & provider)
     UnregisterDescriptor(provider);
 
     // De-init in reverse order as init, in case there were data dependencies.
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (mIcdManagementCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mIcdManagementCluster.Cluster()));
+        mIcdManagementCluster.Destroy();
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     if (mOperationalCredentialsCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster()));
