@@ -230,6 +230,12 @@ private:
     SessionSlot * ClaimSlot();
     bool AnySessionOpen() const;
 
+    /// Drop the PAF session keyed on @p discriminator and close any PAFTP endpoint its
+    /// handshake created. The session is captured before it is removed, because
+    /// RmPafSession clears the slot the endpoint is found by; skipping the close leaks
+    /// the endpoint from the 2-slot pool until its own timer self-closes.
+    void RemovePafSessionAndCloseEndpoint(uint16_t discriminator);
+
     /// Tear down an in-flight connect that did not succeed: cancel the subscribe, close
     /// any PAFTP endpoint the handshake created, drop the PAF session, answer the
     /// originating ProxyConnectRequest with @p status, and release the subscribe slot.

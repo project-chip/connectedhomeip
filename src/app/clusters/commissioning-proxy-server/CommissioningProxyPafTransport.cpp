@@ -397,6 +397,35 @@ void CommissioningProxyPafTransport::HandleForegroundScanDone(void * context)
 // Connect
 // ==================================================================
 
+void CommissioningProxyPafTransport::RemovePafSessionAndCloseEndpoint(uint16_t discriminator)
+{
+    WiFiPAF::WiFiPAFLayer & pafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    WiFiPAF::WiFiPAFSession key{};
+    key.discriminator = discriminator;
+
+    // Capture the session before RmPafSession clears the slot so we can close any PAFTP
+    // endpoint the handshake created; otherwise it leaks from the 2-slot pool until its
+    // own timer self-closes. CloseEndPoint is a no-op if there is none.
+    WiFiPAF::WiFiPAFSession endpointSession{};
+    bool haveEndpoint               = false;
+    WiFiPAF::WiFiPAFSession * pInfo = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccDisc, key);
+    if (pInfo != nullptr)
+    {
+        endpointSession = *pInfo;
+        haveEndpoint    = true;
+    }
+
+    CHIP_ERROR rmErr = pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccDisc, key);
+    if (rmErr != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "RemovePafSessionAndCloseEndpoint: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
+    }
+    if (haveEndpoint)
+    {
+        pafLayer.CloseEndPoint(endpointSession);
+    }
+}
+
 void CommissioningProxyPafTransport::FailPendingConnect(Status status, bool cancelTimer)
 {
     // Every caller has already verified a connect is pending; the check is repeated here
@@ -423,31 +452,7 @@ void CommissioningProxyPafTransport::FailPendingConnect(Status status, bool canc
                       cancelIncompleteErr.Format());
     }
 
-    WiFiPAF::WiFiPAFLayer & pafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-    WiFiPAF::WiFiPAFSession key{};
-    key.discriminator = ctx.discriminator;
-
-    // Capture the session before RmPafSession clears the slot so we can close any PAFTP
-    // endpoint the handshake created; otherwise it leaks from the 2-slot pool until its
-    // own timer self-closes. CloseEndPoint is a no-op if there is none.
-    WiFiPAF::WiFiPAFSession endpointSession{};
-    bool haveEndpoint               = false;
-    WiFiPAF::WiFiPAFSession * pInfo = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccDisc, key);
-    if (pInfo != nullptr)
-    {
-        endpointSession = *pInfo;
-        haveEndpoint    = true;
-    }
-
-    CHIP_ERROR rmErr = pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccDisc, key);
-    if (rmErr != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(AppServer, "FailPendingConnect: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
-    }
-    if (haveEndpoint)
-    {
-        pafLayer.CloseEndPoint(endpointSession);
-    }
+    RemovePafSessionAndCloseEndpoint(ctx.discriminator);
 
     if (ctx.subscribeId != 0)
     {
@@ -897,9 +902,7 @@ void CommissioningProxyPafTransport::Shutdown()
             (void) DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(ctx.subscribeId);
         }
 
-        WiFiPAF::WiFiPAFSession keyInfo{};
-        keyInfo.discriminator = ctx.discriminator;
-        LogErrorOnFailure(WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(WiFiPAF::PafInfoAccess::kAccDisc, keyInfo));
+        RemovePafSessionAndCloseEndpoint(ctx.discriminator);
 
         if (app::CommandHandler * cmd = ctx.handle.Get())
         {

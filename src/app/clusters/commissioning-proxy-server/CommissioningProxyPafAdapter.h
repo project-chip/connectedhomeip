@@ -78,7 +78,9 @@ public:
      * of its own and relies on @p onDone to close the scan out.
      *
      * A NAN radio has a single subscribe slot shared with the background scan and with
-     * connect, so this reports CHIP_ERROR_BUSY when that slot is already held.
+     * connect. This reports CHIP_ERROR_BUSY only when a background scan holds the slot,
+     * and even that is a backstop: the transport pauses a running background scan before
+     * calling. A connect holding the slot is not reported here.
      */
     virtual CHIP_ERROR StartForegroundScan(System::Clock::Seconds16 window, DiscoveryCallback onDevice, ScanCompleteCallback onDone,
                                            void * context) = 0;
@@ -98,8 +100,10 @@ public:
      * re-discoveries, so the cluster's cache can refresh a TTL rather than treat the
      * peer as new.
      *
-     * Reports CHIP_ERROR_BUSY while the single subscribe slot is held; the
-     * background-scan registry treats that as "defer and retry later".
+     * Reports CHIP_ERROR_BUSY when a foreground scan holds the single subscribe slot.
+     * A connect holding it is caught before this is reached, by the transport hook the
+     * registry calls to start the hardware scan. Either way the registry treats
+     * CHIP_ERROR_BUSY as "defer and retry later".
      */
     virtual CHIP_ERROR StartBackgroundScan(DiscoveryCallback cb, void * context) = 0;
 
