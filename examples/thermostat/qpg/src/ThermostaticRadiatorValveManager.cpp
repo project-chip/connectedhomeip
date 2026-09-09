@@ -472,15 +472,7 @@ ThermostaticRadiatorValveManager::TempDisplayMode_t ThermostaticRadiatorValveMan
 {
     ThermostaticRadiatorValveManager::TempDisplayMode_t value = TempDisplayMode_t::kCelsius;
 
-    auto * cluster = ThermostatUserInterfaceConfiguration::FindClusterOnEndpoint(QPG_THERMOSTATIC_ENDPOINT_ID);
-    if (cluster == nullptr)
-    {
-        ChipLogError(NotSpecified, "GetTemperatureDisplayMode failed");
-    }
-    else
-    {
-        value = cluster->GetTemperatureDisplayMode();
-    }
+    ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
 
     ChipLogDetail(NotSpecified, "GetTemperatureDisplayMode -  %d", (uint8_t) value);
 
@@ -490,17 +482,7 @@ ThermostaticRadiatorValveManager::TempDisplayMode_t ThermostaticRadiatorValveMan
 void ThermostaticRadiatorValveManager::SetTemperatureDisplayMode(ThermostaticRadiatorValveManager::TempDisplayMode_t aMode)
 {
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aMode] {
-        auto * cluster = ThermostatUserInterfaceConfiguration::FindClusterOnEndpoint(QPG_THERMOSTATIC_ENDPOINT_ID);
-        if (cluster == nullptr)
-        {
-            ChipLogError(NotSpecified, "SetTemperatureDisplayMode failed: cluster not found");
-            return;
-        }
-
-        if (cluster->SetTemperatureDisplayMode(aMode) != chip::Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogError(NotSpecified, "SetTemperatureDisplayMode failed");
-        }
+        ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aMode);
 
         ChipLogDetail(NotSpecified, "SetTemperatureDisplayMode value %d", (uint8_t) aMode);
     });

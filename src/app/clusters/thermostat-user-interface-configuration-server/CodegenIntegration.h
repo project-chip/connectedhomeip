@@ -22,4 +22,17 @@ namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration {
 
 ThermostatUserInterfaceConfigurationCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+namespace Attributes {
+
+namespace TemperatureDisplayMode {
+
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
+
+} // namespace TemperatureDisplayMode
+
+} // namespace Attributes
+
 } // namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration

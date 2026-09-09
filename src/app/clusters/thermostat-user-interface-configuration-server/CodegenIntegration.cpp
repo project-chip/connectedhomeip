@@ -107,4 +107,37 @@ ThermostatUserInterfaceConfigurationCluster * FindClusterOnEndpoint(EndpointId e
     return static_cast<ThermostatUserInterfaceConfigurationCluster *>(cluster);
 }
 
+namespace Attributes {
+
+namespace TemperatureDisplayMode {
+
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum * value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
+
+    *value = cluster->GetTemperatureDisplayMode();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
+
+    return cluster->SetTemperatureDisplayMode(value);
+}
+
+} // namespace TemperatureDisplayMode
+
+} // namespace Attributes
+
 } // namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration
