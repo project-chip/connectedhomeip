@@ -137,6 +137,7 @@ public:
     chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
     chip::app::Clusters::AvAnalysisDelegate & GetAVAnalysisDelegate() override;
+    chip::app::Clusters::AvAnalysis::AvAnalysisManager & GetAVAnalysisManager() { return mAVAnalysisManager; }
 
     MediaController & GetMediaController() override;
 

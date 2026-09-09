@@ -156,6 +156,7 @@ enum
     kDeviceOption_Camera_AudioPlayback,
     kDeviceOption_Camera_VideoDevice,
     kDeviceOption_Camera_Framerate,
+    kDeviceOption_Camera_RemoteAnalysis,
 #endif
     kDeviceOption_VendorName,
     kDeviceOption_ProductName,
@@ -271,6 +272,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "camera-audio-playback", kNoArgument, kDeviceOption_Camera_AudioPlayback },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
     { "camera-framerate", kArgumentRequired, kDeviceOption_Camera_Framerate },
+    { "camera-remote-analysis", kNoArgument, kDeviceOption_Camera_RemoteAnalysis },
 #endif
     {}
 };
@@ -503,6 +505,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-framerate <fps>\n"
     "       Framerate for video streaming (default: 30).\n"
+    "\n"
+    "  --camera-remote-analysis\n"
+    "       Runs camera-app as a Remote Analysis Node (REMCONDETECT) with analysis streams enabled.\n"
     "\n"
 #endif
     "\n";
@@ -1029,6 +1034,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             break;
         }
         LinuxDeviceOptions::GetInstance().cameraFramerate.SetValue(static_cast<uint16_t>(value));
+        break;
+    }
+    case kDeviceOption_Camera_RemoteAnalysis: {
+        LinuxDeviceOptions::GetInstance().cameraRemoteAnalysis = true;
         break;
     }
 #endif

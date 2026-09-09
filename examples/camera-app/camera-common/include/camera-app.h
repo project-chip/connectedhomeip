@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include "camera-device-interface.h"
+#include <app/clusters/av-analysis-server/DefaultAvAnalysisCameraClient.h>
 #include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
 #include <app/util/config.h>
 #include <cstring>
@@ -56,6 +57,7 @@ private:
         mAVStreamMgmtServer;
     std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::AvAnalysisCluster> mAVAnalysisServer;
+    chip::app::Clusters::DefaultAvAnalysisCameraClient mAVAnalysisCameraClient;
 
     // Method to instantiate CameraAVStreamMgmt and set attribute defaults for initialization.
     void CreateAndInitializeCameraAVStreamMgmt();

@@ -42,6 +42,9 @@ private:
 
     void OnZoneTriggeredHandler(const std::vector<uint16_t> & zoneIds);
     void OnSetHardPrivacyModeOnHandler(bool value);
+    void OnAvAnalysisSessionStartHandler();
+    void OnAvAnalysisPerceivedContextHandler();
+    void OnAvAnalysisSessionEndHandler();
 };
 
 class CameraAppCommandDelegate : public NamedPipeCommandDelegate

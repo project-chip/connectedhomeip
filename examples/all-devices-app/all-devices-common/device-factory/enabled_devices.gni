@@ -143,6 +143,10 @@ _available_devices = [
     "MICROWAVE_OVEN",
   ],
   [
+    "mode-select",
+    "MODE_SELECT",
+  ],
+  [
     "mounted-dimmable-load-control",
     "MOUNTED_DIMMABLE_LOAD_CONTROL",
   ],

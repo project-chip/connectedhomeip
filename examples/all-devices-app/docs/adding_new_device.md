@@ -91,6 +91,7 @@ and easy to test:
       by `DeviceFactory` or unit tests without requiring external wiring.
 
 5. **Spec-Pure Directory Layout & Extracted Capabilities**:
+
     - Keep the root of the `devices/` directory pure: it should contain _only_
       real, spec-defined Matter Device Types (like `dimmable-light`, `fan`,
       `air-purifier`).
@@ -101,6 +102,21 @@ and easy to test:
       `device/capabilities/<capability-name>/` (e.g.,
       `device/capabilities/dimmable-load/`). Concrete leaf devices then inherit
       publicly from this capability base.
+
+6. **Registration & Teardown Ordering**:
+    - **Registration order**: Call `RegisterDescriptor()` first (to construct
+      the descriptor cluster and initialize endpoint metadata), create and add
+      all domain and optional clusters via `provider.AddCluster()`, and finally
+      register the endpoint via `provider.AddEndpoint(mEndpointRegistration)`.
+      Once started, `CodeDrivenDataModelProvider` rejects adding clusters to an
+      already-registered endpoint (`CHIP_ERROR_INCORRECT_STATE`).
+    - **Teardown order**: Call `UnregisterDescriptor(provider)` **first**,
+      before removing or destroying any domain or optional clusters.
+      `UnregisterDescriptor()` removes the endpoint from the provider via
+      `provider.RemoveEndpoint()`. Once started, `CodeDrivenDataModelProvider`
+      prevents non-atomic endpoint modifications and returns
+      `CHIP_ERROR_INCORRECT_STATE` if `provider.RemoveCluster()` is called while
+      the endpoint is still registered.
 
 ---
 
@@ -187,6 +203,8 @@ CHIP_ERROR MySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMod
 
 void MySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    // UnregisterDescriptor MUST be called first to remove the endpoint from the provider.
+    // Once started, calling provider.RemoveCluster while the endpoint is still registered returns CHIP_ERROR_INCORRECT_STATE.
     UnregisterDescriptor(provider);
     if (mMySensorCluster.IsConstructed())
     {
