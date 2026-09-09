@@ -30,7 +30,8 @@ import logging
 
 from mobly import asserts
 from support_modules.pqc_support import (AttestationCryptoProfile, CertificateAlgorithms, OperationalCredentialsFeature,
-                                         assert_initial_certificate_segment, assert_profile_supported_by_test_harness,
+                                         assert_initial_certificate_segment, assert_profile_advertised,
+                                         assert_profile_supported_by_test_harness,
                                          kCertificateSegmentSize, parse_certificate_algorithms, retrieve_segmented_document,
                                          select_strongest_profile)
 
@@ -158,9 +159,10 @@ class TC_OPCREDS_3_9(MatterBaseTest):
                                    "DUT signals PQCDA but does not expose PQCDeviceAttestationProfile")
         selected_paa_profile = select_strongest_profile(attestation_profile.PAASupportedProfiles, "PAA")
         selected_pai_profile = select_strongest_profile(attestation_profile.PAISupportedProfiles, "PAI")
-        selected_dac_profile = select_strongest_profile(attestation_profile.DACSupportedProfiles, "DAC")
-        asserts.assert_equal(selected_dac_profile, AttestationCryptoProfile.kEcdsaMatterLegacy,
-                             "PQC Phase 1 requires the selected DAC profile to be EcdsaMatterLegacy")
+        assert_profile_advertised(attestation_profile.DACSupportedProfiles,
+                                  AttestationCryptoProfile.kEcdsaMatterLegacy, "DAC", "Device Attestation signature")
+        # Exercise the Phase 1 DAC profile even when the DUT advertises additional profiles.
+        selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
 
         assert_profile_supported_by_test_harness(selected_paa_profile)
         assert_profile_supported_by_test_harness(selected_pai_profile)
