@@ -29,7 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Zephyr/ZephyrConfig.h>
-#include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
 #include <zephyr/settings/settings.h>

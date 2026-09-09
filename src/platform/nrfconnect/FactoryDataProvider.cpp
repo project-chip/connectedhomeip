@@ -200,6 +200,9 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::MoveDACPrivateKeyToSecureStora
         size_t requiredFlashSpaceSize  = ROUND_UP(kDACPrivateKeyLength + bytesToLeftBefore, flashParameters->write_block_size);
         size_t bytesToLeftAfter        = requiredFlashSpaceSize - bytesToLeftBefore - kDACPrivateKeyLength;
 
+        VerifyOrReturnError(mFactoryData.dacPrivateKeyOffset + kDACPrivateKeyLength <= factoryDataSize, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(alignedDacPrivKeyOffset + requiredFlashSpaceSize <= factoryDataSize, CHIP_ERROR_INVALID_ARGUMENT);
+
         // Allocate the memory buffer for removing DAC private key.
         chip::Platform::ScopedMemoryBuffer<uint8_t> removedPrivKeyBuffer;
         VerifyOrReturnError(removedPrivKeyBuffer.Calloc(requiredFlashSpaceSize), CHIP_ERROR_NO_MEMORY);

@@ -108,8 +108,6 @@ CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
-
 #if OPENTHREAD_API_VERSION >= 85
 #if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 static int OnOtCliOutput(void * aContext, const char * aFormat, va_list aArguments)
@@ -170,9 +168,13 @@ CHIP_ERROR cmd_otcli_dispatch(int argc, char ** argv)
     }
 }
 
-static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
-
 #endif // CHIP_TARGET_STYLE_EMBEDDED/UNIX
+
+#if (CHIP_TARGET_STYLE_EMBEDDED &&                                                                                                 \
+     (CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI || (defined(CONFIG_OPENTHREAD_SHELL) && CONFIG_OPENTHREAD_SHELL))) ||                   \
+    CHIP_TARGET_STYLE_UNIX
+static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "Dispatch OpenThread CLI command" };
+#endif
 
 #endif // CHIP_ENABLE_OPENTHREAD
 

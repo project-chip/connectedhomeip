@@ -580,7 +580,7 @@ exit:
     return err;
 }
 
-#endif // !CHIP_CRYPTO_PSA_SPAKE2P
+#endif // !CHIP_CRYPTO_SPAKE2P_PSA
 
 CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized) const
 {
