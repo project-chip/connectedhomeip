@@ -55,7 +55,7 @@ The YAML file is strictly structured as a mapping of label names to lists of Git
 - **Case-Insensitive**: Both label names and usernames are matched case-insensitively (`Security` matches `security`, `Cecille` matches `cecille`).
 - **Optional `@`**: Leading `@` signs are automatically stripped (both `cecille` and `@cecille` work).
 - **OR-Logic per Label**: At least **one** listed reviewer from the label's list must approve the PR.
-- **AND-Logic across Labels**: If a PR has multiple designated labels attached (e.g., both `security` and `certification`), at least one SME from **each** label must approve.
+- **AND-Logic across Labels**: If a PR has multiple designated labels attached (e.g., both `security` and `certification`), **every** attached label requires at least one approval from its respective reviewer list (approval required for each domain).
 - **Author Self-Approval Exclusion**: A PR author **cannot approve their own PR**. Even if the author is listed as an SME for a label, another reviewer from that label's list must provide the approval.
 - **State Transition Awareness**: The check accurately tracks current review states. If an SME approves, but later submits `CHANGES_REQUESTED` or the approval is `DISMISSED`, the approval is no longer valid until re-approved.
 

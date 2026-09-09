@@ -17,7 +17,7 @@
 
 """SME (Subject Matter Expert) Label Reviewer Checker for Pull Requests.
 
-Verifies that if a designated label is attached to a pull request, at least one
+Verifies that for each designated label attached to a pull request, at least one
 designated SME username from the corresponding configuration has approved the PR.
 Can be executed manually or as part of a GitHub Actions workflow.
 """

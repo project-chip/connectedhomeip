@@ -34,8 +34,8 @@
 #   - Optional leading '@' on usernames is supported (e.g. '@username' or 'username').
 #   - PR authors cannot approve their own PRs (author approvals are ignored).
 #   - If a PR has no designated labels attached, the check passes automatically.
-#   - If multiple designated labels are attached, each label requires at least one
-#     approval from its respective list.
+#   - If multiple designated labels are attached, EVERY label requires at least one
+#     approval from its respective reviewer list.
 #
 # Format:
 #   <label_name>:
