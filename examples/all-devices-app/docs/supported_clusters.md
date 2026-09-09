@@ -110,8 +110,8 @@ To update or validate this list manually, follow these steps:
 | 64        | Groupcast                                                  | 101 (0x0065)  | Yes                | Yes                 |                                       |
 | 65        | Groups                                                     | 4 (0x0004)    | Yes                | Yes                 |                                       |
 | 66        | HEPA Filter Monitoring                                     | 113 (0x0071)  | Yes                | No                  | Alias of Resource Monitoring          |
-| 67        | Humidistat                                                 | 517 (0x0205)  | Yes                | Yes                 |                                       |
-| 68        | ICD Management                                             | 70 (0x0046)   | Yes                | No                  |                                       |
+| 67        | Humidistat                                                 | 517 (0x0205)  | Yes                | No                  |                                       |
+| 68        | ICD Management                                             | 70 (0x0046)   | Yes                | Yes                 |                                       |
 | 69        | Identify                                                   | 3 (0x0003)    | Yes                | Yes                 |                                       |
 | 70        | Illuminance Measurement                                    | 1024 (0x0400) | Yes                | Yes                 |                                       |
 | 71        | Joint Fabric Administrator                                 | 1875 (0x0753) | No                 | No                  |                                       |
@@ -204,4 +204,4 @@ To update or validate this list manually, follow these steps:
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
 | 160       | Smoke Concentration Measurement                            | 1076 (0x0434) | Yes                | Yes                 | Instance of Concentration Measurement |
-| **Total** | **160**                                                    |               | **108**            | **72**              |                                       |
+| **Total** | **160**                                                    |               | **108**            | **73**              |                                       |

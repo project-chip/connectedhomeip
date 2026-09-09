@@ -94,3 +94,41 @@ matterCli> devtype list
 matterCli> devtype set humidity-sensor
 matterCli> reboot
 ```
+
+## Low-power build (ICD, MTD, no shell/LEDs)
+
+To reproduce a low-power / battery-operated sample-app configuration, add the
+`--low-power` flag (which disables LEDs, buttons, LCD and shell), select the
+`power-source` device type in addition to the sensor(s) you want on the endpoint
+topology, enable the ICD server, and switch the OpenThread stack to MTD:
+
+```bash
+./scripts/examples/gn_silabs_example.sh \
+    examples/all-devices-app/silabs \
+    out/temp_sensor/ \
+    BRD2601B \
+    --low-power \
+    'all_devices_enabled_devices=["humidity-sensor","temperature-sensor","power-source"]' \
+    'all_devices_default_devices=["humidity-sensor","temperature-sensor"]' \
+    'all_devices_app_name="TempSensor"' \
+    'sl_enable_si70xx_sensor=true' \
+    'chip_enable_icd_server=true' \
+    'chip_openthread_ftd=false'
+```
+
+Notes:
+
+-   `all_devices_default_devices` intentionally omits `power-source`; the app
+    auto-appends a `power-source` endpoint when `chip_enable_icd_server=true`
+    (see `maybeAddPowerSource()` in `src/AppTask.cpp`) so commissioners can
+    display a battery level / battery voltage.
+-   `sl_enable_si70xx_sensor=true` wires the on-board Si7021 sensor of the
+    BRD2601B to feed the humidity- and temperature-sensor endpoints.
+
+### Expected power consumption
+
+Once commissioned, in ICD Idle Mode (i.e. between polls), current draw on the
+BRD2601B should easily reach **~4 µA**. If you observe a significantly higher
+baseline or short periodic wake-ups on the power scope, double-check that
+`--low-power`, `chip_enable_icd_server=true` and `chip_openthread_ftd=false` all
+made it into the build.
