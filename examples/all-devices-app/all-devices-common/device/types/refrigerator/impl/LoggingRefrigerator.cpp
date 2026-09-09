@@ -94,9 +94,15 @@ CHIP_ERROR LoggingRefrigerator::RegisterParts(EndpointIdAllocator & allocator, C
 
 void LoggingRefrigerator::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
+    // Cabinets whose registration never completed (or was rolled back) still have an
+    // invalid endpoint id: skip them, unregistering them again would fail in
+    // RemoveEndpoint().
     for (auto it = mCabinets.rbegin(); it != mCabinets.rend(); ++it)
     {
-        (*it)->Unregister(provider);
+        if ((*it)->GetEndpointId() != kInvalidEndpointId)
+        {
+            (*it)->Unregister(provider);
+        }
     }
 }
 
