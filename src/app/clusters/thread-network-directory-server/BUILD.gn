@@ -18,6 +18,8 @@ source_set("thread-network-directory-server") {
   sources = [
     "DefaultThreadNetworkDirectoryStorage.cpp",
     "DefaultThreadNetworkDirectoryStorage.h",
+    "MigrateThreadNetworkDirectoryServerStorage.cpp",
+    "MigrateThreadNetworkDirectoryServerStorage.h",
     "ThreadNetworkDirectoryCluster.cpp",
     "ThreadNetworkDirectoryCluster.h",
     "ThreadNetworkDirectoryStorage.h",
@@ -25,6 +27,7 @@ source_set("thread-network-directory-server") {
 
   public_deps = [
     "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/ThreadNetworkDirectory",

@@ -25,6 +25,8 @@ static NSString * const kBDXThrottleIntervalInMsecsUserDefaultKey = @"BDXThrottl
 
 static NSString * const kBDXThreadFramesPerBlockDefaultKey = @"BDXThreadFramesPerBlock";
 
+static NSString * const kBDXTransferTimeoutInSecondsDefaultKey = @"BDXTransferTimeoutInSeconds";
+
 namespace chip {
 namespace Platform {
 
@@ -75,6 +77,19 @@ namespace Platform {
             ChipLogProgress(BDX, "Got a user default value for thread frames per block - %d", numberOfFrames.value());
         }
         return numberOfFrames;
+    }
+
+    std::optional<System::Clock::Seconds16> GetUserDefaultBDXTransferTimeout()
+    {
+        std::optional timeoutInSeconds = GetUserDefault<uint16_t>(kBDXTransferTimeoutInSecondsDefaultKey, kDontAcceptZero);
+        if (timeoutInSeconds.has_value()) {
+            ChipLogProgress(BDX, "Got a user default value for BDX transfer timeout - %d seconds", timeoutInSeconds.value());
+            return std::make_optional(System::Clock::Seconds16(timeoutInSeconds.value()));
+        }
+
+        // A value of 0 means either the key was not found or the value was zero; treat both as unset,
+        // since a zero-second timeout is not a feasible value.
+        return std::nullopt;
     }
 
 } // namespace Platform

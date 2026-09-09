@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -36,6 +38,19 @@ enum class Tag : uint8_t
     kSuppressResponse = 0,
     kTimedRequest     = 1,
     kInvokeRequests   = 2,
+    kDelayReportData  = 3,
+};
+
+enum class DelayReportDataTag : uint8_t
+{
+    kDelayMinMs          = 0,
+    kDelayJitterWindowMs = 1,
+};
+
+struct DelayReportData
+{
+    uint16_t delayMinMs          = 0;
+    uint16_t delayJitterWindowMs = 0;
 };
 
 class Parser : public MessageParser
@@ -46,30 +61,30 @@ public:
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
     /**
-     *  @brief Get SuppressResponse. Next() must be called before accessing them.
+     *  @brief Gets SuppressResponse from the TLV structure if present.
      *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
+     *  @return #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetSuppressResponse(bool * const apSuppressResponse) const;
 
     /**
-     *  @brief Get TimedRequest. Next() must be called before accessing them.
+     *  @brief Gets TimedRequest from the TLV structure if present.
      *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
+     *  @return #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetTimedRequest(bool * const apTimedRequest) const;
 
     /**
-     *  @brief Get a parser for an InvokeRequests.
+     *  @brief Gets the InvokeRequests from the TLV structure if present.
      *
-     *  @param [in] apInvokeRequests    A pointer to the invoke request list parser.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
+     *  @return #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const;
+
+    /**
+     * @brief Gets the DelayReportData from the TLV structure if present.
+     */
+    CHIP_ERROR GetDelayReportData(std::optional<DelayReportData> & aDelayReportData) const;
 };
 
 class Builder : public MessageBuilder
@@ -90,6 +105,11 @@ public:
      *  @brief This is flag to indication if ths action is part of a timed invoke transaction
      */
     InvokeRequestMessage::Builder & TimedRequest(const bool aTimedRequest);
+
+    /**
+     *  @brief Encode DelayReportData structure.
+     */
+    InvokeRequestMessage::Builder & DelayReport(const DelayReportData & aDelayReportData);
 
     /**
      *  @brief Initialize a InvokeRequests::Builder for writing into the TLV stream

@@ -48,6 +48,8 @@ struct CASEClientInitParams
     // Note: Setting this parameter to a nonzero value is not spec-compliant.
     Optional<uint32_t> minimumLITBackoffInterval = NullOptional;
 
+    SessionParameters localSessionParams;
+
     CHIP_ERROR Validate() const
     {
         // sessionResumptionStorage can be nullptr when resumption is disabled.

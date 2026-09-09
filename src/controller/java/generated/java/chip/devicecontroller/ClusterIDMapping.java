@@ -4720,6 +4720,7 @@ public class ClusterIDMapping {
             CommissionedFabrics(3L),
             TrustedRootCertificates(4L),
             CurrentFabricIndex(5L),
+            PQCDeviceAttestationProfile(6L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -4809,7 +4810,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum CertificateChainRequestCommandField {CertificateType(0),;
+                }public enum CertificateChainRequestCommandField {CertificateType(0),CryptoProfile(1),SegmentID(2),MaxSegmentSize(3),;
                     private final int id;
                     CertificateChainRequestCommandField(int id) {
                         this.id = id;
@@ -12754,6 +12755,11 @@ public class ClusterIDMapping {
             ThermostatSuggestions(84L),
             CurrentThermostatSuggestion(85L),
             ThermostatSuggestionNotFollowingReason(86L),
+            Sensors(89L),
+            AvailableSensors(90L),
+            EnabledSensors(91L),
+            NumberOfSensorScheduleTransitions(92L),
+            SensorSchedule(93L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -16158,6 +16164,7 @@ public class ClusterIDMapping {
             BLTCSSecurityLevel(4L),
             BLTCSModeCapability(5L),
             SessionIDList(6L),
+            RangingConstraints(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -16224,7 +16231,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum StartRangingRequestCommandField {Technology(0),WiFiRangingDeviceRoleConfig(1),BLERangingDeviceRoleConfig(2),BLTChannelSoundingDeviceRoleConfig(3),FrequencyBand(4),Bandwidth(5),SecurityMode(6),Trigger(7),ReportingCondition(8),;
+        }public enum StartRangingRequestCommandField {Technology(0),WiFiRangingDeviceRoleConfig(1),BLERangingDeviceRoleConfig(2),BLTChannelSoundingDeviceRoleConfig(3),FrequencyBand(4),Bandwidth(5),Trigger(6),ReportingCondition(7),;
                     private final int id;
                     StartRangingRequestCommandField(int id) {
                         this.id = id;
@@ -20862,6 +20869,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedFormats(0L),
             CurrentConnections(1L),
+            MaxZones(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -20914,7 +20922,8 @@ public class ClusterIDMapping {
             ModifyPushTransport(3L),
             SetTransportStatus(4L),
             ManuallyTriggerTransport(5L),
-            FindTransport(6L),;
+            FindTransport(6L),
+            UpdateMotionZoneOptions(8L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -21028,6 +21037,23 @@ public class ClusterIDMapping {
                     }
                     public static FindTransportCommandField value(int id) throws NoSuchFieldError {
                         for (FindTransportCommandField field : FindTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum UpdateMotionZoneOptionsCommandField {ConnectionID(0),MotionZones(1),MotionSensitivity(2),;
+                    private final int id;
+                    UpdateMotionZoneOptionsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static UpdateMotionZoneOptionsCommandField value(int id) throws NoSuchFieldError {
+                        for (UpdateMotionZoneOptionsCommandField field : UpdateMotionZoneOptionsCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

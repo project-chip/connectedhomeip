@@ -19,6 +19,8 @@
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestControllerDelegate.h"
 
+#include <signal.h>
+
 static unsigned sAppRunnerIndex = 1;
 static const uint16_t kPairingTimeoutInSeconds = 30;
 
@@ -37,6 +39,36 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif // HAVE_NSTASK
 
 @implementation MTRTestCaseServerApp
+
+- (void)terminate
+{
+#if HAVE_NSTASK
+    NSTask * task = self.task;
+    if (task == nil || !task.isRunning) {
+        return;
+    }
+
+    [task terminate]; // Sends SIGTERM
+
+    // Wait up to 10 seconds for graceful shutdown, then force-kill, mirroring
+    // TerminateTask in MTRTestCase.mm, so a stuck child can't hang the test run.
+    BOOL terminated = NO;
+    for (int i = 0; i < 100; i++) {
+        if (![task isRunning]) {
+            terminated = YES;
+            break;
+        }
+        [NSThread sleepForTimeInterval:0.1];
+    }
+
+    if (!terminated) {
+        kill(task.processIdentifier, SIGKILL);
+    }
+
+    [task waitUntilExit];
+#endif // HAVE_NSTASK
+}
+
 @end
 
 @implementation MTRTestCase (ServerAppRunner)

@@ -57,6 +57,8 @@ static bool HasFeatureInCtx(TariffUpdateCtx * aCtx, Feature aFeature)
  *       2. MemoryFree doesn't modify the memory, just deallocates it
  *       3. The const-ness was only added for interface safety
  *       4. This matches the symmetric Alloc/Free pattern we established
+ *
+ * @see Called from CleanupStruct() to free memory allocated in CopyData()
  */
 static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
 {
@@ -99,7 +101,6 @@ CHIP_ERROR CTC_BaseDataClass<T>::CopyData(const StructType & input, StructType &
     // Log error since this base implementation doesn't do anything meaningful
     ChipLogError(DataManagement, "CopyData() called on base class - this should be overridden!");
 
-    // Return appropriate error code
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -114,14 +115,20 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>
 
     if (!input.tariffLabel.IsNull())
     {
+        // Memory allocated in SpanCopier::CopyToNullable
+        // Freed in: CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>::CleanupStruct()
+        // See CleanupStruct() that frees tariffLabel memory via Platform::MemoryFree
         ReturnErrorOnFailure(
-            SpanCopier<char>::Copy(input.tariffLabel.Value(), output.tariffLabel, input.tariffLabel.Value().size()));
+            SpanCopier::CopyToNullable(input.tariffLabel.Value(), output.tariffLabel, input.tariffLabel.Value().size()));
     }
 
     if (!input.providerName.IsNull())
     {
+        // Memory allocated in SpanCopier::CopyToNullable
+        // Freed in: CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>::CleanupStruct()
+        // See CleanupStruct() that frees providerName memory via Platform::MemoryFree
         ReturnErrorOnFailure(
-            SpanCopier<char>::Copy(input.providerName.Value(), output.providerName, input.providerName.Value().size()));
+            SpanCopier::CopyToNullable(input.providerName.Value(), output.providerName, input.providerName.Value().size()));
     }
 
     if (input.currency.HasValue())
@@ -247,8 +254,11 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponent
         output.label.Value().SetNull();
         if (!input.label.Value().IsNull())
         {
+            // Memory allocated in SpanCopier::CopyToNullable
+            // Freed in: CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>::CleanupStruct()
+            // See CleanupStruct() that frees label memory via Platform::MemoryFree
             ReturnErrorOnFailure(
-                SpanCopier<char>::Copy(input.label.Value().Value(), output.label.Value(), input.label.Value().Value().size()));
+                SpanCopier::CopyToNullable(input.label.Value().Value(), output.label.Value(), input.label.Value().Value().size()));
         }
     }
 
@@ -266,17 +276,40 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
                                                                                                        StructType & output)
 {
     output.label.SetNull();
+
+    // Handle label (nullable CharSpan) - NEEDS MEMORY ALLOCATION
     if (!input.label.IsNull())
     {
-        ReturnErrorOnFailure(SpanCopier<char>::Copy(input.label.Value(), output.label, input.label.Value().size()));
+        ReturnErrorOnFailure(SpanCopier::CopyToNullable(input.label.Value(), output.label));
     }
 
-    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
-                                                    output.dayEntryIDs, input.dayEntryIDs.size()));
+    // Handle dayEntryIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.dayEntryIDs.empty())
+    {
+        Platform::ScopedMemoryBufferWithSize<uint32_t> buffer;
+        buffer.CopyFromSpan(input.dayEntryIDs);
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        size_t size        = buffer.AllocatedSize();
+        output.dayEntryIDs = DataModel::List<const uint32_t>(buffer.Release(), size);
+    }
+    else
+    {
+        output.dayEntryIDs = DataModel::List<uint32_t>();
+    }
 
-    ReturnErrorOnFailure(
-        SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()),
-                                   output.tariffComponentIDs, input.tariffComponentIDs.size()));
+    // Handle tariffComponentIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.tariffComponentIDs.empty())
+    {
+        Platform::ScopedMemoryBufferWithSize<uint32_t> buffer;
+        buffer.CopyFromSpan(input.tariffComponentIDs);
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        size_t size               = buffer.AllocatedSize();
+        output.tariffComponentIDs = DataModel::List<const uint32_t>(buffer.Release(), size);
+    }
+    else
+    {
+        output.tariffComponentIDs = DataModel::List<uint32_t>();
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -288,8 +321,20 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruc
     output.dayPatternID = input.dayPatternID;
     output.daysOfWeek   = input.daysOfWeek;
 
-    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
-                                                    output.dayEntryIDs, input.dayEntryIDs.size()));
+    // Handle dayEntryIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.dayEntryIDs.empty())
+    {
+        Platform::ScopedMemoryBufferWithSize<uint32_t> buffer;
+        buffer.CopyFromSpan(input.dayEntryIDs);
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        size_t size        = buffer.AllocatedSize();
+        output.dayEntryIDs = DataModel::List<const uint32_t>(buffer.Release(), size);
+    }
+    else
+    {
+        output.dayEntryIDs = DataModel::List<uint32_t>();
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -300,8 +345,19 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type
     output.date    = input.date;
     output.dayType = input.dayType;
 
-    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayEntryIDs.data(), input.dayEntryIDs.size()),
-                                                    output.dayEntryIDs, input.dayEntryIDs.size()));
+    // Handle dayEntryIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.dayEntryIDs.empty())
+    {
+        Platform::ScopedMemoryBufferWithSize<uint32_t> buffer;
+        buffer.CopyFromSpan(input.dayEntryIDs);
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        size_t size        = buffer.AllocatedSize();
+        output.dayEntryIDs = DataModel::List<const uint32_t>(buffer.Release(), size);
+    }
+    else
+    {
+        output.dayEntryIDs = DataModel::List<uint32_t>();
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -316,9 +372,20 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         output.startDate.SetNonNull(input.startDate.Value());
     }
 
-    ReturnErrorOnFailure(
-        SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.dayPatternIDs.data(), input.dayPatternIDs.size()),
-                                   output.dayPatternIDs, input.dayPatternIDs.size()));
+    // Handle dayPatternIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.dayPatternIDs.empty())
+    {
+        Platform::ScopedMemoryBufferWithSize<uint32_t> buffer;
+        buffer.CopyFromSpan(input.dayPatternIDs);
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        size_t size = buffer.AllocatedSize();
+        DataModel::List<const uint32_t> tmpList(buffer.Release(), size);
+        output.dayPatternIDs = tmpList;
+    }
+    else
+    {
+        output.dayPatternIDs = DataModel::List<uint32_t>();
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -955,12 +1022,14 @@ void CTC_BaseDataClass<T>::CleanupStruct(StructType & aValue)
 template <>
 void CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>::CleanupStruct(StructType & aValue)
 {
+    // Free label memory allocated in CopyData() via SpanCopier::CopyToNullable
     if (!aValue.tariffLabel.IsNull() && aValue.tariffLabel.Value().data())
     {
         Platform::MemoryFree(const_cast<char *>(aValue.tariffLabel.Value().data()));
         aValue.tariffLabel.SetNull();
     }
 
+    // Free provider name memory allocated in CopyData() via SpanCopier::CopyToNullable
     if (!aValue.providerName.IsNull() && aValue.providerName.Value().data())
     {
         Platform::MemoryFree(const_cast<char *>(aValue.providerName.Value().data()));
@@ -981,12 +1050,14 @@ void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>
 template <>
 void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
+    // Free dayEntryIDs memory allocated in CopyData()
     CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
 }
 
 template <>
 void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponentStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
+    // Free label memory allocated in CopyData() via SpanCopier::CopyToNullable
     if (aValue.label.HasValue() && !aValue.label.Value().IsNull())
     {
         MemoryFree(const_cast<char *>(aValue.label.Value().Value().data()));
@@ -1003,24 +1074,31 @@ void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponentStruct
 template <>
 void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
+    // Free label memory allocated in CopyData()
     if (!aValue.label.IsNull() && aValue.label.Value().data())
     {
         Platform::MemoryFree(const_cast<char *>(aValue.label.Value().data()));
         aValue.label.SetNull();
     }
+
+    // Free dayEntryIDs memory allocated in CopyData()
     CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
+
+    // Free tariffComponentIDs memory allocated in CopyData()
     CommonUtilities::CleanUpIDs(aValue.tariffComponentIDs);
 }
 
 template <>
 void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
+    // Free dayEntryIDs memory allocated in CopyData()
     CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
 }
 
 template <>
 void CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>::CleanupStruct(StructType & aValue)
 {
+    // Free dayPatternIDs memory allocated in CopyData()
     CommonUtilities::CleanUpIDs(aValue.dayPatternIDs);
 }
 

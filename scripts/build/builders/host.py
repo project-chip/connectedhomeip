@@ -135,6 +135,7 @@ class HostApp(Enum):
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
     DISHWASHER = auto()
+    ELECTRICAL_PROTECTION = auto()
     MICROWAVE_OVEN = auto()
     REFRIGERATOR = auto()
     RVC = auto()
@@ -234,6 +235,8 @@ class HostApp(Enum):
             return 'dishwasher-app/linux'
         if self == HostApp.MICROWAVE_OVEN:
             return 'microwave-oven-app/linux'
+        if self == HostApp.ELECTRICAL_PROTECTION:
+            return 'electrical-protection-app/linux'
         if self == HostApp.REFRIGERATOR:
             return 'refrigerator-app/linux'
         if self == HostApp.RVC:
@@ -368,6 +371,9 @@ class HostApp(Enum):
         elif self == HostApp.MICROWAVE_OVEN:
             yield 'chip-microwave-oven-app'
             yield 'chip-microwave-oven-app.map'
+        elif self == HostApp.ELECTRICAL_PROTECTION:
+            yield 'chip-electrical-protection-app'
+            yield 'chip-electrical-protection-app.map'
         elif self == HostApp.REFRIGERATOR:
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'
@@ -579,6 +585,14 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('is_libfuzzer=true')
         elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
+            # The ICD Management cluster command handlers are compiled only when
+            # the ICD server is enabled, and RegisterClient/UnregisterClient
+            # additionally require the Check-In Protocol. Without these the
+            # corresponding fuzz target is configured out and never built. CIP is
+            # enabled directly rather than via chip_enable_icd_lit, which would
+            # also pull in LIT and UAT that the target does not need.
+            self.extra_gn_options.append('chip_enable_icd_server=true')
+            self.extra_gn_options.append('chip_enable_icd_checkin=true')
             if pw_fuzz_libfuzzer_compat:
                 self.extra_gn_options.append('chip_pw_fuzz_libfuzzer_compat=true')
             if use_ubsan:

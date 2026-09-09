@@ -75,6 +75,18 @@ die() {
     exit 1
 }
 
+# Digest the registry currently serves for a tag, empty if it serves none.
+# Always succeeds: an unknown tag is an answer, not an error, and the callers
+# run under set -e where a non-zero status would abort the script.
+remote_digest() {
+    # Parse the Digest line rather than asking for it with --format: older
+    # buildx ignores the flag and prints the whole human readable record, which
+    # still compares as non-empty and so silently defeats any comparison
+    # between two of these. The unformatted output has carried a "Digest:" line
+    # across versions.
+    docker buildx imagetools inspect "$1" 2>/dev/null | awk '$1 == "Digest:" { print $2; exit }'
+}
+
 set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
@@ -220,9 +232,37 @@ if [ "$SQUASH" = true ]; then
 fi
 
 if [ "$PUSH" = true ]; then
-    docker push "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION"
+    IMAGE_REF="$GHCR_ORG/$ORG/$IMAGE"
+
+    # Only push what the registry does not already serve.
+    #
+    # Ask the registry rather than inferring it from the build being skipped. A
+    # runner with a persistent image cache can hold an image from an earlier run
+    # whose push failed, so "we did not build it" does not mean "it is
+    # published", and treating the two as equivalent would stop publishing
+    # silently while the job stayed green.
+    #
+    # An unknown tag, or no buildx, leaves the digest empty and the push goes
+    # ahead, so a failure to answer errs towards publishing.
+    VERSION_DIGEST=""
+    if [ "$BUILT" = false ]; then
+        VERSION_DIGEST=$(remote_digest "$IMAGE_REF:$VERSION")
+    fi
+
+    if [ "$VERSION_DIGEST" != "" ]; then
+        echo "$me: $IMAGE_REF:$VERSION already published, not pushing"
+    else
+        docker push "$IMAGE_REF:$VERSION"
+    fi
+
     if [ "$LATEST" = true ]; then
-        docker push "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
+        # latest moves, so compare digests rather than just existence: the
+        # version tag can be published while latest still points at an older one.
+        if [ "$VERSION_DIGEST" != "" ] && [ "$(remote_digest "$IMAGE_REF:latest")" = "$VERSION_DIGEST" ]; then
+            echo "$me: $IMAGE_REF:latest already points at $VERSION, not pushing"
+        else
+            docker push "$IMAGE_REF:latest"
+        fi
     fi
 fi
 

@@ -37,11 +37,12 @@ enum class GroupcastTestResultEnum : uint8_t
     kFailedAuth     = 0x03,
     kNoAvailableKey = 0x04,
     kSendFailure    = 0x05,
+    kUnknownGroup   = 0x06,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 6,
+    kUnknownEnumValue = 7,
 };
 
 // Enum for GroupcastTestingEnum

@@ -17,10 +17,10 @@
 #pragma once
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/clusters/operational-state-server/OperationalStateDelegate.h>
 #include <app/clusters/operational-state-server/OvenCavityOperationalStateCluster.h>
 #include <app/clusters/temperature-control-server/TemperatureControlCluster.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
@@ -38,18 +38,32 @@ public:
         int16_t step                = 10;  // 0.10 °C
     };
 
-    TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate);
-    TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config, Clusters::IdentifyDelegate & identifyDelegate);
+    TemperatureControlledCabinetPart(TimerDelegate & timerDelegate,
+                                     Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate,
+                                     Clusters::IdentifyDelegate & identifyDelegate);
+    TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
+                                     Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate,
+                                     Clusters::IdentifyDelegate & identifyDelegate);
     ~TemperatureControlledCabinetPart() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // Public cluster getters for programmatic control
-    Clusters::TemperatureControlCluster & TemperatureControlCluster() { return mTemperatureControlCluster.Cluster(); }
-    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    // Values only available after registration.
+    Clusters::TemperatureControlCluster & TemperatureControlCluster()
+    {
+        VerifyOrDie(mTemperatureControlCluster.IsConstructed());
+        return mTemperatureControlCluster.Cluster();
+    }
+    Clusters::IdentifyCluster & IdentifyCluster()
+    {
+        VerifyOrDie(mIdentifyCluster.IsConstructed());
+        return mIdentifyCluster.Cluster();
+    }
     Clusters::OvenCavityOperationalState::OvenCavityOperationalStateCluster & OperationalState()
     {
+        VerifyOrDie(mOperationalStateCluster.IsConstructed());
         return mOperationalStateCluster.Cluster();
     }
 
@@ -61,7 +75,7 @@ private:
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::TemperatureControlCluster> mTemperatureControlCluster;
 
-    Clusters::OperationalState::LoggingOperationalStateDelegate mOperationalStateDelegate;
+    Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::OvenCavityOperationalState::OvenCavityOperationalStateCluster> mOperationalStateCluster;
 };
 

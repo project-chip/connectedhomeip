@@ -163,6 +163,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kRole), role);
     encoder.Encode(to_underlying(Fields::kPeerBLEDeviceID), peerBLEDeviceID);
+    encoder.Encode(to_underlying(Fields::kBLERBCSecurityMode), BLERBCSecurityMode);
+    encoder.Encode(to_underlying(Fields::kSessionKey), sessionKey);
     return encoder.Finalize();
 }
 
@@ -183,6 +185,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPeerBLEDeviceID))
         {
             err = DataModel::Decode(reader, peerBLEDeviceID);
+        }
+        else if (__context_tag == to_underlying(Fields::kBLERBCSecurityMode))
+        {
+            err = DataModel::Decode(reader, BLERBCSecurityMode);
+        }
+        else if (__context_tag == to_underlying(Fields::kSessionKey))
+        {
+            err = DataModel::Decode(reader, sessionKey);
         }
 
         ReturnErrorOnFailure(err);
@@ -246,7 +256,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kTechnology), technology);
     encoder.Encode(to_underlying(Fields::kFrequencyBand), frequencyBand);
+    encoder.Encode(to_underlying(Fields::kBandwidth), bandwidth);
+    encoder.Encode(to_underlying(Fields::kSupportedRangingRoles), supportedRangingRoles);
+    encoder.Encode(to_underlying(Fields::kRDRCapability), RDRCapability);
     encoder.Encode(to_underlying(Fields::kPeriodicRangingSupport), periodicRangingSupport);
+    encoder.Encode(to_underlying(Fields::kMaxConcurrentSessions), maxConcurrentSessions);
     return encoder.Finalize();
 }
 
@@ -268,9 +282,25 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, frequencyBand);
         }
+        else if (__context_tag == to_underlying(Fields::kBandwidth))
+        {
+            err = DataModel::Decode(reader, bandwidth);
+        }
+        else if (__context_tag == to_underlying(Fields::kSupportedRangingRoles))
+        {
+            err = DataModel::Decode(reader, supportedRangingRoles);
+        }
+        else if (__context_tag == to_underlying(Fields::kRDRCapability))
+        {
+            err = DataModel::Decode(reader, RDRCapability);
+        }
         else if (__context_tag == to_underlying(Fields::kPeriodicRangingSupport))
         {
             err = DataModel::Decode(reader, periodicRangingSupport);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxConcurrentSessions))
+        {
+            err = DataModel::Decode(reader, maxConcurrentSessions);
         }
 
         ReturnErrorOnFailure(err);
@@ -278,6 +308,60 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace RangingCapabilitiesStruct
+
+namespace RangingConstraintStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kTechnology), technology);
+    encoder.Encode(to_underlying(Fields::kRole), role);
+    encoder.Encode(to_underlying(Fields::kEnabled), enabled);
+    encoder.Encode(to_underlying(Fields::kMinRangingInterval), minRangingInterval);
+    encoder.Encode(to_underlying(Fields::kMaxSessionDuration), maxSessionDuration);
+    encoder.Encode(to_underlying(Fields::kMaxRangingInstances), maxRangingInstances);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kTechnology))
+        {
+            err = DataModel::Decode(reader, technology);
+        }
+        else if (__context_tag == to_underlying(Fields::kRole))
+        {
+            err = DataModel::Decode(reader, role);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnabled))
+        {
+            err = DataModel::Decode(reader, enabled);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinRangingInterval))
+        {
+            err = DataModel::Decode(reader, minRangingInterval);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxSessionDuration))
+        {
+            err = DataModel::Decode(reader, maxSessionDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxRangingInstances))
+        {
+            err = DataModel::Decode(reader, maxRangingInstances);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace RangingConstraintStruct
 
 namespace RangingTriggerConditionStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const

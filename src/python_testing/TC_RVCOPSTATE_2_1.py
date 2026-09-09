@@ -35,6 +35,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_1_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --app-pipe /tmp/rvcopstate_2_1_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -101,7 +116,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
 
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.PhaseList):
             self.print_step(2, "Read PhaseList attribute")
@@ -199,7 +214,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the error state"
                 self.print_step("6g", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "UnableToStartOrResume"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "UnableToStartOrResume"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6h", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kError)
@@ -208,7 +223,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the seeking charger state"
                 self.print_step("6i", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "Reset"})
+                    self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
                     await self.send_run_change_to_mode_cmd(1)
                     await self.send_run_change_to_mode_cmd(0)
                 else:
@@ -219,7 +234,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the charging state"
                 self.print_step("6k", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ChargerFound"})
+                    self.write_to_app_pipe({"Name": "ChargerFound", "EndpointId": self.endpoint})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6l", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCharging)
@@ -228,7 +243,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the docked state"
                 self.print_step("6m", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "Charged"})
+                    self.write_to_app_pipe({"Name": "Charged", "EndpointId": self.endpoint})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6n", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked)
@@ -237,7 +252,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the emptying dust bin state"
                 self.print_step("6o", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "EmptyingDustBin"})
+                    self.write_to_app_pipe({"Name": "EmptyingDustBin", "EndpointId": self.endpoint})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6p", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kEmptyingDustBin)
@@ -246,7 +261,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the cleaning mop state"
                 self.print_step("6q", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "CleaningMop"})
+                    self.write_to_app_pipe({"Name": "CleaningMop", "EndpointId": self.endpoint})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6r", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCleaningMop)
@@ -255,7 +270,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the filling water tank state"
                 self.print_step("6s", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "FillingWaterTank"})
+                    self.write_to_app_pipe({"Name": "FillingWaterTank", "EndpointId": self.endpoint})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6t", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kFillingWaterTank)
@@ -264,7 +279,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the updating maps state"
                 self.print_step("6u", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "UpdatingMaps"})
+                    self.write_to_app_pipe({"Name": "UpdatingMaps", "EndpointId": self.endpoint})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6v", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kUpdatingMaps)
@@ -297,7 +312,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the unable to start or resume error state"
                 self.print_step("7c", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "UnableToStartOrResume"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "UnableToStartOrResume"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7d", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume)
@@ -305,7 +320,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the unable to complete operation error state"
                 self.print_step("7e", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "UnableToCompleteOperation"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint,
+                                           "Error": "UnableToCompleteOperation"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7f", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation)
@@ -313,7 +329,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the command invalid error state"
                 self.print_step("7g", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "CommandInvalidInState"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "CommandInvalidInState"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7h", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState)
@@ -321,7 +337,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the failed to find dock error state"
                 self.print_step("7i", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "FailedToFindChargingDock"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "FailedToFindChargingDock"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7j", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kFailedToFindChargingDock)
@@ -329,7 +345,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the stuck error state"
                 self.print_step("7k", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "Stuck"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "Stuck"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7l", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kStuck)
@@ -337,7 +353,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the dust bin missing error state"
                 self.print_step("7m", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "DustBinMissing"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "DustBinMissing"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7n", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinMissing)
@@ -345,7 +361,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the dust bin full error state"
                 self.print_step("7o", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "DustBinFull"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "DustBinFull"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7p", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinFull)
@@ -353,7 +369,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the water tank empty error state"
                 self.print_step("7q", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "WaterTankEmpty"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "WaterTankEmpty"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7r", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankEmpty)
@@ -361,7 +377,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the water tank missing error state"
                 self.print_step("7s", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "WaterTankMissing"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "WaterTankMissing"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7t", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankMissing)
@@ -369,7 +385,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the water tank lid open error state"
                 self.print_step("7u", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "WaterTankLidOpen"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "WaterTankLidOpen"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7v", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankLidOpen)
@@ -377,7 +393,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the mop cleaning pad missing error state"
                 self.print_step("7w", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "MopCleaningPadMissing"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "MopCleaningPadMissing"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7x", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing)
@@ -385,7 +401,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the low battery error state"
                 self.print_step("7y", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "BatteryLow"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "BatteryLow"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7z", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kLowBattery)
@@ -393,7 +409,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the cannot reach target area error state"
                 self.print_step("7aa", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "CannotReachTargetArea"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "CannotReachTargetArea"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7ab", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kCannotReachTargetArea)
@@ -401,7 +417,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the dirty water full error state"
                 self.print_step("7ac", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "DirtyWaterTankFull"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "DirtyWaterTankFull"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7ad", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankFull)
@@ -409,7 +425,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the dirty water tank missing error state"
                 self.print_step("7ae", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "DirtyWaterTankMissing"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "DirtyWaterTankMissing"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7af", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankMissing)
@@ -417,7 +433,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the wheels jammed error state"
                 self.print_step("7ag", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "WheelsJammed"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "WheelsJammed"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7ah", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWheelsJammed)
@@ -425,7 +441,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the brush jammed error state"
                 self.print_step("7ai", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "BrushJammed"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "BrushJammed"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7aj", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kBrushJammed)
@@ -433,7 +449,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the navigation sensor obscured error state"
                 self.print_step("7ak", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "NavigationSensorObscured"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "NavigationSensorObscured"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7al", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kNavigationSensorObscured)

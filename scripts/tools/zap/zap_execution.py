@@ -22,7 +22,7 @@ import sys
 # Use scripts/tools/zap/version_update.py to manage ZAP versioning as many
 # files may need updating for versions
 #
-MIN_ZAP_VERSION = '2026.5.12'
+MIN_ZAP_VERSION = '2026.8.24'
 
 
 class ZapTool:

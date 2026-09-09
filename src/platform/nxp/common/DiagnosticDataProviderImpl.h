@@ -83,6 +83,11 @@ public:
     CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR ResetEthNetworkDiagnosticsCounts() override;
 #endif
+
+private:
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    bool IsWiFiStaConnected();
+#endif
 };
 
 /**
