@@ -87,7 +87,7 @@ class TC_SC_4_6(MatterBaseTest):
 
             TestStep(2, """TH browses for the 'Commissioner Service' (_matterd._udp) through DNS-SD""",
                      """- Verify that there is one, and only one, commissioner service advertised
-                        - Verify that the DNS-SD instance name is a 64-bit randomly selected ID expressed as a
+                        - Verify that the DNS-SD instance name is a 64-bit ID expressed as a
                           sixteen-char hex string with capital letters
                         - Verify that the service type is _matterd._udp and the service domain is .local"""),
 
