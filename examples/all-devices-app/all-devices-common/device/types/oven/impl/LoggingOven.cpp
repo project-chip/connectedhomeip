@@ -26,28 +26,21 @@ namespace {
 
 // Distinct positional tags: sibling endpoints of the same device type under one tree root
 // must carry mutually-distinct TagList entries (checked by Descriptor 2.2).
-constexpr std::array<EndpointComposition::SemanticTag, 7> kCavityTags = { {
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop) },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom) },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kMiddle) },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRow) },
-    { .mfgCode     = DataModel::NullNullable,
-      .namespaceID = CommonNamespace::kPositionId,
-      .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kColumn) },
+const std::array<EndpointComposition::SemanticTag, 7> kCavityTags = { {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kMiddle) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRow) },
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPositionId,
+      .tag = static_cast<uint8_t>(Clusters::Globals::PositionTag::kColumn) },
 } };
 
 } // namespace
