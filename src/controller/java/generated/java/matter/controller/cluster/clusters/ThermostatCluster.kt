@@ -22,7 +22,6 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
-import matter.controller.BooleanSubscriptionState
 import matter.controller.ByteSubscriptionState
 import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
