@@ -25,6 +25,10 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <clusters/OtaSoftwareUpdateProvider/ClusterId.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -32,7 +36,19 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace app {
 
+<<<<<<< HEAD:examples/all-devices-app/all-devices-common/devices/root-node/RootNodeDevice.cpp
 CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+=======
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+CHIP_ERROR RootNode::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
+{
+    static constexpr ClusterId kClientClusters[] = { OtaSoftwareUpdateProvider::Id };
+    return out.ReferenceExisting(Span<const ClusterId>(kClientClusters));
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
+CHIP_ERROR RootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+>>>>>>> d07927e ([all-device-app] Add OTA Requestor device type to RootNode (#73879)):examples/all-devices-app/all-devices-common/device/types/root-node/RootNode.cpp
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpointId, provider, parentId));
 
