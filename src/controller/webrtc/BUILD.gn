@@ -56,11 +56,7 @@ static_library("chip_webrtc") {
     "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 
-  public_deps = [ 
-    ":webrtc",
-  ]
+  public_deps = [ ":webrtc" ]
 
-  deps = [
-    "${chip_root}/third_party/libdatachannel:libdatachannel",
-  ]
+  deps = [ "${chip_root}/third_party/libdatachannel:libdatachannel" ]
 }

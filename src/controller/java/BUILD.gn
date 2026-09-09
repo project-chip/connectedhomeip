@@ -678,9 +678,9 @@ android_library("java") {
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "src/chip/devicecontroller/ThreadScanResult.java",
     "src/chip/devicecontroller/UnpairDeviceCallback.java",
-    "src/chip/devicecontroller/WebRTCTransportSolicitOfferCallback.java",
     "src/chip/devicecontroller/WebRTCTransportProvideOfferCallback.java",
     "src/chip/devicecontroller/WebRTCTransportRequestorDelegate.java",
+    "src/chip/devicecontroller/WebRTCTransportSolicitOfferCallback.java",
     "src/chip/devicecontroller/WiFiScanResult.java",
   ]
 
