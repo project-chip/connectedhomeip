@@ -348,8 +348,8 @@ OptionSet * AppOptions::GetOptions()
         result += "  --wifipaf freq_list=<freq_1>,<freq_2>...\n";
         result += "       Enable Wi-Fi PAF via wpa_supplicant, on these NAN frequencies in MHz.\n";
         result += "       2437 is channel 6, the default publish channel. The list sets the\n";
-        result += "       advertised WiFiBand; scans and connects subscribe on 2437 when listed,\n";
-        result += "       otherwise on the first frequency given.\n";
+        result += "       advertised WiFiBand and the channels published on; scans and connects\n";
+        result += "       subscribe on 2437 when listed, otherwise on the first frequency given.\n";
         result += "       Give an empty string if not setting freq_list: \"\"\n\n";
 #endif
 

@@ -261,16 +261,16 @@ PAF channel, permitted in all regulatory regions:
 | `--wifipaf "freq_list=<MHz>"`    | NAN frequencies in MHz. `2437` = channel 6 (2.4 GHz); add e.g. `5745` for 5 GHz           |
 | `--discriminator <value>`        | 12-bit value identifying the proxy during its own commissioning                           |
 
-`freq_list` is parsed once at startup and drives two things. The `WiFiBand`
+`freq_list` is parsed once at startup and drives three things. The `WiFiBand`
 attribute advertised by the cluster follows the bands it covers: 2412–2484 MHz
 → 2.4 GHz, 5035–5980 MHz → 5 GHz, defaulting to 2.4 GHz if no valid frequency
 is parsed. Scans and `ProxyConnectRequest` create a subscribe instance on a
 single channel: 2437 when it is listed, otherwise the first frequency given.
+The proxy's own NAN publisher advertises on the whole list, so the proxy can be
+commissioned over Wi-Fi PAF itself.
 
-The proxy does not publish on these frequencies. Starting a NAN publisher
-alongside the proxy's own subscribe leaves the PAFTP handshake for a
-`ProxyConnectRequest` unanswered, and the proxy is commissioned over IP or BLE
-rather than over PAF, so it does not need to be PAF-commissionable.
+That publisher stops once the proxy joins a fabric, as the NAN radio is needed
+to subscribe on a commissionee's behalf.
 
 Once the proxy is commissioned (next step), it disconnects the NAN receive
 handler, so the PAF subscribe calls it makes on behalf of commissioners register
