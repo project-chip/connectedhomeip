@@ -41,10 +41,15 @@ CHIP_ERROR LiveViewStartCommand::RunCommand()
     {
         std::string base64Sdp(mClientSdp.Value());
 
-        std::vector<uint8_t> decodedSdpBuf(base64Sdp.length());
+        std::vector<uint8_t> decodedSdpBuf(base64Sdp.size());
         uint16_t decodedSdpLen =
-            chip::Base64Decode(base64Sdp.c_str(), static_cast<uint16_t>(base64Sdp.length()), decodedSdpBuf.data());
-        std::string clientSdp(reinterpret_cast<char *>(decodedSdpBuf.data()), decodedSdpLen);
+            chip::Base64Decode(base64Sdp.c_str(), static_cast<uint16_t>(base64Sdp.size()), decodedSdpBuf.data());
+        if (decodedSdpLen == UINT16_MAX)
+        {
+            ChipLogError(Camera, "Invalid Base64 in --client-sdp");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        std::string clientSdp(reinterpret_cast<const char *>(decodedSdpBuf.data()), decodedSdpLen);
 
         camera::DeviceManager::Instance().SetClientSdp(clientSdp);
     }

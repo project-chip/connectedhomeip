@@ -2441,6 +2441,12 @@ JNI_METHOD(void, webRTCTransportProvideOffer)
     if (jVideoStreamId != nullptr)
     {
         jint videoStreamId = chip::JniReferences::GetInstance().IntegerToPrimitive(jVideoStreamId);
+        if (!chip::CanCastTo<uint16_t>(videoStreamId))
+        {
+            ChipLogError(Controller, "Invalid video stream ID: out of uint16_t range.");
+            chip::JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
         optionalVideoStreamId.SetValue(app::DataModel::Nullable<uint16_t>(static_cast<uint16_t>(videoStreamId)));
     }
 
@@ -2448,6 +2454,12 @@ JNI_METHOD(void, webRTCTransportProvideOffer)
     if (jAudioStreamId != nullptr)
     {
         jint audioStreamId = chip::JniReferences::GetInstance().IntegerToPrimitive(jAudioStreamId);
+        if (!chip::CanCastTo<uint16_t>(audioStreamId))
+        {
+            ChipLogError(Controller, "Invalid audio stream ID: out of uint16_t range.");
+            chip::JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
         optionalAudioStreamId.SetValue(app::DataModel::Nullable<uint16_t>(static_cast<uint16_t>(audioStreamId)));
     }
 

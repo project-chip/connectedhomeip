@@ -33,21 +33,36 @@ namespace webrtc {
 
 static std::mutex g_mutex;
 static std::map<WebRTCClientHandle, std::shared_ptr<WebRTCClient>> g_clients;
-static std::map<WebRTCClientHandle, std::unique_ptr<WebRTCTransportProviderClient>> g_provider_clients;
+
+struct ProviderClientWrapper {
+    std::unique_ptr<WebRTCTransportProviderClient> client;
+    OnCommandSenderResponseCallback onResponse = nullptr;
+    OnCommandSenderErrorCallback onError = nullptr;
+    OnCommandSenderDoneCallback onDone = nullptr;
+};
+
+struct CommandContext {
+    void * pythonAppContext;
+    WebRTCClientHandle handle;
+};
+
+static std::map<WebRTCClientHandle, std::unique_ptr<ProviderClientWrapper>> g_provider_clients;
 
 WebRTCClientHandle webrtc_client_create()
 {
-    auto client               = std::make_shared<WebRTCClient>();
-    WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(client.get());
+    auto wrapper = std::make_unique<ProviderClientWrapper>();
+    wrapper->client = std::make_unique<WebRTCTransportProviderClient>();
+    WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(wrapper->client.get());
+    
     std::lock_guard<std::mutex> lock(g_mutex);
-    g_clients[handle] = client;
+    g_provider_clients[handle] = std::move(wrapper);
     return handle;
 }
 
 void webrtc_client_destroy(WebRTCClientHandle handle)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    g_clients.erase(handle);
+    g_provider_clients.erase(handle);
 }
 
 PyChipError webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url)
@@ -170,10 +185,12 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
 
 WebRTCClientHandle webrtc_provider_client_create()
 {
-    auto client               = std::make_unique<WebRTCTransportProviderClient>();
-    WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(client.get());
+    auto wrapper = std::make_unique<ProviderClientWrapper>();
+    wrapper->client = std::make_unique<WebRTCTransportProviderClient>();
+    WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(wrapper->client.get());
+
     std::lock_guard<std::mutex> lock(g_mutex);
-    g_provider_clients[handle] = std::move(client);
+    g_provider_clients[handle] = std::move(wrapper);
     return handle;
 }
 
@@ -189,7 +206,7 @@ void webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uin
     auto it = g_provider_clients.find(handle);
     if (it != g_provider_clients.end())
     {
-        it->second->Init(nodeId, fabricIndex, endpoint);
+        it->second->client->Init(nodeId, fabricIndex, endpoint);
     }
 }
 
@@ -197,26 +214,45 @@ void OnCommandResponseCallback(void * appContext, chip::EndpointId endpointId, c
                                size_t index, chip::Protocols::InteractionModel::Status status, chip::ClusterStatus clusterStatus,
                                const uint8_t * payload, uint32_t length)
 {
-    if (gOnCommandSenderResponseCallback != nullptr)
+    CommandContext * ctx = static_cast<CommandContext *>(appContext);
+    if (!ctx) return;
+
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_provider_clients.find(ctx->handle);
+    if (it != g_provider_clients.end() && it->second->onResponse)
     {
-        gOnCommandSenderResponseCallback(appContext, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus,
-                                         payload, length);
+        it->second->onResponse(ctx->pythonAppContext, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus, payload, length);
     }
 }
+
 void OnCommandErrorCallback(void * appContext, chip::Protocols::InteractionModel::Status status, chip::ClusterStatus clusterStatus,
                             CHIP_ERROR error)
 {
-    if (gOnCommandSenderErrorCallback != nullptr)
+    CommandContext * ctx = static_cast<CommandContext *>(appContext);
+    if (!ctx) return;
+
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_provider_clients.find(ctx->handle);
+    if (it != g_provider_clients.end() && it->second->onError)
     {
-        gOnCommandSenderErrorCallback(appContext, to_underlying(status), clusterStatus, ToPyChipError(error));
+        it->second->onError(ctx->pythonAppContext, to_underlying(status), clusterStatus, ToPyChipError(error));
     }
 }
+
 void OnCommandDoneCallback(void * appContext)
 {
-    if (gOnCommandSenderDoneCallback != nullptr)
+    CommandContext * ctx = static_cast<CommandContext *>(appContext);
+    if (!ctx) return;
+
     {
-        gOnCommandSenderDoneCallback(appContext);
+        std::lock_guard<std::mutex> lock(g_mutex);
+        auto it = g_provider_clients.find(ctx->handle);
+        if (it != g_provider_clients.end() && it->second->onDone)
+        {
+            it->second->onDone(ctx->pythonAppContext);
+        }
     }
+    delete ctx;
 }
 
 void webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle handle,
@@ -228,10 +264,11 @@ void webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle hand
     auto it = g_provider_clients.find(handle);
     if (it != g_provider_clients.end())
     {
-        gOnCommandSenderResponseCallback = onCommandSenderResponseCallback;
-        gOnCommandSenderErrorCallback    = onCommandSenderErrorCallback;
-        gOnCommandSenderDoneCallback     = onCommandSenderDoneCallback;
-        it->second->InitCallbacks(OnCommandResponseCallback, OnCommandErrorCallback, OnCommandDoneCallback);
+        it->second->onResponse = onCommandSenderResponseCallback;
+        it->second->onError    = onCommandSenderErrorCallback;
+        it->second->onDone     = onCommandSenderDoneCallback;
+
+        it->second->client->InitCallbacks(OnCommandResponseCallback, OnCommandErrorCallback, OnCommandDoneCallback);
     }
 }
 
@@ -242,7 +279,14 @@ PyChipError webrtc_provider_client_send_command(WebRTCClientHandle handle, void 
     auto it = g_provider_clients.find(handle);
     if (it != g_provider_clients.end())
     {
-        return ToPyChipError(it->second->SendCommand(appContext, endpointId, clusterId, commandId, payload, length));
+        CommandContext * ctx = new CommandContext{appContext, handle};
+        CHIP_ERROR err = it->second->client->SendCommand(ctx, endpointId, clusterId, commandId, payload, length);
+        
+        if (err != CHIP_NO_ERROR)
+        {
+            delete ctx;
+        }
+        return ToPyChipError(err);
     }
     return ToPyChipError(CHIP_ERROR_INTERNAL);
 }

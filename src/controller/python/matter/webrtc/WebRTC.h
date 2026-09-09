@@ -42,10 +42,6 @@ using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,
                                               chip::ClusterStatus clusterStatus, PyChipError chiperror);
 using OnCommandSenderDoneCallback     = void (*)(PyObject appContext);
 
-inline OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
-inline OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
-inline OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
-
 /**
  * @brief Creates a new WebRTC client instance.
  *

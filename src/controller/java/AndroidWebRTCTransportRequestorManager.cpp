@@ -120,7 +120,12 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnOffer(uint16_t sessionId, c
     jstring jOffer = env->NewStringUTF(offer);
     jint status    = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnOfferMethod, sessionId, jOffer);
     env->DeleteLocalRef(jOffer);
-    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_ERROR_INTERNAL);
+    if (env->ExceptionCheck())
+    {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_ERROR_INTERNAL;
+    }
 
     return (status == 0) ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
@@ -211,7 +216,12 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnEnd(uint16_t sessionId, uin
     VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     jint status = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnEndMethod, sessionId, static_cast<int>(reason));
-    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_ERROR_INTERNAL);
+    if (env->ExceptionCheck())
+    {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_ERROR_INTERNAL;
+    }
 
     return (status == 0) ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
