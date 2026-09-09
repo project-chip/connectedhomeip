@@ -208,7 +208,7 @@ CHIP_ERROR MaximumScheduleTypeCount(ThermostatSchedules::Delegate & delegate, Sy
  *         if the scan could not be completed.
  */
 CHIP_ERROR CountSchedulesInPendingListWithScheduleHandle(ThermostatSchedules::Delegate & delegate,
-                                                          const ByteSpan & scheduleHandleToMatch, uint8_t & count)
+                                                         const ByteSpan & scheduleHandleToMatch, uint8_t & count)
 {
     count = 0;
     for (uint8_t i = 0; true; i++)
@@ -645,8 +645,8 @@ CHIP_ERROR ThermostatSchedules::AppendPendingSchedule(const ScheduleStruct::Deco
         // (a) There is an existing non-pending schedule with this handle.
         ScheduleStructWithOwnedMembers matchingSchedule;
         bool matchingScheduleFound = false;
-        CHIP_ERROR matchErr =
-            GetMatchingScheduleInSchedules(mDelegate, schedule.GetScheduleHandle().Value(), matchingSchedule, matchingScheduleFound);
+        CHIP_ERROR matchErr = GetMatchingScheduleInSchedules(mDelegate, schedule.GetScheduleHandle().Value(), matchingSchedule,
+                                                             matchingScheduleFound);
         if (matchErr != CHIP_NO_ERROR)
         {
             // A real delegate error must be propagated, not turned into NotFound.
@@ -659,8 +659,8 @@ CHIP_ERROR ThermostatSchedules::AppendPendingSchedule(const ScheduleStruct::Deco
 
         // (b) There is no existing pending schedule with this handle.
         uint8_t pendingCountWithHandle = 0;
-        ReturnErrorOnFailure(CountSchedulesInPendingListWithScheduleHandle(mDelegate, schedule.GetScheduleHandle().Value(),
-                                                                           pendingCountWithHandle));
+        ReturnErrorOnFailure(
+            CountSchedulesInPendingListWithScheduleHandle(mDelegate, schedule.GetScheduleHandle().Value(), pendingCountWithHandle));
         if (pendingCountWithHandle > 0)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
@@ -821,7 +821,7 @@ Status ThermostatSchedules::PrecommitSchedules()
     if (!activeScheduleHandle.IsNull())
     {
         uint8_t count = 0;
-        err = CountSchedulesInPendingListWithScheduleHandle(mDelegate, activeScheduleHandle.Value(), count);
+        err           = CountSchedulesInPendingListWithScheduleHandle(mDelegate, activeScheduleHandle.Value(), count);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl,
