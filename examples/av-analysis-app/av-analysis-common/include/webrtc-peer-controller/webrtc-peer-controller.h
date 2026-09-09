@@ -28,6 +28,9 @@ namespace app {
 
 /**
  * Platform-supplied WebRTC peer connections: the SDK client's peer delegate and signaling for established sessions.
+ *
+ * A session is identified by its camera together with its id: the camera assigns the id, and it is
+ * unique only within that camera.
  */
 class WebRTCPeerController : public Clusters::AvAnalysisWebRTCPeerDelegate
 {
@@ -50,12 +53,12 @@ public:
         /**
          * The session's peer connection reached the Connected state
          */
-        virtual void OnPeerConnectionConnected(uint16_t aWebRTCSessionId) = 0;
+        virtual void OnPeerConnectionConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
 
         /**
          * The session's peer connection reached the Failed or Closed state
          */
-        virtual void OnPeerConnectionFailed(uint16_t aWebRTCSessionId) = 0;
+        virtual void OnPeerConnectionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
     };
 
     void SetPeerConnectionObserver(PeerConnectionObserver * aObserver) { mPeerConnectionObserver = aObserver; }
@@ -63,18 +66,19 @@ public:
     /**
      * Applies the camera's SDP answer to the session's peer connection.
      */
-    virtual CHIP_ERROR ApplyAnswer(uint16_t aWebRTCSessionId, const std::string & aSdp) = 0;
+    virtual CHIP_ERROR ApplyAnswer(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId, const std::string & aSdp) = 0;
 
     /**
      * Adds a remote ICE candidate trickled by the camera to the session's peer connection.
      */
-    virtual CHIP_ERROR AddRemoteCandidate(uint16_t aWebRTCSessionId, const std::string & aCandidate) = 0;
+    virtual CHIP_ERROR AddRemoteCandidate(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId,
+                                          const std::string & aCandidate) = 0;
 
     /**
      * Hands over the candidates the session's peer connection has gathered so far and forgets them,
      * so each is sent to the camera once.
      */
-    virtual std::vector<LocalICECandidate> TakeLocalCandidates(uint16_t aWebRTCSessionId) = 0;
+    virtual std::vector<LocalICECandidate> TakeLocalCandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
 
 protected:
     PeerConnectionObserver * mPeerConnectionObserver = nullptr;
