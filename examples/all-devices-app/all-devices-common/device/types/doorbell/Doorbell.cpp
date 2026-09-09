@@ -25,8 +25,8 @@ namespace chip {
 namespace app {
 
 namespace {
-    const ClusterId kClientClusters[] = { Chime::Id };
-    } // namespace
+const ClusterId kClientClusters[] = { Chime::Id };
+} // namespace
 
 Doorbell::Doorbell(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
                    Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager) :
@@ -41,7 +41,7 @@ CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProv
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    SwitchCluster::StartupConfiguration switchConfig = {2, 2};
+    SwitchCluster::StartupConfiguration switchConfig = { 2, 2 };
     mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kMomentarySwitch), switchConfig);
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 

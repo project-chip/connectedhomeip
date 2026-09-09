@@ -34,9 +34,8 @@ namespace app {
 class Doorbell : public SingleEndpoint
 {
 public:
-
-    Doorbell(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
-             Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager);
+    Doorbell(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager, Clusters::Binding::Table & bindingTable,
+             Clusters::Binding::Manager & bindingManager);
     ~Doorbell() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
