@@ -36,6 +36,9 @@ public:
     {
         TemperatureControlledCabinetPart::Config cavityConfig;
         uint8_t cavityCount = 1;
+        /// Semantic tags applied to the oven root endpoint descriptor (e.g. to
+        /// disambiguate variants under wildcard allocation).
+        Span<const EndpointComposition::SemanticTag> tagList = {};
     };
 
     explicit LoggingOven(TimerDelegate & timerDelegate);

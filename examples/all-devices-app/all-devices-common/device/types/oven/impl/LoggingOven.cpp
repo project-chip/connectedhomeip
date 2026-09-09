@@ -24,6 +24,8 @@ LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDeleg
 
 LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) : mSurface(timerDelegate, "Top Surface")
 {
+    mTagList = config.tagList;
+
     // The MA-oven device type requires at least one cavity endpoint.
     VerifyOrDie(config.cavityCount >= 1);
 
