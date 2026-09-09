@@ -130,7 +130,8 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnAnswer(uint16_t sessionId, 
     ChipLogProgress(Controller, "OnAnswer called for sessionId: %u", sessionId);
 
     VerifyOrReturnError(gJvm != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(Instance().mJavaCallbackObj != nullptr && Instance().mOnAnswerMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(Instance().mJavaCallbackObj != nullptr && Instance().mOnAnswerMethod != nullptr,
+                        CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
@@ -155,7 +156,8 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnICECandidates(uint16_t sess
     ChipLogProgress(Controller, "OnICECandidates called for sessionId: %u, count: %d", sessionId, candidateCount);
 
     VerifyOrReturnError(gJvm != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(Instance().mJavaCallbackObj != nullptr && Instance().mOnICECandidatesMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(Instance().mJavaCallbackObj != nullptr && Instance().mOnICECandidatesMethod != nullptr,
+                        CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = nullptr;
     if (gJvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
