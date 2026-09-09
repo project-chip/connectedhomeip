@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
 
-source_set("groups-server") {
+source_set("groups-cluster") {
   sources = [
     "GroupsCluster.cpp",
     "GroupsCluster.h",
-    "StubbedGroupsCluster.cpp",
-    "StubbedGroupsCluster.h",
   ]
 
   public_deps = [
@@ -31,4 +30,27 @@ source_set("groups-server") {
     "${chip_root}/zzz_generated/app-common/clusters/GroupKeyManagement",
     "${chip_root}/zzz_generated/app-common/clusters/Groups",
   ]
+}
+
+source_set("stubbed-groups-cluster") {
+  sources = [
+    "StubbedGroupsCluster.cpp",
+    "StubbedGroupsCluster.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/access-control-server:access-control-event-helper",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/tracing:macros",
+    "${chip_root}/zzz_generated/app-common/clusters/Groups",
+  ]
+}
+
+group("groups-server") {
+  if (chip_config_use_stubbed_groups_cluster) {
+    public_deps = [ ":stubbed-groups-cluster" ]
+  } else {
+    public_deps = [ ":groups-cluster" ]
+  }
 }

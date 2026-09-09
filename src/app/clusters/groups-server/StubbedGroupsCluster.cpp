@@ -16,7 +16,6 @@
 #include <app/clusters/groups-server/StubbedGroupsCluster.h>
 
 #include <app/clusters/access-control-server/AccessControlEventHelper.h>
-#include <app/clusters/scenes-server/Constants.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Groups/Attributes.h>
 #include <clusters/Groups/Commands.h>

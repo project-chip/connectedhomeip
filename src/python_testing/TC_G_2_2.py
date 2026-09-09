@@ -479,14 +479,14 @@ class TC_G_2_2(MatterBaseTest):
                 await self.send_single_cmd(Clusters.Groups.Commands.AddGroup(kGroupId1, ""))
                 asserts.fail("AddGroup command should have failed with cluster revision 5+")
             except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.InvalidInState, "AddGroup should fail with InvalidState error")
+                asserts.assert_equal(e.status, Status.InvalidInState, "AddGroup should fail with InvalidInState error")
 
             self.step("27")
             try:
                 await self.send_single_cmd(Clusters.Groups.Commands.ViewGroup(kGroupId1))
                 asserts.fail("ViewGroup command should have failed with cluster revision 5+")
             except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.InvalidInState, "ViewGroup should fail with InvalidState error")
+                asserts.assert_equal(e.status, Status.InvalidInState, "ViewGroup should fail with InvalidInState error")
 
             self.step("28")
             await self.send_single_cmd(
