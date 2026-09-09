@@ -288,6 +288,27 @@ CHIP_ERROR TestHarnessDACProvider::Init(std::istream & json)
 
     TestHarnessDACProviderData data;
 
+    // Validate selectors before writing the static credential buffers so a rejected
+    // fixture cannot overwrite documents referenced by the current provider.
+    auto readPaiProfile = [](const Json::Value & value, DeviceAttestationCertProfile & outProfile) -> CHIP_ERROR {
+        VerifyOrReturnError(value.isIntegral() && value.isUInt(), CHIP_ERROR_INVALID_ARGUMENT);
+        const auto raw = value.asUInt();
+        VerifyOrReturnError(raw == static_cast<unsigned>(DeviceAttestationCertProfile::kEcdsaMatterLegacy) ||
+                                raw == static_cast<unsigned>(DeviceAttestationCertProfile::kMlDsa44) ||
+                                raw == static_cast<unsigned>(DeviceAttestationCertProfile::kMlDsa65),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        outProfile = static_cast<DeviceAttestationCertProfile>(raw);
+        return CHIP_NO_ERROR;
+    };
+    if (root.isMember("pai_profile_ml_dsa_44"))
+    {
+        ReturnErrorOnFailure(readPaiProfile(root["pai_profile_ml_dsa_44"], data.paiProfileMlDsa44));
+    }
+    if (root.isMember("pai_profile_ml_dsa_65"))
+    {
+        ReturnErrorOnFailure(readPaiProfile(root["pai_profile_ml_dsa_65"], data.paiProfileMlDsa65));
+    }
+
     static uint8_t dacCertBuffer[kMaxDERCertLength];
     static uint8_t dacPrivateKeyBuffer[Crypto::kP256_PrivateKey_Length];
     static uint8_t dacPublicKeyBuffer[Crypto::kP256_PublicKey_Length];
@@ -339,14 +360,6 @@ CHIP_ERROR TestHarnessDACProvider::Init(std::istream & json)
         data.pid.SetValue(ReadUint16(root[kPid]));
     }
 
-    if (root.isMember("pai_profile_ml_dsa_44"))
-    {
-        data.paiProfileMlDsa44 = static_cast<DeviceAttestationCertProfile>(root["pai_profile_ml_dsa_44"].asUInt());
-    }
-    if (root.isMember("pai_profile_ml_dsa_65"))
-    {
-        data.paiProfileMlDsa65 = static_cast<DeviceAttestationCertProfile>(root["pai_profile_ml_dsa_65"].asUInt());
-    }
 
     Init(data);
     return CHIP_NO_ERROR;

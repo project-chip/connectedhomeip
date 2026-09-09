@@ -359,6 +359,7 @@ TEST_F(TestDeviceAttestationCredentials, TestJsonIssuerProfilesAreIndependent)
     const IssuerProfiles cases[] = {
         { "44", 0, 0x3, 0x1, DeviceAttestationCertProfile::kMlDsa44 },
         { "44", 1, 0x3, 0x3, DeviceAttestationCertProfile::kMlDsa44 },
+        { "44", 2, 0x3, 0x5, DeviceAttestationCertProfile::kMlDsa44 },
         { "65", 0, 0x5, 0x1, DeviceAttestationCertProfile::kMlDsa65 },
         { "65", 1, 0x5, 0x3, DeviceAttestationCertProfile::kMlDsa65 },
         { "65", 2, 0x5, 0x5, DeviceAttestationCertProfile::kMlDsa65 },
@@ -390,6 +391,45 @@ TEST_F(TestDeviceAttestationCredentials, TestJsonIssuerProfilesAreIndependent)
         EXPECT_EQ(legacyProfiles.dacSupportedProfiles.Raw(), 0x1);
         EXPECT_FALSE(provider.HasRequiredPqcCredentials());
         EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), DeviceAttestationCertProfile::kEcdsaMatterLegacy);
+    }
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestJsonRejectsInvalidIssuerProfiles)
+{
+    using namespace chip::Credentials::Examples;
+    for (const char * suffix : { "44", "65" })
+    {
+        // Only integer enumerators 0, 1 and 2 are valid. In particular, 258 must
+        // not truncate to ML-DSA-65, and the generated unknown sentinel (3) is invalid.
+        for (const char * invalidValue : { "3", "7", "255", "258", "4294967296", "-1", "1.5", "true", "null", "\"2\"", "[]", "{}" })
+        {
+            TestHarnessDACProvider provider;
+            std::istringstream validJson(R"({"pai_cert_ml_dsa_65":"010203", "dac_cert_ml_dsa_65":"040506",
+                                              "pai_profile_ml_dsa_65":0})");
+            ASSERT_EQ(provider.Init(validJson), CHIP_NO_ERROR);
+            const auto originalProfiles = provider.GetDeviceAttestationProfileSupport();
+
+            std::stringstream invalidJson;
+            invalidJson << R"({"pai_cert_ml_dsa_65":"aabbcc", "dac_cert_ml_dsa_65":"ddeeff", "pai_profile_ml_dsa_)" << suffix
+                        << "\":" << invalidValue << "}";
+            EXPECT_EQ(provider.Init(invalidJson), CHIP_ERROR_INVALID_ARGUMENT);
+            const auto profiles = provider.GetDeviceAttestationProfileSupport();
+            EXPECT_EQ(profiles.paaSupportedProfiles, originalProfiles.paaSupportedProfiles);
+            EXPECT_EQ(profiles.paiSupportedProfiles, originalProfiles.paiSupportedProfiles);
+            EXPECT_EQ(profiles.dacSupportedProfiles, originalProfiles.dacSupportedProfiles);
+            EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), DeviceAttestationCertProfile::kMlDsa65);
+
+            uint8_t buffer[3];
+            MutableByteSpan document(buffer);
+            ASSERT_EQ(provider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa65, document), CHIP_NO_ERROR);
+            constexpr uint8_t kExpectedDac[] = { 4, 5, 6 };
+            EXPECT_TRUE(document.data_equal(ByteSpan(kExpectedDac)));
+            document = MutableByteSpan(buffer);
+            ASSERT_EQ(provider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kMlDsa65, document),
+                      CHIP_NO_ERROR);
+            constexpr uint8_t kExpectedPai[] = { 1, 2, 3 };
+            EXPECT_TRUE(document.data_equal(ByteSpan(kExpectedPai)));
+        }
     }
 }
 
