@@ -20,6 +20,7 @@
 #include <app/FailSafeContext.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
@@ -33,6 +34,7 @@
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
+#include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
@@ -42,6 +44,7 @@
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
 #include <device/types/microwave-oven/impl/EmulatedMicrowaveOven.h>
+#include <device/types/mode-select/impl/SimulatedModeSelect.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
 #include <device/types/mounted-on-off-control/MountedOnOffControl.h>
 #include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
@@ -55,7 +58,7 @@
 #include <device/types/proximity-ranger/ProximityRanger.h>
 #include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
 #include <device/types/refrigerator/impl/LoggingRefrigerator.h>
-#include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
+#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
@@ -100,6 +103,8 @@ public:
         FailSafeContext & failSafeContext;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
+        TestEventTriggerDelegate & testEventTriggerDelegate;
+        Clusters::IdentifyDelegate & identifyDelegate;
     };
 
     static DeviceFactory & GetInstance()
@@ -302,6 +307,8 @@ private:
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
+                        .identifyDelegate  = mContext->identifyDelegate,
+
                     },
                     DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
@@ -315,6 +322,7 @@ private:
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
+                        .identifyDelegate  = mContext->identifyDelegate,
                     },
                     DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
@@ -338,6 +346,7 @@ private:
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
+                        .identifyDelegate  = mContext->identifyDelegate,
                     },
                     DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
@@ -350,6 +359,7 @@ private:
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
                 });
             });
         }
@@ -369,6 +379,7 @@ private:
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
                 });
             });
         }
@@ -388,6 +399,7 @@ private:
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
                 });
             });
         }
@@ -419,6 +431,13 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
             RegisterCreator("temperature-sensor", []() { return std::make_unique<IncreasingTemperatureSensor>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
+        {
+            RegisterCreator("electrical-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTRACTOR_HOOD)
         {
@@ -558,6 +577,13 @@ private:
                 });
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_MODE_SELECT)
+        {
+            RegisterCreator("mode-select", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<SimulatedModeSelect>(mContext->diagnosticDataProvider);
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
         {
             RegisterCreator("pressure-sensor", [this]() {
@@ -574,7 +600,13 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
         {
-            RegisterCreator("robotic-vacuum-cleaner", []() { return std::make_unique<RoboticVacuumCleaner>(); });
+            RegisterCreator("robotic-vacuum-cleaner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<SimulatedRoboticVacuumCleaner>(SimulatedRoboticVacuumCleaner::Context{
+                    .timerDelegate          = mContext->timerDelegate,
+                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
+            });
         }
 
         // at least one device type MUST be enabled

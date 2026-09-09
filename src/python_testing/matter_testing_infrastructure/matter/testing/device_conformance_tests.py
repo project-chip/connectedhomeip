@@ -110,7 +110,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             return f'Conformance: {str(conformance)}, implemented features: {",".join(codes)}'
 
         def record_problem(location, problem, severity):
-            problems.append(ProblemNotice("IDM-10.2", location, severity, problem, ""))
+            problems.append(ProblemNotice("Conformance test", location, severity, problem, ""))
 
         def record_error(location, problem):
             nonlocal success
@@ -279,7 +279,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         success = True
 
         def record_problem(location, problem, severity):
-            problems.append(ProblemNotice("IDM-10.3", location, severity, problem, ""))
+            problems.append(ProblemNotice("Check revisions test", location, severity, problem, ""))
 
         def record_error(location, problem):
             nonlocal success
@@ -292,9 +292,8 @@ class DeviceConformanceTests(BasicCompositionTests):
         ignore_revisions: list[int] = []
         if ignore_in_progress_test_event_only_disallowed_for_certification:
             # This is a manually curated list of cluster revisions that are in-progress in the SDK, but have landed in the spec
-            # Groups cluster rev 5 in progress for 1.7. Some apps are still using groups rev 4 implementation. Remove once (#73746 addressed)
             in_progress_revisions = [Clusters.BasicInformation.id, Clusters.PowerSource.id,
-                                     Clusters.NetworkCommissioning.id, Clusters.Groups.id]
+                                     Clusters.NetworkCommissioning.id, Clusters.OperationalCredentials.id, Clusters.Groups.id]
             ignore_revisions.extend(in_progress_revisions)
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():

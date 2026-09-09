@@ -40,7 +40,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kBLTChannelSoundingDeviceRoleConfig), BLTChannelSoundingDeviceRoleConfig);
     encoder.Encode(to_underlying(Fields::kFrequencyBand), frequencyBand);
     encoder.Encode(to_underlying(Fields::kBandwidth), bandwidth);
-    encoder.Encode(to_underlying(Fields::kSecurityMode), securityMode);
     encoder.Encode(to_underlying(Fields::kTrigger), trigger);
     encoder.Encode(to_underlying(Fields::kReportingCondition), reportingCondition);
     return encoder.Finalize();
@@ -80,10 +79,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, bandwidth);
         }
-        else if (__context_tag == to_underlying(Fields::kSecurityMode))
-        {
-            err = DataModel::Decode(reader, securityMode);
-        }
         else if (__context_tag == to_underlying(Fields::kTrigger))
         {
             err = DataModel::Decode(reader, trigger);
@@ -102,7 +97,6 @@ namespace StartRangingResponse {
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kResultCode), resultCode);
     encoder.Encode(to_underlying(Fields::kSessionID), sessionID);
     return encoder.Finalize();
 }
@@ -117,11 +111,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kResultCode))
-        {
-            err = DataModel::Decode(reader, resultCode);
-        }
-        else if (__context_tag == to_underlying(Fields::kSessionID))
+        if (__context_tag == to_underlying(Fields::kSessionID))
         {
             err = DataModel::Decode(reader, sessionID);
         }

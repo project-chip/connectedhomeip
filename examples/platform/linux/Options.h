@@ -55,8 +55,13 @@ struct LinuxDeviceOptions
     chip::Optional<std::string> dacProviderFile;
     uint32_t spake2pIterations = 0; // When not provided (0), will default elsewhere
     uint32_t mBleDevice        = 0;
-    bool wifiSupports5g        = false;
-    bool mWiFi                 = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    bool wifiSupports5g = false;
+    bool mWiFi          = false;
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    chip::Optional<std::string> mWiFiInterface; // WiFi interface name override (from --wifi=<interface>)
+#endif
+#endif
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     uint16_t mThreadNodeId = 0;
@@ -64,10 +69,11 @@ struct LinuxDeviceOptions
     bool mThread = false;
 #endif
 #endif
-    bool cameraDeferredOffer = false;
-    bool cameraTestVideosrc  = false;
-    bool cameraTestAudiosrc  = false;
-    bool cameraAudioPlayback = false;
+    bool cameraDeferredOffer  = false;
+    bool cameraTestVideosrc   = false;
+    bool cameraTestAudiosrc   = false;
+    bool cameraAudioPlayback  = false;
+    bool cameraRemoteAnalysis = false;
     chip::Optional<std::string> cameraVideoDevice;
     chip::Optional<uint16_t> cameraFramerate;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF

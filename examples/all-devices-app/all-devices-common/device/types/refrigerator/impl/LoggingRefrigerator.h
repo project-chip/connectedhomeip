@@ -48,8 +48,14 @@ public:
     LoggingRefrigerator(TimerDelegate & timerDelegate, Config config);
     ~LoggingRefrigerator() override = default;
 
+    LoggingTemperatureControlledCabinetPart & Cabinet() { return mCabinet; }
+
+protected:
+    CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
+
 private:
-    LoggingTemperatureControlledCabinetPart mLoggingCabinet;
+    LoggingTemperatureControlledCabinetPart mCabinet;
 };
 
 } // namespace chip::app

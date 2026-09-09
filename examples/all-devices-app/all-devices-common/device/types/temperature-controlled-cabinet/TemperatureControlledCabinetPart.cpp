@@ -53,7 +53,7 @@ CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeD
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
     ReturnErrorOnFailure(provider.AddCluster(mTemperatureControlCluster.Registration()));
 
-    mOperationalStateCluster.Create(endpoint, &mOperationalStateDelegate);
+    mOperationalStateCluster.Create(endpoint, mOperationalStateDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));

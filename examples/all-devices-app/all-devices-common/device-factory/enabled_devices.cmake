@@ -23,6 +23,7 @@
 # Exports:
 #   ALL_DEVICES_DEVICE_SRCDIRS  — list of device module source directories
 #   ALL_DEVICES_DEVICE_SOURCES  — list of device module source files (for non-component builds)
+#   ALL_DEVICES_EXTRA_INCLUDE_DIRS — shared include directories for enabled devices
 #
 # After including this file, callers must append ${CMAKE_CURRENT_BINARY_DIR}
 # to their include-directory list so that the generated
@@ -54,6 +55,9 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/DimmablePlugInUnit.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/Dishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/impl/EmulatedDishwasher.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/ElectricalSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/SimulatedElectricalSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/FakeReadings.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/ExtractorHood.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/fan/Fan.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/fan/impl/LoggingFan.cpp"
@@ -70,6 +74,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/light-sensor/impl/IncreasingLightSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/microwave-oven/MicrowaveOven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/microwave-oven/impl/EmulatedMicrowaveOven.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mode-select/ModeSelect.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mode-select/impl/SimulatedModeSelect.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/MountedOnOffControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
@@ -88,6 +94,9 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/Refrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/impl/LoggingRefrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/RootNode.cpp"
@@ -110,10 +119,9 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/impl/LoggingDimmableLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/FanLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/impl/LoggingFanLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/identify/LoggingIdentifyDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffLoad.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
@@ -163,12 +171,14 @@ foreach(_key
         ambient-context-sensor
         bridged-node
         chime
+        commissioning-proxy
         contact-sensor
         cooktop
         device-energy-management
         dimmable-light
         dimmable-plug-in-unit
         dishwasher
+        electrical-sensor
         extractor-hood
         fan
         flow-sensor
@@ -178,6 +188,7 @@ foreach(_key
         laundry-washer
         light-sensor
         microwave-oven
+        mode-select
         mounted-dimmable-load-control
         mounted-on-off-control
         network-infrastructure-manager
@@ -258,3 +269,6 @@ set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/binding-table.cpp"
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
 )
+
+# No extra include directories beyond ALL_DEVICES_COMMON_DIR (for <device/...> paths).
+set(ALL_DEVICES_EXTRA_INCLUDE_DIRS)

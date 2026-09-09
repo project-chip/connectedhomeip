@@ -71,7 +71,7 @@ static bool SanityCheckOptions(OptionSet * optSets[]);
 
 static inline bool IsShortOptionChar(int ch)
 {
-    return isgraph(ch);
+    return CanCastTo<uint8_t>(ch) && isgraph(ch);
 }
 
 /**

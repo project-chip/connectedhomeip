@@ -17,32 +17,27 @@
 #pragma once
 
 #include <device/api/Interface.h>
-#include <device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.h>
 
 namespace chip::app {
 
 class Refrigerator : public DeviceInterface
 {
 public:
-    struct Config
-    {
-        Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
-        TemperatureControlledCabinetPart::Config cabinetConfig{};
-    };
-
-    Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify, const Config & config);
+    Refrigerator();
     ~Refrigerator() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // Composition getters to expose child endpoints
-    TemperatureControlledCabinetPart & Cabinet() { return mCabinet; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
+
+protected:
+    virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) = 0;
+    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider)                                      = 0;
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;
-    TemperatureControlledCabinetPart mCabinet;
 };
 
 } // namespace chip::app

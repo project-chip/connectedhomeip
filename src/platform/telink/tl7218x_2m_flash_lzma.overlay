@@ -9,11 +9,11 @@
 
 		boot_partition: partition@0 {
 			label = "mcuboot";
-			reg = <0x00000000 0xf000>;
+			reg = <0x00000000 0x12000>;
 		};
-		slot0_partition: partition@f000 {
+		slot0_partition: partition@12000 {
 			label = "image-0";
-			reg = <0xf000 0x139000>;
+			reg = <0x12000 0x136000>;
 		};
 		factory_partition: partition@148000 {
 			label = "factory-data";
