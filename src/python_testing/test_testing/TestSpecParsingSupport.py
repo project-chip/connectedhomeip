@@ -301,12 +301,16 @@ def _spec_version_from_dirname(dirname: str) -> int:
     # derivable from the directory name. A newly added data_model directory may not have a
     # PrebuiltDataModelDirectory member yet, so this cannot go through _SPEC_VERSION_TO_DM.
     parts = list(_version_key(dirname))
-    # There is no field for a fourth component, so a longer name is not encodable. Reject it rather
-    # than truncate: _version_key sorts 1.6.1.1 above 1.6.1, so a silently truncated directory would
-    # become the newest one and then satisfy a header claiming only 1.6.1.
+    # Reject anything that does not encode exactly rather than truncating or aliasing it. There is
+    # no field for a fourth component, and each component has to fit its own byte: 1.6.1.1 would
+    # truncate to 1.6.1 and 1.6.256 would alias 1.7. Both sort above 1.6.1, so a malformed
+    # directory would become the newest one and then satisfy a header claiming less than it.
     asserts.assert_in(len(parts), (2, 3),
                       f"data_model/{dirname}/ is not a major.minor[.dot] version - SpecificationVersion "
                       "has no field to encode it")
+    asserts.assert_true(all(part <= 0xFF for part in parts),
+                        f"data_model/{dirname}/ has a component that does not fit in one byte, so it has no "
+                        "SpecificationVersion encoding")
     parts += [0, 0]
     return (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8)
 
@@ -864,6 +868,11 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         # but it must never lag behind the files that are.
         dirnames = _checked_in_data_model_dirnames()
         asserts.assert_true(dirnames, f"No specification version directories found in {_DATA_MODEL_DIR}")
+
+        # Encode every checked-in directory, not just the newest one, so that the rejections in
+        # _spec_version_from_dirname cover a malformed name that happens to sort below a good one.
+        for dirname in dirnames:
+            _spec_version_from_dirname(dirname)
 
         stale = sorted(_UNCLAIMED_DATA_MODEL_DIRNAMES - set(dirnames))
         asserts.assert_false(stale,
