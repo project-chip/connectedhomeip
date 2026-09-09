@@ -2686,7 +2686,21 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 } // namespace FanControl
 
 namespace ThermostatUserInterfaceConfiguration {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace TemperatureDisplayMode {
+Protocols::InteractionModel::Status GetDefault(
+    EndpointId endpoint,
+    chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum * value); // TemperatureDisplayModeEnum
+} // namespace TemperatureDisplayMode
+
+namespace KeypadLockout {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint,
+           chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum * value); // KeypadLockoutEnum
+} // namespace KeypadLockout
+
+} // namespace Attributes
 } // namespace ThermostatUserInterfaceConfiguration
 
 namespace Humidistat {

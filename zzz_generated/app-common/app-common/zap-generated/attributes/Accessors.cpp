@@ -13978,7 +13978,51 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 } // namespace FanControl
 
 namespace ThermostatUserInterfaceConfiguration {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace TemperatureDisplayMode {
+
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum * value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace TemperatureDisplayMode
+
+namespace KeypadLockout {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum * value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace KeypadLockout
+
+} // namespace Attributes
 } // namespace ThermostatUserInterfaceConfiguration
 
 namespace Humidistat {
