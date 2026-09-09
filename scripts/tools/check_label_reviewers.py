@@ -61,7 +61,7 @@ class LabelEvaluation:
 class GitHubApiClient:
     """Lightweight GitHub REST API client using standard library urllib."""
 
-    def __init__(self, token: str | None = None) -> None:
+    def __init__(self, token: str) -> None:
         self.token = token
 
     def request(self, url: str) -> Any:
@@ -69,9 +69,8 @@ class GitHubApiClient:
             "Accept": "application/vnd.github+json",
             "User-Agent": "chip-label-reviewer-action",
             "X-GitHub-Api-Version": "2022-11-28",
+            "Authorization": f"Bearer {self.token}",
         }
-        if self.token:
-            headers["Authorization"] = f"Bearer {self.token}"
 
         req = urllib.request.Request(url, headers=headers)
         try:
@@ -118,9 +117,8 @@ class GitHubApiClient:
             "User-Agent": "chip-label-reviewer-action",
             "X-GitHub-Api-Version": "2022-11-28",
             "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.token}",
         }
-        if self.token:
-            headers["Authorization"] = f"Bearer {self.token}"
 
         body = json.dumps(data).encode("utf-8")
         req = urllib.request.Request(url, data=body, headers=headers, method="POST")
@@ -450,6 +448,12 @@ def main() -> int:
     logging.info(f"Configured labels with SME reviewers ({len(config_mapping)}):")
     for key, rule in config_mapping.items():
         logging.debug(f"  - '{rule.display_name}': {sorted(rule.smes)}")
+
+    if not args.token:
+        logging.error(
+            "GitHub API token is required. Set GITHUB_TOKEN environment variable or pass --token."
+        )
+        return 2
 
     client = GitHubApiClient(token=args.token)
 

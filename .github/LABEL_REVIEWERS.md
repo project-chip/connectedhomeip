@@ -143,7 +143,10 @@ To prevent pull requests from merging until the SME review check passes:
 The underlying verification script can also be run locally on a developer workstation or cloudtop:
 
 ```bash
-# Basic check on a specific PR
+# Set your GitHub personal access token
+export GITHUB_TOKEN="ghp_xxx"
+
+# Run check on a specific PR
 python3 scripts/tools/check_label_reviewers.py --pr 30000
 
 # Test with a custom config file
