@@ -241,8 +241,11 @@ TEST_F(TestOperationalCredentials, TestPQCProviderRequirements)
     class ProfileProvider : public TestDACProvider
     {
     public:
-        Credentials::DeviceAttestationProfileSupport profiles =
-            Credentials::DeviceAttestationCredentialsProvider::GetDeviceAttestationProfileSupport();
+        Credentials::DeviceAttestationProfileSupport profiles{
+            BitMask<Profile>(Profile::kSupportsEcdsaMatterLegacy),
+            BitMask<Profile>(Profile::kSupportsEcdsaMatterLegacy),
+            BitMask<Profile>(Profile::kSupportsEcdsaMatterLegacy),
+        };
 
         Credentials::DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const override { return profiles; }
     } provider;
@@ -371,6 +374,10 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestLegacyModeIgnoresP
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    if (!result.response.has_value())
+    {
+        return;
+    }
     EXPECT_EQ(result.response->certificate.size(), 32u);
     EXPECT_FALSE(result.response->totalDocumentSize.HasValue());
     EXPECT_FALSE(result.response->nextSegmentID.HasValue());
@@ -387,6 +394,10 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCFeatureServesLe
     auto dacResult = tester.Invoke(dacRequest);
     ASSERT_TRUE(dacResult.IsSuccess());
     ASSERT_TRUE(dacResult.response.has_value());
+    if (!dacResult.response.has_value())
+    {
+        return;
+    }
     EXPECT_EQ(dacResult.response->certificate.size(), 32u);
     EXPECT_EQ(dacResult.response->certificate.data()[0], 0u);
     EXPECT_FALSE(dacResult.response->totalDocumentSize.HasValue());
@@ -398,6 +409,10 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCFeatureServesLe
     auto paiResult = tester.Invoke(paiRequest);
     ASSERT_TRUE(paiResult.IsSuccess());
     ASSERT_TRUE(paiResult.response.has_value());
+    if (!paiResult.response.has_value())
+    {
+        return;
+    }
     EXPECT_EQ(paiResult.response->certificate.size(), 48u);
     EXPECT_EQ(paiResult.response->certificate.data()[0], 0x80u);
     EXPECT_FALSE(paiResult.response->totalDocumentSize.HasValue());
@@ -416,6 +431,10 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestEcdsaProfilesSelec
     auto dacResult = tester.Invoke(dacRequest);
     ASSERT_TRUE(dacResult.IsSuccess());
     ASSERT_TRUE(dacResult.response.has_value());
+    if (!dacResult.response.has_value())
+    {
+        return;
+    }
     EXPECT_EQ(dacResult.response->certificate.size(), 96u);
     EXPECT_EQ(dacResult.response->certificate.data()[0], 0x20u);
     ASSERT_TRUE(dacResult.response->totalDocumentSize.HasValue());
@@ -429,6 +448,10 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestEcdsaProfilesSelec
     auto paiResult = tester.Invoke(paiRequest);
     ASSERT_TRUE(paiResult.IsSuccess());
     ASSERT_TRUE(paiResult.response.has_value());
+    if (!paiResult.response.has_value())
+    {
+        return;
+    }
     EXPECT_EQ(paiResult.response->certificate.size(), 128u);
     EXPECT_EQ(paiResult.response->certificate.data()[0], 0x40u);
     ASSERT_TRUE(paiResult.response->totalDocumentSize.HasValue());
@@ -449,7 +472,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
         request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
         auto result = tester.Invoke(request);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+        if (!result.status.has_value())
+        {
+            return;
+        }
+        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
 
     Commands::CertificateChainRequest::Type unsupportedProfile;
@@ -458,7 +485,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
 
     auto unsupportedProfileResult = tester.Invoke(unsupportedProfile);
     ASSERT_TRUE(unsupportedProfileResult.status.has_value());
-    EXPECT_EQ(unsupportedProfileResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    if (!unsupportedProfileResult.status.has_value())
+    {
+        return;
+    }
+    EXPECT_EQ(unsupportedProfileResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     Commands::CertificateChainRequest::Type outOfBoundsSegment;
     outOfBoundsSegment.certificateType = CertificateChainTypeEnum::kDACCertificate;
@@ -466,7 +497,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
 
     auto outOfBoundsResult = tester.Invoke(outOfBoundsSegment);
     ASSERT_TRUE(outOfBoundsResult.status.has_value());
-    EXPECT_EQ(outOfBoundsResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    if (!outOfBoundsResult.status.has_value())
+    {
+        return;
+    }
+    EXPECT_EQ(outOfBoundsResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     // Unknown generated enum values must be rejected before profile-to-bitmap conversion.
     Commands::CertificateChainRequest::Type unknownProfile;
@@ -475,7 +510,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     unknownProfile.cryptoProfile.SetValue(static_cast<AttestationCryptoProfileEnum>(0xff));
     auto unknownProfileResult = tester.Invoke(unknownProfile);
     ASSERT_TRUE(unknownProfileResult.status.has_value());
-    EXPECT_EQ(unknownProfileResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    if (!unknownProfileResult.status.has_value())
+    {
+        return;
+    }
+    EXPECT_EQ(unknownProfileResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     Commands::CertificateChainRequest::Type unsupportedPqcProfile;
     unsupportedPqcProfile.certificateType = CertificateChainTypeEnum::kPAICertificate;
@@ -483,7 +522,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
 
     auto unsupportedPqcProfileResult = tester.Invoke(unsupportedPqcProfile);
     ASSERT_TRUE(unsupportedPqcProfileResult.status.has_value());
-    EXPECT_EQ(unsupportedPqcProfileResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    if (!unsupportedPqcProfileResult.status.has_value())
+    {
+        return;
+    }
+    EXPECT_EQ(unsupportedPqcProfileResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     // A SegmentID whose offset lands past the end of the document is a client error, not an
     // internal failure, so it has to surface as INVALID_COMMAND rather than the provider's
@@ -495,7 +538,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
 
     auto outOfRangeSegmentResult = tester.Invoke(outOfRangeSegment);
     ASSERT_TRUE(outOfRangeSegmentResult.status.has_value());
-    EXPECT_EQ(outOfRangeSegmentResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    if (!outOfRangeSegmentResult.status.has_value())
+    {
+        return;
+    }
+    EXPECT_EQ(outOfRangeSegmentResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     Commands::CertificateChainRequest::Type undersizedSegmentSize;
     undersizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
@@ -504,7 +551,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
 
     auto undersizedSegmentSizeResult = tester.Invoke(undersizedSegmentSize);
     ASSERT_TRUE(undersizedSegmentSizeResult.status.has_value());
-    EXPECT_EQ(undersizedSegmentSizeResult.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    if (!undersizedSegmentSizeResult.status.has_value())
+    {
+        return;
+    }
+    EXPECT_EQ(undersizedSegmentSizeResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     // TC-OPCREDS-3.9 step 8 requires INVALID_COMMAND above RESP_MAX, even if
     // the actual document would fit in a normal 600-byte segment.
@@ -517,7 +568,11 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
 
         auto result = tester.Invoke(oversizedSegmentSize);
         ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+        if (!result.status.has_value())
+        {
+            return;
+        }
+        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
     }
 }
 
@@ -538,6 +593,10 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegm
         auto result = tester.Invoke(request);
         ASSERT_TRUE(result.IsSuccess()) << "MaxSegmentSize " << maxSegmentSize << " was rejected";
         ASSERT_TRUE(result.response.has_value());
+        if (!result.response.has_value())
+        {
+            return;
+        }
         EXPECT_EQ(result.response->certificate.size(), 96u);
         ASSERT_TRUE(result.response->totalDocumentSize.HasValue());
         EXPECT_EQ(result.response->totalDocumentSize.Value(), 96u);
