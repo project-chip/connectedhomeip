@@ -22,12 +22,8 @@
 
 #include <controller/python/matter/case_capture/CASEHandshakeMetricsBackend.h>
 #include <controller/python/matter/case_capture/CompletedCASEHandshakeQueue.h>
-#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-
-static_assert(CONFIG_BUILD_FOR_HOST_UNIT_TEST,
-              "CASEHandshakeMetrics.cpp requires CONFIG_BUILD_FOR_HOST_UNIT_TEST; it is only valid for the Python test build.");
 
 extern "C" {
 
