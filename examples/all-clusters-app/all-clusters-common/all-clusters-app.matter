@@ -8734,7 +8734,7 @@ endpoint 1 {
     callback attribute holdTimeLimits;
     callback attribute predictedOccupancy;
     callback attribute PIROccupiedToUnoccupiedDelay;
-    ram      attribute featureMap default = 0x0100;
+    ram      attribute featureMap default = 0x0102;
     callback attribute clusterRevision;
   }
 
