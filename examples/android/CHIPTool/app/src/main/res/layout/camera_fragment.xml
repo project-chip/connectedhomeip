@@ -105,24 +105,6 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold" />
             </LinearLayout>
-            <EditText
-                android:id="@+id/liveviewLocalWidthEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints="Liveview Width"
-                android:hint="@string/camera_liveview_local_width_hint"
-                android:text="@string/camera_liveview_local_width"
-                android:inputType="numberDecimal"
-                android:gravity="top"/>
-            <EditText
-                android:id="@+id/liveviewLocalHeightSEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints="LiveView Height"
-                android:hint="@string/camera_liveview_local_height_hint"
-                android:text="@string/camera_liveview_local_height"
-                android:inputType="numberDecimal"
-                android:gravity="top" />
             <Button
                 android:id="@+id/liveviewLocalAllocateVideoStreamBtn"
                 android:layout_width="match_parent"

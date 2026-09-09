@@ -186,6 +186,12 @@ void AndroidWebRTCTransportProviderClient::HandleCommandResponse(void * appConte
     auto * self = static_cast<AndroidWebRTCTransportProviderClient *>(appContext);
     VerifyOrReturn(self != nullptr);
 
+    if (status != chip::Protocols::InteractionModel::Status::Success)
+    {
+        self->NotifyError(chip::app::StatusIB(status, clusterStatus).ToChipError());
+        return;
+    }
+
     if (payload == nullptr || length == 0)
     {
         self->NotifyError(CHIP_ERROR_INVALID_ARGUMENT);
@@ -252,7 +258,7 @@ void AndroidWebRTCTransportProviderClient::HandleCommandDone(void * appContext)
 
 static jobject CreateJavaInteger(JNIEnv * env, Optional<DataModel::Nullable<uint16_t>> value)
 {
-    if (!value.HasValue() || !value.Value().IsNull())
+    if (!value.HasValue() || value.Value().IsNull())
     {
         return nullptr;
     }

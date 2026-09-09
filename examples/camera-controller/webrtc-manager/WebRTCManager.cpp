@@ -204,11 +204,11 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(const WebRTCSessionStruct & sessio
     {
         std::string mergedSdp = MergeICECandidatesIntoSDP(mClientSDP, candidates);
 
-        size_t maxBase64Len = BASE64_ENCODED_LEN(mClientSDP.length());
+        size_t maxBase64Len = BASE64_ENCODED_LEN(mergedSdp.length());
         std::vector<char> base64SdpBuf(maxBase64Len + 1);
 
-        uint16_t base64SdpLen = chip::Base64Encode(reinterpret_cast<const uint8_t *>(mClientSDP.data()),
-                                                   static_cast<uint16_t>(mClientSDP.length()), base64SdpBuf.data());
+        uint16_t base64SdpLen = chip::Base64Encode(reinterpret_cast<const uint8_t *>(mergedSdp.data()),
+                                                   static_cast<uint16_t>(mergedSdp.length()), base64SdpBuf.data());
         std::string base64Sdp(base64SdpBuf.data(), base64SdpLen);
 
         ChipLogDetail(Camera, "SDP(Base64) : \n%s", base64Sdp.c_str());

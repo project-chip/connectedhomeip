@@ -43,8 +43,10 @@ void AndroidWebRTCTransportRequestorManager::Init(JNIEnv * env, jobject javaCall
 
     // Creates a global reference so the Java object is not destroyed by the GC.
     mJavaCallbackObj = env->NewGlobalRef(javaCallbackObj);
+    VerifyOrReturn(mJavaCallbackObj != nullptr, ChipLogError(Controller, "Failed to create global ref for WebRTC delegate"));
 
     jclass cbClass = env->GetObjectClass(mJavaCallbackObj);
+    VerifyOrReturn(cbClass != nullptr, ChipLogError(Controller, "Failed to get WebRTC delegate class"));
 
     // Caches the IDs of the callback methods to be implemented on the Java side.
     // Changed return type from 'V' (void) to 'I' (integer)
@@ -79,6 +81,8 @@ void AndroidWebRTCTransportRequestorManager::Init(JNIEnv * env, jobject javaCall
     }
 
     // Registers the JNI static callback functions with the original C++ manager.
+
+    VerifyOrReturn(mJavaCallbackObj != nullptr && mOnOfferMethod != nullptr && mOnAnswerMethod != nullptr && mOnEndMethod != nullptr && mOnICECandidatesMethod != nullptr && mIceCandidateClass != nullptr, ChipLogError(Controller, "WebRTC Transport Requestor JNI callbacks not initialized; skipping init"));
     WebRTCTransportRequestorManager::Instance().InitCallbacks(OnOffer, OnAnswer, OnICECandidates, OnEnd);
     WebRTCTransportRequestorManager::Instance().Init();
 }
@@ -106,16 +110,15 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnOffer(uint16_t sessionId, c
 {
     ChipLogProgress(Controller, "OnOffer called for sessionId: %u", sessionId);
 
-    JNIEnv * env = nullptr;
-    if (gJvm->AttachCurrentThread(&env, nullptr) != JNI_OK)
-    {
-        ChipLogError(Controller, "Failed to attach current thread for OnOffer");
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(gJvm != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(Instance().mJavaCallbackObj != nullptr && Instance().mOnOfferMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     jstring jOffer = env->NewStringUTF(offer);
     jint status    = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnOfferMethod, sessionId, jOffer);
     env->DeleteLocalRef(jOffer);
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_ERROR_INTERNAL);
 
     return (status == 0) ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }

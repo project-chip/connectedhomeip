@@ -1,3 +1,5 @@
+package com.google.chip.chiptool.clusterclient
+
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -18,7 +20,6 @@ import chip.devicecontroller.WebRTCTransportProvideOfferCallback
 import chip.devicecontroller.WebRTCTransportRequestorDelegate
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import com.google.chip.chiptool.databinding.CameraFragmentBinding
 import java.io.File
 import java.io.FileOutputStream
@@ -149,10 +150,7 @@ class CameraFragment : Fragment() {
 
   private fun setupLocalLiveViewListeners() {
     binding.liveviewLocalAllocateVideoStreamBtn.setOnClickListener {
-      val width = binding.liveviewLocalWidthEditText.text.toString().toUIntOrNull() ?: 0U
-      val height = binding.liveviewLocalHeightSEditText.text.toString().toUIntOrNull() ?: 0U
-
-      scope.launch { sendAllocateVideoStream(width, height) }
+      scope.launch { sendAllocateVideoStream() }
     }
 
     binding.startLiveviewBtn.setOnClickListener { scope.launch { startLiveView() } }
@@ -169,7 +167,7 @@ class CameraFragment : Fragment() {
     }
   }
 
-  private suspend fun sendAllocateVideoStream(width: UInt, height: UInt) {
+  private suspend fun sendAllocateVideoStream() {
     val devicePtr =
       try {
         ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
@@ -644,8 +642,11 @@ class CameraFragment : Fragment() {
     )
   }
 
-  private fun setRemoteDescription(answerSdp: String) {
-    val sessionDescription = SessionDescription(SessionDescription.Type.ANSWER, answerSdp)
+  private fun setRemoteDescription(sdp: String) {
+    val remoteType =
+      if (peerConnection?.localDescription == null) SessionDescription.Type.OFFER
+      else SessionDescription.Type.ANSWER
+    val sessionDescription = SessionDescription(remoteType, sdp)
     peerConnection?.setRemoteDescription(
       object : SdpObserver {
         override fun onCreateSuccess(sdp: SessionDescription?) {}
@@ -786,12 +787,26 @@ class CameraFragment : Fragment() {
           resolution: ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct?
         ) {
           Log.d(TAG, "Capture Snapshot Success! $imageCodec")
-          downloadFileOutputStream.write(data)
+          if (data == null) {
+            downloadFileOutputStream.close()
+            Log.e(TAG, "Capture Snapshot returned null data")
+            return
+          }
+          val bytes =
+            data
+              ?: run {
+                Log.e(TAG, "Capture Snapshot returned null data")
+                downloadFileOutputStream.close()
+                return
+              }
+          downloadFileOutputStream.use { it.write(bytes) }
+          downloadFileOutputStream.close()
           scope.launch { showNotification(downloadFile) }
         }
 
         override fun onError(error: java.lang.Exception?) {
           Log.e(TAG, "Capture Snapshot Error", error)
+          runCatching { downloadFileOutputStream.close() }
           scope.launch(Dispatchers.Main) {
             Toast.makeText(
                 requireContext(),

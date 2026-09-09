@@ -48,6 +48,10 @@ CHIP_ERROR LiveViewStartCommand::RunCommand()
 
         camera::DeviceManager::Instance().SetClientSdp(clientSdp);
     }
+    else
+    {
+        camera::DeviceManager::Instance().SetClientSdp("");
+    }
 
     return camera::DeviceManager::Instance().AllocateVideoStream(mPeerNodeId, streamUsage, camera::WebRTCOfferType::kProvideOffer,
                                                                  mMinResWidth, mMinResHeight, mMinFrameRate, mMinBitRate);
