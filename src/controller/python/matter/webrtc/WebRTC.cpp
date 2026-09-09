@@ -229,8 +229,8 @@ void webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle hand
     if (it != g_provider_clients.end())
     {
         gOnCommandSenderResponseCallback = onCommandSenderResponseCallback;
-        gOnCommandSenderErrorCallback = onCommandSenderErrorCallback;
-        gOnCommandSenderDoneCallback = onCommandSenderDoneCallback;
+        gOnCommandSenderErrorCallback    = onCommandSenderErrorCallback;
+        gOnCommandSenderDoneCallback     = onCommandSenderDoneCallback;
         it->second->InitCallbacks(OnCommandResponseCallback, OnCommandErrorCallback, OnCommandDoneCallback);
     }
 }

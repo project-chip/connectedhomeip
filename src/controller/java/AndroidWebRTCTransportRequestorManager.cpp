@@ -82,7 +82,9 @@ void AndroidWebRTCTransportRequestorManager::Init(JNIEnv * env, jobject javaCall
 
     // Registers the JNI static callback functions with the original C++ manager.
 
-    VerifyOrReturn(mJavaCallbackObj != nullptr && mOnOfferMethod != nullptr && mOnAnswerMethod != nullptr && mOnEndMethod != nullptr && mOnICECandidatesMethod != nullptr && mIceCandidateClass != nullptr, ChipLogError(Controller, "WebRTC Transport Requestor JNI callbacks not initialized; skipping init"));
+    VerifyOrReturn(mJavaCallbackObj != nullptr && mOnOfferMethod != nullptr && mOnAnswerMethod != nullptr &&
+                       mOnEndMethod != nullptr && mOnICECandidatesMethod != nullptr && mIceCandidateClass != nullptr,
+                   ChipLogError(Controller, "WebRTC Transport Requestor JNI callbacks not initialized; skipping init"));
     WebRTCTransportRequestorManager::Instance().InitCallbacks(OnOffer, OnAnswer, OnICECandidates, OnEnd);
     WebRTCTransportRequestorManager::Instance().Init();
 }
