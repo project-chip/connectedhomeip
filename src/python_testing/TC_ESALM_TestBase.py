@@ -101,10 +101,12 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
                      "Verify that the DUT response contains a map32 AlarmBitmap. Bit "
                      f"{bit} is 0 (alarm not yet active before test begins)."),
             TestStep(4, "TH establishes a subscription to State with MinIntervalFloor=0 and "
-                     "MaxIntervalCeiling=30.",
-                     "Subscription is established successfully."),
-            TestStep("4a", "TH awaits subscription report of an initial priming report for State.",
-                     "Priming report received carrying the current State value."),
+                     "MaxIntervalCeiling=30, and a subscription to the Notify event on the same "
+                     "interval.",
+                     "Both subscriptions are established successfully."),
+            TestStep("4a", "TH reads from the DUT the State to establish the baseline for the "
+                     "reports awaited in later steps.",
+                     f"Verify that the DUT response contains a map32 AlarmBitmap. Bit {bit} is 0."),
             TestStep(5, f"{trigger_cmd} with EventTrigger set to {trig_set} to simulate the "
                      f"{alarm_name} alarm condition.",
                      "Verify DUT responds w/ status SUCCESS(0x00)."),
