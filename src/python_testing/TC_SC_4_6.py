@@ -93,9 +93,7 @@ class TC_SC_4_6(MatterBaseTest):
 
             TestStep(3, """TH performs a 'Commissioner Service' SRV record query against the instance name""",
                      """- Verify that the SRV record is returned and its instance name is equal to the browsed instance name
-                        - Verify that the target hostname is expressed as a
-                          twelve or sixteen capital letter hex string. 
-                          """),
+                        - Verify that the target hostname is expressed as a twelve or sixteen capital letter hex string."""),
 
             TestStep(4, """TH performs a 'Commissioner Service' TXT record query against the instance name""",
                      """- If the VP key is present, verify that it is non-empty and contains at least Vendor ID, and if
@@ -143,9 +141,9 @@ class TC_SC_4_6(MatterBaseTest):
                              f"There must only be one commissioner service advertised, found {len(services)}.")
         service = services[0]
 
-        # Verify that the DNS-SD instance name is a 64-bit randomly selected ID
-        # expressed as a sixteen-char hex string with capital letters (the rule is
-        # shared with the commissionable instance name)
+        # Verify that the DNS-SD instance name is a 64-bit ID expressed as a
+        # sixteen-char hex string with capital letters (the rule is shared with
+        # the commissionable instance name)
         assert_valid_commissionable_instance_name(service.instance_name)
 
         # Verify that the service type is '_matterd._udp' and service domain '.local'
@@ -168,8 +166,8 @@ class TC_SC_4_6(MatterBaseTest):
         asserts.assert_equal(srv_record.instance_name, instance_name,
                              "SRV record's instance name must be equal to the commissioner service instance name.")
 
-        # Verify that the target hostname is derived from the 48bit or 64bit MAC
-        # address expressed as a twelve or sixteen capital letter hex string
+        # Verify that the target hostname is expressed as a twelve or sixteen
+        # capital letter hex string
         assert_valid_hostname(srv_record.hostname)
 
         return srv_record.hostname
