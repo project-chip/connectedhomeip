@@ -34,14 +34,16 @@ namespace webrtc {
 static std::mutex g_mutex;
 static std::map<WebRTCClientHandle, std::shared_ptr<WebRTCClient>> g_clients;
 
-struct ProviderClientWrapper {
+struct ProviderClientWrapper
+{
     std::unique_ptr<WebRTCTransportProviderClient> client;
     OnCommandSenderResponseCallback onResponse = nullptr;
-    OnCommandSenderErrorCallback onError = nullptr;
-    OnCommandSenderDoneCallback onDone = nullptr;
+    OnCommandSenderErrorCallback onError       = nullptr;
+    OnCommandSenderDoneCallback onDone         = nullptr;
 };
 
-struct CommandContext {
+struct CommandContext
+{
     void * pythonAppContext;
     WebRTCClientHandle handle;
 };
@@ -50,10 +52,10 @@ static std::map<WebRTCClientHandle, std::unique_ptr<ProviderClientWrapper>> g_pr
 
 WebRTCClientHandle webrtc_client_create()
 {
-    auto wrapper = std::make_unique<ProviderClientWrapper>();
-    wrapper->client = std::make_unique<WebRTCTransportProviderClient>();
+    auto wrapper              = std::make_unique<ProviderClientWrapper>();
+    wrapper->client           = std::make_unique<WebRTCTransportProviderClient>();
     WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(wrapper->client.get());
-    
+
     std::lock_guard<std::mutex> lock(g_mutex);
     g_provider_clients[handle] = std::move(wrapper);
     return handle;
@@ -185,8 +187,8 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
 
 WebRTCClientHandle webrtc_provider_client_create()
 {
-    auto wrapper = std::make_unique<ProviderClientWrapper>();
-    wrapper->client = std::make_unique<WebRTCTransportProviderClient>();
+    auto wrapper              = std::make_unique<ProviderClientWrapper>();
+    wrapper->client           = std::make_unique<WebRTCTransportProviderClient>();
     WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(wrapper->client.get());
 
     std::lock_guard<std::mutex> lock(g_mutex);
@@ -215,13 +217,15 @@ void OnCommandResponseCallback(void * appContext, chip::EndpointId endpointId, c
                                const uint8_t * payload, uint32_t length)
 {
     CommandContext * ctx = static_cast<CommandContext *>(appContext);
-    if (!ctx) return;
+    if (!ctx)
+        return;
 
     std::lock_guard<std::mutex> lock(g_mutex);
     auto it = g_provider_clients.find(ctx->handle);
     if (it != g_provider_clients.end() && it->second->onResponse)
     {
-        it->second->onResponse(ctx->pythonAppContext, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus, payload, length);
+        it->second->onResponse(ctx->pythonAppContext, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus,
+                               payload, length);
     }
 }
 
@@ -229,7 +233,8 @@ void OnCommandErrorCallback(void * appContext, chip::Protocols::InteractionModel
                             CHIP_ERROR error)
 {
     CommandContext * ctx = static_cast<CommandContext *>(appContext);
-    if (!ctx) return;
+    if (!ctx)
+        return;
 
     std::lock_guard<std::mutex> lock(g_mutex);
     auto it = g_provider_clients.find(ctx->handle);
@@ -242,7 +247,8 @@ void OnCommandErrorCallback(void * appContext, chip::Protocols::InteractionModel
 void OnCommandDoneCallback(void * appContext)
 {
     CommandContext * ctx = static_cast<CommandContext *>(appContext);
-    if (!ctx) return;
+    if (!ctx)
+        return;
 
     {
         std::lock_guard<std::mutex> lock(g_mutex);
@@ -279,9 +285,9 @@ PyChipError webrtc_provider_client_send_command(WebRTCClientHandle handle, void 
     auto it = g_provider_clients.find(handle);
     if (it != g_provider_clients.end())
     {
-        CommandContext * ctx = new CommandContext{appContext, handle};
-        CHIP_ERROR err = it->second->client->SendCommand(ctx, endpointId, clusterId, commandId, payload, length);
-        
+        CommandContext * ctx = new CommandContext{ appContext, handle };
+        CHIP_ERROR err       = it->second->client->SendCommand(ctx, endpointId, clusterId, commandId, payload, length);
+
         if (err != CHIP_NO_ERROR)
         {
             delete ctx;
