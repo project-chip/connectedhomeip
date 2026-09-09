@@ -95,10 +95,18 @@ CHIP_ERROR LoggingOven::RegisterParts(EndpointIdAllocator & allocator, CodeDrive
 
 void LoggingOven::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
-    mSurface.Unregister(provider);
+    // Parts whose registration never completed (or was rolled back) still have an invalid
+    // endpoint id: skip them, unregistering them again would fail in RemoveEndpoint().
+    if (mSurface.GetEndpointId() != kInvalidEndpointId)
+    {
+        mSurface.Unregister(provider);
+    }
     for (auto it = mCavities.rbegin(); it != mCavities.rend(); ++it)
     {
-        (*it)->Unregister(provider);
+        if ((*it)->GetEndpointId() != kInvalidEndpointId)
+        {
+            (*it)->Unregister(provider);
+        }
     }
 }
 
