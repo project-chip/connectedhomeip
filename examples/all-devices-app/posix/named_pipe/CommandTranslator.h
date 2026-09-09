@@ -117,8 +117,7 @@ public:
     {
         static_assert(std::is_unsigned_v<T>, "ExtractUInt requires an unsigned integer type");
         if (!json.isObject() || !json.isMember(key) || !json[key].isIntegral() ||
-            (json[key].isInt64() && json[key].asInt64() < 0) ||
-            json[key].asUInt64() > std::numeric_limits<T>::max())
+            (json[key].isInt64() && json[key].asInt64() < 0) || json[key].asUInt64() > std::numeric_limits<T>::max())
         {
             return std::nullopt;
         }
