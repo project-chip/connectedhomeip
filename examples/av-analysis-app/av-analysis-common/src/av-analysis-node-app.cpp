@@ -93,18 +93,8 @@ void AvAnalysisNodeApp::Shutdown()
 {
     ChipLogProgress(AppServer, "AvAnalysisNodeApp: Shutdown");
 
-    // Abandon any signaling exchange still in flight
+    // Abandon any signaling exchange still in flight.
     mWebRTCClient.Cancel();
-
-    if (mWebRTCRequestorServer.IsConstructed())
-    {
-        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCRequestorServer.Cluster());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "WebRTCTransportRequestor unregister error: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        mWebRTCRequestorServer.Destroy();
-    }
 
     if (mAvAnalysisServer.IsConstructed())
     {
@@ -114,6 +104,16 @@ void AvAnalysisNodeApp::Shutdown()
             ChipLogError(AppServer, "AVAnalysis unregister error: %" CHIP_ERROR_FORMAT, err.Format());
         }
         mAvAnalysisServer.Destroy();
+    }
+
+    if (mWebRTCRequestorServer.IsConstructed())
+    {
+        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCRequestorServer.Cluster());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "WebRTCTransportRequestor unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        mWebRTCRequestorServer.Destroy();
     }
 }
 
