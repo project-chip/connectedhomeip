@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  */
 #include <device/types/doorbell/Doorbell.h>
 #include <devices/Types.h>
-#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -26,6 +25,8 @@ namespace app {
 
 namespace {
 const ClusterId kClientClusters[] = { Chime::Id };
+// Assuming a simple doorbell with two switch positions.
+const uint8_t kSwitchNumberOfPositions = 2;
 } // namespace
 
 Doorbell::Doorbell(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
@@ -36,13 +37,15 @@ Doorbell::Doorbell(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager &
 
 CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    SwitchCluster::StartupConfiguration switchConfig = { 2, 2 };
-    mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kMomentarySwitch), switchConfig);
+    mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kMomentarySwitch), SwitchCluster::StartupConfiguration{ .numberOfPositions = kSwitchNumberOfPositions });
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 
     mBindingCluster.Create(
@@ -54,7 +57,10 @@ CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProv
         endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+ 
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void Doorbell::Unregister(CodeDrivenDataModelProvider & provider)
