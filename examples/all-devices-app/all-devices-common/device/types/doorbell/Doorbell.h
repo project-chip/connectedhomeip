@@ -19,7 +19,6 @@
 #include <app/clusters/bindings/BindingCluster.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
-#include <app/clusters/chime-server/ChimeCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/switch-server/SwitchCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
