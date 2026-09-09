@@ -1872,7 +1872,8 @@ void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)
     // Note: PushAVTransportManager doesn't need zone stopped event currently
 }
 
-void CameraDevice::HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds)
+void CameraDevice::HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
+                                                               uint16_t identifiedContextId)
 {
     bool triggeredContextEnabled;
 
@@ -1891,7 +1892,7 @@ void CameraDevice::HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespace
         }
     }
 
-    mAVAnalysisManager.OnAmbientContextTriggeredEvent(namespaceId, tagId, mZoneIds, triggeredContextEnabled);
+    mAVAnalysisManager.OnAmbientContextTriggeredEvent(namespaceId, tagId, mZoneIds, identifiedContextId, triggeredContextEnabled);
 
     // We only want to trigger PushAV if the triggering context has been enabled
     if (triggeredContextEnabled)

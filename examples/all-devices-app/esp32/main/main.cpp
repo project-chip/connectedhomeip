@@ -28,6 +28,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/root-node/WifiRootNode.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -104,6 +105,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
+LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<DeviceInterface> gRootNode;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
@@ -313,6 +315,7 @@ void InitServer(intptr_t context)
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
@@ -322,6 +325,7 @@ void InitServer(intptr_t context)
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,
+            .identifyDelegate  = gIdentifyDelegate,
         });
     });
 #endif

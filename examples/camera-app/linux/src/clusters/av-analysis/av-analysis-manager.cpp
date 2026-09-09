@@ -17,6 +17,7 @@
  */
 
 #include "av-analysis-manager.h"
+#include "camera-device-interface.h"
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -37,24 +38,20 @@ void AvAnalysisManager::ShutdownApp() {}
  */
 CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs)
 {
+    if (aZoneIDs.empty())
+    {
+        return CHIP_NO_ERROR;
+    }
     VerifyOrReturnError(mCameraDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    // Get our Zone Manager. Ensure that:
-    // - each zone ID exists
-    // - for each zoneID, it does not represent a privacy zone
-    //
-    bool zoneNotFound = false;
-
-    for (const auto & zone : aZoneIDs)
+    for (uint16_t zoneId : aZoneIDs)
     {
-        if (!mCameraDevice->GetCameraHALInterface().IsValidAnalysisZone(zone))
+        if (!mCameraDevice->GetCameraHALInterface().IsValidAnalysisZone(zoneId))
         {
-            zoneNotFound = true;
-            break;
+            return CHIP_ERROR_NOT_FOUND;
         }
     }
-
-    return (zoneNotFound ? CHIP_ERROR_NOT_FOUND : CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
 }
 
 bool AvAnalysisManager::CanAddContextTriggers()
@@ -70,10 +67,19 @@ CHIP_ERROR AvAnalysisManager::PersistentAttributesLoadedCallback()
 }
 
 /**
- * Context event handling
+ * Context event handling. Invoked by an app or by app-pipe handling when a new context trigger is detected. This
+ * verifies that the triggered context is part of the current enabled set on the server, informs the invoker of this
+ * (via setting triggerContextEnabled), and generates the event.
+ * 
+ * @param namespaceId           the namespace for the trigger
+ * @param tagId                 the actual context tag within the namespace
+ * @param zoneIds               the zoneIds for the trigger, if present
+ * @param identifiedContextId   the current app generated context id
+ * @param triggerContextEnabled boolean that is set, true if this is an enabled context
  */
 void AvAnalysisManager::OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId,
                                                        Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds,
+                                                       uint16_t identifiedContextId,
                                                        bool & triggeredContextEnabled)
 {
     ChipLogProgress(Camera, "AvAnalysisManager::OnAmbientContextTriggeredEvent. Namespace %d, Tag %d", namespaceId, tagId);
@@ -87,12 +93,119 @@ void AvAnalysisManager::OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint
     triggeredContextEnabled = GetServer()->IsTriggeringContextActive(context, zoneIds);
     ChipLogProgress(Camera, "AvAnalysisManager::OnAmbientContextTriggeredEvent. ContextEnabled %s.",
                     triggeredContextEnabled ? "true" : "false");
+                    
+    if (!triggeredContextEnabled)
+    {
+        return;
+    }
+    
+    // Generate our perceived context event.  
+    // Create our TrackedContext
+    Structs::TrackedContext::Type aTrackedContext;
+    std::vector<Structs::TrackedContext::Type> trackedContextList;
+    std::vector<Structs::TrackedContext::Type> expiredContextList;
+
+    aTrackedContext.identifiedContextID = identifiedContextId;
+    aTrackedContext.identifiedContext = context;
+    
+    trackedContextList.push_back(aTrackedContext);
+    
+    CHIP_ERROR err = TriggerPerceivedContext(trackedContextList, expiredContextList, Optional<uint16_t>(), Optional<NodeId>());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysisManager: Failed to trigger perceived context: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
-/*
- * Camera App Interface
- */
-void AvAnalysisManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
+CHIP_ERROR AvAnalysisManager::TriggerSessionStart(const std::vector<uint16_t> & aZoneIds, bool aZoneIdsNull,
+                                                  chip::Optional<chip::NodeId> aSourceNodeId)
 {
-    mCameraDevice = aCameraDevice;
+    AvAnalysisCluster * server = GetServer();
+    VerifyOrReturnError(server != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    DataModel::Nullable<std::vector<uint16_t>> zoneList;
+    if (!aZoneIdsNull)
+    {
+        zoneList.SetNonNull(aZoneIds);
+    }
+
+    uint16_t sessionId = 0;
+    CHIP_ERROR err     = server->AnalysisSessionStart(sessionId, zoneList, aSourceNodeId);
+    if (err == CHIP_NO_ERROR)
+    {
+        mLatestSessionId           = sessionId;
+        mHasActiveSession          = true;
+        mSessionHasTrackedContexts = false;
+        ChipLogProgress(Zcl, "AvAnalysisManager: Started analysis session %u", sessionId);
+    }
+    else
+    {
+        ChipLogError(Zcl, "AvAnalysisManager: Failed to start session: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
+}
+
+CHIP_ERROR
+AvAnalysisManager::TriggerPerceivedContext(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContexts,
+                                           const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aExpiredContexts,
+                                           chip::Optional<uint16_t> aSessionId, chip::Optional<chip::NodeId> aSourceNodeId)
+{
+    AvAnalysisCluster * server = GetServer();
+    VerifyOrReturnError(server != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // If no active session exists, auto-create a session first without emitting AnalysisSessionStart event
+    if (!mHasActiveSession)
+    {
+        uint16_t sid = aSessionId.ValueOr(0);
+        ReturnErrorOnFailure(server->CreateActiveSession(sid, aSourceNodeId, aSessionId.HasValue()));
+        mLatestSessionId           = sid;
+        mHasActiveSession          = true;
+        mSessionHasTrackedContexts = false;
+    }
+
+    uint16_t sessionId = aSessionId.ValueOr(mLatestSessionId);
+
+    if (!aNewContexts.empty())
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        if (!mSessionHasTrackedContexts)
+        {
+            err = server->InitialTriggeringContextDetected(sessionId, aNewContexts, aSourceNodeId);
+            if (err == CHIP_NO_ERROR)
+            {
+                mSessionHasTrackedContexts = true;
+            }
+        }
+        else
+        {
+            err = server->NewContextDetected(sessionId, aNewContexts, aSourceNodeId);
+        }
+        ReturnErrorOnFailure(err);
+    }
+
+    if (!aExpiredContexts.empty())
+    {
+        ReturnErrorOnFailure(server->ContextNoLongerDetected(sessionId, aExpiredContexts, aSourceNodeId));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisManager::TriggerSessionEnd(chip::Optional<uint16_t> aSessionId, chip::Optional<chip::NodeId> aSourceNodeId)
+{
+    AvAnalysisCluster * server = GetServer();
+    VerifyOrReturnError(server != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint16_t sessionId = aSessionId.ValueOr(mLatestSessionId);
+    CHIP_ERROR err     = server->AnalysisSessionEnd(sessionId, aSourceNodeId);
+    if (err == CHIP_NO_ERROR)
+    {
+        if (sessionId == mLatestSessionId)
+        {
+            mHasActiveSession          = false;
+            mSessionHasTrackedContexts = false;
+        }
+        ChipLogProgress(Zcl, "AvAnalysisManager: Ended analysis session %u", sessionId);
+    }
+    return err;
 }

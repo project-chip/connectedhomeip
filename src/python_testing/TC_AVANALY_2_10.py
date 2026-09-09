@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -139,7 +139,7 @@ class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtil
         # Manual: User should trigger an ambient context event from the defined zone.
         if self.is_pics_sdk_ci_only:
             self.write_to_app_pipe({"Name": "AmbientContextTriggered", "NamespaceId": namespace_id,
-                                   "TagId": tag_id, "ZoneIds": zone_ids})
+                                   "TagId": tag_id, "ZoneIds": zone_ids, "IdentifiedContextId": 1})
         else:
             if prompt_msg is None:
                 prompt_msg = "Press enter and immediately start a detectable ambient context activity anywhere in the frame."
