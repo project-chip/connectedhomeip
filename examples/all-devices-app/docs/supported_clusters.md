@@ -111,7 +111,7 @@ To update or validate this list manually, follow these steps:
 | 65        | Groups                                                     | 4 (0x0004)    | Yes                | Yes                 |                                       |
 | 66        | HEPA Filter Monitoring                                     | 113 (0x0071)  | Yes                | No                  | Alias of Resource Monitoring          |
 | 67        | Humidistat                                                 | 517 (0x0205)  | Yes                | No                  |                                       |
-| 68        | ICD Management                                             | 70 (0x0046)   | Yes                | Yes                  |                                       |
+| 68        | ICD Management                                             | 70 (0x0046)   | Yes                | Yes                 |                                       |
 | 69        | Identify                                                   | 3 (0x0003)    | Yes                | Yes                 |                                       |
 | 70        | Illuminance Measurement                                    | 1024 (0x0400) | Yes                | Yes                 |                                       |
 | 71        | Joint Fabric Administrator                                 | 1875 (0x0753) | No                 | No                  |                                       |

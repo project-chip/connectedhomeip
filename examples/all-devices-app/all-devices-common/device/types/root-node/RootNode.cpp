@@ -160,8 +160,8 @@ CHIP_ERROR RootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
         mIcdManagementCluster.Create(endpointId, *mContext.icdSymmetricKeystore, mContext.fabricTable,
-                                     ICDConfigurationData::GetInstance(), ClusterType::OptionalAttributeSet(0),
-                                     enabledCommands, BitMask<IcdManagement::UserActiveModeTriggerBitmap>(0), CharSpan());
+                                     ICDConfigurationData::GetInstance(), ClusterType::OptionalAttributeSet(0), enabledCommands,
+                                     BitMask<IcdManagement::UserActiveModeTriggerBitmap>(0), CharSpan());
         ReturnErrorOnFailure(provider.AddCluster(mIcdManagementCluster.Registration()));
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
