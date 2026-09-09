@@ -18,7 +18,6 @@
 #include <app/clusters/audio-control-server/AudioControlCluster.h>
 
 #include <algorithm>
-#include <optional>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/data-model/Decode.h>
@@ -30,6 +29,7 @@
 #include <clusters/ScenesManagement/Structs.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <optional>
 
 namespace chip::app::Clusters {
 
@@ -82,10 +82,10 @@ AudioControlSceneValidator & GlobalSceneValidator()
 
 AudioControlCluster::AudioControlCluster(EndpointId endpointId, AudioControlDelegate & delegate, const Config & config) :
     DefaultServerCluster({ endpointId, AudioControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalSceneValidator()),
-    mDelegate(delegate), mFeatures(config.mFeatures),
-    mOptionalAttributeSet(config.mOptionalAttributeSet), mMinDeviceVolume(delegate.GetMinDeviceVolume()),
-    mMaxDeviceVolume(delegate.GetMaxDeviceVolume()), mMaxDeviceVolumeDB(delegate.GetMaxDeviceVolumeDB()),
-    mMinCorrection(delegate.GetMinCorrection()), mMaxCorrection(delegate.GetMaxCorrection())
+    mDelegate(delegate), mFeatures(config.mFeatures), mOptionalAttributeSet(config.mOptionalAttributeSet),
+    mMinDeviceVolume(delegate.GetMinDeviceVolume()), mMaxDeviceVolume(delegate.GetMaxDeviceVolume()),
+    mMaxDeviceVolumeDB(delegate.GetMaxDeviceVolumeDB()), mMinCorrection(delegate.GetMinCorrection()),
+    mMaxCorrection(delegate.GetMaxCorrection())
 {
     VerifyOrDie(mMinDeviceVolume >= 1);
     VerifyOrDie(mMaxDeviceVolume >= mMinDeviceVolume);
@@ -1032,7 +1032,7 @@ CHIP_ERROR AudioControlCluster::SerializeSave(EndpointId endpoint, ClusterId clu
 }
 
 CHIP_ERROR AudioControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
-                                          scenes::TransitionTimeMs timeMs)
+                                           scenes::TransitionTimeMs timeMs)
 {
     // Transition time is intentionally ignored: the stored values are applied immediately, as
     // there is no meaningful hardware ramp for mute or tone controls.

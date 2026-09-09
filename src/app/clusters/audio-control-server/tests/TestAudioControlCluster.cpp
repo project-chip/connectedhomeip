@@ -3495,7 +3495,7 @@ TEST_F(TestAudioControlCluster, StartUpVolumeOverridePersistsAcrossReboot)
 
 namespace {
 
-using ScenePair     = ScenesManagement::Structs::AttributeValuePairStruct::Type;
+using ScenePair      = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 using SceneDecodable = ScenesManagement::Structs::AttributeValuePairStruct::DecodableType;
 
 // Encodes a list of {attributeID, value} pairs into a scene EFS blob, as the scene table would.
@@ -3518,8 +3518,7 @@ TEST_F(TestAudioControlCluster, SceneSupportsClusterOnlyOwnEndpointAndCluster)
 
 TEST_F(TestAudioControlCluster, SceneSerializeMandatoryAttributesOnly)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(42));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(42));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     uint8_t buffer[128];
@@ -3530,7 +3529,7 @@ TEST_F(TestAudioControlCluster, SceneSerializeMandatoryAttributesOnly)
     ASSERT_EQ(cluster.DecodeAttributeValueList(serialized, list), CHIP_NO_ERROR);
 
     bool sawSoftMuted = false, sawVolume = false;
-    auto it           = list.begin();
+    auto it = list.begin();
     while (it.Next())
     {
         const auto & p = it.GetValue();
