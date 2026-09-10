@@ -137,7 +137,7 @@ private:
         // rejects would mean the builder emitted something it cannot itself read.
         NullParserDelegate delegate;
         const BytesRange reply(data->Start(), data->Start() + data->DataLength());
-        EXPECT_TRUE(ParsePacket(reply, &delegate));
+        EXPECT_TRUE(ParseMdnsPacket(reply, &delegate));
         return CHIP_NO_ERROR;
     }
 
@@ -329,7 +329,7 @@ void RespondToQueryNoCorruption(const std::vector<uint8_t> & queryPacket)
 
     const BytesRange packet(queryPacket.data(), queryPacket.data() + queryPacket.size());
     RespondingDelegate delegate(sender, source);
-    (void) ParsePacket(packet, &delegate);
+    (void) ParseMdnsPacket(packet, &delegate);
 }
 
 FUZZ_TEST(QueryResponderPW, RespondToQueryNoCorruption)
