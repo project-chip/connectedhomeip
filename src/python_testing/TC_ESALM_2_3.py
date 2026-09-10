@@ -266,15 +266,25 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_step_range_skipped("10a", "10d")
 
+        # Step 11: read State explicitly so step 12 can target a Supported bit that is inactive.
+        state_before_reset = initial_state
+        self.step(11, "TH reads from the DUT the State. Store the value as StateBeforeReset.",
+                  expectation="Verify that the DUT response contains a map32 AlarmBitmap. Store the value as "
+                              "StateBeforeReset.")
+        if has_reset:
+            state_before_reset = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attrs.State)
+            matter_asserts.assert_valid_uint32(state_before_reset, "State attribute (map32 AlarmBitmap)")
+        else:
+            self.mark_current_step_skipped()
+
         inactive_bit = None
-        self.step(11, "TH sends command Reset with a bit that is not active in State.",
+        self.step(12, "TH sends command Reset with a Supported alarm bit that is not active in State.",
                   expectation="Verify DUT responds w/ status SUCCESS(0x00).")
         if has_reset:
-            state_before_11 = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attrs.State)
             for _bit in range(32):
                 _candidate = 1 << _bit
-                if (int(supported) & _candidate) and not (int(state_before_11) & _candidate):
+                if (int(supported) & _candidate) and not (int(state_before_reset) & _candidate):
                     inactive_bit = _candidate
                     break
             if inactive_bit is not None:
@@ -284,7 +294,7 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step("11a", "TH reads from the DUT the State.",
+        self.step("12a", "TH reads from the DUT the State.",
                   expectation="Verify that the DUT response contains an AlarmBitmap (map32) value equal to "
                               "InitialState (step 2c).")
         if has_reset and inactive_bit is not None:
@@ -295,7 +305,7 @@ class TC_ESALM_2_3(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(12, "IF Reset is not present in AcceptedCmds: TH sends command Reset (0x00).",
+        self.step(13, "IF Reset is not present in AcceptedCmds: TH sends command Reset (0x00).",
                   expectation="Verify that the DUT response contains UNSUPPORTED_COMMAND.")
         if not has_reset:
             try:
