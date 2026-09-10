@@ -179,8 +179,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
             }
             else
             {
-                ChipLogError(SoftwareUpdate, "HandleFinalize sl_si91x_fwup_load() error 0x%lx",
-                             static_cast<unsigned long>(status));
+                ChipLogError(SoftwareUpdate, "HandleFinalize sl_si91x_fwup_load() error 0x%lx", static_cast<unsigned long>(status));
                 imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                 return;
             }
@@ -314,8 +313,8 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
-        ChipLogProgress(SoftwareUpdate, "Image Header software version: %" PRIu32 " payload size: %" PRIu64, header.mSoftwareVersion,
-                        header.mPayloadSize);
+        ChipLogProgress(SoftwareUpdate, "Image Header software version: %" PRIu32 " payload size: %" PRIu64,
+                        header.mSoftwareVersion, header.mPayloadSize);
         mParams.totalFileBytes = header.mPayloadSize;
         mHeaderParser.Clear();
     }
