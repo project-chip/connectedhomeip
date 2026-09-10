@@ -146,6 +146,9 @@ The underlying verification script uses the GitHub CLI (`gh`) and can also be ru
 # Ensure GitHub CLI is authenticated (via gh auth login or GH_TOKEN)
 gh auth status
 
+# Run unit tests
+python3 -m unittest scripts/tools/tests/test_check_label_reviewers.py
+
 # Validate YAML configuration syntax and format locally
 python3 scripts/tools/check_label_reviewers.py --validate-config
 

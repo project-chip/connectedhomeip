@@ -91,8 +91,11 @@ def parse_label_config(config_path: str) -> dict[str, LabelRule]:
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Configuration file not found: {config_path}")
 
-    with open(config_path, encoding="utf-8") as f:
-        content = yaml.safe_load(f) or {}
+    try:
+        with open(config_path, encoding="utf-8") as f:
+            content = yaml.safe_load(f) or {}
+    except yaml.YAMLError as e:
+        raise ValueError(f"YAML syntax error in {config_path}: {e}") from e
 
     if not isinstance(content, dict):
         raise ValueError(
@@ -138,6 +141,18 @@ def parse_label_config(config_path: str) -> dict[str, LabelRule]:
         )
 
     return mapping
+
+
+def extract_approvers(pr_data: dict[str, Any]) -> set[str]:
+    """Extracts lowercase usernames of approved reviewers from PR JSON data, excluding the author."""
+    pr_author = pr_data.get("author", {}).get("login", "")
+    author_lower = pr_author.lower() if pr_author else ""
+    return {
+        r.get("author", {}).get("login", "").lower()
+        for r in pr_data.get("latestReviews", [])
+        if r.get("state") == "APPROVED"
+        and r.get("author", {}).get("login", "").lower() != author_lower
+    }
 
 
 def evaluate_pr_labels(
@@ -370,14 +385,7 @@ def main() -> int:
     print("=" * 72)
     print(f"Active PR labels: {pr_labels}\n")
 
-    # Author cannot approve their own PR
-    author_lower = pr_author.lower()
-    approvers = {
-        r.get("author", {}).get("login", "").lower()
-        for r in pr_data.get("latestReviews", [])
-        if r.get("state") == "APPROVED"
-        and r.get("author", {}).get("login", "").lower() != author_lower
-    }
+    approvers = extract_approvers(pr_data)
     logging.info(f"Active approved reviews from: {sorted(approvers) or 'None'}")
 
     evaluations = evaluate_pr_labels(pr_labels, config_mapping, approvers)

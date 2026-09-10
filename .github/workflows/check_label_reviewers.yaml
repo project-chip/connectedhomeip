@@ -78,6 +78,10 @@ jobs:
           git fetch origin "refs/pull/${{ steps.params.outputs.pr_number }}/head" --depth=1
           git checkout FETCH_HEAD -- .github/label_reviewers.yaml || true
 
+      - name: Run Unit Tests
+        run: |
+          python3 -m unittest scripts/tools/tests/test_check_label_reviewers.py
+
       - name: Validate Configuration File
         run: |
           python3 scripts/tools/check_label_reviewers.py \
