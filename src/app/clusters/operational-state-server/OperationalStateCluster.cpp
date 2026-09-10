@@ -39,11 +39,11 @@ constexpr size_t kMaxOperationalStateCount = 256;
 // OperationalStateCluster — constructors
 // ---------------------------------------------------------------------------
 
-OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, Delegate * delegate, const Config & config) :
+OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, Delegate & delegate, const Config & config) :
     OperationalStateCluster(endpointId, OperationalState::Id, OperationalState::kRevision, delegate, config)
 {}
 
-OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint16_t revision, Delegate * delegate,
+OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint16_t revision, Delegate & delegate,
                                                  const Config & config) :
     DefaultServerCluster({ endpointId, clusterId }),
     mDelegate(delegate), mRevision(revision), mConfig(config)
@@ -150,7 +150,7 @@ void OperationalStateCluster::ReportPhaseListChange()
 
 void OperationalStateCluster::UpdateCountdownTime(bool fromDelegate)
 {
-    DataModel::Nullable<uint32_t> newCountdownTime = mDelegate->GetCountdownTime();
+    DataModel::Nullable<uint32_t> newCountdownTime = mDelegate.GetCountdownTime();
     auto now                                       = System::SystemClock().GetMonotonicTimestamp();
     bool markDirty                                 = false;
 
@@ -188,13 +188,13 @@ bool OperationalStateCluster::IsSupportedPhase(uint8_t aPhase)
 {
     char buffer[kMaxPhaseNameLength];
     MutableCharSpan phase(buffer);
-    return mDelegate->GetOperationalPhaseAtIndex(aPhase, phase) == CHIP_NO_ERROR;
+    return mDelegate.GetOperationalPhaseAtIndex(aPhase, phase) == CHIP_NO_ERROR;
 }
 
 bool OperationalStateCluster::IsSupportedOperationalState(uint8_t aState)
 {
     GenericOperationalState opState;
-    for (size_t i = 0; i < kMaxOperationalStateCount && mDelegate->GetOperationalStateAtIndex(i, opState) == CHIP_NO_ERROR; i++)
+    for (size_t i = 0; i < kMaxOperationalStateCount && mDelegate.GetOperationalStateAtIndex(i, opState) == CHIP_NO_ERROR; i++)
     {
         if (opState.operationalStateID == aState)
         {
@@ -221,7 +221,7 @@ DataModel::ActionReturnStatus OperationalStateCluster::ReadAttribute(const DataM
     case PhaseList::Id: {
         char firstBuf[kMaxPhaseNameLength];
         MutableCharSpan firstPhase(firstBuf);
-        if (mDelegate->GetOperationalPhaseAtIndex(0, firstPhase) == CHIP_ERROR_NOT_FOUND)
+        if (mDelegate.GetOperationalPhaseAtIndex(0, firstPhase) == CHIP_ERROR_NOT_FOUND)
         {
             return encoder.EncodeNull();
         }
@@ -231,7 +231,7 @@ DataModel::ActionReturnStatus OperationalStateCluster::ReadAttribute(const DataM
             {
                 char buf[kMaxPhaseNameLength];
                 MutableCharSpan phase(buf);
-                CHIP_ERROR err = mDelegate->GetOperationalPhaseAtIndex(i, phase);
+                CHIP_ERROR err = mDelegate.GetOperationalPhaseAtIndex(i, phase);
                 if (err == CHIP_ERROR_NOT_FOUND)
                 {
                     return CHIP_NO_ERROR;
@@ -245,13 +245,13 @@ DataModel::ActionReturnStatus OperationalStateCluster::ReadAttribute(const DataM
     case CurrentPhase::Id:
         return encoder.Encode(mCurrentPhase);
     case CountdownTime::Id:
-        return encoder.Encode(mDelegate->GetCountdownTime());
+        return encoder.Encode(mDelegate.GetCountdownTime());
     case OperationalStateList::Id:
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             GenericOperationalState opState;
             for (size_t i = 0; i < kMaxOperationalStateCount; i++)
             {
-                CHIP_ERROR err = mDelegate->GetOperationalStateAtIndex(i, opState);
+                CHIP_ERROR err = mDelegate.GetOperationalStateAtIndex(i, opState);
                 if (err == CHIP_ERROR_NOT_FOUND)
                 {
                     return CHIP_NO_ERROR;
@@ -391,11 +391,11 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandlePaus
     {
         if (isPause)
         {
-            mDelegate->HandlePauseStateCallback(err);
+            mDelegate.HandlePauseStateCallback(err);
         }
         else
         {
-            mDelegate->HandleResumeStateCallback(err);
+            mDelegate.HandleResumeStateCallback(err);
         }
     }
 
@@ -421,11 +421,11 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandleStar
     {
         if (isStart)
         {
-            mDelegate->HandleStartStateCallback(err);
+            mDelegate.HandleStartStateCallback(err);
         }
         else
         {
-            mDelegate->HandleStopStateCallback(err);
+            mDelegate.HandleStopStateCallback(err);
         }
     }
 

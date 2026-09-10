@@ -120,12 +120,12 @@ HelpOptions helpOptions("minimal-mdns-server", "Usage: minimal-mdns-server [opti
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-class ReplyDelegate : public mdns::Minimal::ServerDelegate, public mdns::Minimal::ParserDelegate
+class ReplyDelegate : public mdns::Minimal::ServerDelegate, public chip::Dnssd::ParserDelegate
 {
 public:
     ReplyDelegate(mdns::Minimal::ResponseSender * responder) : mResponder(responder) {}
 
-    void OnQuery(const mdns::Minimal::BytesRange & data, const Inet::IPPacketInfo * info) override
+    void OnQuery(const chip::Dnssd::BytesRange & data, const Inet::IPPacketInfo * info) override
     {
         char addr[Inet::IPAddress::kMaxStringLength];
         info->SrcAddress.ToString(addr, sizeof(addr));
@@ -137,14 +137,14 @@ public:
         Report("QUERY: ", data);
 
         mCurrentSource = info;
-        if (!mdns::Minimal::ParsePacket(data, this))
+        if (!chip::Dnssd::ParsePacket(data, this))
         {
             printf("Parsing failure may result in reply failure!\n");
         }
         mCurrentSource = nullptr;
     }
 
-    void OnResponse(const mdns::Minimal::BytesRange & data, const Inet::IPPacketInfo * info) override
+    void OnResponse(const chip::Dnssd::BytesRange & data, const Inet::IPPacketInfo * info) override
     {
         char addr[Inet::IPAddress::kMaxStringLength];
         info->SrcAddress.ToString(addr, sizeof(addr));
@@ -156,10 +156,10 @@ public:
     }
 
     // ParserDelegate
-    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override { mMessageId = header.GetMessageId(); }
-    void OnResource(mdns::Minimal::ResourceType type, const mdns::Minimal::ResourceData & data) override {}
+    void OnHeader(chip::Dnssd::ConstHeaderRef & header) override { mMessageId = header.GetMessageId(); }
+    void OnResource(chip::Dnssd::ResourceType type, const chip::Dnssd::ResourceData & data) override {}
 
-    void OnQuery(const mdns::Minimal::QueryData & data) override
+    void OnQuery(const chip::Dnssd::QueryData & data) override
     {
         if (mResponder->Respond(mMessageId, data, mCurrentSource, mdns::Minimal::ResponseConfiguration()) != CHIP_NO_ERROR)
         {
@@ -168,10 +168,10 @@ public:
     }
 
 private:
-    void Report(const char * prefix, const mdns::Minimal::BytesRange & data)
+    void Report(const char * prefix, const chip::Dnssd::BytesRange & data)
     {
         MdnsExample::PacketReporter reporter(prefix, data);
-        if (!mdns::Minimal::ParsePacket(data, &reporter))
+        if (!chip::Dnssd::ParsePacket(data, &reporter))
         {
             printf("INVALID PACKET!!!!!!\n");
         }
@@ -224,30 +224,29 @@ int main(int argc, char ** args)
 
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
-    mdns::Minimal::QNamePart tcpServiceName[]       = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
-                                                        Dnssd::kLocalDomain };
-    mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, Dnssd::kOperationalServiceName,
-                                                        Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
-    mdns::Minimal::QNamePart udpServiceName[]       = { Dnssd::kCommissionableServiceName, Dnssd::kCommissionProtocol,
-                                                        Dnssd::kLocalDomain };
-    mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, Dnssd::kCommissionableServiceName,
-                                                        Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart tcpServiceName[] = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart tcpServerServiceName[] = { gOptions.instanceName, Dnssd::kOperationalServiceName,
+                                                      Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart udpServiceName[]       = { Dnssd::kCommissionableServiceName, Dnssd::kCommissionProtocol,
+                                                      Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart udpServerServiceName[] = { gOptions.instanceName, Dnssd::kCommissionableServiceName,
+                                                      Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
 
     // several UDP versions for discriminators
-    mdns::Minimal::QNamePart udpDiscriminator1[] = { "S52", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
-                                                     Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
-    mdns::Minimal::QNamePart udpDiscriminator2[] = { "V123", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
-                                                     Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
-    mdns::Minimal::QNamePart udpDiscriminator3[] = { "L840", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
-                                                     Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart udpDiscriminator1[] = { "S52", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
+                                                   Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart udpDiscriminator2[] = { "V123", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
+                                                   Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart udpDiscriminator3[] = { "L840", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
+                                                   Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
 
-    mdns::Minimal::QNamePart serverName[] = { gOptions.instanceName, Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart serverName[] = { gOptions.instanceName, Dnssd::kLocalDomain };
 
     mdns::Minimal::IPv4Responder ipv4Responder(serverName);
     mdns::Minimal::IPv6Responder ipv6Responder(serverName);
-    mdns::Minimal::SrvResourceRecord srvRecord(tcpServerServiceName, serverName, CHIP_PORT);
-    mdns::Minimal::SrvResponder tcpSrvResponder(mdns::Minimal::SrvResourceRecord(tcpServerServiceName, serverName, CHIP_PORT));
-    mdns::Minimal::SrvResponder udpSrvResponder(mdns::Minimal::SrvResourceRecord(udpServerServiceName, serverName, CHIP_PORT));
+    chip::Dnssd::SrvResourceRecord srvRecord(tcpServerServiceName, serverName, CHIP_PORT);
+    mdns::Minimal::SrvResponder tcpSrvResponder(chip::Dnssd::SrvResourceRecord(tcpServerServiceName, serverName, CHIP_PORT));
+    mdns::Minimal::SrvResponder udpSrvResponder(chip::Dnssd::SrvResourceRecord(udpServerServiceName, serverName, CHIP_PORT));
     mdns::Minimal::PtrResponder ptrTcpResponder(tcpServiceName, tcpServerServiceName);
     mdns::Minimal::PtrResponder ptrUdpResponder(udpServiceName, udpServerServiceName);
     mdns::Minimal::PtrResponder ptrUdpDiscriminator1Responder(udpDiscriminator1, udpServerServiceName);
@@ -261,8 +260,8 @@ int main(int argc, char ** args)
         "PH=3",
         "OTH=Some text here...",
     };
-    mdns::Minimal::TxtResponder tcpTxtResponder(mdns::Minimal::TxtResourceRecord(tcpServerServiceName, txtEntries));
-    mdns::Minimal::TxtResponder udpTxtResponder(mdns::Minimal::TxtResourceRecord(udpServerServiceName, txtEntries));
+    mdns::Minimal::TxtResponder tcpTxtResponder(chip::Dnssd::TxtResourceRecord(tcpServerServiceName, txtEntries));
+    mdns::Minimal::TxtResponder udpTxtResponder(chip::Dnssd::TxtResourceRecord(udpServerServiceName, txtEntries));
 
     queryResponder.AddResponder(&ptrTcpResponder).SetReportInServiceListing(true).SetReportAdditional(tcpServerServiceName);
     queryResponder.AddResponder(&ptrUdpResponder).SetReportInServiceListing(true).SetReportAdditional(udpServerServiceName);

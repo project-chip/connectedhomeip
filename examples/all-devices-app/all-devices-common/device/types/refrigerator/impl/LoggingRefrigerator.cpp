@@ -18,10 +18,21 @@
 
 namespace chip::app {
 
-LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate) : LoggingRefrigerator(timerDelegate, Config::Default()) {}
+LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate) : LoggingRefrigerator(timerDelegate, Config{}) {}
 
 LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, Config config) :
-    Refrigerator(timerDelegate, mLoggingCabinet, config), mLoggingCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
+    mCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
 {}
+
+CHIP_ERROR LoggingRefrigerator::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
+{
+    ReturnErrorOnFailure(mCabinet.Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
+    return CHIP_NO_ERROR;
+}
+
+void LoggingRefrigerator::UnregisterParts(CodeDrivenDataModelProvider & provider)
+{
+    mCabinet.Unregister(provider);
+}
 
 } // namespace chip::app

@@ -50,7 +50,7 @@ JNI_METHOD(jobject, sendUDC)
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::sendUDC() called");
 
-    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    memory::Strong<CastingPlayer> castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
 
     // Find the ConnectionCallbacks class, get the field IDs of the connection callbacks and extract the callback objects.
@@ -134,7 +134,7 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() called with a timeout of: %d seconds",
                     static_cast<int>(commissioningWindowTimeoutSec));
 
-    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    memory::Strong<CastingPlayer> castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
 
     // Find the ConnectionCallbacks class, get the field IDs of the connection callbacks and extract the callback objects.
@@ -222,7 +222,7 @@ JNI_METHOD(jobject, continueConnectingNative)
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::continueConnecting()");
 
-    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    memory::Strong<CastingPlayer> castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
 
     return support::convertMatterErrorFromCppToJava(castingPlayer->ContinueConnecting());
@@ -234,7 +234,7 @@ JNI_METHOD(jobject, stopConnecting)
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::stopConnecting()");
 
-    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    memory::Strong<CastingPlayer> castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
 
     return support::convertMatterErrorFromCppToJava(castingPlayer->StopConnecting());
@@ -246,7 +246,7 @@ JNI_METHOD(void, disconnect)
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::disconnect()");
 
-    core::CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    memory::Strong<core::CastingPlayer> castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturn(castingPlayer != nullptr,
                    ChipLogError(AppServer, "MatterCastingPlayer-JNI::disconnect() castingPlayer == nullptr"));
 
@@ -259,17 +259,23 @@ JNI_METHOD(void, removeFabric)
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::removeFabric()");
 
-    core::CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    memory::Strong<core::CastingPlayer> castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturn(castingPlayer != nullptr,
                    ChipLogError(AppServer, "MatterCastingPlayer-JNI::removeFabric() castingPlayer == nullptr"));
 
     castingPlayer->RemoveFabric();
 }
 
+JNI_METHOD(void, nativeReleaseCastingPlayer)
+(JNIEnv * env, jclass clazz, jlong ptr)
+{
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::nativeReleaseCastingPlayer()");
+    delete reinterpret_cast<support::CastingPlayerHandle *>(ptr);
+}
+
 JNI_METHOD(jstring, getConnectionStateNative)
 (JNIEnv * env, jobject thiz)
 {
-    char error_str[50];
     jobject jstr_obj = nullptr;
 
     if (NULL == env)
@@ -281,11 +287,14 @@ JNI_METHOD(jstring, getConnectionStateNative)
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::getConnectionState()");
 
-    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
-    jstring result                = nullptr;
-    LogErrorOnFailure(JniReferences::GetInstance().CharToStringUTF(
-        chip::CharSpan("Cast Player is nullptr", strlen("Cast Player is nullptr")), reinterpret_cast<jobject &>(result)));
-    VerifyOrReturnValue(castingPlayer != nullptr, result);
+    memory::Strong<CastingPlayer> castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    if (castingPlayer == nullptr)
+    {
+        ChipLogError(AppServer,
+                     "MatterCastingPlayer-JNI::getConnectionStateNative() castingPlayer == nullptr, returning NOT_CONNECTED");
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF("NOT_CONNECTED"_span, jstr_obj));
+        return static_cast<jstring>(jstr_obj);
+    }
 
     matter::casting::core::ConnectionState state = castingPlayer->GetConnectionState();
     switch (state)
@@ -300,8 +309,9 @@ JNI_METHOD(jstring, getConnectionStateNative)
         LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF("CONNECTED"_span, jstr_obj));
         break;
     default:
-        snprintf(error_str, sizeof(error_str), "Unsupported Connection State: %d", state);
-        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(error_str), jstr_obj));
+        ChipLogError(AppServer, "MatterCastingPlayer-JNI::getConnectionStateNative() unexpected state: %d, returning NOT_CONNECTED",
+                     state);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF("NOT_CONNECTED"_span, jstr_obj));
         break;
     }
     return static_cast<jstring>(jstr_obj);
@@ -313,7 +323,7 @@ JNI_METHOD(jobject, getEndpoints)
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::getEndpoints() called");
 
-    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    memory::Strong<CastingPlayer> castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, nullptr,
                         ChipLogError(AppServer, "MatterCastingPlayer-JNI::getEndpoints() castingPlayer == nullptr"));
 

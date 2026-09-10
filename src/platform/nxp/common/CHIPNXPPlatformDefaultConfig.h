@@ -173,14 +173,6 @@
 #define CHIP_CONFIG_SHA256_CONTEXT_ALIGN max_align_t
 #endif // CONFIG_CHIP_CRYPTO_PSA
 
-#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE
-#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_BASE 0x40000
-#endif
-
-#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END
-#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_EL2GO_END 0x4FFFF
-#endif
-
 // ==================== General Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_PEER_NODES

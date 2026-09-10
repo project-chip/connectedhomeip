@@ -47,6 +47,7 @@ namespace {
 
 using chip::Platform::UniquePtr;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 #if CHIP_MINMDNS_HIGH_VERBOSITY
 const char * ToString(QClass qClass)

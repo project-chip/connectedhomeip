@@ -18,15 +18,172 @@
 #include <PosixAudioManager.h>
 #include <PosixChime.h>
 #include <PosixSpeaker.h>
+#include <app/server/Server.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+// The commissioning-proxy device target in BUILD.gn is conditional on either
+// transport being enabled, which gn check cannot evaluate, hence the nogncheck.
+#if CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <device/types/commissioning-proxy/CommissioningProxyDevice.h> // nogncheck
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+#include <CommissioningProxyBleAdapter.h>
+// The ble-transport / paf-transport dependencies in BUILD.gn are conditional on
+// chip_config_network_layer_ble and chip_device_config_enable_wifipaf, which gn check
+// cannot evaluate, hence the nogncheck on the transport includes below.
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyBleTransport.h> // nogncheck
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <CommissioningProxyPafAdapter.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyPafTransport.h> // nogncheck
+#include <app_options/AppOptions.h>
+#endif
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
-                                    PosixAudioManager & audioManager)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+namespace {
+
+/// Derive the Wi-Fi bands the proxy advertises from the "--wifipaf freq_list=" the app
+/// was started with.  This lives here rather than in the device because it reads the
+/// app's command line; the device takes the resulting bands injected.
+BitMask<Clusters::CommissioningProxy::WiFiBandBitmap> ProxyWiFiBands()
 {
+    using Clusters::CommissioningProxy::WiFiBandBitmap;
+
+    BitMask<WiFiBandBitmap> bands;
+
+    const AppOptions::AppConfig * cfg = AppOptions::TryGetConfig();
+    if (cfg != nullptr)
+    {
+        for (uint16_t freq : cfg->wifipafFreqList)
+        {
+            if (freq >= 2412 && freq <= 2484)
+            {
+                bands.Set(WiFiBandBitmap::k2g4);
+            }
+            else if (freq >= 5035 && freq <= 5980)
+            {
+                bands.Set(WiFiBandBitmap::k5g);
+            }
+        }
+    }
+
+    // With no valid frequency in the freq_list, advertise 2.4 GHz rather than an empty
+    // bitmap, so a Wi-Fi-PAF-capable proxy does not report supporting no bands at all.
+    if (!bands.HasAny())
+    {
+        bands.Set(WiFiBandBitmap::k2g4);
+    }
+
+    return bands;
+}
+
+/// Stop advertising this device's own commissioning window over Wi-Fi PAF, from the point
+/// it joins a fabric onwards. Publishing uses the same NAN radio the proxy needs for the
+/// subscribes it makes on a commissionee's behalf.
+void SuppressProxyWiFiPafAdvertising()
+{
+    Server::GetInstance().GetCommissioningWindowManager().SetWiFiPAFAdvertisingAllowed(false);
+}
+
+void OnProxyDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+{
+    // Two ways to arrive on a fabric. kCommissioningComplete: the proxy has just joined
+    // one. kServerReady: the fabric table has been loaded, which is the first point a
+    // proxy commissioned before this boot can be recognised -- the device factory runs
+    // before Server::Init(), so the fabric count is always zero when the device is
+    // created and cannot be tested there.
+    const bool joinedNow = event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete;
+    const bool alreadyOnAFabric =
+        event->Type == DeviceLayer::DeviceEventType::kServerReady && Server::GetInstance().GetFabricTable().FabricCount() > 0;
+    VerifyOrReturn(joinedNow || alreadyOnAFabric);
+
+    SuppressProxyWiFiPafAdvertising();
+}
+
+} // namespace
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, FabricTable & fabricTable,
+                                    PersistentStorageDelegate * storageDelegate, PosixAudioManager & audioManager)
+{
+    // Registered only when a transport is compiled in.
+#if CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if constexpr (ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
+    {
+        const CommissioningProxyDevice::Context proxyContext{ fabricTable, timerDelegate };
+
+        // The adapters and their transport drivers outlive every device the factory
+        // creates, because a registered transport holds a pointer back to the device's
+        // cluster. Only one commissioning proxy device is ever created, so one instance
+        // of each serves it.
+        //
+        // Adding a technology here is one more block like these plus one more
+        // AddTransport() call below; no new device type is involved.
+        BitMask<Clusters::CommissioningProxy::Feature> proxyFeatures;
+        BitMask<Clusters::CommissioningProxy::WiFiBandBitmap> proxyBands;
+
+#if CONFIG_NETWORK_LAYER_BLE
+        static CommissioningProxyBleAdapter sBleProxyAdapter;
+        static Clusters::CommissioningProxy::CommissioningProxyBleTransport sBleProxyTransport(sBleProxyAdapter, timerDelegate);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        static CommissioningProxyPafAdapter sPafProxyAdapter;
+        static Clusters::CommissioningProxy::CommissioningProxyPafTransport sPafProxyTransport(sPafProxyAdapter, timerDelegate);
+#endif
+
+#if CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        // Every transport driver implements ProxyBackgroundScanStart/Stop, so the
+        // feature follows from having any transport at all.
+        proxyFeatures.Set(Clusters::CommissioningProxy::Feature::kBackgroundScan);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        // Wi-Fi PAF makes this a Wi-Fi device, which is what makes WiFiBand present.
+        proxyFeatures.Set(Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface);
+        proxyBands = ProxyWiFiBands();
+#endif
+
+        const Clusters::CommissioningProxy::CommissioningProxyCluster::Config proxyConfig(proxyFeatures, proxyBands);
+
+        DeviceFactory::GetInstance().RegisterCreator(
+            "commissioning-proxy", [proxyContext, proxyConfig]() -> std::unique_ptr<DeviceInterface> {
+                // Refuse a second proxy. The drivers above are single instances because
+                // the radios they drive are: one BLE scanner, one NAN subscribe slot.
+                // Handing them to a second device would take them over from the first,
+                // leaving it registered but unreachable, and two proxies could not both
+                // work on one radio anyway.
+                static bool sProxyDeviceCreated = false;
+                if (sProxyDeviceCreated)
+                {
+                    ChipLogError(AppServer, "Only one commissioning-proxy device is supported: its transports drive single radios");
+                    return nullptr;
+                }
+                sProxyDeviceCreated = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                // A proxy needs its NAN radio to subscribe on a commissionee's behalf, so
+                // it must not publish its own commissioning window once it is on a fabric
+                // and can be asked to proxy. Until then it does advertise over Wi-Fi PAF,
+                // so the proxy itself can be commissioned that way.
+                LogErrorOnFailure(DeviceLayer::PlatformMgr().AddEventHandler(OnProxyDeviceEvent, 0));
+#endif
+
+                auto device = std::make_unique<CommissioningProxyDevice>(proxyContext, proxyConfig);
+#if CONFIG_NETWORK_LAYER_BLE
+                device->AddTransport(sBleProxyTransport);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                device->AddTransport(sPafProxyTransport);
+#endif
+                return device;
+            });
+    }
+#endif // CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
         DeviceFactory::GetInstance().RegisterCreator("speaker", [&timerDelegate, &audioManager]() {

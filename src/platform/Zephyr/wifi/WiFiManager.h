@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024, 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -193,6 +193,14 @@ public:
     void SetLastDisconnectReason(uint16_t reason);
     uint16_t GetLastDisconnectReason();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Wi-Fi PAF station-join hooks, invoked on the CHIP thread.
+    using OnConnectStartedCallback = void (*)();
+    using OnConnectFailedCallback  = void (*)();
+    void SetOnConnectStartedCallback(OnConnectStartedCallback cb) { mOnConnectStartedCallback = cb; }
+    void SetOnConnectFailedCallback(OnConnectFailedCallback cb) { mOnConnectFailedCallback = cb; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 private:
     using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>, size_t);
 
@@ -229,6 +237,7 @@ private:
     static void PostConnectivityStatusChange(ConnectivityChange changeType);
     static void SendRouterSolicitation(System::Layer * layer, void * param);
     static void IPv6AddressChangeHandler(const void * data);
+    static void UpdateIpv6InternetConnectivityState();
 
     // Connection Recovery feature
     // This feature allows re-scanning and re-connecting the connection to the known network after
@@ -262,6 +271,11 @@ private:
     uint32_t mConnectionRecoveryTimeMs{ kConnectionRecoveryMinIntervalMs };
     bool mApplicationDisconnectRequested{ false };
     uint16_t mLastDisconnectedReason;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    OnConnectStartedCallback mOnConnectStartedCallback{ nullptr };
+    OnConnectFailedCallback mOnConnectFailedCallback{ nullptr };
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    bool mHasGlobalIPv6Address{ false };
 
     static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;
 };

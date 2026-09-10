@@ -170,21 +170,6 @@ void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpoin
     LogErrorOnFailure(cluster->GroupWillBeRemoved(aFabricIx, aGroupId));
 }
 
-void ScenesServer::MakeSceneInvalid(EndpointId aEndpointId, FabricIndex aFabricIx)
-{
-    ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
-    VerifyOrReturn(cluster != nullptr);
-
-    LogErrorOnFailure(cluster->MakeSceneInvalid(aFabricIx));
-}
-
-void ScenesServer::MakeSceneInvalidForAllFabrics(EndpointId aEndpointId)
-{
-    ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);
-    VerifyOrReturn(cluster != nullptr);
-    LogErrorOnFailure(cluster->MakeSceneInvalidForAllFabrics());
-}
-
 void ScenesServer::StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
     ScenesManagementCluster * cluster = FindClusterOnEndpoint(aEndpointId);

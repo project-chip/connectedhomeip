@@ -31,6 +31,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
@@ -45,6 +46,7 @@
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -54,6 +56,7 @@
 
 #include <AppCommandDelegate.h>
 #include <BleInit.h>
+#include <ClusterRegistryTypes.h>
 #include <TermHandling.h>
 #if PW_RPC_ENABLED
 #include <Rpc.h>
@@ -61,9 +64,15 @@
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
 #include <device/api/SingleEndpoint.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
+#include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
+
+#include <algorithm>
+#include <memory>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -80,6 +89,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
+LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -128,6 +138,7 @@ public:
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
+        uint16_t minGuaranteedSubscriptionsPerFabric;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -137,26 +148,27 @@ public:
         mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
         mRootNode(
             {
-                .commissioningWindowManager     = mContext.commissioningWindowManager, //
-                    .configurationManager       = mContext.configurationManager,       //
-                    .deviceControlServer        = mContext.deviceControlServer,        //
-                    .fabricTable                = mContext.fabricTable,                //
-                    .accessControl              = mContext.accessControl,              //
-                    .persistentStorage          = mContext.persistentStorage,          //
-                    .failSafeContext            = mContext.failSafeContext,            //
-                    .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider, //
-                    .platformManager            = mContext.platformManager,            //
-                    .groupDataProvider          = mContext.groupDataProvider,          //
-                    .sessionManager             = mContext.sessionManager,             //
-                    .dnssdServer                = mContext.dnssdServer,                //
-                    .deviceLoadStatusProvider   = mContext.deviceLoadStatusProvider,   //
-                    .diagnosticDataProvider     = mContext.diagnosticDataProvider,     //
-                    .testEventTriggerDelegate   = mContext.testEventTriggerDelegate,   //
-                    .dacProvider                = mContext.dacProvider,                //
-                    .eventManagement            = mContext.eventManagement,            //
-                    .timerDelegate              = mContext.timerDelegate,              //
+                .commissioningWindowManager              = mContext.commissioningWindowManager, //
+                    .configurationManager                = mContext.configurationManager,       //
+                    .deviceControlServer                 = mContext.deviceControlServer,        //
+                    .fabricTable                         = mContext.fabricTable,                //
+                    .accessControl                       = mContext.accessControl,              //
+                    .persistentStorage                   = mContext.persistentStorage,          //
+                    .failSafeContext                     = mContext.failSafeContext,            //
+                    .deviceInstanceInfoProvider          = mContext.deviceInstanceInfoProvider, //
+                    .platformManager                     = mContext.platformManager,            //
+                    .groupDataProvider                   = mContext.groupDataProvider,          //
+                    .sessionManager                      = mContext.sessionManager,             //
+                    .dnssdServer                         = mContext.dnssdServer,                //
+                    .deviceLoadStatusProvider            = mContext.deviceLoadStatusProvider,   //
+                    .diagnosticDataProvider              = mContext.diagnosticDataProvider,     //
+                    .testEventTriggerDelegate            = mContext.testEventTriggerDelegate,   //
+                    .dacProvider                         = mContext.dacProvider,                //
+                    .eventManagement                     = mContext.eventManagement,            //
+                    .timerDelegate                       = mContext.timerDelegate,              //
+                    .minGuaranteedSubscriptionsPerFabric = mContext.minGuaranteedSubscriptionsPerFabric,
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             },
             []() {
@@ -286,6 +298,32 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
                 .RegisterClusterInstance<chip::app::Clusters::AmbientContextSensingCluster>(
                     &ambientContextSensorDevice->AmbientContextSensingCluster());
         }
+        else if (config.type == "robotic-vacuum-cleaner")
+        {
+            auto * rvcDevice = static_cast<SimulatedRoboticVacuumCleaner *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+                    &rvcDevice->OperationalState());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(&rvcDevice->GetServiceAreaCluster());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<RvcRunModeType>(
+                &rvcDevice->RunMode());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<RvcCleanModeType>(
+                &rvcDevice->CleanMode());
+        }
+        else if (config.type == "electrical-sensor")
+        {
+            auto * electricalSensorDevice = static_cast<ElectricalSensor *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster>(
+                    &electricalSensorDevice->ElectricalEnergyMeasurementCluster());
+        }
+        else if (config.type == "mode-select")
+        {
+            auto * modeSelectDevice = static_cast<chip::app::ModeSelect *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ModeSelectCluster>(&modeSelectDevice->ModeSelectCluster());
+        }
     }
 
     gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
@@ -308,14 +346,27 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::CommonCaseDeviceServerInitParams initParams;
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
+    // Initialize the test event trigger delegate, and add a handler
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+    SuccessOrDie(sTestEventTriggerDelegate.Init(ByteSpan(AppOptions::GetConfig().testEventTriggerEnableKey)));
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider = gGroupDataProvider,                     //
-        .fabricTable       = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate     = gTimerDelegate,                         //
-        .storageDelegate   = *initParams.persistentStorageDelegate,  //
+        .groupDataProvider        = gGroupDataProvider,                     //
+        .fabricTable              = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate            = gTimerDelegate,                         //
+        .storageDelegate          = *initParams.persistentStorageDelegate,  //
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable             = Binding::Table::GetInstance(),
+        .bindingManager           = Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
     });
 
-    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
+    RegisterDeviceFactoryOverrides(gTimerDelegate, Server::GetInstance().GetFabricTable(), initParams.persistentStorageDelegate,
+                                   gAudioManager);
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.
@@ -370,6 +421,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement            = EventManagement::GetInstance(),                          //
             .timerDelegate              = gTimerDelegate,                                          //
+            .minGuaranteedSubscriptionsPerFabric =
+                InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -506,6 +559,38 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+// Apply "--wifipaf freq_list=" to the Wi-Fi PAF radio.  Without this the frequencies
+// would only reach the CommissioningProxy cluster's advertised WiFiBand, leaving the
+// publish, scan and connect paths on the compile-time default channel.
+void ConfigureWiFiPaf(const std::vector<uint16_t> & freqList)
+{
+    if (freqList.empty())
+    {
+        return;
+    }
+
+    // A commissionable device advertises on the default publish channel and additionally
+    // on the channels in this list. The proxy stops publishing once it is on a fabric.
+    DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam advertiseParam;
+    advertiseParam.freq_list_len = static_cast<uint16_t>(freqList.size());
+    advertiseParam.freq_list     = std::make_unique<uint16_t[]>(freqList.size());
+    std::copy(freqList.begin(), freqList.end(), advertiseParam.freq_list.get());
+    DeviceLayer::ConnectivityMgr().WiFiPAFSetParam(advertiseParam);
+
+    // A subscribe instance is created on a single channel, and a commissioner should use
+    // the default publish channel wherever it can, so only fall back to the first
+    // frequency listed when the default is not among them.
+    constexpr uint16_t kDefaultPublishChannel = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
+    const bool defaultListed     = std::find(freqList.begin(), freqList.end(), kDefaultPublishChannel) != freqList.end();
+    const uint16_t subscribeFreq = defaultListed ? kDefaultPublishChannel : freqList.front();
+    DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(subscribeFreq);
+
+    ChipLogProgress(AppServer, "Wi-Fi PAF: publishing on %u frequencies, subscribing on %u MHz",
+                    static_cast<unsigned>(freqList.size()), subscribeFreq);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, const AppOptions::AppConfig & config)
 {
     auto discriminator = config.discriminator.value_or(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR));
@@ -559,6 +644,10 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ConfigurationMgr().LogDeviceConfig();
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ConfigureWiFiPaf(config.wifipafFreqList);
+#endif
 
     ReturnErrorOnFailure(chip::app::InitBle(AppOptions::GetConfig().bleController));
 

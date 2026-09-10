@@ -152,8 +152,8 @@ constexpr uint8_t kOvenDeviceTypeRevision = 2;
 constexpr DeviceTypeId kLaundryDryerDeviceTypeId  = 0x0000007C;
 constexpr uint8_t kLaundryDryerDeviceTypeRevision = 2;
 
-constexpr DeviceTypeId kHumidifierDehumidifierDeviceTypeId  = 0x0000007D;
-constexpr uint8_t kHumidifierDehumidifierDeviceTypeRevision = 1;
+constexpr DeviceTypeId kHumidityConditionerDeviceTypeId  = 0x0000007D;
+constexpr uint8_t kHumidityConditionerDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kNetworkInfrastructureManagerDeviceTypeId  = 0x00000090;
 constexpr uint8_t kNetworkInfrastructureManagerDeviceTypeRevision = 3;
@@ -232,6 +232,9 @@ constexpr uint8_t kCameraControllerDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kDoorbellDeviceTypeId  = 0x00000148;
 constexpr uint8_t kDoorbellDeviceTypeRevision = 2;
+
+constexpr DeviceTypeId kAvAnalysisNodeDeviceTypeId  = 0x00000149;
+constexpr uint8_t kAvAnalysisNodeDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kAmbientContextSensorDeviceTypeId  = 0x00000150;
 constexpr uint8_t kAmbientContextSensorDeviceTypeRevision = 2;

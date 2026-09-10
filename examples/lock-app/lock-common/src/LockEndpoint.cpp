@@ -88,7 +88,7 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
         return true;
     }
 
-    user.userName       = chip::CharSpan(userInDb.userName, strlen(userInDb.userName));
+    user.userName       = chip::CharSpan::fromCharString(userInDb.userName);
     user.credentials    = chip::Span<const CredentialStruct>(userInDb.credentials.data(), userInDb.credentials.size());
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;

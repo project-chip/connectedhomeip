@@ -152,7 +152,22 @@ following guidelines:
 3. **Explicit Lifecycle Management**: Do not rely on RAII or C++ destructor
    methods for automated endpoint teardown. Core device type implementations
    must use `~Device() override = default;` and manage lifecycle teardown
-   explicitly by executing `Unregister(provider)`.
+   explicitly by executing `Unregister(provider)`. Teardown must unregister the
+   endpoint first (via `UnregisterDescriptor()`) before removing or destroying
+   individual clusters, as `CodeDrivenDataModelProvider` disallows removing
+   clusters from an actively registered endpoint once started
+   (`CHIP_ERROR_INCORRECT_STATE`).
 4. **Concrete Naming**: Avoid ambiguous umbrella folders or generic utility
    names. Use specific operational titles (e.g., `DeviceTypeParser.h`,
    `NetworkInfrastructureManager.h`).
+
+---
+
+## 5. Subsystem Design Documents
+
+Detailed architecture specifications for application subsystems:
+
+-   **[Out-of-Band Control Architecture](design/out_of_band_control.md)**:
+    Unified architecture for external control interfaces (Named Pipes, Pigweed
+    RPC, test runners), separating transport translators from cluster execution
+    backends (`OOBAccessor`).

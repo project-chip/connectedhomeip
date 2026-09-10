@@ -17,26 +17,41 @@
 
 #pragma once
 
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/operational-state-server/OperationalStateDelegate.h>
+#include <clusters/DishwasherMode/Enums.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
 
 class Dishwasher : public SingleEndpoint
 {
 public:
-    Dishwasher();
+    struct Config
+    {
+        Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
+        Clusters::ModeBase::AppDelegate & modeDelegate;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+    };
+
+    explicit Dishwasher(const Config & config);
     ~Dishwasher() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::OperationalState::OperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
+    Clusters::ModeBaseCluster & DishwasherMode() { return mDishwasherModeCluster.Cluster(); }
 
 private:
-    Clusters::OperationalState::LoggingOperationalStateDelegate mDelegate;
+    DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
+    Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
+
+    Clusters::ModeBase::AppDelegate & mDishwasherModeDelegate;
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mDishwasherModeCluster;
 };
 
 } // namespace chip::app

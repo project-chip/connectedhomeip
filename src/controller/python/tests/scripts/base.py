@@ -1112,14 +1112,14 @@ class BaseTestHelper:
             while not addr:
                 addr = self.devCtrl.GetAddressAndPort(nodeId)
                 if time.time() - start > 10:
-                    self.logger.exception("Timeout waiting for address...")
+                    self.logger.error("Timeout waiting for address...")
                     break
 
                 if not addr:
                     time.sleep(0.2)
 
             if not addr:
-                self.logger.exception("Addr is missing...")
+                self.logger.error("Addr is missing...")
                 return False
             self.logger.info("Resolved address: %s:%s", addr[0], addr[1])
             return True
@@ -1169,7 +1169,7 @@ class BaseTestHelper:
             except Exception as ex:
                 failed_zcl[basic_attr] = str(ex)
         if failed_zcl:
-            self.logger.exception("Following attributes failed: %s", failed_zcl)
+            self.logger.error("Following attributes failed: %s", failed_zcl)
             return False
         return True
 
@@ -1208,7 +1208,7 @@ class BaseTestHelper:
             except Exception as ex:
                 failed_attribute_write.append(str(ex))
         if failed_attribute_write:
-            self.logger.exception("Following attributes failed: %s", failed_attribute_write)
+            self.logger.error("Following attributes failed: %s", failed_attribute_write)
             return False
         return True
 
