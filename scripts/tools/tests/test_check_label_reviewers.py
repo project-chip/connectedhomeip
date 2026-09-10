@@ -26,14 +26,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from check_label_reviewers import (  # noqa: E402
-    LabelEvaluation,
-    LabelRule,
-    evaluate_pr_labels,
-    extract_approvers,
-    generate_step_summary,
-    parse_label_config,
-)
+from check_label_reviewers import (LabelEvaluation, LabelRule, evaluate_pr_labels, extract_approvers,  # noqa: E402
+                                   generate_step_summary, parse_label_config)
 
 
 class TestParseLabelConfig(unittest.TestCase):

@@ -79,7 +79,6 @@ def fetch_pull_request_data(repo: str, pr_number: int) -> dict[str, Any]:
         raise RuntimeError(f"Failed to parse gh output as JSON: {e}") from e
 
 
-
 def parse_label_config(config_path: str) -> dict[str, LabelRule]:
     """Parses the YAML configuration file mapping labels to SME reviewers.
 
