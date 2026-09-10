@@ -139,7 +139,7 @@ CHIP_ERROR GetMatchingPresetInPresets(Delegate * delegate, const ByteSpan & pres
     {
         CHIP_ERROR err = delegate->GetPresetAtIndex(i, matchingPreset);
 
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED || err == CHIP_ERROR_NOT_FOUND)
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             break;
         }
@@ -293,6 +293,11 @@ Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         return StatusIB(err).mStatus;
     }
 
+    // The active handle has now genuinely changed (or been confirmed unchanged) in the delegate; report it regardless
+    // of whether applying the preset's setpoints below succeeds, so subscribers are never left with a stale cached
+    // value for an attribute that has already changed.
+    NotifyAttributeChanged(ActivePresetHandle::Id);
+
     if (found)
     {
         // Apply the preset's setpoints to the occupied setpoint range now that it's active.
@@ -317,8 +322,6 @@ Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
             mSetpoints = setpoints;
         }
     }
-
-    NotifyAttributeChanged(ActivePresetHandle::Id);
 
     return Status::Success;
 }
