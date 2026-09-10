@@ -17,16 +17,10 @@
 
 #pragma once
 
-#include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/StatusIB.h>
 #include <app/OperationalSessionSetup.h>
-#include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CancelableOperation.h>
-#include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
-#include <lib/core/Optional.h>
-#include <system/SystemClock.h>
 
 namespace chip {
 namespace Controller {
@@ -70,56 +64,6 @@ private:
 
 template <typename... Args>
 using ControllerOperation = Callback::TypedOperation<ControllerOperationBase, Args...>;
-
-/**
- * A ControllerOperation that invokes a single command on the node it connects to. Subclasses send
- * their command from OnConnected() via Invoke(), which targets the endpoint given to Start().
- *
- * The invocation is tied to the lifetime of the operation: it is cancelled if the operation is
- * cancelled or completed before the response arrives, so nothing is left pointing at the operation.
- */
-class ControllerInvokeOperationBase : public ControllerOperationBase
-{
-protected:
-    void Start(DeviceController & controller, NodeId nodeId, EndpointId endpoint, Callback::Cancelable::Owned onCompletion);
-
-    /**
-     * Sends the given request to the endpoint passed to Start(), and hands the outcome to one of
-     * the two handlers, which are free to complete (and thereby reuse or destroy) the operation.
-     * An error return means neither handler will be called.
-     *
-     * Note the handlers run with the invocation already released: cancelling one deletes the
-     * CommandSender, which must not happen from within its own callback. The CommandSender tears
-     * itself down as the callback returns, so there is nothing left to cancel at that point anyway.
-     */
-    template <typename RequestType, typename OnSuccess, typename OnFailure>
-    CHIP_ERROR Invoke(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session, const RequestType & request,
-                      OnSuccess onSuccess, OnFailure onFailure, const Optional<uint16_t> & timedInvokeTimeoutMs = NullOptional,
-                      const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
-    {
-        using ResponseType = typename RequestType::ResponseType;
-        return InvokeCommandRequest(
-            &exchangeMgr, session, mEndpoint, request,
-            [this, onSuccess](const app::ConcreteCommandPath & path, const app::StatusIB & status, const ResponseType & response) {
-                mCancelInvoke = nullptr;
-                onSuccess(path, status, response);
-            },
-            [this, onFailure](CHIP_ERROR error) {
-                mCancelInvoke = nullptr;
-                onFailure(error);
-            },
-            timedInvokeTimeoutMs, responseTimeout, &mCancelInvoke);
-    }
-
-    void OnFinished(bool cancelled) override;
-
-private:
-    Internal::InvokeCancelFn mCancelInvoke;
-    EndpointId mEndpoint = kInvalidEndpointId;
-};
-
-template <typename... Args>
-using ControllerInvokeOperation = Callback::TypedOperation<ControllerInvokeOperationBase, Args...>;
 
 } // namespace Controller
 } // namespace chip

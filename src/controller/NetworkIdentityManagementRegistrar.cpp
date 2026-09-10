@@ -18,6 +18,7 @@
 #include <controller/NetworkIdentityManagementRegistrar.h>
 
 #include <app/ConcreteCommandPath.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/data-model/NullObject.h>
 #include <clusters/NetworkIdentityManagement/Commands.h>
 #include <clusters/NetworkIdentityManagement/Enums.h>
@@ -124,19 +125,6 @@ void NetworkIdentityManagementRegistrar::Operation::AbortIfPending()
     }
 }
 
-void NetworkIdentityManagementRegistrar::Operation::OnConnected(Messaging::ExchangeManager & exchangeMgr,
-                                                                const SessionHandle & session)
-{
-    CHIP_ERROR err = SendCommand(exchangeMgr, session);
-    if (err != CHIP_NO_ERROR)
-    {
-        // No logging here: the error is reported to the caller, who logs it with the context of what
-        // it was trying to achieve, which we don't have at this level.
-        auto notify = mRegistrar.DeferOperationFinished();
-        Fail(err);
-    }
-}
-
 void NetworkIdentityManagementRegistrar::Operation::OnConnectionFailure(CHIP_ERROR error)
 {
     ChipLogFailure(error, Controller, "Failed to establish a session with the Network Infrastructure Manager");
@@ -146,7 +134,15 @@ void NetworkIdentityManagementRegistrar::Operation::OnConnectionFailure(CHIP_ERR
 
 void NetworkIdentityManagementRegistrar::Operation::OnFinished(bool cancelled)
 {
-    ControllerInvokeOperationBase::OnFinished(cancelled);
+    // Tear down an invocation we are no longer interested in. Reaching this from within one of the
+    // handlers installed by InvokeCommand() is not a concern: they clear mCancelInvoke first.
+    if (mCancelInvoke)
+    {
+        mCancelInvoke();
+        mCancelInvoke = nullptr;
+    }
+
+    ControllerOperationBase::OnFinished(cancelled);
     mCommandSent = false; // whatever we sent is done with; the operation is free to be started again
 
     if (cancelled)
@@ -155,23 +151,21 @@ void NetworkIdentityManagementRegistrar::Operation::OnFinished(bool cancelled)
     }
 }
 
-CHIP_ERROR NetworkIdentityManagementRegistrar::QueryIdentityOperation::SendCommand(Messaging::ExchangeManager & exchangeMgr,
-                                                                                   const SessionHandle & session)
+void NetworkIdentityManagementRegistrar::QueryIdentityOperation::OnConnected(Messaging::ExchangeManager & exchangeMgr,
+                                                                             const SessionHandle & session)
 {
     // Ask for the network's current identity of the only type PDC defines, rather than for a
     // specific entry in the NIM's table: which one is current is up to the NIM.
     Commands::QueryIdentity::Type request;
     request.networkIdentityType.Emplace(IdentityTypeEnum::kEcdsa);
 
-    return Invoke(
-        exchangeMgr, session, request,
-        [this](const app::ConcreteCommandPath &, const app::StatusIB &,
-               const Commands::QueryIdentityResponse::DecodableType & response) {
-            // The identity points into the response message, which is exactly as long-lived as the
-            // OnNetworkIdentityAvailable callback needs it to be.
-            Complete(CHIP_NO_ERROR, response.identity);
-        },
-        [this](CHIP_ERROR error) { Fail(error); });
+    InvokeCommand(exchangeMgr, session, request,
+                  [this](const app::ConcreteCommandPath &, const app::StatusIB &,
+                         const Commands::QueryIdentityResponse::DecodableType & response) {
+                      // The identity points into the response message, which is exactly as long-lived
+                      // as the OnNetworkIdentityAvailable callback needs it to be.
+                      Complete(CHIP_NO_ERROR, response.identity);
+                  });
 }
 
 void NetworkIdentityManagementRegistrar::AddClientOperation::Start(DeviceController & controller, NodeId nodeId,
@@ -189,20 +183,20 @@ void NetworkIdentityManagementRegistrar::AddClientOperation::Start(DeviceControl
     Base::Start(controller, nodeId, endpoint, std::move(onCompletion));
 }
 
-CHIP_ERROR NetworkIdentityManagementRegistrar::AddClientOperation::SendCommand(Messaging::ExchangeManager & exchangeMgr,
-                                                                               const SessionHandle & session)
+void NetworkIdentityManagementRegistrar::AddClientOperation::OnConnected(Messaging::ExchangeManager & exchangeMgr,
+                                                                         const SessionHandle & session)
 {
     Commands::AddClient::Type request;
     request.clientIdentity = ByteSpan(mClientIdentity, mClientIdentityLength);
 
-    return Invoke(
+    InvokeCommand(
         exchangeMgr, session, request,
         [this](const app::ConcreteCommandPath &, const app::StatusIB &,
                const Commands::AddClientResponse::DecodableType & response) {
             ChipLogProgress(Controller, "Network Client Identity registered at client index %u", response.clientIndex);
             Complete(CHIP_NO_ERROR, /* determinate = */ true);
         },
-        [this](CHIP_ERROR error) { Fail(error); }, MakeOptional(kTimedInvokeTimeoutMs));
+        MakeOptional(kTimedInvokeTimeoutMs));
 }
 
 void NetworkIdentityManagementRegistrar::RemoveClientOperation::Start(DeviceController & controller, NodeId nodeId,
@@ -214,29 +208,31 @@ void NetworkIdentityManagementRegistrar::RemoveClientOperation::Start(DeviceCont
     Base::Start(controller, nodeId, endpoint, std::move(onCompletion));
 }
 
-CHIP_ERROR NetworkIdentityManagementRegistrar::RemoveClientOperation::SendCommand(Messaging::ExchangeManager & exchangeMgr,
-                                                                                  const SessionHandle & session)
+void NetworkIdentityManagementRegistrar::RemoveClientOperation::OnConnected(Messaging::ExchangeManager & exchangeMgr,
+                                                                            const SessionHandle & session)
 {
     Commands::RemoveClient::Type request;
     request.clientIdentifier.Emplace(ByteSpan(mClientIdentifier));
 
-    return Invoke(
+    InvokeCommand(
         exchangeMgr, session, request,
         [this](const app::ConcreteCommandPath &, const app::StatusIB &, const app::DataModel::NullObjectType &) {
             ChipLogProgress(Controller, "Network Client Identity revoked");
             Complete(CHIP_NO_ERROR);
         },
-        [this](CHIP_ERROR error) {
-            if (error == CHIP_IM_GLOBAL_STATUS(NotFound))
-            {
-                // Revocation is required to be idempotent, so this is a success as far as we care.
-                ChipLogDetail(Controller, "Network Client Identity was already revoked");
-                Complete(CHIP_NO_ERROR);
-                return;
-            }
-            Fail(error);
-        },
         MakeOptional(kTimedInvokeTimeoutMs));
+}
+
+void NetworkIdentityManagementRegistrar::RemoveClientOperation::Fail(CHIP_ERROR error)
+{
+    if (error == CHIP_IM_GLOBAL_STATUS(NotFound))
+    {
+        // Revocation is required to be idempotent, so this is a success as far as we care.
+        ChipLogDetail(Controller, "Network Client Identity was already revoked");
+        Complete(CHIP_NO_ERROR);
+        return;
+    }
+    Complete(error);
 }
 
 } // namespace Controller

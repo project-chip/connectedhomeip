@@ -18,6 +18,7 @@
 #pragma once
 
 #include <controller/ControllerOperation.h>
+#include <controller/InvokeInteraction.h>
 #include <controller/NetworkIdentityRegistrar.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPCallback.h>
@@ -145,9 +146,13 @@ private:
     }
 
     // What our three operations have in common: each connects to the NIM, invokes a single command
-    // on it, and reports anything that stops it getting an answer back to the caller.
-    class Operation : public ControllerInvokeOperationBase
+    // on it, and reports anything that stops it getting an answer back to the caller. A subclass
+    // sends its command from OnConnected() via InvokeCommand(), which is the only thing it should
+    // be doing there: InvokeCommand() completes the operation one way or the other.
+    class Operation : public ControllerOperationBase
     {
+        using Base = ControllerOperationBase;
+
     public:
         explicit Operation(NetworkIdentityManagementRegistrar & registrar) : mRegistrar(registrar) {}
 
@@ -156,9 +161,15 @@ private:
         void AbortIfPending();
 
     protected:
-        virtual CHIP_ERROR SendCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session) = 0;
+        void Start(DeviceController & controller, NodeId nodeId, EndpointId endpoint, Callback::Cancelable::Owned onCompletion)
+        {
+            mEndpoint = endpoint;
+            Base::Start(controller, nodeId, std::move(onCompletion));
+        }
 
-        // Completes the operation with a failure status, whatever its completion signature is.
+        // Completes the operation (whatever its completion signature is) based on the given error.
+        // Every failure a started operation can suffer arrives here, so a subclass has a single
+        // place to make sense of them.
         virtual void Fail(CHIP_ERROR error) = 0;
 
         // Whether the command has gone out, i.e. whether a failure from here on could still have
@@ -166,44 +177,54 @@ private:
         // before the completion is delivered, so it has to be read on the way into Complete().
         bool CommandSent() const { return mCommandSent; }
 
-        // Sends a command like ControllerInvokeOperationBase::Invoke() does, and additionally
-        // reports the operation as finished to the registrar once the handler has run, i.e. once
-        // the caller's completion has been delivered. Hides the inherited Invoke(), which is what
-        // makes this the only way for a subclass to send its command.
-        template <typename RequestType, typename OnSuccess, typename OnFailure>
-        CHIP_ERROR Invoke(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session, const RequestType & request,
-                          OnSuccess onSuccess, OnFailure onFailure, const Optional<uint16_t> & timedInvokeTimeoutMs = NullOptional,
-                          const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
+        // Sends the given request to the endpoint passed to Start(), reporting a response to
+        // onSuccess, which is responsible for completing the operation, or any failure (including
+        // failure to send at all) to Fail(). The operation is reported finished to the registrar
+        // once either of those calls returns.
+        //
+        // The invocation is tied to the operation's lifecycle: it is cancelled if the operation is
+        // cancelled or completed before the response arrives, so nothing is left pointing at the
+        // operation. Note the handlers run with the invocation already released: cancelling one
+        // deletes the CommandSender, which must not happen from within its own callback. The
+        // CommandSender tears itself down as the callback returns, so there is nothing left to
+        // cancel at that point anyway.
+        template <typename RequestType, typename OnSuccess>
+        void InvokeCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session, const RequestType & request,
+                           OnSuccess onSuccess, const Optional<uint16_t> & timedInvokeTimeoutMs = NullOptional,
+                           const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
         {
-            // Record the command as sent before it goes out, since a handler may run before this
-            // returns and is free to reuse or destroy the operation. An error return is the one case
-            // where we know that neither handler ran, and that nothing went out after all.
+            // Record the command as sent before it goes out, since a handler may run before
+            // InvokeCommandRequest() returns and is free to reuse or destroy the operation.
             mCommandSent   = true;
-            CHIP_ERROR err = ControllerInvokeOperationBase::Invoke(
-                exchangeMgr, session, request,
+            CHIP_ERROR err = InvokeCommandRequest(
+                &exchangeMgr, session, mEndpoint, request,
                 [this, onSuccess](auto &&... args) {
-                    auto notify = mRegistrar.DeferOperationFinished();
+                    mCancelInvoke = nullptr;
+                    auto notify   = mRegistrar.DeferOperationFinished();
                     onSuccess(std::forward<decltype(args)>(args)...);
                 },
-                [this, onFailure](CHIP_ERROR error) {
-                    auto notify = mRegistrar.DeferOperationFinished();
-                    onFailure(error);
+                [this](CHIP_ERROR error) {
+                    mCancelInvoke = nullptr;
+                    auto notify   = mRegistrar.DeferOperationFinished();
+                    Fail(error);
                 },
-                timedInvokeTimeoutMs, responseTimeout);
+                timedInvokeTimeoutMs, responseTimeout, &mCancelInvoke);
             if (err != CHIP_NO_ERROR)
             {
-                mCommandSent = false;
+                mCommandSent = false; // no handler ran, and nothing was sent after all
+                auto notify  = mRegistrar.DeferOperationFinished();
+                Fail(err);
             }
-            return err;
         }
 
     private:
-        void OnConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session) final;
         void OnConnectionFailure(CHIP_ERROR error) final;
         void OnFinished(bool cancelled) final;
 
         NetworkIdentityManagementRegistrar & mRegistrar;
-        bool mCommandSent = false; // see CommandSent()
+        Internal::InvokeCancelFn mCancelInvoke;
+        EndpointId mEndpoint = kInvalidEndpointId;
+        bool mCommandSent    = false; // see CommandSent()
     };
 
     class QueryIdentityOperation final : public Callback::TypedOperation<Operation, CHIP_ERROR, ByteSpan>
@@ -215,7 +236,7 @@ private:
         using Base::Start;
 
     private:
-        CHIP_ERROR SendCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session) override;
+        void OnConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session) override;
         void Fail(CHIP_ERROR error) override { Complete(error, ByteSpan()); }
     };
 
@@ -231,7 +252,7 @@ private:
                    Completion::Owned onCompletion);
 
     private:
-        CHIP_ERROR SendCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session) override;
+        void OnConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session) override;
 
         // A failure is only determinate if the AddClient never went out: once it has, an error that
         // stopped the NIM from acting on it is indistinguishable from one that lost us the answer.
@@ -254,8 +275,8 @@ private:
                    Credentials::CertificateKeyId clientIdentifier, Completion::Owned onCompletion);
 
     private:
-        CHIP_ERROR SendCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session) override;
-        void Fail(CHIP_ERROR error) override { Complete(error); }
+        void OnConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session) override;
+        void Fail(CHIP_ERROR error) override;
 
         Credentials::CertificateKeyIdStorage mClientIdentifier;
     };

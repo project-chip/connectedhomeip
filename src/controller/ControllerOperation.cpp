@@ -41,25 +41,5 @@ void ControllerOperationBase::OnFinished(bool cancelled)
     Callback::CancelableOperationBase::OnFinished(cancelled);
 }
 
-void ControllerInvokeOperationBase::Start(DeviceController & controller, NodeId nodeId, EndpointId endpoint,
-                                          Callback::Cancelable::Owned onCompletion)
-{
-    // Before starting: a connection failure completes the operation from within the call below.
-    mEndpoint = endpoint;
-    ControllerOperationBase::Start(controller, nodeId, std::move(onCompletion));
-}
-
-void ControllerInvokeOperationBase::OnFinished(bool cancelled)
-{
-    // Tear down an invocation we are no longer interested in. Reaching this from within one of the
-    // handlers installed by Invoke() is not a concern: they clear mCancelInvoke first.
-    if (mCancelInvoke)
-    {
-        mCancelInvoke();
-        mCancelInvoke = nullptr;
-    }
-    ControllerOperationBase::OnFinished(cancelled);
-}
-
 } // namespace Controller
 } // namespace chip
