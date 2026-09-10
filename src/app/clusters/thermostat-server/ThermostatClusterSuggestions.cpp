@@ -404,7 +404,7 @@ bool ThermostatSuggestions::RemoveThermostatSuggestionsForRemovedPresets()
     }
 
     bool didRemoveAnEntry = false;
-    bool abortedEarly      = false;
+    bool abortedEarly     = false;
 
     // Second pass: every preset check above succeeded and is cached, so it's now safe to actually remove the stale
     // entries using the cached results, without any further Presets delegate lookups that could themselves fail
