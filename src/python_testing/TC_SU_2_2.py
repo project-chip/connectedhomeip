@@ -165,22 +165,39 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             TestStep(2, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to 'NotAvailable'.",
                      "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "
-                     "which is 2 minutes (120 seconds) from the last QueryImage command."),
+                     "which is 2 minutes (120 seconds) from the last QueryImage command."
+                     "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnQuery."),
             TestStep(3, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to Busy, Set DelayedActionTime to 3 minutes. On the subsequent QueryImage command, "
                      "TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'.",
                      "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P. "
                      "Verify that the transfer of the software image has been initiated after the second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT."
-                     "Cancel the transfer after confirming it has started to avoid applying the update in this step (the single full update is reserved for Step 5)."),
-            TestStep(4, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
+                     ),
+            TestStep(4, "Cancel the trasnfer by Forcing an error during the download of the OTA image to the DUT (the single full update is reserved for Step 9). Wait for the Idle timeout which should be no less than 5 minutes.",
+                     "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle."
+                     "Verify that the OTA-Subscriber receives a DownloadError event notification on BDX Idle timeout."
+                     "Verify that the data in this event has the following."
+                     "SoftwareVersion - Set to the value of the SoftwareVersion being downloaded."
+                     "BytesDownloaded - Number of bytes that have been downloaded."
+                     "ProgressPercent - Nearest Integer percent value reflecting how far within the transfer the failure occurred. IF the total length of the transfer is unknown, the value can be NULL."
+                     "PlatformCode - Internal product-specific error code or NULL."),
+            TestStep(5, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to 'UpdateAvailable', ImageURI field contains an invalid BDX ImageURI.",
                      "Verify that the DUT does not start transferring the software image."),
-            TestStep(5, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
-                     "QueryStatus is set to 'UpdateAvailable'. "
-                     "Set ImageURI to the location where the image is located.",
+            TestStep(6, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P does not respond back to DUT.",
+                     "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle."),
+            TestStep(7, "If LocalConfigDisabled from BasicInformationCluster is supported writes the LocalConfigDisabled attribute as False on the DUT"),
+            TestStep(8, "DUT sends a QueryImage command to the TH/OTA-P. RequestorCanConsent is set to True by DUT. OTA-P/TH responds with a QueryImageResponse with UserConsentNeeded field set to True.",
+                     "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnUserConsent."),
+            TestStep(9, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
+                     "QueryStatus is set to 'UpdateAvailable' Action field is set to 'AwaitNextAction' "
+                     "Set ImageURI to the location where the image is located."
+                     "Verify that the OTA-Subscriber receives a StateTransition event notification for all the state changes i.e. Querying, Downloading, Applying, Idle (optional)."
+                     "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnApply."
+                     "DUT successfully finishes applying a software update, and the new software image version is being executed on the DUT. OTA-Subscriber sends a read request to read the VersionApplied event from the DUT.",
                      "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT."),
-            TestStep(6, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
-                     "Software Version is set to the same version the DUT just applied (V2), which is numerically equal to the current version.",
+            TestStep(10, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
+                     "Software Version is set to the same version the DUT just applied (V2), which is numerically equal to the current version."
                      "Verify that the DUT does not start transferring the software image."),
         ]
 
@@ -1343,9 +1360,25 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                                            expected_reason=Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kFailure
                                            )
 
-        subscription_attr_state_querying.cancel()
+        # # Device can ReQuery and then go back to kIdle
+        # logger.info("After going to KIdle and Failure, wait the DUT go back to kIdle after kQuerying.")
+        # subscription_attr_state_querying.await_sequence_of_reports(
+        #     attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+        #     sequence=[Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+        #               Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle],
+        #     timeout_sec=300)
 
+        subscription_attr_state_querying.cancel()
         # [End of Step #3 TC_SU_2_7]
+
+        # [Start of Step #4 TC_SU_2_7] In between because if Provider is not started the DUT might not respond.
+        # If LocalConfigDisabled is set to True obtaining consent from the requestor Shall not be used.
+        # LocalConfigDisabled is optional, if found set it to False to allow continue with the test, if not is considered as False and continue.
+        # OTA(SU) spec 3.4.1
+        if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
+            await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
+            logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
+        # [End of Step #4 TC_SU_2_7]
 
         # [Start of Step #5 TC_SU_2_7]
         # First Start the Provider then check the localconfigdisabled
@@ -1364,15 +1397,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Arm the barrier before the announce below; start_provider() leaves the match armed on
         # its own "Server initialization complete" wait, so this must follow it.
         self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
-
-        # [Start of Step #4 TC_SU_2_7] In between because if Provider is not started the DUT might not respond.
-        # If LocalConfigDisabled is set to True obtaining consent from the requestor Shall not be used.
-        # LocalConfigDisabled is optional, if found set it to False to allow continue with the test, if not is considered as False and continue.
-        # OTA(SU) spec 3.4.1
-        if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
-            await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
-            logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
-        # [End of Step #4 TC_SU_2_7]
 
         await self._wait_until_idle_before_announce(
             controller=controller,
