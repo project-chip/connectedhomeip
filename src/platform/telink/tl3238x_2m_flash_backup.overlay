@@ -17,7 +17,7 @@
 		};
 		slot1_partition: partition@fa000 {
 			label = "image-1";
-			reg = <0xfa000 0xe6000>; // total slot1 is 916k
+			reg = <0xfa000 0xe6000>; // total slot1 is 920k
 		};
 		user_rfu_partition: partition@1e0000 {
  			label = "user_rfu";
