@@ -89,8 +89,7 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
     if (operation == UDPEndPointImplSockets::MulticastOperation::kJoin)
     {
         status = net_ipv6_mld_join(iface, &in6Addr);
-        VerifyOrReturnError((status == 0 || status == -EALREADY || status == -ENETDOWN),
-                            System::MapErrorZephyr(status));
+        VerifyOrReturnError((status == 0 || status == -EALREADY || status == -ENETDOWN), System::MapErrorZephyr(status));
     }
     else if (operation == UDPEndPointImplSockets::MulticastOperation::kLeave)
     {
