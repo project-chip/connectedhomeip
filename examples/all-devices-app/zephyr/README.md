@@ -104,7 +104,7 @@ Device types are Kconfig options (`CONFIG_ALL_DEVICES_DEVICE_*`, see
 `Kconfig.devices`). Pick them in `menuconfig` under "Matter device types", or in
 a `.conf` file:
 
-```conf
+```
 CONFIG_ALL_DEVICES_DEVICE_ON_OFF_LIGHT=y
 CONFIG_ALL_DEVICES_DEVICE_OCCUPANCY_SENSOR=y
 ```
