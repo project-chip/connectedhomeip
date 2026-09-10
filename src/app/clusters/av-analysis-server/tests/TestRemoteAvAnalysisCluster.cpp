@@ -2405,6 +2405,18 @@ TEST_F(TestRemoteAvAnalysisCluster, StartupRejectsAMisconfiguredInstance)
     bothDetection.SetDelegate(&mMockDelegate);
     EXPECT_EQ(bothDetection.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
 
+    // The supported set is constrained to 50, and sizes the active triggers' persistence
+    std::vector<Descriptor::Structs::SemanticTagStruct::Type> tooManyContexts(kMaxSupportedAmbientContexts + 1);
+    for (size_t i = 0; i < tooManyContexts.size(); i++)
+    {
+        tooManyContexts[i].namespaceID = static_cast<uint8_t>(0x49);
+        tooManyContexts[i].tag         = static_cast<uint8_t>(i);
+    }
+    AvAnalysisCluster tooManySupported(kTestEndpointId, BitFlags<Feature>(Feature::kLocalContextDetection), tooManyContexts,
+                                       DataModel::NullNullable);
+    tooManySupported.SetDelegate(&mMockDelegate);
+    EXPECT_EQ(tooManySupported.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+
     // PerZone detection and the zone count go together
     AvAnalysisCluster zonesWithoutMax(kTestEndpointId, kRemoteAndZones, testAmbientContexts, DataModel::NullNullable,
                                       kTestMaxAnalysisStreams);

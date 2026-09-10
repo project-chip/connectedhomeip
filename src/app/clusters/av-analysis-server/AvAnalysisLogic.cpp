@@ -81,6 +81,12 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
                                      "AvAnalysis: Feature configuration error. One and only one of "
                                      "Local or Remote Context Detection must be supported"));
 
+    // The attribute is constrained to 50 entries, and the persisted size of the active triggers, which
+    // may be every supported context, is computed from that
+    VerifyOrReturnError(mSupportedAmbientContexts.size() <= static_cast<size_t>(kMaxSupportedAmbientContexts),
+                        CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl, "AvAnalysis: more than %d SupportedAmbientContexts", kMaxSupportedAmbientContexts));
+
     // If we don't have PerZoneSensivity then mMaxZones has to be Null
     VerifyOrReturnError(!(HasFeature(Feature::kPerZoneContextDetection) ^ !mMaxZones.IsNull()), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "AvAnalysis: If Per Zone Sensitivity is set, Zones must be present, and vice versa"));
