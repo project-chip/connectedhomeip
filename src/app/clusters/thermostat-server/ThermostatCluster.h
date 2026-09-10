@@ -324,7 +324,7 @@ public:
     }
 
     Protocols::InteractionModel::Status ApplyOccupiedSetpoints(chip::Optional<temperature> heat,
-                                                                chip::Optional<temperature> cool) override
+                                                               chip::Optional<temperature> cool) override
     {
         return mSetpoints.ApplyOccupiedSetpoints(heat, cool);
     }
