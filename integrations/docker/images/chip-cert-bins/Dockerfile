@@ -180,6 +180,7 @@ RUN printf '%s\n' \
     lit-icd-ipv6only \
     energy-gateway-ipv6only \
     evse-ipv6only \
+    electrical-protection-ipv6only \
     microwave-oven-ipv6only \
     rvc-ipv6only \
     fabric-bridge-rpc-ipv6only \
