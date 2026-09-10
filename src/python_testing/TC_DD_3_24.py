@@ -155,20 +155,22 @@ class TC_DD_3_24(MatterTestCommissioner):
         )
 
         step_6_conditions_met = False
-        retry_query_timeout_sec = 1.0
-        for attempt in range(10):
+        retry_query_timeout_sec = 5.0
+        max_step_6_attempts = 3
+        for attempt in range(max_step_6_attempts):
             step_6_conditions_met = await self.check_operational_service_no_longer_advertises_ic(
                 retry_query_timeout_sec,
             )
             if step_6_conditions_met:
                 break
 
-            log.info('Attempt %d/10: Step 6 conditions not met yet, retrying in 1 second', attempt + 1)
+            log.info('Attempt %d/%d: Step 6 conditions not met yet, retrying in 1 second',
+                     attempt + 1, max_step_6_attempts)
             await asyncio.sleep(1)
 
         asserts.assert_true(
             step_6_conditions_met,
-            'Step 6 conditions not met after 10 attempts: expected discoverable operational service, no "_IC" subtype, and IC absent or set to 0.'
+            'Step 6 conditions not met after 3 attempts: expected discoverable operational service, no "_IC" subtype, and IC absent or set to 0.'
         )
 
     def get_dut_instance_name(self, log_result: bool = False) -> str:
@@ -254,7 +256,10 @@ class TC_DD_3_24(MatterTestCommissioner):
 
         log.info("Operational TXT record: %s", txt_record.txt)
 
-        return "IC" in txt_record.txt and txt_record.txt["IC"] == "1"
+        ic_value = txt_record.txt.get("IC")
+        if isinstance(ic_value, bytes):
+            ic_value = ic_value.decode("utf-8", errors="replace")
+        return ic_value == "1"
 
     async def check_operational_service_no_longer_advertises_ic(
             self,
@@ -305,6 +310,14 @@ class TC_DD_3_24(MatterTestCommissioner):
         if advertises_ic_subtype:
             log.info("Operational mDNS service '%s' still advertises subtype '%s'", instance_qname, ic_subtype)
 
+        txt_payload = None
+        if hasattr(srv_record, "txt") and srv_record.txt is not None:
+            asserts.assert_true(
+                isinstance(srv_record.txt, dict),
+                f"Operational mDNS service '{instance_qname}' SRV TXT data is not a dictionary: {srv_record.txt}"
+            )
+            txt_payload = srv_record.txt
+
         txt_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
@@ -313,18 +326,33 @@ class TC_DD_3_24(MatterTestCommissioner):
         )
 
         if txt_record is None:
-            log.info("Operational mDNS service '%s' TXT lookup returned no record", instance_qname)
-            return False
-
-        if not hasattr(txt_record, "txt") or txt_record.txt is None:
+            if txt_payload is None:
+                log.info("Operational mDNS service '%s' TXT lookup returned no record", instance_qname)
+                return False
+            log.info(
+                "Operational mDNS service '%s' TXT lookup returned no record; using TXT from SRV discovery data",
+                instance_qname,
+            )
+        elif hasattr(txt_record, "txt") and txt_record.txt is not None:
+            asserts.assert_true(
+                isinstance(txt_record.txt, dict),
+                f"Operational mDNS service '{instance_qname}' TXT data is not a dictionary: {txt_record.txt}"
+            )
+            txt_payload = txt_record.txt
+        elif txt_payload is None:
             log.info("Operational mDNS service '%s' TXT payload not available yet", instance_qname)
             return False
+        else:
+            log.info(
+                "Operational mDNS service '%s' TXT payload not available from TXT lookup; using TXT from SRV discovery data",
+                instance_qname,
+            )
 
-        asserts.assert_true(
-            isinstance(txt_record.txt, dict),
-            f"Operational mDNS service '{instance_qname}' TXT data is not a dictionary: {txt_record.txt}"
-        )
-        ic_value = txt_record.txt.get("IC")
+        log.info("Operational TXT record used for IC check: %s", txt_payload)
+
+        ic_value = txt_payload.get("IC")
+        if isinstance(ic_value, bytes):
+            ic_value = ic_value.decode("utf-8", errors="replace")
         ic_absent_or_zero = ic_value is None or ic_value == "0"
 
         if not ic_absent_or_zero:
