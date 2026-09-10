@@ -144,3 +144,80 @@ time.**
 partition limit.
 
 **Solution**: Use the LZMA-enabled configuration (target #2) instead.
+
+## 5. Concurrent Mode (Matter over Thread + BLE coexistence, NO OTA)
+
+**Kconfig:** boards/tl3238x_concurrent.conf (explicitly specified)
+
+-   CONFIG_CHIP_CONCURRENT_MODE=y
+-   CONFIG_IEEE802154_TLX_BLE_COEXIST=y
+-   CONFIG_CHIP_OTA_REQUESTOR=n
+-   CONFIG_DUAL_MODE=0
+
+**Note**: This configuration enables BLE + 802.15.4 coexistence for Matter over
+Thread with BLE advertising. OTA is disabled.
+
+**DTS Overlay:** src/platform/telink/tl3238x_2m_flash.overlay (default)
+
+**Build:**
+
+```bash
+west build -p -b tl3238x -d build_tl3238x_concurrent -- \
+-DCONF_FILE="prj.conf boards/tl3238x_concurrent.conf" > build_tl3238x_concurrent.log
+# Kconfig: explicitly specified (-DCONF_FILE="prj.conf boards/tl3238x_concurrent.conf")
+# DTS Overlay: default (src/platform/telink/tl3238x_2m_flash.overlay)
+```
+
+**Output:**
+
+```bash
+build_tl3238x_concurrent/zephyr/zephyr.bin          -> flash this
+```
+
+**Note**: TL3238X does NOT support Channel Sounding. Use TL7218X for concurrent
+mode + Channel Sounding (see boards/tl7218x_concurrent_cs.conf).
+
+## 6. Concurrent Mode (Matter over Thread + BLE coexistence, with OTA)
+
+**Kconfig:** boards/tl3238x_concurrent_ota_lzma.conf (explicitly specified)
+
+-   CONFIG_CHIP_CONCURRENT_MODE=y
+-   CONFIG_IEEE802154_TLX_BLE_COEXIST=y
+-   CONFIG_CHIP_OTA_REQUESTOR=y
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+-   CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
+-   CONFIG_DUAL_MODE=0
+
+**Note**: This configuration enables BLE + 802.15.4 coexistence for Matter over
+Thread with BLE advertising and OTA support. LZMA compression is required for
+2MB flash with OTA.
+
+**DTS Overlay:** src/platform/telink/tl3238x_2m_flash_lzma.overlay (default)
+
+**Build Software Version 1:**
+
+```bash
+west build -p -b tl3238x -d build_tl3238x_concurrent_ota_lzma_v1 -- \
+-DCONF_FILE="prj.conf boards/tl3238x_concurrent_ota_lzma.conf" \
+-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=1 > build_tl3238x_concurrent_ota_lzma_v1.log
+# Kconfig: explicitly specified (-DCONF_FILE="prj.conf boards/tl3238x_concurrent_ota_lzma.conf")
+# DTS Overlay: default (src/platform/telink/tl3238x_2m_flash_lzma.overlay)
+```
+
+**Build Software Version 2:**
+
+```bash
+west build -p -b tl3238x -d build_tl3238x_concurrent_ota_lzma_v2 -- \
+-DCONF_FILE="prj.conf boards/tl3238x_concurrent_ota_lzma.conf" \
+-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 > build_tl3238x_concurrent_ota_lzma_v2.log
+# Kconfig: explicitly specified (-DCONF_FILE="prj.conf boards/tl3238x_concurrent_ota_lzma.conf")
+# DTS Overlay: default (src/platform/telink/tl3238x_2m_flash_lzma.overlay)
+```
+
+**Output:**
+
+```bash
+build_tl3238x_concurrent_ota_lzma_v1/zephyr/merged.bin          -> flash this
+build_tl3238x_concurrent_ota_lzma_v2/zephyr/merged_dfu.lzma.bin -> DFU over BLE SMP
+build_tl3238x_concurrent_ota_lzma_v2/zephyr/matter.ota          -> OTA upgrade
+```

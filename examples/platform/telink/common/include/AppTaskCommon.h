@@ -118,8 +118,8 @@ protected:
     static void FactoryResetButtonEventHandler(void);
     static void FactoryResetHandler(AppEvent * aEvent);
 
-    static void StartBleAdvButtonEventHandler(void);
-    static void StartBleAdvHandler(AppEvent * aEvent);
+    static void ToggleBleAdvButtonEventHandler(void);
+    static void ToggleBleAdvHandler(AppEvent * aEvent);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     static void StartThreadButtonEventHandler(void);

@@ -478,7 +478,7 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
         break;
 #endif
     case kButtonId_StartBleAdv:
-        StartBleAdvButtonEventHandler();
+        ToggleBleAdvButtonEventHandler();
         break;
     }
 }
@@ -551,7 +551,7 @@ void AppTaskCommon::LinkButtons(ButtonManager & buttonManager)
 #if CONFIG_TELINK_OTA_BUTTON_TEST
     buttonManager.addCallback(TestOTAButtonEventHandler, 2, true);
 #else
-    buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
+    buttonManager.addCallback(ToggleBleAdvButtonEventHandler, 2, true);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     buttonManager.addCallback(StartThreadButtonEventHandler, 3, true);
@@ -614,20 +614,21 @@ void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEn
     }
 }
 
-void AppTaskCommon::StartBleAdvButtonEventHandler(void)
+void AppTaskCommon::ToggleBleAdvButtonEventHandler(void)
 {
     AppEvent event;
 
     event.Type               = AppEvent::kEventType_Button;
     event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = StartBleAdvHandler;
+    event.Handler            = ToggleBleAdvHandler;
     GetAppTask().PostEvent(&event);
 }
 
-void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
+void AppTaskCommon::ToggleBleAdvHandler(AppEvent * aEvent)
 {
-    LOG_INF("StartBleAdvHandler");
+    LOG_INF("ToggleBleAdvHandler");
 
+    // Disable manual Matter service BLE advertising after device provisioning.
     if (sIsNetworkProvisioned)
     {
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
