@@ -992,6 +992,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # [Start of Step #6 TC_SU_2_7]
         self.step(4)
+        step_number_s4 = "[STEP_4]"
         # After the Provider is killed and Download was visible we need to wait at least 5 minutes for the device to go back to KIdle
         # and only after those 5 mintues  DownloadError must be triggered
 
@@ -1001,7 +1002,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError.event_id
         )
 
-        logger.info('%s: Step #4.1 - Kill Provider Process (aborting download) while is Downloading', step_number_s3)
+        logger.info('%s: Step #4.1 - Kill Provider Process (aborting download) while is Downloading', step_number_s4)
         await asyncio.sleep(5)
         # Kill (not terminate) the ProviderProcess
         self.current_provider_app_proc.kill()
@@ -1016,10 +1017,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info("DownloadError events after provider kill() %s", download_error_events_after_kill)
 
         logger.info('%s: Step #4.2 - Wait for DUT to go back to kIdle status after killing the provider, at termination time: %d',
-                    step_number_s3, provider_termination_time)
+                    step_number_s4, provider_termination_time)
         # Wait for the report for the kIdle status afer triggering terminating the Provider.
         # The kIdle timeout should not be less than 5 minutes.
-        logger.info('%s: Step #4.3 - Waiting for kIdle status', step_number_s3)
+        logger.info('%s: Step #4.3 - Waiting for kIdle status', step_number_s4)
 
         # Check for the change to kIdle using previous subscription
         kidle_report_time = subscription_attr_state_busy_180s.await_first_value_asserting_no_forbidden(
@@ -1034,7 +1035,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         asserts.assert_greater_equal(total_time_to_kidle, 300, "Time to UpdateState kIdle was less than 5 minutes.")
         subscription_attr_state_busy_180s.cancel()
 
-        logger.info('%s: Step #4.4 - Once the DUT goes back to kIdle the device should trigger the DownloadError', step_number_s3)
+        logger.info('%s: Step #4.4 - Once the DUT goes back to kIdle the device should trigger the DownloadError', step_number_s4)
         # When the kIdle is received the the script must wait for the DownloadError Event.
 
         # Check if a DownloadError was Triggered here
@@ -1049,7 +1050,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         if len(download_error_events) - len(download_error_events_after_kill) == 0:
             # # Make first the subscription before killing the provider to avoid wait if can not make the subscription on time.
             await self._start_subscription_bounded(
-                subscription_download_error, step_number_s3,
+                subscription_download_error, step_number_s4,
                 dev_ctrl=controller,
                 node_id=requestor_node_id,
                 endpoint=0,
@@ -1075,7 +1076,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         asserts.assert_greater(event_download_error.progressPercent, 0, "Download progress was 0")
         asserts.assert_equal(event_download_error.platformCode, NullValue,
                              f"Null value not found at platformCode {event_download_error.platformCode}")
-        logger.info("DownloadError Event found: %s", event_download_error)
+        logger.info("%s : DownloadError Event found: %s", step_number_s4, event_download_error)
         # [End of Step #6 TC_SU_2_7]
 
         self.step(5)
@@ -1291,6 +1292,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Arm the barrier before the announce below; start_provider() leaves the match armed on
         # its own "Server initialization complete" wait, so this must follow it.
         self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        kQuerying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+        kDownloading_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+        kApplying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
+        kIdle_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
 
         subscription_attr_state_querying = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -1327,16 +1332,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Announce done at this point
         # State should change from Idle -> Querying
         subscription_attr_state_querying.await_first_value_asserting_no_forbidden(
-            target_value=kQuerying_s1,
+            target_value=kQuerying_s6,
             forbidden_values=set(),
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC),
         )
         # Once the device is Querying with the Provider Terminated , wait for the event report
         logger.info('%s: Step #6.3 - Waiting for the StateTransitionEvent with kIdle value and reason Failure', step_number_s6)
-
         subscription_attr_state_querying.await_first_value_asserting_no_forbidden(
-            target_value=kIdle,
-            forbidden_values={kDownloading_s1, kApplying_s1},
+            target_value=kIdle_s6,
+            forbidden_values={kDownloading_s6, kApplying_s6},
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC),
         )
 
