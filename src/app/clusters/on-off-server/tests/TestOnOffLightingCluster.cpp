@@ -560,7 +560,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
         mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds32(100));
     }
 
-    // Do not expect report since the initial change was not reported
+    // Expect report since the attributes changed to 0
     for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OnTime::Id)
