@@ -313,7 +313,7 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         EXPECT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
         if (mFakeWebRTCClient.mLastCallback != nullptr)
         {
-            mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, aSessionId);
+            mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, aSessionId, /* aOfferSent = */ true);
             EXPECT_EQ(LastStatus(activateHandler), Status::Success);
             mFakeWebRTCClient.mLastCallback->OnSessionActive(aCameraNode, aSessionId);
         }
@@ -1361,7 +1361,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiatesAWebRTCSession)
 
     // The camera assigns session 55: the entry records it and the command answers SUCCESS
     ASSERT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
-    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55);
+    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55, /* aOfferSent = */ true);
     ASSERT_EQ(LastStatus(activateHandler), Status::Success);
 
     Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
@@ -1382,6 +1382,37 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiatesAWebRTCSession)
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 1);
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, ActivationFailingAfterTheOfferMarksTheStreamFailed)
+{
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+
+    InvalidatableCommandHandler activateHandler;
+    activateHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::ActivateAnalysisStream::Id };
+    Commands::ActivateAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 0;
+    commandData.webRTCEndpointID = MakeOptional(static_cast<EndpointId>(2));
+
+    auto response = mServer.GetLogic().HandleActivateAnalysisStream(activateHandler, path, commandData);
+    ASSERT_FALSE(response.has_value());
+
+    // The camera refused the offer it received: the flow failed after initiating, so the stream is
+    // Failure rather than the PendingInitiation it started from (11.9.8.5)
+    ASSERT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
+    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::InvalidInState, 0, /* aOfferSent = */ true);
+    ASSERT_EQ(LastStatus(activateHandler), Status::InvalidInState);
+    ASSERT_EQ(StreamState(0), AnalysisStreamStateEnum::kFailure);
+
+    // A failed stream is activatable again: the command parks on a fresh request to the camera
+    InvalidatableCommandHandler retryHandler;
+    retryHandler.SetFabricIndex(1);
+    auto retry = mServer.GetLogic().HandleActivateAnalysisStream(retryHandler, path, commandData);
+    ASSERT_FALSE(retry.has_value());
+    ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 2);
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiationFailureIsPropagatedWithoutSideEffects)
 {
     InvalidatableCommandHandler establishHandler;
@@ -1398,9 +1429,9 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiationFailureIsPropagatedWithout
     auto response = mServer.GetLogic().HandleActivateAnalysisStream(activateHandler, path, commandData);
     ASSERT_FALSE(response.has_value());
 
-    // No WebRTCTransportProvider on the camera surfaces as NOT_FOUND
+    // No WebRTCTransportProvider on the camera surfaces as NOT_FOUND, before any offer is sent
     ASSERT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
-    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::NotFound, 0);
+    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::NotFound, 0, /* aOfferSent = */ false);
     ASSERT_EQ(LastStatus(activateHandler), Status::NotFound);
 
     // The entry is untouched: still PendingInitiation, no endpoint, and activatable again
@@ -1421,7 +1452,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiationFailureIsPropagatedWithout
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 2);
 
     // Settle the retry: a mock handler must not outlive the test with an interaction parked on it
-    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 56);
+    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 56, /* aOfferSent = */ true);
     ASSERT_EQ(LastStatus(retryHandler), Status::Success);
 }
 
@@ -1539,7 +1570,7 @@ TEST_F(TestRemoteAvAnalysisCluster, SessionFailureBeforeActiveMarksTheStreamFail
     commandData.webRTCEndpointID = MakeOptional(static_cast<EndpointId>(2));
     auto response                = mServer.GetLogic().HandleActivateAnalysisStream(activateHandler, path, commandData);
     ASSERT_FALSE(response.has_value());
-    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55);
+    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55, /* aOfferSent = */ true);
     ASSERT_EQ(LastStatus(activateHandler), Status::Success);
 
     mFakeWebRTCClient.mLastCallback->OnSessionFailed(ScopedNodeId(0x1234, 1), 55);
@@ -1726,7 +1757,7 @@ TEST_F(TestRemoteAvAnalysisCluster, DeactivateIsRejectedUnlessTheStreamIsActive)
     activateData.analysisStreamID = 0;
     activateData.webRTCEndpointID = MakeOptional(static_cast<EndpointId>(2));
     ASSERT_FALSE(mServer.GetLogic().HandleActivateAnalysisStream(activateHandler, activatePath, activateData).has_value());
-    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55);
+    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55, /* aOfferSent = */ true);
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kWebRTCInitiated);
     ASSERT_EQ(ImmediateDeactivateStatus(0), Status::InvalidInState);
 
@@ -1812,7 +1843,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateWhileAnotherActivateIsParkedIsBusy)
     ASSERT_EQ(ImmediateActivateStatus(1, 2), Status::Busy);
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 1);
 
-    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55);
+    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55, /* aOfferSent = */ true);
     ASSERT_EQ(LastStatus(activateHandler), Status::Success);
 }
 
@@ -2268,7 +2299,7 @@ TEST_F(TestRemoteAvAnalysisCluster, DeadExchangeActivateStillRecordsTheSession)
     // The client exchange dies, then the camera assigns the session. The session is live on the
     // camera regardless and must be recorded, or nothing could ever end it.
     activateHandler.InvalidateHandles();
-    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55);
+    mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, 55, /* aOfferSent = */ true);
     ASSERT_FALSE(activateHandler.HasStatus());
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kWebRTCInitiated);
 
@@ -2652,7 +2683,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ShutdownDuringActivateCancelsTheClientsAndAn
     ASSERT_EQ(LastStatus(activateHandler), Status::Failure);
 
     // A stray late completion (contract violation by a client) answers nothing more
-    pendingCallback->OnSessionInitiated(Status::Success, 55);
+    pendingCallback->OnSessionInitiated(Status::Success, 55, /* aOfferSent = */ true);
     ASSERT_EQ(activateHandler.GetStatuses().size(), 1u);
 
     // Restart so the fixture TearDown shuts down a running server

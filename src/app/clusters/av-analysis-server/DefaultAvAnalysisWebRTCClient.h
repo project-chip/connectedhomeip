@@ -300,6 +300,8 @@ protected:
         // carry this pointer belongs to an interaction this request has already finished with.
         void SetInvokedSender(CommandSender * aSender) { mInvokedSender = aSender; }
         bool WasInvokedBy(const CommandSender * aSender) const { return mInvokedSender == aSender; }
+        // The command reached the exchange: a send that failed clears this again
+        bool Invoked() const { return mInvokedSender != nullptr; }
 
         // What the provider check learnt about the named endpoint
         enum class ProviderCheck : uint8_t

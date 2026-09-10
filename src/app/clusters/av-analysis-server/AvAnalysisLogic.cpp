@@ -1123,7 +1123,7 @@ bool AvAnalysisServerLogic::ZoneIDListContains(const DataModel::DecodableList<ui
     return false;
 }
 
-void AvAnalysisServerLogic::OnSessionInitiated(Status aStatus, uint16_t aWebRTCSessionId)
+void AvAnalysisServerLogic::OnSessionInitiated(Status aStatus, uint16_t aWebRTCSessionId, bool aOfferSent)
 {
     VerifyOrReturn(mCameraInteraction.GetState() == AvAnalysis::CameraInteraction::State::kActivating,
                    ChipLogError(Zcl, "AvAnalysis[ep=%d]: unexpected session initiation completion", mEndpointId));
@@ -1135,14 +1135,6 @@ void AvAnalysisServerLogic::OnSessionInitiated(Status aStatus, uint16_t aWebRTCS
     auto handleRef = mCameraInteraction.Complete(commandPath);
     auto * handler = handleRef.Get();
 
-    // A failed initiation is propagated as the command status, no side-effects.
-    if (aStatus != Status::Success)
-    {
-        VerifyOrReturn(handler != nullptr);
-        handler->AddStatus(commandPath, aStatus);
-        return;
-    }
-
     AnalysisStreamEntry * entry = mStreamTable.Find(analysisStreamId);
     if (entry == nullptr)
     {
@@ -1150,6 +1142,19 @@ void AvAnalysisServerLogic::OnSessionInitiated(Status aStatus, uint16_t aWebRTCS
         ChipLogError(Zcl, "AvAnalysis[ep=%d]: stream %u removed while activating", mEndpointId, analysisStreamId);
         VerifyOrReturn(handler != nullptr);
         handler->AddStatus(commandPath, Status::NotFound);
+        return;
+    }
+
+    if (aStatus != Status::Success)
+    {
+        // Sending the offer initiates the session, so a failure after that is a failure of the stream
+        if (aOfferSent)
+        {
+            SetStreamState(*entry, AnalysisStreamStateEnum::kFailure);
+        }
+
+        VerifyOrReturn(handler != nullptr);
+        handler->AddStatus(commandPath, aStatus);
         return;
     }
 

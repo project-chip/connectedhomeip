@@ -52,8 +52,12 @@ public:
          * The session with the camera has been initiated: the offer exchange completed and the
          * camera assigned aWebRTCSessionId. A non-Success status means initiation failed and no
          * session exists; it is the camera's response status where one was received.
+         *
+         * aOfferSent tells whether the offer reached the camera before the failure, which is what
+         * separates a flow that failed after initiating from one that never initiated.
          */
-        virtual void OnSessionInitiated(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) = 0;
+        virtual void OnSessionInitiated(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId,
+                                        bool aOfferSent) = 0;
 
         /**
          * The initiated session completed its signaling flow and media is streaming. Session ids are

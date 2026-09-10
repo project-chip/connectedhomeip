@@ -200,12 +200,14 @@ public:
     // A status no completion delivers, so a Success can only come from one
     Status mLastStatus    = Status::InvalidAction;
     uint16_t mLastSession = 0;
+    bool mLastOfferSent   = false;
 
-    void OnSessionInitiated(Status aStatus, uint16_t aWebRTCSessionId) override
+    void OnSessionInitiated(Status aStatus, uint16_t aWebRTCSessionId, bool aOfferSent) override
     {
         mInitiatedCount++;
-        mLastStatus  = aStatus;
-        mLastSession = aWebRTCSessionId;
+        mLastOfferSent = aOfferSent;
+        mLastStatus    = aStatus;
+        mLastSession   = aWebRTCSessionId;
     }
     void OnSessionActive(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override
     {
@@ -934,6 +936,9 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, CameraErrorStatusIsPropagatedVerbatim)
 
     EXPECT_EQ(mCallback.mInitiatedCount, 1);
     EXPECT_EQ(mCallback.mLastStatus, Status::ResourceExhausted);
+    // The camera answered, so the offer had reached it: the stream this activates is failed, not
+    // left as it was
+    EXPECT_TRUE(mCallback.mLastOfferSent);
     EXPECT_EQ(mPeerDelegate.mSessionsAssigned, 0);
     EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
 }
@@ -967,6 +972,8 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferTheClientCannotSendFailsTheRequ
     EXPECT_EQ(mClient.mSendAttempts, 1);
     EXPECT_EQ(mCallback.mInitiatedCount, 1);
     EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    // And the offer never reached the camera, so the stream it would have activated is untouched
+    EXPECT_FALSE(mCallback.mLastOfferSent);
     EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
     EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
 

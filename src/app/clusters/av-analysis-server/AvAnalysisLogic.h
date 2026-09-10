@@ -93,7 +93,7 @@ public:
     void OnVideoStreamAllocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
     void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
 
-    void OnSessionInitiated(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) override;
+    void OnSessionInitiated(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId, bool aOfferSent) override;
     void OnSessionActive(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
     void OnSessionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
     void OnSessionEnded(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) override;

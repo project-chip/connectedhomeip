@@ -645,6 +645,8 @@ void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebR
     // An offer request failing after asking for the offer leaves the application a peer connection
     // that will never get a session
     const bool offerAbandoned = mRequest.OfferRequested() && aStatus != Status::Success;
+    // Whether ProvideOffer reached the camera: a send that failed rolled this back
+    const bool offerSent = mRequest.Invoked();
     mRequest.Reset();
     mOfferSdp.clear();
     mICECandidates.clear();
@@ -672,7 +674,7 @@ void DefaultAvAnalysisWebRTCClient::FinishRequest(Status aStatus, uint16_t aWebR
 
     if (completed == Request::CommandType::kProvideOffer)
     {
-        callback->OnSessionInitiated(aStatus, aWebRTCSessionId);
+        callback->OnSessionInitiated(aStatus, aWebRTCSessionId, offerSent);
         return;
     }
 
