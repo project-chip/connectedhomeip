@@ -16,7 +16,9 @@
 
 rsource "../Kconfig"
 
+if CHIP
 rsource "Kconfig.bt"
+endif # CHIP
 
 rsource "../../nxp/chip-module/Kconfig"
 
