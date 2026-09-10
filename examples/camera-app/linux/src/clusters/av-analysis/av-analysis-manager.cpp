@@ -107,7 +107,7 @@ AvAnalysisManager::TriggerPerceivedContext(const std::vector<AvAnalysis::Structs
     {
         uint16_t sid = aSessionId.ValueOr(0);
         ReturnErrorOnFailure(
-            server->CreateActiveSession(sid, aSourceNodeId.ValueOr(chip::kUndefinedNodeId), aSessionId.HasValue()));
+            server->CreateActiveSession(sid, aSourceNodeId.ValueOr(chip::kUndefinedNodeId), 0, aSessionId.HasValue()));
         mLatestSessionId           = sid;
         mHasActiveSession          = true;
         mSessionHasTrackedContexts = false;

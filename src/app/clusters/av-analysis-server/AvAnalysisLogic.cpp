@@ -1256,9 +1256,11 @@ uint16_t AvAnalysisServerLogic::AllocateSessionId()
     return mNextAnalysisSessionID++;
 }
 
-CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId, bool aUseSpecificSessionId)
+CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId, uint64_t aSourceStartTimestampUs,
+                                                      bool aUseSpecificSessionId)
 {
-    // Every event of a RemoteContextDetection session reports its source, so it cannot start without one
+    // Every event of a RemoteContextDetection session names the camera the analyzed stream comes
+    // from, so it cannot start without one
     if (HasFeature(Feature::kRemoteContextDetection))
     {
         VerifyOrReturnError(aSourceNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -1275,14 +1277,13 @@ CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, Nod
 
     if (session_it != mActiveSessions.end())
     {
-        // Only the source node is known here, so a timestamp recorded at session start stays
-        session_it->SetSource(aSourceNodeId, session_it->GetSourceStartTimestampUs());
+        session_it->SetSource(aSourceNodeId, aSourceStartTimestampUs);
         return CHIP_NO_ERROR;
     }
 
     AvAnalysis::ActiveAmbientContextSession newSession;
     newSession.SetSessionId(aSessionId);
-    newSession.SetSource(aSourceNodeId, 0);
+    newSession.SetSource(aSourceNodeId, aSourceStartTimestampUs);
     mActiveSessions.push_back(newSession);
 
     return CHIP_NO_ERROR;

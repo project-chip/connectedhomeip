@@ -161,10 +161,10 @@ public:
     // Context detection and event generation
     /**
      * Records an active session without generating an AnalysisSessionStart event, for a delegate reporting
-     * contexts of a session it started itself. Source argument as for AnalysisSessionStart.
+     * contexts of a session it started itself. Source arguments as for AnalysisSessionStart.
      */
     CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId = kUndefinedNodeId,
-                                   bool aUseSpecificSessionId = false);
+                                   uint64_t aSourceStartTimestampUs = 0, bool aUseSpecificSessionId = false);
 
     /**
      * Invoked by the delegate when a new analysis session is initiated based on its own detection metrics. The server will
@@ -176,7 +176,8 @@ public:
      * @param aSourceNodeId           With RemoteContextDetection: the camera node the analyzed stream comes from;
      * every event of the session reports it. Not used with LocalContextDetection.
      * @param aSourceStartTimestampUs With RemoteContextDetection: the start timestamp (epoch-us) of the analyzed stream,
-     * reported by the session's PerceivedContext events.
+     * reported as given by the session's PerceivedContext events, where the field is mandatory. Not used with
+     * LocalContextDetection.
      */
     CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
                                     NodeId aSourceNodeId = kUndefinedNodeId, uint64_t aSourceStartTimestampUs = 0);

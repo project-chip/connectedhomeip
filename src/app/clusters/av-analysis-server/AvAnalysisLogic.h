@@ -160,7 +160,7 @@ public:
 
     // Active context tracking and events
     CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId = kUndefinedNodeId,
-                                   bool aUseSpecificSessionId = false);
+                                   uint64_t aSourceStartTimestampUs = 0, bool aUseSpecificSessionId = false);
 
     CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
                                     ServerClusterContext * aContext, NodeId aSourceNodeId = kUndefinedNodeId,

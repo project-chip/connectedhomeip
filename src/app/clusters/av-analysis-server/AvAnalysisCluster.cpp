@@ -154,9 +154,10 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(co
 }
 
 // Context detection
-CHIP_ERROR AvAnalysisCluster::CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId, bool aUseSpecificSessionId)
+CHIP_ERROR AvAnalysisCluster::CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId, uint64_t aSourceStartTimestampUs,
+                                                  bool aUseSpecificSessionId)
 {
-    return mLogic.CreateActiveSession(aSessionId, aSourceNodeId, aUseSpecificSessionId);
+    return mLogic.CreateActiveSession(aSessionId, aSourceNodeId, aSourceStartTimestampUs, aUseSpecificSessionId);
 }
 
 CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
