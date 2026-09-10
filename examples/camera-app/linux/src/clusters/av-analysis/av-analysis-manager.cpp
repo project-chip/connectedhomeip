@@ -66,6 +66,56 @@ CHIP_ERROR AvAnalysisManager::PersistentAttributesLoadedCallback()
     return CHIP_NO_ERROR;
 }
 
+/**
+ * Context event handling. Invoked by an app or by app-pipe handling when a new context trigger is detected. This
+ * verifies that the triggered context is part of the current enabled set on the server, informs the invoker of this
+ * (via setting triggerContextEnabled), and generates the event.
+ *
+ * @param namespaceId           the namespace for the trigger
+ * @param tagId                 the actual context tag within the namespace
+ * @param zoneIds               the zoneIds for the trigger, if present
+ * @param identifiedContextId   the current app generated context id
+ * @param triggerContextEnabled boolean that is set, true if this is an enabled context
+ */
+void AvAnalysisManager::OnAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId,
+                                                       Optional<DataModel::Nullable<std::vector<uint16_t>>> zoneIds,
+                                                       uint16_t identifiedContextId, bool & triggeredContextEnabled)
+{
+    ChipLogProgress(Camera, "AvAnalysisManager::OnAmbientContextTriggeredEvent. Namespace %d, Tag %d", namespaceId, tagId);
+    // Context defined as semantic tags
+    Globals::Structs::SemanticTagStruct::Type context;
+
+    context.namespaceID = namespaceId;
+    context.tag         = tagId;
+
+    // Verify that the triggering context and zones are part of our set of active context triggers
+    triggeredContextEnabled = GetServer()->IsTriggeringContextActive(context, zoneIds);
+    ChipLogProgress(Camera, "AvAnalysisManager::OnAmbientContextTriggeredEvent. ContextEnabled %s.",
+                    triggeredContextEnabled ? "true" : "false");
+
+    if (!triggeredContextEnabled)
+    {
+        return;
+    }
+
+    // Generate our perceived context event.
+    // Create our TrackedContext
+    Structs::TrackedContext::Type aTrackedContext;
+    std::vector<Structs::TrackedContext::Type> trackedContextList;
+    std::vector<Structs::TrackedContext::Type> expiredContextList;
+
+    aTrackedContext.identifiedContextID = identifiedContextId;
+    aTrackedContext.identifiedContext   = context;
+
+    trackedContextList.push_back(aTrackedContext);
+
+    CHIP_ERROR err = TriggerPerceivedContext(trackedContextList, expiredContextList, Optional<uint16_t>(), Optional<NodeId>());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysisManager: Failed to trigger perceived context: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
 CHIP_ERROR AvAnalysisManager::TriggerSessionStart(const std::vector<uint16_t> & aZoneIds, bool aZoneIdsNull,
                                                   chip::Optional<chip::NodeId> aSourceNodeId)
 {

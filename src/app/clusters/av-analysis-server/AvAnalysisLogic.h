@@ -158,6 +158,10 @@ public:
     HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
 
+    // Attribute interactions
+    bool IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext,
+                                   Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds);
+
     // Active context tracking and events
     CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId = kUndefinedNodeId,
                                    uint64_t aSourceStartTimestampUs = 0, bool aUseSpecificSessionId = false);
@@ -222,13 +226,14 @@ private:
     // Session ids are assigned per camera, so the camera is part of the key
     AvAnalysis::AnalysisStreamEntry * FindByWebRTCSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
     // Assigns the next session id not currently in use
-    uint16_t AllocateSessionId();
+    CHIP_ERROR AllocateSessionId(uint16_t & aSessionId);
     // The active session with this id
     std::vector<AvAnalysis::ActiveAmbientContextSession>::iterator FindSession(uint16_t aSessionId);
     // Names the session's source stream on a PerceivedContext, under RemoteContextDetection
     void SetEventSource(AvAnalysis::Events::PerceivedContext::Type & aEvent,
                         const AvAnalysis::ActiveAmbientContextSession & aSession);
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
+    bool AreAllZoneIdsFound(const std::vector<uint16_t> & subset, const std::vector<uint16_t> & target);
     bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext);
 
     /**
