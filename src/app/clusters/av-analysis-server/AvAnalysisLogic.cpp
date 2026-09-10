@@ -40,6 +40,30 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace {
+
+// The two fields a context is identified by throughout this cluster
+bool SameContext(const Globals::Structs::SemanticTagStruct::Type & aLhs, const Globals::Structs::SemanticTagStruct::Type & aRhs)
+{
+    return aLhs.namespaceID == aRhs.namespaceID && aLhs.tag == aRhs.tag;
+}
+
+// Copies a decoded ZoneIDs list into aZoneIDs
+CHIP_ERROR DecodeZoneIDs(const DataModel::DecodableList<uint16_t> & aList, std::vector<uint16_t> & aZoneIDs)
+{
+    size_t size = 0;
+    ReturnErrorOnFailure(aList.ComputeSize(&size));
+    aZoneIDs.reserve(size);
+    auto iter = aList.begin();
+    while (iter.Next())
+    {
+        aZoneIDs.push_back(iter.GetValue());
+    }
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
 AvAnalysisServerLogic::AvAnalysisServerLogic(
     EndpointId aEndpointId, BitFlags<Feature> aFeatures,
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
@@ -442,21 +466,11 @@ CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
         if (!mMaxZones.IsNull())
         {
             std::vector<uint16_t> zoneIDs;
-            size_t size;
 
             // An entry stored without ZoneIDs reads as the entire frame
             if (trigger.zoneIDs.HasValue() && !trigger.zoneIDs.Value().IsNull())
             {
-                err = trigger.zoneIDs.Value().Value().ComputeSize(&size);
-                VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-                zoneIDs.reserve(size);
-
-                auto zone_iter = trigger.zoneIDs.Value().Value().begin();
-
-                while (zone_iter.Next())
-                {
-                    zoneIDs.push_back(zone_iter.GetValue());
-                }
+                ReturnErrorOnFailure(DecodeZoneIDs(trigger.zoneIDs.Value().Value(), zoneIDs));
                 triggerStorage.SetZoneIDs(MakeOptional(DataModel::MakeNullable(zoneIDs)));
             }
             else
@@ -646,8 +660,7 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
             //
             auto it = std::find_if(mSupportedAmbientContexts.begin(), mSupportedAmbientContexts.end(),
                                    [&contextTrigger](const Descriptor::Structs::SemanticTagStruct::Type & stt) {
-                                       return stt.namespaceID == contextTrigger.context.namespaceID &&
-                                           stt.tag == contextTrigger.context.tag;
+                                       return SameContext(stt, contextTrigger.context);
                                    });
 
             VerifyOrReturnError(it != mSupportedAmbientContexts.end(), Status::ConstraintError);
@@ -673,19 +686,10 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
                 //
                 if (!contextTrigger.zoneIDs.Value().IsNull())
                 {
-                    size_t size;
-                    CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
+                    std::vector<uint16_t> zoneIDs;
+                    CHIP_ERROR err = DecodeZoneIDs(contextTrigger.zoneIDs.Value().Value(), zoneIDs);
                     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
 
-                    std::vector<uint16_t> zoneIDs;
-                    zoneIDs.reserve(size);
-
-                    auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
-
-                    while (zone_iter.Next())
-                    {
-                        zoneIDs.push_back(zone_iter.GetValue());
-                    }
                     // A repeated id would be stored and reported repeatedly, and could exceed the MaxZones entries the
                     // persisted size is computed from.
                     std::sort(zoneIDs.begin(), zoneIDs.end());
@@ -716,7 +720,7 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
         for (auto trigger = validatedTriggers.begin(); trigger != validatedTriggers.end(); ++trigger)
         {
             bool isDuplicate = std::any_of(validatedTriggers.begin(), trigger, [&trigger](const ValidatedTrigger & earlier) {
-                return earlier.context.namespaceID == trigger->context.namespaceID && earlier.context.tag == trigger->context.tag;
+                return SameContext(earlier.context, trigger->context);
             });
             if (isDuplicate)
             {
@@ -726,11 +730,9 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
             // Update our active trigger set with this new context.
             // If the context exists, update the zone IDs, otherwise add a new entry
             //
-            auto it2 = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
-                                    [&trigger](AvAnalysis::AmbientContextStorage & acs) {
-                                        return acs.GetContext().namespaceID == trigger->context.namespaceID &&
-                                            acs.GetContext().tag == trigger->context.tag;
-                                    });
+            auto it2 = std::find_if(
+                mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
+                [&trigger](AvAnalysis::AmbientContextStorage & acs) { return SameContext(acs.GetContext(), trigger->context); });
 
             // Does an entry with this context already exist?
             //
@@ -836,8 +838,7 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
             // Make sure the context is part of our active set
             //
             auto it = std::find_if(updated.begin(), updated.end(), [&contextTrigger](AmbientContextStorage & acs) {
-                return acs.GetContext().namespaceID == contextTrigger.context.namespaceID &&
-                    acs.GetContext().tag == contextTrigger.context.tag;
+                return SameContext(acs.GetContext(), contextTrigger.context);
             });
 
             if (it == updated.end())
@@ -866,21 +867,11 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                 if (!contextTrigger.zoneIDs.Value().IsNull())
                 {
                     std::vector<uint16_t> zoneIDs;
-                    size_t size;
-
-                    CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
+                    CHIP_ERROR err = DecodeZoneIDs(contextTrigger.zoneIDs.Value().Value(), zoneIDs);
                     if (err != CHIP_NO_ERROR)
                     {
                         outcome = Status::Failure;
                         break;
-                    }
-                    zoneIDs.reserve(size);
-
-                    auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
-
-                    while (zone_iter.Next())
-                    {
-                        zoneIDs.push_back(zone_iter.GetValue());
                     }
                     if (!zoneIDs.empty())
                     {
@@ -1254,6 +1245,24 @@ AnalysisStreamEntry * AvAnalysisServerLogic::FindByWebRTCSession(const ScopedNod
     return nullptr;
 }
 
+std::vector<AvAnalysis::ActiveAmbientContextSession>::iterator AvAnalysisServerLogic::FindSession(uint16_t aSessionId)
+{
+    return std::find_if(
+        mActiveSessions.begin(), mActiveSessions.end(),
+        [aSessionId](const AvAnalysis::ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+}
+
+void AvAnalysisServerLogic::SetEventSource(Events::PerceivedContext::Type & aEvent,
+                                           const AvAnalysis::ActiveAmbientContextSession & aSession)
+{
+    // With RemoteContextDetection every PerceivedContext names the session's source stream
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        aEvent.sourceNodeId         = MakeOptional(aSession.GetSourceNodeId());
+        aEvent.sourceStartTimestamp = MakeOptional(aSession.GetSourceStartTimestampUs());
+    }
+}
+
 uint16_t AvAnalysisServerLogic::AllocateSessionId()
 {
     // A session created with an id of the caller's choosing does not move the counter, so ids still
@@ -1283,9 +1292,7 @@ CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, Nod
         aSessionId = AllocateSessionId();
     }
 
-    auto session_it = std::find_if(
-        mActiveSessions.begin(), mActiveSessions.end(),
-        [aSessionId](const AvAnalysis::ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+    auto session_it = FindSession(aSessionId);
 
     if (session_it != mActiveSessions.end())
     {
@@ -1363,9 +1370,7 @@ CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Make sure the provided session ID is one we know about
-    auto session_it =
-        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
-                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+    auto session_it = FindSession(aSessionId);
 
     // Check if the element was actually found
     if (session_it == mActiveSessions.end())
@@ -1387,11 +1392,7 @@ CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
     perceivedEvent.sessionID             = aSessionId;
     perceivedEvent.newIdentifiedContexts = chip::MakeOptional(
         DataModel::List<const Structs::TrackedContext::Type>(aTriggeringContext.data(), aTriggeringContext.size()));
-    if (HasFeature(Feature::kRemoteContextDetection))
-    {
-        perceivedEvent.sourceNodeId         = MakeOptional(session_it->GetSourceNodeId());
-        perceivedEvent.sourceStartTimestamp = MakeOptional(session_it->GetSourceStartTimestampUs());
-    }
+    SetEventSource(perceivedEvent, *session_it);
 
     VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
@@ -1406,9 +1407,7 @@ CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Make sure the provided session ID is one we know about
-    auto it =
-        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
-                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+    auto it = FindSession(aSessionId);
 
     // Check if the element was actually found
     if (it == mActiveSessions.end())
@@ -1430,11 +1429,7 @@ CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
         chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aNewContext.data(), aNewContext.size()));
     perceivedEvent.currentIdentifiedContexts = chip::MakeOptional(
         DataModel::List<const Structs::TrackedContext::Type>(it->GetTrackedContexts().data(), it->GetTrackedContexts().size()));
-    if (HasFeature(Feature::kRemoteContextDetection))
-    {
-        perceivedEvent.sourceNodeId         = MakeOptional(it->GetSourceNodeId());
-        perceivedEvent.sourceStartTimestamp = MakeOptional(it->GetSourceStartTimestampUs());
-    }
+    SetEventSource(perceivedEvent, *it);
 
     VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
@@ -1453,9 +1448,7 @@ AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Make sure the provided session ID is one we know about
-    auto it =
-        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
-                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+    auto it = FindSession(aSessionId);
 
     // Check if the element was actually found
     if (it == mActiveSessions.end())
@@ -1466,12 +1459,10 @@ AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
     for (const auto & context : aOldContext)
     {
         // Make sure the context actually exists in the session
-        auto context_it =
-            std::find_if(it->GetTrackedContexts().begin(), it->GetTrackedContexts().end(),
-                         [context](const Structs::TrackedContext::Type & mContext) {
-                             return ((context.identifiedContext.namespaceID == mContext.identifiedContext.namespaceID) &&
-                                     (context.identifiedContext.tag == mContext.identifiedContext.tag));
-                         });
+        auto context_it = std::find_if(it->GetTrackedContexts().begin(), it->GetTrackedContexts().end(),
+                                       [context](const Structs::TrackedContext::Type & mContext) {
+                                           return SameContext(context.identifiedContext, mContext.identifiedContext);
+                                       });
 
         // Check if the element was actually found
         if (context_it == it->GetTrackedContexts().end())
@@ -1491,11 +1482,7 @@ AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
         DataModel::List<const Structs::TrackedContext::Type>(it->GetTrackedContexts().data(), it->GetTrackedContexts().size()));
     perceivedEvent.expiredContexts =
         chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aOldContext.data(), aOldContext.size()));
-    if (HasFeature(Feature::kRemoteContextDetection))
-    {
-        perceivedEvent.sourceNodeId         = MakeOptional(it->GetSourceNodeId());
-        perceivedEvent.sourceStartTimestamp = MakeOptional(it->GetSourceStartTimestampUs());
-    }
+    SetEventSource(perceivedEvent, *it);
 
     VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
                         CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
@@ -1508,9 +1495,7 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId, Server
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Make sure the provided session ID is one we know about
-    auto it =
-        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
-                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+    auto it = FindSession(aSessionId);
 
     // Check if the element was actually found
     if (it == mActiveSessions.end())
@@ -1545,8 +1530,7 @@ bool AvAnalysisServerLogic::IsContextPartOfActiveContextTriggers(
     {
         auto trigger_it = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
                                        [&contextTrigger](AmbientContextStorage & acs) {
-                                           return acs.GetContext().namespaceID == contextTrigger.identifiedContext.namespaceID &&
-                                               acs.GetContext().tag == contextTrigger.identifiedContext.tag;
+                                           return SameContext(acs.GetContext(), contextTrigger.identifiedContext);
                                        });
 
         if (trigger_it == mActiveAmbientContextTriggers.end())

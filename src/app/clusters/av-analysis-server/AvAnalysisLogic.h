@@ -223,6 +223,11 @@ private:
     AvAnalysis::AnalysisStreamEntry * FindByWebRTCSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
     // Assigns the next session id not currently in use
     uint16_t AllocateSessionId();
+    // The active session with this id
+    std::vector<AvAnalysis::ActiveAmbientContextSession>::iterator FindSession(uint16_t aSessionId);
+    // Names the session's source stream on a PerceivedContext, under RemoteContextDetection
+    void SetEventSource(AvAnalysis::Events::PerceivedContext::Type & aEvent,
+                        const AvAnalysis::ActiveAmbientContextSession & aSession);
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
     bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext);
 
