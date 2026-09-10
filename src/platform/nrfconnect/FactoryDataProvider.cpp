@@ -173,6 +173,10 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::MoveDACPrivateKeyToSecureStora
                                                mFactoryData.dac_priv_key.len, &mDACPrivKeyId) == PSA_SUCCESS,
                                 CHIP_ERROR_INTERNAL);
         }
+        else
+        {
+            psa_reset_key_attributes(&attributes);
+        }
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
 #if defined(CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS) && defined(CONFIG_CHIP_CRYPTO_PSA_DAC_PRIV_KEY_ITS) &&                       \
@@ -182,6 +186,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::MoveDACPrivateKeyToSecureStora
 #endif
         // Check once again if the saved key has attributes set before removing it from the factory data set.
         VerifyOrReturnError(psa_get_key_attributes(mDACPrivKeyId, &attributes) == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+        psa_reset_key_attributes(&attributes);
 
         const struct device * flashDev = mFlashFactoryData.GetFlashDevice();
         VerifyOrReturnError(flashDev != nullptr && device_is_ready(flashDev), CHIP_ERROR_INTERNAL);
