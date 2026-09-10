@@ -175,11 +175,14 @@ private:
      *        preset in the Presets attribute list, and notifies ThermostatSuggestions changed if any entry was
      *        removed. Does not itself evaluate or notify CurrentThermostatSuggestion; see OnPresetsCommitted().
      *
-     * This is best-effort: if a delegate lookup fails partway through, the cascade logs the error and leaves every
-     * entry untouched rather than risk a partial cleanup.
+     * This is best-effort: if a delegate lookup fails partway through the first pass, the cascade logs the error and
+     * leaves every entry untouched rather than risk a partial cleanup. If a delegate removal fails partway through
+     * the second pass, the entries already removed stay removed, but the cascade still reports that it did not
+     * complete, since one or more stale entries may remain.
      *
      * @return true if the cascade completed (whether or not anything was removed), false if it aborted early on a
-     *         delegate error.
+     *         delegate error, in which case stale entries may remain even though some entries may already have been
+     *         removed.
      */
     bool RemoveThermostatSuggestionsForRemovedPresets();
 

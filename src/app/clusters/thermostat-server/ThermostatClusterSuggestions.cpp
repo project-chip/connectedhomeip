@@ -404,6 +404,7 @@ bool ThermostatSuggestions::RemoveThermostatSuggestionsForRemovedPresets()
     }
 
     bool didRemoveAnEntry = false;
+    bool abortedEarly      = false;
 
     // Second pass: every preset check above succeeded and is cached, so it's now safe to actually remove the stale
     // entries using the cached results, without any further Presets delegate lookups that could themselves fail
@@ -422,6 +423,7 @@ bool ThermostatSuggestions::RemoveThermostatSuggestionsForRemovedPresets()
                          "RemoveThermostatSuggestionsForRemovedPresets: RemoveFromThermostatSuggestionsList failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
+            abortedEarly = true;
             break;
         }
         didRemoveAnEntry = true;
@@ -431,7 +433,10 @@ bool ThermostatSuggestions::RemoveThermostatSuggestionsForRemovedPresets()
     {
         mCluster.NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
     }
-    return true;
+
+    // A removal-phase delegate error leaves stale entries still present, so this cascade did not complete per the
+    // documented contract: report false even though some entries may already have been removed.
+    return !abortedEarly;
 }
 
 void ThermostatSuggestions::OnPresetsCommitted()
