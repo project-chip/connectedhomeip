@@ -112,8 +112,8 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
             }
             // Then check for YYYYMMDD or extended formats (8-16 digits)
             else if ((date->len >= 8 && date->len <= 16) && isdigit(date->value[0]) && isdigit(date->value[1]) &&
-                isdigit(date->value[2]) && isdigit(date->value[3]) && isdigit(date->value[4]) && isdigit(date->value[5]) &&
-                isdigit(date->value[6]) && isdigit(date->value[7]))
+                     isdigit(date->value[2]) && isdigit(date->value[3]) && isdigit(date->value[4]) && isdigit(date->value[5]) &&
+                     isdigit(date->value[6]) && isdigit(date->value[7]))
             {
                 factoryData->date_year = 1000 * (date->value[0] - '0') + 100 * (date->value[1] - '0') +
                     10 * (date->value[2] - '0') + date->value[3] - '0';
@@ -200,17 +200,17 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
     return res && zcbor_list_map_end_force_decode(states);
 }
 
-bool LoadDACCertAndKey(uint8_t * base_buffer , struct FactoryData * factoryData)
+bool LoadDACCertAndKey(uint8_t * base_buffer, struct FactoryData * factoryData)
 {
     size_t dac_priv_key_len;
-    uint8_t ieee_addr[8] = {0};
-    uint8_t chip_id[16] = { 0 };
+    uint8_t ieee_addr[8] = { 0 };
+    uint8_t chip_id[16]  = { 0 };
     /* get the dac key pair info form the flash directly*/
-    uint8_t buffer[34] = {0};
+    uint8_t buffer[34]                 = { 0 };
     const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
     int ret = flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(dac_keypair_partition), buffer, sizeof(buffer));
 
-    dac_priv_key_len    = buffer[0];
+    dac_priv_key_len = buffer[0];
     dac_priv_key_len |= (uint16_t) buffer[1] << 8;
     factoryData->dac_priv_key.len = dac_priv_key_len;
     if (!factoryData->dac_priv_key.len)
@@ -246,7 +246,7 @@ bool LoadDACCertAndKey(uint8_t * base_buffer , struct FactoryData * factoryData)
     }
 
     size_t dac_cert_len = 0;
-    flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(dac_keypair_partition)+100, buffer, 2);
+    flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(dac_keypair_partition) + 100, buffer, 2);
     dac_cert_len = buffer[0];
     dac_cert_len |= (uint16_t) buffer[1] << 8;
     factoryData->dac_cert.len = dac_cert_len;
@@ -254,7 +254,7 @@ bool LoadDACCertAndKey(uint8_t * base_buffer , struct FactoryData * factoryData)
     {
         return false;
     }
-    factoryData->dac_cert.data =(uint8_t *) (0x20000000 + FIXED_PARTITION_OFFSET(dac_keypair_partition) + 102);
+    factoryData->dac_cert.data = (uint8_t *) (0x20000000 + FIXED_PARTITION_OFFSET(dac_keypair_partition) + 102);
     // LOG_INF("[LoadDACCertAndKey]DAC cert len=%u", dac_cert_len);
     // LOG_HEXDUMP_INF(factoryData->dac_cert.data, factoryData->dac_cert.len, "DAC CERT");
 
