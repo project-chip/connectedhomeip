@@ -185,8 +185,8 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, ThermostatUserInter
 
 namespace ScheduleProgrammingVisibility {
 
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum * value)
 {
     auto * cluster = FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
@@ -198,8 +198,8 @@ Get(EndpointId endpoint, ThermostatUserInterfaceConfiguration::ScheduleProgrammi
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value)
 {
     auto * cluster = FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)

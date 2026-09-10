@@ -49,10 +49,10 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, ThermostatUserInter
 
 namespace ScheduleProgrammingVisibility {
 
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum * value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value);
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value);
 
 } // namespace ScheduleProgrammingVisibility
 
