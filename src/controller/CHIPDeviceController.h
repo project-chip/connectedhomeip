@@ -952,7 +952,8 @@ private:
     CHIP_ERROR SendCertificateChainRequestCommand(
         DeviceProxy * device, Credentials::CertificateType certificateType, Optional<System::Clock::Timeout> timeout,
         Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile = NullOptional,
-        Optional<uint16_t> segmentId                                                                = NullOptional);
+        Optional<uint16_t> segmentId                                                                = NullOptional,
+        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> issuerProfile = NullOptional);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
@@ -1196,6 +1197,7 @@ private:
 
     SetUpCodePairer mSetUpCodePairer;
     CertificateChainRequestState mCertificateChainRequestState;
+    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mPaaAttestationIssuerProfile;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
         &mAutoCommissioner; // Commissioning delegate to call when PairDevice / Commission functions are used

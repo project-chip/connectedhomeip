@@ -22,8 +22,9 @@
 namespace chip {
 namespace Controller {
 
-void CertificateChainRequestTracker::Reset()
+void CertificateChainRequestTracker::Reset(CryptoProfile subject, CryptoProfile issuer)
 {
+    mMaxCertificateDocumentSize = MaxCertificateDocumentSize(subject, issuer);
     mStorage.Free();
     mCertificateSize = 0;
     mWriteOffset     = 0;
@@ -47,7 +48,7 @@ CHIP_ERROR CertificateChainRequestTracker::HandleResponse(ByteSpan certificate, 
 CHIP_ERROR CertificateChainRequestTracker::HandleSingleResponse(ByteSpan certificate)
 {
     VerifyOrReturnError(!mHasResponse, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(certificate.size() <= kMaxCertificateDocumentSize, CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(certificate.size() <= mMaxCertificateDocumentSize, CHIP_ERROR_MESSAGE_TOO_LONG);
 
     VerifyOrReturnError(mStorage.Alloc(certificate.size()), CHIP_ERROR_NO_MEMORY);
 
@@ -63,7 +64,7 @@ CHIP_ERROR CertificateChainRequestTracker::HandleSingleResponse(ByteSpan certifi
 CHIP_ERROR CertificateChainRequestTracker::HandleSegmentedResponse(ByteSpan certificate, uint16_t totalDocumentSize,
                                                                    const Optional<uint16_t> & nextSegmentId)
 {
-    VerifyOrReturnError(totalDocumentSize <= kMaxCertificateDocumentSize, CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(totalDocumentSize <= mMaxCertificateDocumentSize, CHIP_ERROR_MESSAGE_TOO_LONG);
     VerifyOrReturnError(!certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(certificate.size() <= totalDocumentSize, CHIP_ERROR_INVALID_ARGUMENT);
 

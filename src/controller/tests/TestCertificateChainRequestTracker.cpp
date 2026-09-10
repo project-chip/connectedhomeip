@@ -155,6 +155,63 @@ TEST(CertificateChainRequestTracker, AcceptsMaximumSupportedCertificateSize)
     EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(certificate)));
 }
 
+TEST(CertificateChainRequestTracker, EnforcesSubjectAndIssuerBoundsBeforeAcceptingResponse)
+{
+    using Profile = CertificateChainRequestTracker::CryptoProfile;
+    struct TestCase
+    {
+        Profile subject;
+        Profile issuer;
+        uint16_t limit;
+    };
+    const TestCase cases[] = {
+        { Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy, 600 },
+        { Profile::kEcdsaMatterLegacy, Profile::kMlDsa44, 4732 },
+        { Profile::kMlDsa44, Profile::kEcdsaMatterLegacy, 4732 },
+        { Profile::kMlDsa44, Profile::kMlDsa44, 4732 },
+        { Profile::kEcdsaMatterLegacy, Profile::kMlDsa65, 6261 },
+        { Profile::kMlDsa44, Profile::kMlDsa65, 6261 },
+        { Profile::kMlDsa65, Profile::kMlDsa44, 6261 },
+        { Profile::kMlDsa65, Profile::kMlDsa65, 6261 },
+        { Profile::kUnknownEnumValue, Profile::kMlDsa44, 6261 },
+        { Profile::kMlDsa44, Profile::kUnknownEnumValue, 6261 },
+    };
+    uint8_t certificate[Credentials::kMaxDERCertLengthMlDsa65 + 1] = {};
+    for (const auto & test : cases)
+    {
+        for (const bool segmented : { false, true })
+        {
+            CertificateChainRequestTracker tracker;
+            tracker.Reset(test.subject, test.issuer);
+            const auto total = segmented ? MakeOptional<uint16_t>(static_cast<uint16_t>(test.limit + 1)) : NullOptional;
+            // Reject the advertised total on the first byte, before accepting any state.
+            EXPECT_EQ(tracker.HandleResponse(ByteSpan(certificate, segmented ? 1 : test.limit + 1), total,
+                                             segmented ? MakeOptional<uint16_t>(static_cast<uint16_t>(1)) : NullOptional),
+                      CHIP_ERROR_MESSAGE_TOO_LONG);
+            EXPECT_FALSE(tracker.IsComplete());
+            EXPECT_FALSE(tracker.IsSegmentedTransfer());
+            EXPECT_FALSE(tracker.HasPendingSegment());
+            EXPECT_TRUE(tracker.GetCertificate().empty());
+            ASSERT_EQ(tracker.HandleResponse(ByteSpan(certificate, test.limit), segmented ? MakeOptional(test.limit) : NullOptional,
+                                             NullOptional),
+                      CHIP_NO_ERROR);
+            EXPECT_EQ(tracker.GetCertificate().size(), test.limit);
+        }
+    }
+}
+
+TEST(CertificateChainRequestTracker, ResetRestoresDefaultBound)
+{
+    using Profile = CertificateChainRequestTracker::CryptoProfile;
+    CertificateChainRequestTracker tracker;
+    tracker.Reset(Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy);
+    tracker.Reset();
+    const uint8_t firstByte[] = { 1 };
+    EXPECT_EQ(tracker.HandleResponse(ByteSpan(firstByte), MakeOptional<uint16_t>(static_cast<uint16_t>(6261)),
+                                     MakeOptional<uint16_t>(static_cast<uint16_t>(1))),
+              CHIP_NO_ERROR);
+}
+
 TEST(CertificateChainRequestTracker, RejectsOversizedDocument)
 {
     CertificateChainRequestTracker tracker;

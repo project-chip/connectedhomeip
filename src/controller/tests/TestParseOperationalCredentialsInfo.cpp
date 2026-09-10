@@ -175,6 +175,47 @@ TEST_F(TestParseOperationalCredentialsInfo, PqcFeaturePreservesIndependentPaiAnd
         info.dacSupportedAttestationProfiles.Has(OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65));
 }
 
+TEST_F(TestParseOperationalCredentialsInfo, RetainsLargestPaaProfileAndClearsItOnLegacyFallback)
+{
+    using Profile  = OperationalCredentials::AttestationCryptoProfileEnum;
+    using Profiles = OperationalCredentials::AttestationCryptoProfileBitmap;
+    for (const uint16_t bitmap : { uint16_t(1), uint16_t(3), uint16_t(5), uint16_t(7), uint16_t(9) })
+    {
+        auto cache      = Platform::MakeUnique<MockClusterStateCache>();
+        auto * cachePtr = cache.get();
+        const ConcreteAttributePath featurePath(kRootEndpointId, OperationalCredentials::Id,
+                                                OperationalCredentials::Attributes::FeatureMap::Id);
+        ASSERT_EQ(cache->SetAttribute(featurePath, uint32_t(1)), CHIP_NO_ERROR);
+        OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type profiles;
+        profiles.PAASupportedProfiles = BitMask<Profiles>(bitmap);
+        profiles.PAISupportedProfiles = BitMask<Profiles>(Profiles::kSupportsEcdsaMatterLegacy, Profiles::kSupportsMlDsa44);
+        profiles.DACSupportedProfiles = BitMask<Profiles>(Profiles::kSupportsEcdsaMatterLegacy);
+        ASSERT_EQ(cache->SetAttribute(ConcreteAttributePath(kRootEndpointId, OperationalCredentials::Id,
+                                                            OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id),
+                                      profiles),
+                  CHIP_NO_ERROR);
+        DeviceCommissionerTestAccess access(&mCommissioner);
+        access.SetAttributeCache(Platform::UniquePtr<ClusterStateCache>(cache.release()));
+        ReadCommissioningInfo info;
+        ASSERT_EQ(access.ParseOperationalCredentialsInfo(info), CHIP_NO_ERROR);
+        if (bitmap == 9)
+        {
+            EXPECT_FALSE(access.PaaAttestationIssuerProfile().HasValue());
+        }
+        else
+        {
+            ASSERT_TRUE(access.PaaAttestationIssuerProfile().HasValue());
+            EXPECT_EQ(access.PaaAttestationIssuerProfile().Value(),
+                      bitmap >= 5       ? Profile::kMlDsa65
+                          : bitmap == 3 ? Profile::kMlDsa44
+                                        : Profile::kEcdsaMatterLegacy);
+        }
+        ASSERT_EQ(cachePtr->SetAttribute(featurePath, uint32_t(0)), CHIP_NO_ERROR);
+        ASSERT_EQ(access.ParseOperationalCredentialsInfo(info), CHIP_NO_ERROR);
+        EXPECT_FALSE(access.PaaAttestationIssuerProfile().HasValue());
+    }
+}
+
 TEST_F(TestParseOperationalCredentialsInfo, PqcFeatureFallsBackToLegacyWhenDacDoesNotAdvertiseLegacy)
 {
     auto cache = Platform::MakeUnique<MockClusterStateCache>();

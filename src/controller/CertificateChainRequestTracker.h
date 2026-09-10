@@ -33,7 +33,18 @@ public:
     static constexpr uint16_t kDefaultSegmentSize         = 600;
     static constexpr uint16_t kMaxCertificateDocumentSize = Credentials::kMaxDERCertLengthMlDsa65;
 
-    void Reset();
+    using CryptoProfile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+
+    // Bound both the subject key and issuer signature. Unknown algorithms retain the
+    // largest supported bound so mixed-algorithm chains are not rejected prematurely.
+    static constexpr uint16_t MaxCertificateDocumentSize(CryptoProfile subject, CryptoProfile issuer)
+    {
+        const auto subjectSize = MaxCertificateSizeForProfile(subject);
+        const auto issuerSize  = MaxCertificateSizeForProfile(issuer);
+        return subjectSize > issuerSize ? subjectSize : issuerSize;
+    }
+
+    void Reset(CryptoProfile subject = CryptoProfile::kUnknownEnumValue, CryptoProfile issuer = CryptoProfile::kUnknownEnumValue);
 
     CHIP_ERROR HandleResponse(ByteSpan certificate, const Optional<uint16_t> & totalDocumentSize,
                               const Optional<uint16_t> & nextSegmentId);
@@ -45,6 +56,19 @@ public:
     ByteSpan GetCertificate() const { return ByteSpan(mStorage.Get(), mCertificateSize); }
 
 private:
+    static constexpr uint16_t MaxCertificateSizeForProfile(CryptoProfile profile)
+    {
+        switch (profile)
+        {
+        case CryptoProfile::kEcdsaMatterLegacy:
+            return Credentials::kMaxDERCertLength;
+        case CryptoProfile::kMlDsa44:
+            return Credentials::kMaxDERCertLengthMlDsa44;
+        default:
+            return kMaxCertificateDocumentSize;
+        }
+    }
+
     CHIP_ERROR HandleSingleResponse(ByteSpan certificate);
     CHIP_ERROR HandleSegmentedResponse(ByteSpan certificate, uint16_t totalDocumentSize, const Optional<uint16_t> & nextSegmentId);
 
@@ -53,7 +77,8 @@ private:
     size_t mWriteOffset     = 0;
     Optional<uint16_t> mTotalDocumentSize;
     Optional<uint16_t> mNextSegmentId;
-    bool mHasResponse = false;
+    uint16_t mMaxCertificateDocumentSize = kMaxCertificateDocumentSize;
+    bool mHasResponse                    = false;
 };
 
 } // namespace Controller

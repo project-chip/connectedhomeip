@@ -71,6 +71,18 @@ class TestCommissioningFlowBlocks(unittest.TestCase):
         self.assertIsNone(selected.pai)
         self.assertIsNone(selected.dac)
 
+    def test_paa_bound_uses_largest_advertised_profile(self):
+        profiles = Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum
+        for bitmap, expected in ((1, profiles.kEcdsaMatterLegacy), (3, profiles.kMlDsa44),
+                                 (5, profiles.kMlDsa65), (7, profiles.kMlDsa65), (9, None)):
+            with self.subTest(bitmap=bitmap):
+                opcreds = Clusters.OperationalCredentials(
+                    featureMap=1,
+                    PQCDeviceAttestationProfile=Clusters.OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct(
+                        PAASupportedProfiles=bitmap, PAISupportedProfiles=3, DACSupportedProfiles=1))
+                selected = self.flow._select_attestation_certificate_request_profiles(opcreds)
+                self.assertEqual(selected.paa, expected)
+
 
 class TestCertificateChainDocumentLimit(unittest.IsolatedAsyncioTestCase):
     async def test_uses_native_limit_for_single_and_segmented_responses(self):
@@ -91,8 +103,20 @@ class TestCertificateChainDocumentLimit(unittest.IsolatedAsyncioTestCase):
                             # Both response forms must reject a document larger than the native SDK limit.
                             with self.assertRaisesRegex(CommissionFailure, "document size"):
                                 await flow._request_certificate_chain(1, 1, None)
-                        native_limit.assert_called_once_with()
+                        native_limit.assert_called_once_with(None, None)
                     controller.SendCommand.assert_awaited_once()
+
+    async def test_rejects_advertised_total_before_requesting_another_segment(self):
+        profiles = Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum
+        controller = SimpleNamespace(SendCommand=AsyncMock(return_value=SimpleNamespace(
+            certificate=b"x", totalDocumentSize=4733, nextSegmentID=1)))
+        flow = CommissioningFlowBlocks(controller, None, logging.getLogger(__name__))
+        with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size",
+                   return_value=4732) as native_limit:
+            with self.assertRaisesRegex(CommissionFailure, "document size"):
+                await flow._request_certificate_chain(1, 1, profiles.kEcdsaMatterLegacy, profiles.kMlDsa44)
+            native_limit.assert_called_once_with(profiles.kEcdsaMatterLegacy, profiles.kMlDsa44)
+        controller.SendCommand.assert_awaited_once()
 
 
 if __name__ == "__main__":

@@ -39,6 +39,7 @@ _CERTIFICATE_CHAIN_REQUEST_MAX_SEGMENT_SIZE = 900
 class _AttestationCertificateRequestProfiles:
     pai: Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum | None
     dac: Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum | None
+    paa: Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum | None = None
 
 
 class CommissioningFlowBlocks:
@@ -92,15 +93,21 @@ class CommissioningFlowBlocks:
         pai_profile = self._select_attestation_certificate_request_profile(profile_support.PAISupportedProfiles)
         dac_profile = self._select_attestation_certificate_request_profile(profile_support.DACSupportedProfiles)
         if pai_profile is not None and dac_profile is not None:
-            return _AttestationCertificateRequestProfiles(pai=pai_profile, dac=dac_profile)
+            # PAA is not requested: use the largest advertised issuer algorithm, but
+            # retain the global bound if the bitmap contains an unknown algorithm.
+            paa_profiles = profile_support.PAASupportedProfiles
+            known_profiles = _ATTESTATION_PROFILE_SUPPORTS_ECDSA_MATTER_LEGACY | pqc_profiles
+            paa_profile = (self._select_attestation_certificate_request_profile(paa_profiles)
+                           if paa_profiles & ~known_profiles == 0 else None)
+            return _AttestationCertificateRequestProfiles(pai=pai_profile, dac=dac_profile, paa=paa_profile)
 
         self._logger.warning(
             "Device advertised PQC device attestation without usable PAI and DAC profiles; "
             "falling back to Matter legacy device attestation")
         return legacy_profiles
 
-    async def _request_certificate_chain(self, node_id: int, certificate_type, crypto_profile):
-        max_document_size = get_max_certificate_chain_document_size()
+    async def _request_certificate_chain(self, node_id: int, certificate_type, crypto_profile, issuer_profile=None):
+        max_document_size = get_max_certificate_chain_document_size(crypto_profile, issuer_profile)
         certificate_segments = []
         next_segment_id = None
         total_document_size = None
@@ -190,7 +197,7 @@ class CommissioningFlowBlocks:
             dac = await self._request_certificate_chain(
                 node_id,
                 Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate,
-                attestation_request_profiles.dac)
+                attestation_request_profiles.dac, attestation_request_profiles.pai)
         except Exception as ex:
             raise commissioning.CommissionFailure(f"Failed to get DAC: {ex}")
 
@@ -199,7 +206,7 @@ class CommissioningFlowBlocks:
             pai = await self._request_certificate_chain(
                 node_id,
                 Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kPAICertificate,
-                attestation_request_profiles.pai)
+                attestation_request_profiles.pai, attestation_request_profiles.paa)
         except Exception as ex:
             raise commissioning.CommissionFailure(f"Failed to get PAI: {ex}")
 

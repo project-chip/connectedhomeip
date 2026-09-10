@@ -38,6 +38,8 @@ public:
         return mCommissioner->ParseOperationalCredentialsInfo(info);
     }
 
+    auto PaaAttestationIssuerProfile() const { return mCommissioner->mPaaAttestationIssuerProfile; }
+
     void SetAttributeCache(Platform::UniquePtr<app::ClusterStateCache> cache) { mCommissioner->mAttributeCache = std::move(cache); }
 
     void SetCommissioningStage(Controller::CommissioningStage stage) { mCommissioner->mCommissioningStage = stage; }
