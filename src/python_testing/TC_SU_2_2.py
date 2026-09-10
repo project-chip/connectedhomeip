@@ -173,7 +173,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                      "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P. "
                      "Verify that the transfer of the software image has been initiated after the second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT."
                      ),
-            TestStep(4, "Cancel the trasnfer by Forcing an error during the download of the OTA image to the DUT (the single full update is reserved for Step 9). Wait for the Idle timeout which should be no less than 5 minutes.",
+            TestStep(4, "Cancel the transfer by Forcing an error during the download of the OTA image to the DUT (the single full update is reserved for Step 9). Wait for the Idle timeout which should be no less than 5 minutes.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle."
                      "Verify that the OTA-Subscriber receives a DownloadError event notification on BDX Idle timeout."
                      "Verify that the data in this event has the following."
@@ -992,6 +992,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info('%s: Phase C complete — DUT is on kDownloading state', step_number_s3)
 
         # [Start of Step #6 TC_SU_2_7]
+        self.step(4)
         # After the Provider is killed and Download was visible we need to wait at least 5 minutes for the device to go back to KIdle
         # and only after those 5 mintues  DownloadError must be triggered
 
@@ -1077,7 +1078,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info("DownloadError Event found: %s", event_download_error)
         # [End of Step #6 TC_SU_2_7]
 
-        self.step(4)
+        self.step(5)
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Prerequisites - Setup Provider
         # ------------------------------------------------------------------------------------
@@ -1274,6 +1275,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.terminate_provider()
 
         # [Start of Step #3 TC_SU_2_7]
+        self.step(6)
         # This step will verify kFailure and Reason when the Provider process is killed (not terminated).
         step_number_s3_2_7 = "step_3-2_7"
         self.start_provider(
@@ -1375,6 +1377,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # If LocalConfigDisabled is set to True obtaining consent from the requestor Shall not be used.
         # LocalConfigDisabled is optional, if found set it to False to allow continue with the test, if not is considered as False and continue.
         # OTA(SU) spec 3.4.1
+        self.step(7)
         if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
             await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
             logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
@@ -1382,6 +1385,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # [Start of Step #5 TC_SU_2_7]
         # First Start the Provider then check the localconfigdisabled
+        self.step(8)
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=ota_image_version,
@@ -1467,7 +1471,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # [End of Step #5 TC_SU_2_7]
 
-        self.step(5)
+        self.step(9)
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Prerequisites - Setup Provider
         # The provider is started with updateAvailable args. The provider is kept running until
@@ -1775,7 +1779,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         asserts.assert_is_not_none(version_applied_event_data.productID, "Product ID from VersionApplied Event is None")
         # [ End of Step #1 from TC_SU_2_7]
 
-        self.step(6)
+        self.step(10)
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Prerequisites - Setup Provider
         # The DUT has just applied the V2 firmware in Step 5. By serving the same V2 image here
