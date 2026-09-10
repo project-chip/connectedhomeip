@@ -263,6 +263,17 @@ class TestCertificateParsing(FixtureTestCase):
             parse_certificate(b"", "nothing")
 
 
+class TestLegacyPaa(FixtureTestCase):
+    """Validate the legacy PAA without requiring ML-DSA support."""
+
+    def test_accepts_the_legacy_paa(self):
+        assert_attestation_certificate_format(self.legacy_paa(), AttestationCertType.PAA)
+
+    def test_validates_the_legacy_ecdsa_self_signature(self):
+        paa = self.legacy_paa()
+        verify_certificate_signature(paa, paa)
+
+
 @_kNeedsMlDsa
 class TestCertificateFormatRequirements(FixtureTestCase):
     """Cross-checks assert_attestation_certificate_format against the C++ suite's expectations."""
@@ -285,9 +296,6 @@ class TestCertificateFormatRequirements(FixtureTestCase):
         for fixture_name, cert_type in roles:
             with self.subTest(fixture=fixture_name, role=cert_type.value):
                 assert_attestation_certificate_format(self.certificate(fixture_name), cert_type)
-
-    def test_accepts_the_legacy_paa(self):
-        assert_attestation_certificate_format(self.legacy_paa(), AttestationCertType.PAA)
 
     def test_rejects_a_key_stronger_than_its_issuer(self):
         # These two are the C++ suite's "must be rejected" vectors: a certificate whose key is
@@ -341,10 +349,6 @@ class TestChainValidation(FixtureTestCase):
             with self.subTest(chain=f"{paa_name}/{pai_name}/{dac_name}"):
                 paa, pai, dac = (self.certificate(name) for name in (paa_name, pai_name, dac_name))
                 validate_attestation_chain(paa, pai, dac, pai_name)
-
-    def test_validates_the_legacy_ecdsa_self_signature(self):
-        paa = self.legacy_paa()
-        verify_certificate_signature(paa, paa)
 
     def test_rejects_a_pai_signed_by_a_different_paa(self):
         # The ML-DSA-44 PAI belongs to the ML-DSA-44 PAA, so the ML-DSA-65 PAA must not validate it.
