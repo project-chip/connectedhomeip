@@ -35,6 +35,7 @@ constexpr size_t kMaxTestIoSize = 128;
 uint8_t gEmberIoBuffer[kMaxTestIoSize];
 size_t gEmberIoBufferFill;
 Status gEmberStatusCode = Status::InvalidAction;
+std::optional<chip::Access::SubjectDescriptor> gEmberReadSubjectDescriptor;
 
 } // namespace
 
@@ -73,6 +74,11 @@ void SetEmberReadOutput(std::variant<chip::ByteSpan, Status> what)
     gEmberStatusCode = Status::InvalidAction;
 }
 
+std::optional<Access::SubjectDescriptor> GetEmberReadSubjectDescriptor()
+{
+    return gEmberReadSubjectDescriptor;
+}
+
 ByteSpan GetEmberBuffer()
 {
     return ByteSpan(gEmberIoBuffer, gEmberIoBufferFill);
@@ -84,8 +90,14 @@ ByteSpan GetEmberBuffer()
 /// TODO: this SHOULD be part of attribute-storage mocks and allow proper I/O control
 ///       with helpers for "ember encoding"
 Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
-                                uint8_t * buffer, uint16_t readLength, bool write)
+                                uint8_t * buffer, uint16_t readLength, bool write,
+                                const chip::Access::SubjectDescriptor * subjectDescriptor)
 {
+    if (!write)
+    {
+        gEmberReadSubjectDescriptor = subjectDescriptor != nullptr ? std::make_optional(*subjectDescriptor) : std::nullopt;
+    }
+
     if (gEmberStatusCode != Status::Success)
     {
         return gEmberStatusCode;

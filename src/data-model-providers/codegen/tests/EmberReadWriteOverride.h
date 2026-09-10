@@ -20,6 +20,7 @@
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <optional>
 #include <variant>
 
 namespace chip {
@@ -29,6 +30,9 @@ namespace Testing {
 ///
 /// It may return a value with success or some error. The byte span WILL BE COPIED.
 void SetEmberReadOutput(std::variant<chip::ByteSpan, chip::Protocols::InteractionModel::Status> what);
+
+/// Returns a copy of the most recent read context, or nullopt for a local read.
+std::optional<Access::SubjectDescriptor> GetEmberReadSubjectDescriptor();
 
 /// Grab the data currently in the buffer
 chip::ByteSpan GetEmberBuffer();

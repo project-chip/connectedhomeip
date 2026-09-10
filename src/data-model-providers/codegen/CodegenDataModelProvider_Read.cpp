@@ -129,7 +129,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
     record.attributeId                         = request.path.mAttributeId;
     Protocols::InteractionModel::Status status = emAfReadOrWriteAttribute(
         &record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(), static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
-        /* write = */ false);
+        /* write = */ false, &request.subjectDescriptor);
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
