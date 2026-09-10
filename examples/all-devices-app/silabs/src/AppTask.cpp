@@ -209,7 +209,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
-    chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
+    chip::app::NoHooksDeviceFactory::GetInstance().Init(chip::app::NoHooksDeviceFactory::Context{
         .groupDataProvider        = *groupDataProvider,
         .fabricTable              = chip::Server::GetInstance().GetFabricTable(),
         .timerDelegate            = sTimerDelegate,
@@ -223,7 +223,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .identifyDelegate         = sIdentifyDelegate,
     });
 
-    auto & deviceFactory = chip::app::DeviceFactory::GetInstance();
+    auto & deviceFactory = chip::app::NoHooksDeviceFactory::GetInstance();
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
 
@@ -234,11 +234,15 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         VerifyOrReturnError(sConstructedDeviceCount < sConstructedDevices.size(), CHIP_ERROR_NO_MEMORY);
-        auto device = deviceFactory.Create(type);
-        VerifyOrReturnError(device != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(device->Register(allocator, *sDataModelProvider));
+        auto created = deviceFactory.Create(type);
+        VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(created.device->Register(allocator, *sDataModelProvider));
+        if (created.onDeviceRegistered)
+        {
+            created.onDeviceRegistered();
+        }
         ChipLogProgress(AppServer, "Registered device type '%s'", type.c_str());
-        sConstructedDevices[sConstructedDeviceCount++] = std::move(device);
+        sConstructedDevices[sConstructedDeviceCount++] = std::move(created.device);
         return CHIP_NO_ERROR;
     };
 

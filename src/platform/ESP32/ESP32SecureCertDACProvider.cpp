@@ -28,6 +28,7 @@
 #endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
 
 #ifdef CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2
+#include <esp_idf_version.h>
 #include <esp_tee_sec_storage.h>
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
 #endif // CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2
@@ -154,8 +155,13 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
         VerifyOrReturnError(esp_err == ESP_OK, CHIP_ERROR_INTERNAL,
                             ESP_LOGE(TAG, "TEE PBKDF2 DAC signing failed, esp_err:%d", esp_err));
 
+        // IDF v6.0 merged sign_r/sign_s into a single signature[] holding R||S.
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+        memcpy(signature.Bytes(), teeSign.signature, Crypto::kP256_ECDSA_Signature_Length_Raw);
+#else
         memcpy(signature.Bytes(), teeSign.sign_r, Crypto::kP256_FE_Length);
         memcpy(signature.Bytes() + Crypto::kP256_FE_Length, teeSign.sign_s, Crypto::kP256_FE_Length);
+#endif
         ReturnErrorOnFailure(signature.SetLength(Crypto::kP256_ECDSA_Signature_Length_Raw));
 
         return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
