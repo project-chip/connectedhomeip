@@ -170,6 +170,11 @@ TEST_F(AutoCommissionerTest, ControllerSupportedAttestationRequestProfilesAlways
 
 TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersHighestSharedProfile)
 {
+    if (!Crypto::IsMlDsa65Supported())
+    {
+        GTEST_SKIP() << "Build has no ML-DSA-65 support, so the preference order cannot be exercised";
+    }
+
     Internal::AttestationProfileBitmap deviceProfiles;
     deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
     deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
@@ -178,18 +183,24 @@ TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfileP
     const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
 
     ASSERT_TRUE(selectedProfile.HasValue());
-    if (Crypto::IsMlDsa65Supported())
+    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa65);
+}
+
+TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersMlDsa44OverLegacy)
+{
+    if (!Crypto::IsMlDsa44Supported())
     {
-        EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa65);
+        GTEST_SKIP() << "Build has no ML-DSA-44 support, so its preference over legacy cannot be exercised";
     }
-    else if (Crypto::IsMlDsa44Supported())
-    {
-        EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa44);
-    }
-    else
-    {
-        EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
-    }
+
+    Internal::AttestationProfileBitmap deviceProfiles(
+        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
+        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
+
+    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
+
+    ASSERT_TRUE(selectedProfile.HasValue());
+    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa44);
 }
 
 TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfileReturnsLegacyWhenItIsOnlySharedProfile)
@@ -208,6 +219,11 @@ TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfiles
     using app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap;
     using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
 
+    if (!Crypto::IsMlDsa65Supported() || !Crypto::IsMlDsa44Supported())
+    {
+        GTEST_SKIP() << "Build needs both ML-DSA-65 and ML-DSA-44 support to exercise independent PQC profiles";
+    }
+
     Internal::AttestationProfileBitmap paiProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
                                                    AttestationCryptoProfileBitmap::kSupportsMlDsa65);
     Internal::AttestationProfileBitmap dacProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
@@ -218,12 +234,8 @@ TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfiles
 
     ASSERT_TRUE(selectedPaiProfile.HasValue());
     ASSERT_TRUE(selectedDacProfile.HasValue());
-    EXPECT_EQ(selectedPaiProfile.Value(),
-              Crypto::IsMlDsa65Supported() ? AttestationCryptoProfileEnum::kMlDsa65
-                                           : AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
-    EXPECT_EQ(selectedDacProfile.Value(),
-              Crypto::IsMlDsa44Supported() ? AttestationCryptoProfileEnum::kMlDsa44
-                                           : AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    EXPECT_EQ(selectedPaiProfile.Value(), AttestationCryptoProfileEnum::kMlDsa65);
+    EXPECT_EQ(selectedDacProfile.Value(), AttestationCryptoProfileEnum::kMlDsa44);
 }
 
 TEST_F(AutoCommissionerTest, FeaturesPassedNTPValue)
