@@ -45355,6 +45355,141 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
+@implementation MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionID = @(0);
+
+        _motionZones = nil;
+
+        _motionSensitivity = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams alloc] init];
+
+    other.connectionID = self.connectionID;
+    other.motionZones = self.motionZones;
+    other.motionSensitivity = self.motionSensitivity;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; motionZones:%@; motionSensitivity:%@; >", NSStringFromClass([self class]), _connectionID, _motionZones, _motionSensitivity];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.connectionID = self.connectionID.unsignedShortValue;
+    }
+    {
+        if (self.motionZones == nil) {
+            encodableStruct.motionZones.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.motionZones.SetNonNull();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.motionZones.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.motionZones.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.motionZones.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.motionZones[i_1], MTRPushAVStreamTransportClusterTransportZoneOptionsStruct);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.motionZones[i_1], NSStringFromClass(MTRPushAVStreamTransportClusterTransportZoneOptionsStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        if (element_1.zone == nil) {
+                            listHolder_1->mList[i_1].zone.SetNull();
+                        } else {
+                            auto & nonNullValue_3 = listHolder_1->mList[i_1].zone.SetNonNull();
+                            nonNullValue_3 = element_1.zone.unsignedShortValue;
+                        }
+                        if (element_1.sensitivity != nil) {
+                            auto & definedValue_3 = listHolder_1->mList[i_1].sensitivity.Emplace();
+                            definedValue_3 = element_1.sensitivity.unsignedCharValue;
+                        }
+                    }
+                    nonNullValue_0 = ListType_1(listHolder_1->mList, self.motionZones.count);
+                } else {
+                    nonNullValue_0 = ListType_1();
+                }
+            }
+        }
+    }
+    {
+        if (self.motionSensitivity != nil) {
+            auto & definedValue_0 = encodableStruct.motionSensitivity.Emplace();
+            if (self.motionSensitivity == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.motionSensitivity.unsignedCharValue;
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRChimeClusterPlayChimeSoundParams
 - (instancetype)init
 {

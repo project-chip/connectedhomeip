@@ -9644,6 +9644,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentConnections";
             break;
 
+        case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeMaxZonesID:
+            result = @"MaxZones";
+            break;
+
         case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -13577,6 +13581,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterPushAVStreamTransportCommandFindTransportID:
             result = @"FindTransport";
+            break;
+
+        case MTRCommandIDTypeClusterPushAVStreamTransportCommandUpdateMotionZoneOptionsID:
+            result = @"UpdateMotionZoneOptions";
             break;
 
         default:

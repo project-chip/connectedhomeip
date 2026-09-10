@@ -1536,6 +1536,8 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
             return true;
+        case Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Id:
+            return true;
         default:
             return false;
         }

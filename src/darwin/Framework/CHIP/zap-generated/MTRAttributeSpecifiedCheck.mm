@@ -7017,6 +7017,9 @@ static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttr
     case Attributes::CurrentConnections::Id: {
         return YES;
     }
+    case Attributes::MaxZones::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

@@ -5108,6 +5108,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedFormats";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id:
             return "CurrentConnections";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::MaxZones::Id:
+            return "MaxZones";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::AcceptedCommandList::Id:
@@ -7044,6 +7046,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ManuallyTriggerTransport";
         case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
             return "FindTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Id:
+            return "UpdateMotionZoneOptions";
         default:
             return "Unknown";
         }
