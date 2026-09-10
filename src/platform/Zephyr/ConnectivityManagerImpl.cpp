@@ -81,7 +81,7 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     // Use MLD join/leave so Ethernet/Wi-Fi L2 installs the HW multicast MAC
     // filter (e.g. 33:33:00:00:00:fb for ff02::fb). Plain maddr_add/join does
-    // not program SiWx917 filters, so mDNS queries are dropped after other
+    // not program HW multicast MAC filters, so mDNS queries are dropped after other
     // filters (all-nodes / solicited-node) enable filtering.
     const InetUtils::ZephyrIn6Addr in6Addr = InetUtils::ToZephyrAddr(address);
     int status;
@@ -89,7 +89,8 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
     if (operation == UDPEndPointImplSockets::MulticastOperation::kJoin)
     {
         status = net_ipv6_mld_join(iface, &in6Addr);
-        VerifyOrReturnError((status == 0 || status == -EALREADY), System::MapErrorZephyr(status));
+        VerifyOrReturnError((status == 0 || status == -EALREADY || status == -ENETDOWN),
+                            System::MapErrorZephyr(status));
     }
     else if (operation == UDPEndPointImplSockets::MulticastOperation::kLeave)
     {

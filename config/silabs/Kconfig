@@ -189,22 +189,13 @@ config NET_PKT_RX_COUNT
 	default 8
 
 config NET_PKT_TX_COUNT
-	default 16 if CHIP_WIFI
 	default 8
 
 config NET_BUF_RX_COUNT
-	default 16 if CHIP_WIFI
 	default 16
 
 config NET_BUF_TX_COUNT
-	default 16 if CHIP_WIFI
 	default 16
-
-config NET_BUF_DATA_SIZE
-	default 1514 if CHIP_WIFI
-
-config NET_CONTEXT_RECV_PKTINFO
-	default y if CHIP_WIFI
 
 config ZVFS_POLL_MAX
 	default 6 if CHIP_WIFI
