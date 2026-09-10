@@ -241,8 +241,7 @@ not_automated:
       reason:
           Needs a DUT started with a PQC-capable DAC provider whose DAC
           documents share one attestation key, plus a PAA trust store holding
-          the matching ML-DSA PAA, which the generic CI harness does not set
-          up.
+          the matching ML-DSA PAA, which the generic CI harness does not set up.
     - name: TC_AUDIOCONTROLTestBase.py
       reason: Shared code for TC_AUDIOCONTROL, not a standalone test.
     - name: TC_MEDIAPLAYBACKTestBase.py
