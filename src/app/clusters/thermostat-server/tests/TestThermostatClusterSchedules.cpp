@@ -856,4 +856,28 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleFailsWhenScheduleTyp
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleReportsDelegateErrorFromNameSupportLookup)
+{
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+
+    // Let MaximumScheduleTypeCount() succeed on the first scan of the (single-entry) schedule type list, then fail
+    // the delegate for the second scan performed by ScheduleTypeSupportsNames(). A delegate failure here must be
+    // reported as InvalidInState, not misclassified as the ConstraintError used when names are genuinely unsupported.
+    mSchedulesDelegate.mGetScheduleTypeAtIndexError               = CHIP_ERROR_INTERNAL;
+    mSchedulesDelegate.mGetScheduleTypeAtIndexErrorAfterCallCount = 1;
+
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, MakeOptional("name"_span),
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>()) };
+    auto writeStatus =
+        tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(InvalidInState));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace

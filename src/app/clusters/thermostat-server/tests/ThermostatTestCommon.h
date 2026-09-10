@@ -562,7 +562,11 @@ class MockSchedulesDelegate : public ThermostatSchedules::Delegate
 public:
     CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) override
     {
-        if (mGetScheduleTypeAtIndexError.has_value())
+        bool shouldError = mGetScheduleTypeAtIndexError.has_value() &&
+            (!mGetScheduleTypeAtIndexErrorAfterCallCount.has_value() ||
+             mGetScheduleTypeAtIndexCallCount >= *mGetScheduleTypeAtIndexErrorAfterCallCount);
+        mGetScheduleTypeAtIndexCallCount++;
+        if (shouldError)
         {
             return *mGetScheduleTypeAtIndexError;
         }
@@ -706,6 +710,12 @@ public:
     std::optional<CHIP_ERROR> mGetScheduleTypeAtIndexError;
     std::optional<CHIP_ERROR> mGetScheduleAtIndexError;
     std::optional<CHIP_ERROR> mGetPendingScheduleAtIndexError;
+
+    // When set alongside mGetScheduleTypeAtIndexError, delays the injected error until after this many prior calls
+    // have succeeded, simulating a delegate that fails partway through a second scan of the schedule type list
+    // (e.g. one triggered by ScheduleTypeSupportsNames() after MaximumScheduleTypeCount() already scanned it).
+    std::optional<size_t> mGetScheduleTypeAtIndexErrorAfterCallCount;
+    size_t mGetScheduleTypeAtIndexCallCount = 0;
 };
 
 inline bool HasAttribute(ServerClusterInterface & cluster, AttributeId attrId)

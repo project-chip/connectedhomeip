@@ -241,26 +241,35 @@ CHIP_ERROR CountSchedulesInPendingListWithScheduleHandle(ThermostatSchedules::De
  *
  * @param[in] delegate The delegate to use.
  * @param[in] systemMode The systemMode to match with.
+ * @param[out] supportsNames True if the scheduleType for the given system mode supports names, false if no matching
+ *             scheduleType was found. Only meaningful when the returned error is CHIP_NO_ERROR.
  *
- * @return true if the scheduleType for the given system mode supports name, false otherwise.
+ * @return CHIP_NO_ERROR if the scheduleType list was scanned to completion, or the CHIP_ERROR returned by the delegate
+ *         if the scan could not be completed.
  */
-bool ScheduleTypeSupportsNames(ThermostatSchedules::Delegate & delegate, SystemModeEnum systemMode)
+CHIP_ERROR ScheduleTypeSupportsNames(ThermostatSchedules::Delegate & delegate, SystemModeEnum systemMode, bool & supportsNames)
 {
+    supportsNames = false;
     for (uint8_t i = 0; true; i++)
     {
         ScheduleTypeStruct::Type scheduleType;
         auto err = delegate.GetScheduleTypeAtIndex(i, scheduleType);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            // We exhausted the list trying to find the system mode
+            return CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
-            return false;
+            return err;
         }
 
         if (scheduleType.systemMode == systemMode)
         {
-            return (scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsNames));
+            supportsNames = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsNames);
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
 }
 
 /**
@@ -387,9 +396,10 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSchedules::WriteAttribute
 
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();
 
-    // Schedules are not editable, return INVALID_IN_STATE.
+    // Schedules are only writable during an open atomic write, return INVALID_IN_STATE otherwise.
     VerifyOrReturnError(mAtomicWriteSession.InAtomicWrite(std::make_optional(request.path.mAttributeId)),
-                        CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Schedules are not editable"));
+                        CHIP_IM_GLOBAL_STATUS(InvalidInState),
+                        ChipLogError(Zcl, "Schedules are not writable outside of an atomic write"));
 
     // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
     // otherwise return BUSY.
@@ -705,9 +715,17 @@ CHIP_ERROR ThermostatSchedules::AppendPendingSchedule(const ScheduleStruct::Deco
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (schedule.GetName().HasValue() && !ScheduleTypeSupportsNames(mDelegate, schedule.GetSystemMode()))
+    if (schedule.GetName().HasValue())
     {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        bool supportsNames = false;
+        if (ScheduleTypeSupportsNames(mDelegate, schedule.GetSystemMode(), supportsNames) != CHIP_NO_ERROR)
+        {
+            return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+        }
+        if (!supportsNames)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
     }
 
     ReturnErrorOnFailure(ValidateTransitionsPerDay(mDelegate, schedule));
