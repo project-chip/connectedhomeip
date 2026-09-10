@@ -693,6 +693,29 @@ void PushAvStreamTransportManager::HandleZoneTrigger(const std::vector<uint16_t>
     }
 }
 
+void PushAvStreamTransportManager::HandleAmbientContextTrigger(uint8_t namespaceId, uint8_t tagId,
+                                                               const std::vector<uint16_t> & zoneIds)
+{
+    std::vector<int> intZoneIds;
+    intZoneIds.reserve(zoneIds.size());
+    for (const auto & zoneId : zoneIds)
+    {
+        intZoneIds.push_back(static_cast<int>(zoneId));
+    }
+
+    // Trigger only if we have a transport with an Ambient trigger
+    for (auto & pavst : mTransportMap)
+    {
+        int connectionId = pavst.first;
+        ChipLogProgress(Camera, "PushAV sending trigger to connection ID %d", connectionId);
+
+        if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext)
+        {
+            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, intZoneIds, kDefaultSensitivity);
+        }
+    }
+}
+
 void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                                                Tls::CertificateTable::BufferedRootCert & rootCertEntry)
 {

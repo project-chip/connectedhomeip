@@ -16,6 +16,8 @@
  *
  */
 
+#include <cstdint>
+
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
@@ -736,6 +738,385 @@ bool AvAnalysisServerLogic::ZoneIDListContains(const DataModel::DecodableList<ui
     return false;
 }
 
+<<<<<<< HEAD
+=======
+bool AvAnalysisServerLogic::AreAllZoneIdsFound(const std::vector<uint16_t> & subset, const std::vector<uint16_t> & target)
+{
+    return std::all_of(subset.begin(), subset.end(),
+                       [&](uint16_t val) { return std::find(target.begin(), target.end(), val) != target.end(); });
+}
+
+/**
+ *
+ */
+bool AvAnalysisServerLogic::IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext,
+                                                      Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds)
+{
+    ChipLogProgress(Zcl, "AvAnalysisServer::IsTriggeringContextActive.");
+
+    // If we have per zone detect, but no provided zones (Null counts as provided), then fail
+    //
+    if (HasFeature(Feature::kPerZoneContextDetection))
+    {
+        if (!aZoneIds.HasValue())
+        {
+            ChipLogError(Zcl, "AvAnalysisServer::IsTriggeringContextActive. No zone IDs with PerZoneDetect set.");
+            return false;
+        }
+    }
+
+    // Make sure the context is part of our active set
+    //
+    auto it = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
+                           [&aContext](AmbientContextStorage & acs) {
+                               return acs.GetContext().namespaceID == aContext.namespaceID && acs.GetContext().tag == aContext.tag;
+                           });
+
+    // If we have a discovered context, do any provided zoneIds also match.
+    // If the context has Null zones then any zone ID matches
+    //
+    if (it != mActiveAmbientContextTriggers.end())
+    {
+        // If no Per Zone, then no local zones, we have a match
+        if (!HasFeature(Feature::kPerZoneContextDetection))
+        {
+            return true;
+        }
+
+        // Get the Zone IDs for the context
+        Optional<DataModel::Nullable<std::vector<uint16_t>>> mContextZoneIds = it->GetZoneIDs();
+
+        // We know that we have local ZoneIDs, check anyway to keep compilers happy
+        if (mContextZoneIds.HasValue())
+        {
+            if (mContextZoneIds.Value().IsNull())
+            {
+                // Null means match on all zones, doesn't matter what was passed in
+                //
+                return true;
+            }
+
+            // Compare the vectors, what was passed in has to be present in our local set.  If no zones passed in, fail. We
+            // know that there is a value as we have Per Zone Detect, and we verified presence earlier.
+            //
+            if (aZoneIds.Value().IsNull())
+            {
+                return false;
+            }
+
+            if (AreAllZoneIdsFound(aZoneIds.Value().Value(), mContextZoneIds.Value().Value()))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, Optional<NodeId> aSourceNodeId,
+                                                      bool aUseSpecificSessionId)
+{
+    if (!aUseSpecificSessionId)
+    {
+        // Scan at most the full uint16_t ID space (with wraparound). If every ID
+        // is already active there is nothing left to allocate, so fail instead
+        // of looping indefinitely.
+        uint16_t candidatesScanned = 0;
+        while (std::any_of(mActiveSessions.begin(), mActiveSessions.end(), [this](const ActiveAmbientContextSession & session) {
+            return session.GetSessionId() == mNextAnalysisSessionID;
+        }))
+        {
+            VerifyOrReturnError(candidatesScanned < UINT16_MAX, CHIP_ERROR_NO_MEMORY);
+            mNextAnalysisSessionID++;
+            candidatesScanned++;
+        }
+        aSessionId = mNextAnalysisSessionID++;
+    }
+
+    auto session_it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    if (session_it != mActiveSessions.end())
+    {
+        if (aSourceNodeId.HasValue())
+        {
+            session_it->SetSourceNodeId(aSourceNodeId);
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    AvAnalysis::ActiveAmbientContextSession newSession;
+    newSession.SetSessionId(aSessionId);
+    newSession.SetSourceNodeId(aSourceNodeId);
+    mActiveSessions.push_back(newSession);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
+                                                       const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
+                                                       ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Validate the information received - are the zoneIDs known (if provided)
+    if (!aZoneList.IsNull())
+    {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(mDelegate->VerifyZoneIDsAreValid(aZoneList.Value()));
+    }
+
+    // Allocate a unique session ID and reserve it in the active set. Automatic
+    // allocation routes through the shared allocator so IDs already reserved by
+    // specific-ID sessions are skipped instead of reused.
+    ReturnErrorOnFailure(CreateActiveSession(aSessionId, aSourceNodeId, /* aUseSpecificSessionId = */ false));
+
+    // Create the Initial Event
+    Events::AnalysisSessionStart::Type startEvent;
+
+    startEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        startEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+
+    // The zones could be null, meaning that no zone information is available
+    if (aZoneList.IsNull())
+    {
+        startEvent.triggeredZones = DataModel::NullNullable;
+    }
+    else
+    {
+        startEvent.triggeredZones =
+            DataModel::MakeNullable(DataModel::List<const uint16_t>(aZoneList.Value().data(), aZoneList.Value().size()));
+    }
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(startEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate AnalysisSessionStart event"));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
+    uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
+    ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Make sure the provided session ID is one we know about
+    auto session_it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    // Check if the element was actually found
+    if (session_it == mActiveSessions.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    // Are the contexts part of our active set
+    if (!IsContextPartOfActiveContextTriggers(aTriggeringContext))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    session_it->AddTrackedContext(aTriggeringContext);
+
+    // Now create the first Perceived Context Event with the tiggering context
+    Events::PerceivedContext::Type perceivedEvent;
+
+    perceivedEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (session_it->GetSourceNodeId().HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(session_it->GetSourceNodeId().Value());
+    }
+
+    perceivedEvent.newIdentifiedContexts = chip::MakeOptional(
+        DataModel::List<const Structs::TrackedContext::Type>(aTriggeringContext.data(), aTriggeringContext.size()));
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
+                                                     const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext,
+                                                     ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Make sure the provided session ID is one we know about
+    auto it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    // Check if the element was actually found
+    if (it == mActiveSessions.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    // Are the contexts part of our active set
+    if (!IsContextPartOfActiveContextTriggers(aNewContext))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    // Now create the Perceived Context Event with newly detected context
+    Events::PerceivedContext::Type perceivedEvent;
+
+    perceivedEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (it->GetSourceNodeId().HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(it->GetSourceNodeId().Value());
+    }
+
+    perceivedEvent.newIdentifiedContexts =
+        chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aNewContext.data(), aNewContext.size()));
+    perceivedEvent.currentIdentifiedContexts = chip::MakeOptional(
+        DataModel::List<const Structs::TrackedContext::Type>(it->GetTrackedContexts().data(), it->GetTrackedContexts().size()));
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
+
+    // Add the new context triggers to our current set for the session
+    it->AddTrackedContext(aNewContext);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
+                                               const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext,
+                                               ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Make sure the provided session ID is one we know about
+    auto it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    // Check if the element was actually found
+    if (it == mActiveSessions.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    for (const auto & context : aOldContext)
+    {
+        // Make sure the context actually exists in the session
+        auto context_it =
+            std::find_if(it->GetTrackedContexts().begin(), it->GetTrackedContexts().end(),
+                         [context](const Structs::TrackedContext::Type & mContext) {
+                             return ((context.identifiedContext.namespaceID == mContext.identifiedContext.namespaceID) &&
+                                     (context.identifiedContext.tag == mContext.identifiedContext.tag));
+                         });
+
+        // Check if the element was actually found
+        if (context_it == it->GetTrackedContexts().end())
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+    }
+
+    // Remove the old context triggers from our current set for the session
+    it->RemoveTrackedContext(aOldContext);
+
+    // Now create the Perceived Context Event with newly removed context
+    Events::PerceivedContext::Type perceivedEvent;
+
+    perceivedEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (it->GetSourceNodeId().HasValue())
+    {
+        perceivedEvent.sourceNodeId.SetValue(it->GetSourceNodeId().Value());
+    }
+
+    perceivedEvent.currentIdentifiedContexts = chip::MakeOptional(
+        DataModel::List<const Structs::TrackedContext::Type>(it->GetTrackedContexts().data(), it->GetTrackedContexts().size()));
+    perceivedEvent.expiredContexts =
+        chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aOldContext.data(), aOldContext.size()));
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(perceivedEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate PerceivedContext event"));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext,
+                                                     Optional<NodeId> aSourceNodeId)
+{
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Make sure the provided session ID is one we know about
+    auto it =
+        std::find_if(mActiveSessions.begin(), mActiveSessions.end(),
+                     [aSessionId](const ActiveAmbientContextSession & session) { return session.GetSessionId() == aSessionId; });
+
+    // Check if the element was actually found
+    if (it == mActiveSessions.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    // Now create the End Session Event
+    Events::AnalysisSessionEnd::Type endSessionEvent;
+    endSessionEvent.sessionID = aSessionId;
+    if (aSourceNodeId.HasValue())
+    {
+        endSessionEvent.sourceNodeId.SetValue(aSourceNodeId.Value());
+    }
+    else if (it->GetSourceNodeId().HasValue())
+    {
+        endSessionEvent.sourceNodeId.SetValue(it->GetSourceNodeId().Value());
+    }
+
+    VerifyOrReturnError(aContext->interactionContext.eventsGenerator.GenerateEvent(endSessionEvent, mEndpointId).has_value(),
+                        CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate EndSession event"));
+
+    // Remove the session from our active contexts
+    it = mActiveSessions.erase(it);
+
+    return CHIP_NO_ERROR;
+}
+
+bool AvAnalysisServerLogic::IsContextPartOfActiveContextTriggers(
+    const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext)
+{
+    // Are the contexts part of our active set
+    for (const auto & contextTrigger : aContext)
+    {
+        auto trigger_it = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
+                                       [&contextTrigger](AmbientContextStorage & acs) {
+                                           return acs.GetContext().namespaceID == contextTrigger.identifiedContext.namespaceID &&
+                                               acs.GetContext().tag == contextTrigger.identifiedContext.tag;
+                                       });
+
+        if (trigger_it == mActiveAmbientContextTriggers.end())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+>>>>>>> 35b9631 ([AVanalysis] Integrate analysis triggers with pushav clip recording (#74020))
 } // namespace Clusters
 } // namespace app
 } // namespace chip

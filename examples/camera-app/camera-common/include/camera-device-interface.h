@@ -399,6 +399,15 @@ public:
         // Remove a zone trigger
         virtual CameraError RemoveZoneTrigger(uint16_t zoneId) = 0;
 
+<<<<<<< HEAD
+=======
+        // Does the camera support PerZone analysis for AV triggers
+        virtual bool GetCameraSupportsPerZoneDetect() = 0;
+
+        // Verify Zone presence
+        virtual bool IsValidAnalysisZone(uint16_t zoneId) = 0;
+
+>>>>>>> 35b9631 ([AVanalysis] Integrate analysis triggers with pushav clip recording (#74020))
         class ZoneEventCallback
         {
         public:

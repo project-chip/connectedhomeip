@@ -42,6 +42,14 @@ private:
 
     void OnZoneTriggeredHandler(const std::vector<uint16_t> & zoneIds);
     void OnSetHardPrivacyModeOnHandler(bool value);
+<<<<<<< HEAD
+=======
+    void OnAmbientContextTriggeredHandler(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
+                                          uint16_t identifiedContextId);
+    void OnAvAnalysisSessionStartHandler();
+    void OnAvAnalysisPerceivedContextHandler();
+    void OnAvAnalysisSessionEndHandler();
+>>>>>>> 35b9631 ([AVanalysis] Integrate analysis triggers with pushav clip recording (#74020))
 };
 
 class CameraAppCommandDelegate : public NamedPipeCommandDelegate
