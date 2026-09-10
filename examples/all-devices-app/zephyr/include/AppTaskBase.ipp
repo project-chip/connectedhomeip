@@ -168,6 +168,8 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
         .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement            = EventManagement::GetInstance(),
         .timerDelegate              = mTimerDelegate,
+        .minGuaranteedSubscriptionsPerFabric =
+            InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -188,7 +190,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
 
 #endif
 
-    VerifyOrReturnError(mRootNode != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(mRootNode->Register(rootAllocator, *mDataModelProvider));
