@@ -658,7 +658,7 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
             }
 
             ValidatedTrigger validated;
-            validated.context = contextTrigger.context;
+            validated.context = *it;
 
             if (hasZoneIDs)
             {
@@ -680,6 +680,11 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
                     {
                         zoneIDs.push_back(zone_iter.GetValue());
                     }
+                    // A repeated id would be stored and reported repeatedly, and could exceed the MaxZones entries the
+                    // persisted size is computed from.
+                    std::sort(zoneIDs.begin(), zoneIDs.end());
+                    zoneIDs.erase(std::unique(zoneIDs.begin(), zoneIDs.end()), zoneIDs.end());
+
                     if (!zoneIDs.empty())
                     {
                         VerifyOrReturnError(mDelegate != nullptr, Status::Failure);
@@ -871,11 +876,15 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                     {
                         zoneIDs.push_back(zone_iter.GetValue());
                     }
-                    err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
-                    if (err != CHIP_NO_ERROR)
+                    if (!zoneIDs.empty())
                     {
-                        outcome = Status::NotFound;
-                        break;
+                        VerifyOrReturnError(mDelegate != nullptr, Status::Failure);
+                        err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            outcome = Status::NotFound;
+                            break;
+                        }
                     }
                 }
             }
@@ -946,7 +955,10 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
     // Inform the delegate of the new active context set. The delegate will read the updated contents
     // of the attribute
     //
-    mDelegate->ActiveAmbientContextTriggersUpdated();
+    if (mDelegate != nullptr)
+    {
+        mDelegate->ActiveAmbientContextTriggersUpdated();
+    }
     MarkDirty(AvAnalysis::Attributes::ActiveAmbientContextTriggers::Id);
     LogErrorOnFailure(StoreActiveAmbientContextTriggers());
 
@@ -1230,6 +1242,20 @@ AnalysisStreamEntry * AvAnalysisServerLogic::FindByWebRTCSession(const ScopedNod
     return nullptr;
 }
 
+uint16_t AvAnalysisServerLogic::AllocateSessionId()
+{
+    // A session created with an id of the caller's choosing does not move the counter, so ids still
+    // in use are skipped rather than assumed free
+    while (std::any_of(mActiveSessions.begin(), mActiveSessions.end(),
+                       [this](const AvAnalysis::ActiveAmbientContextSession & session) {
+                           return session.GetSessionId() == mNextAnalysisSessionID;
+                       }))
+    {
+        mNextAnalysisSessionID++;
+    }
+    return mNextAnalysisSessionID++;
+}
+
 CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId, bool aUseSpecificSessionId)
 {
     // Every event of a RemoteContextDetection session reports its source, so it cannot start without one
@@ -1240,14 +1266,7 @@ CHIP_ERROR AvAnalysisServerLogic::CreateActiveSession(uint16_t & aSessionId, Nod
 
     if (!aUseSpecificSessionId)
     {
-        while (std::any_of(mActiveSessions.begin(), mActiveSessions.end(),
-                           [this](const AvAnalysis::ActiveAmbientContextSession & session) {
-                               return session.GetSessionId() == mNextAnalysisSessionID;
-                           }))
-        {
-            mNextAnalysisSessionID++;
-        }
-        aSessionId = mNextAnalysisSessionID++;
+        aSessionId = AllocateSessionId();
     }
 
     auto session_it = std::find_if(
@@ -1290,8 +1309,7 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId,
         ReturnErrorOnFailure(mDelegate->VerifyZoneIDsAreValid(aZoneList.Value()));
     }
 
-    // Get our current session ID, and increment for next use
-    aSessionId = mNextAnalysisSessionID++;
+    aSessionId = AllocateSessionId();
 
     // Capture our new active session information
     AvAnalysis::ActiveAmbientContextSession newSession;

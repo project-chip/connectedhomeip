@@ -221,6 +221,8 @@ private:
      */
     // Session ids are assigned per camera, so the camera is part of the key
     AvAnalysis::AnalysisStreamEntry * FindByWebRTCSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
+    // Assigns the next session id not currently in use
+    uint16_t AllocateSessionId();
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
     bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext);
 

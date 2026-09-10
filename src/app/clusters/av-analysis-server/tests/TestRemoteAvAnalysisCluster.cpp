@@ -283,9 +283,12 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         commandData.nodeID = aCameraNodeId;
 
         auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
-        ASSERT_FALSE(response.has_value()); // Response is pending on the camera interaction
-        ASSERT_NE(mFakeCameraClient.mLastCallback, nullptr);
-        mFakeCameraClient.mLastCallback->OnVideoStreamAllocated(aCameraStatus, aVideoStreamId);
+        EXPECT_FALSE(response.has_value()); // Response is pending on the camera interaction
+        EXPECT_NE(mFakeCameraClient.mLastCallback, nullptr);
+        if (mFakeCameraClient.mLastCallback != nullptr)
+        {
+            mFakeCameraClient.mLastCallback->OnVideoStreamAllocated(aCameraStatus, aVideoStreamId);
+        }
     }
 
     // Establishes-then-activates stream aAnalysisStreamId through the fakes: the offer exchange
@@ -306,11 +309,17 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         commandData.webRTCEndpointID = MakeOptional(aWebRTCEndpoint);
 
         auto response = mServer.GetLogic().HandleActivateAnalysisStream(activateHandler, path, commandData);
-        ASSERT_FALSE(response.has_value());
-        ASSERT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
-        mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, aSessionId);
-        ASSERT_EQ(LastStatus(activateHandler), Status::Success);
-        mFakeWebRTCClient.mLastCallback->OnSessionActive(aCameraNode, aSessionId);
+        EXPECT_FALSE(response.has_value());
+        EXPECT_NE(mFakeWebRTCClient.mLastCallback, nullptr);
+        if (mFakeWebRTCClient.mLastCallback != nullptr)
+        {
+            mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::Success, aSessionId);
+            EXPECT_EQ(LastStatus(activateHandler), Status::Success);
+            mFakeWebRTCClient.mLastCallback->OnSessionActive(aCameraNode, aSessionId);
+        }
+
+        // What every caller of this helper goes on to assume
+        EXPECT_EQ(StreamState(aAnalysisStreamId), AnalysisStreamStateEnum::kWebRTCActive);
     }
 
     template <typename RequestType>
@@ -368,6 +377,26 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
     }
 
     // The state of the first stream in the AnalysisStreams attribute
+    // The state of one stream by id, kUnknownEnumValue if there is no such entry: degrades rather
+    // than returning, so it is usable from the fixture helpers
+    AnalysisStreamStateEnum StreamState(uint16_t aAnalysisStreamId)
+    {
+        Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
+        if (mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams) != CHIP_NO_ERROR)
+        {
+            return AnalysisStreamStateEnum::kUnknownEnumValue;
+        }
+        auto iter = streams.begin();
+        while (iter.Next())
+        {
+            if (iter.GetValue().analysisStreamID == aAnalysisStreamId)
+            {
+                return iter.GetValue().analysisStreamState;
+            }
+        }
+        return AnalysisStreamStateEnum::kUnknownEnumValue;
+    }
+
     AnalysisStreamStateEnum FirstStreamState()
     {
         Attributes::AnalysisStreams::TypeInfo::DecodableType streams;

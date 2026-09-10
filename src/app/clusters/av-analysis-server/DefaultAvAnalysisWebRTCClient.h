@@ -110,6 +110,9 @@ public:
         mOnConnectedCallback(OnDeviceConnected, this), mOnConnectionFailureCallback(OnDeviceConnectionFailure, this)
     {}
 
+    // The requestor cluster holds spans into the session store, so the sessions have to be removed from it
+    ~DefaultAvAnalysisWebRTCClient() override { Cancel(); }
+
     /**
      * @param aCASESessionManager Used to reach the camera node; must outlive this instance.
      * @param aPeerDelegate       Produces the SDP offers and manages the peer connections; must
