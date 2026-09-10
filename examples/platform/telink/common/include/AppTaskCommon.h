@@ -143,6 +143,8 @@ protected:
 
     static void UpdateStatusLED(void);
 
+    static void OtaEventsHandler(const ChipDeviceEvent * event);
+
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
 #endif
