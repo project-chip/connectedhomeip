@@ -117,7 +117,7 @@ public:
 
     void RegisterCreator(const std::string & deviceTypeArg, DeviceCreator && creator)
     {
-        if (mDefaultDevice.empty())
+        if (mDefaultDevice.empty() && deviceTypeArg != "aggregator" && deviceTypeArg != "bridged-node")
         {
             mDefaultDevice = deviceTypeArg;
         }
@@ -137,7 +137,19 @@ public:
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
     }
 
-    const std::string & GetDefaultDevice() const { return mDefaultDevice; }
+    const std::string & GetDefaultDevice() const
+    {
+        static const std::string kDimmableLight = "dimmable-light";
+        if (mRegistry.find(kDimmableLight) != mRegistry.end())
+        {
+            return kDimmableLight;
+        }
+        if (!mDefaultDevice.empty())
+        {
+            return mDefaultDevice;
+        }
+        return kDimmableLight;
+    }
 
     bool IsValidDevice(const std::string & deviceTypeArg) { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
 

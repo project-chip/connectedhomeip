@@ -34,6 +34,14 @@ set(PRIV_INCLUDE_DIRS_LIST
                       ${ALL_DEVICES_EXTRA_INCLUDE_DIRS}
 )
 
+if (CONFIG_HAVE_DISPLAY)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST
+        "${CMAKE_CURRENT_LIST_DIR}/display"
+        "${CHIP_ROOT}/examples/common/screen-framework/include"
+        "${CHIP_ROOT}/examples/common/QRCode/repo/c"
+    )
+endif()
+
 # Keep top-level src/app files explicit to avoid pulling unrelated src/app/*.cpp.
 set(APP_TOPLEVEL_EXTRA_SRCS
     "${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp"
@@ -51,6 +59,12 @@ set(SRC_DIRS_LIST
     "${CHIP_ROOT}/src/app/server-cluster"
     ${ALL_DEVICES_DEVICE_SRCDIRS}
 )
+
+if (CONFIG_HAVE_DISPLAY)
+    list(APPEND SRC_DIRS_LIST
+        "${CMAKE_CURRENT_LIST_DIR}/display"
+    )
+endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST})

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/root-node/WifiRootNode.h>
 #include <esp_heap_caps.h>
@@ -36,6 +37,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <nvs_flash.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32Utils.h>
@@ -45,8 +47,16 @@
 
 #include <app_config/enabled_devices.h>
 
+#include <cctype>
 #include <memory>
 #include <string>
+#include <vector>
+
+#if CONFIG_HAVE_DISPLAY
+#include "DeviceDisplay.h"
+#include "Display.h"
+#include "ScreenManager.h"
+#endif // CONFIG_HAVE_DISPLAY
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <DeviceShellCommands.h>
@@ -89,6 +99,26 @@ static const size_t kMaxDeviceTypeLength = 64;
 
 namespace {
 
+std::string KebabCaseToTitleCase(const std::string & input)
+{
+    std::string output  = input;
+    bool capitalizeNext = true;
+    for (char & c : output)
+    {
+        if (c == '-')
+        {
+            c              = ' ';
+            capitalizeNext = true;
+        }
+        else if (capitalizeNext)
+        {
+            c              = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+            capitalizeNext = false;
+        }
+    }
+    return output;
+}
+
 // Use the singleton - platform event handlers report to GetInstance()
 DeviceLayer::NetworkCommissioning::ESPWiFiDriver & sWiFiDriver = DeviceLayer::NetworkCommissioning::ESPWiFiDriver::GetInstance();
 
@@ -108,7 +138,8 @@ Credentials::GroupDataProviderImpl gGroupDataProvider;
 LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<DeviceInterface> gRootNode;
-std::unique_ptr<DeviceInterface> gConstructedDevice;
+std::vector<std::unique_ptr<DeviceInterface>> gConstructedDevices;
+std::vector<std::unique_ptr<OOBAccessor>> gConstructedAccessors;
 DefaultTimerDelegate gTimerDelegate;
 
 void DeInitBLEIfCommissioned()
@@ -265,26 +296,158 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     }
 
     auto & deviceFactory = DeviceFactory::GetInstance();
+    gConstructedDevices.clear();
+    gConstructedAccessors.clear();
 
-    // figure out the default
-    if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
+    DynamicEndpointIdAllocator endpointIdAllocator;
+    constexpr size_t kMinFreeInternalHeap = 24 * 1024;
+
+    if (gDeviceType == "*" || gDeviceType == "aggregator")
     {
-        gDeviceType = deviceFactory.GetDefaultDevice();
+        if (deviceFactory.IsValidDevice("aggregator"))
+        {
+            auto aggregator = deviceFactory.Create("aggregator");
+            if (aggregator == nullptr)
+            {
+                ESP_LOGE(TAG, "Failed to create aggregator");
+                return nullptr;
+            }
+            EndpointId aggregatorEp = endpointIdAllocator.Allocate();
+            endpointIdAllocator.ForceNext(aggregatorEp);
+            ESP_LOGI(TAG, "Registering aggregator on endpoint %u", aggregatorEp);
+            err = aggregator->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(kInvalidEndpointId));
+            if (err != CHIP_NO_ERROR)
+            {
+                ESP_LOGE(TAG, "Failed to register aggregator on endpoint %u: %" CHIP_ERROR_FORMAT, aggregatorEp, err.Format());
+                return nullptr;
+            }
+            gConstructedDevices.push_back(std::move(aggregator));
+
+            unsigned int createdCount = 0;
+            unsigned int skippedCount = 0;
+
+            for (const auto & deviceType : deviceFactory.SupportedDeviceTypes())
+            {
+                if (deviceType == "aggregator" || deviceType == "bridged-node")
+                {
+                    continue;
+                }
+
+                size_t freeInternalHeap = heap_caps_get_free_size(MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL);
+                if (freeInternalHeap < kMinFreeInternalHeap)
+                {
+                    ESP_LOGW(TAG, "Not creating '%s': low internal heap (%u bytes free, threshold %u bytes)", deviceType.c_str(),
+                             static_cast<unsigned int>(freeInternalHeap), static_cast<unsigned int>(kMinFreeInternalHeap));
+                    skippedCount++;
+                    continue;
+                }
+
+                auto bridgedNode = deviceFactory.Create("bridged-node", KebabCaseToTitleCase(deviceType));
+                if (bridgedNode == nullptr)
+                {
+                    ESP_LOGE(TAG, "Failed to create bridged-node for '%s'", deviceType.c_str());
+                    skippedCount++;
+                    continue;
+                }
+                EndpointId bnEp = endpointIdAllocator.Allocate();
+                endpointIdAllocator.ForceNext(bnEp);
+                ESP_LOGI(TAG, "Registering bridged-node for '%s' on endpoint %u (parent %u)", deviceType.c_str(), bnEp,
+                         aggregatorEp);
+                err = bridgedNode->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(aggregatorEp));
+                if (err != CHIP_NO_ERROR)
+                {
+                    ESP_LOGE(TAG, "Failed to register bridged-node for '%s' on endpoint %u: %" CHIP_ERROR_FORMAT,
+                             deviceType.c_str(), bnEp, err.Format());
+                    skippedCount++;
+                    continue;
+                }
+
+                auto device = deviceFactory.Create(deviceType);
+                if (device == nullptr)
+                {
+                    ESP_LOGE(TAG, "Failed to create device '%s'", deviceType.c_str());
+                    skippedCount++;
+                    continue;
+                }
+                ESP_LOGI(TAG, "Registering device '%s' with parent %u", deviceType.c_str(), bnEp);
+                err = device->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(bnEp));
+                if (err != CHIP_NO_ERROR)
+                {
+                    ESP_LOGE(TAG, "Failed to register device '%s' with parent %u: %" CHIP_ERROR_FORMAT, deviceType.c_str(), bnEp,
+                             err.Format());
+                    skippedCount++;
+                    continue;
+                }
+
+                auto oobAccessor = deviceFactory.CreateAccessor(deviceType, *device);
+                if (oobAccessor)
+                {
+                    OOBAccessorRegistry::Instance().Register(*oobAccessor);
+                    gConstructedAccessors.push_back(std::move(oobAccessor));
+                }
+
+                gConstructedDevices.push_back(std::move(bridgedNode));
+                gConstructedDevices.push_back(std::move(device));
+                createdCount++;
+            }
+            ESP_LOGI(TAG,
+                     "Aggregator initialization complete: %u bridged devices created, %u devices skipped (remaining internal heap: "
+                     "%u bytes)",
+                     createdCount, skippedCount,
+                     static_cast<unsigned int>(heap_caps_get_free_size(MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL)));
+        }
+        else
+        {
+            auto defaultDevName = deviceFactory.GetDefaultDevice();
+            auto device         = deviceFactory.Create(defaultDevName);
+            if (device == nullptr)
+            {
+                ESP_LOGE(TAG, "Failed to create default device %s", defaultDevName.c_str());
+                return nullptr;
+            }
+            endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
+            ESP_LOGI(TAG, "Registering default device '%s' on endpoint %u", defaultDevName.c_str(),
+                     static_cast<unsigned int>(CONFIG_ALL_DEVICES_ENDPOINT));
+            err = device->Register(endpointIdAllocator, dataModelProvider);
+            if (err != CHIP_NO_ERROR)
+            {
+                ESP_LOGE(TAG, "Failed to register default device '%s': %" CHIP_ERROR_FORMAT, defaultDevName.c_str(), err.Format());
+                return nullptr;
+            }
+            gConstructedDevices.push_back(std::move(device));
+        }
     }
-    gConstructedDevice = deviceFactory.Create(gDeviceType);
-
-    if (gConstructedDevice == nullptr)
+    else
     {
-        ESP_LOGE(TAG, "Failed to create device of type: %s", gDeviceType.c_str());
-        return nullptr;
-    }
+        if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
+        {
+            gDeviceType = deviceFactory.GetDefaultDevice();
+        }
+        auto device = deviceFactory.Create(gDeviceType);
+        if (device == nullptr)
+        {
+            ESP_LOGE(TAG, "Failed to create device of type: %s", gDeviceType.c_str());
+            return nullptr;
+        }
 
-    ConsecutiveEndpointIdAllocator allocator(CONFIG_ALL_DEVICES_ENDPOINT);
-    err = gConstructedDevice->Register(allocator, dataModelProvider);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to register device: %" CHIP_ERROR_FORMAT, err.Format());
-        return nullptr;
+        endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
+        ESP_LOGI(TAG, "Registering device '%s' on endpoint %u", gDeviceType.c_str(),
+                 static_cast<unsigned int>(CONFIG_ALL_DEVICES_ENDPOINT));
+        err = device->Register(endpointIdAllocator, dataModelProvider);
+        if (err != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Failed to register device '%s': %" CHIP_ERROR_FORMAT, gDeviceType.c_str(), err.Format());
+            return nullptr;
+        }
+
+        auto oobAccessor = deviceFactory.CreateAccessor(gDeviceType, *device);
+        if (oobAccessor)
+        {
+            OOBAccessorRegistry::Instance().Register(*oobAccessor);
+            gConstructedAccessors.push_back(std::move(oobAccessor));
+        }
+
+        gConstructedDevices.push_back(std::move(device));
     }
 
     return &dataModelProvider;
@@ -383,6 +546,31 @@ void InitServerWithDeviceType(std::string deviceType)
     SuccessOrDie(PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr)));
 }
 
+const std::string & GetActiveDeviceType()
+{
+    return gDeviceType;
+}
+
+void SetDeviceTypeAndRestart(const std::string & deviceType)
+{
+    ESP_LOGI(TAG, "Saving device type '%s' to NVS and restarting...", deviceType.c_str());
+    CHIP_ERROR err = ESP32Config::WriteConfigValueStr(kConfigKey_DeviceType, deviceType.c_str());
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to save device type to NVS: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+#if CONFIG_HAVE_DISPLAY
+    TFT_fillScreen(TFT_BLACK);
+    TFT_setFont(DEJAVU24_FONT, nullptr);
+    tft_fg = ScreenNormalColor;
+    TFT_print("Restarting...", 40, DisplayHeight / 2 - 20);
+#endif
+
+    vTaskDelay(pdMS_TO_TICKS(300));
+    esp_restart();
+}
+
 extern "C" void app_main()
 {
     // Initialize the ESP NVS layer.
@@ -440,6 +628,13 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
+    // Print onboarding codes (QR code URL and manual code)
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
+
+#if CONFIG_HAVE_DISPLAY
+    InitDeviceDisplay();
+#endif // CONFIG_HAVE_DISPLAY
+
     error = PlatformMgr().StartEventLoopTask();
     if (error != CHIP_NO_ERROR)
     {
@@ -469,8 +664,9 @@ extern "C" void app_main()
     else
     {
         ESP_LOGI(TAG, "==================================================");
-        ESP_LOGI(TAG, "No stored device type found.");
-        ESP_LOGI(TAG, "Use command: devtype set <device-type>");
+        ESP_LOGI(TAG, "No stored device type found, defaulting to all bridged devices (*)");
+        ESP_LOGI(TAG, "Auto-initializing...");
         ESP_LOGI(TAG, "==================================================");
+        InitServerWithDeviceType("*");
     }
 }

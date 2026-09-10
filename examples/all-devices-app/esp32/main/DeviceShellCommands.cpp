@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
  */
 
 #include <DeviceShellCommands.h>
+#include <cstring>
 #include <device-factory/DeviceFactory.h>
 #include <lib/shell/streamer.h>
 
 // Forward declaration of the function defined in main.cpp
-void InitServerWithDeviceType(std::string deviceType);
+void SetDeviceTypeAndRestart(const std::string & deviceType);
 
 namespace chip {
 namespace Shell {
@@ -47,7 +48,9 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
         const auto supportedDeviceTypes = chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes();
         streamer_printf(streamer_get(), "Usage: devtype set <device-type>\r\n");
         streamer_printf(streamer_get(), "Example: devtype set contact-sensor\r\n");
+        streamer_printf(streamer_get(), "Example: devtype set * (all bridged devices)\r\n");
         streamer_printf(streamer_get(), "Supported device types:\r\n");
+        streamer_printf(streamer_get(), "  - *\r\n");
         for (const auto & deviceType : supportedDeviceTypes)
         {
             streamer_printf(streamer_get(), "  - %s\r\n", deviceType.c_str());
@@ -57,9 +60,15 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
 
     const char * deviceType = argv[0];
 
-    streamer_printf(streamer_get(), "Device type set to: %s\r\n", deviceType);
+    if (strcmp(deviceType, "*") != 0 && !chip::app::DeviceFactory::GetInstance().IsValidDevice(deviceType))
+    {
+        streamer_printf(streamer_get(), "Unknown device type: %s\r\n", deviceType);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
-    InitServerWithDeviceType(std::string(deviceType));
+    streamer_printf(streamer_get(), "Device type set to: %s. Restarting...\r\n", deviceType);
+
+    SetDeviceTypeAndRestart(std::string(deviceType));
 
     return CHIP_NO_ERROR;
 }
