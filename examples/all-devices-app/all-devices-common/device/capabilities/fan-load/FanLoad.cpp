@@ -58,12 +58,7 @@ CHIP_ERROR FanLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvi
     ReturnErrorOnFailure(provider.AddCluster(mScenesManagementCluster.Registration()));
 
     // Groups
-    mGroupsCluster.Create(endpoint,
-                          GroupsCluster::Context{
-                              .groupDataProvider   = mContext.groupDataProvider,
-                              .scenesIntegration   = &mScenesManagementCluster.Cluster(),
-                              .identifyIntegration = &mIdentifyCluster.Cluster(),
-                          });
+    mGroupsCluster.Create(endpoint, StubbedGroupsCluster::Context{ .groupDataProvider = mContext.groupDataProvider });
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
     // OnOff

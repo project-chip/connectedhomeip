@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/clusters/groups-server/GroupsCluster.h>
+#include <app/clusters/groups-server/StubbedGroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/level-control/LevelControlCluster.h>
 #include <app/clusters/level-control/LevelControlDelegate.h>
@@ -123,7 +123,7 @@ public:
     Clusters::LevelControlCluster & LevelControlCluster() { return mLevelControlCluster.Cluster(); }
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::ScenesManagementCluster & ScenesManagementCluster() { return mScenesManagementCluster.Cluster(); }
-    Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
+    Clusters::StubbedGroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
 
 protected:
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -159,7 +159,7 @@ private:
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::LevelControlCluster> mLevelControlCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
-    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
+    LazyRegisteredServerCluster<Clusters::StubbedGroupsCluster> mGroupsCluster;
 };
 
 } // namespace app
