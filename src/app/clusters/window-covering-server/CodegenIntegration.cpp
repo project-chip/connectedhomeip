@@ -79,6 +79,46 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    void OnTargetPositionLiftChanged(DataModel::Nullable<Percent100ths> newTargetLift) override
+    {
+        if (mWrapped)
+        {
+            mWrapped->OnTargetPositionLiftChanged(newTargetLift);
+        }
+    }
+
+    void OnTargetPositionTiltChanged(DataModel::Nullable<Percent100ths> newTargetTilt) override
+    {
+        if (mWrapped)
+        {
+            mWrapped->OnTargetPositionTiltChanged(newTargetTilt);
+        }
+    }
+
+    void OnModeChanged(chip::BitMask<Mode> newMode) override
+    {
+        if (mWrapped)
+        {
+            mWrapped->OnModeChanged(newMode);
+        }
+    }
+
+    void OnSafetyStatusChanged(chip::BitMask<SafetyStatus> newSafetyStatus) override
+    {
+        if (mWrapped)
+        {
+            mWrapped->OnSafetyStatusChanged(newSafetyStatus);
+        }
+    }
+
+    void OnConfigStatusChanged(chip::BitMask<ConfigStatus> newConfigStatus) override
+    {
+        if (mWrapped)
+        {
+            mWrapped->OnConfigStatusChanged(newConfigStatus);
+        }
+    }
+
 private:
     WindowCoveringDelegate * mWrapped = nullptr;
 };
