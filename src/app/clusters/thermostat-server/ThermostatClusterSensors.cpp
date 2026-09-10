@@ -33,20 +33,18 @@ using Protocols::InteractionModel::Status;
 
 bool ThermostatSensors::IsSensorHandleConfigured(const ByteSpan & sensorHandle) const
 {
-    uint8_t i = 0;
-    while (true)
+    for (size_t i = 0; true; i++)
     {
         ThermostatSensorStructWithOwnedMembers sensor;
         CHIP_ERROR err = mDelegate.GetSensorAtIndex(i, sensor);
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        if (err != CHIP_NO_ERROR)
         {
             break;
         }
-        if (err == CHIP_NO_ERROR && sensor.GetSensorHandle().data_equal(sensorHandle))
+        if (sensor.GetSensorHandle().data_equal(sensorHandle))
         {
             return true;
         }
-        i++;
     }
     return false;
 }
@@ -57,11 +55,11 @@ bool ThermostatSensors::IsSensorHandleAvailable(const ByteSpan & sensorHandle) c
     {
         ByteSpan handle;
         CHIP_ERROR err = mDelegate.GetAvailableSensorAtIndex(i, handle);
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        if (err != CHIP_NO_ERROR)
         {
             break;
         }
-        if (err == CHIP_NO_ERROR && handle.data_equal(sensorHandle))
+        if (handle.data_equal(sensorHandle))
         {
             return true;
         }

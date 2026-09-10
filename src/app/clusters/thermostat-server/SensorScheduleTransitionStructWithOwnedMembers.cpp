@@ -40,7 +40,11 @@ SensorScheduleTransitionStructWithOwnedMembers::operator=(const Structs::SensorS
 {
     SetDayOfWeek(other.dayOfWeek);
     SetTransitionTime(other.transitionTime);
-    TEMPORARY_RETURN_IGNORED SetEnabledSensors(other.enabledSensors);
+    if (SetEnabledSensors(other.enabledSensors) != CHIP_NO_ERROR)
+    {
+        mNumEnabledSensors = 0;
+        RefreshEnabledSensorsList();
+    }
     return *this;
 }
 
@@ -49,7 +53,11 @@ SensorScheduleTransitionStructWithOwnedMembers::operator=(const Structs::SensorS
 {
     SetDayOfWeek(other.dayOfWeek);
     SetTransitionTime(other.transitionTime);
-    TEMPORARY_RETURN_IGNORED SetEnabledSensors(other.enabledSensors);
+    if (SetEnabledSensors(other.enabledSensors) != CHIP_NO_ERROR)
+    {
+        mNumEnabledSensors = 0;
+        RefreshEnabledSensorsList();
+    }
     return *this;
 }
 

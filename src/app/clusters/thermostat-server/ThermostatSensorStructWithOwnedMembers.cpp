@@ -35,8 +35,14 @@ ThermostatSensorStructWithOwnedMembers::operator=(const Structs::ThermostatSenso
     SetEndpoint(other.endpoint);
     SetNode(other.node);
     SetFabricIndex(other.fabricIndex);
-    TEMPORARY_RETURN_IGNORED SetName(other.name);
-    TEMPORARY_RETURN_IGNORED SetSensorHandle(other.sensorHandle);
+    if (SetName(other.name) != CHIP_NO_ERROR)
+    {
+        name = CharSpan(mNameData, 0);
+    }
+    if (SetSensorHandle(other.sensorHandle) != CHIP_NO_ERROR)
+    {
+        sensorHandle = ByteSpan(mSensorHandleData, 0);
+    }
     return *this;
 }
 
