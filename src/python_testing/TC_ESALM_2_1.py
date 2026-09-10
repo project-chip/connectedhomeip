@@ -97,7 +97,7 @@ class TC_ESALM_2_1(MatterBaseTest):
                               "PowerExported (bit 14) ↔ POWEREXP.")
         supported = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Supported)
-        matter_asserts.assert_valid_uint32(supported, "Supported (map32 AlarmBitmap)")
+        matter_asserts.assert_valid_uint32(supported, "The Supported AlarmBitmap value")
         if has_overvolt:
             asserts.assert_true(supported & _A.kOverVoltage, "OVERVOLT feature set but OverVoltage bit missing from Supported")
         if has_undervolt:
@@ -162,7 +162,7 @@ class TC_ESALM_2_1(MatterBaseTest):
                               "bit set in Mask is also set in Supported.")
         mask = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
-        matter_asserts.assert_valid_uint32(mask, "Mask (map32 AlarmBitmap)")
+        matter_asserts.assert_valid_uint32(mask, "The Mask AlarmBitmap value")
         asserts.assert_equal(int(mask) & ~int(supported), 0, "Mask contains bits not set in Supported")
 
         self.step(5, "TH reads from the DUT the Latch attribute.",
@@ -171,7 +171,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_latch:
             latch = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Latch)
-            matter_asserts.assert_valid_uint32(latch, "Latch (map32 AlarmBitmap)")
+            matter_asserts.assert_valid_uint32(latch, "The Latch AlarmBitmap value")
             asserts.assert_equal(int(latch) & ~int(supported), 0, "Latch contains bits not set in Supported")
         else:
             self.mark_current_step_skipped()
@@ -181,7 +181,7 @@ class TC_ESALM_2_1(MatterBaseTest):
                               "bit set in State is also set in Supported.")
         state = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attrs.State)
-        matter_asserts.assert_valid_uint32(state, "State (map32 AlarmBitmap)")
+        matter_asserts.assert_valid_uint32(state, "The State AlarmBitmap value")
         asserts.assert_equal(int(state) & ~int(supported), 0, "State contains bits not set in Supported")
 
         over_voltage = None
@@ -198,7 +198,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_overvolt:
             over_voltage = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverVoltageThreshold)
-            matter_asserts.assert_valid_int64(over_voltage, "OverVoltageThreshold")
+            matter_asserts.assert_valid_int64(over_voltage, "The OverVoltageThreshold value")
         else:
             self.mark_current_step_skipped()
 
@@ -208,7 +208,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_undervolt:
             under_voltage = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderVoltageThreshold)
-            matter_asserts.assert_valid_int64(under_voltage, "UnderVoltageThreshold")
+            matter_asserts.assert_valid_int64(under_voltage, "The UnderVoltageThreshold value")
         else:
             self.mark_current_step_skipped()
         if has_overvolt and has_undervolt:
@@ -220,7 +220,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_overfreq:
             over_frequency = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverFrequencyThreshold)
-            matter_asserts.assert_valid_int64(over_frequency, "OverFrequencyThreshold")
+            matter_asserts.assert_valid_int64(over_frequency, "The OverFrequencyThreshold value")
         else:
             self.mark_current_step_skipped()
 
@@ -230,7 +230,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_underfreq:
             under_frequency = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderFrequencyThreshold)
-            matter_asserts.assert_valid_int64(under_frequency, "UnderFrequencyThreshold")
+            matter_asserts.assert_valid_int64(under_frequency, "The UnderFrequencyThreshold value")
         else:
             self.mark_current_step_skipped()
         if has_overfreq and has_underfreq:
@@ -242,7 +242,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_overpower:
             over_power = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverPowerThreshold)
-            matter_asserts.assert_valid_int64(over_power, "OverPowerThreshold")
+            matter_asserts.assert_valid_int64(over_power, "The OverPowerThreshold value")
         else:
             self.mark_current_step_skipped()
 
@@ -252,7 +252,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_underpower:
             under_power = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderPowerThreshold)
-            matter_asserts.assert_valid_int64(under_power, "UnderPowerThreshold")
+            matter_asserts.assert_valid_int64(under_power, "The UnderPowerThreshold value")
         else:
             self.mark_current_step_skipped()
         if has_overpower and has_underpower:
@@ -264,7 +264,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_overcur:
             over_current = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverCurrentThreshold)
-            matter_asserts.assert_valid_int64(over_current, "OverCurrentThreshold")
+            matter_asserts.assert_valid_int64(over_current, "The OverCurrentThreshold value")
         else:
             self.mark_current_step_skipped()
 
@@ -274,7 +274,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_undercur:
             under_current = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderCurrentThreshold)
-            matter_asserts.assert_valid_int64(under_current, "UnderCurrentThreshold")
+            matter_asserts.assert_valid_int64(under_current, "The UnderCurrentThreshold value")
         else:
             self.mark_current_step_skipped()
         if has_overcur and has_undercur:
@@ -287,7 +287,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_powerimp:
             power_import = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.PowerImportThreshold)
-            matter_asserts.assert_valid_int64(power_import, "PowerImportThreshold")
+            matter_asserts.assert_valid_int64(power_import, "The PowerImportThreshold value")
             asserts.assert_greater_equal(power_import, 0, "PowerImportThreshold must be >= 0")
         else:
             self.mark_current_step_skipped()
@@ -299,7 +299,7 @@ class TC_ESALM_2_1(MatterBaseTest):
         if has_powerexp:
             power_export = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.PowerExportThreshold)
-            matter_asserts.assert_valid_int64(power_export, "PowerExportThreshold")
+            matter_asserts.assert_valid_int64(power_export, "The PowerExportThreshold value")
             asserts.assert_less_equal(power_export, 0, "PowerExportThreshold must be <= 0")
         else:
             self.mark_current_step_skipped()
