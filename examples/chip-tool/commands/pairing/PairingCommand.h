@@ -328,6 +328,13 @@ private:
     chip::Controller::WiFiCredentials GetWiFiCredentials();
 
     /**
+     * Finishes the command with the given status, once nothing is left to wind down. Paths that
+     * end a pairing run go through here rather than calling SetCommandExitStatus() directly, so
+     * that a Network Client Identity revocation still in flight gets to complete first.
+     */
+    void FinishCommand(CHIP_ERROR aExitErr);
+
+    /**
      * If the PDC registrar still has a Network Client Identity revocation in flight -- which the
      * commissioner issues without waiting for it -- shut it down gracefully and defer exiting with
      * aExitErr until it is done, so the entry does not survive us on the network. Returns true if the

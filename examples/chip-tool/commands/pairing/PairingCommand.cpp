@@ -241,6 +241,15 @@ void PairingCommand::Shutdown()
     CHIPCommand::Shutdown();
 }
 
+void PairingCommand::FinishCommand(CHIP_ERROR aExitErr)
+{
+    // A rollback of the Network Client Identity may still be under way; the commissioner does not
+    // generally wait (letting it complete in the background), but we should before quitting.
+    VerifyOrReturn(!DeferExitForPDCRegistrar(aExitErr));
+
+    SetCommandExitStatus(aExitErr);
+}
+
 bool PairingCommand::DeferExitForPDCRegistrar(CHIP_ERROR aExitErr)
 {
     VerifyOrReturnValue(mPDCRegistrar.has_value() && !mPDCRegistrar->IsIdle(), false);
@@ -652,15 +661,12 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     if (mPairingMode == PairingMode::Proxy)
     {
         // Clean up the proxy session before exiting, regardless of success or failure.
+        // The disconnect completing is what eventually reaches FinishCommand().
         SendProxyDisconnect(err);
         return;
     }
 
-    // A rollback of the Network Client Identity may still be under way; the commissioner does not
-    // generally wait (letting it complete in the background), but we should before quitting.
-    VerifyOrReturn(!DeferExitForPDCRegistrar(err));
-
-    SetCommandExitStatus(err);
+    FinishCommand(err);
 }
 
 void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioningInfo & info)
@@ -1217,7 +1223,7 @@ void PairingCommand::OnError(const chip::app::CommandSender * client, CHIP_ERROR
     {
         // The disconnect is best-effort; log but use the original exit status.
         ChipLogDetail(chipTool, "PairViaProxy: ProxyDisconnectRequest error (ignored): %" CHIP_ERROR_FORMAT, error.Format());
-        SetCommandExitStatus(mProxyDisconnectExitErr);
+        FinishCommand(mProxyDisconnectExitErr);
         return;
     }
     ChipLogError(chipTool, "PairViaProxy CommandSender error: %" CHIP_ERROR_FORMAT, error.Format());
@@ -1269,12 +1275,12 @@ void PairingCommand::OnDone(chip::app::CommandSender * client)
     {
         mProxyDisconnectCmdSender.reset();
         mProxySession.Release();
-        SetCommandExitStatus(mProxyDisconnectExitErr);
+        FinishCommand(mProxyDisconnectExitErr);
     }
 }
 
 // Send ProxyDisconnectRequest to clean up the proxy session, then exit.
-// SetCommandExitStatus is deferred until the response (or a timeout) is received so
+// Finishing the command is deferred until the response (or a timeout) is received so
 // that chip-tool keeps the TCP session alive long enough for the proxy to reply.
 void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPendingConnect)
 {
@@ -1283,7 +1289,7 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPending
     const bool haveSomethingToSend = aCancelPendingConnect || mProxySessionActive;
     if (!haveSomethingToSend || mProxyExchangeMgr == nullptr || !static_cast<bool>(mProxySession))
     {
-        SetCommandExitStatus(exitErr);
+        FinishCommand(exitErr);
         return;
     }
 
@@ -1331,7 +1337,7 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPending
     {
         ChipLogError(chipTool, "PairViaProxy: failed to allocate CommandSender for ProxyDisconnectRequest");
         mProxySession.Release();
-        SetCommandExitStatus(exitErr);
+        FinishCommand(exitErr);
         return;
     }
 
@@ -1340,13 +1346,13 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPending
     {
         ChipLogError(chipTool, "PairViaProxy: failed to send ProxyDisconnectRequest");
         mProxySession.Release();
-        SetCommandExitStatus(exitErr);
+        FinishCommand(exitErr);
         return;
     }
 
     ChipLogProgress(chipTool, "PairViaProxy: sent ProxyDisconnectRequest, waiting for response");
     mProxyDisconnectCmdSender = std::move(cmdSender);
-    // SetCommandExitStatus is deferred until OnDone/OnError fires for mProxyDisconnectCmdSender.
+    // Finishing the command is deferred until OnDone/OnError fires for mProxyDisconnectCmdSender.
 }
 
 // ProxyTransportDelegate — called by ProxyTransport when it needs to forward
