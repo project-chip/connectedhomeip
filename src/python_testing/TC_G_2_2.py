@@ -265,14 +265,16 @@ class TC_G_2_2(MatterBaseTest):
                 self.mark_current_step_skipped()
 
             self.step("5")
-            group_names = [f"Gp{i}" for i in range(2, maxgroups)]  # ["Gp3", "Gp4", ..., "(maxgroups-1)"]
-            for i, group_name in enumerate(group_names, start=2):
+            # After groups 0x0001 and 0x0002, add the remaining (maxgroups-2) groups: 0x0003 .. maxgroups.
+            added_group_ids = list(range(3, maxgroups + 1))
+            for group_id in added_group_ids:
+                group_name = f"Gp{group_id}"
                 result = await th1.SendCommand(
                     self.dut_node_id,
                     self.matter_test_config.endpoint,
-                    Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[i].groupId, group_name),
+                    Clusters.Groups.Commands.AddGroup(group_id, group_name),
                 )
-                asserts.assert_equal(result.status, Status.Success, f"Adding Group 0x{groupKeyMapStruct[i].groupId:04X} failed")
+                asserts.assert_equal(result.status, Status.Success, f"Adding Group 0x{group_id:04X} failed")
 
             self.step("6")
             groupTableList: list[
@@ -280,17 +282,14 @@ class TC_G_2_2(MatterBaseTest):
             ] = await self.read_single_attribute_check_success(
                 cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0
             )
-            # Get the group IDs that were added in step 5
-            added_group_ids = [groupKeyMapStruct[i].groupId for i in range(2, maxgroups - 1)]
-            # Verify that each group ID is present in the GroupTable list
             for group_id in added_group_ids:
                 found = any(entry.groupId == group_id for entry in groupTableList)
                 asserts.assert_true(found, f"GroupTable does not contain expected groupId 0x{group_id:04X}")
 
             self.step("7a")
             kGroupIdUnused = maxgroups + 1
-            groupKeyMapStructMaxGroup: Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct = [
-                {"groupId": kGroupIdUnused, "groupKeySetID": kGroupKeySetID, "fabricIndex": 1}
+            groupKeyMapStructMaxGroup: list[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = groupKeyMapStruct + [
+                GroupKeyMapStruct(groupId=kGroupIdUnused, groupKeySetID=kGroupKeySetID)
             ]
             resp = await th1.WriteAttribute(
                 self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(groupKeyMapStructMaxGroup))]
