@@ -132,6 +132,29 @@ Status RemoveFromThermostatSuggestionsList(chip::app::Clusters::Thermostat::Ther
     return Status::Success;
 }
 
+/**
+ * @brief Determines whether CurrentThermostatSuggestion actually changed between two snapshots of it.
+ *
+ * @param[in] before A snapshot of CurrentThermostatSuggestion taken before some operation.
+ * @param[in] after A snapshot of CurrentThermostatSuggestion taken after that operation.
+ *
+ * @return true if the null-ness differs, or both are non-null but their UniqueID differs.
+ */
+bool CurrentSuggestionChanged(
+    const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSuggestionStructWithOwnedMembers> & before,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSuggestionStructWithOwnedMembers> & after)
+{
+    if (before.IsNull() != after.IsNull())
+    {
+        return true;
+    }
+    if (after.IsNull())
+    {
+        return false;
+    }
+    return before.Value().GetUniqueID() != after.Value().GetUniqueID();
+}
+
 } // anonymous namespace
 
 namespace chip {
@@ -452,7 +475,15 @@ void ThermostatSuggestions::OnPresetsCommitted()
     if (!RemoveThermostatSuggestionsForRemovedPresets())
     {
         // The cascade aborted on a delegate error, leaving potentially-stale suggestions in place. Skip
-        // re-evaluation: it could otherwise pick a suggestion whose preset no longer exists.
+        // re-evaluation: it could otherwise pick a suggestion whose preset no longer exists. The partial cleanup
+        // that ran before the failure may already have removed the current suggestion, though, and that real
+        // transition must still be reported rather than silently dropped.
+        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentAfterPartialCleanup;
+        mDelegate.GetCurrentThermostatSuggestion(currentAfterPartialCleanup);
+        if (CurrentSuggestionChanged(currentBeforeCleanup, currentAfterPartialCleanup))
+        {
+            mCluster.NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
+        }
         return;
     }
 
@@ -464,13 +495,7 @@ void ThermostatSuggestions::OnPresetsCommitted()
 
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentAfter;
     mDelegate.GetCurrentThermostatSuggestion(currentAfter);
-
-    bool currentSuggestionActuallyChanged = currentBeforeCleanup.IsNull() != currentAfter.IsNull();
-    if (!currentSuggestionActuallyChanged && !currentAfter.IsNull())
-    {
-        currentSuggestionActuallyChanged = currentBeforeCleanup.Value().GetUniqueID() != currentAfter.Value().GetUniqueID();
-    }
-    if (currentSuggestionActuallyChanged)
+    if (CurrentSuggestionChanged(currentBeforeCleanup, currentAfter))
     {
         mCluster.NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
     }

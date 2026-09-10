@@ -582,6 +582,75 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeAbortsOnRemovalFailure)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeReportsCurrentSuggestionChangeOnPartialAbort)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kThermostatSuggestions);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    // No presets survive the atomic write below, so both suggestions below become stale. The backward removal
+    // walk visits the current suggestion (index 1) before the other one (index 0), so it is removed successfully
+    // before the failure below aborts the cascade partway through.
+    uint8_t handleB[4] = { 2, 2, 2, 2 };
+    uint8_t handleC[4] = { 3, 3, 3, 3 };
+
+    ThermostatSuggestionStructWithOwnedMembers otherSuggestion;
+    otherSuggestion.SetUniqueID(31);
+    EXPECT_EQ(otherSuggestion.SetPresetHandle(ByteSpan(handleC)), CHIP_NO_ERROR);
+    otherSuggestion.SetEffectiveTime(Seconds32(0));
+    otherSuggestion.SetExpirationTime(Seconds32(1000000));
+    mSuggestionsDelegate.mSuggestions.push_back(otherSuggestion);
+
+    ThermostatSuggestionStructWithOwnedMembers currentSuggestion;
+    currentSuggestion.SetUniqueID(32);
+    EXPECT_EQ(currentSuggestion.SetPresetHandle(ByteSpan(handleB)), CHIP_NO_ERROR);
+    currentSuggestion.SetEffectiveTime(Seconds32(0));
+    currentSuggestion.SetExpirationTime(Seconds32(1000000));
+    mSuggestionsDelegate.mSuggestions.push_back(currentSuggestion);
+    mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(currentSuggestion);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate, mSuggestionsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::AtomicRequest::Type beginReq;
+    beginReq.requestType        = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Attributes::Presets::Id };
+    beginReq.attributeRequests  = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    beginReq.timeout            = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+    ASSERT_TRUE(tester.Invoke(beginReq).IsSuccess());
+
+    // Remove every preset, so both suggestions above become stale.
+    DataModel::List<const Structs::PresetStruct::Type> emptyListPayload;
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Presets::Id, emptyListPayload, ListWritingPattern::ReplaceAll), Status::Success);
+
+    // Fail the cascade's second-pass removal of the lower-index (non-current) entry, after it has already
+    // removed the higher-index current suggestion (the backward walk visits index 1 first, then index 0).
+    mSuggestionsDelegate.mFailRemoveFromThermostatSuggestionsListOnCall = 2;
+
+    Commands::AtomicRequest::Type commitReq;
+    commitReq.requestType       = AtomicRequestTypeEnum::kCommitWrite;
+    commitReq.attributeRequests = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    ASSERT_TRUE(tester.Invoke(commitReq).IsSuccess());
+
+    // The current suggestion was really removed (per RemoveFromThermostatSuggestionsList()'s API contract) before
+    // the cascade aborted, so that transition is real and must be reported, even though the cascade as a whole is
+    // incomplete and must still skip re-evaluating a replacement.
+    ASSERT_EQ(mSuggestionsDelegate.mSuggestions.size(), 1u);
+    EXPECT_EQ(mSuggestionsDelegate.mSuggestions[0].GetUniqueID(), 31);
+    EXPECT_TRUE(mSuggestionsDelegate.mCurrentSuggestion.IsNull());
+    EXPECT_FALSE(mSuggestionsDelegate.mReEvaluateCalled);
+    EXPECT_TRUE(tester.IsAttributeDirty(Attributes::ThermostatSuggestions::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(CurrentThermostatSuggestion::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeDoesNotDoubleNotifyCurrentSuggestion)
 {
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kThermostatSuggestions);
