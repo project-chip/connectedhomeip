@@ -180,7 +180,7 @@ class TC_DD_3_24(MatterTestCommissioner):
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
         if log_result:
-            log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
+            log.info("DUT Instance Name: %s", instance_name)
         return instance_name
 
     async def check_operational_service_has_txt_ic(self, query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC) -> bool:
