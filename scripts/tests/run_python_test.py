@@ -569,11 +569,26 @@ class FactoryResetType(enum.Enum):
                 yield match.group("path")
 
 
+# The tv-app's media store
+TV_APP_MEDIA_DIR = "/tmp/chip-media-files"
+
+
 def factory_reset_config_removal(app_args: str, script_args: str, reset_type: FactoryResetType = None):
     """Handles app factory reset requests by removing configuration and storage files."""
     for path in reset_type.config_files(app_args, script_args):
         log.info("Removing config/storage file, path: '%s'...", path)
+<<<<<<< HEAD
         pathlib.Path(path).unlink(missing_ok=True)
+=======
+
+        # Targets the specific tv-app media directory if found, which
+        # unlink can't remove, so using shutil.rmtree instead.
+        if path == TV_APP_MEDIA_DIR:
+            with contextlib.suppress(FileNotFoundError):
+                shutil.rmtree(path)
+        else:
+            pathlib.Path(path).unlink(missing_ok=True)
+>>>>>>> 1e35375 (TC-SC-4.7 - Add python automation for Commissioner Discovery (#73567))
 
 
 if __name__ == '__main__':
