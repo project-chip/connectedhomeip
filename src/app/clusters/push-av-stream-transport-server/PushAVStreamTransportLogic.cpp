@@ -531,9 +531,16 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                 Zcl, "Transport Options verification from command data[ep=%d]: Motion Time Control (MaxDuration) Constraint Error",
                 mEndpointId));
     }
+    else if (triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext)
+    {
+        VerifyOrReturnValue(
+            !triggerOptions.motionTimeControl.HasValue(), Status::InvalidCommand,
+            ChipLogError(
+                Zcl, "Transport Options verification from command data[ep=%d]: Found Motion Time Control which is not expected ",
+                mEndpointId));
+    }
     else
     {
-
         VerifyOrReturnValue(
             !triggerOptions.motionZones.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Found motion zones which is not expected",
@@ -571,6 +578,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
     }
 
     if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
+        triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext ||
         triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand)
     {
         VerifyOrReturnValue(triggerOptions.maxPreRollLen.HasValue(), Status::InvalidCommand,
