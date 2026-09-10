@@ -7,11 +7,11 @@ This tool is designed to generate factory partitions for mass production.
 Please make sure you have had the following tools before using the generator
 tool.
 
--   [CHIP Certificate Tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/chip-cert)
+- [CHIP Certificate Tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/chip-cert)
 
--   [SPAKE2P Parameters Tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/spake2p)
+- [SPAKE2P Parameters Tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/spake2p)
 
--   [chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+- [chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
 
 ### [Build Matter tools](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#build-for-the-host-os-linux-or-macos)
 
@@ -149,17 +149,17 @@ out
 
 Tool generates following output files:
 
--   Partition Binary : `factory_data.bin` and `factory_data.hex`
--   Partition JSON : `summary.json`
--   Onboarding codes : `onb_codes.csv`
--   QR Code image : `qrcode.png`
+- Partition Binary : `factory_data.bin` and `factory_data.hex`
+- Partition JSON : `summary.json`
+- Onboarding codes : `onb_codes.csv`
+- QR Code image : `qrcode.png`
 
 Other intermediate files are stored in `internal/` directory:
 
--   PAI Certificate : `pai_cert.der`
--   DAC Certificates : `DAC_cert.der` and `DAC_cert.pem`
--   DAC Private Key : `DAC_private_key.bin`
--   DAC Public Key : `DAC_public_key.bin`
+- PAI Certificate : `pai_cert.der`
+- DAC Certificates : `DAC_cert.der` and `DAC_cert.pem`
+- DAC Private Key : `DAC_private_key.bin`
+- DAC Public Key : `DAC_public_key.bin`
 
 Above files are stored at `out/<vid_pid>/<SN>`. Each device is identified with
 an unique SN.
@@ -184,12 +184,12 @@ You can try one of these factory partition FW on developing stage.
 3. Then flash the `factory_data.bin` generated from the generator tool at
    specific address:
 
-    > Note: The factory data partition offset depends on the flash size. For
-    > [2 MB flash](../../../src/platform/telink/tlsr9518adk80d_2m_flash.overlay)
-    > it is `0xff000` and for
-    > [4 MB flash](../../../src/platform/telink/tlsr9518adk80d_4m_flash.overlay)
-    > it is `0x205000`. You can check the `factory_partition` reg in the
-    > corresponding flash overlay for details.
+    > Note: The offset for Matter
+    > [v1.0-branch](https://github.com/telink-semi/tl_zephyr/blob/telink_matter_v1.0-branch/boards/riscv/tlsr9518adk80d/tlsr9518adk80d.dts)
+    > is `0xF4000` and for
+    > [master branch](https://github.com/telink-semi/tl_zephyr/blob/telink_matter/boards/riscv/tlsr9518adk80d/tlsr9518adk80d.dts)
+    > is `0x107000`. You can check the `factory_partition` reg at
+    > `tlsr9518adk80d.dts` for details.
 
     For example, the `factory_data_bin` with serial number
     `aabbccddeeff11223344556677889900`. Here is the expected output in logging:

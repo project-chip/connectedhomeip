@@ -12,11 +12,11 @@ reference for creating your own pump application.
 
 The example supports building and running on the following devices:
 
-| Board/SoC                                                                                                                                                              | Build target                                                  | Zephyr Board Info                                                                                                  |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| [B91](https://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide) [TLSR9518ADK80D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR951x-Series) | `tlsr9518adk80d`, `tlsr9518adk80d-mars`, `tlsr9518adk80d-usb` | [TLSR9518ADK80D](https://github.com/telink-semi/tl_zephyr/blob/develop/boards/telink/tlsr9518adk80d/doc/index.rst) |
-| [B92](https://wiki.telink-semi.cn/wiki/Hardware/B92_Generic_Starter_Kit_Hardware_Guide) [TLSR9528A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR952x-Series)      | `tlsr9528a`, `tlsr9528a_retention`                            | [TLSR9528A](https://github.com/telink-semi/tl_zephyr/blob/develop/boards/telink/tlsr9528a/doc/index.rst)           |
-| [W91](https://wiki.telink-semi.cn/wiki/Hardware/W91_Generic_Starter_Kit_Hardware_Guide) [TLSR9118BDK40D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR911x-Series) | `tlsr9118bdk40d`                                              | [TLSR9118BDK40D](https://github.com/telink-semi/tl_zephyr/blob/develop/boards/telink/tlsr9118bdk40d/doc/index.rst) |
+| Board/SoC                                                                                                                                                              | Build target                                                  | Zephyr Board Info                                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| [B91](https://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide) [TLSR9518ADK80D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR951x-Series) | `tlsr9518adk80d`, `tlsr9518adk80d-mars`, `tlsr9518adk80d-usb` | [TLSR9518ADK80D](https://github.com/telink-semi/tl_zephyr/blob/develop/boards/riscv/tlsr9518adk80d/doc/index.rst) |
+| [B92](https://wiki.telink-semi.cn/wiki/Hardware/B92_Generic_Starter_Kit_Hardware_Guide) [TLSR9528A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR952x-Series)      | `tlsr9528a`, `tlsr9528a_retention`                            | [TLSR9528A](https://github.com/telink-semi/tl_zephyr/blob/develop/boards/riscv/tlsr9528a/doc/index.rst)           |
+| [W91](https://wiki.telink-semi.cn/wiki/Hardware/W91_Generic_Starter_Kit_Hardware_Guide) [TLSR9118BDK40D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR911x-Series) | `tlsr9118bdk40d`                                              | [TLSR9118BDK40D](https://github.com/telink-semi/tl_zephyr/blob/develop/boards/riscv/tlsr9118bdk40d/doc/index.rst) |
 
 ## Build and flash
 
@@ -147,13 +147,13 @@ be used to specify the the effect. It is able to be in following effects:
 OTA feature enabled by default only for ota-requestor-app example. To enable OTA
 feature for another Telink example:
 
--   set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
-    file.
+- set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
+  file.
 
 After build application with enabled OTA feature, use next binary files:
 
--   merged.bin - main binary to flash PCB (Use at least 2MB PCB).
--   matter.ota - binary for OTA Provider
+- merged.bin - main binary to flash PCB (Use at least 2MB PCB).
+- matter.ota - binary for OTA Provider
 
 All binaries has the same SW version. To test OTA “matter.ota” should have
 higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
@@ -161,48 +161,45 @@ corresponding “prj.conf” conﬁguration file.
 
 Usage of OTA:
 
--   Build the [Linux OTA Provider](../../ota-provider-app/linux)
+- Build the [Linux OTA Provider](../../ota-provider-app/linux)
 
     ```
     ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
     ```
 
--   Run the Linux OTA Provider with OTA image.
+- Run the Linux OTA Provider with OTA image.
 
     ```
     ./chip-ota-provider-app -f matter.ota
     ```
 
--   Provision the Linux OTA Provider using chip-tool
+- Provision the Linux OTA Provider using chip-tool
 
     ```
     ./chip-tool pairing onnetwork ${OTA_PROVIDER_NODE_ID} 20202021
     ```
 
     here:
+    - \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
 
-    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
-
--   Configure the ACL of the ota-provider-app to allow access
+- Configure the ACL of the ota-provider-app to allow access
 
     ```
     ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' ${OTA_PROVIDER_NODE_ID} 0
     ```
 
     here:
+    - \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
 
-    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
-
--   Use the chip-tool to announce the ota-provider-app to start the OTA process
+- Use the chip-tool to announce the ota-provider-app to start the OTA process
 
     ```
     ./chip-tool otasoftwareupdaterequestor announce-otaprovider ${OTA_PROVIDER_NODE_ID} 0 0 0 ${DEVICE_NODE_ID} 0
     ```
 
     here:
-
-    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
-    -   \${DEVICE_NODE_ID} is the node id of paired device
+    - \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+    - \${DEVICE_NODE_ID} is the node id of paired device
 
 Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
 OTA provider for applying the image. Device will restart on successful

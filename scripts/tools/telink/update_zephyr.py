@@ -124,7 +124,8 @@ def main():
         description='Update Telink Zephyr to specific revision and fetch BLE SDK.'
     )
     parser.add_argument("remote",
-                        default="https://github.com/telink-semi/zephyr",
+                        nargs='?',
+                        default="https://github.com/telink-semi/tl_zephyr",
                         help="New remote URL for the Zephyr repository.")
     parser.add_argument("hash",
                         help="Update Telink Zephyr to specific revision.")

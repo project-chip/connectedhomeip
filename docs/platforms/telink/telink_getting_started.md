@@ -77,7 +77,7 @@ west blobs fetch hal_telink
 west zephyr-export
 
 cd zephyr
-git remote add telink https://github.com/telink-semi/zephyr
+git remote add telink https://github.com/telink-semi/tl_zephyr
 git fetch telink
 git checkout develop     # or the branch matched to your Matter release
 cd ..
@@ -123,7 +123,7 @@ west build -p auto -b tlsr9518adk80d zephyr/samples/hello_world -d build_helloWo
 ```
 
 For more details, see the
-[Telink Zephyr Getting Started guide](https://github.com/telink-semi/zephyr/blob/release-v1.0-v4.1-branch/doc/telink/getting_started/index.md).
+[Telink Zephyr Getting Started guide](https://github.com/telink-semi/tl_zephyr/blob/release-v1.0-v4.1-branch/doc/telink/getting_started/index.md).
 
 ## Step 2: Get the Matter source code
 
@@ -138,7 +138,7 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 ### 2.2 Clone and set up the Matter repository
 
 ```bash
-git clone https://github.com/telink-semi/connectedhomeip.git
+git clone https://github.com/telink-semi/tl_matter.git connectedhomeip
 cd connectedhomeip
 git checkout <telink_matter_branch>     # e.g. release-v1.0-v1.5-branch
 ./scripts/checkout_submodules.py --platform telink,linux
@@ -262,7 +262,7 @@ west flash --erase
 
 <!-- Telink provides the **BDT** (Burning Debug Tool) for flashing. On Windows use
 the BDT GUI (`Telink BDT.exe`); on Linux use the `bdt` CLI. See the
-[Telink Zephyr Getting Started — Flash the Firmware](https://github.com/telink-semi/zephyr/blob/develop/doc/telink/getting_started/index.md#flash-the-firmware)
+[Telink Zephyr Getting Started — Flash the Firmware](https://github.com/telink-semi/tl_zephyr/blob/develop/doc/telink/getting_started/index.md#flash-the-firmware)
 section for the chip-to-BDT name mapping and the unlock/erase/write flow.
 
 A typical Linux BDT session:
@@ -279,7 +279,7 @@ A typical Linux BDT session:
 
 Telink provides the **BDT** (Burning Debug Tool) for flashing. On Windows use
 the BDT GUI (`Telink BDT.exe`). See the
-[Telink Zephyr Getting Started — Flash the Firmware](https://github.com/telink-semi/zephyr/blob/release-v1.0-v4.1-branch/doc/telink/getting_started/index.md#Flash-the-Firmware)
+[Telink Zephyr Getting Started — Flash the Firmware](https://github.com/telink-semi/tl_zephyr/blob/release-v1.0-v4.1-branch/doc/telink/getting_started/index.md#Flash-the-Firmware)
 
 <!-- ### 4.3 UART console -->
 
@@ -373,7 +373,7 @@ To test OTA with a Linux OTA Provider, refer to the
 
 - [Telink Release Notes](./releases/telink_release_notes.md) — version info,
   chip/EVK versions, per-example support matrix, and resource usage tables.
-- [Telink Zephyr Getting Started](https://github.com/telink-semi/zephyr/blob/release-v1.0-v4.1-branch/doc/telink/getting_started/index.md)
+- [Telink Zephyr Getting Started](https://github.com/telink-semi/tl_zephyr/blob/release-v1.0-v4.1-branch/doc/telink/getting_started/index.md)
   — Zephyr SDK setup, BDT flashing details, and board overviews.
 - Per-example `README.md` files under `examples/<app>/telink/` —
   example-specific build commands, button/LED mappings, and chip-tool usage.
