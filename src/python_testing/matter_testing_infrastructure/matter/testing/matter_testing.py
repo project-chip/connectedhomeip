@@ -541,8 +541,16 @@ class MatterBaseTest(base_test.BaseTestClass):
     * When a wildcard subscription is active, read_single_attribute_check_success compares
       each read to the subscription cache unless verify_wildcard_subscription=False is passed,
       or the class sets default_verify_wildcard_subscription = False.
+
+    * Set class attribute enable_server_interactions = False for tests where the TH must
+      publish no DNS-SD records at all (neither its commissioner service nor its
+      operational identities). Needed by tests that browse a service type the TH itself
+      advertises and whose records carry nothing to tell the TH's apart from the DUT's
+      (e.g. TC-SC-4.6: both advertise '_matterd._udp', and commissioner records have no
+      mandatory DUT-identifying key to filter on). Default is True.
     """
     requires_dut: bool = True
+    enable_server_interactions: bool = True
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -2428,6 +2436,38 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Only ever moves from False to True, see commission_devices.
         self._dut_confirmed_available = self._dut_confirmed_available or result
         return result
+
+    async def find_or_establish_pase_session_over_ntl(self, setup_payload: SetupPayload, node_id: int) -> ChipDeviceCtrl.DeviceProxyWrapper | None:
+        """Establish a PASE session over NTL.
+
+        Args:
+            setup_payload: SetupPayload from NFC Tag.
+            node_id: Node ID of target device.
+
+        Returns:
+            DeviceProxyWrapper if PASE session was successfully established, None otherwise.
+        """
+        # Retrieve the long_discriminator
+        long_discriminator = setup_payload.long_discriminator
+        asserts.assert_is_not_none(long_discriminator, "Expected setup payload to contain a long discriminator")
+        long_discriminator = typing.cast(int, long_discriminator)
+
+        # Create a new onboarding_data where only the NTL bit (0b10000) is kept in the discovery capabilities bitmask
+        ntl_onboarding_data = SetupPayload().GenerateQrCode(
+            passcode=setup_payload.setup_passcode,
+            vendorId=setup_payload.vendor_id,
+            productId=setup_payload.product_id,
+            discriminator=long_discriminator,
+            customFlow=setup_payload.commissioning_flow,
+            capabilities=0b10000,
+            version=setup_payload.version
+        )
+
+        # Setup a PASE only session over NTL
+        return await self.default_controller.FindOrEstablishPASESession(
+            setupCode=ntl_onboarding_data,
+            nodeId=node_id
+        )
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.

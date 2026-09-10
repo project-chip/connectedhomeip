@@ -38,12 +38,14 @@ paused/deferred state used while the radio is held by a connect or foreground
 scan — leaving the driver only the hardware start/stop. See
 [Background scanning](#background-scanning).
 
-The application supplies **only the platform-specific transport work** by
-implementing the `CommissioningProxyTransport` driver interface (one per
-physical transport, e.g. BLE or Wi-Fi PAF) and registering it with the cluster.
-There is no do-everything application delegate: static device capabilities are
-passed to the constructor via `Config`, writable-attribute state is owned by the
-cluster, and the driver is scoped to transport actions only. See
+The application supplies **only the platform-specific transport work**. A BLE
+driver, `CommissioningProxyBleTransport`, ships with the cluster and needs only
+a `CommissioningProxyBleAdapter` from the application; for any other physical
+transport the application implements the `CommissioningProxyTransport` driver
+interface itself and registers it with the cluster. There is no do-everything
+application delegate: static device capabilities are passed to the constructor
+via `Config`, writable-attribute state is owned by the cluster, and the driver
+is scoped to transport actions only. See
 [Architecture](#architecture-why-a-driver-not-a-delegate) below.
 
 ### How it works
@@ -63,8 +65,9 @@ device advertises on uses the proxy as a tunnel. The flow is:
    by `SessionID`; the proxy forwards it over the transport and returns the
    device's reply in the `ProxyMessageResponse`. The proxy is a dumb relay — the
    PASE session is end-to-end between the Commissioner and the device.
-4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` to cancel an
-   in-flight connect); the proxy tears the transport connection down.
+4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` with the
+   `SessionID` to close an established session, or with a null `SessionID` to
+   cancel an in-flight connect; the proxy tears the transport connection down.
 
 The cluster server itself is **transport-agnostic**: it validates the requested
 transport against the set it advertises, then dispatches the work to the
@@ -137,21 +140,25 @@ register the cluster directly. This provides the most flexibility and control.
 
 ### 1. Implement a transport driver
 
-Create a class that inherits from
+BLE needs no driver of your own — register the cluster's own
+`CommissioningProxyBleTransport` (see
+[BLE Transport Integration](#ble-transport-integration)). For a transport the
+SDK does not ship, create a class that inherits from
 `chip::app::Clusters::CommissioningProxy::CommissioningProxyTransport` and
-implement its virtual methods — one class per physical transport. A driver only
-handles the transport-specific work; the cluster performs all spec validation
-first and owns the session/scan/message bookkeeping. Methods run on the Matter
-task; the driver reports async results back through its host cluster (given in
-`SetHost`) via `Sessions()`, `ScanCache()`, and `ScanAggregator()`.
+implement its virtual methods — one class per physical transport; Wi-Fi PAF is
+the example below. A driver only handles the transport-specific work; the
+cluster performs all spec validation first and owns the session/scan/message
+bookkeeping. Methods run on the Matter task; the driver reports async results
+back through its host cluster (given in `SetHost`) via `Sessions()`,
+`ScanCache()`, and `ScanAggregator()`.
 
 ```cpp
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyTransport.h>
 
-class MyBleTransport : public chip::app::Clusters::CommissioningProxy::CommissioningProxyTransport
+class MyPafTransport : public chip::app::Clusters::CommissioningProxy::CommissioningProxyTransport
 {
 public:
-    CapabilitiesBitmap GetTransportType() const override { return CapabilitiesBitmap::kBle; }
+    CapabilitiesBitmap GetTransportType() const override { return CapabilitiesBitmap::kWiFiPAF; }
     void SetHost(CommissioningProxyCluster * cluster) override { mHost = cluster; }
 
     // Open a transport connection. On success, allocate a session via
@@ -197,7 +204,7 @@ capabilities), then register a driver per available transport.
 
 using namespace chip::app::Clusters::CommissioningProxy;
 
-MyBleTransport gBleTransport;
+MyPafTransport gPafTransport;
 
 chip::BitMask<Feature> gFeatures(Feature::kBackgroundScan, Feature::kWiFiNetworkInterface);
 
@@ -212,7 +219,7 @@ chip::app::RegisteredServerCluster<CommissioningProxyCluster> gCPCluster(
 
 void SetUpProxy()
 {
-    gCPCluster.Cluster().RegisterTransport(gBleTransport); // before registration/Startup
+    gCPCluster.Cluster().RegisterTransport(gPafTransport); // before registration/Startup
 }
 ```
 
@@ -231,8 +238,11 @@ void ApplicationInit()
 }
 ```
 
-A complete working example (device wiring plus the BLE and Wi-Fi PAF drivers)
-lands with the example-app change later in this series.
+For a complete working example of the device wiring, see
+`examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/`.
+It registers the cluster's `CommissioningProxyBleTransport` and supplies the
+platform adapters for both transports from
+`examples/all-devices-app/posix/linux/`.
 
 ## Transport driver methods
 
@@ -279,7 +289,7 @@ reference to the driver's `HardwareControl` implementation:
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Start()`          | Add or refresh the `(fabricIndex, nodeId)` record and its transport/band mask, arm its lifetime timer, start the hardware if it is the first record |
 | `Stop()`           | Remove the requested transports/bands from the record; stop the hardware once no records remain                                                     |
-| `Pause()`          | Suspend the hardware scan while the radio is needed for a connect or foreground scan; records stay registered (idempotent)                          |
+| `Pause()`          | Suspend the hardware scan while the radio is needed for a connect or foreground scan; records stay registered; a second call does nothing           |
 | `ResumeIfNeeded()` | Restart a paused scan once the radio is free; no-op if not paused or if no records remain                                                           |
 | `Shutdown()`       | Cancel every lifetime timer and stop the hardware scan if the registry owns it                                                                      |
 
@@ -291,11 +301,11 @@ overlapped, and `NOT_FOUND` only when the fabric has no record at all.
 
 The driver supplies the only transport-specific parts via `HardwareControl`:
 
-| Hook                   | Contract                                                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `StartHardwareScan()`  | Start or resume the hardware scan, wiring the driver's own discovery callback (return codes below)                 |
-| `StopHardwareScan()`   | Stop the hardware scan; called only while the registry owns the radio, never while paused                          |
-| `ClearCachedResults()` | Drop this transport's cached results (`host->ScanCache().ClearTransport(...)`) whenever the last record is removed |
+| Hook                   | Contract                                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `StartHardwareScan()`  | Start or resume the hardware scan, wiring the driver's own discovery callback (return codes below)               |
+| `StopHardwareScan()`   | Stop the hardware scan; called only while the registry owns the radio, never while paused                        |
+| `ClearCachedResults()` | Drop cached results for the bands that stopped (`host->ScanCache().ClearTransport(<transport>, bands)`); 0 = all |
 
 `StartHardwareScan()` returns `CHIP_NO_ERROR` when the scan is running,
 `CHIP_ERROR_BUSY` when the radio is currently held — the registry keeps the
@@ -308,29 +318,47 @@ to it:
 
 ```cpp
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
+#include <platform/DefaultTimerDelegate.h>
 
-class MyBleBgScanHardware : public CommissioningProxyBgScanRegistry::HardwareControl
+// The registry drives these hooks from its own lifetime timer and from resume, i.e.
+// outside the driver's call stack, so the hardware object holds its own host pointer.
+// MyPafTransport::SetHost() hands it over: mHost = cluster; sHardware.SetHost(cluster);
+class MyPafBgScanHardware : public CommissioningProxyBgScanRegistry::HardwareControl
 {
 public:
+    void SetHost(CommissioningProxyCluster * host) { mHost = host; }
+
     // Returns CHIP_ERROR_BUSY when the single scanner is held by a connect or a
     // foreground scan; the registry then defers and retries on resume.
     CHIP_ERROR StartHardwareScan() override { return StartMyPlatformScan(OnBgScanDiscovery); }
     void StopHardwareScan() override { StopMyPlatformScan(); }
-    void ClearCachedResults() override { sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle); }
+
+    // bands names the bands that stopped; 0 means the transport stopped entirely.
+    void ClearCachedResults(BitMask<WiFiBandBitmap> bands) override
+    {
+        if (mHost != nullptr)
+        {
+            mHost->ScanCache().ClearTransport(CapabilitiesBitmap::kWiFiPAF, bands);
+        }
+    }
+
+private:
+    CommissioningProxyCluster * mHost = nullptr;
 };
 
 // Declared before the registry so it outlives it: the registry's destructor may
 // call back into these hooks.
-MyBleBgScanHardware sHardware;
-CommissioningProxyBgScanRegistry sBgScan(sHardware);
+MyPafBgScanHardware sHardware;
+chip::app::DefaultTimerDelegate sBgScanTimerDelegate;
+CommissioningProxyBgScanRegistry sBgScan(sHardware, sBgScanTimerDelegate);
 
-Status MyBleTransport::BgScanStart(System::Clock::Seconds16 timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex,
+Status MyPafTransport::BgScanStart(System::Clock::Seconds16 timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex,
                                    NodeId nodeId)
 {
     return sBgScan.Start(fabricIndex, nodeId, GetTransportType(), wiFiBands, timeout);
 }
 
-Status MyBleTransport::BgScanStop(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> wiFiBands,
+Status MyPafTransport::BgScanStop(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> wiFiBands,
                                  FabricIndex fabricIndex, NodeId nodeId)
 {
     return sBgScan.Stop(fabricIndex, nodeId, transport, wiFiBands);
@@ -353,11 +381,13 @@ the "radio freed" path could otherwise re-enter the driver.
 transport callback once the operation completes.
 
 To keep the exchange alive across the async operation, store a
-`CommandHandler::Handle` and extend the exchange response timeout:
+`CommandHandler::Handle` in the driver's pending-operation state — not on the
+stack, which unwinds when `InvokeCommand` returns — and extend the exchange
+response timeout:
 
 ```cpp
-// Store the handle before returning nullopt
-CommandHandler::Handle handle(commandObj);
+// mPending outlives InvokeCommand; the handle must live there, not here
+mPending.handle = CommandHandler::Handle(commandObj);
 if (auto * ec = commandObj->GetExchangeContext())
 {
     ec->SetResponseTimeout(chip::System::Clock::Seconds16(responseTimeout + 10));
@@ -365,7 +395,7 @@ if (auto * ec = commandObj->GetExchangeContext())
 // … return std::nullopt from InvokeCommand …
 
 // Later, in your transport callback:
-auto * handler = handle.Get();
+auto * handler = mPending.handle.Get();
 if (handler != nullptr)
 {
     handler->AddResponse(commandPath, response);
@@ -374,45 +404,130 @@ if (handler != nullptr)
 
 ## BLE Transport Integration
 
-When the build enables BLE (`CONFIG_NETWORK_LAYER_BLE`) the driver
-(`CommissioningProxyBleTransport`) drives a BTP connection through
-`chip::Ble::BleLayer`. The Linux example driver, landing with the example-app
-change later in this series,
-(`examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/CommissioningProxyBleTransport.cpp`)
-shows the full integration:
+`CommissioningProxyBleTransport` ships with the cluster as the separate
+`ble-transport` target, so an application that proxies over another transport —
+or a platform with no BLE stack — can depend on `commissioning-proxy-server`
+without pulling in `src/ble`. It drives a BTP connection through
+`chip::Ble::BleLayer`:
 
 -   `Connect()` — on the first BLE connect the proxy flips its own BLE role from
-    peripheral to central via `BLEManagerImpl::SwitchToCentralMode()` (a one-way
-    switch; `IsCentralMode()` reports the state and central-mode advertising is
-    then refused), then calls `BleLayer::NewBleConnectionByDiscriminator()` to
-    open an L2CAP/BTP connection to the commissionee.
+    peripheral to central, then calls
+    `BleLayer::NewBleConnectionByDiscriminator()` to open an L2CAP/BTP
+    connection to the commissionee.
 -   `SendMessage()` — calls `BLEEndPoint::Send()` to push the tunneled
     commissioning packet over BTP.
 -   `Disconnect()` — calls `BLEEndPoint::Close()` to drop the connection.
 
-Incoming BTP messages are routed back to the cluster via a `BleProxyDelegate`
+Incoming BTP messages are routed back to the cluster via a `ProxyBleDelegate`
 (`chip::Ble::BleLayerDelegate`) that wraps the original `BleLayer` transport,
-matches the connection against the active session map, and calls
+matches the connection against the active session slots, and calls
 `host->Sessions().DispatchMessageResponse()`.
+
+### The platform adapter
+
+Two BLE operations have no portable form, so they are not in the transport:
+switching the local BLE role from peripheral to central, and driving a scan for
+commissionable devices. The application supplies both by implementing
+`CommissioningProxyBleAdapter` and passing it to the transport's constructor:
+
+```cpp
+class MyBleProxyAdapter : public CommissioningProxyBleAdapter
+{
+    CHIP_ERROR EnableCentralRole() override;
+    CHIP_ERROR StartScan(DiscoveryCallback cb, void * context) override;
+    void StopScan() override;
+};
+
+MyBleProxyAdapter gBleAdapter;
+CommissioningProxyBleTransport gBleTransport(gBleAdapter, gTimerDelegate);
+```
+
+`examples/all-devices-app/posix/linux/CommissioningProxyBleAdapter.cpp` is a
+worked implementation over `BLEManagerImpl`, wired up in that app's
+`posix/linux/DeviceFactoryPlatformOverride.cpp`.
 
 ## Wi-Fi PAF Transport Integration
 
-When the build enables Wi-Fi PAF (`CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`) the
-driver (`CommissioningProxyPafTransport`) interacts with
-`chip::WiFiPAF::WiFiPAFLayer` to open, send over, receive from, and close PAF
-(NAN) sessions:
+`CommissioningProxyPafTransport` ships with the cluster as the separate
+`paf-transport` target, on the same terms as `ble-transport`: an application
+that proxies over BLE only — or a platform with no Wi-Fi PAF stack — can depend
+on `commissioning-proxy-server` without pulling in `src/wifipaf`. It drives NAN
+and PAFTP sessions through `chip::WiFiPAF::WiFiPAFLayer`:
 
--   `Connect()` — calls `WiFiPAFLayer::WiFiPAFSubscribe()` to open a PAF session
-    identified by the commissionee discriminator and peer address.
+-   `Connect()` — calls `ConnectivityMgr().WiFiPAFSubscribe()` to open a PAF
+    session to the commissionee discriminator.
 -   `SendMessage()` — calls `WiFiPAFLayer::SendMessage()` to send the tunneled
-    commissioning packet over PAFTP.
--   `Disconnect()` — calls `WiFiPAFLayer::RmPafSession()` to release the PAF
-    session.
+    commissioning packet over PAFTP (the PAFTP endpoint, not the raw NAN
+    transmit, which would bypass framing).
+-   `Disconnect()` — calls `WiFiPAFLayer::RmPafSession()`, closes the PAFTP
+    endpoint, and cancels the NAN subscribe that backed the session.
 
-Incoming PAF messages are routed back to the cluster via a
-`WiFiPAFLayerDelegate` subclass that intercepts `WiFiPAFMessageReceived`,
-matches the peer against the active session map, and calls
+Incoming PAF messages are routed back to the cluster via a `ProxyPafDelegate`
+(`chip::WiFiPAF::WiFiPAFLayerDelegate`) that wraps the original transport,
+matches the peer against the active session slots, and calls
 `host->Sessions().DispatchMessageResponse()`.
+
+### The platform adapter
+
+Session setup and teardown above are portable — they go through the generic
+`ConnectivityManager` facade. Discovery is not, so it is not in the transport:
+scanning for commissionable devices, and recovering the subscribe id the
+platform assigned to a request, both need the platform implementation. The
+application supplies them by implementing `CommissioningProxyPafAdapter`:
+
+```cpp
+class MyPafProxyAdapter : public CommissioningProxyPafAdapter
+{
+    CHIP_ERROR StartForegroundScan(System::Clock::Seconds16 window, DiscoveryCallback onDevice,
+                                   ScanCompleteCallback onDone, void * context) override;
+    CHIP_ERROR StartBackgroundScan(DiscoveryCallback cb, void * context) override;
+    void StopBackgroundScan() override;
+    uint32_t PendingConnectSubscribeId() const override;
+};
+
+MyPafProxyAdapter gPafAdapter;
+CommissioningProxyPafTransport gPafTransport(gPafAdapter, gTimerDelegate);
+```
+
+Unlike BLE, the platform owns the scan window: `StartForegroundScan()` takes the
+duration and the adapter signals completion, so the transport arms no scan timer
+of its own.
+`examples/all-devices-app/posix/linux/CommissioningProxyPafAdapter.cpp` is a
+worked implementation over `ConnectivityManagerImpl`, and is also where the
+platform's peer descriptor is unpacked into the interface's scalars so no
+platform type reaches the cluster.
+
+## Driving the Proxy from a Commissioner
+
+Everything above is the proxy side. The commissioner side is `chip-tool`, which
+implements the tunnel as a pairing mode: `pairing proxy` establishes a CASE
+session to the proxy, sends `ProxyConnectRequest`, then carries every PASE and
+commissioning packet to the commissionee inside `ProxyMessageRequest` and
+`ProxyMessageResponse`.
+
+The proxy must already be commissioned onto the fabric, since the commissioner
+needs a CASE session before it can tunnel anything:
+
+```bash
+chip-tool pairing onnetwork <proxy-node-id> 20202021
+
+chip-tool commissioningproxy proxy-scan-request 0x0A <proxy-node-id> <endpoint> \
+    --WiFiBands 0x01 --allow-large-payload true --timeout 30
+
+chip-tool pairing proxy <node-id> <ssid> <password> <pin> <discriminator> \
+    <proxy-node-id> <proxy-connect-timeout> ble|wifipaf \
+    --proxy-endpoint <endpoint> [--proxy-wifi-band 2g4|5g]
+```
+
+`ProxyScanRequest` carries the large-message quality, so it needs
+`--allow-large-payload true`; the background-scan commands do not.
+`<proxy-connect-timeout>` is in seconds, with `0` meaning no timeout.
+
+Full argument documentation, worked examples, and the background-scan commands
+are in
+[the chip-tool README](../../../../examples/chip-tool/README.md#commission-a-device-through-a-commissioning-proxy)
+and
+[Working with the CHIP Tool](../../../../docs/development_controllers/chip-tool/chip_tool_guide.md#commissioning-through-a-commissioning-proxy).
 
 ## Cluster State
 
@@ -424,7 +539,24 @@ The cluster tracks proxy state internally:
 
 State transitions:
 
-```
+```text
 ProxyConnectRequest ──► transport connect success ──► kState_CPConnected
+kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPConnected
+                                                      (sessions remain)
 kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPDisconnected
+                        for the last session
+kState_CPConnected  ──► peer closes the transport ──► kState_CPDisconnected
+                        connection, last session
 ```
+
+With `MaxSessions > 1` several sessions can be open at once, so a
+`ProxyDisconnectRequest` only returns the cluster to `kState_CPDisconnected` —
+and only notifies the transports via `OnAllSessionsClosed()` — once no session
+is left.
+
+A session can also end without a `ProxyDisconnectRequest`, when the commissionee
+closes the transport connection. A transport reports that through
+`SetDisconnectedIfLastSession()` rather than setting the state itself: the
+cluster counts the sessions of every transport, plus any connect still in
+flight, so the last session on one transport is not necessarily the last session
+on the proxy.

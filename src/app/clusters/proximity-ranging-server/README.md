@@ -214,15 +214,22 @@ limitations (e.g., requested frequency band unsupported by hardware).
 Client                    Cluster                   Driver                Adapter
   │                         │                         │                     │
   ├─ StartRangingRequest ──►│                         │                     │
-  │                         ├─ Validate request ─────►│                     │
   │                         ├─ HandleStartRanging ───►│                     │
   │                         │                         ├─ FindAdapter(tech)  │
   │                         │                         ├─ allocate session   │
-  │                         │                         ├─ StartSession ─────►│
-  │                         │                         │◄── ResultCodeEnum ──┤
-  │                         │◄── ResultCodeEnum ──────┤                     │
+  │                         │                         ├─ PrepareSession ───►│
+  │                         │                         │◄─ ClusterStatusCode ┤
+  │                         │◄─ ClusterStatusCode ────┤                     │
   │◄─ StartRangingResponse ─┤                         │                     │
+  │                         │                         ├─ StartSession ─────►│
 ```
+
+On success the cluster sends a `StartRangingResponse` carrying the assigned
+`SessionID`. On rejection the driver/adapter return a cluster-specific failure
+`ClusterStatusCode` (a `StatusCodeEnum` value such as
+`RejectedInfeasibleRanging` or `BusySessionCapacityReached`); the cluster
+returns that status code as the command's response and does not send a
+`StartRangingResponse`.
 
 ## Events
 

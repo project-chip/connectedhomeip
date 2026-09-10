@@ -43,6 +43,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher:emulated",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor:increasing",
@@ -52,6 +53,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-washer:emulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/light-sensor:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/microwave-oven:emulated",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mode-select:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/network-infrastructure-manager",
@@ -72,7 +74,6 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
-    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/boolean-state-sensor:boolean-state-sensor-accessor",
     "${chip_root}/src/lib/support",
   ]
 }
