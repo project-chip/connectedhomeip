@@ -151,6 +151,9 @@ class CommissioningFlowBlocks:
                         "CertificateChainResponse ended before the advertised total document size was received")
                 return b"".join(certificate_segments)
 
+            expected_segment_id = 1 if next_segment_id is None else next_segment_id + 1
+            if response.nextSegmentID != expected_segment_id:
+                raise commissioning.CommissionFailure("CertificateChainResponse returned an invalid nextSegmentID progression")
             next_segment_id = response.nextSegmentID
 
     def _attestation_profile_name(self, crypto_profile) -> str:

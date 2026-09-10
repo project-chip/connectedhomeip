@@ -85,6 +85,29 @@ class TestCommissioningFlowBlocks(unittest.TestCase):
 
 
 class TestCertificateChainDocumentLimit(unittest.IsolatedAsyncioTestCase):
+    async def test_rejects_invalid_continuation_ids_before_another_request(self):
+        # Require 1 first, then consecutive IDs: reject repeats, skips, and backwards IDs.
+        for segment_ids in ((0,), (2,), (1, 1), (1, 3), (1, 2, 1)):
+            with self.subTest(segment_ids=segment_ids):
+                responses = [SimpleNamespace(certificate=b"x", totalDocumentSize=8, nextSegmentID=segment_id)
+                             for segment_id in segment_ids]
+                controller = SimpleNamespace(SendCommand=AsyncMock(side_effect=responses))
+                flow = CommissioningFlowBlocks(controller, None, logging.getLogger(__name__))
+                with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size",
+                           return_value=8):
+                    with self.assertRaisesRegex(CommissionFailure, "invalid nextSegmentID progression"):
+                        await flow._request_certificate_chain(1, 1, None)
+                self.assertEqual(controller.SendCommand.await_count, len(responses))
+
+    async def test_assembles_consecutive_segments(self):
+        responses = [SimpleNamespace(certificate=certificate, totalDocumentSize=6, nextSegmentID=segment_id)
+                     for certificate, segment_id in ((b"ab", 1), (b"cd", 2), (b"ef", None))]
+        controller = SimpleNamespace(SendCommand=AsyncMock(side_effect=responses))
+        flow = CommissioningFlowBlocks(controller, None, logging.getLogger(__name__))
+        with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size", return_value=8):
+            self.assertEqual(await flow._request_certificate_chain(1, 1, None), b"abcdef")
+        self.assertEqual([call.args[2].segmentID for call in controller.SendCommand.await_args_list], [None, 1, 2])
+
     async def test_rejects_empty_segments_without_requesting_another_segment(self):
         for continuation in (False, True):
             for next_segment_id in (None, 2):
