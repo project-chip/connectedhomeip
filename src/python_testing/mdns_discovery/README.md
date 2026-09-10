@@ -290,7 +290,8 @@ for addr in addr_list:
 
 ## 🧰 Discovery Test Support Helpers
 
-This module contains higher-level helpers shared across the SC-X.x discovery family of tests
+This module contains higher-level helpers shared across the SC-X.x discovery
+family of tests
 
 You can import them from the following file: `mdns_discovery/utils/support.py`
 
