@@ -67,35 +67,6 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 
 class TC_ACS_3_1(MatterBaseTest):
 
-    @pics('ACS.S')
-    @async_test_body
-    async def test_TC_ACS_3_1(self):
-        """[TC-ACS-3.1] Cluster endpoint"""
-        self.step(1, "Commissioning, already done", is_commissioning=True)
-        self.step(2, "TH reads the SimultaneousDetectionLimit attribute.",
-                  "If 1 is read, skip this test case. Otherwise proceed the following.")
-        self.step(3, "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false..")
-        self.step(4, "TH writes DUT HoldTime attribute.",
-                  "Verify that its value is ranged between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax.")
-        self.step(5a, "This step is for DUT capable of supporting only 2 simultaneous detection. Otherwise, skip to 6a.",
-                  "An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus.",
-                  "And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus.")
-        self.step(5b, "TH verifies the AmbientContextType attribute change.",
-                  "Verify that DUT response contains the AmbientContextSensed struct data list size of up to 2.",
-                  "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match both ambient sensing events from the step 5a.")
-        self.step(5c, "An operator waits until the HoldTime duration expires since the step 5a execution.",
-                  "Check if AmbientContextDetectEnded is received for the second ambient sensing event.")
-        self.step(6a, "This step is for DUT capable of supporting 3 or more simultaneous detection. An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus.",
-                  "And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus.",
-                  "And within HoldTime duration, an operator actuates DUT to generate the third ambient sensing event, and then removes its sensing stimulus.")
-        self.step(6b, "TH verifies the AmbientContextType attribute change.",
-                  "Verify that DUT response contains the AmbientContextSensed struct data list size of up to 3.",
-                  "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match both ambient sensing events from the step 6a.")
-        self.step(6c, "An operator waits until the HoldTime duration expires since the step 6a execution.",
-                  "Check if AmbientContextDetectEnded is received for the last ambient sensing event.")
-        self.step(7, "TH reads the AmbientContextType attribute.",
-                  "Verify that the AmbientContextType attribute contains an empty list and the Boolean attributes related the step 5a or 6a are False.")
-
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
@@ -116,8 +87,12 @@ class TC_ACS_3_1(MatterBaseTest):
         # Delay for pipe command to be processed (otherwise tests are flaky)
         time.sleep(0.001)
 
+    @pics('ACS.S')
+    @async_test_body
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     async def test_TC_ACS_3_1(self):
+        """[TC-ACS-3.1] Cluster endpoint"""
+        
         node_id = self.dut_node_id
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
