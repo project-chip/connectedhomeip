@@ -456,9 +456,9 @@ tests:
       attribute: "ClusterRevision"
       response:
           saveAs: ScenesManagementClusterRevision
-           constraints:
-               type: int16u
-               anyOf: [1, 2]
+          constraints:
+              type: int16u
+              anyOf: [1, 2]
 
     - label:
           "Check if ScenesManagement cluster revision is 2 (stubbed
