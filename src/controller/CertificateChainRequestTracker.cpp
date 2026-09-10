@@ -64,6 +64,7 @@ CHIP_ERROR CertificateChainRequestTracker::HandleSegmentedResponse(ByteSpan cert
                                                                    const Optional<uint16_t> & nextSegmentId)
 {
     VerifyOrReturnError(totalDocumentSize <= kMaxCertificateDocumentSize, CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(!certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(certificate.size() <= totalDocumentSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (!mHasResponse)

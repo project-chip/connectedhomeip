@@ -83,6 +83,53 @@ TEST(CertificateChainRequestTracker, ReassemblesCertificateLargerThanLegacyLimit
     EXPECT_TRUE(tracker.GetCertificate().data_equal(document));
 }
 
+TEST(CertificateChainRequestTracker, RejectsEmptyFirstSegmentWithoutChangingState)
+{
+    CertificateChainRequestTracker tracker;
+    const auto totalSize = MakeOptional<uint16_t>(static_cast<uint16_t>(2));
+    const auto nextId    = MakeOptional<uint16_t>(static_cast<uint16_t>(1));
+
+    // A continuation must make progress instead of allowing an unbounded sequence of empty responses.
+    EXPECT_EQ(tracker.HandleResponse(ByteSpan(), totalSize, nextId), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_FALSE(tracker.IsComplete());
+    EXPECT_FALSE(tracker.IsSegmentedTransfer());
+    EXPECT_FALSE(tracker.HasPendingSegment());
+    EXPECT_TRUE(tracker.GetCertificate().empty());
+
+    const uint8_t certificate[] = { 0x10, 0x11 };
+    ASSERT_EQ(tracker.HandleResponse(ByteSpan(certificate), totalSize, NullOptional), CHIP_NO_ERROR);
+    EXPECT_TRUE(tracker.IsComplete());
+    EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(certificate)));
+}
+
+TEST(CertificateChainRequestTracker, RejectsEmptyContinuationWithoutChangingState)
+{
+    CertificateChainRequestTracker tracker;
+    const auto totalSize         = MakeOptional<uint16_t>(static_cast<uint16_t>(3));
+    const uint8_t firstSegment[] = { 0x10 };
+    ASSERT_EQ(tracker.HandleResponse(ByteSpan(firstSegment), totalSize, MakeOptional<uint16_t>(static_cast<uint16_t>(1))),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(tracker.HandleResponse(ByteSpan(), totalSize, MakeOptional<uint16_t>(static_cast<uint16_t>(2))),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_FALSE(tracker.IsComplete());
+    EXPECT_TRUE(tracker.IsSegmentedTransfer());
+    ASSERT_TRUE(tracker.NextSegmentId().HasValue());
+    EXPECT_EQ(tracker.NextSegmentId().Value(), 1);
+    EXPECT_TRUE(tracker.GetCertificate().empty());
+
+    // Continuing at the same segment ID proves that the rejected response consumed neither an ID nor bytes.
+    const uint8_t secondSegment[] = { 0x11 };
+    ASSERT_EQ(tracker.HandleResponse(ByteSpan(secondSegment), totalSize, MakeOptional<uint16_t>(static_cast<uint16_t>(2))),
+              CHIP_NO_ERROR);
+    const uint8_t finalSegment[] = { 0x12 };
+    ASSERT_EQ(tracker.HandleResponse(ByteSpan(finalSegment), totalSize, NullOptional), CHIP_NO_ERROR);
+    EXPECT_TRUE(tracker.IsComplete());
+    EXPECT_FALSE(tracker.HasPendingSegment());
+    const uint8_t expected[] = { 0x10, 0x11, 0x12 };
+    EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(expected)));
+}
+
 TEST(CertificateChainRequestTracker, RejectsInconsistentSegmentedResponse)
 {
     CertificateChainRequestTracker tracker;
