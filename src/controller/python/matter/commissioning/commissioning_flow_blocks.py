@@ -121,6 +121,9 @@ class CommissioningFlowBlocks:
             )
             response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, request)
 
+            if not response.certificate:
+                raise commissioning.CommissionFailure("CertificateChainResponse returned an empty certificate segment")
+
             certificate_segments.append(response.certificate)
             assembled_size = sum(len(segment) for segment in certificate_segments)
 

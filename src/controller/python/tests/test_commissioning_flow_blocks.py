@@ -85,6 +85,33 @@ class TestCommissioningFlowBlocks(unittest.TestCase):
 
 
 class TestCertificateChainDocumentLimit(unittest.IsolatedAsyncioTestCase):
+    async def test_rejects_empty_segments_without_requesting_another_segment(self):
+        for continuation in (False, True):
+            for next_segment_id in (None, 2):
+                with self.subTest(continuation=continuation, next_segment_id=next_segment_id):
+                    responses = []
+                    if continuation:
+                        responses.append(SimpleNamespace(certificate=b"x", totalDocumentSize=2, nextSegmentID=1))
+                    responses.append(SimpleNamespace(certificate=b"", totalDocumentSize=2, nextSegmentID=next_segment_id))
+                    # A finite response list also prevents a regression from hanging the test.
+                    controller = SimpleNamespace(SendCommand=AsyncMock(side_effect=responses))
+                    flow = CommissioningFlowBlocks(controller, None, logging.getLogger(__name__))
+                    with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size",
+                               return_value=8):
+                        # Empty segments cannot advance reassembly, including an empty final segment.
+                        with self.assertRaisesRegex(CommissionFailure, "empty certificate segment"):
+                            await flow._request_certificate_chain(1, 1, None)
+                    self.assertEqual(controller.SendCommand.await_count, len(responses))
+
+    async def test_rejects_empty_single_response(self):
+        controller = SimpleNamespace(SendCommand=AsyncMock(return_value=SimpleNamespace(
+            certificate=b"", totalDocumentSize=None, nextSegmentID=None)))
+        flow = CommissioningFlowBlocks(controller, None, logging.getLogger(__name__))
+        with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size", return_value=8):
+            with self.assertRaisesRegex(CommissionFailure, "empty certificate segment"):
+                await flow._request_certificate_chain(1, 1, None)
+        controller.SendCommand.assert_awaited_once()
+
     async def test_uses_native_limit_for_single_and_segmented_responses(self):
         # A small substituted native limit makes boundary coverage independent of its current value.
         for segmented in (False, True):
