@@ -64,7 +64,7 @@ from cryptography import x509
 from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec, utils
-from mobly import asserts
+from mobly import asserts, signals
 from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import univ
@@ -197,7 +197,7 @@ def select_strongest_profile(supported_profiles: int, chain_element: str) -> Att
             logger.info("Selected %s profile %s from bitmap 0x%04X", chain_element, profile.name, supported_profiles)
             return profile
 
-    asserts.fail(f"{chain_element}SupportedProfiles (0x{supported_profiles:04X}) advertises no known profile")
+    raise signals.TestFailure(f"{chain_element}SupportedProfiles (0x{supported_profiles:04X}) advertises no known profile")
 
 
 def assert_profile_advertised(supported_profiles: int, profile: AttestationCryptoProfile, document_name: str,
@@ -255,7 +255,7 @@ def _subject_public_key_algorithm_oid(certificate: x509.Certificate, name: str) 
         if isinstance(public_key, mldsa.MLDSA65PublicKey):
             return kOidMlDsa65
 
-    asserts.fail(f"{name} carries an unsupported public key type {type(public_key).__name__}")
+    raise signals.TestFailure(f"{name} carries an unsupported public key type {type(public_key).__name__}")
 
 
 @dataclass(frozen=True)
@@ -560,8 +560,8 @@ def find_issuing_paa(pai: ParsedCertificate, candidates: list[ParsedCertificate]
         logger.info("Resolved the %s PAI issuer to %s", chain_name, candidate.name)
         return candidate
 
-    asserts.fail(f"None of the {len(matching_profile)} {expected_profile.name} PAA candidate(s) for the "
-                 f"{chain_name} PAI issuer validate its signature")
+    raise signals.TestFailure(f"None of the {len(matching_profile)} {expected_profile.name} PAA candidate(s) for the "
+                              f"{chain_name} PAI issuer validate its signature")
 
 
 @dataclass(frozen=True)
