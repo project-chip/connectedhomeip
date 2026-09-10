@@ -70,7 +70,7 @@ class TC_ASU_3_1(MatterBaseTest):
             TestStep("3", "Change UnionName attribute."),
             TestStep("4", "TH awaits a ReportDataMessage containing an attribute report for UnionName attribute.",
                      "Verify that the value of UnionName attribute reflects the change made in step 3."),
-            TestStep("5", "Change UnionHealth attribute by adding an online contributor to affect the union health."),
+            TestStep("5", "Change UnionHealth attribute by adding an offline contributor to affect the union health."),
             TestStep("6", "TH awaits a ReportDataMessage containing an attribute report for UnionHealth attribute.",
                      "Verify that the value of UnionHealth attribute reflects the change made in step 5."),
             TestStep("7", "Change UnionContributorList attribute by adding a contributor."),
