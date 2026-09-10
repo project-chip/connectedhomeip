@@ -184,7 +184,7 @@ class TC_ACS_3_2(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
         # log.info(f"Rx'd AmbientContextType_read: {ambientContextType_read}")
 
-        # check attribute read
+        # check attribute read for future use, just in case
         # nsID_1_read = ambientContextType_read[0].ambientContextSensed[0].namespaceID
         # tagID_1_read = ambientContextType_read[0].ambientContextSensed[0].tag
         # asserts.assert_equal(nsID_1_read, namespaceID1, "Namespace ID and Tag ID must match.")
@@ -236,12 +236,6 @@ class TC_ACS_3_2(MatterBaseTest):
             subscription_expected3 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
             audioContextDetected = subscription_expected3[0].value
             asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
-
-        # check attribute read
-        # nsID_1_read = ambientContextType_read[0].ambientContextSensed[0].namespaceID
-        # tagID_1_read = ambientContextType_read[0].ambientContextSensed[0].tag
-        # asserts.assert_equal(nsID_1_read, namespaceID1, "Namespace ID must match.")
-        # asserts.assert_equal(tagID_1_read, tag1, "Tag ID must match.")
 
         # check the subscription of AmbientContextType attribute
         subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][-1].value
