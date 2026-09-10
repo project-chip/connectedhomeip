@@ -2,7 +2,7 @@
 
 ## Overview
 
-The script `docs/platforms/telink/releases/build_and_update_matter_notes.py`
+The script `docs/platforms/telink/releases/generate_and_update_matter_notes.py`
 can:
 
 1. Build all Telink board Matter sample applications (using `build_examples.py`)
@@ -16,8 +16,8 @@ can:
 
 ## Files
 
-- `docs/platforms/telink/releases/build_and_update_matter_notes.py` - main build
-  and update script (alongside the release note working copy)
+- `docs/platforms/telink/releases/generate_and_update_matter_notes.py` - main
+  build and update script (alongside the release note working copy)
 - `docs/platforms/telink/releases/telink_release_notes.md` - release note
   working copy (in the same directory as the script; the script reads and
   updates it in-place, only replacing the Resource Usage section while
@@ -51,7 +51,7 @@ source ./scripts/activate.sh -p all,telink
 
 ```bash
 cd /home/ubuntu/zephyrproject/connectedhomeip
-python3 docs/platforms/telink/releases/build_and_update_matter_notes.py
+python3 docs/platforms/telink/releases/generate_and_update_matter_notes.py
 ```
 
 This will:
@@ -97,30 +97,18 @@ Each board's zip archive contains:
 
 ## Supported boards
 
-1. tlsr9518adk80d (TLSR951X/B91)
-2. tlsr9528a (TLSR952X/B92)
-3. tlsr9118bdk40d (TLSR911X/W91)
-4. tl3238x (TL323X)
-5. tl7218x (TL721X)
+1. tl3238x (TL323X)
+2. tl5218x (TL521X)
+3. tl7218x (TL721X)
 
 ## Supported sample applications
 
-| Application              | Description                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| lighting-app             | Lighting application (supports OTA, Factory Data, LZMA, Shell) |
-| light-switch-app         | Light switch application (supports OTA, LZMA, Factory Data)    |
-| bridge-app               | Bridge application                                             |
-| window-app               | Window covering application                                    |
-| air-quality-sensor-app   | Air quality sensor application                                 |
-| all-clusters-app         | All-clusters application                                       |
-| all-clusters-minimal-app | Minimal all-clusters application (supports NFC Payload)        |
-| contact-sensor-app       | Contact sensor application                                     |
-| lock-app                 | Door lock application (supports DFU over SMP)                  |
-| smoke-co-alarm-app       | Smoke/CO alarm application                                     |
-| pump-controller-app      | Pump controller application                                    |
-| shell                    | Shell application                                              |
-| thermostat               | Thermostat application                                         |
-| ota-requestor-app        | OTA requestor application                                      |
+| Application      | Description                                                               |
+| ---------------- | ------------------------------------------------------------------------- |
+| lighting-app     | Lighting application (supports OTA, Factory Data, LZMA, Shell, Dual-Mode) |
+| light-switch-app | Light switch application (supports OTA, LZMA, Factory Data, Retention)    |
+| bridge-app       | Bridge application                                                        |
+| window-app       | Window covering application                                               |
 
 ## Script features
 
@@ -167,10 +155,18 @@ The build target format is `telink-<board>-<app>[-<options>]`, for example:
 
 - `telink-tl3238x-light-ota-factory-data-4mb` - TL3238X lighting application
   with OTA, Factory Data, 4MB Flash
+- `telink-tl3238x-light-ota-compress-lzma-factory-data-dual-mode` - TL3238X
+  lighting application with OTA, LZMA, Factory Data, BLE + Thread concurrent
+  mode
 - `telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data` -
   TL7218X Retention light switch application
-- `telink-tlsr9518adk80d-light-ota-rpc-factory-data-4mb` - B91 lighting
-  application with RPC, OTA, Factory Data
+- `telink-tl7218x-light-ota-compress-lzma-factory-data-dual-mode` - TL7218X
+  lighting application with OTA, LZMA, Factory Data, BLE + Thread concurrent
+  mode
+- `telink-tl5218x-light-ota-factory-data-4mb` - TL521X lighting application with
+  OTA, Factory Data, 4MB Flash
+- `telink-tl5218x-light-ota-factory-data-4mb` - TL521X lighting application with
+  OTA, Factory Data, 4MB Flash, Dual-Mode
 
 Available options:
 
@@ -183,3 +179,4 @@ Available options:
 - `4mb` - 4MB Flash
 - `log-progress` - reduce log output (progress and errors only)
 - `nfc-payload` - NFC Payload support
+- `dual-mode` - enable BLE + Thread concurrent mode (TL323X, TL721X)
