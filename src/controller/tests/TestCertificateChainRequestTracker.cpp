@@ -58,6 +58,31 @@ TEST(CertificateChainRequestTracker, ReassemblesSegmentedResponse)
     EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(expected)));
 }
 
+TEST(CertificateChainRequestTracker, ReassemblesCertificateLargerThanLegacyLimit)
+{
+    // A legacy PAI subject key may have an ML-DSA issuer signature. Response metadata,
+    // rather than the request profile, determines how many segments to assemble.
+    CertificateChainRequestTracker tracker;
+    uint8_t certificate[1300];
+    for (size_t i = 0; i < sizeof(certificate); ++i)
+    {
+        certificate[i] = static_cast<uint8_t>(i);
+    }
+    const ByteSpan document(certificate);
+    constexpr uint16_t segmentSize = CertificateChainRequestTracker::kDefaultSegmentSize;
+    for (uint16_t segment = 0; segment < 3; ++segment)
+    {
+        const size_t offset = segment * segmentSize;
+        const bool last     = segment == 2;
+        ASSERT_EQ(tracker.HandleResponse(document.SubSpan(offset, last ? sizeof(certificate) - offset : segmentSize),
+                                         MakeOptional<uint16_t>(static_cast<uint16_t>(sizeof(certificate))),
+                                         last ? NullOptional : MakeOptional<uint16_t>(static_cast<uint16_t>(segment + 1))),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(tracker.IsComplete(), last);
+    }
+    EXPECT_TRUE(tracker.GetCertificate().data_equal(document));
+}
+
 TEST(CertificateChainRequestTracker, RejectsInconsistentSegmentedResponse)
 {
     CertificateChainRequestTracker tracker;

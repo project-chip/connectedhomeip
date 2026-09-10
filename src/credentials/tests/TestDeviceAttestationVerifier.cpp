@@ -19,6 +19,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <controller/CommissioneeDeviceProxy.h>
+#include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -26,11 +27,16 @@
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <crypto/tests/MlDsaAttestationChain_test_vectors.h>
+#include <lib/support/Base64.h>
+
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
+#include <string>
+#include <vector>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -269,5 +275,105 @@ TEST_F(TestDeviceAttestationVerifier, VerifyAttestationInformationRejectsUnsuppo
     verifier.VerifyAttestationInformation(pqcInfo, &callback);
     EXPECT_EQ(result,
               Crypto::IsMlDsa44Supported() ? AttestationVerificationResult::kPaiFormatInvalid
+                                           : AttestationVerificationResult::kNotImplemented);
+}
+
+namespace {
+class PaaAllocationVerifier : public DefaultDACVerifier
+{
+public:
+    using DefaultDACVerifier::GetPaaCertificateAllocationSize;
+};
+
+std::vector<uint8_t> DecodeAttestationCertificate(const char * pem)
+{
+    const std::string text(pem);
+    const size_t start = text.find('\n') + 1;
+    const size_t end   = text.find("-----END CERTIFICATE-----", start);
+    std::string base64;
+    for (size_t i = start; i < end; ++i)
+    {
+        if (text[i] != '\n' && text[i] != '\r')
+        {
+            base64.push_back(text[i]);
+        }
+    }
+    std::vector<uint8_t> der(base64.size());
+    const uint32_t size = Base64Decode32(base64.data(), static_cast<uint32_t>(base64.size()), der.data());
+    if (size == UINT32_MAX)
+    {
+        return {};
+    }
+    der.resize(size);
+    return der;
+}
+} // namespace
+
+TEST_F(TestDeviceAttestationVerifier, MixedChainUsesItsIssuerForPaaAllocation)
+{
+    const struct
+    {
+        const char * pai;
+        const char * paa;
+        size_t expectedSize;
+        bool supported;
+    } cases[] = {
+        { kP256PaiUnderMlDsa44PaaPem, kMlDsa44PaaPem, kMaxDERCertLengthMlDsa44, Crypto::IsMlDsa44Supported() },
+        { kP256PaiUnderMlDsa65PaaPem, kMlDsa65PaaPem, kMaxDERCertLengthMlDsa65, Crypto::IsMlDsa65Supported() },
+        { kMlDsa44PaiUnderMlDsa65PaaPem, kMlDsa65PaaPem, kMaxDERCertLengthMlDsa65, Crypto::IsMlDsa65Supported() },
+    };
+    for (const auto & test : cases)
+    {
+        const auto pai = DecodeAttestationCertificate(test.pai);
+        const auto paa = DecodeAttestationCertificate(test.paa);
+        ASSERT_FALSE(pai.empty());
+        ASSERT_FALSE(paa.empty());
+        ASSERT_GT(pai.size(), kMaxDERCertLength);
+        ASSERT_GT(paa.size(), kMaxDERCertLength);
+        size_t allocationSize = 0;
+        EXPECT_EQ(PaaAllocationVerifier::GetPaaCertificateAllocationSize(ByteSpan(pai.data(), pai.size()), allocationSize),
+                  test.supported ? CHIP_NO_ERROR : CHIP_ERROR_NOT_IMPLEMENTED);
+        EXPECT_EQ(allocationSize, test.expectedSize);
+        EXPECT_GE(allocationSize, paa.size());
+    }
+}
+
+TEST_F(TestDeviceAttestationVerifier, LegacyPaiKeepsSmallPaaAllocation)
+{
+    size_t allocationSize = 0;
+    ASSERT_EQ(PaaAllocationVerifier::GetPaaCertificateAllocationSize(sTestCert_PAI_FFF1_8000_Cert, allocationSize), CHIP_NO_ERROR);
+    EXPECT_EQ(allocationSize, kMaxDERCertLength);
+}
+
+TEST_F(TestDeviceAttestationVerifier, InvalidPaiCannotDeterminePaaAllocation)
+{
+    size_t allocationSize = 0;
+    EXPECT_NE(PaaAllocationVerifier::GetPaaCertificateAllocationSize(ByteSpan(), allocationSize), CHIP_NO_ERROR);
+    EXPECT_NE(PaaAllocationVerifier::GetPaaCertificateAllocationSize(sTestCert_PAI_FFF1_8000_Cert.SubSpan(0, 20), allocationSize),
+              CHIP_NO_ERROR);
+}
+
+TEST_F(TestDeviceAttestationVerifier, LegacyRequestProfileStillChecksMlDsaPaaCapability)
+{
+    const auto pai = DecodeAttestationCertificate(kP256PaiUnderMlDsa65PaaPem);
+    ASSERT_FALSE(pai.empty());
+    const uint8_t data[]       = { 0x01 };
+    const ByteSpan certSpans[] = { ByteSpan(data) };
+    ArrayAttestationTrustStore trustStore(certSpans, 1);
+    DefaultDACVerifier verifier(&trustStore);
+    DeviceAttestationVerifier::AttestationInfo info(ByteSpan(data), ByteSpan(data), ByteSpan(data),
+                                                    ByteSpan(pai.data(), pai.size()), ByteSpan(data), ByteSpan(data),
+                                                    VendorId(0xFFF1), 0x8000, DeviceAttestationCertProfile::kEcdsaMatterLegacy);
+    AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
+        [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult verificationResult) {
+            *static_cast<AttestationVerificationResult *>(context) = verificationResult;
+        },
+        &result);
+    verifier.VerifyAttestationInformation(info, &callback);
+    // Without ML-DSA, reject the issuer explicitly even though the request profile is legacy.
+    // With ML-DSA, the real PAI passes and validation reaches the deliberately invalid DAC.
+    EXPECT_EQ(result,
+              Crypto::IsMlDsa65Supported() ? AttestationVerificationResult::kDacFormatInvalid
                                            : AttestationVerificationResult::kNotImplemented);
 }
