@@ -14,10 +14,6 @@
 #    limitations under the License.
 #
 
-get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../.. REALPATH)
-
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
-
 include(${APP_DIR}/cmake/board_files.cmake)
 
 # BOARD may include qualifiers (e.g. xg26_rb4118a/efr32mg26b510f3200il136); our
@@ -25,31 +21,18 @@ include(${APP_DIR}/cmake/board_files.cmake)
 all_devices_board_name(${BOARD} _board_name)
 
 all_devices_find_board_file(${APP_DIR}/boards ${_board_name}.overlay _board_overlay)
-if(_board_overlay)
-    set(zephyr_DTC_OVERLAY_FILE ${_board_overlay}
-        CACHE INTERNAL "App board overlay for application partitions")
-    set(mcuboot_EXTRA_DTC_OVERLAY_FILE ${_board_overlay}
-        CACHE INTERNAL "App board overlay for MCUboot partitions")
-else()
-    unset(zephyr_DTC_OVERLAY_FILE CACHE)
-    unset(mcuboot_EXTRA_DTC_OVERLAY_FILE CACHE)
-endif()
+all_devices_append_image_files(zephyr_DTC_OVERLAY_FILE ${_board_overlay})
+all_devices_append_image_files(mcuboot_EXTRA_DTC_OVERLAY_FILE ${_board_overlay})
 
 all_devices_find_board_file(${APP_DIR}/boards ${_board_name}.conf _board_conf EXCLUDE_FLAT)
-if(_board_conf)
-    set(zephyr_EXTRA_CONF_FILE ${_board_conf}
-        CACHE INTERNAL "App board Kconfig fragment")
-else()
-    unset(zephyr_EXTRA_CONF_FILE CACHE)
-endif()
+all_devices_append_image_files(zephyr_EXTRA_CONF_FILE ${_board_conf})
 
 all_devices_find_board_file(${APP_DIR}/boards ${_board_name}_mcuboot.conf _board_mcuboot_conf)
 set(_mcuboot_extra_conf ${APP_DIR}/sysbuild/mcuboot.conf)
 if(_board_mcuboot_conf)
     list(APPEND _mcuboot_extra_conf ${_board_mcuboot_conf})
 endif()
-set(mcuboot_EXTRA_CONF_FILE ${_mcuboot_extra_conf}
-    CACHE INTERNAL "MCUboot Kconfig fragments for the all-devices-app")
+all_devices_append_image_files(mcuboot_EXTRA_CONF_FILE ${_mcuboot_extra_conf})
 
 # Apply boards/${BOARD}_sysbuild.conf (optionally grouped under a vendor subfolder).
 all_devices_find_board_file(${APP_DIR}/boards ${_board_name}_sysbuild.conf _board_sysbuild_conf)

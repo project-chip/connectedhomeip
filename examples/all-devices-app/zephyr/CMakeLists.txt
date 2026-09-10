@@ -1,45 +1,25 @@
 #
-# Copyright (c) 2026 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#        http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
 #
 cmake_minimum_required(VERSION 3.20)
 
-get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
-get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common REALPATH)
-
-# You may point this at a file that defines GetAppTask() to return a subclass of AppTask.
-if(NOT DEFINED APP_TASK_INSTANCE_SOURCE)
-    set(APP_TASK_INSTANCE_SOURCE "")
+# You may point this at a header that defines chip::app::AllDevices::AppTask as the
+# final type of a CRTP layer chain rooted at AppTaskBase (see include/AppTask.h).
+if(NOT DEFINED APP_TASK_IMPL_HEADER)
+    set(APP_TASK_IMPL_HEADER "")
 endif()
-
-# Device selection: -DALL_DEVICES_ENABLED_DEVICES="on-off-light;..." (default: on-off-light).
-# Set to an empty string to build all of the devices.
-if(NOT DEFINED ALL_DEVICES_ENABLED_DEVICES)
-    set(ALL_DEVICES_ENABLED_DEVICES "on-off-light")
-endif()
-include(${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake)
-
-# Count how many are ALL_DEVICES_ENABLE_<NAME>=1 to size AppTask's device array
-get_cmake_property(_all_devices_vars VARIABLES)
-set(ALL_DEVICES_ENABLED_DEVICE_COUNT 0)
-foreach(_var IN LISTS _all_devices_vars)
-    if(_var MATCHES "^ALL_DEVICES_ENABLE_" AND ${_var})
-        math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 1")
-    endif()
-endforeach()
-
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
 
 # Zephyr auto-discovers files directly under boards/. This also discovers
 # board files in the registered vendor subdirectories.
@@ -64,6 +44,37 @@ if(DEFINED BOARD)
 endif()
 
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
+
+# Matter is the Zephyr module "connectedhomeip"; it must be in the west manifest.
+if(NOT DEFINED ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)
+    message(FATAL_ERROR "Matter is not registered as a Zephyr module. Add it to your west manifest.")
+endif()
+set(CHIP_ROOT ${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR})
+set(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common)
+
+# Device selection comes from Kconfig (CONFIG_ALL_DEVICES_DEVICE_*, see Kconfig.devices).
+# -DALL_DEVICES_ENABLED_DEVICES="on-off-light;..." overrides it; an empty list means all devices.
+if(NOT DEFINED ALL_DEVICES_ENABLED_DEVICES)
+    set(ALL_DEVICES_ENABLED_DEVICES "")
+    get_cmake_property(_all_devices_vars VARIABLES)
+    foreach(_var IN LISTS _all_devices_vars)
+        if(_var MATCHES "^CONFIG_ALL_DEVICES_DEVICE_(.+)$" AND ${_var})
+            string(TOLOWER "${CMAKE_MATCH_1}" _key)
+            string(REPLACE "_" "-" _key "${_key}")
+            list(APPEND ALL_DEVICES_ENABLED_DEVICES "${_key}")
+        endif()
+    endforeach()
+endif()
+include(${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake)
+
+# Count how many are ALL_DEVICES_ENABLE_<NAME>=1 to size AppTask's device array
+get_cmake_property(_all_devices_vars VARIABLES)
+set(ALL_DEVICES_ENABLED_DEVICE_COUNT 0)
+foreach(_var IN LISTS _all_devices_vars)
+    if(_var MATCHES "^ALL_DEVICES_ENABLE_" AND ${_var})
+        math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 1")
+    endif()
+endforeach()
 
 # ot-config re-lists zephyr_interface's INTERFACE_COMPILE_DEFINITIONS, including
 # $<COMPILE_LANGUAGE:CXX> generator expressions. openthread/CMakeLists.txt uses
@@ -102,8 +113,8 @@ target_compile_definitions(app PRIVATE ALL_DEVICES_ENABLED_DEVICE_COUNT=${ALL_DE
 #    include(${CMAKE_CURRENT_SOURCE_DIR}/custom/CMakeLists.txt)
 # endif()
 
-if(APP_TASK_INSTANCE_SOURCE STREQUAL "")
-    set(APP_TASK_INSTANCE_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/AppTaskInstance.cpp)
+if(NOT APP_TASK_IMPL_HEADER STREQUAL "")
+    target_compile_definitions(app PRIVATE APP_TASK_IMPL_HEADER="${APP_TASK_IMPL_HEADER}")
 endif()
 
 target_include_directories(app PRIVATE
@@ -118,9 +129,9 @@ target_include_directories(app PRIVATE
 
 target_sources(app PRIVATE
     CHIPProjectConfig.h
+    include/AppTaskBase.h
+    include/AppTaskBase.ipp
     include/AppTask.h
-    src/AppTask.cpp
-    ${APP_TASK_INSTANCE_SOURCE}
     include/Buttons.h
     src/Buttons.cpp
     src/main.cpp
@@ -137,7 +148,11 @@ target_sources(app PRIVATE
     ${ALL_DEVICES_CLUSTER_SOURCES}
 )
 
-if(CONFIG_ALL_DEVICES_ENABLE_THREAD)
+# Included by AppTaskBase.h; listed above only so it shows up in IDEs.
+set_source_files_properties(include/AppTaskBase.ipp PROPERTIES HEADER_FILE_ONLY TRUE)
+
+# Matches CHIP_DEVICE_CONFIG_ENABLE_THREAD, which AppTaskBase.ipp gates on.
+if(CONFIG_OPENTHREAD)
     target_sources(app PRIVATE
         ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.h
         ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.cpp

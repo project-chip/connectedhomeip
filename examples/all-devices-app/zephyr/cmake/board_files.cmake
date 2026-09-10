@@ -17,6 +17,7 @@
 # Vendor subdirectories containing board-specific application files.
 set(ALL_DEVICES_BOARD_VENDOR_SUBDIRECTORIES
     silabs
+    # Add other manufacturer folders here
 )
 
 # Strips the revision and qualifiers from BOARD.
@@ -50,4 +51,14 @@ function(all_devices_find_board_file boards_dir filename out_var)
         endif()
     endforeach()
     set(${out_var} "${_match}" PARENT_SCOPE)
+endfunction()
+
+# Appends to a sysbuild image variable. Read-modify-write because writing a
+# CACHE INTERNAL entry implies FORCE, which would drop values passed with -D.
+function(all_devices_append_image_files var)
+    set(_value ${${var}} ${ARGN})
+    if(_value)
+        list(REMOVE_DUPLICATES _value)
+        set(${var} "${_value}" CACHE INTERNAL "all-devices-app: ${var}")
+    endif()
 endfunction()

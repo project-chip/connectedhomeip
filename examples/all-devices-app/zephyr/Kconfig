@@ -17,26 +17,12 @@
 mainmenu "Matter All-Devices Zephyr"
 
 rsource "Kconfig.defaults"
+rsource "Kconfig.devices"
 
-config ALL_DEVICES_ENABLE_THREAD
-	bool "Thread networking"
-	default y
-	depends on NET_L2_OPENTHREAD
-	help
-	  Enables AppTask::InitThreadNetworking() and the ThreadRootNode.
-
-config ALL_DEVICES_ENABLE_WIFI
-	bool "Wi-Fi networking"
-	default n
-	depends on WIFI
-	select CHIP_WIFI
-	help
-	  Enables AppTask::InitWifiNetworking() and the WifiRootNode.
-
-if ALL_DEVICES_ENABLE_THREAD
+if NET_L2_OPENTHREAD
 choice OPENTHREAD_DEVICE_TYPE
 	default OPENTHREAD_FTD
 endchoice
-endif # ALL_DEVICES_ENABLE_THREAD
+endif # NET_L2_OPENTHREAD
 
 source "Kconfig.zephyr"
