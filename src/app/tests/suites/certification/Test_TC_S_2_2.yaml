@@ -473,17 +473,19 @@ tests:
                 - name: "Equals"
                   saveAs: IsRevision2
 
+    ## Currently this test only expect cluster revision 1 or 2.
+    ## If new version is added, We should create a GreaterThanOrEqual command for yaml parser or migrate this test to python testing.
     - label:
           "Step 3e: Determine if test should run (ScenesManagement cluster
-          revision < 2)"
+          revision 1)"
       cluster: "EqualityCommands"
-      command: "BooleanEquals"
+      command: "UnsignedNumberEquals"
       arguments:
           values:
               - name: "Value1"
-                value: IsRevision2
+                value: ScenesManagementClusterRevision
               - name: "Value2"
-                value: false
+                value: 1
       response:
           - values:
                 - name: "Equals"
