@@ -163,17 +163,18 @@ DataModel::ActionReturnStatus OnOffLightingCluster::ReadAttribute(const DataMode
 DataModel::ActionReturnStatus OnOffLightingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                    AttributeValueDecoder & decoder)
 {
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+}
+
+DataModel::ActionReturnStatus OnOffLightingCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
+                                                              AttributeValueDecoder & decoder)
+{
     switch (request.path.mAttributeId)
     {
     case Attributes::OnTime::Id: {
         uint16_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnValue(mOnTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-
-        if (abs(mOnTime - value) > kValueDeltaReportTrigger || value == 0)
-        {
-            NotifyAttributeChanged(request.path.mAttributeId);
-        }
 
         mOnTime = value;
         UpdateTimer();
@@ -184,21 +185,13 @@ DataModel::ActionReturnStatus OnOffLightingCluster::WriteAttribute(const DataMod
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnValue(mOffWaitTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
-        if (abs(mOffWaitTime - value) > kValueDeltaReportTrigger || value == 0)
-        {
-            NotifyAttributeChanged(request.path.mAttributeId);
-        }
-
         mOffWaitTime = value;
         UpdateTimer();
         return Status::Success;
     }
     case Attributes::StartUpOnOff::Id: {
         AttributePersistence persistence(mContext->attributeStorage);
-        app::DataModel::ActionReturnStatus result =
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mStartUpOnOff);
-        NotifyAttributeChangedIfSuccess(request.path.mAttributeId, result);
-        return result;
+        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mStartUpOnOff);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
