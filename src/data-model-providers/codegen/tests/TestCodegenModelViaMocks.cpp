@@ -55,6 +55,7 @@
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/util/attribute-metadata.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -1171,6 +1172,41 @@ void WriteLe16(void * buffer, uint16_t value)
 {
     uint8_t * p = reinterpret_cast<uint8_t *>(buffer);
     chip::Encoding::LittleEndian::Write16(p, value);
+}
+
+TEST_F(TestCodegenModelViaMocks, EmberReadReceivesSubjectDescriptor)
+{
+    // Consecutive reads must carry their own fabric and controller identity.
+    for (FabricIndex fabricIndex : { FabricIndex{ 1 }, FabricIndex{ 2 } })
+    {
+        Access::SubjectDescriptor subject;
+        subject.authMode    = Access::AuthMode::kCase;
+        subject.fabricIndex = fabricIndex;
+        subject.subject     = 0x12340000 + fabricIndex;
+
+        ReadOperation request(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_INT8U_ATTRIBUTE_TYPE));
+        request.SetSubjectDescriptor(subject);
+        const uint8_t value = 42;
+        chip::Testing::SetEmberReadOutput(ByteSpan(&value, sizeof(value)));
+        auto encoder = request.StartEncoding();
+        ASSERT_EQ(CodegenDataModelProvider::Instance().ReadAttribute(request.GetRequest(), *encoder), CHIP_NO_ERROR);
+        ASSERT_EQ(request.FinishEncoding(), CHIP_NO_ERROR);
+
+        const auto actual = chip::Testing::GetEmberReadSubjectDescriptor();
+        ASSERT_TRUE(actual.has_value());
+        EXPECT_TRUE(*actual == subject);
+
+        // A subsequent local read must not inherit the previous remote subject.
+        EmberAfAttributeSearchRecord record;
+        record.endpoint                           = request.GetRequest().path.mEndpointId;
+        record.clusterId                          = request.GetRequest().path.mClusterId;
+        record.attributeId                        = request.GetRequest().path.mAttributeId;
+        const EmberAfAttributeMetadata * metadata = nullptr;
+        uint8_t buffer                            = 0;
+        ASSERT_EQ(emAfReadOrWriteAttribute(&record, &metadata, &buffer, sizeof(buffer), false), Status::Success);
+        EXPECT_FALSE(chip::Testing::GetEmberReadSubjectDescriptor().has_value());
+        EXPECT_EQ(buffer, value);
+    }
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
