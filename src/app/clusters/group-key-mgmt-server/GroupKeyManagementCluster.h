@@ -35,10 +35,7 @@ public:
         chip::Credentials::GroupDataProvider & groupDataProvider;
     };
 
-    // New constructor using Context
-    GroupKeyManagementCluster(Context && context) :
-        GroupKeyManagementCluster(std::move(context), BitFlags<GroupKeyManagement::Feature>(0))
-    {}
+    GroupKeyManagementCluster(Context && context);
 
     GroupKeyManagementCluster(Context && context, BitFlags<GroupKeyManagement::Feature> features);
 
