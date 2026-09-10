@@ -78,6 +78,7 @@ static_library("ESP32") {
   ]
 
   public_deps = [
+    "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]

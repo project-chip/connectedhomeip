@@ -5085,6 +5085,20 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+    case Attributes::PQCDeviceAttestationProfile::Id: {
+        using TypeInfo = Attributes::PQCDeviceAttestationProfile::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct * _Nonnull value;
+        value = [MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct new];
+        value.paaSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAASupportedProfiles.Raw()];
+        value.paiSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAISupportedProfiles.Raw()];
+        value.dacSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.DACSupportedProfiles.Raw()];
+        return value;
+    }
     default: {
         // Not a known OperationalCredentials attribute.
         break;
@@ -14391,12 +14405,8 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value().Raw()];
-        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::Continuous::Id: {
@@ -18083,6 +18093,7 @@ static id _Nullable DecodeAttributeValueForAmbientSensingUnionCluster(AttributeI
                     }
                 }
                 newElement_0.contributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorStatus)];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

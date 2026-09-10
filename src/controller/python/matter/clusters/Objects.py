@@ -12857,6 +12857,7 @@ class OperationalCredentials(Cluster):
                 ClusterObjectFieldDescriptor(Label="commissionedFabrics", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="trustedRootCertificates", Tag=0x00000004, Type=typing.List[bytes]),
                 ClusterObjectFieldDescriptor(Label="currentFabricIndex", Tag=0x00000005, Type=uint),
+                ClusterObjectFieldDescriptor(Label="PQCDeviceAttestationProfile", Tag=0x00000006, Type=typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -12870,6 +12871,7 @@ class OperationalCredentials(Cluster):
     commissionedFabrics: uint = 0
     trustedRootCertificates: typing.List[bytes] = field(default_factory=lambda: [])
     currentFabricIndex: uint = 0
+    PQCDeviceAttestationProfile: typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -12877,6 +12879,16 @@ class OperationalCredentials(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class AttestationCryptoProfileEnum(MatterIntEnum):
+            kEcdsaMatterLegacy = 0x00
+            kMlDsa44 = 0x01
+            kMlDsa65 = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class CertificateChainTypeEnum(MatterIntEnum):
             kDACCertificate = 0x01
             kPAICertificate = 0x02
@@ -12902,6 +12914,15 @@ class OperationalCredentials(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
+
+    class Bitmaps:
+        class AttestationCryptoProfileBitmap(IntFlag):
+            kSupportsEcdsaMatterLegacy = 0x1
+            kSupportsMlDsa44 = 0x2
+            kSupportsMlDsa65 = 0x4
+
+        class Feature(IntFlag):
+            kPQCDeviceAttestation = 0x1
 
     class Structs:
         @dataclass
@@ -12943,6 +12964,21 @@ class OperationalCredentials(Cluster):
             icac: 'typing.Union[Nullable, bytes]' = NullValue
             vvsc: 'typing.Optional[bytes]' = None
             fabricIndex: 'uint' = 0
+
+        @dataclass
+        class PQCDeviceAttestationProfileStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="PAASupportedProfiles", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="PAISupportedProfiles", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="DACSupportedProfiles", Tag=2, Type=uint),
+                    ])
+
+            PAASupportedProfiles: 'uint' = 0
+            PAISupportedProfiles: 'uint' = 0
+            DACSupportedProfiles: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -12991,9 +13027,15 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="certificateType", Tag=0, Type=OperationalCredentials.Enums.CertificateChainTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="cryptoProfile", Tag=1, Type=typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum]),
+                        ClusterObjectFieldDescriptor(Label="segmentID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="maxSegmentSize", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             certificateType: OperationalCredentials.Enums.CertificateChainTypeEnum = 0
+            cryptoProfile: typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum] = None
+            segmentID: typing.Optional[uint] = None
+            maxSegmentSize: typing.Optional[uint] = None
 
         @dataclass
         class CertificateChainResponse(ClusterCommand):
@@ -13007,9 +13049,13 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="certificate", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="totalDocumentSize", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="nextSegmentID", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             certificate: bytes = b""
+            totalDocumentSize: typing.Optional[uint] = None
+            nextSegmentID: typing.Optional[uint] = None
 
         @dataclass
         class CSRRequest(ClusterCommand):
@@ -13313,6 +13359,22 @@ class OperationalCredentials(Cluster):
             value: uint = 0
 
         @dataclass
+        class PQCDeviceAttestationProfile(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000003E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct])
+
+            value: typing.Optional[OperationalCredentials.Structs.PQCDeviceAttestationProfileStruct] = None
+
+        @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -13425,15 +13487,6 @@ class GroupKeyManagement(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
-        class GroupKeyMulticastPolicyEnum(MatterIntEnum):
-            kPerGroupID = 0x00
-            kAllNodes = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
-
         class GroupKeySecurityPolicyEnum(MatterIntEnum):
             kTrustFirst = 0x00
             kCacheAndSync = 0x01
@@ -20676,11 +20729,12 @@ class Groupcast(Cluster):
             kFailedAuth = 0x03
             kNoAvailableKey = 0x04
             kSendFailure = 0x05
+            kUnknownGroup = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6
+            kUnknownEnumValue = 7
 
         class GroupcastTestingEnum(MatterIntEnum):
             kDisableTesting = 0x00
@@ -25079,14 +25133,14 @@ class DeviceEnergyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="minPower", Tag=0, Type=typing.Union[Nullable, int]),
-                        ClusterObjectFieldDescriptor(Label="maxPower", Tag=1, Type=typing.Union[Nullable, int]),
+                        ClusterObjectFieldDescriptor(Label="minPower", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="maxPower", Tag=1, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="duration", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="cause", Tag=3, Type=DeviceEnergyManagement.Enums.AdjustmentCauseEnum),
                     ])
 
-            minPower: typing.Union[Nullable, int] = NullValue
-            maxPower: typing.Union[Nullable, int] = NullValue
+            minPower: typing.Optional[int] = None
+            maxPower: typing.Optional[int] = None
             duration: uint = 0
             cause: DeviceEnergyManagement.Enums.AdjustmentCauseEnum = 0
 
@@ -36647,7 +36701,7 @@ class Humidistat(Cluster):
                 ClusterObjectFieldDescriptor(Label="maxSetpoint", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="step", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="targetSetpoint", Tag=0x00000007, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="mistType", Tag=0x00000008, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="mistType", Tag=0x00000008, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="continuous", Tag=0x00000009, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="sleep", Tag=0x0000000A, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="optimal", Tag=0x0000000B, Type=typing.Optional[bool]),
@@ -36668,7 +36722,7 @@ class Humidistat(Cluster):
     maxSetpoint: typing.Optional[uint] = None
     step: typing.Optional[uint] = None
     targetSetpoint: typing.Optional[uint] = None
-    mistType: typing.Union[None, Nullable, uint] = None
+    mistType: typing.Optional[uint] = None
     continuous: typing.Optional[bool] = None
     sleep: typing.Optional[bool] = None
     optimal: typing.Optional[bool] = None
@@ -36888,9 +36942,9 @@ class Humidistat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: typing.Union[None, Nullable, uint] = None
+            value: typing.Optional[uint] = None
 
         @dataclass
         class Continuous(ClusterAttributeDescriptor):
@@ -44874,14 +44928,20 @@ class AmbientSensingUnion(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="contributorIndex", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="previousContributorStatus", Tag=1, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
-                        ClusterObjectFieldDescriptor(Label="currentContributorStatus", Tag=2, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="contributorNodeID", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="contributorEndpointID", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="contributorName", Tag=2, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="previousContributorStatus", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="currentContributorStatus", Tag=4, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
-            contributorIndex: 'uint' = 0
+            contributorNodeID: 'typing.Union[Nullable, uint]' = NullValue
+            contributorEndpointID: 'typing.Union[Nullable, uint]' = NullValue
+            contributorName: 'typing.Union[Nullable, str]' = NullValue
             previousContributorStatus: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
             currentContributorStatus: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class UnionContributorStruct(ClusterObject):
@@ -44893,12 +44953,14 @@ class AmbientSensingUnion(Cluster):
                         ClusterObjectFieldDescriptor(Label="contributorEndpointID", Tag=1, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="contributorName", Tag=2, Type=typing.Union[Nullable, str]),
                         ClusterObjectFieldDescriptor(Label="contributorStatus", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             contributorNodeID: 'typing.Union[Nullable, uint]' = NullValue
             contributorEndpointID: 'typing.Union[Nullable, uint]' = NullValue
             contributorName: 'typing.Union[Nullable, str]' = NullValue
             contributorStatus: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
+            fabricIndex: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -45045,9 +45107,11 @@ class AmbientSensingUnion(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="addedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             addedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
+            fabricIndex: uint = 0
 
         @dataclass
         class UnionContributorRemoved(ClusterEvent):
@@ -45064,9 +45128,11 @@ class AmbientSensingUnion(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="removedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             removedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
+            fabricIndex: uint = 0
 
         @dataclass
         class UnionContributorStatusChanged(ClusterEvent):
@@ -45083,9 +45149,11 @@ class AmbientSensingUnion(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="contributorStatusChange", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.ContributorStatusChangeStruct]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             contributorStatusChange: typing.List[AmbientSensingUnion.Structs.ContributorStatusChangeStruct] = field(default_factory=lambda: [])
+            fabricIndex: uint = 0
 
 
 @dataclass
@@ -58694,15 +58762,6 @@ class JointFabricDatastore(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 0
-
-        class DatastoreGroupKeyMulticastPolicyEnum(MatterIntEnum):
-            kPerGroupID = 0x00
-            kAllNodes = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
 
         class DatastoreGroupKeySecurityPolicyEnum(MatterIntEnum):
             kTrustFirst = 0x00

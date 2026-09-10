@@ -20,6 +20,7 @@
 
 #include <app/clusters/av-analysis-server/AvAnalysisLogic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <lib/core/ScopedNodeId.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <string>
 #include <vector>
@@ -27,8 +28,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-
-constexpr uint8_t kMaxSpeakerLevel = 254;
 
 class AvAnalysisCluster;
 
@@ -47,31 +46,6 @@ public:
      * the destructor, it shall not be invoked as part of the destructor.
      */
     virtual void ShutdownApp() = 0;
-
-    /**
-     * Delegate command handlers
-     */
-
-    /**
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() = 0;
-
-    /**
-     *
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status ActivateAnalysisStream() = 0;
-
-    /**
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status DeactivateAnalysisStream() = 0;
-
-    /**
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status RemoveAnalysisStream() = 0;
 
     /**
      * Delegate command helpers
@@ -119,17 +93,19 @@ public:
      * called by the interaction model at the appropriate times.
      * @param aEndpointId               The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures                 The bitflags value that identifies which features are supported by this instance.
-     * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
+     * @param aSupportedAmbientContexts The set of Ambient Contexts that this server is capable of detecting
      * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
      * not set.
+     * @param aMaxAnalysisStreamCount   The fixed value of the MaxAnalysisStreamCount attribute. Shall be non-zero if
+     * RemoteContextDetection is set, and 0 otherwise.
      *
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     AvAnalysisCluster(EndpointId aEndpointId, BitFlags<AvAnalysis::Feature> aFeatures,
                       const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
-                      DataModel::Nullable<uint8_t> aMaxZones) :
+                      DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount = 0) :
         DefaultServerCluster({ aEndpointId, AvAnalysis::Id }),
-        mLogic(aEndpointId, aFeatures, aSupportedAmbientContexts, aMaxZones)
+        mLogic(aEndpointId, aFeatures, aSupportedAmbientContexts, aMaxZones, aMaxAnalysisStreamCount)
     {}
 
     AvAnalysisServerLogic & GetLogic() { return mLogic; }
@@ -148,6 +124,8 @@ public:
             delegate->SetServer(this);
         }
     }
+
+    void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mLogic.SetCameraClient(aCameraClient); }
 
     CHIP_ERROR Init() { return mLogic.Init(); }
 
@@ -174,12 +152,14 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // Attribute mutators
-    CHIP_ERROR SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount);
-
     // Context detection and event generation
+    CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, Optional<NodeId> aSourceNodeId = NullOptional,
+                                   bool aUseSpecificSessionId = false);
+
     /**
      * Invoked by the delegate when a new analysis session is initiated based on its own detection metrics. The server will
      * provide the session ID to be used over the lifetime of the session.  The server will generate the AnalysisSessionStart event.
@@ -188,7 +168,8 @@ public:
      * @param aZoneList  the list of Zones that are relevant for the session, Null is used when this information is not available,
      * or all zones
      */
-    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList);
+    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
+                                    Optional<NodeId> aSourceNodeId = NullOptional);
 
     /**
      * Invoked by the delegate to furnish details of the event that triggered the session. The server will generate a
@@ -199,7 +180,8 @@ public:
      *                           This will be validated against the set of known, enabled contexts by the server.
      */
     CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId,
-                                                const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext);
+                                                const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
+                                                Optional<NodeId> aSourceNodeId = NullOptional);
 
     /**
      * Invoked by the delegate for all newly detected analysis contexts as part of the current session. The server will generate a
@@ -209,7 +191,8 @@ public:
      * @param aNewContext the set (could be more than one) of contexts that are newly detected for the session.
      *                    This will be validated against the set of known, enabled contexts by the server.
      */
-    CHIP_ERROR NewContextDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext);
+    CHIP_ERROR NewContextDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext,
+                                  Optional<NodeId> aSourceNodeId = NullOptional);
 
     /**
      * Invoked by the delegate when a previously detected context is no longer present (e.g. a detected package has been
@@ -222,15 +205,16 @@ public:
      * the server.
      */
     CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId,
-                                       const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext);
+                                       const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext,
+                                       Optional<NodeId> aSourceNodeId = NullOptional);
 
     /**
      * Invoked by the delegate to indicate the conclusion of an analysis session that has been triggered. It is up to the
-     * delegate to determine the criteria for determing that a session has concluded.
+     * delegate to determine the criteria for determining that a session has concluded.
      *
      * @param aSessionId         the sessionId for the current session, the method will fail if this is not known by the server
      */
-    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId);
+    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId, Optional<NodeId> aSourceNodeId = NullOptional);
 
 private:
     AvAnalysisServerLogic mLogic;
