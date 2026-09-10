@@ -19,10 +19,13 @@ source_set("mode-select") {
   sources = [
     "ModeSelect.cpp",
     "ModeSelect.h",
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/mode-select-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
@@ -38,4 +41,16 @@ source_set("simulated") {
   ]
 
   public_deps = [ ":mode-select" ]
+}
+
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":mode-select",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
 }

@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <cstdlib>
 #include <string>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -1015,6 +1016,8 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     {
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
+
+    ResolveDeviceAttestationCredentialsProvider();
 
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.

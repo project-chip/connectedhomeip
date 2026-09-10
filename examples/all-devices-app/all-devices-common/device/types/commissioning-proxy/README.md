@@ -425,11 +425,7 @@ Adapter and driver are both constructed in
 the single `CommissioningProxyDevice` with `AddTransport()` — a build with BLE
 adds that driver the same way — and derives the advertised `WiFiBand` from
 `--wifipaf freq_list=`, since the device itself reads no command line. The same
-<<<<<<< HEAD parsed list reaches the radio from `posix/main.cpp`. ======= parsed
-list reaches the radio from `posix/main.cpp`. Transports are registered before
-`Server::Init()`, so the fabric table is empty at that point and the driver's
-`DisconnectPublishReceiveHandler()` call lands on the commissioning-complete
-event instead.
+parsed list reaches the radio from `posix/main.cpp`.
 
 <hr>
 
