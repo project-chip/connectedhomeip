@@ -19,11 +19,16 @@ import("//build_overrides/chip.gni")
 
 source_set("on-off-light") {
   sources = [
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
     "OnOffLight.cpp",
     "OnOffLight.h",
   ]
 
-  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/on-off-load" ]
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/on-off-load",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+  ]
 }
 
 source_set("logging") {
@@ -35,5 +40,17 @@ source_set("logging") {
   public_deps = [
     ":on-off-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/on-off-load:logging",
+  ]
+}
+
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":on-off-light",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
   ]
 }
