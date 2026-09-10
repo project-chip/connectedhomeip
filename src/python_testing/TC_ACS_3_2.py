@@ -62,6 +62,7 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # --script src/python_testing/TC_ACS_3_2.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
+
 class TC_ACS_3_2(MatterBaseTest):
 
     @pics('ACS.S')
@@ -73,14 +74,14 @@ class TC_ACS_3_2(MatterBaseTest):
         self.step(3, "TH writes DUT HoldTime attribute to enable proper testing completion.")
         self.step(4, "Trigger one of DUT supporting ambient sensing features")
         self.step(5, "TH reads the AmbientContextType attribute.",
-                 "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID of test step 4")
+                  "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID of test step 4")
         self.step(6, "Within HoldTime duration of the step 4, trigger the DUT with the same ambient sensing feature.")
         self.step(7, "TH reads the AmbientContextType attribute.",
-                 "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID from the step 6.",
-                 "Verify that DUT response contains the size of AmbientContextType list is 1.")
+                  "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID from the step 6.",
+                  "Verify that DUT response contains the size of AmbientContextType list is 1.")
         self.step(8, "Wait until HoldTime seconds are passed from the step 4 execution.")
         self.step(9, "TH reads the AmbientContextType attribute and check a Boolean attribute related to the step 6.",
-                 "Verify that DUT response contains the Boolean attribute (HumanActivityDetected, ObjectIdentified, AudioContextDetected) is read False.")
+                  "Verify that DUT response contains the Boolean attribute (HumanActivityDetected, ObjectIdentified, AudioContextDetected) is read False.")
 
     def setup_test(self):
         super().setup_test()
