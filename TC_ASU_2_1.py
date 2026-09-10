@@ -39,9 +39,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -60,32 +60,20 @@ MAX_UINT64 = 0xFFFFFFFFFFFFFFFF
 
 
 class TC_ASU_2_1(MatterBaseTest):
-    def desc_TC_ASU_2_1(self) -> str:
-        return "[TC-ASU-2.1] Attributes with DUT as a server"
 
-    def pics_TC_ASU_2_1(self):
-        return ["ASU.S"]
-
-    def steps_TC_ASU_2_1(self) -> list[TestStep]:
-        return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads the UnionName attribute.",
-                     "DUT response contains string characters."),
-            TestStep("3", "TH reads the UnionHealth attribute.",
-                     "DUT response contains a UnionHealthEnum type data."),
-            TestStep("4", "TH reads the UnionContributorList attribute.",
-                     "DUT response contains UnionContributorStruct data containing ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus.")
-        ]
-
+    @pics('ASU.S')
+    @async_test_body
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientSensingUnion))
     async def test_TC_ASU_2_1(self):
+        """[TC-ASU-2.1] Cluster endpoint"""
+
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientSensingUnion
         attr = Clusters.AmbientSensingUnion.Attributes
 
-        self.step("1")
+        self.step("1", "Commissioning, already done", is_commissioning=True)
 
-        self.step("2")
+        self.step("2", "TH reads the UnionName attribute. DUT response contains string characters.")
         unionName_read = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -98,7 +86,7 @@ class TC_ASU_2_1(MatterBaseTest):
         asserts.assert_greater_equal(string_size, 1, "The string size needs to be betwween 1 and 128.")
         asserts.assert_less_equal(string_size, 128, "The string size needs to be betwween 1 and 128.")
 
-        self.step("3")
+        self.step("3", "TH reads the UnionHealth attribute. DUT response contains a UnionHealthEnum type data")
         unionHealth_read = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -113,7 +101,7 @@ class TC_ASU_2_1(MatterBaseTest):
         asserts.assert_in(unionHealth_read, valid_union_health_values,
                           "UnionHealth shall be a valid UnionHealthEnum value.")
 
-        self.step("4")
+        self.step("4", "TH reads the UnionContributorList attribute. DUT response contains UnionContributorStruct data containing ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus. If ContributorNodeID are ContributorEndpointID are NULL, check if ContributorName is not NULL and contains string data.")
         unionlist_read = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
