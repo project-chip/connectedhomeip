@@ -104,10 +104,25 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     // may be passing a modified shallow copy of our CommissioningParmeters, i.e. where various spans
     // already point into the buffers we're copying into, and memcpy() with overlapping buffers is UB.
     //
-    // Note: Only the parameters that are inputs are relocated below. Output-only parameters that we
-    // populate ourselves as commissioning progresses (the generated NOC chain, the PDC network and
-    // client identities, the attestation elements) are cleared here and left for the stage that
-    // produces them to set again.
+    // Note: Only the parameters that are inputs are copied from params below. Output-only
+    // parameters that we populate ourselves as commissioning progresses (the generated NOC chain,
+    // the PDC network and client identities, the attestation elements) are cleared here and left
+    // for the stage that produces them to set again.
+    //
+    // Dropping them is safe because the delegate only gets to call us back mid-commissioning at
+    // kICDGetRegistrationInfo and kNeedsNetworkCreds, both of which are past kSendNOC: the attestation
+    // values were consumed at kAttestationVerification, and the CSR and NOC chain by kSendNOC, while the
+    // PDC values are not produced until the network setup stages that follow. A retry walks the flow back
+    // to kScanNetworks, but CommissioningStepFinished() clears the PDC parameters before the delegate is
+    // asked for credentials again, so there is nothing stale to carry forward either. State that does have
+    // to outlive a rewrite is deliberately kept out of CommissioningParameters: mDeviceCommissioningInfo
+    // and the network attempt type here, and the pending Network Client Identity rollback in the
+    // DeviceCommissioner.
+    //
+    // Note this assignment also replaces the scalar parameters, including ones we derived from the
+    // commissionee ourselves. Of those only the failsafe timer is read again after a delegate callback
+    // (at kFailsafeBeforeWiFiEnable / kFailsafeBeforeThreadEnable), and losing it there is harmless: the
+    // fail-safe is already armed with the recommended value and never gets shortened.
     mParams = params;
     mParams.ClearExternalBufferDependentValues();
 
@@ -169,6 +184,9 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetCSRNonce(ByteSpan(mCSRNonce));
     }
 
+    // Unlike the CSR nonce above, we only copy a PDC possession nonce that was actually supplied; the
+    // fallback to a random value happens lazily in kPDCGetNetworkIdentity, i.e. only once we know we
+    // are going to use PDC at all. Leaving mParams without a nonce here is what signals that.
     if (params.GetPDCPossessionNonce().HasValue())
     {
         ByteSpan possessionNonce = params.GetPDCPossessionNonce().Value();
@@ -357,7 +375,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(Commi
         // We need credentials, request them if necessary.
         VerifyOrReturnValue(mParams.GetWiFiCredentials().HasValue(), CommissioningStage::kRequestWiFiCredentials);
 
-        auto credentials = mParams.GetWiFiCredentials().Value();
+        auto credentials = mParams.GetWiFiCredentials().Value(); // GetWiFiCredentials() returns a shallow copy (spans / pointers)
         if (credentials.registrar != nullptr)
         {
             if (mDeviceCommissioningInfo.network.wifi.supportsPerDeviceCredentials)

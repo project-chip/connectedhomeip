@@ -1212,6 +1212,12 @@ private:
 
     chip::Callback::Callback<OnNetworkIdentityAvailableFunct> mOnNetworkIdentityRequestCallback;
     chip::Callback::Callback<OnClientRegisteredFunct> mOnNetworkClientRegistrationCallback;
+
+    // Tracks the Network Client Identity revocation in flight, if any. Its mCall rests at the base
+    // OnClientUnregistered() variant, and a caller that needs to carry on once the revocation lands
+    // swaps in one of the other variants; RollBackNetworkClientIdentity() may only be entered at the
+    // resting state, and cancels (and reports) a revocation still using the callback object when it
+    // needs it for a new one. See those declarations above for the full invariants.
     chip::Callback::Callback<OnClientUnregisteredFunct> mOnNetworkClientUnregistrationCallback;
 
     // A Network Client Identity we have registered with a NetworkIdentityRegistrar on behalf of

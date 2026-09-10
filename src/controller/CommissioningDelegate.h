@@ -218,8 +218,10 @@ public:
     static constexpr size_t kMaxCredentialsLen   = 64;
     static constexpr size_t kMaxCountryCodeLen   = 2;
 
-    static constexpr size_t kMaxNetworkIdentityLen  = Credentials::kMaxCHIPCompactNetworkIdentityLength;
-    static constexpr size_t kPossessionNonceLen     = 32; // same as server-side NetworkCommissioning::kPossessionNonceSize
+    static constexpr size_t kMaxNetworkIdentityLen = Credentials::kMaxCHIPCompactNetworkIdentityLength;
+    // Duplicates the server-side NetworkCommissioning::kPossessionNonceSize, which lives in a cluster
+    // implementation header the controller cannot depend on. TestPDCCommissioning.cpp asserts they agree.
+    static constexpr size_t kPossessionNonceLen     = 32;
     static constexpr size_t kPossessionSignatureLen = Crypto::kP256_ECDSA_Signature_Length_Raw;
 
     // Value to use when setting the commissioning failsafe timer on the node being commissioned.
@@ -318,11 +320,13 @@ public:
     // The AutoCommissioner populates this from the PDCNetworkIdentityInfo report returned
     // by kPDCGetNetworkIdentity, but a CommissioningDelegate is free to obtain the Network Identity
     // in some other way and bypass that step entirely.
-    // Note: The CommissioningDelegate is responsible for checking that the commissionee supports
-    // PDC (generally via the network.wifi.supportsPerDeviceCredentials flag of the
+    // Note: Whoever supplies the identity is responsible for first checking that the commissionee
+    // supports PDC (generally via the network.wifi.supportsPerDeviceCredentials flag of the
     // ReadCommissioningInfo report returned by kReadCommissioningInfo), since a commissionee that
     // does not support PDC could otherwise misinterpret a PDC AddOrUpdateWiFiNetwork command as
-    // configuring a connection to an open network.
+    // configuring a connection to an open network. The AutoCommissioner performs that check itself
+    // before scheduling kPDCGetNetworkIdentity, so the obligation only falls to a delegate that sets
+    // this parameter up front.
     const Optional<ByteSpan> GetPDCNetworkIdentity() const { return mPDCNetworkIdentity; }
 
     // The nonce sent to the commissionee during kWiFiNetworkSetup, and signed by it to prove
@@ -337,11 +341,13 @@ public:
     // The Network Client Identity to register with the NetworkIdentityRegistrar during
     // kPDCRegisterClientIdentity, in compact-pdc-identity TLV format.
     // The AutoCommissioner populates this from the PDCClientIdentityInfo report returned by kWiFiNetworkSetup.
+    // This must be set before calling PerformCommissioningStep for the kPDCRegisterClientIdentity step.
     const Optional<ByteSpan> GetPDCClientIdentity() const { return mPDCClientIdentity; }
 
     // The commissionee's proof-of-possession signature over the Client Identity and the Possession Nonce.
     // Verified during kPDCRegisterClientIdentity prior to registering the client identity.
     // The AutoCommissioner populates this from the PDCClientIdentityInfo report returned by kWiFiNetworkSetup.
+    // This must be set before calling PerformCommissioningStep for the kPDCRegisterClientIdentity step.
     const Optional<ByteSpan> GetPDCPossessionSignature() const { return mPDCPossessionSignature; }
 
     // Whether the DeviceCommissioner is responsible for rolling back registration of the Network

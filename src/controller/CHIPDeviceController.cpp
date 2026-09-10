@@ -1271,8 +1271,10 @@ void DeviceCommissioner::CancelCommissioningInteractions()
     {
         // Drop the continuation waiting on the revocation, since it belongs to the attempt being
         // cancelled, whose caller is completed by other means from here. Note we deliberately do not
-        // cancel the revocation itself: it is not an interaction of this attempt (the registration it
-        // undoes was given up when it was issued), and abandoning it would leave the entry behind.
+        // cancel the revocation itself: this attempt being over is no reason to leave a stale client
+        // registration behind, and the revocation is not an interaction of this attempt anyway (the
+        // registration it undoes was given up when it was issued). So we let it run to completion and
+        // simply do nothing in particular once it does.
         ChipLogDetail(Controller, "Dropping the continuation of a network client revocation for step '%s'",
                       StageToString(mCommissioningStage));
         mOnNetworkClientUnregistrationCallback.mCall = OnClientUnregistered;
