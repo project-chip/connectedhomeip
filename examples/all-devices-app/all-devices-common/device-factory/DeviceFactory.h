@@ -874,7 +874,7 @@ private:
         {
             RegisterCreator("window-covering", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<SimulatedWindowCovering>(WindowCovering::Context{
+                return MakeDevice<SimulatedWindowCovering>(WindowCovering::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .timerDelegate     = mContext->timerDelegate,
                 });
