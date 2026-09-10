@@ -165,7 +165,6 @@ jobs:
                      --known-failure tests/scripts/subscription_resumption_test.py \
                      --known-failure tests/scripts/subscription_resumption_timeout_test.py \
                      --known-failure tests/test_cluster_objects.py \
-                     --known-failure tests/test_commissioning_flow_blocks.py \
                      --known-failure tests/test_generated_cluster_objects.py \
                      --known-failure tests/test_tlv.py \
                      src/controller/python

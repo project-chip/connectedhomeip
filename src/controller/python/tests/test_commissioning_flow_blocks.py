@@ -94,9 +94,8 @@ class TestCertificateChainDocumentLimit(unittest.IsolatedAsyncioTestCase):
                 controller = SimpleNamespace(SendCommand=AsyncMock(side_effect=responses))
                 flow = CommissioningFlowBlocks(controller, None, logging.getLogger(__name__))
                 with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size",
-                           return_value=8):
-                    with self.assertRaisesRegex(CommissionFailure, "invalid nextSegmentID progression"):
-                        await flow._request_certificate_chain(1, 1, None)
+                           return_value=8), self.assertRaisesRegex(CommissionFailure, "invalid nextSegmentID progression"):
+                    await flow._request_certificate_chain(1, 1, None)
                 self.assertEqual(controller.SendCommand.await_count, len(responses))
 
     async def test_assembles_consecutive_segments(self):
@@ -119,20 +118,19 @@ class TestCertificateChainDocumentLimit(unittest.IsolatedAsyncioTestCase):
                     # A finite response list also prevents a regression from hanging the test.
                     controller = SimpleNamespace(SendCommand=AsyncMock(side_effect=responses))
                     flow = CommissioningFlowBlocks(controller, None, logging.getLogger(__name__))
+                    # Empty segments cannot advance reassembly, including an empty final segment.
                     with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size",
-                               return_value=8):
-                        # Empty segments cannot advance reassembly, including an empty final segment.
-                        with self.assertRaisesRegex(CommissionFailure, "empty certificate segment"):
-                            await flow._request_certificate_chain(1, 1, None)
+                               return_value=8), self.assertRaisesRegex(CommissionFailure, "empty certificate segment"):
+                        await flow._request_certificate_chain(1, 1, None)
                     self.assertEqual(controller.SendCommand.await_count, len(responses))
 
     async def test_rejects_empty_single_response(self):
         controller = SimpleNamespace(SendCommand=AsyncMock(return_value=SimpleNamespace(
             certificate=b"", totalDocumentSize=None, nextSegmentID=None)))
         flow = CommissioningFlowBlocks(controller, None, logging.getLogger(__name__))
-        with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size", return_value=8):
-            with self.assertRaisesRegex(CommissionFailure, "empty certificate segment"):
-                await flow._request_certificate_chain(1, 1, None)
+        with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size",
+                   return_value=8), self.assertRaisesRegex(CommissionFailure, "empty certificate segment"):
+            await flow._request_certificate_chain(1, 1, None)
         controller.SendCommand.assert_awaited_once()
 
     async def test_uses_native_limit_for_single_and_segmented_responses(self):
