@@ -65,7 +65,10 @@ static_library("CYW30739") {
     "cycfg_gatt_db.h",
   ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   if (chip_enable_thread) {
     sources += [
