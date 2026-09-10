@@ -247,23 +247,23 @@ assert_valid_dn_key("Kitchen")
 
 ### ✅ Available assert functions
 
-|                                             |                                             |
-| ------------------------------------------- | ------------------------------------------- |
-| `assert_valid_d_key`                        | `assert_valid_operational_instance_name`    |
-| `assert_valid_vp_key`                       | `assert_valid_short_discriminator_subtype`  |
-| `assert_valid_cm_key`                       | `assert_valid_long_discriminator_subtype`   |
-| `assert_valid_dt_key`                       | `assert_is_commissionable_type`             |
-| `assert_valid_dn_key`                       | `assert_is_border_router_type`              |
-| `assert_valid_ri_key`                       | `assert_valid_devtype_subtype`              |
-| `assert_valid_ph_key`                       | `assert_valid_vendor_subtype`               |
-| `assert_valid_pi_key`                       | `assert_is_commissioner_type`               |
-| `assert_valid_jf_key`                       | `assert_valid_ipv6_addresses`               |
-| `assert_valid_sii_key`                      | `assert_is_operational_type`                |
-| `assert_valid_sai_key`                      | `assert_valid_product_id`                   |
-| `assert_valid_sat_key`                      | `assert_valid_vendor_id`                    |
-| `assert_valid_t_key`                        | `assert_valid_hostname`                     |
-| `assert_valid_icd_key`                      | `assert_txt_record_present`                 |
-| `assert_valid_commissionable_instance_name` |                                             |
+|                                             |                                            |
+| ------------------------------------------- | ------------------------------------------ |
+| `assert_valid_d_key`                        | `assert_valid_operational_instance_name`   |
+| `assert_valid_vp_key`                       | `assert_valid_short_discriminator_subtype` |
+| `assert_valid_cm_key`                       | `assert_valid_long_discriminator_subtype`  |
+| `assert_valid_dt_key`                       | `assert_is_commissionable_type`            |
+| `assert_valid_dn_key`                       | `assert_is_border_router_type`             |
+| `assert_valid_ri_key`                       | `assert_valid_devtype_subtype`             |
+| `assert_valid_ph_key`                       | `assert_valid_vendor_subtype`              |
+| `assert_valid_pi_key`                       | `assert_is_commissioner_type`              |
+| `assert_valid_jf_key`                       | `assert_valid_ipv6_addresses`              |
+| `assert_valid_sii_key`                      | `assert_is_operational_type`               |
+| `assert_valid_sai_key`                      | `assert_valid_product_id`                  |
+| `assert_valid_sat_key`                      | `assert_valid_vendor_id`                   |
+| `assert_valid_t_key`                        | `assert_valid_hostname`                    |
+| `assert_valid_icd_key`                      | `assert_txt_record_present`                |
+| `assert_valid_commissionable_instance_name` |                                            |
 
 ## 🛜 Network Utilities
 
@@ -290,10 +290,10 @@ for addr in addr_list:
 
 ## 🧰 Discovery Test Support Helpers
 
-This module contains higher-level helpers shared across the SC-4.x discovery test
-cases (`TC-SC-4.1/4.3/4.6/4.7`): DUT reads and record verifications that combine a
-query with its assertions. Record validators live in `utils/asserts.py` and raw
-record I/O in `mdns_discovery.py`.
+This module contains higher-level helpers shared across the SC-4.x discovery
+test cases (`TC-SC-4.1/4.3/4.6/4.7`): DUT reads and record verifications that
+combine a query with its assertions. Record validators live in
+`utils/asserts.py` and raw record I/O in `mdns_discovery.py`.
 
 You can import them from the following file: `mdns_discovery/utils/support.py`
 

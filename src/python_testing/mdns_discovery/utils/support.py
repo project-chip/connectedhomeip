@@ -24,11 +24,11 @@ read plus its assertions) shared across those tests.
 
 import logging
 
+from mdns_discovery.mdns_discovery import MdnsDiscovery
+from mdns_discovery.utils.asserts import assert_valid_hostname, assert_valid_ipv6_addresses
 from mobly import asserts
 
 import matter.clusters as Clusters
-from mdns_discovery.mdns_discovery import MdnsDiscovery
-from mdns_discovery.utils.asserts import assert_valid_hostname, assert_valid_ipv6_addresses
 
 log = logging.getLogger(__name__)
 

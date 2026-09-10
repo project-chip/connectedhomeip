@@ -66,13 +66,13 @@ from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_txt_record_present, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
-                                          assert_valid_hostname, assert_valid_icd_key, assert_valid_long_discriminator_subtype, assert_valid_ph_key,
-                                          assert_valid_ph_pi_relationship, assert_valid_pi_key, assert_valid_ri_key,
-                                          assert_valid_sai_key, assert_valid_sat_key, assert_valid_short_discriminator_subtype,
-                                          assert_valid_sii_key, assert_valid_t_key, assert_valid_vendor_subtype,
-                                          assert_valid_vp_key)
+                                          assert_valid_hostname, assert_valid_icd_key, assert_valid_long_discriminator_subtype,
+                                          assert_valid_ph_key, assert_valid_ph_pi_relationship, assert_valid_pi_key,
+                                          assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
+                                          assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
+                                          assert_valid_vendor_subtype, assert_valid_vp_key)
 from mdns_discovery.utils.network import is_dut_tcp_supported
-from mdns_discovery.utils.support import DiscoverySupport, SUBTYPE_BROWSE_TIMEOUT_SEC, TCP_PICS_STR, verify_aaaa_records
+from mdns_discovery.utils.support import SUBTYPE_BROWSE_TIMEOUT_SEC, TCP_PICS_STR, DiscoverySupport, verify_aaaa_records
 from mobly import asserts
 
 import matter.clusters as Clusters

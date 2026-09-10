@@ -55,7 +55,7 @@ from mdns_discovery.utils.asserts import (assert_txt_record_present, assert_vali
                                           assert_valid_ipv6_addresses, assert_valid_sai_key, assert_valid_sat_key,
                                           assert_valid_sii_key, assert_valid_t_key)
 from mdns_discovery.utils.network import is_dut_tcp_supported
-from mdns_discovery.utils.support import DiscoverySupport, TCP_PICS_STR
+from mdns_discovery.utils.support import TCP_PICS_STR, DiscoverySupport
 from mobly import asserts
 
 import matter.clusters as Clusters
