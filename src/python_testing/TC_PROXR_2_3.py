@@ -40,15 +40,14 @@
 
 import logging
 
+from mobly import asserts
+from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, UNKNOWN_PEER_BLE_DEVICE_ID,
+                              UNKNOWN_PEER_DEV_IK, WIFI_TECHNOLOGIES, BLTCSModeEnum, Feature, ProximityRangingTestBase,
+                              RangingRoleEnum, RangingSessionStatusEnum, RangingTechEnum, StatusCodeEnum)
+
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
-from mobly import asserts
 from matter.clusters.Types import NullValue
-from TC_PROXRTestBase import (BLTCSModeEnum, LTK_LEN, PMK_LEN, ProximityRangingTestBase, RangingRoleEnum,
-                              RangingTechEnum, RangingSessionStatusEnum, SESSION_KEY_LEN,
-                              SIMULATED_RANGING_LATENCY_S, WIFI_TECHNOLOGIES,
-                              UNKNOWN_PEER_BLE_DEVICE_ID, UNKNOWN_PEER_DEV_IK, Feature, StatusCodeEnum)
-
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -327,6 +326,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         if wifi_tech is not None:
             self.step(6)
             pmk = rnd(PMK_LEN)
+
             def _v_wifi(d):
                 self._validate_common_measurement(d)
                 asserts.assert_equal(d.wiFiDevIK, self.wifi_ik_r, "RangingResult WiFiDevIK must equal DUT_R's WiFiDevIK")
@@ -343,6 +343,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         async def _blt_instant(with_mode):
             ltk = rnd(LTK_LEN)
             mode = self.blt_mode if with_mode else None
+
             def _v_blt(d):
                 self._validate_common_measurement(d)
                 asserts.assert_equal(d.BLTDevIK, self.blt_ik_r, "RangingResult BLTDevIK must equal DUT_R's BLTDevIK")
@@ -366,6 +367,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         if ble_tech is not None:
             self.step(8)
             sk = rnd(SESSION_KEY_LEN)
+
             def _v_ble(d):
                 self.assert_time_of_measurement_present(d)
                 asserts.assert_equal(d.BLEDeviceID, self.ble_id_r, "RangingResult BLEDeviceID must equal DUT_R's")
@@ -424,6 +426,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         if wifi_tech is not None:
             self.step("12a")
             pmk = rnd(PMK_LEN)
+
             def _v_wifi2(d):
                 self._validate_common_measurement(d)
                 asserts.assert_equal(d.wiFiDevIK, self.wifi_ik_r, "RangingResult WiFiDevIK must equal DUT_R's WiFiDevIK")
@@ -442,6 +445,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         if blt_runs:
             self.step("13a")
             ltk = rnd(LTK_LEN)
+
             def _v_blt2(d):
                 self._validate_common_measurement(d)
                 asserts.assert_equal(d.BLTDevIK, self.blt_ik_r, "RangingResult BLTDevIK must equal DUT_R's BLTDevIK")
@@ -461,6 +465,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         if ble_tech is not None:
             self.step("14a")
             sk = rnd(SESSION_KEY_LEN)
+
             def _v_ble2(d):
                 self.assert_time_of_measurement_present(d)
                 asserts.assert_equal(d.BLEDeviceID, self.ble_id_r, "RangingResult BLEDeviceID must equal DUT_R's")

@@ -42,14 +42,14 @@ import asyncio
 import logging
 import time
 
+from mobly import asserts
+from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, WIFI_TECHNOLOGIES, BLTCSModeEnum,
+                              Feature, ProximityRangingTestBase, RangingRoleEnum, RangingTechEnum)
+
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
-from mobly import asserts
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from TC_PROXRTestBase import (BLTCSModeEnum, Feature, LTK_LEN, PMK_LEN, ProximityRangingTestBase, RangingRoleEnum,
-                              RangingTechEnum, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, WIFI_TECHNOLOGIES)
-
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main

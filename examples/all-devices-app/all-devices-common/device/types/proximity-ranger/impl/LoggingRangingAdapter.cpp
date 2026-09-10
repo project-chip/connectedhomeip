@@ -219,8 +219,8 @@ Structs::RangingCapabilitiesStruct::Type LoggingRangingAdapter::GetCapabilities(
     //
     // REAL ADAPTER: report exactly the roles the radio can perform for this
     // technology (query the radio driver); do not hard-code both.
-    capabilities.supportedRangingRoles = BitMask<RangingRoleSupportBitmap>(RangingRoleSupportBitmap::kInitiatorSupport,
-                                                                           RangingRoleSupportBitmap::kResponderSupport);
+    capabilities.supportedRangingRoles =
+        BitMask<RangingRoleSupportBitmap>(RangingRoleSupportBitmap::kInitiatorSupport, RangingRoleSupportBitmap::kResponderSupport);
     // MaxConcurrentSessions is Optional<> in the current data model but is treated
     // as mandatory by the cert tests (it is planned to become mandatory in the
     // spec), so the stub always reports it.

@@ -36,13 +36,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import matter.clusters as Clusters
-import matter.testing.matter_asserts as matter_asserts
 import test_plan_support
 from mobly import asserts
-from TC_PROXRTestBase import (DEVICE_IDENTITY_KEY_LEN, Feature, ProximityRangingTestBase, RangingTechEnum, WIFI_TECHNOLOGIES,
-                              BLTCSModeEnum, BLTCSSecurityLevelEnum)
+from TC_PROXRTestBase import (DEVICE_IDENTITY_KEY_LEN, WIFI_TECHNOLOGIES, BLTCSModeEnum, BLTCSSecurityLevelEnum, Feature,
+                              ProximityRangingTestBase, RangingTechEnum)
 
+import matter.clusters as Clusters
+import matter.testing.matter_asserts as matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main

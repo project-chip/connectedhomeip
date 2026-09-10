@@ -36,12 +36,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import test_plan_support
+from TC_PROXRTestBase import (DEVICE_IDENTITY_KEY_LEN, LTK_LEN, PMK_LEN, SESSION_KEY_LEN, BLTCSModeEnum, BLTCSSecurityLevelEnum,
+                              Feature, ProximityRangingTestBase, RangingRoleEnum, StatusCodeEnum)
+
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
-import test_plan_support
-from TC_PROXRTestBase import (BLTCSModeEnum, BLTCSSecurityLevelEnum, DEVICE_IDENTITY_KEY_LEN, Feature, LTK_LEN,
-                              PMK_LEN, ProximityRangingTestBase, RangingRoleEnum, SESSION_KEY_LEN, StatusCodeEnum)
-
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
