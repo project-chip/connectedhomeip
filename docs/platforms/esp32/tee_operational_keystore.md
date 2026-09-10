@@ -1,10 +1,10 @@
 # Operational (NOC) keys in ESP-TEE
 
 On SoCs that support ESP-TEE (Trusted Execution Environment; currently
-ESP32-C6), the Matter **operational (NOC) private key** can be held entirely inside the
-secure world. The key is generated in ESP-TEE secure storage, the CSR is signed
-there, and every CASE signature is produced there. The private key is never
-present in application RAM or in plaintext in flash.
+ESP32-C6), the Matter **operational (NOC) private key** can be held entirely
+inside the secure world. The key is generated in ESP-TEE secure storage, the CSR
+is signed there, and every CASE signature is produced there. The private key is
+never present in application RAM or in plaintext in flash.
 
 This is the operational-key counterpart to the Device Attestation Certificate
 (DAC) key protection described in
@@ -30,9 +30,9 @@ active in the device log:
 chip[SVR]: Operational keystore: ESP-TEE secure storage
 ```
 
-The bundled `examples/lighting-app/esp32/sdkconfig.defaults.esp32c6_tee`
-enables ESP-TEE (and the PBKDF2 TEE DAC), so a lighting-app built with that
-defaults file gets the TEE operational keystore as well.
+The bundled `examples/lighting-app/esp32/sdkconfig.defaults.esp32c6_tee` enables
+ESP-TEE (and the PBKDF2 TEE DAC), so a lighting-app built with that defaults
+file gets the TEE operational keystore as well.
 
 ### Requirements
 
@@ -44,7 +44,7 @@ defaults file gets the TEE operational keystore as well.
 ## 2. How keys are stored
 
 `OperationalKeystore` has fail-safe semantics: a key created by
-`NewOpKeypairForFabric` is *pending* and must survive a fail-safe expiry
+`NewOpKeypairForFabric` is _pending_ and must survive a fail-safe expiry
 (`RevertPendingKeypair`) without disturbing the previously committed key, and is
 only made permanent by `CommitOpKeypairForFabric`.
 
@@ -53,31 +53,31 @@ on commit. A TEE key **cannot** live in RAM — `esp_tee_sec_storage_gen_key`
 persists it immediately. To preserve the fail-safe semantics anyway, each fabric
 uses **two secure-storage slots** plus a small persisted pointer:
 
-| Item | Secure-storage / NVS id | Contents |
-|------|-------------------------|----------|
-| Slot A | `opk-<fabricIndex>-A` | a `SECP256R1` key in TEE secure storage |
-| Slot B | `opk-<fabricIndex>-B` | a `SECP256R1` key in TEE secure storage |
-| Active pointer | KVS `tso/<fabricIndex>` (1 byte) | `'A'` or `'B'` — the committed slot |
+| Item           | Secure-storage / NVS id          | Contents                                |
+| -------------- | -------------------------------- | --------------------------------------- |
+| Slot A         | `opk-<fabricIndex>-A`            | a `SECP256R1` key in TEE secure storage |
+| Slot B         | `opk-<fabricIndex>-B`            | a `SECP256R1` key in TEE secure storage |
+| Active pointer | KVS `tso/<fabricIndex>` (1 byte) | `'A'` or `'B'` — the committed slot     |
 
 Lifecycle → slot mapping:
 
--   **NewOpKeypairForFabric** — generate into the *inactive* slot (the one the
-    pointer does **not** name), so the committed key stays usable. Build and sign
-    the CSR in the TEE.
--   **ActivateOpKeypairForFabric** — verify the pending slot's public key matches
-    the incoming NOC public key.
+-   **NewOpKeypairForFabric** — generate into the _inactive_ slot (the one the
+    pointer does **not** name), so the committed key stays usable. Build and
+    sign the CSR in the TEE.
+-   **ActivateOpKeypairForFabric** — verify the pending slot's public key
+    matches the incoming NOC public key.
 -   **CommitOpKeypairForFabric** — write the active pointer to the pending slot
     (the atomic commit point), then delete the superseded slot's key (rotation).
 -   **RevertPendingKeypair** — clear the pending (inactive) slot's key; the
     committed key and pointer are untouched.
 -   **RemoveOpKeypairForFabric** — delete both slot keys and the pointer.
--   **SignWithOpKeypair** — sign with the pending slot if a pending key is active
-    for the fabric, otherwise with the committed slot.
+-   **SignWithOpKeypair** — sign with the pending slot if a pending key is
+    active for the fabric, otherwise with the committed slot.
 
-Because signing goes through `esp_tee_sec_storage_ecdsa_sign`, the CASE signature
-is computed inside the TEE. The only application-visible NVS record per fabric is
-the 1-byte `tso/<idx>` pointer; the key material lives in the `secure_storage`
-partition, which the REE cannot read.
+Because signing goes through `esp_tee_sec_storage_ecdsa_sign`, the CASE
+signature is computed inside the TEE. The only application-visible NVS record
+per fabric is the 1-byte `tso/<idx>` pointer; the key material lives in the
+`secure_storage` partition, which the REE cannot read.
 
 ### CSR generation
 
@@ -96,17 +96,18 @@ operational key pair to be:
 -   committed to persistent storage only upon successful `AddNOC`/`UpdateNOC`
     with a NOC whose public key matches the candidate (2c).
 
-**Deviation and how it is bounded.** A TEE key is persisted at generation, so the
-candidate key is briefly on flash before commit — it cannot be held RAM-only.
-The two-slot scheme keeps the *committed* key the sole active key until commit:
-the candidate lives in the inactive slot, is cleared by `RevertPendingKeypair`
-on fail-safe expiry, and is never selected by `SignWithOpKeypair` unless it was
-activated. If power is lost mid-fail-safe, a candidate key can linger in the
-inactive slot; it is bounded to at most one inactive slot per fabric and is
-cleared by the next `NewOpKeypairForFabric` (which removes the inactive-slot key
-before generating) or by `RemoveOpKeypairForFabric`. On reboot the RAM
-pending state is gone, so the aborted candidate is never treated as active —
-matching the intent that a fail-safe that did not complete leaves no usable key.
+**Deviation and how it is bounded.** A TEE key is persisted at generation, so
+the candidate key is briefly on flash before commit — it cannot be held
+RAM-only. The two-slot scheme keeps the _committed_ key the sole active key
+until commit: the candidate lives in the inactive slot, is cleared by
+`RevertPendingKeypair` on fail-safe expiry, and is never selected by
+`SignWithOpKeypair` unless it was activated. If power is lost mid-fail-safe, a
+candidate key can linger in the inactive slot; it is bounded to at most one
+inactive slot per fabric and is cleared by the next `NewOpKeypairForFabric`
+(which removes the inactive-slot key before generating) or by
+`RemoveOpKeypairForFabric`. On reboot the RAM pending state is gone, so the
+aborted candidate is never treated as active — matching the intent that a
+fail-safe that did not complete leaves no usable key.
 
 ## 4. Behavior details
 
@@ -156,11 +157,11 @@ application NVS) is the corresponding negative check.
 
 ## 6. Source
 
-| File | Role |
-|------|------|
-| `src/platform/ESP32/ESP32TEEOpKey.{h,cpp}` | Low-level TEE key primitives (generate / public key / CSR / sign / remove) + self-test. |
-| `src/platform/ESP32/ESP32TEEOperationalKeystore.{h,cpp}` | `Crypto::OperationalKeystore` implementation (two-slot + pointer scheme). |
-| `examples/platform/esp32/common/Esp32AppServer.cpp` | Installs the keystore into `initParams` under `CONFIG_SECURE_ENABLE_TEE`. |
+| File                                                     | Role                                                                                    |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `src/platform/ESP32/ESP32TEEOpKey.{h,cpp}`               | Low-level TEE key primitives (generate / public key / CSR / sign / remove) + self-test. |
+| `src/platform/ESP32/ESP32TEEOperationalKeystore.{h,cpp}` | `Crypto::OperationalKeystore` implementation (two-slot + pointer scheme).               |
+| `examples/platform/esp32/common/Esp32AppServer.cpp`      | Installs the keystore into `initParams` under `CONFIG_SECURE_ENABLE_TEE`.               |
 
 > **Note (IDF version):** `esp_tee_sec_storage_ecdsa_sign_t` changed in IDF v6.0
 > (separate `sign_r`/`sign_s` fields became a single `signature[]`). The code
