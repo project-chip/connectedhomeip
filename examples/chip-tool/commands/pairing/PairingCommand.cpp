@@ -227,25 +227,16 @@ void PairingCommand::Shutdown()
         // Stop the pairing first, as the NetworkIdentityRegistrar contract requires: this run may have
         // ended on a timeout, with commissioning still under way and the commissioner still pointing at
         // the registrar. An error just means there was nothing left to stop.
-        CHIP_ERROR err = CurrentCommissioner().StopPairing(mNodeId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(chipTool, "Nothing to stop before releasing the PDC registrar: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        RETURN_SAFELY_IGNORED CurrentCommissioner().StopPairing(mNodeId);
 
         // Drop the idle notification before releasing the registrar: destroying it aborts whatever
         // is in flight, which would otherwise release the waiter and set an exit status from here,
         // re-entering StopWaiting() while the rest of the shutdown is still running.
         mPDCRegistrarIdleCallback.Cancel();
 
-        // The run is over, so there is nothing left to wait on: an abrupt shutdown it is. Anything
-        // still in flight here is a revocation the run did not last long enough to see through, which
-        // DeferExitForPDCRegistrar() would otherwise have waited for.
-        if (!mPDCRegistrar->IsIdle())
-        {
-            ChipLogError(chipTool, "Abandoning a Network Client Identity revocation; the entry may be left behind on the network");
-        }
-        mPDCRegistrar.reset(); // the destructor aborts anything still outstanding
+        // Anything still in flight is a revocation the run did not last long enough to see through;
+        // the destructor aborts it and the commissioner reports the identity left behind.
+        mPDCRegistrar.reset();
     }
     CHIPCommand::Shutdown();
 }
