@@ -66,6 +66,7 @@ SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 # --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo"
 # --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1"
 
+
 class TC_ACS_2_1(MatterBaseTest):
 
     @pics('ACS.S')
@@ -74,35 +75,35 @@ class TC_ACS_2_1(MatterBaseTest):
         """[TC-ACS-2.1] Cluster endpoint"""
         self.step(1, "Commissioning, already done", is_commissioning=True)
         self.setp(2, "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute.",
-                 "TH reads the HumanActivityDetected attribute containing Boolean True or False.")
+                  "TH reads the HumanActivityDetected attribute containing Boolean True or False.")
         self.step(3, "If DUT supports ObjectIdentification feature, TH reads the ObjectIdentified attribute.",
-                 "TH reads the ObjectIdentified attribute containing Boolean True or False.")
+                  "TH reads the ObjectIdentified attribute containing Boolean True or False.")
         self.step(4, "If DUT supports SoundIdentification feature, TH reads the AudioContextDetected attribute.",
-                 "TH reads the AudioContextDetected attribute containing Boolean True or False.")
+                  "TH reads the AudioContextDetected attribute containing Boolean True or False.")
         self.step(5, "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextTypeSupported attribute.",
-                 "Verify that the DUT response contains SemanticTag struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.",
-                 "Verify that the list size is less than equal to 50.")
+                  "Verify that the DUT response contains SemanticTag struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.",
+                  "Verify that the list size is less than equal to 50.")
         self.step(6, "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextType attribute.",
-                 "Verify that DUT response contains the list size is less than SimultaneousDetectionLimit.",
-                 "Verify that DUT response contains the list of namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute.")
+                  "Verify that DUT response contains the list size is less than SimultaneousDetectionLimit.",
+                  "Verify that DUT response contains the list of namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute.")
         self.step(7, "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountThresholdReached attribute.",
-                 "TH reads the ObjectCountThresholdReached containing Boolean True or False.")
+                  "TH reads the ObjectCountThresholdReached containing Boolean True or False.")
         self.step(8, "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute.",
-                 "Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject.",
-                 "Verify that the ObjectCountThreshold value is greater than equal to 1.")
+                  "Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject.",
+                  "Verify that the ObjectCountThreshold value is greater than equal to 1.")
         self.step(9, "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute.",
-                 "Verity that DUT reads uint16 value.")
+                  "Verity that DUT reads uint16 value.")
         self.step(10, "TH reads the SimultaneousDetectionLimit attribute.",
-                 "Verify that the DUT response contains a value greater than equal to 1 and less than equal to 10.")
+                  "Verify that the DUT response contains a value greater than equal to 1 and less than equal to 10.")
         self.step(11, "TH reads the HoldTime attribute.",
-                 "Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax")
+                  "Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax")
         self.step(12, "TH reads the HoldTimeLimits attribute.",
-                 "Verify that DUT response contains HoldTimeMin (>=1), HolTimeMax (min maxOf(HoldTimeMin, 10)) and HoldTimeDefault (between HoldTimeMin and HoldTimeMax)")
+                  "Verify that DUT response contains HoldTimeMin (>=1), HolTimeMax (min maxOf(HoldTimeMin, 10)) and HoldTimeDefault (between HoldTimeMin and HoldTimeMax)")
         self.step(13a, "If DUT supports PredictedActivity feature, then TH reads the PredictedActivity attribute.",
-                 "Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100.",
-                 "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
+                  "Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100.",
+                  "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
         self.step(13b, "If DUT supports ObjectCounting feature, then TH reads the CrowdDetected field",
-                 "TH verifies the CrowdDetected field, Boolean true or false. And If DUT supports the CrowdCount field, then TH reads an uint8 value between 1 and 254.")
+                  "TH verifies the CrowdDetected field, Boolean true or false. And If DUT supports the CrowdCount field, then TH reads an uint8 value between 1 and 254.")
 
     def setup_test(self):
         super().setup_test()
