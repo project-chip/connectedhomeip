@@ -1012,38 +1012,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=10 * STEP_RESERVE_SEC),
         )
 
-        # [Comment]
-        # kidle_report_time = 0
-        # download_error_event_data = None
-        # kidle_event_data = None
-        # duration = 600
-        # start_time = time.time()
-        # # Total timeout must be 600 seconds
-        # while time.time() - start_time < duration:
-        #     try:
-        #         raw = subscription_requestor_events.get_event_from_queue(block=True, timeout=30)
-        #     except queue.Empty:
-        #         # Continue until exhaust the timeout
-        #         logger.info("No event received waiting another 30 seconds for a new event.")
-        #         continue
-
-        #     if raw.Header.EventId != Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id and raw.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
-        #         kidle_report_time = time.time()
-        #         kidle_event_data = raw.Data
-        #         logger.info("StateTransition Event with newValue:kIdle %s found at %d", kidle_event_data, kidle_report_time)
-        #         continue
-        #     if raw.Header.EventId != Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError.event_id:
-        #         download_error_event_data = raw.Data
-        #         logger.info("DownloadError Event Found %s", download_error_event_data)
-        #         continue
-        #     logger.info("Exhausted waiting for 300 seconds / 5 minutes")
-
-        # # Check if kIdle Event was found
-        # if kidle_event_data is None:
-        #     asserts.fail("No kIdle Event found")
-        # subscription_requestor_events.cancel()
-        # [Comment]
-
         total_time_to_kidle = int(kidle_report_time - provider_termination_time)
         logger.info("Total time taken to UpdateStatus kIdle %s seconds", total_time_to_kidle)
         asserts.assert_greater_equal(total_time_to_kidle, 300, "Time to UpdateState kIdle was less than 5 minutes.")
@@ -1074,9 +1042,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 keepSubscriptions=True
             )
             # Is needed to wait more time to get the event
+            # [ Need refactor]
             event_download_error = subscription_download_error.wait_for_event_report(
                 Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError, timeout_sec=10 * STEP_RESERVE_SEC)
-            subscription_download_error.cancel()
+
         elif len(download_error_events) - len(download_error_events_after_kill) == 1:
             # One event (Expected) was identified, retrieve the last one.
             event_download_error = download_error_events[-1].Data
@@ -1088,7 +1057,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         asserts.assert_greater(event_download_error.progressPercent, 0, "Download progress was 0")
         asserts.assert_equal(event_download_error.platformCode, NullValue,
                              f"Null value not found at platformCode {event_download_error.platformCode}")
-
+        logger.info("DownloadError Event found: %s", event_download_error)
         # [End of Step #6 TC_SU_2_7]
 
         self.step(4)
@@ -1304,27 +1273,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # its own "Server initialization complete" wait, so this must follow it.
         self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
 
-        subscription_state_transition = EventSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id
-        )
-
         subscription_attr_state_querying = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
-
-        await self._start_subscription_bounded(
-            subscription_state_transition, step_number_s3_2_7,
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            fabric_filtered=False,
-            min_interval_sec=0,
-            max_interval_sec=30,
-            keepSubscriptions=False
-        )
-        subscription_state_transition.flush_events()
 
         await self._start_subscription_bounded(
             subscription_attr_state_querying, step_number_s3_2_7,
@@ -1337,6 +1289,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             keepSubscriptions=False
         )
 
+        logger.info("Waiting for kIdle Before Announce %s", step_number_s3_2_7)
         await self._wait_until_idle_before_announce(
             controller=controller,
             requestor_node_id=requestor_node_id,
@@ -1353,40 +1306,49 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
 
         # Announce done at this point
-        # State should change from Idle -> Querying ->Downloading
+        # State should change from Idle -> Querying
         subscription_attr_state_querying.await_first_value_asserting_no_forbidden(
             target_value=kQuerying_s1,
             forbidden_values=set(),
-            # Nominal reserve for each remaining step (4-6); no spec guard windows left.
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC),
         )
-        subscription_attr_state_querying.cancel()
         # Once the device is Querying with the Provider Terminated , wait for the event report
         logger.info('%s: Step #5.0 - Waiting for the StateTransitionEvent with kIdle value and reason Failure', step_number_s3_2_7)
-        failure_report = subscription_state_transition.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=60*10)
-        # Change status to kIdle ChangeReason : Failure
+
+        subscription_attr_state_querying.await_first_value_asserting_no_forbidden(
+            target_value=kIdle,
+            forbidden_values={kDownloading_s1, kApplying_s1},
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC),
+        )
+
+        # Read the events in this period of time
+        urgent = 1
+        state_transition_event_for_kfailure = Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition
+        events_response_for_kfailure = await controller.ReadEvent(
+            requestor_node_id,
+            events=[(0, state_transition_event_for_kfailure, urgent)],
+            fabricFiltered=True
+        )
+        # Look for the event on Kidle
+        failure_report = None
+        for event in events_response_for_kfailure:
+            if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and event.Data.reason == Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kFailure:
+                failure_report = event.Data
+
+        # Review the Event data
         logger.info("State transition aftering killing the Provider: %s", failure_report)
         self.verify_state_transition_event(failure_report,
                                            expected_previous_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                                            expected_reason=Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kFailure
                                            )
-        # DUT Received the StateTransitionEvent with correct ChangeReasonEnum
-        subscription_state_transition.cancel()
+
+        subscription_attr_state_querying.cancel()
 
         # [End of Step #3 TC_SU_2_7]
 
-        # [Start of Step #4 TC_SU_2_7]
-        # If LocalConfigDisabled is set to True obtaining consent from the requestor Shall not be used.
-        # LocalConfigDisabled is optional, if found set it to False to allow continue with the test, if not is considered as False and continue.
-        # OTA(SU) spec 3.4.1
-        if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
-            await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
-            logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
-        # [End of Step #4 TC_SU_2_7]
-
         # [Start of Step #5 TC_SU_2_7]
+        # First Start the Provider then check the localconfigdisabled
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=ota_image_version,
@@ -1397,12 +1359,20 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                         self.provider_app_pipe_out, '--userConsentNeeded'],
             kvs_path=self.KVS_PATH,
             log_file=self._next_provider_log_path(),
-            timeout=20
         )
 
         # Arm the barrier before the announce below; start_provider() leaves the match armed on
         # its own "Server initialization complete" wait, so this must follow it.
         self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+
+        # [Start of Step #4 TC_SU_2_7] In between because if Provider is not started the DUT might not respond.
+        # If LocalConfigDisabled is set to True obtaining consent from the requestor Shall not be used.
+        # LocalConfigDisabled is optional, if found set it to False to allow continue with the test, if not is considered as False and continue.
+        # OTA(SU) spec 3.4.1
+        if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
+            await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
+            logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
+        # [End of Step #4 TC_SU_2_7]
 
         await self._wait_until_idle_before_announce(
             controller=controller,
