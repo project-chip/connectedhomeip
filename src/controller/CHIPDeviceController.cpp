@@ -2865,8 +2865,12 @@ CHIP_ERROR DeviceCommissioner::ParseOperationalCredentialsInfo(ReadCommissioning
         mAttributeCache->Get<OperationalCredentials::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, *featureMap.RawStorage());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to read OperationalCredentials FeatureMap: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
+        ChipLogError(Controller,
+                     "Failed to read OperationalCredentials FeatureMap: %" CHIP_ERROR_FORMAT
+                     ". Falling back to Matter legacy device attestation.",
+                     err.Format());
+        SetLegacyAttestationInfo(info);
+        return CHIP_NO_ERROR;
     }
 
     if (!featureMap.Has(Feature::kPQCDeviceAttestation))

@@ -107,6 +107,35 @@ TEST_F(TestParseOperationalCredentialsInfo, LegacyFeatureMapDefaultsToLegacyProf
         OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy));
 }
 
+TEST_F(TestParseOperationalCredentialsInfo, FeatureMapStatusErrorFallsBackToLegacy)
+{
+    using OperationalCredentials::AttestationCryptoProfileBitmap;
+
+    auto cache = Platform::MakeUnique<MockClusterStateCache>();
+    ASSERT_NE(cache, nullptr);
+
+    // An unavailable FeatureMap must select pre-PQC attestation instead of failing commissioning.
+    ConcreteDataAttributePath featureMapPath(kRootEndpointId, OperationalCredentials::Id,
+                                             OperationalCredentials::Attributes::FeatureMap::Id);
+    ReadClient::Callback & callback = cache->GetBufferedCallback();
+    callback.OnAttributeData(featureMapPath, nullptr, StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
+
+    DeviceCommissionerTestAccess access(&mCommissioner);
+    access.SetAttributeCache(Platform::UniquePtr<ClusterStateCache>(cache.release()));
+
+    ReadCommissioningInfo info{};
+    info.supportsPqcDeviceAttestation = true;
+    info.paiSupportedAttestationProfiles.Set(AttestationCryptoProfileBitmap::kSupportsMlDsa65);
+    info.dacSupportedAttestationProfiles.Set(AttestationCryptoProfileBitmap::kSupportsMlDsa44);
+
+    ASSERT_EQ(access.ParseOperationalCredentialsInfo(info), CHIP_NO_ERROR);
+    EXPECT_FALSE(info.supportsPqcDeviceAttestation);
+    EXPECT_EQ(info.paiSupportedAttestationProfiles.Raw(),
+              BitMask<AttestationCryptoProfileBitmap>(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy).Raw());
+    EXPECT_EQ(info.dacSupportedAttestationProfiles.Raw(),
+              BitMask<AttestationCryptoProfileBitmap>(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy).Raw());
+}
+
 TEST_F(TestParseOperationalCredentialsInfo, PqcFeaturePreservesIndependentPaiAndDacProfiles)
 {
     auto cache = Platform::MakeUnique<MockClusterStateCache>();
