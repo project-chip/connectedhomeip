@@ -66,13 +66,13 @@ from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_txt_record_present, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
-                                          assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
-                                          assert_valid_long_discriminator_subtype, assert_valid_ph_key,
+                                          assert_valid_hostname, assert_valid_icd_key, assert_valid_long_discriminator_subtype, assert_valid_ph_key,
                                           assert_valid_ph_pi_relationship, assert_valid_pi_key, assert_valid_ri_key,
                                           assert_valid_sai_key, assert_valid_sat_key, assert_valid_short_discriminator_subtype,
                                           assert_valid_sii_key, assert_valid_t_key, assert_valid_vendor_subtype,
                                           assert_valid_vp_key)
 from mdns_discovery.utils.network import is_dut_tcp_supported
+from mdns_discovery.utils.support import DiscoverySupport, SUBTYPE_BROWSE_TIMEOUT_SEC, TCP_PICS_STR, verify_aaaa_records
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -92,17 +92,7 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#341-tc-sc-41-commissionable-node-discovery-dut_commissionee
 '''
 
-TCP_PICS_STR = "MCORE.SC.S.TCP"
 ROOT_NODE_ENDPOINT_ID = 0
-
-# Timeout for a single subtype PTR browse:
-#   - Browses that get an answer end early via MdnsDiscovery's discovery-silence
-#     monitor; the full 5s is only paid by candidates that never answer.
-#   - Sized so an unanswered browse still spans the initial mDNS query plus two
-#     retransmissions (RFC 6762 §5.2: queries at ~0/1/3s) before the subtype is
-#     treated as not advertised.
-#   - Candidates browse concurrently, so a verification pass pays one 5s window total.
-SUBTYPE_BROWSE_TIMEOUT_SEC = 5
 
 
 class SetupCodeType(enum.IntEnum):
@@ -111,7 +101,7 @@ class SetupCodeType(enum.IntEnum):
     NONE_SUPLIED = 2
 
 
-class TC_SC_4_1(MatterBaseTest):
+class TC_SC_4_1(DiscoverySupport, MatterBaseTest):
     # Cached by get_exposed_device_types() so its per-endpoint Descriptor
     # reads run once per test instead of once per verification pass
     _exposed_device_types: set[int] | None = None
@@ -248,30 +238,6 @@ class TC_SC_4_1(MatterBaseTest):
                         section of the Test Plan for the list of verifications to be performed"""),
         ]
 
-    async def get_descriptor_server_list(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=ROOT_NODE_ENDPOINT_ID,
-            dev_ctrl=self.default_controller,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.ServerList
-        )
-
-    async def get_active_mode_threshold_ms(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=ROOT_NODE_ENDPOINT_ID,
-            dev_ctrl=self.default_controller,
-            cluster=Clusters.IcdManagement,
-            attribute=Clusters.IcdManagement.Attributes.ActiveModeThreshold
-        )
-
-    async def get_icd_feature_map(self):
-        return await self.read_single_attribute_check_success(
-            endpoint=ROOT_NODE_ENDPOINT_ID,
-            dev_ctrl=self.default_controller,
-            cluster=Clusters.IcdManagement,
-            attribute=Clusters.IcdManagement.Attributes.FeatureMap
-        )
-
     async def get_exposed_device_types(self) -> set[int]:
         """Returns the union of device types the DUT exposes across all endpoints
         (Descriptor cluster DeviceTypeList), memoized for the test run. The Primary
@@ -293,14 +259,6 @@ class TC_SC_4_1(MatterBaseTest):
                 device_types.update(entry.deviceType for entry in device_type_list)
             self._exposed_device_types = device_types
         return self._exposed_device_types
-
-    def get_dut_instance_name(self, log_result: bool = False) -> str:
-        node_id = self.dut_node_id
-        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
-        if log_result:
-            log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
-        return instance_name
 
     def get_discriminator_subtype(self, is_obcw: bool = False) -> tuple[str, str] | None:
         # TH constructs the Discriminator Subtype using the DUT's Long or Short Discriminator
@@ -728,19 +686,6 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify the relationship between PH and PI keys
         assert_valid_ph_pi_relationship(txt_record.txt)
 
-    @staticmethod
-    async def _verify_aaaa_records(srv_hostname: str) -> None:
-        # TH performs a AAAA record query against the target 'hostname'
-        # listed in the 'Commissionable Service' SRV record
-        quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_hostname, log_output=True)
-
-        # Verify that at least 1 AAAA record is returned for each IPv6 a address
-        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_hostname}'")
-
-        # Verify that each AAAA record contains a valid IPv6 address
-        ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
-        assert_valid_ipv6_addresses(ipv6_addresses)
-
     async def close_commissioning_window(self) -> None:
         revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.default_controller.SendCommand(nodeId=self.dut_node_id,
@@ -880,7 +825,7 @@ class TC_SC_4_1(MatterBaseTest):
             # *** STEP 16 ***
             # Verify AAAA records
             self.step(16)
-            await self._verify_aaaa_records(srv_hostname)
+            await verify_aaaa_records(srv_hostname)
 
             # *** STEP 17 ***
             # Close commissioning window
@@ -929,7 +874,7 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 24 ***
         # Verify AAAA records
         self.step(24)
-        await self._verify_aaaa_records(srv_hostname)
+        await verify_aaaa_records(srv_hostname)
 
         # *** STEP 25 ***
         # Close commissioning window
@@ -965,7 +910,7 @@ class TC_SC_4_1(MatterBaseTest):
             # *** STEP 30 ***
             # Verify AAAA records
             self.step(30)
-            await self._verify_aaaa_records(srv_hostname)
+            await verify_aaaa_records(srv_hostname)
         else:
             log.info("Skipping Extended Discovery mode advertisements verification steps.")
             self.mark_step_range_skipped(27, 30)
