@@ -55,6 +55,7 @@ endfunction()
 
 # Appends to a sysbuild image variable. Read-modify-write because writing a
 # CACHE INTERNAL entry implies FORCE, which would drop values passed with -D.
+# Appended paths persist in the cache, so changing boards requires a pristine build.
 function(all_devices_append_image_files var)
     set(_value ${${var}} ${ARGN})
     if(_value)
