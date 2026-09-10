@@ -101,6 +101,7 @@ CodeDrivenClusters:
     - Administrator Commissioning
     - Air Quality
     - Ambient Context Sensing
+    - Audio Control
     - Basic Information
     - Binding
     - Boolean State
