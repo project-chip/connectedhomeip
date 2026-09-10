@@ -22,10 +22,14 @@ mdns_discovery/mdns_discovery.py. This module holds the orchestration helpers (a
 read plus its assertions) shared across those tests.
 """
 
+import asyncio
 import logging
+import time
 
-from mdns_discovery.mdns_discovery import MdnsDiscovery
-from mdns_discovery.utils.asserts import assert_valid_hostname, assert_valid_ipv6_addresses
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.utils.asserts import (assert_is_commissioner_type, assert_valid_commissionable_instance_name,
+                                          assert_valid_dn_key, assert_valid_dt_key, assert_valid_hostname,
+                                          assert_valid_ipv6_addresses, assert_valid_vp_key)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -35,23 +39,32 @@ log = logging.getLogger(__name__)
 # Answered browses end early via MdnsDiscovery's discovery-silence monitor, so the
 # full timeout is only paid when the subtype is not advertised.
 SUBTYPE_BROWSE_TIMEOUT_SEC = 5
+# Overall deadline for a commissioner service to appear; the browse is retried
+# until then so a freshly started advertiser has time to answer queries.
+COMMISSIONER_BROWSE_DEADLINE_SEC = 30
 TCP_PICS_STR = "MCORE.SC.S.TCP"
 
 
-async def verify_srv_record(instance_name: str, service_type: str) -> str:
-    """Query the SRV record for instance_name/service_type and return its hostname.
-
-    Verifies the record is returned, its instance name matches, and its hostname is valid.
-    """
+async def get_verify_srv_record(instance_name: str, service_type: str) -> str:
+    """Query the SRV record for instance_name/service_type, verify it, and return its hostname."""
+    # TH performs an SRV record query against the instance name
     srv_record = await MdnsDiscovery().get_srv_record(
         service_name=f"{instance_name}.{service_type}",
         service_type=service_type,
-        log_output=True,
+        log_output=True
     )
+
+    # Verify SRV record is returned
     asserts.assert_true(srv_record is not None, "SRV record was not returned")
+
+    # Verify that the SRV record's instance name is equal to the browsed instance name
     asserts.assert_equal(srv_record.instance_name, instance_name,
-                         "SRV record's instance name must equal the queried instance name.")
+                         "SRV record's instance name must be equal to the browsed instance name.")
+
+    # Verify that the target hostname is expressed as a twelve or sixteen
+    # capital letter hex string
     assert_valid_hostname(srv_record.hostname)
+
     return srv_record.hostname
 
 
@@ -85,13 +98,108 @@ async def get_single_ptr_instance_name(subtype: str, must_be_present: bool = Tru
     return None
 
 
-async def verify_devtype_subtype(instance_name: str, dt_key: str, service_type: str,
-                                 timeout_sec: float = SUBTYPE_BROWSE_TIMEOUT_SEC) -> None:
-    """Verify the Devtype Subtype (_T<dt>) PTR record's instance name equals instance_name."""
+async def verify_devtype_subtype(instance_name: str, dt_key: str, service_type: str) -> None:
+    """Verify the 'Devtype Subtype' (_T<dt>) PTR record for service_type points at instance_name.
+
+    The 'Devtype Subtype' _T value is the advertiser's device type. The advertiser is
+    not commissioned in these tests, so the Descriptor cluster cannot be read; the
+    advertised DT TXT key is the only available device type claim to verify the
+    subtype against.
+    """
+    # Construct the 'Devtype Subtype' _T from the advertised device type
     devtype_subtype = f"_T{int(dt_key)}._sub.{service_type}"
-    ptr_instance_name = await get_single_ptr_instance_name(devtype_subtype, timeout_sec=timeout_sec)
-    asserts.assert_equal(ptr_instance_name, instance_name,
-                         "'Devtype Subtype' PTR record's instance name must equal the service instance name.")
+
+    # TH performs a PTR record query against the 'Devtype Subtype'
+    ptr_records = await MdnsDiscovery().get_ptr_records(
+        service_types=[devtype_subtype],
+        discovery_timeout_sec=SUBTYPE_BROWSE_TIMEOUT_SEC,
+        log_output=True
+    )
+
+    # Verify that there is one, and only one, 'Devtype Subtype' PTR record
+    asserts.assert_equal(len(ptr_records), 1,
+                         f"There must only be one 'Devtype Subtype' ({devtype_subtype}) PTR record, found {len(ptr_records)}.")
+
+    # Verify that the 'Devtype Subtype' PTR record's instance name is
+    # equal to the browsed service instance name
+    asserts.assert_equal(ptr_records[0].instance_name, instance_name,
+                         "'Devtype Subtype' PTR record's instance name must be equal to the browsed service instance name.")
+
+
+async def get_verify_commissioner_service():
+    """Browse for the 'Commissioner Service' (_matterd._udp), verify it, and return the advertised service."""
+
+    # TH browses for the 'Commissioner Service' (_matterd._udp) through DNS-SD, retrying to absorb the advertiser's startup lag
+    deadline = time.monotonic() + COMMISSIONER_BROWSE_DEADLINE_SEC
+    while True:
+        services = await MdnsDiscovery().get_commissioner_services(log_output=True)
+        if services or time.monotonic() >= deadline:
+            break
+        log.info("No commissioner service discovered yet, retrying browse...")
+        await asyncio.sleep(2)
+
+    # Verify that there is one, and only one, commissioner service advertised
+    # (the advertiser is expected to be the only commissioner on the test network)
+    asserts.assert_equal(len(services), 1,
+                         f"There must only be one commissioner service advertised, found {len(services)}.")
+    service = services[0]
+
+    # Verify that the DNS-SD instance name is a 64-bit ID expressed as a
+    # sixteen-char hex string with capital letters (the rule is shared with
+    # the commissionable instance name)
+    assert_valid_commissionable_instance_name(service.instance_name)
+
+    # Verify that the service type is '_matterd._udp' and service domain '.local'
+    assert_is_commissioner_type(service.service_type)
+
+    return service
+
+
+async def verify_commissioner_txt_record_keys(instance_name: str) -> str | None:
+    """Query the Commissioner Service TXT record for instance_name, verify its keys, and return the DT key, if any."""
+    # TH performs a 'Commissioner Service' TXT record query against the instance name
+    txt_record = await MdnsDiscovery().get_txt_record(
+        service_name=f"{instance_name}.{MdnsServiceType.COMMISSIONER.value}",
+        service_type=MdnsServiceType.COMMISSIONER.value,
+        log_output=True
+    )
+    # All commissioner TXT keys are optional, so the record itself may be absent;
+    # treat that as an empty key set.
+    txt = txt_record.txt if txt_record and txt_record.txt else {}
+
+    # *** VP KEY ***
+    # If the 'VP' key is present
+    if 'VP' in txt:
+        # Verify that it is non-empty
+        vp_key = txt['VP']
+        asserts.assert_true(vp_key, "'VP' key is present but has no value.")
+
+        # Verify that it contains at least Vendor ID, and if Product ID
+        # is present, both values must be separated by a + sign
+        assert_valid_vp_key(vp_key)
+
+    # *** DT KEY ***
+    # If the 'DT' key is present
+    if 'DT' in txt:
+        # Verify that it is non-empty
+        dt_key = txt['DT']
+        asserts.assert_true(dt_key, "'DT' key is present but has no value.")
+
+        # Verify that it contains the device type identifier encoded as a
+        # variable length decimal number in ASCII text without leading zeros
+        assert_valid_dt_key(dt_key)
+
+    # *** DN KEY ***
+    # If the 'DN' key is present
+    if 'DN' in txt:
+        # Verify that it is non-empty
+        dn_key = txt['DN']
+        asserts.assert_true(dn_key, "'DN' key is present but has no value.")
+
+        # Verify that it is a valid UTF-8 encoded string of maximum length of 32 bytes
+        assert_valid_dn_key(dn_key)
+
+    return txt.get('DT')
 
 
 class DiscoverySupport:

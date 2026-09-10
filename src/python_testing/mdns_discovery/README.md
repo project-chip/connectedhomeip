@@ -296,22 +296,24 @@ family of tests
 You can import them from the following file: `mdns_discovery/utils/support.py`
 
 ```python
-from mdns_discovery.utils.support import DiscoverySupport, verify_srv_record
+from mdns_discovery.utils.support import DiscoverySupport, get_verify_srv_record
 
 
 class TC_SC_4_X(DiscoverySupport, MatterBaseTest):
     async def test_TC_SC_4_X(self):
-        srv_hostname = await verify_srv_record(instance_name, service_type)
+        srv_hostname = await get_verify_srv_record(instance_name, service_type)
 ```
 
 ### ✅ Available support functions
 
-|                                |
-| ------------------------------ |
-| `verify_srv_record`            |
-| `verify_aaaa_records`          |
-| `get_single_ptr_instance_name` |
-| `verify_devtype_subtype`       |
+|                                       |
+| ------------------------------------- |
+| `get_verify_commissioner_service`     |
+| `get_verify_srv_record`               |
+| `verify_commissioner_txt_record_keys` |
+| `get_single_ptr_instance_name`        |
+| `verify_devtype_subtype`              |
+| `verify_aaaa_records`                 |
 
 ### ✅ `DiscoverySupport` methods
 
