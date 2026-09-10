@@ -44,7 +44,7 @@ import time
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_cluster, pics, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
