@@ -43,7 +43,7 @@ MAX_ATTEMPTS = 4                     # Reduced to prevent stack overflow from to
 TIMEOUT = 900                        # Overall test timeout (15 min) - main test execution time limit
 
 # Matter command timeouts
-TIMED_REQUEST_TIMEOUT = 5            # Matter command timeout (5s) - for individual Matter commands
+TIMED_REQUEST_TIMEOUT = 5000          # Matter command timeout (5s, in ms) - for individual Matter commands
 COMMAND_TIMEOUT = 15                 # Quick command timeout (15s) - for ConnectNetwork that may timeout intentionally
 ATTRIBUTE_READ_TIMEOUT = 30          # Attribute read timeout (30s) - after network changes when DUT may be slow
 OPERATIONAL_DISCOVERY_TIMEOUT = 70   # Increased to handle network delays - for first attribute read after network change
