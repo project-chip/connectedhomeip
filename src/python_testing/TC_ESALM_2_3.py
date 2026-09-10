@@ -73,6 +73,10 @@ _SIMULATE_TRIGGER = {
     _A.kPowerExported: _BASE_TRIGGER | 0x13,
 }
 
+# Clear-alarm trigger code per alarm (Clear = Simulate + 1, from the PIXIT Variable Values
+# table). Used by the re-clear coverage steps 12b-12f.
+_CLEAR_TRIGGER = {_bit: _code + 1 for _bit, _code in _SIMULATE_TRIGGER.items()}
+
 
 class TC_ESALM_2_3(MatterBaseTest):
 
@@ -304,6 +308,53 @@ class TC_ESALM_2_3(MatterBaseTest):
                                  "State must equal InitialState (step 2c) after Reset with an inactive alarm bit")
         else:
             self.mark_current_step_skipped()
+
+        # Steps 12b-12f: validate that Reset on an already-clear alarm has no effect.
+        # This covers the case (missed by step 12) where every supported alarm is already
+        # active: force a supported alarm clear via its Clear trigger + Reset, then Reset it
+        # again and confirm it stays clear. Reset clears State for latched and non-latched
+        # alarms alike, so a Clear trigger followed by Reset guarantees the bit is clear.
+        reclear_bit = None
+        for _bit in range(32):
+            _candidate = 1 << _bit
+            if (int(supported) & _candidate) and _candidate in _CLEAR_TRIGGER:
+                reclear_bit = _candidate
+                break
+        can_reclear = has_reset and reclear_bit is not None
+
+        if can_reclear:
+            self.step("12b", "Select the Clear TestEventTrigger code from the PIXIT Variable Values table "
+                      "corresponding to a Supported alarm. TH sends TestEventTrigger command to General "
+                      "Diagnostics Cluster on Endpoint 0 with EnableKey field set to "
+                      "PIXIT.ESALM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to "
+                      "PIXIT.ESALM.TEST_EVENT_TRIGGER with that code.",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00).")
+            await self.send_test_event_triggers(eventTrigger=_CLEAR_TRIGGER[reclear_bit])
+
+            self.step("12c", "TH sends command Reset with that alarm bit set in the Alarms field.",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00).")
+            await self.send_single_cmd(cmd=cmds.Reset(alarms=reclear_bit), endpoint=endpoint)
+
+            self.step("12d", "TH reads from the DUT the State.",
+                      expectation="Verify that the DUT response contains an AlarmBitmap with that bit cleared.")
+            state_cleared = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attrs.State)
+            asserts.assert_equal(int(state_cleared) & reclear_bit, 0,
+                                 "Alarm bit should be cleared after Clear trigger and Reset")
+
+            self.step("12e", "TH sends command Reset again with the same (already-clear) alarm bit.",
+                      expectation="Verify DUT responds w/ status SUCCESS(0x00).")
+            await self.send_single_cmd(cmd=cmds.Reset(alarms=reclear_bit), endpoint=endpoint)
+
+            self.step("12f", "TH reads from the DUT the State.",
+                      expectation="Verify that the DUT response contains an AlarmBitmap with that bit still "
+                                  "cleared (re-clearing an already-clear alarm has no effect).")
+            state_still_clear = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attrs.State)
+            asserts.assert_equal(int(state_still_clear) & reclear_bit, 0,
+                                 "Alarm bit must stay cleared after re-clearing an already-clear alarm")
+        else:
+            self.mark_step_range_skipped("12b", "12f")
 
         self.step(13, "IF Reset is not present in AcceptedCmds: TH sends command Reset (0x00).",
                   expectation="Verify that the DUT response contains UNSUPPORTED_COMMAND.")
