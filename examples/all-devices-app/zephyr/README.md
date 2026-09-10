@@ -8,7 +8,7 @@ device types are selected at build time. The default device is an on/off light.
 
 ### 1. Install GN
 
-Matter's build uses GN. Either download a prebuilt binary from
+Matter's build uses GN. Either download a binary from
 https://chrome-infra-packages.appspot.com/p/gn/gn and put it in your `PATH`, or
 build it from source:
 
