@@ -78,6 +78,18 @@ Data-Model:
         self.assertEqual(mapping["data-model"].name, "Data-Model")
         self.assertEqual(mapping["data-model"].smes, ["bzbarsky-apple", "Boris-Virk"])
 
+    def test_valid_config_quoted_and_unquoted_usernames(self) -> None:
+        yaml_content = """
+security:
+  - alice
+  - 'bob'
+  - "charlie"
+"""
+        config_path = self._write_temp_config(yaml_content)
+        mapping = parse_label_config(config_path)
+
+        self.assertEqual(mapping["security"].smes, ["alice", "bob", "charlie"])
+
     def test_empty_config(self) -> None:
         yaml_content = "# Only comments in this file\n"
         config_path = self._write_temp_config(yaml_content)
