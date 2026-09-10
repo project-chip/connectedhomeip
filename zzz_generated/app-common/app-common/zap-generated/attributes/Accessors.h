@@ -2700,6 +2700,13 @@ GetDefault(EndpointId endpoint,
            chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum * value); // KeypadLockoutEnum
 } // namespace KeypadLockout
 
+namespace ScheduleProgrammingVisibility {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint,
+           chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum *
+               value); // ScheduleProgrammingVisibilityEnum
+} // namespace ScheduleProgrammingVisibility
+
 } // namespace Attributes
 } // namespace ThermostatUserInterfaceConfiguration
 

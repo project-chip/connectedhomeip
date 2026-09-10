@@ -9215,7 +9215,7 @@ endpoint 1 {
   server cluster ThermostatUserInterfaceConfiguration {
     ram      attribute temperatureDisplayMode default = 0x00;
     ram      attribute keypadLockout default = 0x00;
-    callback attribute scheduleProgrammingVisibility;
+    ram      attribute scheduleProgrammingVisibility;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }

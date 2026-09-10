@@ -53,9 +53,9 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    DataModel::ActionReturnStatus SetTemperatureDisplayMode(ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
-    DataModel::ActionReturnStatus SetKeypadLockout(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value);
-    DataModel::ActionReturnStatus
+    Protocols::InteractionModel::Status SetTemperatureDisplayMode(ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
+    Protocols::InteractionModel::Status SetKeypadLockout(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value);
+    Protocols::InteractionModel::Status
     SetScheduleProgrammingVisibility(ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value);
 
     ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum GetTemperatureDisplayMode() const

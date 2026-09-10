@@ -14022,6 +14022,29 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 } // namespace KeypadLockout
 
+namespace ScheduleProgrammingVisibility {
+
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint,
+           chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum * value)
+{
+    using Traits =
+        NumericAttributeTraits<chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace ScheduleProgrammingVisibility
+
 } // namespace Attributes
 } // namespace ThermostatUserInterfaceConfiguration
 

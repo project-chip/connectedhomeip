@@ -22,6 +22,13 @@ namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration {
 
 ThermostatUserInterfaceConfigurationCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+/**
+ * Live Thermostat User Interface Configuration attribute access for the code-driven server cluster
+ * (reads and writes `ThermostatUserInterfaceConfigurationCluster` runtime state).
+ *
+ * For startup values stored in the ZAP/ember attribute store, use the generated `GetDefault` functions in
+ * `app-common/zap-generated/attributes/Accessors.h`.
+ */
 namespace Attributes {
 
 namespace TemperatureDisplayMode {
@@ -32,6 +39,22 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
                                         ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
 
 } // namespace TemperatureDisplayMode
+
+namespace KeypadLockout {
+
+Protocols::InteractionModel::Status Get(EndpointId endpoint, ThermostatUserInterfaceConfiguration::KeypadLockoutEnum * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value);
+
+} // namespace KeypadLockout
+
+namespace ScheduleProgrammingVisibility {
+
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum * value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value);
+
+} // namespace ScheduleProgrammingVisibility
 
 } // namespace Attributes
 

@@ -156,6 +156,62 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, ThermostatUserInter
 
 } // namespace TemperatureDisplayMode
 
+namespace KeypadLockout {
+
+Protocols::InteractionModel::Status Get(EndpointId endpoint, ThermostatUserInterfaceConfiguration::KeypadLockoutEnum * value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
+
+    *value = cluster->GetKeypadLockout();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
+
+    return cluster->SetKeypadLockout(value);
+}
+
+} // namespace KeypadLockout
+
+namespace ScheduleProgrammingVisibility {
+
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum * value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
+
+    *value = cluster->GetScheduleProgrammingVisibility();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
+
+    return cluster->SetScheduleProgrammingVisibility(value);
+}
+
+} // namespace ScheduleProgrammingVisibility
+
 } // namespace Attributes
 
 } // namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration

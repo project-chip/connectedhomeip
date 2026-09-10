@@ -95,8 +95,7 @@ ThermostatUserInterfaceConfigurationCluster::WriteAttribute(const DataModel::Wri
     }
 }
 
-DataModel::ActionReturnStatus
-ThermostatUserInterfaceConfigurationCluster::SetTemperatureDisplayMode(TemperatureDisplayModeEnum value)
+Status ThermostatUserInterfaceConfigurationCluster::SetTemperatureDisplayMode(TemperatureDisplayModeEnum value)
 {
     if (EnsureKnownEnumValue(value) == TemperatureDisplayModeEnum::kUnknownEnumValue)
     {
@@ -107,7 +106,7 @@ ThermostatUserInterfaceConfigurationCluster::SetTemperatureDisplayMode(Temperatu
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus ThermostatUserInterfaceConfigurationCluster::SetKeypadLockout(KeypadLockoutEnum value)
+Status ThermostatUserInterfaceConfigurationCluster::SetKeypadLockout(KeypadLockoutEnum value)
 {
     if (EnsureKnownEnumValue(value) == KeypadLockoutEnum::kUnknownEnumValue)
     {
@@ -118,8 +117,7 @@ DataModel::ActionReturnStatus ThermostatUserInterfaceConfigurationCluster::SetKe
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus
-ThermostatUserInterfaceConfigurationCluster::SetScheduleProgrammingVisibility(ScheduleProgrammingVisibilityEnum value)
+Status ThermostatUserInterfaceConfigurationCluster::SetScheduleProgrammingVisibility(ScheduleProgrammingVisibilityEnum value)
 {
     if (EnsureKnownEnumValue(value) == ScheduleProgrammingVisibilityEnum::kUnknownEnumValue)
     {
