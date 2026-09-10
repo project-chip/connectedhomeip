@@ -359,6 +359,8 @@ def decode_network_administrator_secret(encoded: bytes) -> NetworkAdministratorS
             if control != 0x30:
                 raise ValueError(f"NASS field {expected_tag} must be an octet string, but carries TLV control "
                                  f"byte 0x{control:02x}")
+            if offset >= len(body):
+                raise ValueError(f"NASS is truncated before the length of field {expected_tag}")
             width = body[offset]
             offset += 1
             value = body[offset:offset + width]

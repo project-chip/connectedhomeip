@@ -255,6 +255,9 @@ class TestNetworkAdministratorSecretDecoding(unittest.TestCase):
                                                   0x30, 0x03, 0x20]) + raw_secret + bytes([0x18])),
             "raw secret as an integer": bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
                                                0x26, 0x03, 0x04, 0x03, 0x02, 0x01, 0x18]),
+            # Ends right after the octet string's tag, so its length prefix is off the end.
+            "truncated before the raw secret length": bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                             0x30, 0x03, 0x18]),
         }
         for name, encoded in cases.items():
             with self.subTest(name=name), self.assertRaises(ValueError):
