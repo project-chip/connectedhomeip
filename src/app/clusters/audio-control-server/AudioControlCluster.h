@@ -29,8 +29,6 @@
 
 namespace chip::app::Clusters {
 
-/// Note: AudioControl cluster does not implement SceneHandler (scenes support is
-/// not tested or supported for AudioControl in the Matter SDK).
 class AudioControlCluster : public DefaultServerCluster
 {
 public:
