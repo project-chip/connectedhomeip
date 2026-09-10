@@ -551,8 +551,7 @@ public:
         // ThermostatPresets::SetActivePreset / SetActivePresetRequest entirely.
         if (mPresetsDelegateToFollow != nullptr)
         {
-            CHIP_ERROR followErr =
-                mCurrentSuggestion.IsNull()
+            CHIP_ERROR followErr = mCurrentSuggestion.IsNull()
                 ? mPresetsDelegateToFollow->SetActivePresetHandle(DataModel::NullNullable)
                 : mPresetsDelegateToFollow->SetActivePresetHandle(
                       DataModel::MakeNullable(ByteSpan(mCurrentSuggestion.Value().GetPresetHandle())));
