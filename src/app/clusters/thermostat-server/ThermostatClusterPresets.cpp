@@ -460,11 +460,8 @@ bool ThermostatPresets::IsPresetHandlePresentInPresets(const ByteSpan & presetHa
 
 Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle)
 {
-    PresetStructWithOwnedMembers matchingPreset;
-    bool found = GetMatchingPresetInPresets(mDelegate, presetHandle, matchingPreset);
-
     // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
-    if (!presetHandle.IsNull() && !found)
+    if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(presetHandle.Value()))
     {
         return Status::InvalidCommand;
     }
@@ -501,21 +498,27 @@ Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
     mCluster.NotifyAttributeChanged(ActivePresetHandle::Id);
     mCluster.GenerateActivePresetChangeEvent(oldPresetHandle, presetHandle);
 
-    if (found)
+    // Apply the preset's setpoints to the occupied setpoint range now that it's active. The active handle has
+    // already changed at this point, so a failure here is reported to the caller but does not roll back the
+    // handle: the preset's setpoints were already validated when the preset was added/committed, so this is not
+    // expected to fail in practice.
+    return ApplyActivePresetSetpoints(presetHandle);
+}
+
+Status ThermostatPresets::ApplyActivePresetSetpoints(DataModel::Nullable<ByteSpan> presetHandle)
+{
+    PresetStructWithOwnedMembers matchingPreset;
+    if (!GetMatchingPresetInPresets(mDelegate, presetHandle, matchingPreset))
     {
-        // Apply the preset's setpoints to the occupied setpoint range now that it's active. The active handle has
-        // already changed at this point, so a failure here is reported to the caller but does not roll back the
-        // handle: the preset's setpoints were already validated when the preset was added/committed, so this is not
-        // expected to fail in practice.
-        auto status = mCluster.ApplyOccupiedSetpoints(matchingPreset.GetHeatingSetpoint(), matchingPreset.GetCoolingSetpoint());
-        if (status != Status::Success)
-        {
-            ChipLogError(Zcl, "SetActivePreset: failed to apply preset setpoints with status 0x%02x", to_underlying(status));
-            return status;
-        }
+        return Status::Success;
     }
 
-    return Status::Success;
+    auto status = mCluster.ApplyOccupiedSetpoints(matchingPreset.GetHeatingSetpoint(), matchingPreset.GetCoolingSetpoint());
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "ApplyActivePresetSetpoints: failed to apply preset setpoints with status 0x%02x", to_underlying(status));
+    }
+    return status;
 }
 
 CHIP_ERROR ThermostatPresets::AppendPendingPreset(const PresetStruct::Type & newPreset)
