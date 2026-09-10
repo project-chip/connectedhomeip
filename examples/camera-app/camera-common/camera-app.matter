@@ -3565,6 +3565,7 @@ endpoint 1 {
     handle command SetTransportStatus;
     handle command ManuallyTriggerTransport;
     handle command FindTransport;
+    handle command UpdateMotionZoneOptions;
   }
 
   server cluster Chime {
