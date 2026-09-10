@@ -34,6 +34,7 @@
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
+#include <device/types/doorbell/Doorbell.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
@@ -349,6 +350,14 @@ private:
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
                     DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_DOORBELL)
+        {
+            RegisterCreator("doorbell", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<Doorbell>(mContext->timerDelegate, mContext->platformManager, mContext->bindingTable,
+                                                  mContext->bindingManager);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)

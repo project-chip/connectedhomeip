@@ -103,6 +103,10 @@ _available_devices = [
     "DISHWASHER",
   ],
   [
+    "doorbell",
+    "DOORBELL",
+  ],
+  [
     "electrical-sensor",
     "ELECTRICAL_SENSOR",
   ],
