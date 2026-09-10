@@ -199,8 +199,8 @@ config BT_HOST_CRYPTO
 if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
-    default 840 if SOC_RISCV_TELINK_TL323X 
     default 1536 if SOC_RISCV_TELINK_TL721X
+    default 1096 if SOC_RISCV_TELINK_TL323X
     default 712
 
 config TL_BLE_CTRL_MASTER_MAX_NUM
@@ -347,6 +347,7 @@ config OPENTHREAD_CSMABACKOFF_OPTIMIZATION
 
 config IEEE802154_TLX_OPTIMIZATION
     bool "Optimize 802.15.4 RF performance for TLX SoCs"
+    default y if PM && SOC_RISCV_TELINK_TL323X
     default n
     help
       Improve RF performance in IEEE 802.15.4 communication on TLX SoCs.
@@ -355,6 +356,7 @@ config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM || SOC_RISCV_TELINK_TL323X
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
+    default 608 if SOC_RISCV_TELINK_TL323X
     default 640
 
 config OPENTHREAD_SLAAC
@@ -365,7 +367,8 @@ config OPENTHREAD_MANUAL_START
 
 # 6 is the max rf level by Vant
 config OPENTHREAD_DEFAULT_TX_POWER
-    default 6 if PM
+    default 6 if PM && (SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_TL721X)
+    default 3 if PM && SOC_RISCV_TELINK_TL323X
     default 11
 
 config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS

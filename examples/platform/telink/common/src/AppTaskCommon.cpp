@@ -99,6 +99,9 @@ bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
+#if defined CONFIG_IEEE802154_TLX_OPTIMIZATION
+bool isThreadCommissioned = false;
+#endif /* CONFIG_IEEE802154_TLX_OPTIMIZATION */
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -889,7 +892,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #endif
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
-        sIsNetworkAttached    = ConnectivityMgr().IsThreadAttached();
+        sIsNetworkAttached    = ConnectivityMgr().sIsNetworkAttached();
 #ifdef CONFIG_TFLM_FEATURE
         if (sIsNetworkProvisioned && sIsNetworkAttached)
         {
@@ -905,6 +908,14 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             }
         }
 #endif
+#if defined CONFIG_IEEE802154_TLX_OPTIMIZATION
+
+        if (sIsNetworkAttached && curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED)
+        {
+            if (isThreadCommissioned == false)
+                isThreadCommissioned = true;
+        }
+#endif /* CONFIG_IEEE802154_TLX_OPTIMIZATION */
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
