@@ -7212,17 +7212,22 @@ public static class AmbientContextSensingClusterAmbientContextDetectEndedEvent {
 }
 public static class AmbientSensingUnionClusterUnionContributorAddedEvent {
   public ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor;
+  public Integer fabricIndex;
   private static final long ADDED_CONTRIBUTOR_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public AmbientSensingUnionClusterUnionContributorAddedEvent(
-    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor,
+    Integer fabricIndex
   ) {
     this.addedContributor = addedContributor;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ADDED_CONTRIBUTOR_ID, ArrayType.generateArrayType(addedContributor, (elementaddedContributor) -> elementaddedContributor.encodeTlv())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -7232,16 +7237,23 @@ public static class AmbientSensingUnionClusterUnionContributorAddedEvent {
       return null;
     }
     ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ADDED_CONTRIBUTOR_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
           addedContributor = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(elementcastingValue));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new AmbientSensingUnionClusterUnionContributorAddedEvent(
-      addedContributor
+      addedContributor,
+      fabricIndex
     );
   }
 
@@ -7252,23 +7264,31 @@ public static class AmbientSensingUnionClusterUnionContributorAddedEvent {
     output.append("\taddedContributor: ");
     output.append(addedContributor);
     output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
 public static class AmbientSensingUnionClusterUnionContributorRemovedEvent {
   public ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor;
+  public Integer fabricIndex;
   private static final long REMOVED_CONTRIBUTOR_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public AmbientSensingUnionClusterUnionContributorRemovedEvent(
-    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor,
+    Integer fabricIndex
   ) {
     this.removedContributor = removedContributor;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(REMOVED_CONTRIBUTOR_ID, ArrayType.generateArrayType(removedContributor, (elementremovedContributor) -> elementremovedContributor.encodeTlv())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -7278,16 +7298,23 @@ public static class AmbientSensingUnionClusterUnionContributorRemovedEvent {
       return null;
     }
     ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == REMOVED_CONTRIBUTOR_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
           removedContributor = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(elementcastingValue));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new AmbientSensingUnionClusterUnionContributorRemovedEvent(
-      removedContributor
+      removedContributor,
+      fabricIndex
     );
   }
 
@@ -7298,23 +7325,31 @@ public static class AmbientSensingUnionClusterUnionContributorRemovedEvent {
     output.append("\tremovedContributor: ");
     output.append(removedContributor);
     output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
 public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent {
   public ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange;
+  public Integer fabricIndex;
   private static final long CONTRIBUTOR_STATUS_CHANGE_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
-    ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange
+    ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange,
+    Integer fabricIndex
   ) {
     this.contributorStatusChange = contributorStatusChange;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CONTRIBUTOR_STATUS_CHANGE_ID, ArrayType.generateArrayType(contributorStatusChange, (elementcontributorStatusChange) -> elementcontributorStatusChange.encodeTlv())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -7324,16 +7359,23 @@ public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent
       return null;
     }
     ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONTRIBUTOR_STATUS_CHANGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
           contributorStatusChange = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct.decodeTlv(elementcastingValue));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
-      contributorStatusChange
+      contributorStatusChange,
+      fabricIndex
     );
   }
 
@@ -7343,6 +7385,9 @@ public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent
     output.append("AmbientSensingUnionClusterUnionContributorStatusChangedEvent {\n");
     output.append("\tcontributorStatusChange: ");
     output.append(contributorStatusChange);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();

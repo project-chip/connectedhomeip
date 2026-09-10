@@ -71,6 +71,7 @@ public:
     RootNode(const Context & context) : SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(kDeviceTypes)), mContext(context) {}
     ~RootNode() override = default;
 
+    using SingleEndpoint::Register;
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 

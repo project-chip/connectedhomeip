@@ -77,8 +77,6 @@ public:
 
     /// Validates that the message does not need to be ignored according to
     /// RFC 6762
-    // TODO: DNS Update carries an OpCode (5) and often non-zero return code. We will need to change this for ULD/SRP support.
-    // (RFC 2136)
     bool IsValidMdns() const { return (mValue & (kOpcodeMask | kResponseCodeMask)) == 0; }
 
 private:
