@@ -30,6 +30,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/util/config.h>
 #include <ble/Ble.h>
+#include <clusters/Identify/Enums.h>
 #include <cmsis_os2.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
@@ -183,6 +184,23 @@ public:
     static void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState);
     static void OnTriggerIdentifyEffect(Identify * identify);
 #endif
+
+    /**
+     * @brief Notification API used by the code-driven identify integration
+     *        (see all-devices-app / PlatformIdentifyIntegration) to drive
+     *        the same status-LED state machine used by the Ember-based
+     *        Identify server plugin.
+     *
+     * The Ember-based Identify server plugin populates `IdentifyPool` via
+     * `emberAfIdentifyClusterInitCallback` and drives blink patterns from
+     * that pool. Code-driven builds (e.g. `all-devices-app`) don't use
+     * Ember, so they call these Notify* entrypoints from their platform
+     * `IdentifyDelegate` implementation instead.
+     */
+    static void NotifyCodeDrivenIdentifyStart();
+    static void NotifyCodeDrivenIdentifyStop();
+    static void NotifyCodeDrivenTriggerEffect(chip::app::Clusters::Identify::EffectIdentifierEnum effect,
+                                              chip::app::Clusters::Identify::EffectVariantEnum variant);
 
     /**
      * @brief Updates the static boolean isCommissioned to the desired state
