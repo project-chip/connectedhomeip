@@ -63,6 +63,8 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
       reason: Shared code for TC_AVSM, not a standalone test
+    - name: TC_PROXRTestBase.py
+      reason: Shared code for TC_PROXR, not a standalone test
     - name: TC_BRBINFO_3_1.py
       reason:
           Attribute is not implemented in the bridge app. Same code as
