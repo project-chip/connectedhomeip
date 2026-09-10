@@ -106,6 +106,8 @@ private:
     OnOffEffectDelegate & mEffectDelegate;
     chip::scenes::ScenesIntegrationDelegate * mScenesIntegrationDelegate;
 
+    static constexpr uint8_t kValueDeltaReportTrigger = 10;
+
     // Lighting Attributes
     bool mGlobalSceneControl = true;
 
@@ -124,8 +126,6 @@ private:
     //   - SetOnOffFromCommand (needs to transition to on/off correctly)
     uint16_t mOnTime      = 0;
     uint16_t mOffWaitTime = 0;
-
-    uint8_t mValueDeltaReportTrigger = 10;
 
     // controlling cluster startup - these values are only used at startup however
     // user may modify mStartUpOnOff attribute as it is writable.
