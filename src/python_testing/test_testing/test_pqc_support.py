@@ -48,16 +48,15 @@ sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
 from support_modules.pqc_support import (AttestationCertType, AttestationCryptoProfile,  # noqa: E402
                                          AttestationCryptoProfileBitmap, CertificateChainType, CertificationType,
-                                         assert_attestation_certificate_format,
-                                         assert_attestation_nonce, assert_authorized_paa, assert_certificate_currently_valid,
-                                         assert_dac_and_pai_ids, assert_profile_advertised, certificate_algorithms_for_oids,
-                                         find_issuing_paa, is_ml_dsa_supported, is_pqc_profile, kAttestationChallengeLength,
-                                         kAttestationNonceLength, kCertificateSegmentSize, kMaxCertificateDocumentSize,
-                                         kOidEcdsaWithSha256, kOidEcPublicKey, kOidMatterPid, kOidMatterVid, kOidMlDsa44,
-                                         kOidMlDsa65, parse_attestation_elements, parse_certificate, profile_mask,
-                                         retrieve_segmented_document, select_strongest_profile, validate_attestation_chain,
-                                         validate_certification_declaration, verify_attestation_signature,
-                                         verify_certificate_signature)
+                                         assert_attestation_certificate_format, assert_attestation_nonce, assert_authorized_paa,
+                                         assert_certificate_currently_valid, assert_dac_and_pai_ids, assert_profile_advertised,
+                                         certificate_algorithms_for_oids, find_issuing_paa, is_ml_dsa_supported, is_pqc_profile,
+                                         kAttestationChallengeLength, kAttestationNonceLength, kCertificateSegmentSize,
+                                         kMaxCertificateDocumentSize, kOidEcdsaWithSha256, kOidEcPublicKey, kOidMatterPid,
+                                         kOidMatterVid, kOidMlDsa44, kOidMlDsa65, parse_attestation_elements, parse_certificate,
+                                         profile_mask, retrieve_segmented_document, select_strongest_profile,
+                                         validate_attestation_chain, validate_certification_declaration,
+                                         verify_attestation_signature, verify_certificate_signature)
 
 _ML_DSA_VECTORS = _CHIP_ROOT / "src/crypto/tests/MlDsaAttestationChain_test_vectors.h"
 _DEV_VECTOR = (_CHIP_ROOT
