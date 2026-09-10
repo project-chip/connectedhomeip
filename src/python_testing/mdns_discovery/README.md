@@ -290,10 +290,7 @@ for addr in addr_list:
 
 ## 🧰 Discovery Test Support Helpers
 
-This module contains higher-level helpers shared across the SC-4.x discovery
-test cases (`TC-SC-4.1/4.3/4.6/4.7`): DUT reads and record verifications that
-combine a query with its assertions. Record validators live in
-`utils/asserts.py` and raw record I/O in `mdns_discovery.py`.
+This module contains higher-level helpers shared across the SC-X.x discovery family of tests
 
 You can import them from the following file: `mdns_discovery/utils/support.py`
 
@@ -315,7 +312,7 @@ class TC_SC_4_X(DiscoverySupport, MatterBaseTest):
 | `get_single_ptr_instance_name` |
 | `verify_devtype_subtype`       |
 
-### ✅ `DiscoverySupport` mixin methods
+### ✅ `DiscoverySupport` methods
 
 |                                |
 | ------------------------------ |
