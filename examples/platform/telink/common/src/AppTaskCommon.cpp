@@ -269,6 +269,15 @@ void AppTaskCommon::PrintFirmwareInfo(void)
     LOG_DBG("\t branch: %s %.8s%s %s", ZEPHYR_BRANCH, ZEPHYR_COMMIT_HASH, ZEPHYR_LOCAL_STATUS, ZEPHYR_COMMIT_DATE);
     LOG_DBG("\t remote: %s", ZEPHYR_REMOTE_URL);
     LOG_DBG("\t HAL commit: %.8s%s %s", TELINK_HAL_COMMIT_HASH, TELINK_HAL_LOCAL_STATUS, TELINK_HAL_COMMIT_DATE);
+
+    LOG_DBG("OpenThread revision: ");
+    LOG_DBG("\t path: %s", OPENTHREAD_PATH);
+    LOG_DBG("\t remote: %s", OT_REMOTE_URL);
+    if (strlen(OT_TAG) > 0)
+    {
+        LOG_DBG("\t tag: %s", OT_TAG);
+    }
+    LOG_DBG("\t branch: %s %.8s%s %s", OT_BRANCH, OT_COMMIT_HASH, OT_LOCAL_STATUS, OT_COMMIT_DATE);
 #endif
 }
 
