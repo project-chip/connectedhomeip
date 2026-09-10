@@ -16,9 +16,7 @@
  *    limitations under the License.
  */
 
-#include "AppTask.h"
-
-#include "Buttons.h"
+#pragma once
 
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
@@ -39,68 +37,68 @@
 #include <platform/Zephyr/DeviceInstanceInfoProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#include "Buttons.h"
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <platform/Zephyr/OTAImageProcessorImpl.h>
 #endif
 
-using namespace chip::Credentials;
-using namespace chip::DeviceLayer;
-
 namespace chip::app::AllDevices {
-namespace {
 
-constexpr EndpointId kRootEndpointId        = 0;
-constexpr EndpointId kFirstDeviceEndpointId = 1;
-
-} // namespace
-
-CHIP_ERROR AppTask::Run()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::Run()
 {
-    ReturnErrorOnFailure(InitPlatform());
-    ReturnErrorOnFailure(InitCredentials());
-    ReturnErrorOnFailure(InitNetwork());
-    ReturnErrorOnFailure(InitPersistence());
-    ReturnErrorOnFailure(InitRootNode());
-    ReturnErrorOnFailure(RegisterOTACluster());
-    ReturnErrorOnFailure(RegisterAppDevices());
-    ReturnErrorOnFailure(InitServer());
-    ReturnErrorOnFailure(InitBoardControls());
-    ReturnErrorOnFailure(PostServerInit());
-    ReturnErrorOnFailure(InitOTARequestor());
+    ReturnErrorOnFailure(Self().InitPlatform());
+    ReturnErrorOnFailure(Self().InitCredentials());
+    ReturnErrorOnFailure(Self().InitNetwork());
+    ReturnErrorOnFailure(Self().InitPersistence());
+    ReturnErrorOnFailure(Self().InitRootNode());
+    ReturnErrorOnFailure(Self().RegisterOTACluster());
+    ReturnErrorOnFailure(Self().RegisterAppDevices());
+    ReturnErrorOnFailure(Self().InitServer());
+    ReturnErrorOnFailure(Self().InitBoardControls());
+    ReturnErrorOnFailure(Self().PostServerInit());
+    ReturnErrorOnFailure(Self().InitOTARequestor());
 
-    return PlatformMgr().StartEventLoopTask();
+    return DeviceLayer::PlatformMgr().StartEventLoopTask();
 }
 
-CHIP_ERROR AppTask::InitPlatform()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitPlatform()
 {
     ReturnErrorOnFailure(Platform::MemoryInit());
-    return PlatformMgr().InitChipStack();
+    return DeviceLayer::PlatformMgr().InitChipStack();
 }
 
-CHIP_ERROR AppTask::InitCredentials()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitCredentials()
 {
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    DeviceLayer::SetDeviceInstanceInfoProvider(&DeviceLayer::DeviceInstanceInfoProviderMgrImpl());
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::InitNetwork()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitNetwork()
 {
-    ReturnErrorOnFailure(InitThreadNetworking());
-    ReturnErrorOnFailure(InitWifiNetworking());
+    ReturnErrorOnFailure(Self().InitThreadNetworking());
+    ReturnErrorOnFailure(Self().InitWifiNetworking());
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::InitThreadNetworking()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitThreadNetworking()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
-    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().InitThreadStack());
+    ReturnErrorOnFailure(
+        DeviceLayer::ConnectivityMgr().SetThreadDeviceType(DeviceLayer::ConnectivityManager::kThreadDeviceType_Router));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::InitWifiNetworking()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitWifiNetworking()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     // TODO WiFi
@@ -108,7 +106,8 @@ CHIP_ERROR AppTask::InitWifiNetworking()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::InitPersistence()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitPersistence()
 {
     ReturnErrorOnFailure(mInitParams.InitializeStaticResourcesBeforeServerInit());
 
@@ -125,43 +124,50 @@ CHIP_ERROR AppTask::InitPersistence()
     return CHIP_NO_ERROR;
 }
 
-TestEventTriggerDelegate & AppTask::GetTestEventTriggerDelegate()
+template <class Derived>
+TestEventTriggerDelegate & AppTaskBase<Derived>::GetTestEventTriggerDelegate()
 {
     return mDefaultTestEventTriggerDelegate;
 }
 
-CHIP_ERROR AppTask::InitRootNode()
+template <class Derived>
+Clusters::IdentifyDelegate & AppTaskBase<Derived>::GetIdentifyDelegate()
+{
+    return mDefaultIdentifyDelegate;
+}
+
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
 {
     mDataModelProvider =
         std::make_unique<CodeDrivenDataModelProvider>(*mInitParams.persistentStorageDelegate, mAttributePersistenceProvider);
     VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_NO_MEMORY);
     mInitParams.dataModelProvider = mDataModelProvider.get();
 
-    mInitParams.testEventTriggerDelegate = &GetTestEventTriggerDelegate();
+    mInitParams.testEventTriggerDelegate = &Self().GetTestEventTriggerDelegate();
 
-    DeviceInstanceInfoProvider * deviceInstanceInfoProvider = GetDeviceInstanceInfoProvider();
+    DeviceLayer::DeviceInstanceInfoProvider * deviceInstanceInfoProvider = DeviceLayer::GetDeviceInstanceInfoProvider();
     VerifyOrReturnError(deviceInstanceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     const RootNode::Context context{
-        .commissioningWindowManager          = Server::GetInstance().GetCommissioningWindowManager(),
-        .configurationManager                = ConfigurationMgr(),
-        .deviceControlServer                 = DeviceControlServer::DeviceControlSvr(),
-        .fabricTable                         = Server::GetInstance().GetFabricTable(),
-        .accessControl                       = Server::GetInstance().GetAccessControl(),
-        .persistentStorage                   = *mInitParams.persistentStorageDelegate,
-        .failSafeContext                     = Server::GetInstance().GetFailSafeContext(),
-        .deviceInstanceInfoProvider          = *deviceInstanceInfoProvider,
-        .platformManager                     = PlatformMgr(),
-        .groupDataProvider                   = mGroupDataProvider,
-        .sessionManager                      = Server::GetInstance().GetSecureSessionManager(),
-        .dnssdServer                         = DnssdServer::Instance(),
-        .deviceLoadStatusProvider            = *InteractionModelEngine::GetInstance(),
-        .diagnosticDataProvider              = GetDiagnosticDataProvider(),
-        .testEventTriggerDelegate            = mInitParams.testEventTriggerDelegate,
-        .dacProvider                         = *Credentials::GetDeviceAttestationCredentialsProvider(),
-        .eventManagement                     = EventManagement::GetInstance(),
-        .timerDelegate                       = mTimerDelegate,
-        .minGuaranteedSubscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .configurationManager       = DeviceLayer::ConfigurationMgr(),
+        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+        .fabricTable                = Server::GetInstance().GetFabricTable(),
+        .accessControl              = Server::GetInstance().GetAccessControl(),
+        .persistentStorage          = *mInitParams.persistentStorageDelegate,
+        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
+        .deviceInstanceInfoProvider = *deviceInstanceInfoProvider,
+        .platformManager            = DeviceLayer::PlatformMgr(),
+        .groupDataProvider          = mGroupDataProvider,
+        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer                = DnssdServer::Instance(),
+        .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),
+        .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),
+        .testEventTriggerDelegate   = mInitParams.testEventTriggerDelegate,
+        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
+        .eventManagement            = EventManagement::GetInstance(),
+        .timerDelegate              = mTimerDelegate,
     };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -198,16 +204,16 @@ CHIP_ERROR AppTask::InitRootNode()
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
+        .identifyDelegate         = Self().GetIdentifyDelegate(),
     });
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::RegisterOTACluster()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::RegisterOTACluster()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
     // Must be registered before Server::Init() starts the provider.
     mOTARequestorCluster.Create(kRootEndpointId, mOTARequestorCore, mOTARequestorAttributes,
                                 Server::GetInstance().GetFabricTable());
@@ -216,12 +222,14 @@ CHIP_ERROR AppTask::RegisterOTACluster()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::InitServer()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitServer()
 {
     return Server::GetInstance().Init(mInitParams);
 }
 
-CHIP_ERROR AppTask::RegisterAppDevices()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::RegisterAppDevices()
 {
     VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -241,20 +249,23 @@ CHIP_ERROR AppTask::RegisterAppDevices()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::InitBoardControls()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitBoardControls()
 {
     ReturnErrorOnFailure(Button::Init());
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::PostServerInit()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::PostServerInit()
 {
-    ConfigurationMgr().LogDeviceConfig();
+    DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::InitOTARequestor()
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::InitOTARequestor()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     SetRequestorInstance(&mOTARequestorCore);
@@ -262,7 +273,7 @@ CHIP_ERROR AppTask::InitOTARequestor()
     ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,
                                                 mOTARequestorAttributes, mOTARequestorCluster.Cluster()));
 
-    auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
+    auto & imageProcessor = DeviceLayer::OTAImageProcessorImpl::GetDefaultInstance();
     mOTARequestorDriver.Init(&mOTARequestorCore, &imageProcessor);
     ReturnErrorOnFailure(imageProcessor.Init(&mOTADownloader));
     mOTADownloader.SetImageProcessorDelegate(&imageProcessor);

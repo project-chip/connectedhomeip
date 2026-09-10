@@ -23,6 +23,7 @@
 
 #include <cstdlib>
 
+
 int main()
 {
     const CHIP_ERROR err = chip::app::AllDevices::GetAppTask().Run();
@@ -32,8 +33,5 @@ int main()
         return EXIT_FAILURE;
     }
 
-    while (true)
-    {
-        k_sleep(K_FOREVER);
-    }
+    return EXIT_SUCCESS;
 }
