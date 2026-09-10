@@ -1056,7 +1056,7 @@ private:
 
     /* Callbacks for the NetworkIdentityRegistrar during PDC commissioning. */
     static void OnNetworkIdentityAvailable(void * context, CHIP_ERROR status, ByteSpan networkIdentity);
-    static void OnClientRegistered(void * context, CHIP_ERROR status);
+    static void OnClientRegistered(void * context, CHIP_ERROR status, bool determinate);
 
     /* Revocation completion callbacks. OnClientUnregistered() is the base variant, installed whenever
        nothing is waiting on the revocation; it reports a failure and resets mCall back to itself. The
@@ -1218,10 +1218,12 @@ private:
     // the commissionee, which we owe a matching UnregisterClient() unless the commissionee ends up
     // actually using it. Taken on by the kPDCRegisterClientIdentity stage if (and only if)
     // CommissioningParameters::GetManagePDCClientIdentityRollback() is true, and discharged by
-    // RollBackNetworkClientIdentity(). The identifier is recorded with the registration because
-    // the delegate is free to clear or overwrite the PDCClientIdentity parameter it is derived
-    // from at any time. Note we only manage one outstanding registration at a time, since we expect
-    // initial commissioning to provision exactly one operational network connection: the
+    // RollBackNetworkClientIdentity(). Note the obligation is taken on before the registrar is
+    // called and survives a registration that fails, unless the registrar reports the failure as
+    // determinate; see OnClientRegistered(). The identifier is recorded with the registration
+    // because the delegate is free to clear or overwrite the PDCClientIdentity parameter it is
+    // derived from at any time. Note we only manage one outstanding registration at a time, since
+    // we expect initial commissioning to provision exactly one operational network connection: the
     // ConnectNetwork / operational discovery / CommissioningComplete flow only validates one set
     // of connection parameters.
     struct NetworkClientRegistration

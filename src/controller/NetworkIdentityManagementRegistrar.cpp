@@ -103,8 +103,8 @@ void NetworkIdentityManagementRegistrar::GetNetworkIdentity(Callback::Callback<O
 void NetworkIdentityManagementRegistrar::RegisterClient(ByteSpan clientIdentity,
                                                         Callback::Callback<OnClientRegisteredFunct>::Owned onCompletion)
 {
-    VerifyOrReturn(!mStopped, onCompletion.Invoke(CHIP_ERROR_INCORRECT_STATE));
-    VerifyOrReturn(!mAddClient.IsPending(), onCompletion.Invoke(CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturn(!mStopped, onCompletion.Invoke(CHIP_ERROR_INCORRECT_STATE, /* determinate = */ true));
+    VerifyOrReturn(!mAddClient.IsPending(), onCompletion.Invoke(CHIP_ERROR_INCORRECT_STATE, /* determinate = */ true));
     mAddClient.Start(mController, mNodeId, mEndpoint, clientIdentity, std::move(onCompletion));
 }
 
@@ -147,6 +147,7 @@ void NetworkIdentityManagementRegistrar::Operation::OnConnectionFailure(CHIP_ERR
 void NetworkIdentityManagementRegistrar::Operation::OnFinished(bool cancelled)
 {
     ControllerInvokeOperationBase::OnFinished(cancelled);
+    mCommandSent = false; // whatever we sent is done with; the operation is free to be started again
 
     if (cancelled)
     {
@@ -181,7 +182,7 @@ void NetworkIdentityManagementRegistrar::AddClientOperation::Start(DeviceControl
     // it on. This is also why the identity buffer is only touched once we know we are taking the
     // call on. Also reject an empty identity outright (otherwise memcpy would need a null guard).
     VerifyOrReturn(!clientIdentity.empty() && clientIdentity.size() <= sizeof(mClientIdentity),
-                   onCompletion.Invoke(CHIP_ERROR_INVALID_ARGUMENT));
+                   onCompletion.Invoke(CHIP_ERROR_INVALID_ARGUMENT, /* determinate = */ true));
     memcpy(mClientIdentity, clientIdentity.data(), clientIdentity.size());
     mClientIdentityLength = static_cast<decltype(mClientIdentityLength)>(clientIdentity.size()); // range asserted at declaration
 
@@ -199,7 +200,7 @@ CHIP_ERROR NetworkIdentityManagementRegistrar::AddClientOperation::SendCommand(M
         [this](const app::ConcreteCommandPath &, const app::StatusIB &,
                const Commands::AddClientResponse::DecodableType & response) {
             ChipLogProgress(Controller, "Network Client Identity registered at client index %u", response.clientIndex);
-            Complete(CHIP_NO_ERROR);
+            Complete(CHIP_NO_ERROR, /* determinate = */ true);
         },
         [this](CHIP_ERROR error) { Fail(error); }, MakeOptional(kTimedInvokeTimeoutMs));
 }

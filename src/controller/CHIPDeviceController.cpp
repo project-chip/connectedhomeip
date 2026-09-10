@@ -3389,15 +3389,19 @@ void DeviceCommissioner::OnClientUnregistered(void * context, CHIP_ERROR status)
     commissioner->mOnNetworkClientUnregistrationCallback.mCall = OnClientUnregistered;
 }
 
-void DeviceCommissioner::OnClientRegistered(void * context, CHIP_ERROR status)
+void DeviceCommissioner::OnClientRegistered(void * context, CHIP_ERROR status, bool determinate)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kPDCRegisterClientIdentity);
 
-    if (status != CHIP_NO_ERROR)
+    ChipLogFailure(status, Controller, "Failed to register Network Client Identity (%s)",
+                   determinate ? "no rollback needed" : "rollback may be necessary");
+
+    // Only a determinate failure (where we know the client definitely wasn't registered) lets us
+    // safely skip the rollback. This covers cases like failing to connect to the NIM at all, or
+    // never getting the command out; anything that leaves the outcome open is revoked instead.
+    if (status != CHIP_NO_ERROR && determinate)
     {
-        // Nothing was registered, so we owe the registrar no rollback.
-        ChipLogFailure(status, Controller, "Failed to register Network Client Identity");
         commissioner->mNetworkClientRegistration.Clear();
     }
     commissioner->CommissioningStageComplete(status);

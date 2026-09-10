@@ -161,6 +161,11 @@ private:
         // Completes the operation with a failure status, whatever its completion signature is.
         virtual void Fail(CHIP_ERROR error) = 0;
 
+        // Whether the command has gone out, i.e. whether a failure from here on could still have
+        // taken effect on the NIM. Note this is cleared as the operation finishes, which happens
+        // before the completion is delivered, so it has to be read on the way into Complete().
+        bool CommandSent() const { return mCommandSent; }
+
         // Sends a command like ControllerInvokeOperationBase::Invoke() does, and additionally
         // reports the operation as finished to the registrar once the handler has run, i.e. once
         // the caller's completion has been delivered. Hides the inherited Invoke(), which is what
@@ -170,7 +175,11 @@ private:
                           OnSuccess onSuccess, OnFailure onFailure, const Optional<uint16_t> & timedInvokeTimeoutMs = NullOptional,
                           const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
         {
-            return ControllerInvokeOperationBase::Invoke(
+            // Record the command as sent before it goes out, since a handler may run before this
+            // returns and is free to reuse or destroy the operation. An error return is the one case
+            // where we know that neither handler ran, and that nothing went out after all.
+            mCommandSent   = true;
+            CHIP_ERROR err = ControllerInvokeOperationBase::Invoke(
                 exchangeMgr, session, request,
                 [this, onSuccess](auto &&... args) {
                     auto notify = mRegistrar.DeferOperationFinished();
@@ -181,6 +190,11 @@ private:
                     onFailure(error);
                 },
                 timedInvokeTimeoutMs, responseTimeout);
+            if (err != CHIP_NO_ERROR)
+            {
+                mCommandSent = false;
+            }
+            return err;
         }
 
     private:
@@ -189,6 +203,7 @@ private:
         void OnFinished(bool cancelled) final;
 
         NetworkIdentityManagementRegistrar & mRegistrar;
+        bool mCommandSent = false; // see CommandSent()
     };
 
     class QueryIdentityOperation final : public Callback::TypedOperation<Operation, CHIP_ERROR, ByteSpan>
@@ -204,9 +219,9 @@ private:
         void Fail(CHIP_ERROR error) override { Complete(error, ByteSpan()); }
     };
 
-    class AddClientOperation final : public Callback::TypedOperation<Operation, CHIP_ERROR>
+    class AddClientOperation final : public Callback::TypedOperation<Operation, CHIP_ERROR, bool>
     {
-        using Base = Callback::TypedOperation<Operation, CHIP_ERROR>;
+        using Base = Callback::TypedOperation<Operation, CHIP_ERROR, bool>;
 
     public:
         using Base::Base;
@@ -217,7 +232,10 @@ private:
 
     private:
         CHIP_ERROR SendCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & session) override;
-        void Fail(CHIP_ERROR error) override { Complete(error); }
+
+        // A failure is only determinate if the AddClient never went out: once it has, an error that
+        // stopped the NIM from acting on it is indistinguishable from one that lost us the answer.
+        void Fail(CHIP_ERROR error) override { Complete(error, /* determinate = */ !CommandSent()); }
 
         uint8_t mClientIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
         uint8_t mClientIdentityLength = 0;

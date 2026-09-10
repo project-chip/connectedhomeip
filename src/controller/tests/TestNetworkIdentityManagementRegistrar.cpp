@@ -48,6 +48,11 @@ constexpr uint8_t kClientIdentifierBytes[Credentials::kKeyIdentifierLength] = { 
                                                                                 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13 };
 constexpr Credentials::CertificateKeyId kClientIdentifier{ kClientIdentifierBytes };
 
+// RegisterClient() only checks that an identity is non-empty and fits, and nothing here gets as far
+// as putting one on the wire, so the contents are arbitrary.
+constexpr uint8_t kClientIdentityBytes[] = { 0x15, 0x18 };
+constexpr ByteSpan kClientIdentity{ kClientIdentityBytes };
+
 /**
  * A controller that establishes no sessions of its own: it holds on to the callbacks it is given so
  * that a test decides if and when a connection attempt resolves, which is what lets an operation sit
@@ -104,6 +109,27 @@ protected:
         Callback::Callback<OnClientUnregisteredFunct> callback{
             [](void * context, CHIP_ERROR aStatus) { static_cast<StatusRecorder *>(context)->status = aStatus; }, this
         };
+    };
+
+    // Records the outcome of a registration, which unlike the other operations also says whether its
+    // status is determinate, i.e. whether the AddClient it stands for definitely had no effect.
+    struct RegistrationRecorder
+    {
+        bool Called() const { return status.has_value(); }
+        CHIP_ERROR Status() const
+        {
+            VerifyOrDie(status.has_value());
+            return status.value();
+        }
+
+        std::optional<CHIP_ERROR> status;
+        bool determinate = false;
+        Callback::Callback<OnClientRegisteredFunct> callback{ [](void * context, CHIP_ERROR aStatus, bool aDeterminate) {
+                                                                 auto * self       = static_cast<RegistrationRecorder *>(context);
+                                                                 self->status      = aStatus;
+                                                                 self->determinate = aDeterminate;
+                                                             },
+                                                              this };
     };
 
     // Records that the registrar reported itself idle.
@@ -187,6 +213,79 @@ TEST_F(TestNetworkIdentityManagementRegistrar, RefusesCallsAfterShutdown)
     mRegistrar.UnregisterClient(kClientIdentifier, &revocation.callback);
     ASSERT_TRUE(revocation.Called());
     EXPECT_EQ(revocation.Status(), CHIP_ERROR_INCORRECT_STATE);
+}
+
+// A refused call and a session that never materialises both leave the NIM untouched, and the
+// registrar saying so is what spares its caller a RemoveClient for access that was never granted.
+TEST_F(TestNetworkIdentityManagementRegistrar, ARefusedRegistrationIsADeterminateFailure)
+{
+    mRegistrar.Shutdown();
+
+    RegistrationRecorder registration;
+    mRegistrar.RegisterClient(kClientIdentity, &registration.callback);
+    ASSERT_TRUE(registration.Called());
+    EXPECT_EQ(registration.Status(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(registration.determinate);
+}
+
+TEST_F(TestNetworkIdentityManagementRegistrar, ARegistrationThatNeverGetsASessionIsADeterminateFailure)
+{
+    RegistrationRecorder registration;
+    mRegistrar.RegisterClient(kClientIdentity, &registration.callback);
+    ASSERT_FALSE(registration.Called());
+
+    mController.FailPendingConnection(CHIP_ERROR_TIMEOUT);
+    ASSERT_TRUE(registration.Called());
+    EXPECT_EQ(registration.Status(), CHIP_ERROR_TIMEOUT);
+    EXPECT_TRUE(registration.determinate) << "the AddClient cannot have been sent without a session";
+}
+
+// Abandoning a registration is the one case whose determinacy depends on how far it got. Still
+// waiting for a session, as here, it cannot have been acted on. Once the command is in flight it can,
+// so the caller is left to revoke an identity that may or may not be on the network. That is not
+// reachable with a mock controller that never produces a session, and is left to integration testing.
+TEST_F(TestNetworkIdentityManagementRegistrar, ARegistrationAbandonedWhileConnectingIsADeterminateFailure)
+{
+    RegistrationRecorder registration;
+    mRegistrar.RegisterClient(kClientIdentity, &registration.callback);
+
+    mRegistrar.Shutdown();
+    ASSERT_TRUE(registration.Called());
+    EXPECT_EQ(registration.Status(), CHIP_ERROR_CANCELLED);
+    EXPECT_TRUE(registration.determinate);
+}
+
+// Revoking from a failed registration's completion is what a commissioner does with an indeterminate
+// failure, and with a synchronous one it means UnregisterClient() is called while RegisterClient() is
+// still on the stack. The failure is forced here by refusing both requests outright, which makes for
+// the tightest version of that nesting: what matters is that the registrar comes out of it idle with
+// both callers answered, not what determinacy it reported on the way.
+TEST_F(TestNetworkIdentityManagementRegistrar, ARevocationCanStartFromAFailedRegistration)
+{
+    mController.RefuseConnections();
+
+    StatusRecorder revocation;
+    struct Registration
+    {
+        NetworkIdentityManagementRegistrar & registrar;
+        StatusRecorder & revocation;
+        int completions = 0;
+
+        Callback::Callback<OnClientRegisteredFunct> callback{ [](void * context, CHIP_ERROR, bool) {
+                                                                 auto * self = static_cast<Registration *>(context);
+                                                                 self->completions++;
+                                                                 self->registrar.UnregisterClient(kClientIdentifier,
+                                                                                                  &self->revocation.callback);
+                                                             },
+                                                              this };
+    };
+    Registration registration{ mRegistrar, revocation };
+
+    mRegistrar.RegisterClient(kClientIdentity, &registration.callback);
+    EXPECT_EQ(registration.completions, 1);
+    ASSERT_TRUE(revocation.Called());
+    EXPECT_EQ(revocation.Status(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mRegistrar.IsIdle());
 }
 
 TEST_F(TestNetworkIdentityManagementRegistrar, WaitForIdleCompletesImmediatelyWhenThereIsNothingToWaitFor)

@@ -61,22 +61,33 @@ public:
 
     void AcceptRegistrations() { mAcceptRegistrations = true; }
 
+    /// Takes registration calls on but completes them with `status`. A determinate failure is one
+    /// where the registrar knows the AddClient it stands for did not take effect; an indeterminate
+    /// one leaves that open, which is what a lost response or a dropped session looks like.
+    void FailRegistrations(CHIP_ERROR status, bool determinate)
+    {
+        mAcceptRegistrations       = true;
+        mRegistrationStatus        = status;
+        mRegistrationIsDeterminate = determinate;
+    }
+
     void RegisterClient(ByteSpan clientIdentity, Callback::Callback<OnClientRegisteredFunct>::Owned onCompletion) override
     {
         if (!mAcceptRegistrations)
         {
             ADD_FAILURE() << "unexpected RegisterClient()";
-            onCompletion.Invoke(CHIP_ERROR_INCORRECT_STATE);
+            onCompletion.Invoke(CHIP_ERROR_INCORRECT_STATE, /* determinate = */ true);
             return;
         }
         mRegisterCalls++;
-        VerifyOrReturn(clientIdentity.size() <= sizeof(mRegisteredIdentity), onCompletion.Invoke(CHIP_ERROR_BUFFER_TOO_SMALL));
+        VerifyOrReturn(clientIdentity.size() <= sizeof(mRegisteredIdentity),
+                       onCompletion.Invoke(CHIP_ERROR_BUFFER_TOO_SMALL, /* determinate = */ true));
         memcpy(mRegisteredIdentity, clientIdentity.data(), clientIdentity.size());
         mRegisteredIdentityLen = clientIdentity.size();
 
         // Completing synchronously is explicitly allowed, and there is no bookkeeping to it: the
         // callback was never registered with us, so the caller has no opportunity to cancel it.
-        onCompletion.Invoke(CHIP_NO_ERROR);
+        onCompletion.Invoke(mRegistrationStatus, mRegistrationIsDeterminate);
     }
 
     /// Hold UnregisterClient() calls instead of completing them re-entrantly, so a test can drive the
@@ -144,6 +155,8 @@ private:
     }
 
     bool mAcceptRegistrations                 = false;
+    CHIP_ERROR mRegistrationStatus            = CHIP_NO_ERROR;
+    bool mRegistrationIsDeterminate           = true;
     bool mDeferRevocations                    = false;
     Callback::Cancelable * mPendingUnregister = nullptr;
     uint8_t mRegisteredIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
@@ -542,6 +555,52 @@ TEST_F(AutoCommissionerPDCTest, ClientIdentityIsRegisteredAndRolledBackOnFailure
     EXPECT_EQ(DeviceCommissionerTestAccess(&mDeviceCommissioner).GetNetworkClientRegistrar(), nullptr);
 }
 
+// A registration that fails indeterminately is revoked from the cleanup of the attempt it just
+// failed, which for a registrar that completes synchronously means the revocation starts while its
+// own RegisterClient() call is still on the stack. Registrars are told to expect that; this is the
+// flow that produces it.
+TEST_F(AutoCommissionerPDCTest, AnIndeterminateRegistrationFailureIsRolledBackFromCleanup)
+{
+    Configure(PDCOnlyParams(), /* supportsPDC = */ true);
+    mRegistrar.FailRegistrations(CHIP_ERROR_TIMEOUT, /* determinate = */ false);
+    CompleteGetNetworkIdentity();
+
+    CommissioneeDeviceProxy commissionee;
+    mAccess.SetCommissioneeDeviceProxy(&commissionee);
+
+    // kPDCRegisterClientIdentity is the stage that fails this time, rather than the one after it.
+    ASSERT_EQ(CompleteWiFiNetworkSetup(), CHIP_NO_ERROR);
+    const CompletionStatus & status = mAccess.AccessParams().GetCompletionStatus();
+    EXPECT_EQ(status.err, CHIP_ERROR_TIMEOUT);
+    ASSERT_TRUE(status.failedStage.HasValue());
+    EXPECT_EQ(status.failedStage.Value(), kPDCRegisterClientIdentity);
+
+    Credentials::CertificateKeyIdStorage clientIdentifier{};
+    ASSERT_EQ(Credentials::ExtractIdentifierFromChipNetworkIdentity(mClientIdentity.Identity(),
+                                                                    Credentials::MutableCertificateKeyId(clientIdentifier)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(mRegistrar.mRegisterCalls, 1);
+    EXPECT_EQ(mRegistrar.mUnregisterCalls, 1);
+    EXPECT_TRUE(mRegistrar.UnregisteredIdentifier().data_equal(ByteSpan(clientIdentifier)));
+    EXPECT_EQ(DeviceCommissionerTestAccess(&mDeviceCommissioner).GetNetworkClientRegistrar(), nullptr);
+}
+
+// Whereas a registrar that knows nothing was granted spares the failing attempt the round trip.
+TEST_F(AutoCommissionerPDCTest, ADeterminateRegistrationFailureIsNotRolledBack)
+{
+    Configure(PDCOnlyParams(), /* supportsPDC = */ true);
+    mRegistrar.FailRegistrations(CHIP_ERROR_TIMEOUT, /* determinate = */ true);
+    CompleteGetNetworkIdentity();
+
+    CommissioneeDeviceProxy commissionee;
+    mAccess.SetCommissioneeDeviceProxy(&commissionee);
+
+    ASSERT_EQ(CompleteWiFiNetworkSetup(), CHIP_NO_ERROR);
+    EXPECT_EQ(mAccess.AccessParams().GetCompletionStatus().err, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(mRegistrar.mRegisterCalls, 1);
+    EXPECT_EQ(mRegistrar.mUnregisterCalls, 0);
+}
+
 // The same failure, but with a registrar that does not revoke synchronously: cleanup holds the
 // attempt open until the revocation lands, so that a retry (possibly against a different network)
 // finds the registrar idle rather than colliding with the identity being abandoned.
@@ -883,7 +942,7 @@ protected:
     // synchronously, so the stage has finished by the time this returns.
     void PerformRegisterClientIdentity(CommissioningParameters & params)
     {
-        mRegistrar.AcceptRegistrations();
+        mRegistrar.AcceptRegistrations(); // a no-op for a test that called FailRegistrations()
         mCommissioner.PerformCommissioningStep(&mDeviceProxy, kPDCRegisterClientIdentity, params, &mDelegate, kRootEndpointId,
                                                NullOptional);
     }
@@ -1022,6 +1081,59 @@ TEST_F(DeviceCommissionerPDCTest, RegisteringAnIdentityArmsTheRollbackByDefault)
     mAccess.RollBackNetworkClientIdentity();
     EXPECT_EQ(mRegistrar.mUnregisterCalls, 1);
     EXPECT_TRUE(mRegistrar.UnregisteredIdentifier().data_equal(ClientIdentifier()));
+}
+
+// A registration that fails without a determinate outcome arms the rollback all the same: the
+// AddClient it stands for may have reached the network with only the response going missing, and
+// revoking an identity that was never registered is the cheaper of the two ways to be wrong.
+TEST_F(DeviceCommissionerPDCTest, IndeterminateRegistrationFailureArmsTheRollback)
+{
+    CommissioningParameters params = RegisterClientIdentityParams(mClientIdentity);
+    mRegistrar.FailRegistrations(CHIP_ERROR_TIMEOUT, /* determinate = */ false);
+    PerformRegisterClientIdentity(params);
+
+    EXPECT_EQ(mDelegate.mLastStage, kPDCRegisterClientIdentity);
+    EXPECT_EQ(mDelegate.mLastError, CHIP_ERROR_TIMEOUT) << "the failure was swallowed";
+    EXPECT_EQ(mRegistrar.mRegisterCalls, 1);
+    EXPECT_EQ(mAccess.GetNetworkClientRegistrar(), &mRegistrar);
+
+    mAccess.RollBackNetworkClientIdentity();
+    EXPECT_EQ(mRegistrar.mUnregisterCalls, 1);
+    EXPECT_TRUE(mRegistrar.UnregisteredIdentifier().data_equal(ClientIdentifier()));
+}
+
+// A registrar that can say for certain that nothing was granted -- because it never got the command
+// out, or because the network turned it down -- saves the attempt a pointless revocation. This is the
+// only failure that leaves us owing nothing.
+TEST_F(DeviceCommissionerPDCTest, DeterminateRegistrationFailureArmsNothing)
+{
+    CommissioningParameters params = RegisterClientIdentityParams(mClientIdentity);
+    mRegistrar.FailRegistrations(CHIP_ERROR_TIMEOUT, /* determinate = */ true);
+    PerformRegisterClientIdentity(params);
+
+    EXPECT_EQ(mDelegate.mLastStage, kPDCRegisterClientIdentity);
+    EXPECT_EQ(mDelegate.mLastError, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(mRegistrar.mRegisterCalls, 1);
+    EXPECT_EQ(mAccess.GetNetworkClientRegistrar(), nullptr);
+
+    mAccess.RollBackNetworkClientIdentity(); // as CleanupCommissioning would on failure
+    EXPECT_EQ(mRegistrar.mUnregisterCalls, 0);
+}
+
+// A delegate that manages the registration itself owns the decision for a failed registration too,
+// determinate or not, so there is still nothing for us to roll back.
+TEST_F(DeviceCommissionerPDCTest, FailedRegistrationArmsNothingWhenTheDelegateManagesRollback)
+{
+    CommissioningParameters params = RegisterClientIdentityParams(mClientIdentity);
+    params.SetManagePDCClientIdentityRollback(false);
+    mRegistrar.FailRegistrations(CHIP_ERROR_TIMEOUT, /* determinate = */ false);
+    PerformRegisterClientIdentity(params);
+
+    EXPECT_EQ(mDelegate.mLastError, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(mAccess.GetNetworkClientRegistrar(), nullptr);
+
+    mAccess.RollBackNetworkClientIdentity(); // as CleanupCommissioning would on failure
+    EXPECT_EQ(mRegistrar.mUnregisterCalls, 0);
 }
 
 // A delegate that manages the registration itself still gets the client registered with the network,

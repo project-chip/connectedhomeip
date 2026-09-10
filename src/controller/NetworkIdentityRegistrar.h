@@ -35,8 +35,16 @@ typedef void (*OnNetworkIdentityAvailableFunct)(void * context, CHIP_ERROR statu
 
 /**
  * Callback for NetworkIdentityRegistrar::RegisterClient()
+ *
+ * @param determinate Whether the outcome of the request is known for certain. A failure is
+ *                    determinate if registering the client definitely did not take effect, which is
+ *                    the case for a request that never reached the network at all. A failure that
+ *                    leaves the outcome open (a response that never arrived, a session that dropped,
+ *                    a request abandoned in flight) is indeterminate, and the client may well have
+ *                    been registered. Pass false whenever there is any doubt.
+ *                    A success is by definition determinate, so pass true along with CHIP_NO_ERROR.
  */
-typedef void (*OnClientRegisteredFunct)(void * context, CHIP_ERROR status);
+typedef void (*OnClientRegisteredFunct)(void * context, CHIP_ERROR status, bool determinate);
 
 /**
  * Callback for NetworkIdentityRegistrar::UnregisterClient()
@@ -110,7 +118,8 @@ public:
      *
      * The commissioner keeps at most one registration outstanding at a time, and revokes it again
      * unless the commissionee ends up using the network it was granted access to, so a registrar
-     * does not need to track pending registrations itself.
+     * does not need to track pending registrations itself. Note this includes a registration that
+     * failed indeterminately, since such a failure does not establish that nothing was granted.
      *
      * @param clientIdentity Network Client Identity in compact-pdc-identity TLV format.
      */
@@ -122,7 +131,8 @@ public:
      * Maps onto the Network Identity Management cluster RemoveClient command.
      *
      * Must be idempotent: the commissioner revokes a registration whose RegisterClient() call was
-     * cancelled, because a cancelled call may still have taken effect on the network.
+     * cancelled, or failed without a determinate outcome, because such a call may still have taken
+     * effect on the network.
      *
      * The commissioner only logs the status it is given; a failure here leaves an entry that only an
      * out-of-band audit against the fabric can clean up. It waits for the completion where it needs
