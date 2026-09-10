@@ -56,7 +56,10 @@ LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDeleg
 
 LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) : mSurface(timerDelegate, "Top Surface")
 {
-    mTagList = config.tagList;
+    // The DescriptorCluster keeps only a non-owning view of the tag list, so the configured
+    // tags must be copied into storage that outlives the registered descriptor.
+    mOwnedTags.assign(config.tagList.begin(), config.tagList.end());
+    mTagList = Span(mOwnedTags.data(), mOwnedTags.size());
 
     // The MA-oven device type requires at least one cavity endpoint.
     VerifyOrDie(config.cavityCount >= 1);
