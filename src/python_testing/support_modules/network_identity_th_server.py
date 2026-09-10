@@ -222,7 +222,7 @@ class NetworkIdentityTHServerTest(MatterBaseTest):
             timeout=_COMMISSIONING_WINDOW_TIMEOUT_SECONDS,
             iteration=_COMMISSIONING_WINDOW_ITERATIONS,
             discriminator=random.randint(0, 4095),
-            option=ChipDeviceCtrl.CommissioningWindowPasscode.kTokenWithRandomPIN)
+            option=self.th_server_controller.CommissioningWindowPasscode.kTokenWithRandomPin)
 
         self.wait_for_user_input(
             prompt_msg="Using the DUT's commissioning interface, commission the TH Network Identity Management server "
@@ -309,8 +309,7 @@ class NetworkIdentityTHServerTest(MatterBaseTest):
         still pinned, because the prompt quotes the exact bytes the harness computed.
         """
         if expected_log is not None:
-            self.th_server.set_output_match(expected_log.pattern)
-            self.th_server.event.clear()
+            self.th_server.arm_output_match(expected_log.pattern)
 
         response = self.wait_for_user_input(
             prompt_msg=f"{instruction}\n\n"
@@ -321,7 +320,7 @@ class NetworkIdentityTHServerTest(MatterBaseTest):
             # The operator has already acted, so the line is normally present by now; the wait
             # only absorbs the lag of the server's output being forwarded to the harness.
             asserts.assert_true(
-                self.th_server.event.wait(_LOG_MATCH_TIMEOUT_SECONDS),
+                self.th_server.wait_for_output(_LOG_MATCH_TIMEOUT_SECONDS),
                 f"The TH server never logged {expected_log.description}, so it did not answer the DUT as the test "
                 "plan requires (or the DUT never sent the command).")
 
