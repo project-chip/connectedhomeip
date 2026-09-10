@@ -6,15 +6,19 @@ platforms.
 
 ## Prerequisites
 
-### Supported Chips and Boards
+### Chip and Board used in the guide
 
-| Board target     | Chip Family    | Flash (default) | Notes                                 |
+<!-- | Board target     | Chip Family    | Flash (default) | Notes                                 |
 | ---------------- | -------------- | :-------------: | ------------------------------------- |
 | `tlsr9518adk80d` | TLSR951X / B91 |      2 MB       | Legacy; broad sample coverage         |
 | `tlsr9528a`      | TLSR952X / B92 |      2 MB       | `_retention` variant for low-power    |
 | `tlsr9118bdk40d` | TLSR911X / W91 |      2 MB       | Legacy; broad sample coverage         |
 | `tl3238x`        | TL323X         |      2 MB       | Dual-mode (Matter + Zigbee) supported |
-| `tl7218x`        | TL721X         |      2 MB       | `_retention` variant for low-power    |
+| `tl7218x`        | TL721X         |      2 MB       | `_retention` variant for low-power    | -->
+
+| Board target | Chip Family | EVK Version    | Flash (default) | Notes                                 |
+| ------------ | ----------- | -------------- | :-------------: | ------------------------------------- |
+| `tl3238x`    | TL323X      | C1T388A20_V1.1 |      2 MB       | Dual-mode (Matter + Zigbee) supported |
 
 > See the [Release Notes](./releases/telink_release_notes.md) for the exact chip
 > versions, EVK versions, and per-example support matrix validated in each
@@ -101,7 +105,7 @@ source ~/.bashrc
 
 ### 1.6 (hal_v2 chips only) Fetch the TL323X BLE SDK
 
-For **TL322X / TL323X** (hal_v2) chips, additionally fetch the BLE SDK:
+For **TL323X** (hal_v2) chips, additionally fetch the BLE SDK:
 
 ```bash
 cd ~/zephyrproject/modules/hal/telink/hal_v2
@@ -119,7 +123,7 @@ west build -p auto -b tlsr9518adk80d zephyr/samples/hello_world -d build_helloWo
 ```
 
 For more details, see the
-[Telink Zephyr Getting Started guide](https://github.com/telink-semi/zephyr/blob/develop/doc/telink/getting_started/index.md).
+[Telink Zephyr Getting Started guide](https://github.com/telink-semi/zephyr/blob/release-v1.0-v4.1-branch/doc/telink/getting_started/index.md).
 
 ## Step 2: Get the Matter source code
 
@@ -136,7 +140,7 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 ```bash
 git clone https://github.com/telink-semi/connectedhomeip.git
 cd connectedhomeip
-git checkout <telink_matter_branch>     # e.g. dev-tlk_v1.5
+git checkout <telink_matter_branch>     # e.g. release-v1.0-v1.5-branch
 ./scripts/checkout_submodules.py --platform telink,linux
 ```
 
@@ -183,16 +187,18 @@ Replace `<build_target>` with your board, e.g. `tlsr9518adk80d`, `tlsr9528a`,
 west build -b tl3238x
 ```
 
+<!--
 If your board has a flash size other than the default 2 MB, specify it:
 
 ```bash
 west build -b tl3238x -- -DFLASH_SIZE=4m
-```
+``` -->
 
-The built firmware is at `build/zephyr/zephyr.bin`. When MCUBoot + OTA is
-enabled, a merged `build/zephyr/merged.bin` (MCUBoot + app) is also generated.
+The built firmware is at `build/zephyr/zephyr.bin`.
 
-### 3.3 Build with build_examples.py (CI-style)
+<!-- When MCUBoot + OTA is enabled, a merged `build/zephyr/merged.bin` (MCUBoot + app) is also generated. -->
+
+<!-- ### 3.3 Build with build_examples.py (CI-style)
 
 Alternatively, use the Matter build system to build via GN:
 
@@ -209,7 +215,9 @@ List all available Telink targets:
 Common target options include `-compress-lzma`, `-ota`, `-dfu-smp`,
 `-factory-data`, `-shell`, `-rpcs`, and `-4mb-flash`.
 
-### 3.4 TL3238X build configurations
+### 3.4 TL3238X build configurations -->
+
+### 3.3 TL3238X build configurations
 
 TL3238X supports several configurations depending on flash size and dual-mode
 (Matter + Zigbee) needs. Key combinations:
@@ -231,19 +239,28 @@ west build -p -b tl3238x -d build_tl3238x_lzma_v1 -- \
   -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2
 ```
 
+If your board has a flash size other than the default 2 MB, specify it:
+
+```bash
+west build -b tl3238x -- -DFLASH_SIZE=4m
+```
+
 ## Step 4: Flash the firmware
 
+<!--
 ### 4.1 Option A: west flash (recommended for development)
 
 If your board is connected via a supported debug probe:
 
 ```bash
 west flash --erase
-```
+``` -->
 
-### 4.2 Option B: BDT (Telink flashing tool)
+<!-- ### 4.2 Option B: BDT (Telink flashing tool) -->
 
-Telink provides the **BDT** (Burning Debug Tool) for flashing. On Windows use
+### 4.1 BDT (Telink flashing tool)
+
+<!-- Telink provides the **BDT** (Burning Debug Tool) for flashing. On Windows use
 the BDT GUI (`Telink BDT.exe`); on Linux use the `bdt` CLI. See the
 [Telink Zephyr Getting Started — Flash the Firmware](https://github.com/telink-semi/zephyr/blob/develop/doc/telink/getting_started/index.md#flash-the-firmware)
 section for the chip-to-BDT name mapping and the unlock/erase/write flow.
@@ -256,11 +273,17 @@ A typical Linux BDT session:
 ./bdt B92 rst                   # reset
 ```
 
-> For B92 / TL721X, run `./bdt <chip> ulf` to unlock the flash before erasing.
-> For TL322X / TL323X, use the **TGui-BDT** tool (or `sctool` on Linux) with the
-> on-board programmer.
+> For B92 / TL721X, run `./bdt <chip> ulf` to unlock the flash before
+> erasing. For TL323X, use the **TGui-BDT** tool (or `sctool` on Linux)
+> with the on-board programmer. -->
 
-### 4.3 UART console
+Telink provides the **BDT** (Burning Debug Tool) for flashing. On Windows use
+the BDT GUI (`Telink BDT.exe`). See the
+[Telink Zephyr Getting Started — Flash the Firmware](https://github.com/telink-semi/zephyr/blob/release-v1.0-v4.1-branch/doc/telink/getting_started/index.md#Flash-the-Firmware)
+
+<!-- ### 4.3 UART console -->
+
+### 4.2 UART console
 
 Connect UART to view device logs:
 
@@ -350,7 +373,7 @@ To test OTA with a Linux OTA Provider, refer to the
 
 - [Telink Release Notes](./releases/telink_release_notes.md) — version info,
   chip/EVK versions, per-example support matrix, and resource usage tables.
-- [Telink Zephyr Getting Started](https://github.com/telink-semi/zephyr/blob/develop/doc/telink/getting_started/index.md)
+- [Telink Zephyr Getting Started](https://github.com/telink-semi/zephyr/blob/release-v1.0-v4.1-branch/doc/telink/getting_started/index.md)
   — Zephyr SDK setup, BDT flashing details, and board overviews.
 - Per-example `README.md` files under `examples/<app>/telink/` —
   example-specific build commands, button/LED mappings, and chip-tool usage.
