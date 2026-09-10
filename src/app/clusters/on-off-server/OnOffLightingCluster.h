@@ -132,6 +132,8 @@ private:
     DataModel::Nullable<OnOff::StartUpOnOffEnum> mStartUpOnOff;
     StartupType mStartupType;
 
+    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
+
     // Timer logic
     void UpdateTimer();
 
