@@ -41,9 +41,8 @@ DEFAULT_CONFIG_PATH = ".github/label_reviewers.yaml"
 
 @dataclass
 class LabelRule:
-    display_name: str
-    smes: set[str]
-    display_smes: list[str]
+    name: str
+    smes: list[str]
 
 
 @dataclass
@@ -104,37 +103,38 @@ def parse_label_config(config_path: str) -> dict[str, LabelRule]:
     for label_raw, val in content.items():
         if not isinstance(label_raw, str):
             continue
-        label_display = label_raw.strip()
-        label_key = label_display.lower()
+        label_name = label_raw.strip()
+        label_key = label_name.lower()
 
         if not isinstance(val, list):
             raise ValueError(
-                f"Invalid format for label '{label_display}' in {config_path}: "
+                f"Invalid format for label '{label_name}' in {config_path}: "
                 f"expected a list of usernames, got {type(val).__name__}."
             )
 
-        sme_normalized: set[str] = set()
-        sme_display: list[str] = []
+        smes: list[str] = []
         for u in val:
-            if isinstance(u, str) and u.strip():
-                clean_name = u.strip().lstrip("@")
-                sme_normalized.add(clean_name.lower())
-                sme_display.append(clean_name)
-            else:
+            if not isinstance(u, str) or not u.strip():
                 raise ValueError(
-                    f"Invalid reviewer entry under label '{label_display}' in {config_path}: "
+                    f"Invalid reviewer entry under label '{label_name}' in {config_path}: "
                     f"expected a username string, got {u!r}."
                 )
+            clean_name = u.strip()
+            if clean_name.startswith("@"):
+                raise ValueError(
+                    f"Invalid reviewer '{clean_name}' under label '{label_name}' in {config_path}: "
+                    f"do not include '@' in usernames."
+                )
+            smes.append(clean_name)
 
-        if not sme_normalized:
+        if not smes:
             raise ValueError(
-                f"Label '{label_display}' in {config_path} must have at least one reviewer listed."
+                f"Label '{label_name}' in {config_path} must have at least one reviewer listed."
             )
 
         mapping[label_key] = LabelRule(
-            display_name=label_display,
-            smes=sme_normalized,
-            display_smes=sme_display,
+            name=label_name,
+            smes=smes,
         )
 
     return mapping
@@ -151,7 +151,7 @@ def evaluate_pr_labels(
 
     for key, rule in config_mapping.items():
         if key in pr_label_keys:
-            matching_approvers = sorted(rule.smes.intersection(approvers))
+            matching_approvers = [u for u in rule.smes if u.lower() in approvers]
             evaluations.append(
                 LabelEvaluation(
                     rule=rule,
@@ -187,8 +187,8 @@ def generate_step_summary(
     md.append("| :--- | :---: | :--- | :--- |")
 
     for ev in evaluations:
-        label_code = f"`{ev.rule.display_name}`"
-        req_smes = ", ".join([f"@{u}" for u in ev.rule.display_smes])
+        label_code = f"`{ev.rule.name}`"
+        req_smes = ", ".join([f"@{u}" for u in ev.rule.smes])
         if ev.satisfied:
             status_icon = "✅ Approved"
             approvers_str = ", ".join([f"@{u}" for u in ev.approvers])
@@ -249,29 +249,29 @@ def sync_labels_to_github(repo: str, config_mapping: dict[str, LabelRule]) -> li
     for key, rule in config_mapping.items():
         if key not in existing_labels:
             logging.info(
-                f"Label '{rule.display_name}' does not exist on {repo}. Creating..."
+                f"Label '{rule.name}' does not exist on {repo}. Creating..."
             )
             create_cmd = [
                 "gh",
                 "label",
                 "create",
-                rule.display_name,
+                rule.name,
                 "--repo",
                 repo,
                 "--description",
-                f"Requires SME review: {rule.display_name}",
+                f"Requires SME review: {rule.name}",
                 "--color",
                 "ededed",
             ]
             try:
                 subprocess.run(create_cmd, capture_output=True, text=True, check=True)
-                created.append(rule.display_name)
+                created.append(rule.name)
                 logging.info(
-                    f"✅ Successfully created label '{rule.display_name}' on GitHub."
+                    f"✅ Successfully created label '{rule.name}' on GitHub."
                 )
             except subprocess.CalledProcessError as e:
                 logging.warning(
-                    f"Could not create label '{rule.display_name}': {e.stderr.strip()}"
+                    f"Could not create label '{rule.name}': {e.stderr.strip()}"
                 )
 
     return created
@@ -329,7 +329,7 @@ def main() -> int:
 
     logging.info(f"Configured labels with SME reviewers ({len(config_mapping)}):")
     for key, rule in config_mapping.items():
-        logging.debug(f"  - '{rule.display_name}': {sorted(rule.smes)}")
+        logging.debug(f"  - '{rule.name}': {rule.smes}")
 
     if args.validate_config:
         print(
@@ -390,15 +390,15 @@ def main() -> int:
         print(f"Found {len(evaluations)} monitored SME label(s) on this PR:\n")
         all_passed = True
         for idx, ev in enumerate(evaluations, 1):
-            req_smes = ", ".join([f"@{u}" for u in ev.rule.display_smes])
+            req_smes = ", ".join([f"@{u}" for u in ev.rule.smes])
             if ev.satisfied:
                 approver_mentions = ", ".join([f"@{u}" for u in ev.approvers])
-                print(f"  [{idx}] Label: '{ev.rule.display_name}'")
+                print(f"  [{idx}] Label: '{ev.rule.name}'")
                 print(f"      Required SMEs: {req_smes}")
                 print(f"      Status:        ✅ APPROVED by {approver_mentions}\n")
             else:
                 all_passed = False
-                print(f"  [{idx}] Label: '{ev.rule.display_name}'")
+                print(f"  [{idx}] Label: '{ev.rule.name}'")
                 print(f"      Required SMEs: {req_smes}")
                 print("      Status:        ❌ MISSING APPROVAL")
                 print(
@@ -410,9 +410,9 @@ def main() -> int:
     gh_output = os.environ.get("GITHUB_OUTPUT")
     if gh_output:
         missing_labels = [
-            ev.rule.display_name for ev in evaluations if not ev.satisfied
+            ev.rule.name for ev in evaluations if not ev.satisfied
         ]
-        approved_labels = [ev.rule.display_name for ev in evaluations if ev.satisfied]
+        approved_labels = [ev.rule.name for ev in evaluations if ev.satisfied]
         write_github_outputs(
             gh_output,
             {

@@ -31,7 +31,7 @@
 #
 # Key Features:
 #   - Usernames and labels are case-insensitive.
-#   - Optional leading '@' on usernames is supported (e.g. '@username' or 'username').
+#   - Usernames must NOT include leading '@' (e.g. 'username', not '@username').
 #   - PR authors cannot approve their own PRs (author approvals are ignored).
 #   - If a PR has no designated labels attached, the check passes automatically.
 #   - If multiple designated labels are attached, EVERY label requires at least one
