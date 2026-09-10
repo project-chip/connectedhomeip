@@ -40,10 +40,10 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_cluster, pics, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -57,52 +57,25 @@ log = logging.getLogger(__name__)
 
 
 class TC_ASU_2_2(MatterBaseTest):
-    def desc_TC_ASU_2_2(self) -> str:
-        return "[TC-ASU-2.2] Event Reporting with DUT as a server"
-
-    def pics_TC_ASU_2_2(self):
-        return ["ASU.S"]
-
-    def steps_TC_ASU_2_2(self) -> list[TestStep]:
-        return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH establishes a wildcard subscription to all attributes on Ambient Sensing Union Cluster on the endpoint under test."),
-            TestStep("3", "Add new contributors to UnionContributorList attribute. "
-                     "In CI: add one Matter contributor without a name and one Matter contributor with a name."),
-            TestStep("4", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute.",
-                     "Verify that the new contributor(s) added to the UnionContributorList attribute is same as the one from step 3. "
-                     "For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string."),
-            TestStep("5", "TH receives UnionContributorAdded event and reads the AddedContributor field.",
-                     "Verify that the AddedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the added contributor(s) from step 3. "
-                     "For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string."),
-            TestStep("6", "Remove one of existing contributors from UnionContributorList attribute."),
-            TestStep("7", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute.",
-                     "Verify that the removed contributor(s) from step 6 is not included in the UnionContributorList attribute."),
-            TestStep("8", "TH receives UnionContributorRemoved event and reads the RemovedContributor field.",
-                     "Verify that the RemovedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the removed contributor(s) from step 6. "
-                     "For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string."),
-            TestStep("9", "Change the ContributorStatus value of one contributor from UnionContributorList attribute, and save its ContributorStatus value before the change."),
-            TestStep("10", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute.",
-                     "Verify that the ContributorStatus value of the contributor changed from step 9 is updated accordingly."),
-            TestStep("11", "TH receives UnionContributorStatusChanged event and reads the ContributorStatusChange field.",
-                     "Verify that the ContributorStatusChange field contains ContributorNodeID, ContributorEndpointID, ContributorName, PreviousContributorStatus, and CurrentContributorStatus and the field values match to the field value changes occurred in step 9.")
-        ]
 
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
+    @pics('ASU.S')
+    @async_test_body
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientSensingUnion))
     async def test_TC_ASU_2_2(self):
+        """[TC-ASU-2.2] Cluster endpoint"""
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientSensingUnion
         attr = Clusters.AmbientSensingUnion.Attributes
 
-        self.step("1")
+        self.step("1", "Commissioning, already done", is_commissioning=True)
 
-        self.step("2")
+        self.step("2", "TH establishes a wildcard subscription to all attributes on Ambient Sensing Union Cluster on the endpoint under test.")
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
@@ -122,7 +95,7 @@ class TC_ASU_2_2(MatterBaseTest):
         named_contname = "PrimarySensor"
         named_contstatus = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline
 
-        self.step("3")
+        self.step("3", "Add new contributors to UnionContributorList attribute. In CI: add one Matter contributor without a name and one Matter contributor with a name.")
         if self.is_ci:
             # Add a Matter contributor without a name (ContributorName will be NULL)
             self.write_to_app_pipe({
@@ -147,7 +120,7 @@ class TC_ASU_2_2(MatterBaseTest):
             self.wait_for_user_input(
                 prompt_msg="Add contributors to UnionContributorList (including at least one with and one without a ContributorName), then type any letter and press ENTER.")
 
-        self.step("4")
+        self.step("4", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute. Verify that the new contributor(s) added to the UnionContributorList attribute is same as the one from step 3. For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string.")
         subscription_reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(subscription_reports is not None and len(subscription_reports) > 0,
                             "No subscription report received for UnionContributorList after adding contributors.")
@@ -184,7 +157,7 @@ class TC_ASU_2_2(MatterBaseTest):
 
         attrib_listener.reset()
 
-        self.step("5")
+        self.step("5", "TH receives UnionContributorAdded event and reads the AddedContributor field. Verify that the AddedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the added contributor(s) from step 3. For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string.")
         # Collect all UnionContributorAdded events and index them by contributor NodeID.
         # In CI, two contributors were added, so both NodeIDs must be present.
         # Drain all queued events by polling until the queue is empty.
@@ -244,7 +217,7 @@ class TC_ASU_2_2(MatterBaseTest):
 
         event_listener.reset()
 
-        self.step("6")
+        self.step("6", "Remove one of existing contributors from UnionContributorList attribute.")
         if self.is_ci:
             self.write_to_app_pipe({
                 "Name": "RemoveAmbientSensingContributor",
@@ -257,7 +230,7 @@ class TC_ASU_2_2(MatterBaseTest):
             self.wait_for_user_input(
                 prompt_msg="Remove a contributor from UnionContributorList, then type any letter and press ENTER.")
 
-        self.step("7")
+        self.step("7", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute. Verify that the removed contributor(s) from step 6 is not included in the UnionContributorList attribute.")
         subscription_reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(subscription_reports is not None and len(subscription_reports) > 0,
                             "No subscription report received for UnionContributorList after removing contributor.")
@@ -270,7 +243,7 @@ class TC_ASU_2_2(MatterBaseTest):
 
         attrib_listener.reset()
 
-        self.step("8")
+        self.step("8", "TH receives UnionContributorRemoved event and reads the RemovedContributor field. Verify that the RemovedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the removed contributor(s) from step 6. For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string.")
         event = event_listener.get_last_event()
         asserts.assert_is_not_none(event, "No UnionContributorRemoved event received.")
         asserts.assert_equal(event.Header.EventId, cluster.Events.UnionContributorRemoved.event_id,
@@ -289,7 +262,7 @@ class TC_ASU_2_2(MatterBaseTest):
         asserts.assert_equal(removed.contributorStatus, contstatus, "Wrong ContributorStatus in UnionContributorRemoved event.")
         event_listener.reset()
 
-        self.step("9")
+        self.step("9", "Change the ContributorStatus value of one contributor from UnionContributorList attribute, and save its ContributorStatus value before the change.")
         prev_status = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline
         current_status = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOffline
 
@@ -317,7 +290,7 @@ class TC_ASU_2_2(MatterBaseTest):
             self.wait_for_user_input(
                 prompt_msg="Change the contributor's ContributorStatus of the one with ContributorName added in previous step in UnionContributorList, then type any letter and press ENTER.")
 
-        self.step("10")
+        self.step("10", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute. Verify that the ContributorStatus value of the contributor changed from step 9 is updated accordingly.")
         subscription_reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(subscription_reports is not None and len(subscription_reports) > 0,
                             "No subscription report received for UnionContributorList after status change.")
@@ -334,7 +307,7 @@ class TC_ASU_2_2(MatterBaseTest):
             found_updated, "Could not find contributor in UnionContributorList subscription report to verify status change.")
         attrib_listener.reset()
 
-        self.step("11")
+        self.step("11", "TH receives UnionContributorStatusChanged event and reads the ContributorStatusChange field. Verify that the ContributorStatusChange field contains ContributorNodeID, ContributorEndpointID, ContributorName, PreviousContributorStatus, and CurrentContributorStatus and the field values match to the field value changes occurred in step 9.")
         event = event_listener.get_last_event()
         asserts.assert_is_not_none(event, "No UnionContributorStatusChanged event received.")
         asserts.assert_equal(event.Header.EventId, cluster.Events.UnionContributorStatusChanged.event_id,
