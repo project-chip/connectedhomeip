@@ -26,6 +26,8 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
 
+#include <limits>
+
 using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
@@ -304,7 +306,7 @@ ThermostatSuggestions::RemoveThermostatSuggestion(CommandHandler * commandObj, c
     return Status::Success;
 }
 
-void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
+bool ThermostatSuggestions::ReEvaluateCurrentSuggestion()
 {
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentSuggestionBeforeReevaluation;
     mDelegate.GetCurrentThermostatSuggestion(currentSuggestionBeforeReevaluation);
@@ -317,14 +319,14 @@ void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to GetActivePresetHandle with error: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
+        return false;
     }
 
     err = mDelegate.ReEvaluateCurrentSuggestion();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to ReEvaluateCurrentSuggestion with error: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
+        return false;
     }
 
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentSuggestionAfterReevaluation;
@@ -350,27 +352,30 @@ void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
     err = mPresets.GetDelegate().GetActivePresetHandle(afterReevaluationHandle);
     if (err != CHIP_NO_ERROR)
     {
-        return;
+        return suggestionChanged;
     }
 
-    if (beforeReevaluationHandle.IsNull() && afterReevaluationHandle.IsNull())
+    bool activePresetHandleChanged = !(beforeReevaluationHandle.IsNull() && afterReevaluationHandle.IsNull()) &&
+        !(!beforeReevaluationHandle.IsNull() && !afterReevaluationHandle.IsNull() &&
+          beforeReevaluationHandle.Value().data_equal(afterReevaluationHandle.Value()));
+    if (activePresetHandleChanged)
     {
-        return;
+        // If the active preset handle changed, notify the attribute changed.
+        mCluster.NotifyAttributeChanged(ActivePresetHandle::Id);
     }
 
-    if (!beforeReevaluationHandle.IsNull() && !afterReevaluationHandle.IsNull() &&
-        beforeReevaluationHandle.Value().data_equal(afterReevaluationHandle.Value()))
-    {
-        return;
-    }
-
-    // If the active preset handle changed, notify the attribute changed.
-    mCluster.NotifyAttributeChanged(ActivePresetHandle::Id);
+    return suggestionChanged;
 }
 
-void ThermostatSuggestions::RemoveThermostatSuggestionsForRemovedPresets()
+bool ThermostatSuggestions::RemoveThermostatSuggestionsForRemovedPresets()
 {
     uint8_t numSuggestions = mDelegate.GetNumberOfThermostatSuggestions();
+
+    // Caches, for each suggestion index, whether its preset is still present -- sized to the type's maximum
+    // possible list length (uint8_t) rather than numSuggestions itself, to avoid a variable-length array. Populated
+    // by the first pass below and consumed by the second, so the second pass never re-queries the Presets delegate
+    // and cannot itself fail partway through a removal.
+    bool presetStillExists[std::numeric_limits<uint8_t>::max()] = { false };
 
     // First pass: check every suggestion's preset for existence without mutating ThermostatSuggestions. If any
     // check fails, abort with no removals at all: an inconclusive answer for one entry must not cause a partial
@@ -385,81 +390,82 @@ void ThermostatSuggestions::RemoveThermostatSuggestionsForRemovedPresets()
                          "RemoveThermostatSuggestionsForRemovedPresets: GetThermostatSuggestionAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
-            return;
+            return false;
         }
 
-        bool presetStillExists = false;
-        err                    = PresetHandleStillExists(mPresets.GetDelegate(), suggestion.GetPresetHandle(), presetStillExists);
+        err = PresetHandleStillExists(mPresets.GetDelegate(), suggestion.GetPresetHandle(), presetStillExists[i]);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(
                 Zcl, "RemoveThermostatSuggestionsForRemovedPresets: PresetHandleStillExists failed with error %" CHIP_ERROR_FORMAT,
                 err.Format());
-            return;
+            return false;
         }
     }
 
-    // currentSuggestion identifies the CurrentThermostatSuggestion entry, if any, so the second pass can tell
-    // whether it is one of the entries being removed. RemoveFromThermostatSuggestionsList() nulls
-    // CurrentThermostatSuggestion when that happens, but does not itself notify: if no other suggestion later
-    // becomes current, ReEvaluateCurrentSuggestion()'s own before/after diff can't detect the change, since by the
-    // time it takes its "before" snapshot, this cascade has already nulled it out.
-    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentSuggestion;
-    mDelegate.GetCurrentThermostatSuggestion(currentSuggestion);
+    bool didRemoveAnEntry = false;
 
-    bool didRemoveAnEntry           = false;
-    bool didRemoveCurrentSuggestion = false;
-
-    // Second pass: every preset check above succeeded, so it's now safe to actually remove the stale entries. Walk
-    // backwards so removing an entry does not shift the indices of entries not yet visited.
+    // Second pass: every preset check above succeeded and is cached, so it's now safe to actually remove the stale
+    // entries using the cached results, without any further Presets delegate lookups that could themselves fail
+    // partway through. Walk backwards so removing an entry does not shift the indices of entries not yet visited.
     for (int i = static_cast<int>(numSuggestions) - 1; i >= 0; i--)
     {
-        ThermostatSuggestionStructWithOwnedMembers suggestion;
-        CHIP_ERROR err = mDelegate.GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
+        if (presetStillExists[static_cast<uint8_t>(i)])
+        {
+            continue;
+        }
+
+        CHIP_ERROR err = mDelegate.RemoveFromThermostatSuggestionsList(static_cast<size_t>(i));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl,
-                         "RemoveThermostatSuggestionsForRemovedPresets: GetThermostatSuggestionAtIndex failed with error "
+                         "RemoveThermostatSuggestionsForRemovedPresets: RemoveFromThermostatSuggestionsList failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
             break;
         }
-
-        bool presetStillExists = false;
-        err                    = PresetHandleStillExists(mPresets.GetDelegate(), suggestion.GetPresetHandle(), presetStillExists);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(
-                Zcl, "RemoveThermostatSuggestionsForRemovedPresets: PresetHandleStillExists failed with error %" CHIP_ERROR_FORMAT,
-                err.Format());
-            break;
-        }
-
-        if (!presetStillExists)
-        {
-            if (!currentSuggestion.IsNull() && currentSuggestion.Value().GetUniqueID() == suggestion.GetUniqueID())
-            {
-                didRemoveCurrentSuggestion = true;
-            }
-
-            err = mDelegate.RemoveFromThermostatSuggestionsList(static_cast<size_t>(i));
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl,
-                             "RemoveThermostatSuggestionsForRemovedPresets: RemoveFromThermostatSuggestionsList failed with error "
-                             "%" CHIP_ERROR_FORMAT,
-                             err.Format());
-                break;
-            }
-            didRemoveAnEntry = true;
-        }
+        didRemoveAnEntry = true;
     }
 
     if (didRemoveAnEntry)
     {
         mCluster.NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
     }
-    if (didRemoveCurrentSuggestion)
+    return true;
+}
+
+void ThermostatSuggestions::OnPresetsCommitted()
+{
+    // RemoveFromThermostatSuggestionsList() nulls CurrentThermostatSuggestion, per its API contract, when the
+    // removed entry was current. Snapshot it here so that if the cascade below removes it and nothing later
+    // replaces it, the true transition can still be detected and reported: ReEvaluateCurrentSuggestion()'s own
+    // before/after diff can't, since by the time it takes its "before" snapshot the cascade has already nulled the
+    // delegate's state.
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentBeforeCleanup;
+    mDelegate.GetCurrentThermostatSuggestion(currentBeforeCleanup);
+
+    if (!RemoveThermostatSuggestionsForRemovedPresets())
+    {
+        // The cascade aborted on a delegate error, leaving potentially-stale suggestions in place. Skip
+        // re-evaluation: it could otherwise pick a suggestion whose preset no longer exists.
+        return;
+    }
+
+    bool alreadyNotifiedCurrentSuggestion = ReEvaluateCurrentSuggestion();
+    if (alreadyNotifiedCurrentSuggestion)
+    {
+        return;
+    }
+
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentAfter;
+    mDelegate.GetCurrentThermostatSuggestion(currentAfter);
+
+    bool currentSuggestionActuallyChanged = currentBeforeCleanup.IsNull() != currentAfter.IsNull();
+    if (!currentSuggestionActuallyChanged && !currentAfter.IsNull())
+    {
+        currentSuggestionActuallyChanged = currentBeforeCleanup.Value().GetUniqueID() != currentAfter.Value().GetUniqueID();
+    }
+    if (currentSuggestionActuallyChanged)
     {
         mCluster.NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
     }

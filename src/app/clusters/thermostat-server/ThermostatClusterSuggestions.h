@@ -152,24 +152,37 @@ public:
     RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
 
-    void ReEvaluateCurrentSuggestion();
+    /**
+     * @brief Re-evaluates and, if it changed, notifies CurrentThermostatSuggestion (and ActivePresetHandle, if the
+     *        delegate's re-evaluation moved it).
+     *
+     * @return true if CurrentThermostatSuggestion was found to have changed (and was notified), false otherwise.
+     */
+    bool ReEvaluateCurrentSuggestion();
 
     /**
-     * @brief Removes every entry in the ThermostatSuggestions attribute list whose PresetHandle no longer matches a
-     *        preset in the Presets attribute list, and notifies if any entry (or CurrentThermostatSuggestion) was
-     *        removed as a result.
+     * @brief Reacts to a successful Presets atomic-write commit: cascades the removal of any ThermostatSuggestions
+     *        entries whose preset no longer exists (see RemoveThermostatSuggestionsForRemovedPresets()) and, if
+     *        that cascade completed, re-evaluates the current suggestion.
      *
-     * Per spec § 4.3.11.50, this cascade must run after a Presets atomic write commits a preset removal. If a
-     * removed entry was the CurrentThermostatSuggestion, RemoveFromThermostatSuggestionsList() is responsible for
-     * setting CurrentThermostatSuggestion to null, per its API contract; this notifies that attribute changed if no
-     * later step (e.g. ReEvaluateCurrentSuggestion()) already will.
-     *
-     * This is best-effort: if a delegate lookup fails partway through, the cascade logs the error and leaves the
-     * remaining entries untouched rather than risk a partial cleanup.
+     * Per spec § 4.3.11.50, this must run after a Presets atomic write commits a preset removal.
      */
-    void RemoveThermostatSuggestionsForRemovedPresets();
+    void OnPresetsCommitted();
 
 private:
+    /**
+     * @brief Removes every entry in the ThermostatSuggestions attribute list whose PresetHandle no longer matches a
+     *        preset in the Presets attribute list, and notifies ThermostatSuggestions changed if any entry was
+     *        removed. Does not itself evaluate or notify CurrentThermostatSuggestion; see OnPresetsCommitted().
+     *
+     * This is best-effort: if a delegate lookup fails partway through, the cascade logs the error and leaves every
+     * entry untouched rather than risk a partial cleanup.
+     *
+     * @return true if the cascade completed (whether or not anything was removed), false if it aborted early on a
+     *         delegate error.
+     */
+    bool RemoveThermostatSuggestionsForRemovedPresets();
+
     ThermostatClusterBase & mCluster;
     Delegate & mDelegate;
     ThermostatPresets & mPresets;
