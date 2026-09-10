@@ -154,6 +154,21 @@ public:
 
     void ReEvaluateCurrentSuggestion();
 
+    /**
+     * @brief Removes every entry in the ThermostatSuggestions attribute list whose PresetHandle no longer matches a
+     *        preset in the Presets attribute list, and notifies if any entry (or CurrentThermostatSuggestion) was
+     *        removed as a result.
+     *
+     * Per spec § 4.3.11.50, this cascade must run after a Presets atomic write commits a preset removal. If a
+     * removed entry was the CurrentThermostatSuggestion, RemoveFromThermostatSuggestionsList() is responsible for
+     * setting CurrentThermostatSuggestion to null, per its API contract; this notifies that attribute changed if no
+     * later step (e.g. ReEvaluateCurrentSuggestion()) already will.
+     *
+     * This is best-effort: if a delegate lookup fails partway through, the cascade logs the error and leaves the
+     * remaining entries untouched rather than risk a partial cleanup.
+     */
+    void RemoveThermostatSuggestionsForRemovedPresets();
+
 private:
     ThermostatClusterBase & mCluster;
     Delegate & mDelegate;

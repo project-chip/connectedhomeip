@@ -405,9 +405,14 @@ public:
 
     CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override
     {
+        mGetPresetAtIndexCallCount++;
         if (mGetPresetAtIndexError.has_value())
         {
             return *mGetPresetAtIndexError;
+        }
+        if (mFailGetPresetAtIndexOnCall.has_value() && mGetPresetAtIndexCallCount == *mFailGetPresetAtIndexOnCall)
+        {
+            return CHIP_ERROR_INTERNAL;
         }
         if (index >= mPresets.size())
         {
@@ -503,6 +508,11 @@ public:
     std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(10000);
     std::optional<CHIP_ERROR> mGetPresetAtIndexError;
     std::optional<CHIP_ERROR> mGetPendingPresetAtIndexError;
+    // When set, the Nth call (1-based, across all indices) to GetPresetAtIndex() returns CHIP_ERROR_INTERNAL
+    // instead of consulting mPresets. Used to simulate a transient delegate enumeration failure at a specific
+    // point in a caller's scan, regardless of earlier unrelated scans over the same list.
+    size_t mGetPresetAtIndexCallCount = 0;
+    std::optional<size_t> mFailGetPresetAtIndexOnCall;
 };
 
 class MockSuggestionsDelegate : public ThermostatSuggestions::Delegate
@@ -556,6 +566,11 @@ public:
         if (index >= mSuggestions.size())
         {
             return CHIP_ERROR_NOT_FOUND;
+        }
+        // Per the API contract, removing the entry that is CurrentThermostatSuggestion nulls it out.
+        if (!mCurrentSuggestion.IsNull() && mCurrentSuggestion.Value().GetUniqueID() == mSuggestions[index].GetUniqueID())
+        {
+            mCurrentSuggestion.SetNull();
         }
         mSuggestions.erase(mSuggestions.begin() + static_cast<ptrdiff_t>(index));
         return CHIP_NO_ERROR;
