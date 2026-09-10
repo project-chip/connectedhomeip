@@ -476,8 +476,8 @@ tests:
                 - name: "Equals"
                   saveAs: IsRevision2
 
-    ## Currently this test only expect cluster revision 1 or 2.
-    ## If new version is added, We should create a GreaterThanOrEqual command for yaml parser or migrate this test to python testing.
+    ## Currently this test only expects cluster revision 1 or 2.
+    ## If a new version is added, we should create a GreaterThanOrEqual command for the YAML parser or migrate this test to python testing.
     - label:
           "Determine if test should run (ScenesManagement cluster revision 1)"
       cluster: "EqualityCommands"
