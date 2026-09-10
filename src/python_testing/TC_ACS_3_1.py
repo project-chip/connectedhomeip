@@ -44,10 +44,10 @@ import time
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -57,48 +57,43 @@ OBJECT_IDENTIFICATION_NAMESPACE_ID = 73  # 0x49
 SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 
 # Script Function Call Example
-# ./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters/chip-all-clusters-app --factory-reset
-# --app-args "--KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_1" --script src/python_testing/TC_ACS_3_1.py
-# --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
+# python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices-clang/all-devices-app --factory-reset
+# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_1"
+# --script src/python_testing/TC_ACS_3_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03
 # --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
 # --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
-
 class TC_ACS_3_1(MatterBaseTest):
-    def desc_TC_ACS_3_1(self) -> str:
-        return "[TC-ACS-3.1] Multiple Detection Functionality & Simultaneous Detection Limit Check with DUT as a server"
-
-    def pics_TC_ACS_3_1(self):
-        return ["ACS.S"]
-
-    def steps_TC_ACS_3_1(self) -> list[TestStep]:
-        return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads the SimultaneousDetectionLimit attribute.",
-                     "If 1 is read, skip this test case. Otherwise proceed the following."),
-            TestStep("3", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false.."),
-            TestStep("4", "TH writes DUT HoldTime attribute.",
-                     "Verify that its value is ranged between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax."),
-            TestStep("5a", "This step is for DUT capable of supporting only 2 simultaneous detection. Otherwise, skip to 6a.",
-                     "An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus.",
-                     "And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus."),
-            TestStep("5b", "TH verifies the AmbientContextType attribute change.",
-                     "Verify that DUT response contains the AmbientContextSensed struct data list size of up to 2.",
-                     "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match both ambient sensing events from the step 5a."),
-            TestStep("5c", "An operator waits until the HoldTime duration expires since the step 5a execution.",
-                     "Check if AmbientContextDetectEnded is received for the second ambient sensing event."),
-            TestStep("6a", "This step is for DUT capable of supporting 3 or more simultaneous detection. An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus.",
-                     "And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus.",
-                     "And within HoldTime duration, an operator actuates DUT to generate the third ambient sensing event, and then removes its sensing stimulus."),
-            TestStep("6b", "TH verifies the AmbientContextType attribute change.",
-                     "Verify that DUT response contains the AmbientContextSensed struct data list size of up to 3.",
-                     "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match both ambient sensing events from the step 6a."),
-            TestStep("6c", "An operator waits until the HoldTime duration expires since the step 6a execution.",
-                     "Check if AmbientContextDetectEnded is received for the last ambient sensing event."),
-            TestStep("7", "TH reads the AmbientContextType attribute.",
-                     "Verify that the AmbientContextType attribute contains an empty list and the Boolean attributes related the step 5a or 6a are False.")
-        ]
+    
+    @pics('ACS.S')
+    @async_test_body
+    async def test_TC_ACS_3_1(self):
+        """[TC-ACS-3.1] Cluster endpoint"""
+        self.step(1, "Commissioning, already done", is_commissioning=True)
+        self.step(2, "TH reads the SimultaneousDetectionLimit attribute.",
+                 "If 1 is read, skip this test case. Otherwise proceed the following.")
+        self.step(3, "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false..")
+        self.step(4, "TH writes DUT HoldTime attribute.",
+                 "Verify that its value is ranged between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax.")
+        self.step(5a, "This step is for DUT capable of supporting only 2 simultaneous detection. Otherwise, skip to 6a.",
+                 "An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus.",
+                 "And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus.")
+        self.step(5b, "TH verifies the AmbientContextType attribute change.",
+                 "Verify that DUT response contains the AmbientContextSensed struct data list size of up to 2.",
+                 "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match both ambient sensing events from the step 5a.")
+        self.step(5c, "An operator waits until the HoldTime duration expires since the step 5a execution.",
+                 "Check if AmbientContextDetectEnded is received for the second ambient sensing event.")
+        self.step(6a, "This step is for DUT capable of supporting 3 or more simultaneous detection. An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus.",
+                 "And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus.",
+                 "And within HoldTime duration, an operator actuates DUT to generate the third ambient sensing event, and then removes its sensing stimulus.")
+        self.step(6b, "TH verifies the AmbientContextType attribute change.",
+                 "Verify that DUT response contains the AmbientContextSensed struct data list size of up to 3.",
+                 "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match both ambient sensing events from the step 6a.")
+        self.step(6c, "An operator waits until the HoldTime duration expires since the step 6a execution.",
+                 "Check if AmbientContextDetectEnded is received for the last ambient sensing event.")
+        self.step(7, "TH reads the AmbientContextType attribute.",
+                 "Verify that the AmbientContextType attribute contains an empty list and the Boolean attributes related the step 5a or 6a are False.")
 
     def setup_test(self):
         super().setup_test()
@@ -278,29 +273,29 @@ class TC_ACS_3_1(MatterBaseTest):
                                 f"Unexpected tag, {subscription_expected[1].ambientContextSensed[0].tag}, exp {tag1}")
 
             # AmbientContextType attribute subscription check for the latest event boolean attribute
-            if (namespaceid_test == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
+            if (namespaceid_test == HUMAN_ACTIVITY_NAMESPACE_ID) and self.HumanActivitySupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
                 humanActivityDetected = subscription_bool_expected[0].value
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test == OBJECT_IDENTIFICATION_NAMESPACE_ID) and self.ObjectIdentificationSupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
                 objectIdentified = subscription_bool_expected[0].value
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test == SOUND_IDENTIFICATION_NAMESPACE_ID) and self.SoundIdentificationSupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
                 audioContextDetected = subscription_bool_expected[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             # AmbientContextType attribute subscription check for the early boolean attribute
-            if (namespaceid_test1 == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
+            if (namespaceid_test1 == HUMAN_ACTIVITY_NAMESPACE_ID) and self.HumanActivitySupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
                 humanActivityDetected = subscription_bool_expected1[0].value
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test1 == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test1 == OBJECT_IDENTIFICATION_NAMESPACE_ID) and self.ObjectIdentificationSupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
                 objectIdentified = subscription_bool_expected1[0].value
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test1 == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test1 == SOUND_IDENTIFICATION_NAMESPACE_ID) and self.SoundIdentificationSupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
                 audioContextDetected = subscription_bool_expected1[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
@@ -446,43 +441,43 @@ class TC_ACS_3_1(MatterBaseTest):
                                 f"Unexpected tag, {subscription_expected[2].ambientContextSensed[0].tag}, exp {tag1}")
 
             # AmbientContextType attribute subscription check for the latest event boolean attribute
-            if (namespaceid_test == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
+            if (namespaceid_test == HUMAN_ACTIVITY_NAMESPACE_ID) and self.HumanActivitySupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
                 humanActivityDetected = subscription_bool_expected[0].value
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test == OBJECT_IDENTIFICATION_NAMESPACE_ID) and self.ObjectIdentificationSupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
                 objectIdentified = subscription_bool_expected[0].value
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test == SOUND_IDENTIFICATION_NAMESPACE_ID) and self.SoundIdentificationSupported:
                 subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
                 audioContextDetected = subscription_bool_expected[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             # AmbientContextType attribute subscription check for the early boolean attribute
-            if (namespaceid_test1 == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
+            if (namespaceid_test1 == HUMAN_ACTIVITY_NAMESPACE_ID) and self.HumanActivitySupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
                 humanActivityDetected = subscription_bool_expected1[0].value
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test1 == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test1 == OBJECT_IDENTIFICATION_NAMESPACE_ID) and self.ObjectIdentificationSupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
                 objectIdentified = subscription_bool_expected1[0].value
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test1 == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test1 == SOUND_IDENTIFICATION_NAMESPACE_ID) and self.SoundIdentificationSupported:
                 subscription_bool_expected1 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
                 audioContextDetected = subscription_bool_expected1[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             # AmbientContextType attribute subscription check for the earliest boolean attribute
-            if (namespaceid_test2 == HUMAN_ACTIVITY_NAMESPACE_ID) & self.HumanActivitySupported:
+            if (namespaceid_test2 == HUMAN_ACTIVITY_NAMESPACE_ID) and self.HumanActivitySupported:
                 subscription_bool_expected2 = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
                 humanActivityDetected = subscription_bool_expected2[0].value
                 asserts.assert_true(humanActivityDetected, "Failed to get HumanActivityDetected being True.")
-            elif (namespaceid_test2 == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
+            elif (namespaceid_test2 == OBJECT_IDENTIFICATION_NAMESPACE_ID) and self.ObjectIdentificationSupported:
                 subscription_bool_expected2 = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
                 objectIdentified = subscription_bool_expected2[0].value
                 asserts.assert_true(objectIdentified, "Failed to get ObjectIdentified being True.")
-            elif (namespaceid_test2 == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
+            elif (namespaceid_test2 == SOUND_IDENTIFICATION_NAMESPACE_ID) and self.SoundIdentificationSupported:
                 subscription_bool_expected2 = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
                 audioContextDetected = subscription_bool_expected2[0].value
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
@@ -507,17 +502,17 @@ class TC_ACS_3_1(MatterBaseTest):
 
         self.step("7", "TH reads the AmbientContextType attribute. Verify that the AmbientContextType attribute contains an empty list and the Boolean attributes related the step 5a or 6a are False.")
         # Check the boolean attributes are set to False
-        if humanActivityDetected & self.HumanActivitySupported:
+        if humanActivityDetected and self.HumanActivitySupported:
             subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
             humanActivityDetected = subscription_bool_expected[-1].value
             asserts.assert_true(not humanActivityDetected, "Failed to get HumanActivityDetected being False.")
 
-        if objectIdentified & self.ObjectIdentificationSupported:
+        if objectIdentified and self.ObjectIdentificationSupported:
             subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
             objectIdentified = subscription_bool_expected[-1].value
             asserts.assert_true(not objectIdentified, "Failed to get ObjectIdentified being False.")
 
-        if audioContextDetected & self.SoundIdentificationSupported:
+        if audioContextDetected and self.SoundIdentificationSupported:
             subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
             audioContextDetected = subscription_bool_expected[-1].value
             asserts.assert_true(not audioContextDetected, "Failed to get audioContextDetected being False.")
