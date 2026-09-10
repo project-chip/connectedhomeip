@@ -136,7 +136,7 @@ struct PychipCASEHandshakeMetricsRecord
     // Which fields above have been filled in.
     chip::python::CASEHandshakeRecordedFields recordedFields;
     // A chip::python::CASEHandshakeDiscoveryOutcome saying why there is no discovery duration, or
-    // that there is one. Fits in the padding the record already had, so it costs no space.
+    // that there is one.
     uint8_t deviceDiscoveryOutcome;
     // The peer's transport address, empty until the peer sends its first message. Always
     // available even when peerNodeId is not, so it is the reliable way to tell two DUTs

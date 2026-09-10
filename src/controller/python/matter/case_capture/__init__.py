@@ -113,7 +113,7 @@ def GetSnapshot() -> PyCaseCaptureSnapshot:
 # message as SessionManager sends or receives it, so nothing here depends on log text or
 # trace files.
 
-# Must match PYCHIP_CASE_HANDSHAKE_METRICS_PEER_ADDRESS_MAX_LENGTH in CASECapture.h. Records cross
+# Must match kCASEHandshakeMetricsPeerAddressMaxLength in CASEHandshakeMetricsRecord.h. Records cross
 # the boundary one at a time, so this is the only size that has to agree between the two sides.
 PEER_TRANSPORT_ADDRESS_MAX_LENGTH = 80
 
@@ -127,7 +127,7 @@ _MICROSECONDS_PER_MILLISECOND = 1000.0
 STATUS_REPORT_GENERAL_CODE_SUCCESS = 0
 STATUS_REPORT_PROTOCOL_CODE_SUCCESS = 0
 
-# Must match the PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_* bits in CASECapture.h.
+# Must match the CASEHandshakeRecordedField values in CASEHandshakeMetricsRecord.h.
 RECORDED_SIGMA1_SENT = 0x01
 RECORDED_SIGMA2_RECEIVED = 0x02
 RECORDED_SIGMA3_SENT = 0x04
@@ -140,7 +140,7 @@ RECORDED_THIS_NODE_REJECTED_PEER = 0x80
 RECORDED_STATUS_REPORT_SENT = 0x100
 
 
-# Mirror of the C struct PychipCASEHandshakeMetricsRecord defined in CASECapture.h.
+# Mirror of the C struct PychipCASEHandshakeMetricsRecord defined in CASEHandshakeMetricsRecord.h.
 class CASEHandshakeDiscoveryOutcome(enum.IntEnum):
     """Why a handshake has no discovery duration, or that it has one.
 
@@ -444,7 +444,7 @@ def _CheckRecordLayoutMatchesNative(handle: ctypes.CDLL) -> None:
         raise RuntimeError(
             f"CASE handshake metrics record layout has drifted: the C struct is {native_size.value} bytes "
             f"but the ctypes mirror in {__name__} is {mirror_size}. Bring PyCASEHandshakeMetricsRecord "
-            "back into line with PychipCASEHandshakeMetricsRecord in CASEHandshakeMetrics.h.")
+            "back into line with PychipCASEHandshakeMetricsRecord in CASEHandshakeMetricsRecord.h.")
 
 
 def _StartCASEHandshakeNotifications(notification_queue_depth: int = NOTIFICATION_QUEUE_DEPTH_NATIVE_DEFAULT) -> None:

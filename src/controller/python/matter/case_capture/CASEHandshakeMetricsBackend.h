@@ -66,8 +66,8 @@ public:
             // SessionManager::PrepareMessage, and an MRP retransmission re-sends the retained
             // buffer through SendPreparedMessage without preparing it again. The guard is here
             // because nothing in this file can enforce that, and if it ever changed the damage
-            // would be silent: a second record would take the later timestamp, the first would
-            // never conclude, and it would eventually be reported as an abandoned handshake.
+            // would be silent: a second record would take the later timestamp, and the first
+            // would hold a slot and be counted as in flight for the rest of the run.
             VerifyOrReturn(FindCASEHandshakeRecord(exchangeId, localId) == nullptr);
             BeginCASEHandshakeRecord(now, exchangeId, localId);
             return;
