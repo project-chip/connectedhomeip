@@ -31,7 +31,7 @@ class CertificateChainRequestTracker
 {
 public:
     static constexpr uint16_t kDefaultSegmentSize         = 600;
-    static constexpr uint16_t kMaxCertificateDocumentSize = 10240;
+    static constexpr uint16_t kMaxCertificateDocumentSize = Credentials::kMaxDERCertLengthMlDsa65;
 
     void Reset();
 

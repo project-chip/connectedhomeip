@@ -144,6 +144,17 @@ TEST(CertificateChainRequestTracker, RejectsInconsistentSegmentedResponse)
               CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+TEST(CertificateChainRequestTracker, AcceptsMaximumSupportedCertificateSize)
+{
+    CertificateChainRequestTracker tracker;
+    uint8_t certificate[Credentials::kMaxDERCertLengthMlDsa65] = {};
+    ASSERT_EQ(tracker.HandleResponse(ByteSpan(certificate), MakeOptional<uint16_t>(static_cast<uint16_t>(sizeof(certificate))),
+                                     NullOptional),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(tracker.IsComplete());
+    EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(certificate)));
+}
+
 TEST(CertificateChainRequestTracker, RejectsOversizedDocument)
 {
     CertificateChainRequestTracker tracker;

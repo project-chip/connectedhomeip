@@ -28,6 +28,8 @@ def _handle():
             ctypes.c_uint8), ctypes.c_size_t, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t)])
         setter.Set("pychip_ConvertChipCertToX509Cert", PyChipError, [ctypes.POINTER(
             ctypes.c_uint8), ctypes.c_size_t, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t)])
+    if handle.pychip_GetMaxCertificateChainDocumentSize.argtypes is None:
+        NativeLibraryHandleMethodArguments(handle).Set("pychip_GetMaxCertificateChainDocumentSize", ctypes.c_uint32, [])
     return handle
 
 
@@ -53,3 +55,8 @@ def convert_chip_cert_to_x509_cert(chipCert: bytes) -> bytes:
                                                ctypes.cast(output_buffer, ptr_type), ctypes.byref(output_size)).raise_on_error()
 
     return bytes(output_buffer)[:output_size.value]
+
+
+def get_max_certificate_chain_document_size() -> int:
+    """Return the maximum certificate-chain document size defined by the native SDK."""
+    return _handle().pychip_GetMaxCertificateChainDocumentSize()

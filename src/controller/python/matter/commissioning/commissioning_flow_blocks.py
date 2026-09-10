@@ -25,7 +25,7 @@ from cryptography.hazmat.primitives import serialization
 from .. import ChipDeviceCtrl
 from .. import clusters as Clusters
 from .. import commissioning
-from ..credentials.cert import convert_chip_cert_to_x509_cert
+from ..credentials.cert import convert_chip_cert_to_x509_cert, get_max_certificate_chain_document_size
 from ..crypto.fabric import generate_compressed_fabric_id
 
 _OPERATIONAL_CREDENTIALS_FEATURE_PQC_DEVICE_ATTESTATION = 0x1
@@ -33,7 +33,6 @@ _ATTESTATION_PROFILE_SUPPORTS_ECDSA_MATTER_LEGACY = 0x1
 _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_44 = 0x2
 _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_65 = 0x4
 _CERTIFICATE_CHAIN_REQUEST_MAX_SEGMENT_SIZE = 900
-_MAX_CERTIFICATE_CHAIN_DOCUMENT_SIZE = 10240
 
 
 @dataclass(frozen=True)
@@ -101,6 +100,7 @@ class CommissioningFlowBlocks:
         return legacy_profiles
 
     async def _request_certificate_chain(self, node_id: int, certificate_type, crypto_profile):
+        max_document_size = get_max_certificate_chain_document_size()
         certificate_segments = []
         next_segment_id = None
         total_document_size = None
@@ -121,7 +121,7 @@ class CommissioningFlowBlocks:
                 if response.nextSegmentID is not None:
                     raise commissioning.CommissionFailure(
                         "CertificateChainResponse included nextSegmentID without totalDocumentSize")
-                if assembled_size > _MAX_CERTIFICATE_CHAIN_DOCUMENT_SIZE:
+                if assembled_size > max_document_size:
                     raise commissioning.CommissionFailure("CertificateChainResponse exceeded the maximum supported document size")
                 return b"".join(certificate_segments)
 
@@ -130,7 +130,7 @@ class CommissioningFlowBlocks:
             elif total_document_size != response.totalDocumentSize:
                 raise commissioning.CommissionFailure("CertificateChainResponse changed totalDocumentSize across segments")
 
-            if total_document_size > _MAX_CERTIFICATE_CHAIN_DOCUMENT_SIZE:
+            if total_document_size > max_document_size:
                 raise commissioning.CommissionFailure("CertificateChainResponse advertised an unsupported total document size")
             if assembled_size > total_document_size:
                 raise commissioning.CommissionFailure("CertificateChainResponse exceeded the advertised total document size")

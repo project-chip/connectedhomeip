@@ -24,6 +24,11 @@
 using namespace chip;
 using namespace chip::Credentials;
 
+uint32_t pychip_GetMaxCertificateChainDocumentSize()
+{
+    return kMaxDERCertLengthMlDsa65;
+}
+
 PyChipError pychip_ConvertX509CertToChipCert(const uint8_t * x509Cert, size_t x509CertLen, uint8_t * chipCert, size_t * chipCertLen)
 {
     MutableByteSpan output(chipCert, *chipCertLen);
