@@ -65,6 +65,11 @@ public:
     // What every intercepted send returns; a failure returns before anything is recorded as sent
     CHIP_ERROR mSendResult = CHIP_NO_ERROR;
 
+    // What an intercepted send returns after recording itself, as production does when
+    // AddRequestData or SendCommandRequest fails with the phase already advanced. Exercises the
+    // rollback that lets the client take another request.
+    CHIP_ERROR mSendResultAfterRecording = CHIP_NO_ERROR;
+
     int mConnectRequests = 0;
     ScopedNodeId mLastPeer;
 
@@ -128,8 +133,7 @@ protected:
         mSentAudioAbsent              = !request.audioStreamID.HasValue() && !request.audioStreams.HasValue();
         mSentIceAbsent                = !request.ICEServers.HasValue() && !request.ICETransportPolicy.HasValue();
 
-        MarkSent();
-        return CHIP_NO_ERROR;
+        return MarkSent();
     }
 
     CHIP_ERROR SendEndSession() override
@@ -142,8 +146,7 @@ protected:
         mSentEndSessionId = request.webRTCSessionID;
         mSentEndReason    = request.reason;
 
-        MarkSent();
-        return CHIP_NO_ERROR;
+        return MarkSent();
     }
 
     CHIP_ERROR SendProvideICECandidates() override
@@ -168,16 +171,18 @@ protected:
             mSentMLineIndexes.push_back(candidate.SDPMLineIndex);
         }
 
-        MarkSent();
-        return CHIP_NO_ERROR;
+        return MarkSent();
     }
 
 private:
     // As InvokeOnHeldSession records a send: the camera's answer arrives through the sender callbacks
-    void MarkSent()
+    CHIP_ERROR MarkSent()
     {
         CurrentRequest().SetInvokedSender(&mSender);
         CurrentRequest().Advance(Request::Phase::kInvoking);
+        // Left recorded and advanced deliberately: undoing it is the caller's job, which is what
+        // these failures exercise
+        return mSendResultAfterRecording;
     }
 
     CommandSender mSender{ nullptr, nullptr };
@@ -326,16 +331,18 @@ void FeedClusterList(InterceptingWebRTCClient & aClient, const ConcreteDataAttri
     TLV::TLVWriter writer;
     writer.Init(buffer, sizeof(buffer));
     TLV::TLVType outer;
-    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outer), CHIP_NO_ERROR);
     for (ClusterId cluster : aClusters)
     {
-        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), cluster), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::AnonymousTag(), cluster), CHIP_NO_ERROR);
     }
-    ASSERT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
 
     TLV::TLVReader reader;
     reader.Init(buffer, writer.GetLengthWritten());
-    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    const bool positioned = (reader.Next() == CHIP_NO_ERROR);
+    EXPECT_TRUE(positioned);
+    VerifyOrReturn(positioned);
     aClient.OnAttributeData(aPath, &reader, aStatus);
 }
 
@@ -384,17 +391,19 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
         TLV::TLVWriter writer;
         writer.Init(buffer);
         TLV::TLVType containerType;
-        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType), CHIP_NO_ERROR);
-        ASSERT_EQ(writer.Put(TLV::ContextTag(Fields::kWebRTCSessionID), aWebRTCSessionId), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::ContextTag(Fields::kWebRTCSessionID), aWebRTCSessionId), CHIP_NO_ERROR);
         if (aVideoStreamId.has_value())
         {
-            ASSERT_EQ(writer.Put(TLV::ContextTag(Fields::kVideoStreamID), *aVideoStreamId), CHIP_NO_ERROR);
+            EXPECT_EQ(writer.Put(TLV::ContextTag(Fields::kVideoStreamID), *aVideoStreamId), CHIP_NO_ERROR);
         }
-        ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
 
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        const bool positioned = (reader.Next() == CHIP_NO_ERROR);
+        EXPECT_TRUE(positioned);
+        VerifyOrReturn(positioned);
 
         ConcreteCommandPath responsePath(kProviderEndpoint, WebRTCTransportProvider::Id,
                                          WebRTCTransportProvider::Commands::ProvideOfferResponse::Id);
@@ -965,6 +974,43 @@ TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferTheClientCannotSendFailsTheRequ
     mClient.mSendResult = CHIP_NO_ERROR;
     EstablishSessionWithId(55);
     EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnOfferThatFailsAfterBeingRecordedIsRolledBack)
+{
+    // The send fails once the request has been advanced and the sender recorded, as it does when
+    // AddRequestData or SendCommandRequest fails: the phase and the sender have to be undone, or
+    // the client stays wedged in kInvoking with a sender that will never call back.
+    mClient.mSendResultAfterRecording = CHIP_ERROR_INCORRECT_STATE;
+    DriveToOffer();
+    ASSERT_NE(mPeerDelegate.mLastOfferCallback, nullptr);
+    mPeerDelegate.mLastOfferCallback->OnOfferReady(CHIP_NO_ERROR, "v=0 test offer"_span);
+
+    EXPECT_EQ(mCallback.mInitiatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    EXPECT_EQ(mPeerDelegate.mOffersAbandoned, 1);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+
+    // The rollback is what makes this succeed: a request left in kInvoking would answer BUSY
+    mClient.mSendResultAfterRecording = CHIP_NO_ERROR;
+    EstablishSessionWithId(55);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Success);
+}
+
+TEST_F(TestDefaultAvAnalysisWebRTCClient, AnEndSessionThatFailsAfterBeingRecordedIsRolledBack)
+{
+    EstablishSessionWithId(55);
+    ASSERT_EQ(mClient.EndSession(kCameraNode, kProviderEndpoint, 55, mCallback), CHIP_NO_ERROR);
+
+    mClient.mSendResultAfterRecording = CHIP_ERROR_INCORRECT_STATE;
+    mClient.ContinueWithSession();
+
+    EXPECT_EQ(mCallback.mEndedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+    EXPECT_EQ(mRequestorCluster.GetCurrentSessions().size(), 0u);
+
+    mClient.mSendResultAfterRecording = CHIP_NO_ERROR;
+    EXPECT_EQ(mClient.RequestSession(kCameraNode, kProviderEndpoint, kVideoStreamId, mCallback), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, CallbacksOfAnotherSenderAreIgnored)

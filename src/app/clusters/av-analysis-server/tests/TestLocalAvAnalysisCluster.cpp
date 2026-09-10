@@ -256,9 +256,9 @@ TEST_F(TestLocalAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
 
     // On startup there should be no active triggers
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
-    size_t triggersSize;
+    size_t triggersSize = 0;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    TEMPORARY_RETURN_IGNORED aActiveContextTriggers.ComputeSize(&triggersSize);
+    ASSERT_EQ(aActiveContextTriggers.ComputeSize(&triggersSize), CHIP_NO_ERROR);
     ASSERT_EQ(triggersSize, static_cast<size_t>(0));
 
     bool trackingEnabled = false;
@@ -511,6 +511,11 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
     // Read our set of active triggers, make sure valid
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
+
+    // The one enabled trigger, so the assertions in the loop below are reached
+    size_t triggerCount = 0;
+    ASSERT_EQ(aActiveContextTriggers.ComputeSize(&triggerCount), CHIP_NO_ERROR);
+    ASSERT_EQ(triggerCount, static_cast<size_t>(1));
 
     auto aActiveContextIterator = aActiveContextTriggers.begin();
     while (aActiveContextIterator.Next())
