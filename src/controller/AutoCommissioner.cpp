@@ -961,8 +961,12 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             {
                 auto paiRequestProfile = Internal::SelectControllerSupportedAttestationRequestProfile(
                     mDeviceCommissioningInfo.paiSupportedAttestationProfiles);
-                auto dacRequestProfile = Internal::SelectControllerSupportedAttestationRequestProfile(
-                    mDeviceCommissioningInfo.dacSupportedAttestationProfiles);
+                Optional<OperationalCredentials::AttestationCryptoProfileEnum> dacRequestProfile;
+                if (mDeviceCommissioningInfo.dacSupportedAttestationProfiles.Has(
+                        OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy))
+                {
+                    dacRequestProfile.SetValue(OperationalCredentials::AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+                }
 
                 if (paiRequestProfile.HasValue() && dacRequestProfile.HasValue())
                 {
