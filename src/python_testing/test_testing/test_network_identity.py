@@ -238,30 +238,46 @@ class TestNetworkAdministratorSecretDecoding(unittest.TestCase):
     def test_rejects_malformed_secrets(self):
         raw_secret = bytes(ni.NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH)
         valid = ni.encode_network_administrator_secret(0x01020304, raw_secret)
+        # Each case names the rejection it must produce. Matching the message keeps two cases
+        # from silently landing in the same branch and leaving another one unreached: dropping
+        # bytes off the end of a valid NASS, for instance, takes the closing 0x18 with them and
+        # is rejected as a bad structure long before any truncation check runs.
         cases = {
-            "not a structure": valid[1:],
-            "truncated": valid[:-4],
-            "trailing field": valid[:-1] + bytes([0x24, 0x04, 0x00, 0x18]),
-            "nonzero version": bytes([0x15, 0x24, 0x01, 0x01]) + valid[4:],
+            "not a structure": (valid[1:], "anonymous TLV structure"),
+            "no closing tag": (valid[:-1], "anonymous TLV structure"),
+            # Ends between two fields, with less than a control-and-tag pair left.
+            "ends after the version": (bytes([0x15, 0x24, 0x01, 0x00, 0x18]), "truncated before field 2"),
+            # Ends right after the octet string's tag, so its length prefix is off the end.
+            "ends after the raw secret tag": (bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                     0x30, 0x03, 0x18]),
+                                              "truncated before the length of field 3"),
+            # Declares 32 bytes of raw secret but carries 28, so the field runs off the end.
+            "raw secret shorter than its length prefix": (valid[:-5] + bytes([0x18]), "truncated inside field 3"),
+            "trailing field": (valid[:-1] + bytes([0x24, 0x04, 0x00, 0x18]), "unexpected trailing fields"),
+            "nonzero version": (bytes([0x15, 0x24, 0x01, 0x01]) + valid[4:], "version must be 0"),
             "short raw secret": (bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
-                                        0x30, 0x03, 0x10]) + raw_secret[:16] + bytes([0x18])),
+                                        0x30, 0x03, 0x10]) + raw_secret[:16] + bytes([0x18]),
+                                 "raw secret must be 32 bytes"),
             "out of tag order": (bytes([0x15, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01, 0x24, 0x01, 0x00,
-                                        0x30, 0x03, 0x20]) + raw_secret + bytes([0x18])),
+                                        0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]),
+                                 "out of tag order"),
             # Each field's TLV type is enforced, so callers can rely on `created` being an
             # integer they can do arithmetic on rather than getting bytes back.
             "version as an octet string": (bytes([0x15, 0x30, 0x01, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
-                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18])),
+                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]),
+                                           "field 1 must be an unsigned integer"),
             "created as an octet string": (bytes([0x15, 0x24, 0x01, 0x00, 0x30, 0x02, 0x04, 0x04, 0x03, 0x02, 0x01,
-                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18])),
-            "raw secret as an integer": bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
-                                               0x26, 0x03, 0x04, 0x03, 0x02, 0x01, 0x18]),
-            # Ends right after the octet string's tag, so its length prefix is off the end.
-            "truncated before the raw secret length": bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
-                                                             0x30, 0x03, 0x18]),
+                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]),
+                                           "field 2 must be an unsigned integer"),
+            "raw secret as an integer": (bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                0x26, 0x03, 0x04, 0x03, 0x02, 0x01, 0x18]),
+                                         "field 3 must be an octet string"),
         }
-        for name, encoded in cases.items():
-            with self.subTest(name=name), self.assertRaises(ValueError):
-                ni.decode_network_administrator_secret(encoded)
+        for name, (encoded, expected_message) in cases.items():
+            with self.subTest(name=name):
+                with self.assertRaises(ValueError) as caught:
+                    ni.decode_network_administrator_secret(encoded)
+                self.assertIn(expected_message, str(caught.exception))
 
 
 if __name__ == "__main__":
