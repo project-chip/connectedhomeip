@@ -60,7 +60,7 @@ from matter.testing.matter_testing import MatterBaseTest
 
 log = logging.getLogger(__name__)
 
-# AddClient, RemoveClient, ImportAdminSecret and ExportAdminSecret require a Timed Interaction.
+# AddClient, RemoveClient and ImportAdminSecret require a Timed Interaction.
 TIMED_REQUEST_TIMEOUT_MS = 5000
 
 # Network Identity Management (0x0450) as the interaction model logs a cluster id.
@@ -238,6 +238,21 @@ class NetworkIdentityTHServerTest(MatterBaseTest):
                              "The TH server did not gain exactly one fabric, so the DUT did not commission it.")
         self.dut_fabric_index = added.pop()
         log.info("The DUT commissioned the TH server on fabric index %d", self.dut_fabric_index)
+
+    def require_any_pics(self, *pics_keys: str) -> None:
+        """Skips the test unless the DUT claims at least one of the given PICS.
+
+        Every command a Network Identity Management client can generate is optional, and the
+        test plan gates each step on the PICS for the command it exercises, so a DUT claiming
+        none of them has nothing to run here. Skipping up front keeps the operator from being
+        asked to commission the TH server for a test that would then skip every step -- which
+        is also what a run that forgot ``--PICS`` looks like, because ``check_pics`` reports
+        False for every key when no PICS file was supplied.
+        """
+        if not any(self.check_pics(key) for key in pics_keys):
+            asserts.skip("The DUT claims none of " + ", ".join(pics_keys) + ", so every step of this test would be "
+                         "skipped. If the DUT does generate one of these commands, say so in the PICS file passed "
+                         "with --PICS.")
 
     def expect_command_status(self, command_id: int, status: Status) -> THServerLogExpectation:
         """The line the TH server emits when it answers a command with a failure status.
