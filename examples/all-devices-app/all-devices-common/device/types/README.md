@@ -22,6 +22,6 @@ layer (e.g., `DeviceFactory`) constructs.
    Specification.
 2. **No Name Stuttering**: Do not include the `Device` suffix in class or file
    names (e.g., use `Aggregator.h/cpp` and class `Aggregator` instead of
-   `Aggregator`).
+   `AggregatorDevice`).
 3. **Clean Composition**: Implement command handlers and attribute accessors by
    delegating logic to the underlying capabilities or platform overrides.

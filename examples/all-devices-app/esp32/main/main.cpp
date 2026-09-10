@@ -295,9 +295,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    auto & deviceFactory = DeviceFactory::GetInstance();
+    auto & deviceFactory = NoHooksDeviceFactory::GetInstance();
     gConstructedDevices.clear();
-    gConstructedAccessors.clear();
 
     DynamicEndpointIdAllocator endpointIdAllocator;
     constexpr size_t kMinFreeInternalHeap = 24 * 1024;
@@ -307,7 +306,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         if (deviceFactory.IsValidDevice("aggregator"))
         {
             auto aggregator = deviceFactory.Create("aggregator");
-            if (aggregator == nullptr)
+            if (aggregator.device == nullptr)
             {
                 ESP_LOGE(TAG, "Failed to create aggregator");
                 return nullptr;
@@ -315,13 +314,18 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             EndpointId aggregatorEp = endpointIdAllocator.Allocate();
             endpointIdAllocator.ForceNext(aggregatorEp);
             ESP_LOGI(TAG, "Registering aggregator on endpoint %u", aggregatorEp);
-            err = aggregator->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(kInvalidEndpointId));
+            err = aggregator.device->Register(endpointIdAllocator, dataModelProvider,
+                                              EndpointComposition::WithParent(kInvalidEndpointId));
             if (err != CHIP_NO_ERROR)
             {
                 ESP_LOGE(TAG, "Failed to register aggregator on endpoint %u: %" CHIP_ERROR_FORMAT, aggregatorEp, err.Format());
                 return nullptr;
             }
-            gConstructedDevices.push_back(std::move(aggregator));
+            if (aggregator.onDeviceRegistered)
+            {
+                aggregator.onDeviceRegistered();
+            }
+            gConstructedDevices.push_back(std::move(aggregator.device));
 
             unsigned int createdCount = 0;
             unsigned int skippedCount = 0;
@@ -343,7 +347,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 }
 
                 auto bridgedNode = deviceFactory.Create("bridged-node", KebabCaseToTitleCase(deviceType));
-                if (bridgedNode == nullptr)
+                if (bridgedNode.device == nullptr)
                 {
                     ESP_LOGE(TAG, "Failed to create bridged-node for '%s'", deviceType.c_str());
                     skippedCount++;
@@ -353,7 +357,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 endpointIdAllocator.ForceNext(bnEp);
                 ESP_LOGI(TAG, "Registering bridged-node for '%s' on endpoint %u (parent %u)", deviceType.c_str(), bnEp,
                          aggregatorEp);
-                err = bridgedNode->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(aggregatorEp));
+                err = bridgedNode.device->Register(endpointIdAllocator, dataModelProvider,
+                                                   EndpointComposition::WithParent(aggregatorEp));
                 if (err != CHIP_NO_ERROR)
                 {
                     ESP_LOGE(TAG, "Failed to register bridged-node for '%s' on endpoint %u: %" CHIP_ERROR_FORMAT,
@@ -363,31 +368,35 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 }
 
                 auto device = deviceFactory.Create(deviceType);
-                if (device == nullptr)
+                if (device.device == nullptr)
                 {
                     ESP_LOGE(TAG, "Failed to create device '%s'", deviceType.c_str());
+                    bridgedNode.device->Unregister(dataModelProvider);
                     skippedCount++;
                     continue;
                 }
                 ESP_LOGI(TAG, "Registering device '%s' with parent %u", deviceType.c_str(), bnEp);
-                err = device->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(bnEp));
+                err = device.device->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(bnEp));
                 if (err != CHIP_NO_ERROR)
                 {
                     ESP_LOGE(TAG, "Failed to register device '%s' with parent %u: %" CHIP_ERROR_FORMAT, deviceType.c_str(), bnEp,
                              err.Format());
+                    bridgedNode.device->Unregister(dataModelProvider);
                     skippedCount++;
                     continue;
                 }
 
-                auto oobAccessor = deviceFactory.CreateAccessor(deviceType, *device);
-                if (oobAccessor)
+                if (bridgedNode.onDeviceRegistered)
                 {
-                    OOBAccessorRegistry::Instance().Register(*oobAccessor);
-                    gConstructedAccessors.push_back(std::move(oobAccessor));
+                    bridgedNode.onDeviceRegistered();
+                }
+                if (device.onDeviceRegistered)
+                {
+                    device.onDeviceRegistered();
                 }
 
-                gConstructedDevices.push_back(std::move(bridgedNode));
-                gConstructedDevices.push_back(std::move(device));
+                gConstructedDevices.push_back(std::move(bridgedNode.device));
+                gConstructedDevices.push_back(std::move(device.device));
                 createdCount++;
             }
             ESP_LOGI(TAG,
@@ -399,8 +408,9 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         else
         {
             auto defaultDevName = deviceFactory.GetDefaultDevice();
-            auto device         = deviceFactory.Create(defaultDevName);
-            if (device == nullptr)
+            gDeviceType         = defaultDevName;
+            auto defaultDevice  = deviceFactory.Create(defaultDevName);
+            if (defaultDevice.device == nullptr)
             {
                 ESP_LOGE(TAG, "Failed to create default device %s", defaultDevName.c_str());
                 return nullptr;
@@ -408,13 +418,17 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
             ESP_LOGI(TAG, "Registering default device '%s' on endpoint %u", defaultDevName.c_str(),
                      static_cast<unsigned int>(CONFIG_ALL_DEVICES_ENDPOINT));
-            err = device->Register(endpointIdAllocator, dataModelProvider);
+            err = defaultDevice.device->Register(endpointIdAllocator, dataModelProvider);
             if (err != CHIP_NO_ERROR)
             {
                 ESP_LOGE(TAG, "Failed to register default device '%s': %" CHIP_ERROR_FORMAT, defaultDevName.c_str(), err.Format());
                 return nullptr;
             }
-            gConstructedDevices.push_back(std::move(device));
+            if (defaultDevice.onDeviceRegistered)
+            {
+                defaultDevice.onDeviceRegistered();
+            }
+            gConstructedDevices.push_back(std::move(defaultDevice.device));
         }
     }
     else
@@ -424,7 +438,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             gDeviceType = deviceFactory.GetDefaultDevice();
         }
         auto device = deviceFactory.Create(gDeviceType);
-        if (device == nullptr)
+        if (device.device == nullptr)
         {
             ESP_LOGE(TAG, "Failed to create device of type: %s", gDeviceType.c_str());
             return nullptr;
@@ -433,21 +447,18 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
         ESP_LOGI(TAG, "Registering device '%s' on endpoint %u", gDeviceType.c_str(),
                  static_cast<unsigned int>(CONFIG_ALL_DEVICES_ENDPOINT));
-        err = device->Register(endpointIdAllocator, dataModelProvider);
+        err = device.device->Register(endpointIdAllocator, dataModelProvider);
         if (err != CHIP_NO_ERROR)
         {
             ESP_LOGE(TAG, "Failed to register device '%s': %" CHIP_ERROR_FORMAT, gDeviceType.c_str(), err.Format());
             return nullptr;
         }
-
-        auto oobAccessor = deviceFactory.CreateAccessor(gDeviceType, *device);
-        if (oobAccessor)
+        if (device.onDeviceRegistered)
         {
-            OOBAccessorRegistry::Instance().Register(*oobAccessor);
-            gConstructedAccessors.push_back(std::move(oobAccessor));
+            device.onDeviceRegistered();
         }
 
-        gConstructedDevices.push_back(std::move(device));
+        gConstructedDevices.push_back(std::move(device.device));
     }
 
     return &dataModelProvider;
@@ -467,7 +478,7 @@ void InitServer(intptr_t context)
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
+    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
         .groupDataProvider        = gGroupDataProvider,                     //
         .fabricTable              = Server::GetInstance().GetFabricTable(), //
         .timerDelegate            = gTimerDelegate,                         //
@@ -483,8 +494,8 @@ void InitServer(intptr_t context)
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
-    DeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
-        return std::make_unique<ESP32DimmableLight>(ESP32DimmableLight::Context{
+    NoHooksDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return NoHooksDeviceFactory::MakeDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,
@@ -558,6 +569,7 @@ void SetDeviceTypeAndRestart(const std::string & deviceType)
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to save device type to NVS: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
     }
 
 #if CONFIG_HAVE_DISPLAY

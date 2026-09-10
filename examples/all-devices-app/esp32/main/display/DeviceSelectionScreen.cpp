@@ -48,7 +48,7 @@ DeviceSelectionListModel::DeviceSelectionListModel()
         mItems.push_back({ "    All Bridged (*)", []() { SetDeviceTypeAndRestart("*"); } });
     }
 
-    auto & deviceFactory = chip::app::DeviceFactory::GetInstance();
+    auto & deviceFactory = chip::app::NoHooksDeviceFactory::GetInstance();
     for (const auto & deviceType : deviceFactory.SupportedDeviceTypes())
     {
         if (deviceType == "aggregator" || deviceType == "bridged-node" || deviceType == activeDev)
@@ -82,7 +82,18 @@ void DeviceSelectionListModel::ItemAction(int i)
 
 void PushDeviceSelectionScreen()
 {
-    ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<DeviceSelectionListModel>()));
+    auto * model = chip::Platform::New<DeviceSelectionListModel>();
+    if (model == nullptr)
+    {
+        return;
+    }
+    auto * screen = chip::Platform::New<ListScreen>(model);
+    if (screen == nullptr)
+    {
+        chip::Platform::Delete(model);
+        return;
+    }
+    ScreenManager::PushScreen(screen);
 }
 
 #endif // CONFIG_HAVE_DISPLAY

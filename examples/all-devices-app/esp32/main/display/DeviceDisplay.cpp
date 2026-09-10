@@ -38,16 +38,27 @@ Button gButtons[BUTTON_NUMBER] = { Button(BUTTON_1_GPIO_NUM), Button(BUTTON_2_GP
 
 void PushFactoryResetScreen()
 {
-    auto * model = (chip::Platform::New<SimpleListModel>())
-                       ->Title("Factory Reset?")
-                       ->Item("< Cancel", []() { ScreenManager::PopScreen(); })
-                       ->Item("No", []() { ScreenManager::PopScreen(); })
-                       ->Item("Yes, Reset", []() {
-                           ESP_LOGI(TAG, "Factory reset requested from UI, resetting...");
-                           LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                               [](intptr_t) { chip::Server::GetInstance().ScheduleFactoryReset(); }));
-                       });
-    ScreenManager::PushScreen(chip::Platform::New<ListScreen>(model));
+    auto * model = chip::Platform::New<SimpleListModel>();
+    if (model == nullptr)
+    {
+        return;
+    }
+    model->Title("Factory Reset?")
+        ->Item("< Cancel", []() { ScreenManager::PopScreen(); })
+        ->Item("No", []() { ScreenManager::PopScreen(); })
+        ->Item("Yes, Reset", []() {
+            ESP_LOGI(TAG, "Factory reset requested from UI, resetting...");
+            LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                [](intptr_t) { chip::Server::GetInstance().ScheduleFactoryReset(); }));
+        });
+
+    auto * screen = chip::Platform::New<ListScreen>(model);
+    if (screen == nullptr)
+    {
+        chip::Platform::Delete(model);
+        return;
+    }
+    ScreenManager::PushScreen(screen);
 }
 
 void InitDeviceDisplay()
@@ -86,14 +97,29 @@ void InitDeviceDisplay()
 
     ESP_LOGI(TAG, "Initializing screen hierarchy");
 
-    auto * rootModel = (chip::Platform::New<SimpleListModel>())
-                           ->Title("All Devices")
-                           ->Item("Status & Info", []() { PushStatusOrQRCodeScreen(); })
-                           ->Item("Select Device", []() { PushDeviceSelectionScreen(); })
-                           ->Item("Factory Reset", []() { PushFactoryResetScreen(); });
+    auto * rootModel = chip::Platform::New<SimpleListModel>();
+    if (rootModel != nullptr)
+    {
+        rootModel->Title("All Devices")
+            ->Item("Status & Info", []() { PushStatusOrQRCodeScreen(); })
+            ->Item("Select Device", []() { PushDeviceSelectionScreen(); })
+            ->Item("Factory Reset", []() { PushFactoryResetScreen(); });
 
-    ScreenManager::PushScreen(chip::Platform::New<ListScreen>(rootModel));
+        auto * rootScreen = chip::Platform::New<ListScreen>(rootModel);
+        if (rootScreen != nullptr)
+        {
+            ScreenManager::PushScreen(rootScreen);
+        }
+        else
+        {
+            chip::Platform::Delete(rootModel);
+        }
+    }
 
     // Push QR Code screen initially so it is visible immediately on boot
-    ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText.data()));
+    auto * qrScreen = chip::Platform::New<QRCodeScreen>(qrCodeText.data());
+    if (qrScreen != nullptr)
+    {
+        ScreenManager::PushScreen(qrScreen);
+    }
 }

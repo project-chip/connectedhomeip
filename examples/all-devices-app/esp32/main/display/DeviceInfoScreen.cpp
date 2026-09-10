@@ -40,7 +40,11 @@ void PushQRCodeScreenHelper()
     CHIP_ERROR err = GetQRCode(qrCodeText, chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
     if (err == CHIP_NO_ERROR)
     {
-        ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText.data()));
+        auto * screen = chip::Platform::New<QRCodeScreen>(qrCodeText.data());
+        if (screen != nullptr)
+        {
+            ScreenManager::PushScreen(screen);
+        }
     }
 }
 
@@ -108,7 +112,18 @@ void PushStatusOrQRCodeScreen()
     }
     else
     {
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<DeviceInfoListModel>()));
+        auto * model = chip::Platform::New<DeviceInfoListModel>();
+        if (model == nullptr)
+        {
+            return;
+        }
+        auto * screen = chip::Platform::New<ListScreen>(model);
+        if (screen == nullptr)
+        {
+            chip::Platform::Delete(model);
+            return;
+        }
+        ScreenManager::PushScreen(screen);
     }
 }
 

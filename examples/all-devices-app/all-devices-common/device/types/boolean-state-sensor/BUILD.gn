@@ -19,14 +19,29 @@ source_set("boolean-state-sensor") {
   sources = [
     "BooleanStateSensor.cpp",
     "BooleanStateSensor.h",
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/boolean-state-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
   ]
 }

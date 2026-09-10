@@ -124,7 +124,7 @@ CHIP_ERROR AppOptions::ValidateConfig()
     if (mConfig.deviceTypeEntries.empty())
     {
         mConfig.deviceTypeEntries.push_back({
-            .type     = chip::app::DeviceFactory::GetInstance().GetDefaultDevice(),
+            .type     = chip::app::NoHooksDeviceFactory::GetInstance().GetDefaultDevice(),
             .endpoint = 1,
             .parentId = chip::kInvalidEndpointId,
         });
@@ -133,7 +133,7 @@ CHIP_ERROR AppOptions::ValidateConfig()
     {
         // Expand wildcards using the supported device types from DeviceFactory
         std::vector<std::string> supportedTypes;
-        for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+        for (const auto & deviceType : chip::app::NoHooksDeviceFactory::GetInstance().SupportedDeviceTypes())
         {
             if (!IsExcludedFromWildcard(deviceType))
             {
@@ -282,7 +282,7 @@ OptionSet * AppOptions::GetOptions()
     static const std::string gHelpText = []() {
         // Device option - this is dynamic
         std::string result = "  --device <";
-        for (auto & name : app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+        for (auto & name : app::NoHooksDeviceFactory::GetInstance().SupportedDeviceTypes())
         {
             result.append(name);
             result.append("|");

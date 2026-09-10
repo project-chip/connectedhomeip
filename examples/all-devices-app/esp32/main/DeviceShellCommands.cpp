@@ -45,7 +45,7 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
 {
     if (argc != 1)
     {
-        const auto supportedDeviceTypes = chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes();
+        const auto supportedDeviceTypes = chip::app::NoHooksDeviceFactory::GetInstance().SupportedDeviceTypes();
         streamer_printf(streamer_get(), "Usage: devtype set <device-type>\r\n");
         streamer_printf(streamer_get(), "Example: devtype set contact-sensor\r\n");
         streamer_printf(streamer_get(), "Example: devtype set * (all bridged devices)\r\n");
@@ -60,7 +60,7 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
 
     const char * deviceType = argv[0];
 
-    if (strcmp(deviceType, "*") != 0 && !chip::app::DeviceFactory::GetInstance().IsValidDevice(deviceType))
+    if (strcmp(deviceType, "*") != 0 && !chip::app::NoHooksDeviceFactory::GetInstance().IsValidDevice(deviceType))
     {
         streamer_printf(streamer_get(), "Unknown device type: %s\r\n", deviceType);
         return CHIP_ERROR_INVALID_ARGUMENT;

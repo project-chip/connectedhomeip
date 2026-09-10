@@ -25,7 +25,7 @@ The [`docs/`](docs/) directory contains documentation for this application:
 
 -   **[Architecture & Design Patterns](docs/architecture.md)**: Describes the
     Code-Driven Data Model, component hierarchies (`DeviceFactory`,
-    `SingleEndpointDevice`), and platform separation.
+    `SingleEndpoint`), and platform separation.
 -   **[Starting Up & CLI Reference](docs/starting_up.md)**: Describes
     application initialization, endpoint composition flags (`--device`), and
     network settings.
@@ -53,7 +53,7 @@ implementations:
 -   **`esp32/`, `posix/`**: Contain platform-specific implementations (with
     `posix/` containing `linux/` and `darwin/` subdirectories), entry points,
     and build configurations.
-    -   For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers
+    -   For example, `posix/include/DeviceFactoryPlatformOverride.h` registers
         platform-specific overrides for devices at build-time.
 
 This separation ensures core logic remains reusable across operating systems and
@@ -67,6 +67,7 @@ The application supports the following device types (specified via the
 -   `aggregator`
 -   `air-purifier`
 -   `air-quality-sensor`
+-   `ambient-context-sensor`
 -   `bridged-node`
 -   `chime`
 -   `commissioning-proxy`
@@ -87,6 +88,7 @@ The application supports the following device types (specified via the
 -   `laundry-washer`
 -   `light-sensor`
 -   `microwave-oven`
+-   `mode-select`
 -   `mounted-dimmable-load-control`
 -   `mounted-on-off-control`
 -   `network-infrastructure-manager`
