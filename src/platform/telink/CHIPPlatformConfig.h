@@ -62,7 +62,7 @@
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 
-#if defined(CONFIG_SOC_RISCV_TELINK_TL323X) || defined(CONFIG_SOC_RISCV_TELINK_TL721X)
+#if defined(CONFIG_SOC_RISCV_TELINK_TL323X) || defined(CONFIG_SOC_RISCV_TELINK_TL721X) || defined(CONFIG_SOC_RISCV_TELINK_TL521X)
 
 #ifndef CHIP_CONFIG_MAX_GROUP_DATA_PEERS
 #define CHIP_CONFIG_MAX_GROUP_DATA_PEERS 5
@@ -72,9 +72,11 @@
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 4
 #endif // CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
 
-#endif // defined(CONFIG_SOC_RISCV_TELINK_TL323X)
+#endif /* defined(CONFIG_SOC_RISCV_TELINK_TL323X) ||                                                                               \
+          defined(CONFIG_SOC_RISCV_TELINK_TL521X) */
 
-#if defined CONFIG_PM || defined CONFIG_SOC_RISCV_TELINK_TL323X || defined CONFIG_SOC_RISCV_TELINK_TL721X
+#if defined CONFIG_PM || defined CONFIG_SOC_RISCV_TELINK_TL323X || defined CONFIG_SOC_RISCV_TELINK_TL721X ||                       \
+    defined CONFIG_SOC_RISCV_TELINK_TL521X
 
 #ifndef CHIP_CONFIG_MAX_GROUP_DATA_PEERS
 #define CHIP_CONFIG_MAX_GROUP_DATA_PEERS 7
@@ -104,7 +106,9 @@
 #define CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES 2
 #endif // CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES
 
-#endif // CONFIG_PM
+#endif /* CONFIG_PM ||                                                                                                             \
+          CONFIG_SOC_RISCV_TELINK_TL323X ||                                                                                        \
+          CONFIG_SOC_RISCV_TELINK_TL521X */
 
 #ifndef CHIP_CONFIG_MAX_FABRICS
 #define CHIP_CONFIG_MAX_FABRICS CONFIG_CHIP_MAX_FABRICS

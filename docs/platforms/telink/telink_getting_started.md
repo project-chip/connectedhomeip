@@ -13,7 +13,6 @@ platforms.
 | `tlsr9518adk80d` | TLSR951X / B91 |      2 MB       | Legacy; broad sample coverage         |
 | `tlsr9528a`      | TLSR952X / B92 |      2 MB       | `_retention` variant for low-power    |
 | `tlsr9118bdk40d` | TLSR911X / W91 |      2 MB       | Legacy; broad sample coverage         |
-| `tl3218x`        | TL321X         |      2 MB       | `_retention` variant for low-power    |
 | `tl3238x`        | TL323X         |      2 MB       | Dual-mode (Matter + Zigbee) supported |
 | `tl7218x`        | TL721X         |      2 MB       | `_retention` variant for low-power    |
 
@@ -26,10 +25,10 @@ platforms.
 The Telink Matter SDK is built **on top of** the Telink Zephyr SDK. The two are
 tightly coupled and must be used as a matched pair:
 
--   The **Telink Zephyr SDK** provides Zephyr RTOS, the Telink HAL, the BLE
-    stack, MCUBoot, OpenThread, and the WEST build toolchain.
--   The **Telink Matter SDK** (this repository) builds upon that foundation to
-    deliver the Matter protocol stack and Telink example applications.
+- The **Telink Zephyr SDK** provides Zephyr RTOS, the Telink HAL, the BLE stack,
+  MCUBoot, OpenThread, and the WEST build toolchain.
+- The **Telink Matter SDK** (this repository) builds upon that foundation to
+  deliver the Matter protocol stack and Telink example applications.
 
 Both are required — the Matter SDK cannot be built without the Zephyr SDK, and
 the Zephyr SDK alone does not provide Matter support.
@@ -176,7 +175,7 @@ west build -b <build_target>
 ```
 
 Replace `<build_target>` with your board, e.g. `tlsr9518adk80d`, `tlsr9528a`,
-`tl3218x`, `tl3238x`, `tl7218x`, or `tlsr9118bdk40d`.
+`tl3238x`, `tl7218x`, or `tlsr9118bdk40d`.
 
 **Example -- A simple build with 2 MB Flash**
 
@@ -257,9 +256,9 @@ A typical Linux BDT session:
 ./bdt B92 rst                   # reset
 ```
 
-> For B92 / TL321X / TL721X, run `./bdt <chip> ulf` to unlock the flash before
-> erasing. For TL322X / TL323X, use the **TGui-BDT** tool (or `sctool` on Linux)
-> with the on-board programmer.
+> For B92 / TL721X, run `./bdt <chip> ulf` to unlock the flash before erasing.
+> For TL322X / TL323X, use the **TGui-BDT** tool (or `sctool` on Linux) with the
+> on-board programmer.
 
 ### 4.3 UART console
 
@@ -349,9 +348,9 @@ To test OTA with a Linux OTA Provider, refer to the
 
 ## Next steps
 
--   [Telink Release Notes](./releases/telink_release_notes.md) — version info,
-    chip/EVK versions, per-example support matrix, and resource usage tables.
--   [Telink Zephyr Getting Started](https://github.com/telink-semi/zephyr/blob/develop/doc/telink/getting_started/index.md)
-    — Zephyr SDK setup, BDT flashing details, and board overviews.
--   Per-example `README.md` files under `examples/<app>/telink/` —
-    example-specific build commands, button/LED mappings, and chip-tool usage.
+- [Telink Release Notes](./releases/telink_release_notes.md) — version info,
+  chip/EVK versions, per-example support matrix, and resource usage tables.
+- [Telink Zephyr Getting Started](https://github.com/telink-semi/zephyr/blob/develop/doc/telink/getting_started/index.md)
+  — Zephyr SDK setup, BDT flashing details, and board overviews.
+- Per-example `README.md` files under `examples/<app>/telink/` —
+  example-specific build commands, button/LED mappings, and chip-tool usage.

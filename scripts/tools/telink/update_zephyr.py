@@ -85,18 +85,31 @@ def update_zephyr(remote_url, commit_hash):
         subprocess.run(['git', '-C', zephyr_base, 'remote', 'add', remote_name, remote_url], check=True)
 
     # Fetch updates from remote
+    # If commit_hash is a PR ref (e.g. pull/782/head), fetch it explicitly
+    # since it lives under refs/pull/*/head and is not fetched by default.
     print(f"Fetching from remote: {remote_name}")
-    command = ['git', '-C', zephyr_base, 'fetch', remote_name]
-    subprocess.run(command, check=True)
+    if commit_hash.startswith('pull/') or commit_hash.startswith('refs/pull/'):
+        ref = commit_hash if commit_hash.startswith('refs/') else f'refs/{commit_hash}'
+        command = ['git', '-C', zephyr_base, 'fetch', remote_name, ref]
+        subprocess.run(command, check=True)
+        # Resolve the fetched ref to a commit hash for checkout
+        result = subprocess.run(['git', '-C', zephyr_base, 'rev-parse', 'FETCH_HEAD'],
+                                capture_output=True, text=True, check=True)
+        checkout_target = result.stdout.strip()
+    else:
+        command = ['git', '-C', zephyr_base, 'fetch', remote_name]
+        subprocess.run(command, check=True)
+        checkout_target = commit_hash
 
-    # Hard reset to specified commit
-    print(f"Resetting to commit: {commit_hash}")
-    command = ['git', '-C', zephyr_base, 'reset', commit_hash, '--hard']
+    # Checkout the specified commit in detached HEAD state to avoid
+    # disrupting any branch the user may currently have checked out.
+    print(f"Checking out commit: {checkout_target}")
+    command = ['git', '-C', zephyr_base, 'checkout', '--detach', checkout_target]
     subprocess.run(command, check=True)
 
     # Update west modules
     print("Updating west modules...")
-    command = ['west', 'update', '-o=--depth=1', '-n', '-f', 'smart']
+    command = ['west', 'update', '-n', '-f', 'smart']
     subprocess.run(command, check=True)
 
     # Fetch blobs

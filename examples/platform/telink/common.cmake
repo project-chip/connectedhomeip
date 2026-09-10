@@ -148,7 +148,7 @@ if(NOT EXISTS "${GLOBAL_DTC_OVERLAY_FILE}")
 endif()
 
 # Special check for tl3238x and tl7218x: 2MB flash with OTA requires LZMA compression
-if(${BASE_BOARD} MATCHES "tl3238x" OR ${BASE_BOARD} MATCHES "tl7218x")
+if(${BASE_BOARD} MATCHES "tl3238x" OR ${BASE_BOARD} MATCHES "tl5218x" OR ${BASE_BOARD} MATCHES "tl7218x")
   if("${CONF_FILE}" MATCHES "_ota" AND "${FLASH_SIZE}" STREQUAL "2m" AND "${FLASH_LAYOUT_SUFFIX}" STREQUAL "")
     # For 2MB flash with OTA, LZMA compression is required because firmware size may exceed 916KB (0xe5000)
     message(WARNING "${BASE_BOARD} with 2MB flash and OTA requires LZMA compression. Please use a config with 'lzma' suffix and set CONFIG_COMPRESS_LZMA=y. Continuing compilation anyway...")
