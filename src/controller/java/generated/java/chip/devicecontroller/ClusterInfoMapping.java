@@ -35104,7 +35104,7 @@ public class ClusterInfoMapping {
         .updateMotionZoneOptions((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("connectionID")
-        , (ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>)
+        , (Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>>)
         commandArguments.get("motionZones")
         , (Optional<Integer>)
         commandArguments.get("motionSensitivity")

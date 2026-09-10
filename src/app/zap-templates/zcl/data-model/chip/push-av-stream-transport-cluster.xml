@@ -254,7 +254,7 @@ Alchemy: v1.7.10
     <command code="0x08" source="client" name="UpdateMotionZoneOptions" isFabricScoped="true" optional="true" apiMaturity="provisional">
       <description>This command is used to selectively modify the motion zones and sensitivity values of the trigger options for a specified push transport.</description>
       <arg fieldId="0" name="ConnectionID" type="int16u" min="0" max="65534" apiMaturity="provisional"/>
-      <arg fieldId="1" name="MotionZones" array="true" type="TransportZoneOptionsStruct" isNullable="true" length="254" minLength="1" apiMaturity="provisional"/>
+      <arg fieldId="1" name="MotionZones" array="true" type="TransportZoneOptionsStruct" isNullable="true" optional="true" length="254" minLength="1" apiMaturity="provisional"/>
       <arg fieldId="2" name="MotionSensitivity" type="int8u" isNullable="true" optional="true" min="1" max="10" apiMaturity="provisional"/>
       <otherwiseConform>
         <provisionalConform/>

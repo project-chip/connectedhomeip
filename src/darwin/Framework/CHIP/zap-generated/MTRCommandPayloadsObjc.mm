@@ -45402,40 +45402,43 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.connectionID = self.connectionID.unsignedShortValue;
     }
     {
-        if (self.motionZones == nil) {
-            encodableStruct.motionZones.SetNull();
-        } else {
-            auto & nonNullValue_0 = encodableStruct.motionZones.SetNonNull();
-            {
-                using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
-                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                if (self.motionZones.count != 0) {
-                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.motionZones.count);
-                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_1);
-                    for (size_t i_1 = 0; i_1 < self.motionZones.count; ++i_1) {
-                        auto element_1 = MTR_SAFE_CAST(self.motionZones[i_1], MTRPushAVStreamTransportClusterTransportZoneOptionsStruct);
-                        if (!element_1) {
-                            // Wrong kind of value.
-                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.motionZones[i_1], NSStringFromClass(MTRPushAVStreamTransportClusterTransportZoneOptionsStruct.class));
+        if (self.motionZones != nil) {
+            auto & definedValue_0 = encodableStruct.motionZones.Emplace();
+            if (self.motionZones == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                {
+                    using ListType_2 = std::remove_reference_t<decltype(nonNullValue_1)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    if (self.motionZones.count != 0) {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.motionZones.count);
+                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        if (element_1.zone == nil) {
-                            listHolder_1->mList[i_1].zone.SetNull();
-                        } else {
-                            auto & nonNullValue_3 = listHolder_1->mList[i_1].zone.SetNonNull();
-                            nonNullValue_3 = element_1.zone.unsignedShortValue;
+                        listFreer.add(listHolder_2);
+                        for (size_t i_2 = 0; i_2 < self.motionZones.count; ++i_2) {
+                            auto element_2 = MTR_SAFE_CAST(self.motionZones[i_2], MTRPushAVStreamTransportClusterTransportZoneOptionsStruct);
+                            if (!element_2) {
+                                // Wrong kind of value.
+                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.motionZones[i_2], NSStringFromClass(MTRPushAVStreamTransportClusterTransportZoneOptionsStruct.class));
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            if (element_2.zone == nil) {
+                                listHolder_2->mList[i_2].zone.SetNull();
+                            } else {
+                                auto & nonNullValue_4 = listHolder_2->mList[i_2].zone.SetNonNull();
+                                nonNullValue_4 = element_2.zone.unsignedShortValue;
+                            }
+                            if (element_2.sensitivity != nil) {
+                                auto & definedValue_4 = listHolder_2->mList[i_2].sensitivity.Emplace();
+                                definedValue_4 = element_2.sensitivity.unsignedCharValue;
+                            }
                         }
-                        if (element_1.sensitivity != nil) {
-                            auto & definedValue_3 = listHolder_1->mList[i_1].sensitivity.Emplace();
-                            definedValue_3 = element_1.sensitivity.unsignedCharValue;
-                        }
+                        nonNullValue_1 = ListType_2(listHolder_2->mList, self.motionZones.count);
+                    } else {
+                        nonNullValue_1 = ListType_2();
                     }
-                    nonNullValue_0 = ListType_1(listHolder_1->mList, self.motionZones.count);
-                } else {
-                    nonNullValue_0 = ListType_1();
                 }
             }
         }

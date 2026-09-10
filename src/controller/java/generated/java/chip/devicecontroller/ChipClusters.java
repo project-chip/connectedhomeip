@@ -70118,11 +70118,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void updateMotionZoneOptions(DefaultClusterCallback callback, Integer connectionID, @Nullable ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct> motionZones, @Nullable Optional<Integer> motionSensitivity) {
+    public void updateMotionZoneOptions(DefaultClusterCallback callback, Integer connectionID, @Nullable Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>> motionZones, @Nullable Optional<Integer> motionSensitivity) {
       updateMotionZoneOptions(callback, connectionID, motionZones, motionSensitivity, 0);
     }
 
-    public void updateMotionZoneOptions(DefaultClusterCallback callback, Integer connectionID, @Nullable ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct> motionZones, @Nullable Optional<Integer> motionSensitivity, int timedInvokeTimeoutMs) {
+    public void updateMotionZoneOptions(DefaultClusterCallback callback, Integer connectionID, @Nullable Optional<ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>> motionZones, @Nullable Optional<Integer> motionSensitivity, int timedInvokeTimeoutMs) {
       final long commandId = 8L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -70131,7 +70131,7 @@ public class ChipClusters {
       elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
 
       final long motionZonesFieldID = 1L;
-      BaseTLVType motionZonestlvValue = motionZones != null ? ArrayType.generateArrayType(motionZones, (elementmotionZones) -> elementmotionZones.encodeTlv()) : new NullType();
+      BaseTLVType motionZonestlvValue = motionZones != null ? motionZones.<BaseTLVType>map((nonOptionalmotionZones) -> ArrayType.generateArrayType(nonOptionalmotionZones, (elementnonOptionalmotionZones) -> elementnonOptionalmotionZones.encodeTlv())).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(motionZonesFieldID, motionZonestlvValue));
 
       final long motionSensitivityFieldID = 2L;

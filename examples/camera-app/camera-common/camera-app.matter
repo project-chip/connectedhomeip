@@ -2795,7 +2795,7 @@ cluster PushAvStreamTransport = 1365 {
 
   request struct UpdateMotionZoneOptionsRequest {
     int16u connectionID = 0;
-    nullable TransportZoneOptionsStruct motionZones[] = 1;
+    optional nullable TransportZoneOptionsStruct motionZones[] = 1;
     optional nullable int8u motionSensitivity = 2;
   }
 

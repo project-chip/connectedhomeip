@@ -189046,7 +189046,7 @@ public:
         AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("MotionZones", &mComplex_MotionZones);
+        AddArgument("MotionZones", &mComplex_MotionZones, "", Argument::kOptional);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         AddArgument("MotionSensitivity", 0, UINT8_MAX, &mRequest.motionSensitivity);
@@ -189069,28 +189069,32 @@ public:
         params.connectionID = [NSNumber numberWithUnsignedShort:mRequest.connectionID];
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        if (mRequest.motionZones.IsNull()) {
-            params.motionZones = nil;
-        } else {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                for (auto & entry_1 : mRequest.motionZones.Value()) {
-                    MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_1;
-                    newElement_1 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
-                    if (entry_1.zone.IsNull()) {
-                        newElement_1.zone = nil;
-                    } else {
-                        newElement_1.zone = [NSNumber numberWithUnsignedShort:entry_1.zone.Value()];
+        if (mRequest.motionZones.HasValue()) {
+            if (mRequest.motionZones.Value().IsNull()) {
+                params.motionZones = nil;
+            } else {
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    for (auto & entry_2 : mRequest.motionZones.Value().Value()) {
+                        MTRPushAVStreamTransportClusterTransportZoneOptionsStruct * newElement_2;
+                        newElement_2 = [MTRPushAVStreamTransportClusterTransportZoneOptionsStruct new];
+                        if (entry_2.zone.IsNull()) {
+                            newElement_2.zone = nil;
+                        } else {
+                            newElement_2.zone = [NSNumber numberWithUnsignedShort:entry_2.zone.Value()];
+                        }
+                        if (entry_2.sensitivity.HasValue()) {
+                            newElement_2.sensitivity = [NSNumber numberWithUnsignedChar:entry_2.sensitivity.Value()];
+                        } else {
+                            newElement_2.sensitivity = nil;
+                        }
+                        [array_2 addObject:newElement_2];
                     }
-                    if (entry_1.sensitivity.HasValue()) {
-                        newElement_1.sensitivity = [NSNumber numberWithUnsignedChar:entry_1.sensitivity.Value()];
-                    } else {
-                        newElement_1.sensitivity = nil;
-                    }
-                    [array_1 addObject:newElement_1];
+                    params.motionZones = array_2;
                 }
-                params.motionZones = array_1;
             }
+        } else {
+            params.motionZones = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
@@ -189125,7 +189129,7 @@ public:
 
 private:
     chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type>>> mComplex_MotionZones;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type>>>> mComplex_MotionZones;
 };
 
 #endif // MTR_ENABLE_PROVISIONAL

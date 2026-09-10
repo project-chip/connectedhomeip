@@ -57084,12 +57084,12 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="motionZones", Tag=1, Type=typing.Union[Nullable, typing.List[PushAvStreamTransport.Structs.TransportZoneOptionsStruct]]),
+                        ClusterObjectFieldDescriptor(Label="motionZones", Tag=1, Type=typing.Union[None, Nullable, typing.List[PushAvStreamTransport.Structs.TransportZoneOptionsStruct]]),
                         ClusterObjectFieldDescriptor(Label="motionSensitivity", Tag=2, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             connectionID: uint = 0
-            motionZones: typing.Union[Nullable, typing.List[PushAvStreamTransport.Structs.TransportZoneOptionsStruct]] = NullValue
+            motionZones: typing.Union[None, Nullable, typing.List[PushAvStreamTransport.Structs.TransportZoneOptionsStruct]] = None
             motionSensitivity: typing.Union[None, Nullable, uint] = None
 
     class Attributes:

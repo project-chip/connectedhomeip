@@ -18247,7 +18247,7 @@ public:
         ClusterCommand("update-motion-zone-options", credsIssuerConfig), mComplex_MotionZones(&mRequest.motionZones)
     {
         AddArgument("ConnectionID", 0, UINT16_MAX, &mRequest.connectionID);
-        AddArgument("MotionZones", &mComplex_MotionZones);
+        AddArgument("MotionZones", &mComplex_MotionZones, "", Argument::kOptional);
         AddArgument("MotionSensitivity", 0, UINT8_MAX, &mRequest.motionSensitivity);
         ClusterCommand::AddArguments();
     }
@@ -18275,8 +18275,8 @@ public:
 
 private:
     chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<
-        chip::app::DataModel::List<const chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type>>>
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type>>>>
         mComplex_MotionZones;
 };
 

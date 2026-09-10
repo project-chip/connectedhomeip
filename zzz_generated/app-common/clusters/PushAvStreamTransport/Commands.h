@@ -396,7 +396,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
 
     uint16_t connectionID = static_cast<uint16_t>(0);
-    DataModel::Nullable<DataModel::List<const Structs::TransportZoneOptionsStruct::Type>> motionZones;
+    Optional<DataModel::Nullable<DataModel::List<const Structs::TransportZoneOptionsStruct::Type>>> motionZones;
     Optional<DataModel::Nullable<uint8_t>> motionSensitivity;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -414,7 +414,7 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     uint16_t connectionID = static_cast<uint16_t>(0);
-    DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>> motionZones;
+    Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> motionZones;
     Optional<DataModel::Nullable<uint8_t>> motionSensitivity;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
