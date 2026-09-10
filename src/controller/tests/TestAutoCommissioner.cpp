@@ -758,6 +758,27 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
     }
 }
 
+TEST_F(AutoCommissionerTest, SetCommissioningParametersPreservesAttestationRequestProfiles)
+{
+    using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    mParams.SetPAIAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kMlDsa65)
+        .SetDACAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    ASSERT_EQ(mCommissioner.SetCommissioningParameters(mParams), CHIP_NO_ERROR);
+
+    // Updating a buffer-backed parameter must retain the already selected scalar profiles.
+    CommissioningParameters updated = mCommissioner.GetCommissioningParameters();
+    updated.SetCountryCode("US"_span);
+    ASSERT_EQ(mCommissioner.SetCommissioningParameters(updated), CHIP_NO_ERROR);
+
+    const auto & stored = mCommissioner.GetCommissioningParameters();
+    ASSERT_TRUE(stored.GetPAIAttestationCertificateRequestProfile().HasValue());
+    EXPECT_EQ(stored.GetPAIAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kMlDsa65);
+    ASSERT_TRUE(stored.GetDACAttestationCertificateRequestProfile().HasValue());
+    EXPECT_EQ(stored.GetDACAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    ASSERT_TRUE(stored.GetCountryCode().HasValue());
+    EXPECT_TRUE(stored.GetCountryCode().Value().data_equal("US"_span));
+}
+
 TEST_F(AutoCommissionerTest, SetCommissioningParametersCopiesSpans)
 {
     uint8_t source[32]{ 0xde, 0xad }; // length 32 is valid for all these except country code

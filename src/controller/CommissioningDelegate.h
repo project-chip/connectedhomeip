@@ -704,7 +704,6 @@ public:
         mAttestationSignature.ClearValue();
         mPAI.ClearValue();
         mDAC.ClearValue();
-        ClearAttestationCertificateRequestProfiles();
         mTimeZone.ClearValue();
         mDSTOffsets.ClearValue();
         mDefaultNTP.ClearValue();
