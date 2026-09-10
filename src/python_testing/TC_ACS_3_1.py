@@ -92,7 +92,7 @@ class TC_ACS_3_1(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     async def test_TC_ACS_3_1(self):
         """[TC-ACS-3.1] Cluster endpoint"""
-        
+
         node_id = self.dut_node_id
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
