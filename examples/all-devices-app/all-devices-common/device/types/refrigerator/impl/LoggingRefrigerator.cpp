@@ -56,7 +56,10 @@ LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate) : Loggin
 
 LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, Config config)
 {
-    mTagList = config.tagList;
+    // The DescriptorCluster keeps only a non-owning view of the tag list, so the configured
+    // tags must be copied into storage that outlives the registered descriptor.
+    mOwnedTags.assign(config.tagList.begin(), config.tagList.end());
+    mTagList = Span(mOwnedTags.data(), mOwnedTags.size());
 
     // The MA-refrigerator device type requires at least one cabinet endpoint.
     VerifyOrDie(config.cabinetCount >= 1);

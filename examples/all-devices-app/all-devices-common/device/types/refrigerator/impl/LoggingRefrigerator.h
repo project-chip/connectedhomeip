@@ -51,7 +51,8 @@ public:
         TemperatureControlledCabinetPart::Config cabinetConfig = DefaultCabinetConfig();
         uint8_t cabinetCount                                   = 1;
         /// Semantic tags applied to the refrigerator root endpoint descriptor (e.g. to
-        /// disambiguate variants under wildcard allocation).
+        /// disambiguate variants under wildcard allocation). The tags are copied, so the
+        /// storage backing this span does not need to outlive the constructor call.
         Span<const EndpointComposition::SemanticTag> tagList = {};
     };
 
@@ -71,6 +72,9 @@ protected:
     void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
 
 private:
+    // Owned copy of Config::tagList: mTagList (consumed by the DescriptorCluster, which keeps
+    // only a view) points into it, so it must never be resized after the constructor.
+    std::vector<EndpointComposition::SemanticTag> mOwnedTags;
     // Cabinet names are owned here because the parts keep only a const char pointer to them.
     std::vector<std::string> mCabinetNames;
     std::vector<std::unique_ptr<LoggingTemperatureControlledCabinetPart>> mCabinets;
