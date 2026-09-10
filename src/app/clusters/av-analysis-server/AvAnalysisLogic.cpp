@@ -1015,8 +1015,7 @@ AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, co
     VerifyOrReturnValue(!commandData.pushAVEndpointID.HasValue(), Status::InvalidCommand,
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: PushAV activation is not supported", mEndpointId));
 
-    // The endpoint is encoded into AnalysisStreams, where an out-of-range one would fail every read
-    VerifyOrReturnValue(commandData.webRTCEndpointID.Value() != kInvalidEndpointId, Status::ConstraintError,
+    VerifyOrReturnValue(commandData.webRTCEndpointID.Value() != kInvalidEndpointId, Status::NotFound,
                         ChipLogError(Zcl, "AvAnalysis[ep=%d]: WebRTCEndpointID is not an endpoint number", mEndpointId));
 
     // One camera-bound command at a time; the response of this one depends on the offer exchange
@@ -1147,9 +1146,11 @@ void AvAnalysisServerLogic::OnSessionInitiated(Status aStatus, uint16_t aWebRTCS
 
     if (aStatus != Status::Success)
     {
-        // Sending the offer initiates the session, so a failure after that is a failure of the stream
+        // Sending the offer initiates the session, so a failure after that is a failure of the stream,
+        // recorded against the endpoint the offer went to
         if (aOfferSent)
         {
+            entry->webRTCEndpointID = DataModel::MakeNullable(webrtcEndpoint);
             SetStreamState(*entry, AnalysisStreamStateEnum::kFailure);
         }
 

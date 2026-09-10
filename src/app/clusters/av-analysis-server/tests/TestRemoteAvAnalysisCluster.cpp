@@ -1275,8 +1275,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateWithANonEndpointIsAConstraintError)
     establishHandler.SetFabricIndex(1);
     EstablishStream(establishHandler, 0x1234, Status::Success, 42);
 
-    // The endpoint is encoded into AnalysisStreams, where an out-of-range one fails every read
-    ASSERT_EQ(ImmediateActivateStatus(0, kInvalidEndpointId), Status::ConstraintError);
+    ASSERT_EQ(ImmediateActivateStatus(0, kInvalidEndpointId), Status::NotFound);
     ASSERT_EQ(mFakeWebRTCClient.mSessionRequests, 0);
     ASSERT_EQ(FirstStreamState(), AnalysisStreamStateEnum::kPendingInitiation);
 }
@@ -1372,6 +1371,8 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivateInitiatesAWebRTCSession)
     ASSERT_TRUE(iter.GetValue().webRTCEndpointID.HasValue());
     ASSERT_FALSE(iter.GetValue().webRTCEndpointID.Value().IsNull());
     ASSERT_EQ(iter.GetValue().webRTCEndpointID.Value().Value(), 2);
+    // Exactly one of the endpoint fields is supported: the PushAV one is not reported at all
+    ASSERT_FALSE(iter.GetValue().pushAVEndpointID.HasValue());
 
     // A second Activate on the initiated stream is a SUCCESS no-op
     InvalidatableCommandHandler secondHandler;
@@ -1404,6 +1405,15 @@ TEST_F(TestRemoteAvAnalysisCluster, ActivationFailingAfterTheOfferMarksTheStream
     mFakeWebRTCClient.mLastCallback->OnSessionInitiated(Status::InvalidInState, 0, /* aOfferSent = */ true);
     ASSERT_EQ(LastStatus(activateHandler), Status::InvalidInState);
     ASSERT_EQ(StreamState(0), AnalysisStreamStateEnum::kFailure);
+
+    // Recorded against the endpoint the offer went to, as a stream that failed after going active is
+    Attributes::AnalysisStreams::TypeInfo::DecodableType failedStreams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, failedStreams), CHIP_NO_ERROR);
+    auto failedIter = failedStreams.begin();
+    ASSERT_TRUE(failedIter.Next());
+    ASSERT_TRUE(failedIter.GetValue().webRTCEndpointID.HasValue());
+    ASSERT_FALSE(failedIter.GetValue().webRTCEndpointID.Value().IsNull());
+    ASSERT_EQ(failedIter.GetValue().webRTCEndpointID.Value().Value(), 2);
 
     // A failed stream is activatable again: the command parks on a fresh request to the camera
     InvalidatableCommandHandler retryHandler;

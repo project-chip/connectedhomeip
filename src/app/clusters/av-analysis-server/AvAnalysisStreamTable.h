@@ -55,9 +55,9 @@ struct AnalysisStreamEntry
     Structs::AnalysisStreamStruct::Type ToEncodableStruct() const
     {
         Structs::AnalysisStreamStruct::Type encodable;
-        encodable.analysisStreamID    = analysisStreamID;
+        encodable.analysisStreamID = analysisStreamID;
+        // Exactly one of the endpoint fields is supported (O.b); PushAV is not implemented
         encodable.webRTCEndpointID    = MakeOptional(webRTCEndpointID);
-        encodable.pushAVEndpointID    = MakeOptional(pushAVEndpointID);
         encodable.analysisStreamState = state;
         return encodable;
     }
