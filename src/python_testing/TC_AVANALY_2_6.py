@@ -61,9 +61,19 @@ class TC_AVANALY_2_6(MatterBaseTest, AVANALYTestBase):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH enables a context trigger. Verify success response."),
             TestStep(3, "Simulate the detection of the enabled ambient context on the DUT."),
-            TestStep(4, "TH waits for AnalysisSessionStart event. Verify event received and save SessionID."),
+            TestStep(
+                4,
+                "TH waits for AnalysisSessionStart event. Verify event received, SessionID is valid uint16, TriggeredZones matches configured trigger or is null, and conditional SourceNodeID. Save SessionID.",
+            ),
             TestStep(5, "Simulate the end of the ambient context detection on the DUT."),
-            TestStep(6, "TH waits for AnalysisSessionEnd event. Verify event received with matching SessionID."),
+            TestStep(
+                6,
+                "TH waits for AnalysisSessionEnd event. Verify event received with matching SessionID and conditional SourceNodeID.",
+            ),
+            TestStep(
+                7,
+                "TH disables context triggers by sending DisableContextTriggers command with ContextTriggers set to null. Verify success response.",
+            ),
         ]
 
     def pics_TC_AVANALY_2_6(self) -> list[str]:
@@ -101,8 +111,11 @@ class TC_AVANALY_2_6(MatterBaseTest, AVANALYTestBase):
         await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
+        start_payload = {"Name": "AvAnalysisSessionStart"}
+        if self.has_feature_remcondetect:
+            start_payload["SourceNodeId"] = self.dut_node_id
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({"Name": "AvAnalysisSessionStart"})
+            self.write_to_app_pipe(start_payload)
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate detection of enabled ambient context (namespace=0x{context_to_enable.namespaceID:02X}, tag=0x{context_to_enable.tag:04X}) on the DUT. Press Enter once initiated."
@@ -115,13 +128,27 @@ class TC_AVANALY_2_6(MatterBaseTest, AVANALYTestBase):
             asserts.assert_is_not_none(start_event_data, "Expected AnalysisSessionStart event")
             session_id = start_event_data.sessionID
             asserts.assert_is_not_none(session_id, "AnalysisSessionStart must contain sessionID")
+            asserts.assert_greater_equal(session_id, 0, "SessionID must be a valid uint16")
+            asserts.assert_less_equal(session_id, 0xFFFF, "SessionID must be a valid uint16")
+            asserts.assert_in(start_event_data.triggeredZones, [NullValue, None],
+                              "TriggeredZones should be null when configured for entire frame")
+            if self.has_feature_remcondetect:
+                asserts.assert_is_not_none(start_event_data.sourceNodeID,
+                                           "SourceNodeID must be present when REMCONDETECT is supported")
+                asserts.assert_equal(start_event_data.sourceNodeID, self.dut_node_id,
+                                     f"SourceNodeID ({start_event_data.sourceNodeID}) must match source camera NodeID ({self.dut_node_id})")
+                source_node_id = start_event_data.sourceNodeID
         else:
             log.info("CI mode: skipping blocking event wait in Step 4")
             session_id = 0
+            source_node_id = self.dut_node_id if self.has_feature_remcondetect else None
 
         self.step(5)
+        end_payload = {"Name": "AvAnalysisSessionEnd", "SessionId": session_id}
+        if self.has_feature_remcondetect:
+            end_payload["SourceNodeId"] = self.dut_node_id
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd", "SessionId": session_id})
+            self.write_to_app_pipe(end_payload)
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg="Simulate the end of the ambient context detection on the DUT. Press Enter once completed."
@@ -134,10 +161,15 @@ class TC_AVANALY_2_6(MatterBaseTest, AVANALYTestBase):
             asserts.assert_is_not_none(end_event_data, "Expected AnalysisSessionEnd event")
             asserts.assert_equal(end_event_data.sessionID, session_id,
                                  f"SessionID in AnalysisSessionEnd ({end_event_data.sessionID}) does not match AnalysisSessionStart ({session_id})")
+            if self.has_feature_remcondetect:
+                asserts.assert_is_not_none(end_event_data.sourceNodeID,
+                                           "SourceNodeID must be present when REMCONDETECT is supported")
+                asserts.assert_equal(end_event_data.sourceNodeID, source_node_id,
+                                     f"SourceNodeID in AnalysisSessionEnd ({end_event_data.sourceNodeID}) does not match Step 4 ({source_node_id})")
         else:
             log.info("CI mode: skipping blocking event wait in Step 6")
 
-        # Cleanup: disable context triggers
+        self.step(7)
         await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
 
 
