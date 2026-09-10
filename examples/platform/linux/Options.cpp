@@ -156,6 +156,7 @@ enum
     kDeviceOption_Camera_AudioPlayback,
     kDeviceOption_Camera_VideoDevice,
     kDeviceOption_Camera_Framerate,
+    kDeviceOption_Camera_RemoteAnalysis,
 #endif
     kDeviceOption_VendorName,
     kDeviceOption_ProductName,
@@ -271,6 +272,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "camera-audio-playback", kNoArgument, kDeviceOption_Camera_AudioPlayback },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
     { "camera-framerate", kArgumentRequired, kDeviceOption_Camera_Framerate },
+    { "camera-remote-analysis", kNoArgument, kDeviceOption_Camera_RemoteAnalysis },
 #endif
     {}
 };
@@ -471,6 +473,7 @@ const char * sDeviceOptionHelp =
 #endif
     "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+    "       PQC Device Attestation is enabled automatically when the provider reports compatible credentials.\n"
 #if CHIP_ATTESTATION_TRUSTY_OS
     "  --dac_provider_trusty\n"
     "       Invoke Trusty OS to get device attestation from secure storage.\n"
@@ -503,6 +506,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-framerate <fps>\n"
     "       Framerate for video streaming (default: 30).\n"
+    "\n"
+    "  --camera-remote-analysis\n"
+    "       Runs camera-app as a Remote Analysis Node (REMCONDETECT) with analysis streams enabled.\n"
     "\n"
 #endif
     "\n";
@@ -923,10 +929,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif
     case kDeviceOption_DacProvider: {
         LinuxDeviceOptions::GetInstance().dacProviderFile.SetValue(aValue);
-        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
-        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
-
-        LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
         break;
     }
 #if CHIP_ATTESTATION_TRUSTY_OS
@@ -1031,6 +1033,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().cameraFramerate.SetValue(static_cast<uint16_t>(value));
         break;
     }
+    case kDeviceOption_Camera_RemoteAnalysis: {
+        LinuxDeviceOptions::GetInstance().cameraRemoteAnalysis = true;
+        break;
+    }
 #endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -1071,10 +1077,23 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
 
 LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
 {
-    if (gDeviceOptions.dacProvider == nullptr)
+    return gDeviceOptions;
+}
+
+void ResolveDeviceAttestationCredentialsProvider()
+{
+    if (gDeviceOptions.dacProvider != nullptr)
     {
-        gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
+        return;
     }
 
-    return gDeviceOptions;
+    if (gDeviceOptions.dacProviderFile.HasValue())
+    {
+        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
+        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
+        gDeviceOptions.dacProvider = &testDacProvider;
+        return;
+    }
+
+    gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
 }

@@ -21,8 +21,7 @@
 # Callers must define ALL_DEVICES_COMMON_DIR before including this file.
 #
 # Exports:
-#   ALL_DEVICES_DEVICE_SRCDIRS  — list of device module source directories
-#   ALL_DEVICES_DEVICE_SOURCES  — list of device module source files (for non-component builds)
+#   ALL_DEVICES_DEVICE_SOURCES  — list of device module source files
 #   ALL_DEVICES_EXTRA_INCLUDE_DIRS — shared include directories for enabled devices
 #
 # After including this file, callers must append ${CMAKE_CURRENT_BINARY_DIR}
@@ -36,8 +35,6 @@
 # ---------------------------------------------------------------------------
 set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
-    "${ALL_DEVICES_COMMON_DIR}/oob-accessors/OOBDataSerializer.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/oob-accessors/boolean-state-sensor/BooleanStateSensorAccessor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/aggregator/Aggregator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/air-purifier/AirPurifier.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/air-purifier/impl/LoggingAirPurifier.cpp"
@@ -74,6 +71,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/light-sensor/impl/IncreasingLightSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/microwave-oven/MicrowaveOven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/microwave-oven/impl/EmulatedMicrowaveOven.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mode-select/ModeSelect.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/mode-select/impl/SimulatedModeSelect.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/MountedOnOffControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
@@ -93,7 +92,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/refrigerator/impl/LoggingRefrigerator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
@@ -117,6 +115,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/impl/LoggingDimmableLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/FanLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/impl/LoggingFanLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/identify/LoggingIdentifyDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
@@ -125,17 +124,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: end
 )
 
-# ---------------------------------------------------------------------------
-# Source directories (unconditional — all device sources are always compiled;
-# LTO eliminates unreachable device code when only a subset is registered).
-# Derived automatically from ALL_DEVICES_DEVICE_SOURCES.
-# ---------------------------------------------------------------------------
-set(ALL_DEVICES_DEVICE_SRCDIRS "")
-foreach(_src IN LISTS ALL_DEVICES_DEVICE_SOURCES)
-    get_filename_component(_dir "${_src}" DIRECTORY)
-    list(APPEND ALL_DEVICES_DEVICE_SRCDIRS "${_dir}")
-endforeach()
-list(REMOVE_DUPLICATES ALL_DEVICES_DEVICE_SRCDIRS)
+include("${ALL_DEVICES_COMMON_DIR}/oob-accessors/all_devices_config.cmake")
 
 # ---------------------------------------------------------------------------
 # Device selection.
@@ -185,6 +174,7 @@ foreach(_key
         laundry-washer
         light-sensor
         microwave-oven
+        mode-select
         mounted-dimmable-load-control
         mounted-on-off-control
         network-infrastructure-manager
