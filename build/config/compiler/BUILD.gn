@@ -42,6 +42,16 @@ declare_args() {
   # Enable Thread sanitizer
   is_tsan = false
 
+  # ASAN builds use -fsanitize-address-field-padding=1 to detect overflows
+  # within (not just past) classes. The flag is ABI-breaking, so libc++/
+  # libc++abi/libunwind have to be rebuilt with it; the Pigweed-shipped
+  # libc++ has different layouts and produces false positives.
+  # build_examples.py resolves this in host.py and passes it as a GN arg
+  # (default: ~/.cache/matter/asan_libcxx, overridable via SYSROOT_ASAN_LIBCXX).
+  # Raw `gn gen` users must set SYSROOT_ASAN_LIBCXX or pass
+  # --args='asan_libcxx_dir="..."' explicitly.
+  asan_libcxx_dir = getenv("SYSROOT_ASAN_LIBCXX")
+
   # enable undefined behavior sanitizer
   is_ubsan = false
 
@@ -441,20 +451,58 @@ config("runtime_default") {
 #   is_sanitize_fatal=false
 #
 
+# -fsanitize-address-field-padding=1 is ABI-breaking: every TU that
+# references a class (including out-of-line code in libc++.a) must agree
+# on the layout, so libc++ has to be rebuilt with the same flag. We've
+# only got that build wired up for Linux x86_64 native + Clang; everything
+# else (cross-builds, darwin, arm, secondary GCC toolchains used by the
+# unified build) gets the original Pigweed libc++ and no field padding.
+# (Extending coverage means teaching build_asan_libcxx.sh to cross-build.)
+_asan_use_padded_libcxx = is_asan && is_clang && host_os == "linux" &&
+                          current_os == "linux" && current_cpu == "x64"
+
+assert(!_asan_use_padded_libcxx || asan_libcxx_dir != "",
+       "asan_libcxx_dir must be set when is_asan=true on Linux x64 with " +
+           "Clang. Run via scripts/build/build_examples.py --target " +
+           "...-asan-clang, or set SYSROOT_ASAN_LIBCXX before `gn gen`, " +
+           "or pass --args='asan_libcxx_dir=\"<path>\"' explicitly. " +
+           "Build the libc++ with scripts/build/build_asan_libcxx.sh.")
+
 config("sanitize_address") {
-  defines = []
   cflags = [
+    "-fsanitize=address",
+    "-fno-omit-frame-pointer",
+    "-fsanitize=pointer-subtract",
+    "-fsanitize=pointer-compare",
+  ]
+  cflags_cc = []
+  ldflags = [
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
   ]
   if (is_clang) {
-    cflags += [
-      "-fsanitize-coverage=inline-8bit-counters,trace-cmp",
-      "-fno-sanitize-coverage=pc-table",
+    # -fsanitize-address-use-after-return=always is Clang-only; GCC doesn't
+    # recognise it (camera GCC ASAN build broke on it).
+    cflags += [ "-fsanitize-address-use-after-return=always" ]
+    ldflags += [ "-fsanitize-address-use-after-return=always" ]
+  }
+  if (_asan_use_padded_libcxx) {
+    cflags += [ "-fsanitize-address-field-padding=2" ]
+    cflags_cc += [
+      "-nostdinc++",
+      "-isystem",
+      rebase_path("${asan_libcxx_dir}/include/c++/v1", root_build_dir),
+    ]
+    ldflags += [
+      "-fsanitize-address-field-padding=1",
+      "-nostdlib++",
+      "-L" + rebase_path("${asan_libcxx_dir}/lib", root_build_dir),
+      "-lc++",
+      "-lc++abi",
+      "-lunwind",
     ]
   }
-  ldflags = cflags
-
+  defines = []
   if ((target_os == "mac" || target_os == "ios") && !is_clang) {
     defines += [ "_LIBCPP_HAS_NO_ASAN" ]
   }
