@@ -1377,4 +1377,63 @@ TEST_F(TestLocalAvAnalysisCluster, TheSerializedSizeEstimateHoldsForAWorstCaseTr
     }
 }
 
+using DetectedZones = Optional<DataModel::Nullable<std::vector<uint16_t>>>;
+
+DetectedZones ZonesOf(std::vector<uint16_t> aZoneIDs)
+{
+    return MakeOptional(DataModel::MakeNullable(std::move(aZoneIDs)));
+}
+
+const DetectedZones kNoZones;
+const DetectedZones kNullZones = MakeOptional(DataModel::Nullable<std::vector<uint16_t>>());
+
+TEST_F(TestLocalAvAnalysisCluster, ATriggeringContextIsActiveWhenItsZonesCoverTheDetection)
+{
+    // With PerZoneContextDetection a detection is only active if every zone it names is one the
+    // context was enabled for; a context enabled with Null zones covers every zone
+    ASSERT_TRUE(EnableSpecificTestContexts(testAmbientContexts[0], DataModel::MakeNullable(testZoneIDList)));
+    ASSERT_TRUE(EnableSpecificTestContexts(testAmbientContexts[1], DataModel::NullNullable));
+
+    auto & logic = mServer.GetLogic();
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], ZonesOf({ 1, 2 })));
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], ZonesOf(testZoneIDList)));
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[0], ZonesOf({ 1, 5 }))) << "zone 5 was not enabled";
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[0], kNullZones)) << "the context is zone-specific";
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[0], kNoZones)) << "per-zone detection needs zones";
+
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[1], ZonesOf({ 5 })));
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[1], kNullZones));
+
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[2], ZonesOf({ 1 }))) << "not enabled";
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testErrorAmbientContext[0], ZonesOf({ 1 }))) << "not supported";
+}
+
+TEST_F(TestLocalAvAnalysisCluster, WithoutPerZoneDetectionAnEnabledContextIsActiveWhateverTheZones)
+{
+    MockAvAnalysisDelegate delegate;
+    AvAnalysisCluster noZones(kTestEndpointId, chip::BitFlags<Feature>(Feature::kLocalContextDetection), testAmbientContexts,
+                              DataModel::NullNullable);
+    noZones.SetDelegate(&delegate);
+    ClusterTester tester(noZones);
+    ASSERT_EQ(noZones.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+    uint8_t tlvBuffer[512];
+    commandData.contextTriggers = CreateCommandData(testAmbientContexts[0], DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer),
+                                                    /* noZones = */ true);
+    auto response               = noZones.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value() && response.value().IsSuccess());
+
+    auto & logic = noZones.GetLogic();
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], kNoZones));
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], kNullZones));
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], ZonesOf({ 1 })));
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[1], kNoZones)) << "not enabled";
+
+    noZones.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace
