@@ -1271,7 +1271,7 @@ TEST_F(TestLocalAvAnalysisCluster, MoreThanFiftyContextTriggersIsAConstraintErro
     writer.Init(buffer.Get(), static_cast<uint32_t>(kBufferSize));
     TLV::TLVType arrayType;
     ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
-    for (int entry = 0; entry <= AvAnalysis::kMaxContextTriggers; entry++)
+    for (size_t entry = 0; entry <= AvAnalysis::kMaxContextTriggers; entry++)
     {
         Structs::ContextTriggerStruct::Type trigger;
         trigger.context.namespaceID = static_cast<uint8_t>(0x49);

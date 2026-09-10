@@ -83,9 +83,9 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
 
     // The attribute is constrained to 50 entries, and the persisted size of the active triggers, which
     // may be every supported context, is computed from that
-    VerifyOrReturnError(mSupportedAmbientContexts.size() <= static_cast<size_t>(kMaxSupportedAmbientContexts),
-                        CHIP_ERROR_INVALID_ARGUMENT,
-                        ChipLogError(Zcl, "AvAnalysis: more than %d SupportedAmbientContexts", kMaxSupportedAmbientContexts));
+    VerifyOrReturnError(mSupportedAmbientContexts.size() <= kMaxSupportedAmbientContexts, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl, "AvAnalysis: more than %u SupportedAmbientContexts",
+                                     static_cast<unsigned>(kMaxSupportedAmbientContexts)));
 
     // If we don't have PerZoneSensivity then mMaxZones has to be Null
     VerifyOrReturnError(!(HasFeature(Feature::kPerZoneContextDetection) ^ !mMaxZones.IsNull()), CHIP_ERROR_INVALID_ARGUMENT,
@@ -352,8 +352,8 @@ CHIP_ERROR AvAnalysisServerLogic::StoreActiveAmbientContextTriggers()
     Platform::ScopedMemoryBuffer<uint8_t> contextTriggers;
     MutableByteSpan bufferSpan;
 
-    size_t maxBufferSize = ContextTriggerSerializedSize(mMaxZones.ValueOr(static_cast<uint8_t>(0))) *
-            static_cast<size_t>(kMaxActiveAmbientContextTriggers) +
+    size_t maxBufferSize =
+        ContextTriggerSerializedSize(mMaxZones.ValueOr(static_cast<uint8_t>(0))) * kMaxActiveAmbientContextTriggers +
         kContextTriggerArrayOverhead;
 
     if (!contextTriggers.Alloc(maxBufferSize))
@@ -397,8 +397,8 @@ CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
     Platform::ScopedMemoryBuffer<uint8_t> contextTriggers;
     MutableByteSpan bufferSpan;
 
-    size_t maxBufferSize = ContextTriggerSerializedSize(mMaxZones.ValueOr(static_cast<uint8_t>(0))) *
-            static_cast<size_t>(kMaxActiveAmbientContextTriggers) +
+    size_t maxBufferSize =
+        ContextTriggerSerializedSize(mMaxZones.ValueOr(static_cast<uint8_t>(0))) * kMaxActiveAmbientContextTriggers +
         kContextTriggerArrayOverhead;
 
     if (!contextTriggers.Alloc(maxBufferSize))
@@ -1532,7 +1532,7 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId, Server
                         CHIP_ERROR_INTERNAL, ChipLogError(Zcl, "Unable to generate EndSession event"));
 
     // Remove the session from our active contexts
-    it = mActiveSessions.erase(it);
+    mActiveSessions.erase(it);
 
     return CHIP_NO_ERROR;
 }

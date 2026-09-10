@@ -20,7 +20,6 @@
 
 #include <algorithm>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <unordered_set>
 #include <vector>
 
 namespace chip {
@@ -29,9 +28,9 @@ namespace Clusters {
 namespace AvAnalysis {
 
 // Spec defined max values
-constexpr int8_t kMaxSupportedAmbientContexts     = 50;
-constexpr int8_t kMaxActiveAmbientContextTriggers = 50;
-constexpr int8_t kMaxContextTriggers              = 50;
+constexpr size_t kMaxSupportedAmbientContexts     = 50;
+constexpr size_t kMaxActiveAmbientContextTriggers = 50;
+constexpr size_t kMaxContextTriggers              = 50;
 
 // Max size for a TLV encoded Semantic Tag, this is used in calculating the buffer size for Context Triggers
 constexpr size_t kSemanticTagStructSerializedSize =
@@ -70,7 +69,6 @@ private:
     LabelState mLabelState;
 
 public:
-    virtual ~AmbientContextStorage() = default;
     AmbientContextStorage()
     {
         mZoneIDs.ClearValue();
@@ -153,8 +151,7 @@ private:
     std::vector<Structs::TrackedContext::Type> mTrackedContexts;
 
 public:
-    virtual ~ActiveAmbientContextSession() = default;
-    ActiveAmbientContextSession()          = default;
+    ActiveAmbientContextSession() = default;
 
     void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
     uint16_t GetSessionId() const { return mSessionId; }
