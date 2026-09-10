@@ -731,6 +731,88 @@ TEST_F(TestRemoteAvAnalysisCluster, AnalysisSessionRequiresASourceCameraOnARemot
     ASSERT_EQ(mServer.AnalysisSessionStart(sessionId, DataModel::NullNullable), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+TEST_F(TestRemoteAvAnalysisCluster, CreateActiveSessionRequiresASourceCameraOnARemoteNode)
+{
+    // As AnalysisSessionStart: a remote session's events all name their source, so it cannot be
+    // recorded without one
+    uint16_t sessionId = 0;
+    ASSERT_EQ(mServer.CreateActiveSession(sessionId), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
+    ASSERT_FALSE(mClusterTester.GetNextGeneratedEvent().has_value());
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, CreateActiveSessionRecordsASessionWithoutAStartEvent)
+{
+    constexpr NodeId kSourceCamera        = 0xCA11;
+    constexpr uint64_t kStreamStartUs     = 987654321;
+    ServerClusterContext & clusterContext = mClusterTester.GetServerClusterContext();
+
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, kSourceCamera, Status::Success, 7);
+
+    InvalidatableCommandHandler enableHandler;
+    enableHandler.SetFabricIndex(1);
+    ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType enableData;
+    enableData.contextTriggers.SetNull();
+    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData)).IsSuccess());
+
+    // The point of the API: the session exists, but no AnalysisSessionStart is reported for it
+    uint16_t sessionId = 0;
+    ASSERT_EQ(mServer.CreateActiveSession(sessionId, kSourceCamera, kStreamStartUs), CHIP_NO_ERROR);
+    ASSERT_FALSE(mClusterTester.GetNextGeneratedEvent().has_value());
+
+    // And the source it was given reaches the events of that session
+    const std::vector<Structs::TrackedContext::Type> trackedContext = {
+        { .identifiedContextID = 0,
+          .identifiedContext   = { .namespaceID = static_cast<uint8_t>(0x49), .tag = static_cast<uint8_t>(0x0B) },
+          .startTime           = 0,
+          .endTime             = DataModel::NullNullable }
+    };
+    ASSERT_EQ(mServer.GetLogic().InitialTriggeringContextDetected(sessionId, trackedContext, &clusterContext), CHIP_NO_ERROR);
+    auto perceivedEvent = mClusterTester.GetNextGeneratedEvent();
+    ASSERT_TRUE(perceivedEvent.has_value());
+    Events::PerceivedContext::DecodableType perceivedData;
+    if (perceivedEvent.has_value())
+    {
+        ASSERT_EQ(perceivedEvent->GetEventData(perceivedData), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(perceivedData.sessionID, sessionId);
+    ASSERT_TRUE(perceivedData.sourceNodeId.HasValue());
+    ASSERT_EQ(perceivedData.sourceNodeId.Value(), kSourceCamera);
+    ASSERT_TRUE(perceivedData.sourceStartTimestamp.HasValue());
+    ASSERT_EQ(perceivedData.sourceStartTimestamp.Value(), kStreamStartUs);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, SessionIdsFromBothPathsDoNotCollide)
+{
+    constexpr NodeId kSourceCamera    = 0xCA11;
+    constexpr uint64_t kStreamStartUs = 555;
+
+    // A session recorded under an id of the caller's choosing does not move the counter that
+    // AnalysisSessionStart assigns from, so that id has to be skipped rather than handed out again
+    uint16_t chosenId = 3;
+    ASSERT_EQ(mServer.CreateActiveSession(chosenId, kSourceCamera, kStreamStartUs, /* aUseSpecificSessionId = */ true),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(chosenId, 3);
+
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, kSourceCamera, Status::Success, 7);
+
+    // Start sessions until the counter has passed the chosen id; none may reuse it
+    for (int i = 0; i < 5; i++)
+    {
+        uint16_t sessionId = 0;
+        ASSERT_EQ(mServer.AnalysisSessionStart(sessionId, DataModel::NullNullable, kSourceCamera, kStreamStartUs), CHIP_NO_ERROR);
+        ASSERT_NE(sessionId, chosenId);
+        ASSERT_TRUE(mClusterTester.GetNextGeneratedEvent().has_value());
+    }
+}
+
 TEST_F(TestRemoteAvAnalysisCluster, EventsCarryTheSourceCameraOfTheSession)
 {
     constexpr NodeId kSourceCamera        = 0xCA11;
@@ -2323,6 +2405,152 @@ TEST_F(TestRemoteAvAnalysisCluster, StartupRequiresBothClientsWithRemoteDetectio
     bothClients.SetWebRTCClient(&mFakeWebRTCClient);
     EXPECT_EQ(bothClients.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     bothClients.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersIgnoresRepeatedZones)
+{
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 7);
+
+    InvalidatableCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+    uint8_t tlvBuffer[256];
+
+    // A zone named repeatedly is enabled once: stored as given it would also report a list longer
+    // than MaxZones, which the persisted size is computed from
+    commandData.contextTriggers = EncodeContextTriggers(
+        testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 2, 1, 2, 1, 2 }), tlvBuffer, sizeof(tlvBuffer));
+    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData)).IsSuccess());
+
+    Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType active;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, active), CHIP_NO_ERROR);
+    auto iter = active.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_TRUE(iter.GetValue().zoneIDs.HasValue());
+    ASSERT_FALSE(iter.GetValue().zoneIDs.Value().IsNull());
+
+    std::vector<uint16_t> storedZones;
+    auto zoneIter = iter.GetValue().zoneIDs.Value().Value().begin();
+    while (zoneIter.Next())
+    {
+        storedZones.push_back(zoneIter.GetValue());
+    }
+    ASSERT_EQ(storedZones, std::vector<uint16_t>({ 1, 2 }));
+    ASSERT_FALSE(iter.Next());
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EnableContextTriggersAcceptsAnEmptyZoneList)
+{
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 7);
+
+    // No zones to ask about, so the delegate is not consulted: it would refuse if it were
+    mMockDelegate.mZoneVerificationResult = CHIP_ERROR_NOT_FOUND;
+
+    InvalidatableCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+    uint8_t tlvBuffer[128];
+    commandData.contextTriggers = EncodeContextTriggers(
+        testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{}), tlvBuffer, sizeof(tlvBuffer));
+
+    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData)).IsSuccess());
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, CommandsSurviveALostDelegate)
+{
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 7);
+
+    // An instance whose Startup failed stays registered, so a command can arrive with no delegate:
+    // every path that would consult it answers a status instead of dereferencing null
+    mServer.SetDelegate(nullptr);
+
+    InvalidatableCommandHandler enableHandler;
+    enableHandler.SetFabricIndex(1);
+    ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType enableData;
+    uint8_t tlvBuffer[256];
+    enableData.contextTriggers = EncodeContextTriggers(
+        testAmbientContexts.front(), DataModel::MakeNullable(std::vector<uint16_t>{ 1 }), tlvBuffer, sizeof(tlvBuffer));
+    ASSERT_EQ(
+        StatusOf(mServer.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData)).GetStatusCode().GetStatus(),
+        Status::Failure);
+
+    // The null-list branch reaches the same guards without any zones
+    InvalidatableCommandHandler nullHandler;
+    nullHandler.SetFabricIndex(1);
+    Commands::EnableContextTriggers::DecodableType nullData;
+    nullData.contextTriggers.SetNull();
+    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleEnableContextTriggers(nullHandler, enablePath, nullData)).IsSuccess());
+
+    InvalidatableCommandHandler disableHandler;
+    disableHandler.SetFabricIndex(1);
+    ConcreteCommandPath disablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
+    Commands::DisableContextTriggers::DecodableType disableData;
+    disableData.contextTriggers.SetNull();
+    ASSERT_TRUE(StatusOf(mServer.GetLogic().HandleDisableContextTriggers(disableHandler, disablePath, disableData)).IsSuccess());
+
+    // And a session with zones cannot validate them
+    uint16_t sessionId = 0;
+    ASSERT_EQ(mServer.AnalysisSessionStart(sessionId, DataModel::MakeNullable(std::vector<uint16_t>{ 1 }), 0xCA11, 555),
+              CHIP_ERROR_INCORRECT_STATE);
+
+    mServer.SetDelegate(&mMockDelegate);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, AStartupFailureLeavesTheClusterInert)
+{
+    // Registration only logs a failed Startup, so an instance missing a client stays reachable.
+    // Its stream table was never sized and its attributes never loaded: every command answers a
+    // status rather than acting or faulting.
+    const BitFlags<Feature> kRemote(Feature::kRemoteContextDetection);
+    AvAnalysisCluster cameraOnly(kTestEndpointId, kRemote, testAmbientContexts, DataModel::NullNullable, kTestMaxAnalysisStreams);
+    cameraOnly.SetDelegate(&mMockDelegate);
+    cameraOnly.SetCameraClient(&mFakeCameraClient);
+    ASSERT_EQ(cameraOnly.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INCORRECT_STATE);
+
+    InvalidatableCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    ConcreteCommandPath establishPath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+    Commands::EstablishAnalysisStream::DecodableType establishData;
+    establishData.nodeID = 0x1234;
+    ASSERT_EQ(StatusOf(cameraOnly.GetLogic().HandleEstablishAnalysisStream(establishHandler, establishPath, establishData))
+                  .GetStatusCode()
+                  .GetStatus(),
+              Status::ResourceExhausted);
+    ASSERT_EQ(mFakeCameraClient.mAllocationRequests, 0);
+
+    // The gate can never be satisfied, since no stream can be established
+    InvalidatableCommandHandler enableHandler;
+    enableHandler.SetFabricIndex(1);
+    ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType enableData;
+    enableData.contextTriggers.SetNull();
+    ASSERT_EQ(StatusOf(cameraOnly.GetLogic().HandleEnableContextTriggers(enableHandler, enablePath, enableData))
+                  .GetStatusCode()
+                  .GetStatus(),
+              Status::InvalidInState);
+
+    // And nothing can be activated, deactivated or removed
+    InvalidatableCommandHandler activateHandler;
+    activateHandler.SetFabricIndex(1);
+    ConcreteCommandPath activatePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::ActivateAnalysisStream::Id };
+    Commands::ActivateAnalysisStream::DecodableType activateData;
+    activateData.analysisStreamID = 0;
+    activateData.webRTCEndpointID = MakeOptional(static_cast<EndpointId>(1));
+    ASSERT_EQ(StatusOf(cameraOnly.GetLogic().HandleActivateAnalysisStream(activateHandler, activatePath, activateData))
+                  .GetStatusCode()
+                  .GetStatus(),
+              Status::NotFound);
+
+    cameraOnly.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ShutdownWithoutInteractionLeavesTheCameraClientAlone)
