@@ -25,6 +25,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/DeviceProxy.h>
+#include <app/clusters/network-commissioning/constants.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioneeDeviceProxy.h>
@@ -39,6 +40,13 @@
 #include <lib/support/Span.h>
 
 #include <cstring>
+
+// The commissioner and the Network Commissioning cluster have to agree on the size of the
+// PossessionNonce, but the controller cannot include the cluster's constants.h (a server cluster
+// implementation header), so CommissioningParameters declares its own copy. Pin the two together
+// here, in a test that is free to include both.
+static_assert(chip::Controller::CommissioningParameters::kPossessionNonceLen ==
+              chip::app::Clusters::NetworkCommissioning::kPossessionNonceSize);
 
 using namespace chip;
 using namespace chip::app::Clusters;

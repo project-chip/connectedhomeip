@@ -3329,8 +3329,9 @@ CHIP_ERROR DeviceCommissioner::VerifyNetworkClientIdentity(ByteSpan clientIdenti
     Crypto::P256PublicKey publicKey(publicKeySpan);
 
     Crypto::P256ECDSASignature signature;
-    memcpy(signature.Bytes(), possessionSignature.data(), possessionSignature.size());
+    static_assert(signature.Capacity() >= CommissioningParameters::kPossessionSignatureLen);
     ReturnErrorOnFailure(signature.SetLength(possessionSignature.size()));
+    memcpy(signature.Bytes(), possessionSignature.data(), possessionSignature.size());
 
     ReturnErrorAndLogOnFailure(publicKey.ECDSA_validate_msg_signature(tbsMessage, clientIdentity.size() + nonce.size(), signature),
                                Controller, "Commissionee failed to prove possession of its Network Client Identity");

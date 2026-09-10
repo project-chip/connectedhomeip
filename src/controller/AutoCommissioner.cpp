@@ -1121,7 +1121,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 mParams.SetPDCClientIdentity(clientIdentity);
 
                 ByteSpan possessionSignature = info.possessionSignature;
-                ReturnErrorOnFailure(RelocateSpan(possessionSignature, mPossessionSignature));
+                ReturnErrorOnFailure(RelocateSpan(possessionSignature, mPossessionSignature, /* exactSize = */ true));
                 mParams.SetPDCPossessionSignature(possessionSignature);
             }
             break;
