@@ -43576,10 +43576,6 @@ public class ChipClusters {
       void onSuccess(List<Integer> value);
     }
 
-    public interface MistTypeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -43819,13 +43815,13 @@ public class ChipClusters {
     }
 
     public void readMistTypeAttribute(
-        MistTypeAttributeCallback callback) {
+        IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIST_TYPE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, MIST_TYPE_ATTRIBUTE_ID, true);
@@ -43836,18 +43832,18 @@ public class ChipClusters {
     }
 
     public void writeMistTypeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
+      BaseTLVType tlvValue = new UIntType(value);
       writeAttribute(new WriteAttributesCallbackImpl(callback), MIST_TYPE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeMistTypeAttribute(
-        MistTypeAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MIST_TYPE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, MIST_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
