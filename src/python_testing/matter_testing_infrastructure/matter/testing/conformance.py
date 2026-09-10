@@ -164,6 +164,10 @@ def is_provisional(conformance: Callable):
     return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL
 
 
+def is_obsolete(conformance: Callable):
+    return isinstance(conformance, obsolete)
+
+
 @dataclass
 class Conformance:
     def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
@@ -244,7 +248,7 @@ class obsolete(Conformance):
         return ConformanceDecisionWithChoice(ConformanceDecision.DISALLOWED)
 
     def __str__(self):
-        return 'Obs'
+        return 'Z'
 
 
 class ValueConformance(Conformance):
