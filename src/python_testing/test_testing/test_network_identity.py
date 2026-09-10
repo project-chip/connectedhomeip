@@ -247,6 +247,14 @@ class TestNetworkAdministratorSecretDecoding(unittest.TestCase):
                                         0x30, 0x03, 0x10]) + raw_secret[:16] + bytes([0x18])),
             "out of tag order": (bytes([0x15, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01, 0x24, 0x01, 0x00,
                                         0x30, 0x03, 0x20]) + raw_secret + bytes([0x18])),
+            # Each field's TLV type is enforced, so callers can rely on `created` being an
+            # integer they can do arithmetic on rather than getting bytes back.
+            "version as an octet string": (bytes([0x15, 0x30, 0x01, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18])),
+            "created as an octet string": (bytes([0x15, 0x24, 0x01, 0x00, 0x30, 0x02, 0x04, 0x04, 0x03, 0x02, 0x01,
+                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18])),
+            "raw secret as an integer": bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                               0x26, 0x03, 0x04, 0x03, 0x02, 0x01, 0x18]),
         }
         for name, encoded in cases.items():
             with self.subTest(name=name), self.assertRaises(ValueError):

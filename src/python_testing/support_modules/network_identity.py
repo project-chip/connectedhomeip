@@ -328,7 +328,8 @@ def decode_network_administrator_secret(encoded: bytes) -> NetworkAdministratorS
     Mirrors ``chip::Crypto::DecodeNetworkAdministratorSecret``: an anonymous TLV struct
     holding version [1], created [2] and raw-secret [3] in tag order, with no trailing
     fields. ``created`` is accepted in any unsigned width because the TLV writer emits
-    the smallest encoding that fits the value.
+    the smallest encoding that fits the value, but each field's TLV type is enforced, so
+    the returned ``version`` and ``created`` are always ints and ``raw_secret`` bytes.
 
     Raises:
         ValueError: If the encoding is not a well-formed NASS.
@@ -346,17 +347,21 @@ def decode_network_administrator_secret(encoded: bytes) -> NetworkAdministratorS
         if tag != expected_tag:
             raise ValueError(f"NASS field {expected_tag} is missing or out of tag order (found tag {tag})")
         offset += 2
-        if control in (0x24, 0x25, 0x26, 0x27):
+        if expected_tag in (1, 2):
             # Context-tagged unsigned integer, 1/2/4/8 bytes of little-endian value.
+            if control not in (0x24, 0x25, 0x26, 0x27):
+                raise ValueError(f"NASS field {expected_tag} must be an unsigned integer, but carries TLV control "
+                                 f"byte 0x{control:02x}")
             width = 1 << (control - 0x24)
             value: int | bytes = int.from_bytes(body[offset:offset + width], "little")
-        elif control == 0x30:
+        else:
             # Context-tagged octet string with a single-byte length prefix.
+            if control != 0x30:
+                raise ValueError(f"NASS field {expected_tag} must be an octet string, but carries TLV control "
+                                 f"byte 0x{control:02x}")
             width = body[offset]
             offset += 1
             value = body[offset:offset + width]
-        else:
-            raise ValueError(f"Unexpected TLV control byte 0x{control:02x} for NASS field {expected_tag}")
         if offset + width > len(body):
             raise ValueError(f"NASS is truncated inside field {expected_tag}")
         offset += width
