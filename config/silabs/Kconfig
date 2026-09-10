@@ -185,7 +185,6 @@ config NET_IF_IPV6_PREFIX_COUNT
 	default NET_IF_UNICAST_IPV6_ADDR_COUNT if CHIP_WIFI
 
 config NET_PKT_RX_COUNT
-	default 16 if CHIP_WIFI
 	default 8
 
 config NET_PKT_TX_COUNT
