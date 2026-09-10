@@ -27,6 +27,7 @@ source_set("network-identity-management-server") {
     "NetworkIdentityKeystore.h",
     "NetworkIdentityManagementCluster.cpp",
     "NetworkIdentityManagementCluster.h",
+    "NetworkIdentityManagementTestEventTriggerHandler.h",
     "NetworkIdentityStorage.cpp",
     "NetworkIdentityStorage.h",
   ]
@@ -41,6 +42,7 @@ source_set("network-identity-management-server") {
   public_deps = [
     "${chip_root}/src/app:constants",
     "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/NetworkIdentityManagement",
   ]
