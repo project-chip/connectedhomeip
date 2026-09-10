@@ -349,6 +349,10 @@ if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
 
+if (CONFIG_SECURE_ENABLE_TEE)
+    chip_gn_arg_append("chip_enable_esp32_tee" "true")
+endif()
+
 if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
     target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostics/include")
 endif()
@@ -468,6 +472,22 @@ target_include_directories(${COMPONENT_LIB} PRIVATE
     "${freertos_dir}/include/freertos"
     "${freertos_dir}/FreeRTOS-Kernel/include/freertos")
 
+# ESP32TEEOpKey.cpp / ESP32TEEOperationalKeystore.cpp (and, on the PBKDF2 DAC path,
+# ESP32SecureCertDACProvider.cpp) include esp_tee_sec_storage.h, owned by the tee_sec_storage
+# component (an esp_tee subproject component that is not in this component's REQUIRES). The
+# operational keystore is compiled whenever CONFIG_SECURE_ENABLE_TEE is set, so add the include
+# dir to the gn compile path under that condition. A config-gated PRIV_REQUIRES is unreliable
+# here: CONFIG_* is unset during IDF's early-expansion pass when REQUIRES is resolved, so inject
+# the dir directly instead.
+if (CONFIG_SECURE_ENABLE_TEE)
+    idf_component_get_property(tee_sec_storage_dir tee_sec_storage COMPONENT_DIR)
+    set(tee_sec_storage_inc "${tee_sec_storage_dir}/include")
+    if (NOT EXISTS "${tee_sec_storage_inc}")
+        message(FATAL_ERROR "tee_sec_storage include dir not found: ${tee_sec_storage_inc}")
+    endif()
+    target_include_directories(${COMPONENT_LIB} PRIVATE "${tee_sec_storage_inc}")
+endif()
+
 target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/src/platform/ESP32"
     "${CHIP_ROOT}/src/platform/OpenThread"
@@ -497,7 +517,8 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND matter_requires espressif__esp_secure_cert_mgr)
 endif()
 
-if (CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2)
+if (CONFIG_SECURE_ENABLE_TEE)
+    # Links esp_tee_sec_storage_* used by the operational keystore and the PBKDF2 TEE-DAC path.
     list(APPEND matter_requires tee_sec_storage)
 endif()
 
