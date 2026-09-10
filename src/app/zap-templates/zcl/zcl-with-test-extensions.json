@@ -1046,7 +1046,10 @@
             "ThermostatSuggestionNotFollowingReason",
             "ClusterRevision"
         ],
-        "Thermostat User Interface Configuration": ["ClusterRevision", "FeatureMap"],
+        "Thermostat User Interface Configuration": [
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Time Format Localization": ["ClusterRevision"],
         "Window Covering": [
             "ClusterRevision",
