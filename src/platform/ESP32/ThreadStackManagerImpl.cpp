@@ -65,7 +65,9 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     // sending DNS Announcement message.
     RunOnTCPIP([this]() {
         esp_netif_t * openthread_netif = esp_openthread_get_netif();
-        chip::Inet::InterfaceId interface(netif_get_by_index(esp_netif_get_netif_impl_index(openthread_netif)));
+        const int netifIndex            = esp_netif_get_netif_impl_index(openthread_netif);
+        VerifyOrReturn(netifIndex >= 0 && netifIndex <= UINT8_MAX);
+        chip::Inet::InterfaceId interface(netif_get_by_index(static_cast<uint8_t>(netifIndex)));
         GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::SetRendezvousNetworkInterface(interface);
     });
 #endif // !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
