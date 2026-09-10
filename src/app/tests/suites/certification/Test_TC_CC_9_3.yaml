@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+CI:
+    - name: "Test against all clusters app"
+      app: all-clusters
+    - name: "Test against all-devices/extended-color-light"
+      app: all-devices
+      args:
+          - --device
+          - extended-color-light
+
 name: 27.2.22. [TC-CC-9.3] ColorLoopSet Validation - change time without stop
 
 PICS:

@@ -528,8 +528,8 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
     // Validate cross-pair ordering. If a feature is enabled, the stored Fallback value is always
     // a valid baseline — use feature presence rather than a "has been explicitly written" flag.
     //
-    // For voltage/frequency/power/current pairs: over must be strictly > under (over >= under + 1).
-    // For import/export: (0, 0) is the valid quiescent state; otherwise over must be > under.
+    // For every pair, including import/export, over must be strictly > under
+    // (over >= under + 1), which is what the attribute constraints require.
     auto checkPair = [&](const Optional<int64_t> & over, const Optional<int64_t> & under, int64_t storedOver,
                          bool overFeatureEnabled, int64_t storedUnder, bool underFeatureEnabled) -> Status {
         if (!over.HasValue() && !under.HasValue())
@@ -572,12 +572,14 @@ Status ElectricalAlarmCluster::HandleSetThresholds(const Commands::SetElectrical
     {
         return s;
     }
-    // PowerImport/Export: (0, 0) is valid quiescent state; otherwise import must be > export.
+    // PowerImportThreshold has constraint min maxOf(0, PowerExportThreshold + 1) and
+    // PowerExportThreshold has max minOf(0, PowerImportThreshold - 1), so import must exceed
+    // export with no exception for (0, 0).
     if (data.powerImportThreshold.HasValue() || data.powerExportThreshold.HasValue())
     {
         int64_t resolvedImport = data.powerImportThreshold.ValueOr(mPowerImportThreshold);
         int64_t resolvedExport = data.powerExportThreshold.ValueOr(mPowerExportThreshold);
-        if (!(resolvedImport == 0 && resolvedExport == 0) && resolvedImport <= resolvedExport)
+        if (resolvedImport <= resolvedExport)
         {
             return Status::ConstraintError;
         }
