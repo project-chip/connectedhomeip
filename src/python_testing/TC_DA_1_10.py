@@ -171,11 +171,8 @@ class TC_DA_1_10(MatterBaseTest):
 
         # Steps 11 and 12 need PAA certificates the DUT never supplies, so resolve the trust store
         # up front rather than failing once the retrieval work is already done.
-        paa_trust_store_path = self.matter_test_config.paa_trust_store_path
-        asserts.assert_is_not_none(paa_trust_store_path,
-                                   "--paa-trust-store-path is required: pre-condition 1 has the TH obtain the PAA "
-                                   "certificates for both the profile-selected and the legacy chain externally")
-        paa_candidates = load_paa_certificates(paa_trust_store_path)
+        # The runner supplies a default path when --paa-trust-store-path is omitted.
+        paa_candidates = load_paa_certificates(self.matter_test_config.paa_trust_store_path)
 
         self.step(0)
 
