@@ -16,13 +16,6 @@
 
 #pragma once
 
-#if defined(CONFIG_SOC_SERIES_SIWG917)
-
-// SiWx917 uses NWP RPS firmware upgrade instead of MCUboot DFU.
-#include <platform/silabs/zephyr/OTAImageProcessorImpl.h>
-
-#else
-
 #include <lib/core/OTAImageHeader.h>
 #include <lib/support/Span.h>
 #include <platform/OTAImageProcessor.h>
@@ -65,5 +58,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // CONFIG_SOC_SERIES_SIWG917

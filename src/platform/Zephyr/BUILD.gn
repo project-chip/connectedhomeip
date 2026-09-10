@@ -106,11 +106,8 @@ static_library("Zephyr") {
   }
 
   if (chip_enable_ota_requestor) {
-    if (chip_enable_siwx_ota) {
-      sources += [
-        "../silabs/zephyr/OTAImageProcessorImpl.cpp",
-        "../silabs/zephyr/OTAImageProcessorImpl.h",
-      ]
+    if (chip_zephyr_ota_image_processor != "") {
+      deps += [ chip_zephyr_ota_image_processor ]
     } else {
       sources += [
         "OTAImageProcessorImpl.cpp",
