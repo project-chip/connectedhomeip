@@ -155,8 +155,8 @@ public:
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
     void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override
     {
-        AppTaskCommon::sIsCommissioningFailed = true;
-        isComissioningStarted                 = false;
+        sIsCommissioningFailed = true;
+        isComissioningStarted  = false;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     void OnCommissioningWindowClosed() override

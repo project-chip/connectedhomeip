@@ -119,7 +119,7 @@ def main():
                         default="https://github.com/telink-semi/tl_ble_sdk_zephyr.git",
                         help="Repository URL for Telink BLE SDK (default: tl_ble_sdk_zephyr.git)")
     parser.add_argument("--sdk-hash",
-                        default="af03f86610f3de8b1f2c12215bbb21f5decf97e3",
+                        default="f50d422d780efb73af939650ef7b8c6bf5a0b99b",
                         help="Specific commit hash for BLE SDK")
     parser.add_argument("--skip-sdk",
                         action="store_true",

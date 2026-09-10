@@ -13,31 +13,23 @@
 		};
 		slot0_partition: partition@15000 {
 			label = "image-0";
-			reg = <0x15000 0xe5000>; // total slot0 is 916k
+			reg = <0x15000 0xee000>; // total slot0 is 952k (4k aligned)
 		};
-		slot1_partition: partition@fa000 {
+		slot1_partition: partition@103000 {
 			label = "image-1";
-			reg = <0xfa000 0xe6000>; // total slot1 is 920k
+			reg = <0x103000 0xef000>; // total slot1 is 956k (4k aligned)
 		};
-		user_rfu_partition: partition@1e0000 {
+		user_rfu_partition: partition@1f2000 {
  			label = "user_rfu";
-			reg = <0x1e0000 0x4000>;
+			reg = <0x1f2000 0x1000>;
  		};
-        storage_partition: partition@1e4000 {
+        storage_partition: partition@1f3000 {
 			label = "matter-nvs";
-			reg = <0x1e4000 0x8000>; // matter nvs part , total is 32k.
+			reg = <0x1f3000 0x8000>; // matter nvs part , total is 32k.
 		};
-        zigbee_nvs_partition: partition@1ec000 {
-			label = "zigbee-nvs";
-			reg = <0x1ec000 0xc000>; // zigbee nvs part , total is 48k.
-		};
-		secure_partition: partition@1f8000 {
+		secure_partition: partition@1fb000 {
  			label = "secure";
-			reg = <0x1f8000 0x1000>; // secure info ,reserved for secure boot .if not use , can beused by other way .
- 		};
-		user_config_partition: partition@1f9000 {
- 			label = "user_config";
-			reg = <0x1f9000 0x1000>; // user_config ,for the secure-boot sign logic changes ,it can release for user .
+			reg = <0x1fb000 0x1000>; // secure info ,reserved for secure boot .if not use , can beused by other way .
  		};
 		dac_keypair_partition: partition@1fc000 {
 			label = "dac-keypair";
