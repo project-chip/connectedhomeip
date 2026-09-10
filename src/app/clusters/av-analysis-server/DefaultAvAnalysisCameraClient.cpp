@@ -20,6 +20,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
+#include <app/server/Server.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 #include <clusters/CameraAvStreamManagement/Ids.h>
 #include <clusters/CameraAvStreamManagement/Structs.h>
@@ -28,6 +29,7 @@
 #include <clusters/shared/GlobalIds.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using chip::Protocols::InteractionModel::Status;
@@ -85,6 +87,27 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(Request::CommandType aCom
     VerifyOrReturnError(!mRequest.InFlight(), CHIP_ERROR_BUSY);
 
     mRequest.Begin(aCommandType, aVideoStreamId, aCallback);
+
+    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(aCameraNode.GetFabricIndex());
+    if (fabricInfo != nullptr && fabricInfo->GetNodeId() == aCameraNode.GetNodeId())
+    {
+        CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, aCommandType, aVideoStreamId]() {
+            static uint16_t sNextSelfAllocatedStreamId = 1;
+            uint16_t streamId =
+                (aCommandType == Request::CommandType::kVideoStreamAllocate) ? sNextSelfAllocatedStreamId++ : aVideoStreamId;
+            if (sNextSelfAllocatedStreamId == 0)
+            {
+                sNextSelfAllocatedStreamId = 1;
+            }
+            FinishRequest(Status::Success, streamId);
+        });
+        if (err != CHIP_NO_ERROR)
+        {
+            mRequest.Reset();
+            return err;
+        }
+        return CHIP_NO_ERROR;
+    }
 
     EstablishSession(aCameraNode);
     return CHIP_NO_ERROR;
