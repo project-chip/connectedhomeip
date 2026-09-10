@@ -65,6 +65,7 @@ import glob
 import logging
 import os
 import shlex
+import signal
 import subprocess
 import sys
 import tempfile
@@ -465,10 +466,20 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
                                 ed_discriminator, ed_passcode, storage_dir, net_ns)
 
         log.info("Running %s", shlex.join(cmd))
+        # Own session, so a timeout can take down the end device the script
+        # started as well. Killing only the script leaves that application
+        # running into the next test, still writing the shared /tmp files.
+        proc = subprocess.Popen(cmd, cwd=DEFAULT_CHIP_ROOT, start_new_session=True)
         try:
-            return subprocess.run(cmd, check=False, cwd=DEFAULT_CHIP_ROOT, timeout=timeout).returncode
+            return proc.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
             log.error("%s did not finish within %d s", script, timeout)
+            for sig in (signal.SIGTERM, signal.SIGKILL):
+                with contextlib.suppress(ProcessLookupError):
+                    os.killpg(os.getpgid(proc.pid), sig)
+                with contextlib.suppress(subprocess.TimeoutExpired):
+                    proc.wait(timeout=5)
+                    break
             return 1
 
 
