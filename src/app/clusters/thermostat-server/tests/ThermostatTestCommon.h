@@ -495,6 +495,12 @@ public:
 
     CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index, ThermostatSuggestionStructWithOwnedMembers & suggestion) override
     {
+        mGetThermostatSuggestionAtIndexCallCount++;
+        if (mFailGetThermostatSuggestionAtIndexOnCall.has_value() &&
+            mGetThermostatSuggestionAtIndexCallCount == *mFailGetThermostatSuggestionAtIndexOnCall)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
         if (index >= mSuggestions.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -535,6 +541,12 @@ public:
 
     CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t index) override
     {
+        mRemoveFromThermostatSuggestionsListCallCount++;
+        if (mFailRemoveFromThermostatSuggestionsListOnCall.has_value() &&
+            mRemoveFromThermostatSuggestionsListCallCount == *mFailRemoveFromThermostatSuggestionsListOnCall)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
         if (index >= mSuggestions.size())
         {
             return CHIP_ERROR_NOT_FOUND;
@@ -567,6 +579,16 @@ public:
     bool mFailGetUniqueID   = false;
     bool mFailAppend        = false;
     bool mReEvaluateCalled  = false;
+    // When set, the Nth call (1-based, across all indices) to GetThermostatSuggestionAtIndex() returns
+    // CHIP_ERROR_INTERNAL instead of consulting mSuggestions. Used to simulate a transient delegate enumeration
+    // failure at a specific point in a caller's scan.
+    size_t mGetThermostatSuggestionAtIndexCallCount = 0;
+    std::optional<size_t> mFailGetThermostatSuggestionAtIndexOnCall;
+    // When set, the Nth call (1-based) to RemoveFromThermostatSuggestionsList() returns CHIP_ERROR_INTERNAL instead
+    // of removing the entry. Used to simulate a transient delegate removal failure partway through a caller's
+    // removal loop.
+    size_t mRemoveFromThermostatSuggestionsListCallCount = 0;
+    std::optional<size_t> mFailRemoveFromThermostatSuggestionsListOnCall;
     std::vector<ThermostatSuggestionStructWithOwnedMembers> mSuggestions;
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> mCurrentSuggestion    = DataModel::NullNullable;
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mNotFollowingReason = DataModel::NullNullable;
