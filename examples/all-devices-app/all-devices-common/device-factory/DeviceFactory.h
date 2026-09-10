@@ -354,7 +354,7 @@ private:
         {
             RegisterCreator("color-temperature-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
+                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -452,7 +452,7 @@ private:
         {
             RegisterCreator("extended-color-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingExtendedColorLight>(LoggingExtendedColorLight::Context{
+                return MakeDevice<LoggingExtendedColorLight>(LoggingExtendedColorLight::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
