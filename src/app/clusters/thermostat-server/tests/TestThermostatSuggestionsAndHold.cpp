@@ -31,6 +31,7 @@ using namespace chip::app::Clusters::Thermostat::Commands;
 using namespace chip::Protocols::InteractionModel;
 using namespace chip::System::Clock;
 using namespace chip::Testing;
+using chip::app::Clusters::Globals::AtomicRequestTypeEnum;
 
 namespace {
 
@@ -237,6 +238,211 @@ TEST_F(ThermostatTestFixture, TestSuggestionsAttributesAndAddRemoveCommands)
     removeCmd.uniqueID = 0xFE;
     removeResult       = tester.Invoke(removeCmd);
     EXPECT_EQ(removeResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatTestFixture, TestPresetRemovalCascadesToStaleSuggestion)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kThermostatSuggestions);
+
+    // Two presets: A survives the atomic write below, B does not. Both are pre-existing (committed) presets, so
+    // BuiltIn must be non-null on both them and their replacements below, per AppendPendingPreset's built-in
+    // consistency check.
+    PresetStructWithOwnedMembers presetA;
+    presetA.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handleA[4] = { 1, 1, 1, 1 };
+    EXPECT_EQ(presetA.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handleA))), CHIP_NO_ERROR);
+    presetA.SetBuiltIn(DataModel::MakeNullable(true));
+    mPresetsDelegate.mPresets.push_back(presetA);
+
+    PresetStructWithOwnedMembers presetB;
+    presetB.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handleB[4] = { 2, 2, 2, 2 };
+    EXPECT_EQ(presetB.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handleB))), CHIP_NO_ERROR);
+    presetB.SetBuiltIn(DataModel::MakeNullable(false));
+    mPresetsDelegate.mPresets.push_back(presetB);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    // A suggestion referencing preset B, and it is the current suggestion.
+    ThermostatSuggestionStructWithOwnedMembers suggestion;
+    suggestion.SetUniqueID(7);
+    EXPECT_EQ(suggestion.SetPresetHandle(ByteSpan(handleB)), CHIP_NO_ERROR);
+    suggestion.SetEffectiveTime(Seconds32(0));
+    suggestion.SetExpirationTime(Seconds32(1000000));
+    mSuggestionsDelegate.mSuggestions.push_back(suggestion);
+    mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(suggestion);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate, mSuggestionsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Remove preset B by committing a Presets atomic write that only re-lists preset A.
+    Commands::AtomicRequest::Type beginReq;
+    beginReq.requestType        = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Attributes::Presets::Id };
+    beginReq.attributeRequests  = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    beginReq.timeout            = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+    ASSERT_TRUE(tester.Invoke(beginReq).IsSuccess());
+
+    Structs::PresetStruct::Type keepA;
+    keepA.presetScenario                  = PresetScenarioEnum::kOccupied;
+    keepA.presetHandle                    = DataModel::MakeNullable(ByteSpan(handleA));
+    keepA.builtIn                         = DataModel::MakeNullable(true);
+    Structs::PresetStruct::Type newList[] = { keepA };
+    auto listPayload                      = DataModel::List<const Structs::PresetStruct::Type>(newList, 1);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Presets::Id, listPayload, ListWritingPattern::ReplaceAll), Status::Success);
+
+    Commands::AtomicRequest::Type commitReq;
+    commitReq.requestType       = AtomicRequestTypeEnum::kCommitWrite;
+    commitReq.attributeRequests = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    ASSERT_TRUE(tester.Invoke(commitReq).IsSuccess());
+
+    // The stale suggestion referencing the removed preset B is gone, and CurrentThermostatSuggestion is null
+    // (there is nothing left to pick as a replacement), with both attributes reported dirty.
+    EXPECT_EQ(mSuggestionsDelegate.mSuggestions.size(), 0u);
+    EXPECT_TRUE(mSuggestionsDelegate.mCurrentSuggestion.IsNull());
+    EXPECT_TRUE(tester.IsAttributeDirty(Attributes::ThermostatSuggestions::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(CurrentThermostatSuggestion::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatTestFixture, TestPresetRemovalLeavesSurvivingPresetSuggestionAlone)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kThermostatSuggestions);
+
+    PresetStructWithOwnedMembers presetA;
+    presetA.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handleA[4] = { 1, 1, 1, 1 };
+    EXPECT_EQ(presetA.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handleA))), CHIP_NO_ERROR);
+    presetA.SetBuiltIn(DataModel::MakeNullable(true));
+    mPresetsDelegate.mPresets.push_back(presetA);
+
+    PresetStructWithOwnedMembers presetB;
+    presetB.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handleB[4] = { 2, 2, 2, 2 };
+    EXPECT_EQ(presetB.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handleB))), CHIP_NO_ERROR);
+    presetB.SetBuiltIn(DataModel::MakeNullable(false));
+    mPresetsDelegate.mPresets.push_back(presetB);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    // The only suggestion references the surviving preset A.
+    ThermostatSuggestionStructWithOwnedMembers suggestion;
+    suggestion.SetUniqueID(9);
+    EXPECT_EQ(suggestion.SetPresetHandle(ByteSpan(handleA)), CHIP_NO_ERROR);
+    suggestion.SetEffectiveTime(Seconds32(0));
+    suggestion.SetExpirationTime(Seconds32(1000000));
+    mSuggestionsDelegate.mSuggestions.push_back(suggestion);
+    mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(suggestion);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate, mSuggestionsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Remove preset B, leaving A (and its suggestion) untouched.
+    Commands::AtomicRequest::Type beginReq;
+    beginReq.requestType        = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Attributes::Presets::Id };
+    beginReq.attributeRequests  = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    beginReq.timeout            = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+    ASSERT_TRUE(tester.Invoke(beginReq).IsSuccess());
+
+    Structs::PresetStruct::Type keepA;
+    keepA.presetScenario                  = PresetScenarioEnum::kOccupied;
+    keepA.presetHandle                    = DataModel::MakeNullable(ByteSpan(handleA));
+    keepA.builtIn                         = DataModel::MakeNullable(true);
+    Structs::PresetStruct::Type newList[] = { keepA };
+    auto listPayload                      = DataModel::List<const Structs::PresetStruct::Type>(newList, 1);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Presets::Id, listPayload, ListWritingPattern::ReplaceAll), Status::Success);
+
+    Commands::AtomicRequest::Type commitReq;
+    commitReq.requestType       = AtomicRequestTypeEnum::kCommitWrite;
+    commitReq.attributeRequests = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    ASSERT_TRUE(tester.Invoke(commitReq).IsSuccess());
+
+    ASSERT_EQ(mSuggestionsDelegate.mSuggestions.size(), 1u);
+    EXPECT_EQ(mSuggestionsDelegate.mSuggestions[0].GetUniqueID(), 9);
+    ASSERT_FALSE(mSuggestionsDelegate.mCurrentSuggestion.IsNull());
+    EXPECT_EQ(mSuggestionsDelegate.mCurrentSuggestion.Value().GetUniqueID(), 9);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeAbortsOnEnumerationFailure)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kThermostatSuggestions);
+
+    PresetStructWithOwnedMembers presetA;
+    presetA.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handleA[4] = { 1, 1, 1, 1 };
+    EXPECT_EQ(presetA.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handleA))), CHIP_NO_ERROR);
+    presetA.SetBuiltIn(DataModel::MakeNullable(true));
+    mPresetsDelegate.mPresets.push_back(presetA);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    // A suggestion referencing a preset that will no longer exist after the atomic write below.
+    uint8_t handleB[4] = { 2, 2, 2, 2 };
+    ThermostatSuggestionStructWithOwnedMembers suggestion;
+    suggestion.SetUniqueID(3);
+    EXPECT_EQ(suggestion.SetPresetHandle(ByteSpan(handleB)), CHIP_NO_ERROR);
+    suggestion.SetEffectiveTime(Seconds32(0));
+    suggestion.SetExpirationTime(Seconds32(1000000));
+    mSuggestionsDelegate.mSuggestions.push_back(suggestion);
+    mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(suggestion);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate, mSuggestionsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::AtomicRequest::Type beginReq;
+    beginReq.requestType        = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Attributes::Presets::Id };
+    beginReq.attributeRequests  = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    beginReq.timeout            = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+    ASSERT_TRUE(tester.Invoke(beginReq).IsSuccess());
+
+    Structs::PresetStruct::Type keepA;
+    keepA.presetScenario                  = PresetScenarioEnum::kOccupied;
+    keepA.presetHandle                    = DataModel::MakeNullable(ByteSpan(handleA));
+    keepA.builtIn                         = DataModel::MakeNullable(true);
+    Structs::PresetStruct::Type newList[] = { keepA };
+    auto listPayload                      = DataModel::List<const Structs::PresetStruct::Type>(newList, 1);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Presets::Id, listPayload, ListWritingPattern::ReplaceAll), Status::Success);
+
+    // The Presets commit itself will enumerate the (now single-entry) committed list cleanly; only fail the
+    // first call the cascade's own scan makes afterwards, to exercise its abort-on-error path specifically
+    // rather than an unrelated failure earlier in PrecommitPresets' own enumeration.
+    mPresetsDelegate.mFailGetPresetAtIndexOnCall = 4;
+
+    Commands::AtomicRequest::Type commitReq;
+    commitReq.requestType       = AtomicRequestTypeEnum::kCommitWrite;
+    commitReq.attributeRequests = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    ASSERT_TRUE(tester.Invoke(commitReq).IsSuccess());
+
+    // The Presets commit itself succeeded; the cascade aborted on the enumeration failure without removing
+    // anything, rather than treating the failure as "preset not found" and dropping the suggestion.
+    ASSERT_EQ(mPresetsDelegate.mPresets.size(), 1u);
+    EXPECT_EQ(mSuggestionsDelegate.mSuggestions.size(), 1u);
+    EXPECT_FALSE(mSuggestionsDelegate.mCurrentSuggestion.IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

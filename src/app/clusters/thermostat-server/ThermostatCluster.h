@@ -353,6 +353,18 @@ public:
         {
             if (auto status = mPresets.OnAtomicWriteCommit(attributeId))
             {
+                if constexpr (kHasSuggestions)
+                {
+                    // Per spec § 4.3.11.50, removing a preset that is referenced by a ThermostatSuggestions entry
+                    // or by CurrentThermostatSuggestion must cascade: prune the stale suggestion entries and
+                    // re-evaluate CurrentThermostatSuggestion. This is best-effort since the Presets commit above
+                    // has already taken effect.
+                    if (*status == Protocols::InteractionModel::Status::Success && attributeId == Attributes::Presets::Id)
+                    {
+                        mSuggestions.RemoveThermostatSuggestionsForRemovedPresets();
+                        mSuggestions.ReEvaluateCurrentSuggestion();
+                    }
+                }
                 return *status;
             }
         }
