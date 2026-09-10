@@ -44,10 +44,10 @@ import time
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -57,35 +57,30 @@ OBJECT_IDENTIFICATION_NAMESPACE_ID = 73  # 0x49
 SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 
 # Script Function Call Example
-# ./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters/chip-all-clusters-app --factory-reset
-# --app-args "--KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_2" --script src/python_testing/TC_ACS_3_2.py
-# --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
+# python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices-clang/all-devices-app --factory-reset
+# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_2"
+# --script src/python_testing/TC_ACS_3_2.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
-
 class TC_ACS_3_2(MatterBaseTest):
-    def desc_TC_ACS_3_2(self) -> str:
-        return "[TC-ACS-3.2] Same Continuous Detection and HoldTimeMax Functionality with DUT as a server"
 
-    def pics_TC_ACS_3_2(self):
-        return ["ACS.S"]
-
-    def steps_TC_ACS_3_2(self) -> list[TestStep]:
-        return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false"),
-            TestStep("3", "TH writes DUT HoldTime attribute to enable proper testing completion."),
-            TestStep("4", "Trigger one of DUT supporting ambient sensing features"),
-            TestStep("5", "TH reads the AmbientContextType attribute.",
-                     "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID of test step 4"),
-            TestStep("6", "Within HoldTime duration of the step 4, trigger the DUT with the same ambient sensing feature."),
-            TestStep("7", "TH reads the AmbientContextType attribute.",
-                     "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID from the step 6.",
-                     "Verify that DUT response contains the size of AmbientContextType list is 1."),
-            TestStep("8", "Wait until HoldTime seconds are passed from the step 4 execution."),
-            TestStep("9", "TH reads the AmbientContextType attribute and check a Boolean attribute related to the step 6.",
-                     "Verify that DUT response contains the Boolean attribute (HumanActivityDetected, ObjectIdentified, AudioContextDetected) is read False.")
-        ]
+    @pics('ACS.S')
+    @async_test_body
+    async def test_TC_ACS_3_2(self):
+        """[TC-ACS-3.2] Cluster endpoint"""
+        self.step(1, "Commissioning, already done", is_commissioning=True)
+        self.step(2, "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false")
+        self.step(3, "TH writes DUT HoldTime attribute to enable proper testing completion.")
+        self.step(4, "Trigger one of DUT supporting ambient sensing features")
+        self.step(5, "TH reads the AmbientContextType attribute.",
+                 "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID of test step 4")
+        self.step(6, "Within HoldTime duration of the step 4, trigger the DUT with the same ambient sensing feature.")
+        self.step(7, "TH reads the AmbientContextType attribute.",
+                 "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID from the step 6.",
+                 "Verify that DUT response contains the size of AmbientContextType list is 1.")
+        self.step(8, "Wait until HoldTime seconds are passed from the step 4 execution.")
+        self.step(9, "TH reads the AmbientContextType attribute and check a Boolean attribute related to the step 6.",
+                 "Verify that DUT response contains the Boolean attribute (HumanActivityDetected, ObjectIdentified, AudioContextDetected) is read False.")
 
     def setup_test(self):
         super().setup_test()
