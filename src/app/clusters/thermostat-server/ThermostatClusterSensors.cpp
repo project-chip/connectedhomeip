@@ -27,7 +27,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-constexpr size_t kMaxSensorsListLength = 32;
+constexpr size_t kMaxSensorsListLength  = 32;
 constexpr size_t kMaxSensorHandleLength = 16;
 
 using namespace chip::app::Clusters::Thermostat;
@@ -316,7 +316,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(c
             Attributes::EnabledSensors::TypeInfo::DecodableType newEnabledSensorsList;
             ReturnErrorOnFailure(decoder.Decode(newEnabledSensorsList));
 
-            ByteSpan handles[   kMaxSensorsListLength];
+            ByteSpan handles[kMaxSensorsListLength];
             size_t numHandles = 0;
             auto iter         = newEnabledSensorsList.begin();
             while (iter.Next())
