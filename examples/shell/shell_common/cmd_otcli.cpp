@@ -190,11 +190,11 @@ void cmd_otcli_init()
     otCliConsoleInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
 #endif // OPENTHREAD_API_VERSION >= 85
 #endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#endif // CHIP_TARGET_STYLE_EMBEDDED otcli init
 
-    // Register the root otcli command with the top-level shell.
-    Engine::Root().RegisterCommands(&cmds_otcli_root, 1);
-
-#elif CHIP_TARGET_STYLE_UNIX
+#if (CHIP_TARGET_STYLE_EMBEDDED &&                                                                                                 \
+     (CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI || (defined(CONFIG_OPENTHREAD_SHELL) && CONFIG_OPENTHREAD_SHELL))) ||                   \
+    CHIP_TARGET_STYLE_UNIX
     // Register the root otcli command with the top-level shell.
     Engine::Root().RegisterCommands(&cmds_otcli_root, 1);
 #endif
