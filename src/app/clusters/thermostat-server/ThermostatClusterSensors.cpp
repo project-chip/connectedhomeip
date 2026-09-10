@@ -27,6 +27,9 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+constexpr size_t kMaxSensorsListLength = 32;
+constexpr size_t kMaxSensorHandleLength = 16;
+
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using Protocols::InteractionModel::Status;
@@ -76,6 +79,11 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(co
         return encoder.EncodeList([this](const auto & enc) -> CHIP_ERROR {
             for (size_t i = 0; true; i++)
             {
+                if (i >= kMaxSensorsListLength)
+                {
+                    ChipLogError(Zcl, "[Sensors] GetSensorAtIndex exceeds max number of sensors");
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
                 ThermostatSensorStructWithOwnedMembers sensor;
                 CHIP_ERROR err = mDelegate.GetSensorAtIndex(i, sensor);
                 if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -91,6 +99,11 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(co
         return encoder.EncodeList([this](const auto & enc) -> CHIP_ERROR {
             for (size_t i = 0; true; i++)
             {
+                if (i >= kMaxSensorsListLength)
+                {
+                    ChipLogError(Zcl, "[Sensors] GetAvailableSensorAtIndex exceeds max number of sensors");
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
                 ByteSpan handle;
                 CHIP_ERROR err = mDelegate.GetAvailableSensorAtIndex(i, handle);
                 if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -106,6 +119,11 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(co
         return encoder.EncodeList([this](const auto & enc) -> CHIP_ERROR {
             for (size_t i = 0; true; i++)
             {
+                if (i >= kMaxSensorsListLength)
+                {
+                    ChipLogError(Zcl, "[Sensors] GetEnabledSensorAtIndex exceeds max number of sensors");
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
                 ByteSpan handle;
                 CHIP_ERROR err = mDelegate.GetEnabledSensorAtIndex(i, handle);
                 if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -170,17 +188,17 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(c
             Attributes::AvailableSensors::TypeInfo::DecodableType newAvailableSensorsList;
             ReturnErrorOnFailure(decoder.Decode(newAvailableSensorsList));
 
-            ByteSpan handles[32];
+            ByteSpan handles[kMaxSensorsListLength];
             size_t numHandles = 0;
             auto iter         = newAvailableSensorsList.begin();
             while (iter.Next())
             {
-                if (numHandles >= 32)
+                if (numHandles >= kMaxSensorsListLength)
                 {
                     return Status::ConstraintError;
                 }
                 const auto & handle = iter.GetValue();
-                if (handle.size() > 16 || !IsSensorHandleConfigured(handle))
+                if (handle.size() > kMaxSensorHandleLength || !IsSensorHandleConfigured(handle))
                 {
                     return Status::ConstraintError;
                 }
@@ -201,7 +219,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(c
             }
 
             // Removing a sensor from AvailableSensors automatically removes it from EnabledSensors
-            ByteSpan filteredEnabled[32];
+            ByteSpan filteredEnabled[kMaxSensorsListLength];
             size_t numFilteredEnabled = 0;
             bool enabledChanged       = false;
 
@@ -226,7 +244,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(c
                 }
                 if (foundInAvailable)
                 {
-                    if (numFilteredEnabled < 32)
+                    if (numFilteredEnabled < kMaxSensorsListLength)
                     {
                         filteredEnabled[numFilteredEnabled++] = enabledHandle;
                     }
@@ -252,12 +270,12 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(c
             ByteSpan handle;
             ReturnErrorOnFailure(decoder.Decode(handle));
 
-            if (handle.size() > 16 || !IsSensorHandleConfigured(handle))
+            if (handle.size() > kMaxSensorHandleLength || !IsSensorHandleConfigured(handle))
             {
                 return Status::ConstraintError;
             }
 
-            ByteSpan currentHandles[32];
+            ByteSpan currentHandles[kMaxSensorsListLength];
             size_t numHandles = 0;
             for (size_t i = 0; true; i++)
             {
@@ -272,13 +290,13 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(c
                 {
                     return Status::ConstraintError;
                 }
-                if (numHandles < 32)
+                if (numHandles < kMaxSensorsListLength)
                 {
                     currentHandles[numHandles++] = existingHandle;
                 }
             }
 
-            if (numHandles >= 32)
+            if (numHandles >= kMaxSensorsListLength)
             {
                 return Status::ConstraintError;
             }
@@ -298,17 +316,17 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(c
             Attributes::EnabledSensors::TypeInfo::DecodableType newEnabledSensorsList;
             ReturnErrorOnFailure(decoder.Decode(newEnabledSensorsList));
 
-            ByteSpan handles[32];
+            ByteSpan handles[   kMaxSensorsListLength];
             size_t numHandles = 0;
             auto iter         = newEnabledSensorsList.begin();
             while (iter.Next())
             {
-                if (numHandles >= 32)
+                if (numHandles >= kMaxSensorsListLength)
                 {
                     return Status::ConstraintError;
                 }
                 const auto & handle = iter.GetValue();
-                if (handle.size() > 16 || !IsSensorHandleAvailable(handle))
+                if (handle.size() > kMaxSensorHandleLength || !IsSensorHandleAvailable(handle))
                 {
                     // Can't enable sensors that aren't available
                     return Status::ConstraintError;
@@ -336,12 +354,12 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(c
             ByteSpan handle;
             ReturnErrorOnFailure(decoder.Decode(handle));
 
-            if (handle.size() > 16 || !IsSensorHandleAvailable(handle))
+            if (handle.size() > kMaxSensorHandleLength || !IsSensorHandleAvailable(handle))
             {
                 return Status::ConstraintError;
             }
 
-            ByteSpan currentHandles[32];
+            ByteSpan currentHandles[kMaxSensorsListLength];
             size_t numHandles = 0;
             for (size_t i = 0; true; i++)
             {
@@ -356,13 +374,13 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(c
                 {
                     return Status::ConstraintError;
                 }
-                if (numHandles < 32)
+                if (numHandles < kMaxSensorsListLength)
                 {
                     currentHandles[numHandles++] = existingHandle;
                 }
             }
 
-            if (numHandles >= 32)
+            if (numHandles >= kMaxSensorsListLength)
             {
                 return Status::ConstraintError;
             }
@@ -472,17 +490,17 @@ CHIP_ERROR ThermostatSensors::AppendPendingSensorScheduleTransition(
                         ChipLogError(Zcl, "SensorSchedule transition time %u exceeds 1439", newTransition.transitionTime));
 
     // 3. Validate EnabledSensors: each handle must be in AvailableSensors
-    ByteSpan handles[32];
+    ByteSpan handles[kMaxSensorsListLength];
     size_t numHandles = 0;
     auto iter         = newTransition.enabledSensors.begin();
     while (iter.Next())
     {
-        if (numHandles >= 32)
+        if (numHandles >= kMaxSensorsListLength)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         const auto & handle = iter.GetValue();
-        if (handle.size() > 16 || !IsSensorHandleAvailable(handle))
+        if (handle.size() > kMaxSensorHandleLength || !IsSensorHandleAvailable(handle))
         {
             ChipLogError(Zcl, "SensorSchedule transition enabledSensor handle is invalid or not in AvailableSensors");
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
@@ -546,14 +564,14 @@ ThermostatSensors::AppendPendingSensorScheduleTransition(const Structs::SensorSc
                         ChipLogError(Zcl, "SensorSchedule transition time %u exceeds 1439", newTransition.transitionTime));
 
     // 3. Validate EnabledSensors: each handle must be in AvailableSensors
-    if (newTransition.enabledSensors.size() > 32)
+    if (newTransition.enabledSensors.size() > kMaxSensorsListLength)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
     for (size_t i = 0; i < newTransition.enabledSensors.size(); i++)
     {
         const auto & handle = newTransition.enabledSensors[i];
-        if (handle.size() > 16 || !IsSensorHandleAvailable(handle))
+        if (handle.size() > kMaxSensorHandleLength || !IsSensorHandleAvailable(handle))
         {
             ChipLogError(Zcl, "SensorSchedule transition enabledSensor handle is invalid or not in AvailableSensors");
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
