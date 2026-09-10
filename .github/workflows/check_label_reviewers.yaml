@@ -72,6 +72,18 @@ jobs:
             echo "sync_labels=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Fetch PR Configuration
+        if: steps.params.outputs.pr_number != ''
+        run: |
+          git fetch origin "refs/pull/${{ steps.params.outputs.pr_number }}/head" --depth=1
+          git checkout FETCH_HEAD -- .github/label_reviewers.yaml || true
+
+      - name: Validate Configuration File
+        run: |
+          python3 scripts/tools/check_label_reviewers.py \
+            --config .github/label_reviewers.yaml \
+            --validate-config
+
       - name: Execute SME Reviewer Check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -302,6 +302,11 @@ def main() -> int:
         help="Ensure all configured labels exist on GitHub, creating any that are missing.",
     )
     parser.add_argument(
+        "--validate-config",
+        action="store_true",
+        help="Validate the syntax and format of the configuration file and exit.",
+    )
+    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
@@ -325,6 +330,12 @@ def main() -> int:
     logging.info(f"Configured labels with SME reviewers ({len(config_mapping)}):")
     for key, rule in config_mapping.items():
         logging.debug(f"  - '{rule.display_name}': {sorted(rule.smes)}")
+
+    if args.validate_config:
+        print(
+            f"✅ Configuration in {args.config} is valid ({len(config_mapping)} label(s) configured)."
+        )
+        return 0
 
     if args.sync_labels:
         logging.info(f"Syncing labels from {args.config} to repository {args.repo}...")
