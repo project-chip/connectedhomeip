@@ -23,7 +23,6 @@
 
 #include <cstdlib>
 
-
 int main()
 {
     const CHIP_ERROR err = chip::app::AllDevices::GetAppTask().Run();
