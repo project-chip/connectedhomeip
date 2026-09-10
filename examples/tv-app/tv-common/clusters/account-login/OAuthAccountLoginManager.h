@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,45 +20,53 @@
 
 #include <app/clusters/account-login-server/account-login-server.h>
 
-#include <app/util/af-types.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
+#include <system/SystemClock.h>
+#include <system/SystemLayer.h>
 
 using chip::CharSpan;
 using chip::app::CommandResponseHelper;
-using chip::Platform::CopyString;
 using AccountLoginDelegate     = chip::app::Clusters::AccountLogin::Delegate;
 using GetSetupPINResponse      = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
 using GetDeviceAuthURIResponse = chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Type;
 
-class AccountLoginManager : public AccountLoginDelegate
+// AccountLogin delegate for a fake Content App that only supports the OAuth 2.0
+// Device Authorization Grant flow. PIN-based login (GetSetupPIN/Login) is
+// deliberately disabled: Login always fails and GetSetupPIN returns an inert
+// placeholder. Requesting the device auth URI starts logged-out and flips
+// OAuthLoggedIn to true on its own a few seconds later, simulating a user
+// completing the out-of-band OAuth flow.
+class DLL_EXPORT OAuthAccountLoginManager : public AccountLoginDelegate
 {
 public:
-    AccountLoginManager() : AccountLoginManager("tempPin123"){};
-    AccountLoginManager(const char * setupPin);
-
-    inline void SetSetupPin(char * setupPin) override { CopyString(mSetupPin, sizeof(mSetupPin), setupPin); };
+    inline void SetSetupPin(char * setupPin) override{};
 
     bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString,
                      const chip::Optional<chip::NodeId> & nodeId) override;
     bool HandleLogout(const chip::Optional<chip::NodeId> & nodeId) override;
     void HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                            const CharSpan & tempAccountIdentifierString) override;
-    inline void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override
-    {
-        CopyString(setupPin, setupPinSize, mSetupPin);
-    };
+    inline void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override{};
 
     void HandleGetDeviceAuthURI(CommandResponseHelper<GetDeviceAuthURIResponse> & helper) override;
     bool GetOAuthLoggedIn(chip::EndpointId endpoint) override { return mOAuthLoggedIn; };
 
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
-    uint32_t GetFeatureMap(chip::EndpointId endpoint) override { return 0; };
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
-protected:
-    static const size_t kSetupPinSize = 12;
-    char mSetupPin[kSetupPinSize];
-    bool mOAuthLoggedIn = false;
+    // Not part of the AccountLogin::Delegate contract. ContentAppImpl calls this
+    // once the app-platform assigns this app's dynamic endpoint, so the delayed
+    // login callback can report the attribute change on the right endpoint.
+    void SetEndpointId(chip::EndpointId endpoint) { mEndpointId = endpoint; };
+
+    ~OAuthAccountLoginManager() override;
 
 private:
-    // TODO: set this based upon meta data from app
-    static constexpr uint16_t kClusterRevision = 3;
+    static constexpr uint32_t kLoginDelaySeconds = 5;
+
+    static void SimulateAsyncLoginSuccess(chip::System::Layer * systemLayer, void * context);
+
+    bool mOAuthLoggedIn          = false;
+    chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
 };
