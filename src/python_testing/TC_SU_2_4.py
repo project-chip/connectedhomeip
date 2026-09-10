@@ -57,7 +57,7 @@ from TC_SUTestBase import SoftwareUpdateBaseTest
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import async_test_body
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -183,14 +183,6 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         controller = self.default_controller
 
         self.step(1)
-        # Watch UpdateState too as a safety net against missing a fast Querying -> Downloading transition.
-        update_state_attr_handler = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        )
-        await update_state_attr_handler.start(dev_ctrl=controller, node_id=self.requestor_node_id, endpoint=0,
-                                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-
         # Subscribe to StateTransition events so we can confirm each stage of the flow.
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
@@ -233,7 +225,6 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
             expected_target_version=self.expected_software_version)
 
         state_transition_event_handler.cancel()
-        update_state_attr_handler.cancel()
 
         # Small pause to avoid a race against the named pipes after the state transition.
         await asyncio.sleep(2)
