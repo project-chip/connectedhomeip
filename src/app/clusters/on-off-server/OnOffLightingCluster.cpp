@@ -170,7 +170,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::WriteAttribute(const DataMod
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnValue(mOnTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
-        if (abs(mOnTime - value) > mValueDeltaReportTrigger)
+        if (abs(mOnTime - value) > kValueDeltaReportTrigger || value == 0)
         {
             NotifyAttributeChanged(request.path.mAttributeId);
         }
@@ -184,7 +184,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::WriteAttribute(const DataMod
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnValue(mOffWaitTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
-        if (abs(mOffWaitTime - value) > mValueDeltaReportTrigger)
+        if (abs(mOffWaitTime - value) > kValueDeltaReportTrigger || value == 0)
         {
             NotifyAttributeChanged(request.path.mAttributeId);
         }
@@ -232,7 +232,7 @@ void OnOffLightingCluster::SetOnTime(uint16_t value)
 {
     VerifyOrReturn(mOnTime != value);
 
-    if (abs(mOnTime - value) > mValueDeltaReportTrigger || value == 0)
+    if (abs(mOnTime - value) > kValueDeltaReportTrigger || value == 0)
     {
         NotifyAttributeChanged(Attributes::OnTime::Id);
     }
@@ -245,7 +245,7 @@ void OnOffLightingCluster::SetOffWaitTime(uint16_t value)
 {
     VerifyOrReturn(mOffWaitTime != value);
 
-    if (abs(mOffWaitTime - value) > mValueDeltaReportTrigger || value == 0)
+    if (abs(mOffWaitTime - value) > kValueDeltaReportTrigger || value == 0)
     {
         NotifyAttributeChanged(Attributes::OffWaitTime::Id);
     }
