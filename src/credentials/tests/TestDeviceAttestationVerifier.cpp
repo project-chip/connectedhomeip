@@ -246,3 +246,28 @@ TEST_F(TestDeviceAttestationVerifier, VerifyAttestationInformationNullCompletion
     // Must return without dereferencing the null callback (previously a null-pointer crash).
     verifier.VerifyAttestationInformation(invalidInfo, nullptr);
 }
+
+TEST_F(TestDeviceAttestationVerifier, VerifyAttestationInformationRejectsUnsupportedPqcProfiles)
+{
+    static uint8_t testData[1]        = { 0x01 };
+    static const ByteSpan certSpans[] = { ByteSpan(testData) };
+    ArrayAttestationTrustStore trustStore(certSpans, 1);
+    DefaultDACVerifier verifier(&trustStore);
+
+    DeviceAttestationVerifier::AttestationInfo pqcInfo(ByteSpan(testData), ByteSpan(testData), ByteSpan(testData),
+                                                       ByteSpan(testData), ByteSpan(testData), ByteSpan(testData), VendorId(0x1234),
+                                                       0x5678, DeviceAttestationCertProfile::kMlDsa44);
+
+    AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
+    chip::Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
+        [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult verificationResult) {
+            auto * resultPtr = static_cast<AttestationVerificationResult *>(context);
+            *resultPtr       = verificationResult;
+        },
+        &result);
+
+    verifier.VerifyAttestationInformation(pqcInfo, &callback);
+    EXPECT_EQ(result,
+              Crypto::IsMlDsa44Supported() ? AttestationVerificationResult::kPaiFormatInvalid
+                                           : AttestationVerificationResult::kNotImplemented);
+}

@@ -463,6 +463,7 @@ const char * sDeviceOptionHelp =
 #endif
     "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+    "       PQC Device Attestation is enabled automatically when the provider reports compatible credentials.\n"
 #if CHIP_ATTESTATION_TRUSTY_OS
     "  --dac_provider_trusty\n"
     "       Invoke Trusty OS to get device attestation from secure storage.\n"
@@ -907,10 +908,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif
     case kDeviceOption_DacProvider: {
         LinuxDeviceOptions::GetInstance().dacProviderFile.SetValue(aValue);
-        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
-        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
-
-        LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
         break;
     }
 #if CHIP_ATTESTATION_TRUSTY_OS
@@ -1055,10 +1052,23 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
 
 LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
 {
-    if (gDeviceOptions.dacProvider == nullptr)
+    return gDeviceOptions;
+}
+
+void ResolveDeviceAttestationCredentialsProvider()
+{
+    if (gDeviceOptions.dacProvider != nullptr)
     {
-        gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
+        return;
     }
 
-    return gDeviceOptions;
+    if (gDeviceOptions.dacProviderFile.HasValue())
+    {
+        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
+        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
+        gDeviceOptions.dacProvider = &testDacProvider;
+        return;
+    }
+
+    gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
 }
