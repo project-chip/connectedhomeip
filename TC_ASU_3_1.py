@@ -40,10 +40,10 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_cluster, pics, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -57,45 +57,26 @@ log = logging.getLogger(__name__)
 
 
 class TC_ASU_3_1(MatterBaseTest):
-    def desc_TC_ASU_3_1(self) -> str:
-        return "[TC-ASU-3.1] Subscription Report Verification with DUT as a server"
-
-    def pics_TC_ASU_3_1(self):
-        return ["ASU.S"]
-
-    def steps_TC_ASU_3_1(self) -> list[TestStep]:
-        return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH establishes a wildcard subscription to all attributes on Ambient Sensing Union Cluster on the endpoint under test."),
-            TestStep("3", "Change UnionName attribute."),
-            TestStep("4", "TH awaits a ReportDataMessage containing an attribute report for UnionName attribute.",
-                     "Verify that the value of UnionName attribute reflects the change made in step 3."),
-            TestStep("5", "Change UnionHealth attribute by adding an offline contributor to affect the union health."),
-            TestStep("6", "TH awaits a ReportDataMessage containing an attribute report for UnionHealth attribute.",
-                     "Verify that the value of UnionHealth attribute reflects the change made in step 5."),
-            TestStep("7", "Change UnionContributorList attribute by adding a contributor."),
-            TestStep("8", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute.",
-                     "Verify that the value of UnionContributorList attribute reflects the contributor added in step 7."),
-            TestStep("9", "Change UnionContributorList attribute by removing a contributor."),
-            TestStep("10", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute.",
-                     "Verify that the value of UnionContributorList attribute reflects the contributor removed in step 9."),
-        ]
 
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
+    @pics('ASU.S')
+    @async_test_body
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientSensingUnion))
     async def test_TC_ASU_3_1(self):
+        """[TC-ASU-3.1] Cluster endpoint"""
+
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientSensingUnion
         attr = Clusters.AmbientSensingUnion.Attributes
 
-        self.step("1")
+        self.step("1", "Commissioning, already done", is_commissioning=True)
 
-        self.step("2")
+        self.step("2", "TH establishes a wildcard subscription to all attributes on Ambient Sensing Union Cluster on the endpoint under test.")
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
@@ -109,13 +90,13 @@ class TC_ASU_3_1(MatterBaseTest):
         contend_2 = 1235
         contstatus_2 = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline
 
-        self.step("3")
+        self.step("3", "Change UnionName attribute.")
         union_name_write = "TestUnionName"
         await self.write_single_attribute(attr.UnionName(union_name_write), endpoint_id=endpoint)
         # Allow time for the subscription report to arrive
         await asyncio.sleep(1)
 
-        self.step("4")
+        self.step("4", "TH awaits a ReportDataMessage containing an attribute report for UnionName attribute. Verify that the value of UnionName attribute reflects the change made in step 3.")
         reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionName)
         asserts.assert_true(reports is not None and len(reports) > 0,
                             "No subscription report received for UnionName after writing.")
@@ -125,7 +106,7 @@ class TC_ASU_3_1(MatterBaseTest):
         log.info("Verified UnionName subscription report: %s", union_name_sub)
         attrib_listener.reset()
 
-        self.step("5")
+        self.step("5", "Change UnionHealth attribute by adding an offline contributor to affect the union health.")
         # Read the current UnionHealth before the mutation so we can verify the report reflects the change.
         union_health_before = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attr.UnionHealth, endpoint=endpoint)
@@ -147,7 +128,7 @@ class TC_ASU_3_1(MatterBaseTest):
             self.wait_for_user_input(
                 prompt_msg="Change the UnionHealth attribute (e.g. by adding/removing contributors), then type any letter and press ENTER.")
 
-        self.step("6")
+        self.step("6", "TH awaits a ReportDataMessage containing an attribute report for UnionHealth attribute. Verify that the value of UnionHealth attribute reflects the change made in step 5.")
         reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionHealth)
         asserts.assert_true(reports is not None and len(reports) > 0,
                             "No subscription report received for UnionHealth after the change.")
@@ -158,7 +139,7 @@ class TC_ASU_3_1(MatterBaseTest):
                              f"({expected_union_health}) after adding an online contributor.")
         attrib_listener.reset()
 
-        self.step("7")
+        self.step("7", "Change UnionContributorList attribute by adding a contributor.")
         if self.is_ci:
             self.write_to_app_pipe({
                 "Name": "AddAmbientSensingContributor",
@@ -172,7 +153,7 @@ class TC_ASU_3_1(MatterBaseTest):
             self.wait_for_user_input(
                 prompt_msg="Add a contributor to UnionContributorList, then type any letter and press ENTER.")
 
-        self.step("8")
+        self.step("8", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute. Verify that the value of UnionContributorList attribute reflects the contributor added in step 7.")
         reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(reports is not None and len(reports) > 0,
                             "No subscription report received for UnionContributorList after adding contributor.")
@@ -190,7 +171,7 @@ class TC_ASU_3_1(MatterBaseTest):
         asserts.assert_true(exist_flag, "The added contributor is not found in the UnionContributorList subscription report.")
         attrib_listener.reset()
 
-        self.step("9")
+        self.step("9", "Change UnionContributorList attribute by removing a contributor.")
         if self.is_ci:
             self.write_to_app_pipe({
                 "Name": "RemoveAmbientSensingContributor",
@@ -203,7 +184,7 @@ class TC_ASU_3_1(MatterBaseTest):
             self.wait_for_user_input(
                 prompt_msg="Remove a contributor from UnionContributorList, then type any letter and press ENTER.")
 
-        self.step("10")
+        self.step("10", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute. Verify that the value of UnionContributorList attribute reflects the contributor removed in step 9.")
         reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(reports is not None and len(reports) > 0,
                             "No subscription report received for UnionContributorList after removing contributor.")
