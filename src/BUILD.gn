@@ -161,7 +161,6 @@ if (chip_build_tests) {
       "${chip_root}/src/app/persistence/tests",
       "${chip_root}/src/app/server-cluster/tests",
       "${chip_root}/src/app/server/tests",
-      "${chip_root}/src/controller/python/matter/case_capture/tests",
       "${chip_root}/src/credentials/tests/jcm",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
@@ -220,6 +219,15 @@ if (chip_build_tests) {
 
         # keep-sorted: end
       ]
+    }
+
+    # Python controller code, only ever built into the ctypes shared library
+    # on a host. It uses host-only facilities an embedded toolchain need not
+    # provide, notably <mutex>, <condition_variable> and <thread>, which
+    # Zephyr's libstdc++ is built without.
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests +=
+          [ "${chip_root}/src/controller/python/matter/case_capture/tests" ]
     }
 
     if (current_os != "zephyr") {
