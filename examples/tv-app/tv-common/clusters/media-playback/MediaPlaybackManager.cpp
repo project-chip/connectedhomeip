@@ -33,9 +33,23 @@ using namespace chip::Uint8;
 
 namespace {
 
-// One title per Content Launcher preset, in preset order, so that switching presets
-// changes what ContentInfo reports.
 constexpr chip::CharSpan kContentTitles[] = { "Morning News"_span, "Evening Playlist"_span };
+
+constexpr chip::CommandId kLiveContentCommands[] = {
+    Commands::Play::Id,
+    Commands::Pause::Id,
+    Commands::Stop::Id,
+};
+
+constexpr chip::CommandId kOnDemandContentCommands[] = {
+    Commands::Play::Id,     Commands::Pause::Id,  Commands::Stop::Id,        Commands::Next::Id,
+    Commands::Previous::Id, Commands::Rewind::Id, Commands::FastForward::Id, Commands::Seek::Id,
+};
+
+constexpr chip::Span<const chip::CommandId> kContentCommands[] = {
+    chip::Span<const chip::CommandId>(kLiveContentCommands),
+    chip::Span<const chip::CommandId>(kOnDemandContentCommands),
+};
 
 size_t gCurrentContentIndex = 0;
 
@@ -113,14 +127,10 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
 CHIP_ERROR MediaPlaybackManager::HandleGetAvailableCommands(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        ReturnErrorOnFailure(encoder.Encode(Commands::Play::Id));
-        ReturnErrorOnFailure(encoder.Encode(Commands::Pause::Id));
-        ReturnErrorOnFailure(encoder.Encode(Commands::Stop::Id));
-        ReturnErrorOnFailure(encoder.Encode(Commands::Next::Id));
-        ReturnErrorOnFailure(encoder.Encode(Commands::Previous::Id));
-        ReturnErrorOnFailure(encoder.Encode(Commands::Rewind::Id));
-        ReturnErrorOnFailure(encoder.Encode(Commands::FastForward::Id));
-        ReturnErrorOnFailure(encoder.Encode(Commands::Seek::Id));
+        for (chip::CommandId commandId : kContentCommands[gCurrentContentIndex])
+        {
+            ReturnErrorOnFailure(encoder.Encode(commandId));
+        }
         return CHIP_NO_ERROR;
     });
 }
@@ -139,6 +149,7 @@ void MediaPlaybackManager::SetCurrentContent(chip::EndpointId endpoint, size_t c
 
     gCurrentContentIndex = contentIndex;
     MatterReportingAttributeChangeCallback(endpoint, Id, Attributes::ContentInfo::Id);
+    MatterReportingAttributeChangeCallback(endpoint, Id, Attributes::AvailableCommands::Id);
 }
 
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
