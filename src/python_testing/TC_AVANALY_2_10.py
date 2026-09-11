@@ -55,6 +55,7 @@ from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
+
 class TC_AVANALY_2_10(MatterTestCommissionedDevice, AVANALYTestBase, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_AVANALY_2_10(self) -> str:
         return "[TC-AVANALY-2.10] Validate PushAV Clip record for Ambient Context Trigger"
