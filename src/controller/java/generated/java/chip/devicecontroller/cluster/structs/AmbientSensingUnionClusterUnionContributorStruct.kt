@@ -27,6 +27,7 @@ class AmbientSensingUnionClusterUnionContributorStruct(
   val contributorEndpointID: UInt?,
   val contributorName: String?,
   val contributorStatus: UInt,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("AmbientSensingUnionClusterUnionContributorStruct {\n")
@@ -34,6 +35,7 @@ class AmbientSensingUnionClusterUnionContributorStruct(
     append("\tcontributorEndpointID : $contributorEndpointID\n")
     append("\tcontributorName : $contributorName\n")
     append("\tcontributorStatus : $contributorStatus\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -56,6 +58,7 @@ class AmbientSensingUnionClusterUnionContributorStruct(
         putNull(ContextSpecificTag(TAG_CONTRIBUTOR_NAME))
       }
       put(ContextSpecificTag(TAG_CONTRIBUTOR_STATUS), contributorStatus)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -65,6 +68,7 @@ class AmbientSensingUnionClusterUnionContributorStruct(
     private const val TAG_CONTRIBUTOR_ENDPOINT_ID = 1
     private const val TAG_CONTRIBUTOR_NAME = 2
     private const val TAG_CONTRIBUTOR_STATUS = 3
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -93,6 +97,7 @@ class AmbientSensingUnionClusterUnionContributorStruct(
           null
         }
       val contributorStatus = tlvReader.getUInt(ContextSpecificTag(TAG_CONTRIBUTOR_STATUS))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -101,6 +106,7 @@ class AmbientSensingUnionClusterUnionContributorStruct(
         contributorEndpointID,
         contributorName,
         contributorStatus,
+        fabricIndex,
       )
     }
   }

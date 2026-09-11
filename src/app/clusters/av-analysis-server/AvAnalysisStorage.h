@@ -135,6 +135,7 @@ struct ActiveAmbientContextSession
 {
 private:
     uint16_t mSessionId = 0;
+    Optional<NodeId> mSourceNodeId;
     std::vector<Structs::TrackedContext::Type> mTrackedContexts;
 
 public:
@@ -143,6 +144,9 @@ public:
 
     void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
     uint16_t GetSessionId() const { return mSessionId; }
+
+    void SetSourceNodeId(const Optional<NodeId> & aSourceNodeId) { mSourceNodeId = aSourceNodeId; }
+    const Optional<NodeId> & GetSourceNodeId() const { return mSourceNodeId; }
 
     void AddTrackedContext(const std::vector<Structs::TrackedContext::Type> & aTrackedContext)
     {

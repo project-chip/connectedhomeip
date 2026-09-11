@@ -7482,7 +7482,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 11;
+  revision 12;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -7602,6 +7602,7 @@ cluster Thermostat = 513 {
     kPresets = 0x100;
     kEvents = 0x200;
     kThermostatSuggestions = 0x400;
+    kThermostatSensors = 0x800;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -7713,6 +7714,21 @@ cluster Thermostat = 513 {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
+  }
+
+  struct SensorScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    octet_string enabledSensors[] = 2;
+  }
+
+  struct ThermostatSensorStruct {
+    char_string<64> name = 0;
+    octet_string<16> sensorHandle = 1;
+    cluster_id cluster = 2;
+    optional endpoint_no endpoint = 3;
+    optional node_id node = 4;
+    optional fabric_idx fabricIndex = 5;
   }
 
   struct ThermostatSuggestionStruct {
@@ -7829,10 +7845,15 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
-  provisional readonly attribute optional int8u maxThermostatSuggestions = 83;
-  provisional readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
-  provisional readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
-  provisional readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  readonly attribute optional int8u maxThermostatSuggestions = 83;
+  readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
+  readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
+  readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  provisional readonly attribute optional ThermostatSensorStruct sensors[] = 89;
+  provisional attribute access(write: manage) optional octet_string availableSensors[] = 90;
+  provisional attribute access(write: manage) optional octet_string enabledSensors[] = 91;
+  provisional readonly attribute optional int8u numberOfSensorScheduleTransitions = 92;
+  provisional attribute access(write: manage) optional SensorScheduleTransitionStruct sensorSchedule[] = 93;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8075,7 +8096,7 @@ provisional cluster Humidistat = 517 {
   readonly attribute optional percent maxSetpoint = 5;
   readonly attribute optional percent step = 6;
   readonly attribute optional percent targetSetpoint = 7;
-  attribute optional nullable MistTypeBitmap mistType = 8;
+  attribute optional MistTypeBitmap mistType = 8;
   attribute optional boolean continuous = 9;
   attribute optional boolean sleep = 10;
   attribute optional boolean optimal = 11;
@@ -9360,29 +9381,36 @@ provisional cluster AmbientSensingUnion = 1074 {
     kNonFunctional = 2;
   }
 
-  struct ContributorStatusChangeStruct {
-    int8u contributorIndex = 0;
-    UnionContributorStatusEnum previousContributorStatus = 1;
-    UnionContributorStatusEnum currentContributorStatus = 2;
+  fabric_scoped struct ContributorStatusChangeStruct {
+    nullable node_id contributorNodeID = 0;
+    nullable endpoint_no contributorEndpointID = 1;
+    nullable char_string<128> contributorName = 2;
+    UnionContributorStatusEnum previousContributorStatus = 3;
+    UnionContributorStatusEnum currentContributorStatus = 4;
+    fabric_idx fabricIndex = 254;
   }
 
-  struct UnionContributorStruct {
+  fabric_scoped struct UnionContributorStruct {
     nullable node_id contributorNodeID = 0;
     nullable endpoint_no contributorEndpointID = 1;
     nullable char_string<128> contributorName = 2;
     UnionContributorStatusEnum contributorStatus = 3;
+    fabric_idx fabricIndex = 254;
   }
 
-  provisional info event UnionContributorAdded = 0 {
+  provisional fabric_sensitive info event UnionContributorAdded = 0 {
     UnionContributorStruct addedContributor[] = 0;
+    fabric_idx fabricIndex = 254;
   }
 
-  provisional info event UnionContributorRemoved = 1 {
+  provisional fabric_sensitive info event UnionContributorRemoved = 1 {
     UnionContributorStruct removedContributor[] = 0;
+    fabric_idx fabricIndex = 254;
   }
 
-  provisional info event UnionContributorStatusChanged = 2 {
+  provisional fabric_sensitive info event UnionContributorStatusChanged = 2 {
     ContributorStatusChangeStruct contributorStatusChange[] = 0;
+    fabric_idx fabricIndex = 254;
   }
 
   attribute char_string<128> unionName = 0;
