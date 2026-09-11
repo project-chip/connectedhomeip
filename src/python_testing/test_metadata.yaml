@@ -159,6 +159,16 @@ not_automated:
       reason:
           No existing app corresponding to the test content (NFC-based
           onboarding data security requirements)
+    - name: TC_NETIM_1_5.py
+      reason:
+          The DUT is a Matter commissioner that originates the commands under
+          test, so the test is driven by an operator working the DUT's
+          interface. It has no CI execution block.
+    - name: TC_NETIM_1_6.py
+      reason:
+          The DUT is a Matter commissioner that originates the commands under
+          test, so the test is driven by an operator working the DUT's
+          interface. It has no CI execution block.
     - name: TC_OPCREDS_3_9.py
       reason:
           Needs a DUT started with a PQC-capable DAC provider, which the generic
