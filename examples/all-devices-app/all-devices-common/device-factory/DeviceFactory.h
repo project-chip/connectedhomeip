@@ -66,6 +66,7 @@
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/water-valve/WaterValve.h>
+#include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -774,6 +775,17 @@ private:
                 return MakeDevice<SimulatedRoboticVacuumCleaner>(SimulatedRoboticVacuumCleaner::Context{
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
+            });
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
+        {
+            RegisterCreator("window-covering", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedWindowCovering>(WindowCovering::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .timerDelegate     = mContext->timerDelegate,
                 });
             });
         }
