@@ -46,6 +46,7 @@ using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::ZoneManagement;
+using namespace chip::app::Clusters::AvAnalysis;
 
 using namespace Camera;
 
@@ -500,6 +501,7 @@ CameraDevice::CameraDevice()
     mZoneManager.SetCameraDevice(this);
     mPushAVTransportManager.SetCameraDevice(this);
     mMediaController.SetCameraDevice(this);
+    mAVAnalysisManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -1846,6 +1848,11 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
     return CameraError::SUCCESS;
 }
 
+bool CameraDevice::IsValidAnalysisZone(const uint16_t zoneId)
+{
+    return mZoneManager.IsValidAnalysisZone(zoneId);
+}
+
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)
 {
     // Zone events are per-zone - each zone needs its own event notification
@@ -1863,6 +1870,35 @@ void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)
 {
     mZoneManager.OnZoneStoppedEvent(zoneId, ZoneEventStoppedReasonEnum::kActionStopped);
     // Note: PushAVTransportManager doesn't need zone stopped event currently
+}
+
+void CameraDevice::HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
+                                                               uint16_t identifiedContextId)
+{
+    bool triggeredContextEnabled;
+
+    // The manager only expects ZoneIDs if the feature flag is set, if the flag is set, and the provided set is empty, then
+    // set this to Null. We will always be given a vector, it may be empty.
+    Optional<app::DataModel::Nullable<std::vector<uint16_t>>> mZoneIds;
+    if (GetCameraSupportsPerZoneDetect())
+    {
+        if (!zoneIds.empty())
+        {
+            mZoneIds = MakeOptional(app::DataModel::MakeNullable(zoneIds));
+        }
+        else
+        {
+            mZoneIds = MakeOptional(app::DataModel::NullNullable);
+        }
+    }
+
+    mAVAnalysisManager.OnAmbientContextTriggeredEvent(namespaceId, tagId, mZoneIds, identifiedContextId, triggeredContextEnabled);
+
+    // We only want to trigger PushAV if the triggering context has been enabled
+    if (triggeredContextEnabled)
+    {
+        mPushAVTransportManager.HandleAmbientContextTrigger(namespaceId, tagId, zoneIds);
+    }
 }
 
 void CameraDevice::InitializeVideoStreams()

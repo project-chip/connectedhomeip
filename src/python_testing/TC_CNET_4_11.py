@@ -43,7 +43,7 @@ MAX_ATTEMPTS = 4                     # Reduced to prevent stack overflow from to
 TIMEOUT = 900                        # Overall test timeout (15 min) - main test execution time limit
 
 # Matter command timeouts
-TIMED_REQUEST_TIMEOUT = 5            # Matter command timeout (5s) - for individual Matter commands
+TIMED_REQUEST_TIMEOUT = 5000          # Matter command timeout (5s, in ms) - for individual Matter commands
 COMMAND_TIMEOUT = 15                 # Quick command timeout (15s) - for ConnectNetwork that may timeout intentionally
 ATTRIBUTE_READ_TIMEOUT = 30          # Attribute read timeout (30s) - after network changes when DUT may be slow
 OPERATIONAL_DISCOVERY_TIMEOUT = 70   # Increased to handle network delays - for first attribute read after network change
@@ -989,22 +989,27 @@ async def verify_operational_network(test, ssid):
 
 
 class TC_CNET_4_11(MatterBaseTest):
+    # The test repeatedly switches the TH's own Wi-Fi connection between two access
+    # points (steps 7-8, 11-12, 16-17), so the transport to the DUT is torn down and
+    # rebuilt several times. A background wildcard subscription cannot survive that and
+    # only adds noise/instability, similar to the issue avoided in TC_CGEN_2_2
+    # (https://github.com/project-chip/connectedhomeip/issues/72732).
+    disable_wildcard_subscription = True
 
-    @classmethod
-    def setup_class(cls):
+    def setup_class(self):
         """Remove default route from LAN interface to force traffic through Wi-Fi during test. (Linux only)"""
+        super().setup_class()
 
         os_name = detect_platform()
         if os_name == "linux":
             try:
-                cls._original_routes = asyncio.run(remove_lan_routes())
+                self._original_routes = asyncio.run(remove_lan_routes())
             except Exception as e:
                 logger.error("setup_class: Failed to setup network environment: %s", e)
-                cls._original_routes = []
+                self._original_routes = []
                 raise
 
-    @classmethod
-    def teardown_class(cls):
+    def teardown_class(self):
         """
         Restore original default routes after the test finishes (Linux only).
         Restore original Wi-Fi network on all platforms.
@@ -1012,7 +1017,7 @@ class TC_CNET_4_11(MatterBaseTest):
         os_name = detect_platform()
         if os_name == "linux":
             try:
-                original_routes = getattr(cls, "_original_routes", [])
+                original_routes = getattr(self, "_original_routes", [])
                 asyncio.run(restore_lan_routes(original_routes))
             except Exception as e:
                 logger.error("teardown_class: Failed to teardown network environment: %s", e)
@@ -1021,6 +1026,7 @@ class TC_CNET_4_11(MatterBaseTest):
             asyncio.run(restore_original_network())
         except Exception as e:
             logger.error("teardown_class: Failed to restore original Wi-Fi network: %s", e)
+        super().teardown_class()
 
     # Overrides default_timeout: Test includes several long waits, adjust timeout to accommodate.
     @property

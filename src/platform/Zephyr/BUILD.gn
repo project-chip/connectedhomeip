@@ -88,6 +88,13 @@ static_library("Zephyr") {
       "wifi/ZephyrWifiDriver.cpp",
       "wifi/ZephyrWifiDriver.h",
     ]
+    if (chip_device_config_enable_wifipaf) {
+      sources += [
+        "wifi/ConnectivityManagerImplWiFiPAF.cpp",
+        "wifi/ConnectivityManagerImplWiFiPAF.h",
+      ]
+      public_deps += [ "${chip_root}/src/wifipaf" ]
+    }
   } else {
     # Non-WiFi builds use the base diagnostic provider getter.
     # Wi-Fi implementation provides its own.

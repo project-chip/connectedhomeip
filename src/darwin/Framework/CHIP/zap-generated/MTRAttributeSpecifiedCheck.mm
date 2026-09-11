@@ -1586,6 +1586,9 @@ static BOOL AttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId aAtt
     case Attributes::CurrentFabricIndex::Id: {
         return YES;
     }
+    case Attributes::PQCDeviceAttestationProfile::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2562,6 +2565,43 @@ static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttribute
     }
     default: {
         // Not a known ScenesManagement attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInThermostatModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThermostatMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::CoreModeTags::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ThermostatMode attribute.
         return NO;
     }
     }
@@ -4281,6 +4321,21 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
         return YES;
     }
+    case Attributes::Sensors::Id: {
+        return YES;
+    }
+    case Attributes::AvailableSensors::Id: {
+        return YES;
+    }
+    case Attributes::EnabledSensors::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfSensorScheduleTransitions::Id: {
+        return YES;
+    }
+    case Attributes::SensorSchedule::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5751,6 +5806,9 @@ static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::SessionIDList::Id: {
+        return YES;
+    }
+    case Attributes::RangingConstraints::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -7964,6 +8022,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ScenesManagement::Id: {
         return AttributeIsSpecifiedInScenesManagementCluster(aAttributeId);
+    }
+    case Clusters::ThermostatMode::Id: {
+        return AttributeIsSpecifiedInThermostatModeCluster(aAttributeId);
     }
     case Clusters::Groupcast::Id: {
         return AttributeIsSpecifiedInGroupcastCluster(aAttributeId);

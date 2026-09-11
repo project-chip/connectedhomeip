@@ -2757,7 +2757,13 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 2;
+  revision 3;
+
+  enum AttestationCryptoProfileEnum : enum8 {
+    kEcdsaMatterLegacy = 0;
+    kMlDsa44 = 1;
+    kMlDsa65 = 2;
+  }
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -2777,6 +2783,16 @@ cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  bitmap AttestationCryptoProfileBitmap : bitmap16 {
+    kSupportsEcdsaMatterLegacy = 0x1;
+    kSupportsMlDsa44 = 0x2;
+    kSupportsMlDsa65 = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPQCDeviceAttestation = 0x1;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -2794,12 +2810,19 @@ cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct PQCDeviceAttestationProfileStruct {
+    AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
+    AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
+    AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2817,10 +2840,15 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional int16u segmentID = 2;
+    optional int16u maxSegmentSize = 3;
   }
 
   response struct CertificateChainResponse = 3 {
-    long_octet_string<600> certificate = 0;
+    octet_string certificate = 0;
+    optional int16u totalDocumentSize = 1;
+    optional int16u nextSegmentID = 2;
   }
 
   request struct CSRRequestRequest {
@@ -2906,11 +2934,6 @@ cluster OperationalCredentials = 62 {
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
   revision 4;
-
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -3977,8 +4000,8 @@ cluster RvcOperationalState = 97 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-provisional cluster ScenesManagement = 98 {
-  revision 1;
+cluster ScenesManagement = 98 {
+  revision 2;
 
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;
@@ -4112,22 +4135,87 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierFrom = 2;
   }
 
-  /** Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'. */
+  /** This command is used to add a new scene. */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  /** Retrieves the requested scene entry from its Scene table. */
+  /** This command returns the details for the requested scene. */
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
+  /** This command removes the specified scene. */
   fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
+  /** This command removes all scenes for the specified GroupID. */
   fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
+  /** This command will create a new entry for the requested scene. */
   fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
+  /** This command will cause the specified scene to be recalled. */
   fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
   /** This command can be used to get the used scene identifiers within a certain group, for the endpoint that implements this cluster. */
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
   /** This command allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
   fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
+}
+
+/** This cluster is derived from the Mode Base cluster, defining additional mode tags and namespaced enumerated values for thermostat devices. */
+cluster ThermostatMode = 99 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
+    kOff = 16384;
+    kCool = 16385;
+    kHeat = 16386;
+    kEmergencyHeat = 16387;
+  }
+
+  bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  provisional readonly attribute optional enum16 coreModeTags[] = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string<64> statusText = 1;
+  }
+
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
+  /** This command is used to change device modes. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
@@ -4354,7 +4442,7 @@ cluster ValveConfigurationAndControl = 129 {
 }
 
 /** This cluster provides an interface to specify preferences for how devices should consume energy. */
-provisional cluster EnergyPreference = 155 {
+cluster EnergyPreference = 155 {
   revision 1;
 
   enum EnergyPriorityEnum : enum8 {
@@ -4663,7 +4751,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 11;
+  revision 12;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -4783,6 +4871,7 @@ cluster Thermostat = 513 {
     kPresets = 0x100;
     kEvents = 0x200;
     kThermostatSuggestions = 0x400;
+    kThermostatSensors = 0x800;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -4894,6 +4983,21 @@ cluster Thermostat = 513 {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
+  }
+
+  struct SensorScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    octet_string enabledSensors[] = 2;
+  }
+
+  struct ThermostatSensorStruct {
+    char_string<64> name = 0;
+    octet_string<16> sensorHandle = 1;
+    cluster_id cluster = 2;
+    optional endpoint_no endpoint = 3;
+    optional node_id node = 4;
+    optional fabric_idx fabricIndex = 5;
   }
 
   struct ThermostatSuggestionStruct {
@@ -5010,10 +5114,15 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
-  provisional readonly attribute optional int8u maxThermostatSuggestions = 83;
-  provisional readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
-  provisional readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
-  provisional readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  readonly attribute optional int8u maxThermostatSuggestions = 83;
+  readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
+  readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
+  readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  provisional readonly attribute optional ThermostatSensorStruct sensors[] = 89;
+  provisional attribute access(write: manage) optional octet_string availableSensors[] = 90;
+  provisional attribute access(write: manage) optional octet_string enabledSensors[] = 91;
+  provisional readonly attribute optional int8u numberOfSensorScheduleTransitions = 92;
+  provisional attribute access(write: manage) optional SensorScheduleTransitionStruct sensorSchedule[] = 93;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5095,7 +5204,7 @@ cluster Thermostat = 513 {
   /** This command will remove the specified suggestion. */
   command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
-  command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
+  command AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
@@ -5256,7 +5365,7 @@ provisional cluster Humidistat = 517 {
   readonly attribute optional percent maxSetpoint = 5;
   readonly attribute optional percent step = 6;
   readonly attribute optional percent targetSetpoint = 7;
-  attribute optional nullable MistTypeBitmap mistType = 8;
+  attribute optional MistTypeBitmap mistType = 8;
   attribute optional boolean continuous = 9;
   attribute optional boolean sleep = 10;
   attribute optional boolean optimal = 11;
@@ -5703,7 +5812,7 @@ provisional cluster DynamicLighting = 773 {
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 cluster IlluminanceMeasurement = 1024 {
-  revision 3;
+  revision 5;
 
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
@@ -5763,7 +5872,7 @@ cluster PressureMeasurement = 1027 {
 
 /** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 cluster FlowMeasurement = 1028 {
-  revision 3;
+  revision 5;
 
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -6482,6 +6591,83 @@ cluster LowPower = 1288 {
 
   /** This command SHALL put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
+}
+
+/** This cluster provides attributes and commands to control the audio output volume and frequency corrections of a device. */
+provisional cluster AudioControl = 1298 {
+  revision 1;
+
+  enum UnmutePolicyEnum : enum8 {
+    kUnmuteOrChangeVolume = 0;
+    kUnmuteOrDoNotChangeVolume = 1;
+    kDoNotUnmuteAndChangeVolume = 2;
+    kDoNotUnmuteAndDoNotChangeVolume = 3;
+  }
+
+  enum UnmuteVolumeEnum : enum8 {
+    kMinDeviceVolume = 0;
+    kVolume = 1;
+    kVolumePlusStepSize = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kDecibel = 0x1;
+    kBasicEqualizer = 0x2;
+  }
+
+  readonly attribute boolean softMuted = 0;
+  readonly attribute optional boolean physicallyMuted = 1;
+  readonly attribute int16u volume = 2;
+  readonly attribute int16u minDeviceVolume = 3;
+  readonly attribute int16u maxDeviceVolume = 4;
+  readonly attribute optional int16u maxDeviceVolumeDB = 5;
+  attribute access(write: manage) optional int16u maxUserVolume = 6;
+  attribute access(write: manage) int16u defaultStepSize = 7;
+  attribute access(write: manage) UnmutePolicyEnum setVolumeUnmutePolicy = 8;
+  attribute access(write: manage) UnmutePolicyEnum increaseVolumeUnmutePolicy = 9;
+  attribute access(write: manage) UnmuteVolumeEnum increaseVolumeUnmuteVolume = 10;
+  attribute access(write: manage) UnmutePolicyEnum decreaseVolumeUnmutePolicy = 11;
+  attribute optional nullable boolean startUpMuted = 12;
+  attribute optional nullable int16u startUpVolume = 13;
+  attribute optional int16s bass = 14;
+  attribute optional int16s mid = 15;
+  attribute optional int16s treble = 16;
+  readonly attribute optional int16s minCorrection = 17;
+  readonly attribute optional int16s maxCorrection = 18;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetVolumeRequest {
+    int16u newVolume = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  request struct IncreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+    optional UnmuteVolumeEnum unmuteVolume = 2;
+  }
+
+  request struct DecreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  /** This command allows the audio output of the device to be muted. */
+  command Mute(): DefaultSuccess = 0;
+  /** This command allows the audio output of the device to be unmuted. */
+  command Unmute(): DefaultSuccess = 1;
+  /** This command allows the audio output of the device to be muted if it is unmuted, or unmuted if it is muted. */
+  command ToggleMuted(): DefaultSuccess = 2;
+  /** Sets the volume to a specified level. */
+  command SetVolume(SetVolumeRequest): DefaultSuccess = 3;
+  /** Increases the volume by a specified level. */
+  command IncreaseVolume(IncreaseVolumeRequest): DefaultSuccess = 4;
+  /** Decreases the volume by a specified level. */
+  command DecreaseVolume(DecreaseVolumeRequest): DefaultSuccess = 5;
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
@@ -7980,14 +8166,14 @@ endpoint 1 {
     ram      attribute description default = "Coffee";
     ram      attribute standardNamespace default = 0;
     callback attribute supportedModes;
-    persist  attribute currentMode default = 0;
-    persist  attribute startUpMode default = 0;
-    persist  attribute onMode default = 255;
+    callback attribute currentMode;
+    callback attribute startUpMode;
+    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -8213,6 +8399,21 @@ endpoint 1 {
     handle command RecallScene;
     handle command GetSceneMembership;
     handle command CopyScene;
+  }
+
+  server cluster ThermostatMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    ram      attribute startUpMode;
+    callback attribute coreModeTags;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeByCoreTag;
   }
 
   server cluster HepaFilterMonitoring {
@@ -8848,6 +9049,40 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command Sleep;
+  }
+
+  server cluster AudioControl {
+    callback attribute softMuted;
+    callback attribute physicallyMuted;
+    callback attribute volume;
+    callback attribute minDeviceVolume;
+    callback attribute maxDeviceVolume;
+    callback attribute maxDeviceVolumeDB;
+    callback attribute maxUserVolume;
+    callback attribute defaultStepSize;
+    callback attribute setVolumeUnmutePolicy;
+    callback attribute increaseVolumeUnmutePolicy;
+    callback attribute increaseVolumeUnmuteVolume;
+    callback attribute decreaseVolumeUnmutePolicy;
+    callback attribute startUpMuted;
+    callback attribute startUpVolume;
+    callback attribute bass;
+    callback attribute mid;
+    callback attribute treble;
+    callback attribute minCorrection;
+    callback attribute maxCorrection;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command Mute;
+    handle command Unmute;
+    handle command ToggleMuted;
+    handle command SetVolume;
+    handle command IncreaseVolume;
+    handle command DecreaseVolume;
   }
 
   server cluster Chime {

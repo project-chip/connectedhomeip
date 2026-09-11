@@ -3843,9 +3843,6 @@ PICS:
     - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
       id: GRPKEY.S.A0003
 
-    - label: "Does the device implement the GroupcastAdoption attribute?"
-      id: GRPKEY.S.A0004
-
     #
     # server commandsGenerated
     #
@@ -10321,6 +10318,62 @@ PICS:
       id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
 
     #
+    # Thermostat Mode Cluster
+    #
+
+    - label: "Does the device implement the TSTATM cluster as a server?"
+      id: TSTATM.S
+
+    # server / features
+    - label: "Does the device support the CoreModes feature?"
+      id: TSTATM.S.F01
+
+    # server / attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: TSTATM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: TSTATM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: TSTATM.S.A0002
+
+    - label: "Does the device implement the CoreModeTags attribute?"
+      id: TSTATM.S.A0004
+
+    # server / Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: TSTATM.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the ChangeToModeByCoreTag
+          command?"
+      id: TSTATM.S.C02.Rsp
+
+    # server / Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: TSTATM.S.C01.Tx
+
+    # Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: TSTATM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: TSTATM.S.M.CAN_MANUALLY_CONTROLLED
+
+    # PIXIT
+    - label:
+          "ID of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.TSTATM.MODE_CHANGE_FAIL
+
+    - label:
+          "ID of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.TSTATM.MODE_CHANGE_OK
+
+    #
     # Power Topology Cluster
     #
     - label: "Does the device implement the Power Topology Cluster as a server?"
@@ -10346,12 +10399,20 @@ PICS:
     - label: "Can the provided set of endpoints change?"
       id: PWRTL.S.F03
 
+    - label:
+          "Does the associated endpoint provide information about downstream
+          nodes on its circuit?"
+      id: PWRTL.S.F04
+
     #Server attributes
     - label: "Does the device implement the AvailableEndpoints attribute?"
       id: PWRTL.S.A0000
 
     - label: "Does the device implement the ActiveEndpoints attribute?"
       id: PWRTL.S.A0001
+
+    - label: "Does the device implement the ElectricalCircuitNodes attribute?"
+      id: PWRTL.S.A0002
 
     #
     # Thread Border Router Management Cluster

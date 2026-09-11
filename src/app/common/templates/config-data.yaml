@@ -25,6 +25,7 @@ CommandHandlerInterfaceOnlyClusters:
     # keep-sorted start
     - Camera AV Settings User Level Management
     - Commodity Tariff
+    - Electrical Alarm
     - Electrical Distribution
     - Electrical Energy Measurement
     - Joint Fabric Administrator
@@ -79,7 +80,6 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Mode Select
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
     # keep-sorted end
@@ -94,6 +94,8 @@ CodeDrivenClusters:
     - Administrator Commissioning
     - Air Quality
     - Ambient Context Sensing
+    - Ambient Sensing Union
+    - Audio Control
     - Basic Information
     - Binding
     - Boolean State
@@ -113,6 +115,7 @@ CodeDrivenClusters:
     - Dishwasher Alarm
     - Dishwasher Mode
     - Dynamic Lighting
+    - Electrical Alarm
     - Electrical Power Measurement
     - Electrical Protection Alarm
     - Energy EVSE
@@ -139,6 +142,7 @@ CodeDrivenClusters:
     - Media File Management
     - Microwave Oven Control
     - Microwave Oven Mode
+    - Mode Select
     - Network Identity Management
     - OTA Software Update Provider
     - OTA Software Update Requestor
@@ -168,6 +172,7 @@ CodeDrivenClusters:
     - Temperature Control
     - Temperature Measurement
     - Thermostat
+    - Thermostat Mode
     - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization

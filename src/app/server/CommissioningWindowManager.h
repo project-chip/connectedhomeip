@@ -68,6 +68,16 @@ public:
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    /**
+     * Allow or forbid advertising this device's own commissioning window over Wi-Fi PAF.
+     * Allowed by default.  A device that needs the NAN radio for something else while a
+     * window is open — a commissioning proxy subscribing on a commissionee's behalf — sets
+     * this false, so opening a window advertises on the other supported transports only.
+     */
+    void SetWiFiPAFAdvertisingAllowed(bool allowed) { mWiFiPAFAdvertisingAllowed = allowed; }
+#endif
+
     /**
      * Open the pairing window using default configured parameters.
      */
@@ -132,6 +142,11 @@ public:
 
     Optional<SessionHandle> GetPASESession() const { return mPASESession.Get(); }
 
+    void SetLocalSessionParameters(const SessionParameters & sessionParams)
+    {
+        mPairingSession.SetLocalSessionParameters(sessionParams);
+    }
+
     /**
      * Expire the fail-safe if there is an active PASE session, since this indicates that the fail-safe is for the commissioning
      * happening over the PASE session, and not for some unrelated non-commissioning activity.
@@ -153,7 +168,11 @@ private:
 
     CHIP_ERROR StartAdvertisement();
 
-    CHIP_ERROR StopAdvertisement(bool aShuttingDown);
+    // aKeepPAFPublish: leave the WiFi-PAF publisher running.  Used by
+    // OnSessionEstablished so the PAFTP session that just established PASE
+    // stays alive for post-PASE commissioning traffic.  The publisher is
+    // cancelled instead when the commissioning window closes, or on shutdown.
+    CHIP_ERROR StopAdvertisement(bool aShuttingDown, bool aKeepPAFPublish = false);
 
     // Start a timer that will call HandleCommissioningWindowTimeout, and then
     // start advertising and listen for PASE.
@@ -213,6 +232,9 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mIsWiFiPAF = false;
+    // Sticky: set once by the application, and not reset by Init() or ResetState(), so it
+    // survives every open/close cycle of the commissioning window.
+    bool mWiFiPAFAdvertisingAllowed = true;
     // Both 0 and kUndefinedWiFiPafSessionId are invalid publish-id.
     // Use 0 as the default value so that the PAF definition does not need to be included.
     uint32_t mPublishId = 0;
