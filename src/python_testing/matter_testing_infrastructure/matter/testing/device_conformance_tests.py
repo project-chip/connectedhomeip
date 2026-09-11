@@ -292,7 +292,6 @@ class DeviceConformanceTests(BasicCompositionTests):
         ignore_revisions: list[int] = []
         if ignore_in_progress_test_event_only_disallowed_for_certification:
 
-
             # This is a manually curated list of cluster revisions that are in-progress in the SDK, but have landed in the spec
             in_progress_revisions = [Clusters.BasicInformation.id, Clusters.PowerSource.id,
                                      Clusters.NetworkCommissioning.id, Clusters.ScenesManagement.id]
@@ -304,14 +303,14 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if (cluster_id & 0xFFFF_0000) != 0:
                         # manufacturer cluster
                         continue
-                    location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
                     # TODO: update this from a warning once we have all the data
                     record_warning(location=location, problem='Standard cluster found on device, but is not present in spec data')
                     continue
                 if cluster_id in ignore_revisions:
                     continue
                 if int(self.xml_clusters[cluster_id].revision) != cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]:
-                    location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                                      attribute_id=GlobalAttributeIds.CLUSTER_REVISION_ID)
                     record_error(
                         location=location, problem=f'Revision found on cluster ({cluster[GlobalAttributeIds.CLUSTER_REVISION_ID]}) does not match revision listed in the spec ({self.xml_clusters[cluster_id].revision})')
@@ -319,45 +318,45 @@ class DeviceConformanceTests(BasicCompositionTests):
         return success, problems
 
     def check_device_type_revisions(self) -> tuple[bool, list[ProblemNotice]]:
-        success=True
-        problems=[]
+        success = True
+        problems = []
 
         def record_error(location, problem):
             nonlocal success
             problems.append(ProblemNotice("IDM-10.6", location, ProblemSeverity.ERROR, problem, ""))
-            success=False
+            success = False
 
         for endpoint_id, endpoint in self.endpoints.items():
             if Clusters.Descriptor not in endpoint:
                 # Descriptor cluster presence checked in 10.5
                 continue
 
-            standard_device_types=[x for x in endpoint[Clusters.Descriptor]
+            standard_device_types = [x for x in endpoint[Clusters.Descriptor]
                                      [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
             for device_type in standard_device_types:
-                device_type_id=device_type.deviceType
+                device_type_id = device_type.deviceType
                 if device_type_id not in self.xml_device_types:
                     # problem recorded in 10.5
                     continue
-                expected_revision=self.xml_device_types[device_type_id].revision
-                actual_revision=device_type.revision
+                expected_revision = self.xml_device_types[device_type_id].revision
+                actual_revision = device_type.revision
                 if expected_revision != actual_revision:
-                    location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id)
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id)
                     record_error(
                         location, f"Expected Device type revision for device type {device_type_id} {self.xml_device_types[device_type_id].name} on endpoint {endpoint_id} does not match revision on DUT. Expected: {expected_revision} DUT: {actual_revision}")
         return success, problems
 
-    def check_device_type(self, fail_on_extra_clusters: bool=True, allow_provisional_test_event_only_disallowed_for_certification: bool=False) -> tuple[bool, list[ProblemNotice]]:
-        success=True
-        problems=[]
+    def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional_test_event_only_disallowed_for_certification: bool = False) -> tuple[bool, list[ProblemNotice]]:
+        success = True
+        problems = []
 
         # This is a specific problem in the 1.5 specification for water heater. For now this requirement is being removed as it is
         # disallowed to overwrite a mandatory cluster requirement to disallowed in the device type
         try:
-            water_heater_id=self._get_device_type_id('Water Heater')
+            water_heater_id = self._get_device_type_id('Water Heater')
         except KeyError:
             # water heater isn't in the spec, so just set it to an unused ID for checks
-            water_heater_id=0
+            water_heater_id = 0
 
         def record_problem(location, problem, severity):
             problems.append(ProblemNotice("IDM-10.5", location, severity, problem, ""))
@@ -365,46 +364,46 @@ class DeviceConformanceTests(BasicCompositionTests):
         def record_error(location, problem):
             nonlocal success
             record_problem(location, problem, ProblemSeverity.ERROR)
-            success=False
+            success = False
 
         def record_warning(location, problem):
             record_problem(location, problem, ProblemSeverity.WARNING)
 
         for endpoint_id, endpoint in self.endpoints.items():
             if Clusters.Descriptor not in endpoint:
-                location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id)
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id)
                 record_error(location=location, problem='No descriptor cluster found on endpoint')
                 continue
 
-            device_type_list=endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
-            invalid_device_types=[x for x in device_type_list if not is_valid_device_type_id(x.deviceType)]
-            standard_device_types=[x for x in endpoint[Clusters.Descriptor]
+            device_type_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+            invalid_device_types = [x for x in device_type_list if not is_valid_device_type_id(x.deviceType)]
+            standard_device_types = [x for x in endpoint[Clusters.Descriptor]
                                      [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
-            endpoint_clusters=[]
-            server_clusters=[]
+            endpoint_clusters = []
+            server_clusters = []
             for device_type in invalid_device_types:
-                location=DeviceTypePathLocation(device_type_id=device_type.deviceType)
+                location = DeviceTypePathLocation(device_type_id=device_type.deviceType)
                 record_error(location=location, problem='Invalid device type ID (out of valid range)')
 
             for device_type in standard_device_types:
-                device_type_id=device_type.deviceType
-                location=DeviceTypePathLocation(device_type_id=device_type_id)
+                device_type_id = device_type.deviceType
+                location = DeviceTypePathLocation(device_type_id=device_type_id)
                 if device_type_id not in self.xml_device_types:
                     record_error(location=location, problem='Unknown device type ID in standard range')
                     continue
 
-                xml_device=self.xml_device_types[device_type_id]
+                xml_device = self.xml_device_types[device_type_id]
                 # IDM 10.1 checks individual clusters for validity,
                 # so here we can ignore checks for invalid and manufacturer clusters.
-                server_clusters=[x for x in endpoint[Clusters.Descriptor]
+                server_clusters = [x for x in endpoint[Clusters.Descriptor]
                                    [Clusters.Descriptor.Attributes.ServerList] if cluster_id_type(x) == ClusterIdType.kStandard]
 
                 # As a start, we are only checking server clusters
                 # TODO: check client clusters too?
                 for cluster_id, cluster_requirement in xml_device.server_clusters.items():
                     # Device type cluster conformances do not include any conformances based on cluster elements
-                    conformance_decision_with_choice=cluster_requirement.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
-                    location=DeviceTypePathLocation(device_type_id=device_type_id, cluster_id=cluster_id)
+                    conformance_decision_with_choice = cluster_requirement.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
+                    location = DeviceTypePathLocation(device_type_id=device_type_id, cluster_id=cluster_id)
                     if conformance_decision_with_choice.is_mandatory() and cluster_id not in server_clusters:
                         record_error(location=location,
                                      problem=f"Mandatory cluster {cluster_requirement.name} for device type {xml_device.name} is not present in the server list")
@@ -421,7 +420,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
                     def check_feature_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, cluster_info: ConformanceAssessmentData):
                         for mask, conformance in cluster_requirement.feature_overrides.items():
-                            conformance_decision_with_choice=conformance(cluster_info)
+                            conformance_decision_with_choice = conformance(cluster_info)
                             if conformance_decision_with_choice.is_mandatory() and ((feature_map & mask) == 0):
                                 record_error(
                                     location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the feature map")
@@ -431,7 +430,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
                     def check_attribute_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, cluster_info: ConformanceAssessmentData) -> None:
                         for _id, conformance in cluster_requirement.attribute_overrides.items():
-                            conformance_decision_with_choice=conformance(cluster_info)
+                            conformance_decision_with_choice = conformance(cluster_info)
                             if conformance_decision_with_choice.is_mandatory() and _id not in attribute_list:
                                 record_error(
                                     location=location, problem=f"Attribute {_id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the attribute list")
@@ -445,7 +444,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
                     def check_command_overrides(cluster_requirement: XmlDeviceTypeClusterRequirements, cluster_info: ConformanceAssessmentData):
                         for _id, conformance in cluster_requirement.command_overrides.items():
-                            conformance_decision_with_choice=conformance(cluster_info)
+                            conformance_decision_with_choice = conformance(cluster_info)
                             if conformance_decision_with_choice.is_mandatory() and _id not in cmd_list:
                                 record_error(
                                     location=location, problem=f"Command {_id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the cmd list")
@@ -453,12 +452,12 @@ class DeviceConformanceTests(BasicCompositionTests):
                                 record_error(
                                     location=location, problem=f"Command {_id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the cmd list")
 
-                    cluster=Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
-                    feature_map=endpoint[cluster][cluster.Attributes.FeatureMap]
-                    attribute_list=endpoint[cluster][cluster.Attributes.AttributeList]
-                    cmd_list=endpoint[cluster][cluster.Attributes.AcceptedCommandList]
-                    revision=endpoint[cluster][cluster.Attributes.ClusterRevision]
-                    cluster_info=ConformanceAssessmentData(feature_map, attribute_list, cmd_list, revision)
+                    cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+                    feature_map = endpoint[cluster][cluster.Attributes.FeatureMap]
+                    attribute_list = endpoint[cluster][cluster.Attributes.AttributeList]
+                    cmd_list = endpoint[cluster][cluster.Attributes.AcceptedCommandList]
+                    revision = endpoint[cluster][cluster.Attributes.ClusterRevision]
+                    cluster_info = ConformanceAssessmentData(feature_map, attribute_list, cmd_list, revision)
 
                     check_feature_overrides(cluster_requirement, cluster_info)
                     check_attribute_overrides(cluster_requirement, cluster_info)
@@ -468,51 +467,51 @@ class DeviceConformanceTests(BasicCompositionTests):
                 # lists across all the device types on the endpoint.
                 endpoint_clusters += xml_device.server_clusters.keys()
             if fail_on_extra_clusters:
-                fn=record_error
+                fn = record_error
             else:
-                fn=record_warning
-            extra_clusters=set(server_clusters) - set(endpoint_clusters)
+                fn = record_warning
+            extra_clusters = set(server_clusters) - set(endpoint_clusters)
             for extra in extra_clusters:
-                location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=extra)
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=extra)
                 fn(location=location, problem=f"Extra cluster found on endpoint with device types {device_type_list}")
 
         return success, problems
 
     def check_root_endpoint_for_application_device_types(self) -> list[ProblemNotice]:
-        problems=[]
-        device_types=[d.deviceType for d in self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        problems = []
+        device_types = [d.deviceType for d in self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
 
         for d in device_types:
             if self.xml_device_types[d].classification_class.lower() == 'simple':
-                location=DeviceTypePathLocation(device_type_id=d)
+                location = DeviceTypePathLocation(device_type_id=d)
                 problems.append(ProblemNotice("TC-DESC-2.3", location, ProblemSeverity.ERROR,
                                 f"Application device type {self.xml_device_types[d].name} found on EP0"))
 
         return problems
 
     def check_all_application_device_types_superset(self) -> list[ProblemNotice]:
-        problems=[]
-        supersets=get_supersets(self.xml_device_types)
+        problems = []
+        supersets = get_supersets(self.xml_device_types)
         for endpoint_num, endpoint in self.endpoints.items():
-            all_device_type_ids=[dt.deviceType for dt in endpoint[Clusters.Descriptor]
+            all_device_type_ids = [dt.deviceType for dt in endpoint[Clusters.Descriptor]
                                    [Clusters.Descriptor.Attributes.DeviceTypeList]]
-            application_device_type_ids={
+            application_device_type_ids = {
                 dt for dt in all_device_type_ids if self.xml_device_types[dt].classification_class == 'simple'}
             if len(application_device_type_ids) <= 1:
                 continue
             if any(application_device_type_ids.issubset(superset) for superset in supersets):
                 continue
 
-            location=AttributePathLocation(3, Clusters.Descriptor.id, Clusters.Descriptor.Attributes.DeviceTypeList.attribute_id)
+            location = AttributePathLocation(3, Clusters.Descriptor.id, Clusters.Descriptor.Attributes.DeviceTypeList.attribute_id)
             problems.append(ProblemNotice('TC-DESC-2.3', location=location, severity=ProblemSeverity.ERROR,
                             problem=f"Multiple non-superset application device types found on EP {endpoint_num} ({application_device_type_ids})"))
         return problems
 
     def check_root_node_restricted_clusters(self) -> list[ProblemNotice]:
         # TODO: Are these marked in the spec? Time sync and ACL have specific notes, but can be determine this from the data model files?
-        root_node_restricted_clusters={Clusters.AccessControl, Clusters.TimeSynchronization,
+        root_node_restricted_clusters = {Clusters.AccessControl, Clusters.TimeSynchronization,
                                          Clusters.TlsCertificateManagement, Clusters.TlsClientManagement}
-        problems=[]
+        problems = []
         for endpoint_id, endpoint in self.endpoints.items():
             if endpoint_id == 0:
                 continue
@@ -526,23 +525,23 @@ class DeviceConformanceTests(BasicCompositionTests):
     def check_closure_restricted_clusters(self) -> list[ProblemNotice]:
         # This is a test that is SPECIFIC to the 1.5 spec, and thus we need the 1.5 spec information specifically
         # to assess the revisions.
-        one_five_device_types, _=build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        one_five_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
 
-        window_covering_id=self._get_device_type_id('Window Covering', one_five_device_types)
-        closure_id=self._get_device_type_id('Closure', one_five_device_types)
-        closure_panel_id=self._get_device_type_id('Closure Panel', one_five_device_types)
-        restricted_device_type_ids=[window_covering_id, closure_id, closure_panel_id]
+        window_covering_id = self._get_device_type_id('Window Covering', one_five_device_types)
+        closure_id = self._get_device_type_id('Closure', one_five_device_types)
+        closure_panel_id = self._get_device_type_id('Closure Panel', one_five_device_types)
+        restricted_device_type_ids = [window_covering_id, closure_id, closure_panel_id]
 
-        problems=[]
+        problems = []
         for endpoint_id, endpoint in self.endpoints.items():
-            device_types=endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
-            have_closure=Clusters.ClosureControl in endpoint or Clusters.ClosureDimension in endpoint
-            have_window_covering=Clusters.WindowCovering in endpoint
+            device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+            have_closure = Clusters.ClosureControl in endpoint or Clusters.ClosureDimension in endpoint
+            have_window_covering = Clusters.WindowCovering in endpoint
 
             if have_closure and have_window_covering:
                 for dt in device_types:
-                    device_type_id=dt.deviceType
+                    device_type_id = dt.deviceType
                     if device_type_id in restricted_device_type_ids and dt.revision <= one_five_device_types[device_type_id].revision:
                         problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
                                                       problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has both window covering and closure clusters"))
@@ -551,24 +550,24 @@ class DeviceConformanceTests(BasicCompositionTests):
     def check_closure_restricted_sem_tags(self) -> list[ProblemNotice]:
         # This is a test that is SPECIFIC to the 1.5 spec, and thus we need the 1.5 spec information specifically
         # to assess the revisions.
-        one_five_device_types, _=build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
-        one_five_namespaces, _=build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
+        one_five_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        one_five_namespaces, _ = build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
 
         def get_namespace_id(name: str) -> uint:
-            ids=[_id for _id, xml in one_five_namespaces.items() if xml.name.lower() == name.lower()]
+            ids = [_id for _id, xml in one_five_namespaces.items() if xml.name.lower() == name.lower()]
             if len(ids) != 1:
                 raise ValueError(f"Unable to find unique namespace for '{name}'")
             return ids[0]
 
-        closure_id=self._get_device_type_id('Closure', one_five_device_types)
-        closure_panel_id=self._get_device_type_id('Closure Panel', one_five_device_types)
-        closure_namespace_id=get_namespace_id('Closure')
-        closure_panel_namespace_id=get_namespace_id('Closure Panel')
+        closure_id = self._get_device_type_id('Closure', one_five_device_types)
+        closure_panel_id = self._get_device_type_id('Closure Panel', one_five_device_types)
+        closure_namespace_id = get_namespace_id('Closure')
+        closure_panel_namespace_id = get_namespace_id('Closure Panel')
 
         def check_tags_on_endpoint(device_type_id: int, allowed_namespace: int, max_num_tags_allowed_namespace: int, disallowed_namespace: int):
-            tag_list=endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
-            allowed_tag_count=0
+            tag_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
+            allowed_tag_count = 0
 
             for tag in tag_list:
                 if tag.namespaceID == disallowed_namespace:
@@ -584,13 +583,13 @@ class DeviceConformanceTests(BasicCompositionTests):
                 problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
                                               problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has multiple {one_five_namespaces[allowed_namespace].name} namespace tags"))
 
-        problems=[]
+        problems = []
         for endpoint_id, endpoint in self.endpoints.items():
             # If a Cloure or Closure Panel does not implement TagList, this is also invalid but is verified by another IDM test,
             if Clusters.Descriptor.Attributes.TagList not in endpoint[Clusters.Descriptor]:
                 continue
 
-            device_types=endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+            device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
 
             for dt in device_types:
                 if dt.deviceType == closure_id:
