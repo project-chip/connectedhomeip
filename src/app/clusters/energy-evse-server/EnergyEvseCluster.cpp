@@ -518,6 +518,9 @@ Status EnergyEvseCluster::ValidateTargets(
         uint8_t bitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kDayOfWeekBitmapMask));
         ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
 
+        VerifyOrReturnValue(bitmask != 0, Status::ConstraintError,
+                            ChipLogError(AppServer, "DayOfWeekForSequence must not be empty"));
+
         VerifyOrReturnValue((dayOfWeekBitmap & bitmask) == 0, Status::ConstraintError,
                             ChipLogError(AppServer, "DayOfWeekForSequence bit already set"));
         dayOfWeekBitmap |= bitmask;
