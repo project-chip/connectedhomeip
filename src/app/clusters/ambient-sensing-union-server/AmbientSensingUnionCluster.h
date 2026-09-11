@@ -56,8 +56,8 @@ public:
      */
     struct ContributorEntry
     {
-        NodeId nodeId         = kUndefinedNodeId;
-        EndpointId endpointId = kInvalidEndpointId;
+        NodeId nodeId           = kUndefinedNodeId;
+        EndpointId endpointId   = kInvalidEndpointId;
         FabricIndex fabricIndex = kUndefinedFabricIndex;
         AmbientSensingUnion::UnionContributorStatusEnum status =
             AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOffline;
@@ -167,8 +167,7 @@ public:
     CHIP_ERROR AddMatterContributor(NodeId nodeId, EndpointId endpointId,
                                     AmbientSensingUnion::UnionContributorStatusEnum status =
                                         AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline,
-                                    FabricIndex fabricIndex = kUndefinedFabricIndex,
-                                    const CharSpan & name = CharSpan());
+                                    FabricIndex fabricIndex = kUndefinedFabricIndex, const CharSpan & name = CharSpan());
     CHIP_ERROR RemoveMatterContributor(NodeId nodeId, EndpointId endpointId);
     CHIP_ERROR UpdateMatterContributorStatus(NodeId nodeId, EndpointId endpointId,
                                              AmbientSensingUnion::UnionContributorStatusEnum status);

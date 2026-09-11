@@ -255,11 +255,11 @@ CHIP_ERROR AmbientSensingUnionCluster::AddMatterContributor(NodeId nodeId, Endpo
 
     // Initialize entry
     entry->Clear();
-    entry->nodeId       = nodeId;
-    entry->endpointId   = endpointId;
-    entry->fabricIndex  = fabricIndex;
-    entry->status       = status;
-    entry->active       = true;
+    entry->nodeId      = nodeId;
+    entry->endpointId  = endpointId;
+    entry->fabricIndex = fabricIndex;
+    entry->status      = status;
+    entry->active      = true;
     if (!name.empty())
     {
         entry->SetName(name);
@@ -405,7 +405,8 @@ void AmbientSensingUnionCluster::EmitContributorAddedEvent(const ContributorEntr
 
     EventOptions options(mPath.mEndpointId, event);
     options.mFabricIndex = entry.fabricIndex;
-    DataModel::internal::SimpleEventPayloadWriter writer(&event, &DataModel::internal::EncodeTypedEventPayload<Events::UnionContributorAdded::Type>);
+    DataModel::internal::SimpleEventPayloadWriter writer(
+        &event, &DataModel::internal::EncodeTypedEventPayload<Events::UnionContributorAdded::Type>);
     DataModel::internal::GenerateEvent(options, mContext->interactionContext.eventsGenerator, writer, true);
 }
 
@@ -421,7 +422,8 @@ void AmbientSensingUnionCluster::EmitContributorRemovedEvent(const ContributorEn
 
     EventOptions options(mPath.mEndpointId, event);
     options.mFabricIndex = entry.fabricIndex;
-    DataModel::internal::SimpleEventPayloadWriter writer(&event, &DataModel::internal::EncodeTypedEventPayload<Events::UnionContributorRemoved::Type>);
+    DataModel::internal::SimpleEventPayloadWriter writer(
+        &event, &DataModel::internal::EncodeTypedEventPayload<Events::UnionContributorRemoved::Type>);
     DataModel::internal::GenerateEvent(options, mContext->interactionContext.eventsGenerator, writer, true);
 }
 
@@ -459,7 +461,8 @@ void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const Contrib
 
     EventOptions options(mPath.mEndpointId, event);
     options.mFabricIndex = entry.fabricIndex;
-    DataModel::internal::SimpleEventPayloadWriter writer(&event, &DataModel::internal::EncodeTypedEventPayload<Events::UnionContributorStatusChanged::Type>);
+    DataModel::internal::SimpleEventPayloadWriter writer(
+        &event, &DataModel::internal::EncodeTypedEventPayload<Events::UnionContributorStatusChanged::Type>);
     DataModel::internal::GenerateEvent(options, mContext->interactionContext.eventsGenerator, writer, true);
 }
 
