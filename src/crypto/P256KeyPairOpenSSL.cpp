@@ -214,6 +214,13 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_lengt
         VerifyOrExit(EVP_DigestSignInit(md_ctx, &pkey_ctx, EVP_sha256(), nullptr, evp_pkey) == 1, error = CHIP_ERROR_INTERNAL);
 
         // Request deterministic nonce generation (RFC 6979).
+        // Ensure OSSL_SIGNATURE_PARAM_NONCE_TYPE is understood by the signature provider,
+        // otherwise we could end up silently creating a non-deterministic signature,
+        // because EVP_PKEY_CTX_set_params() silently ignores parameters it doesn't understand.
+        const OSSL_PARAM * settable = EVP_PKEY_CTX_settable_params(pkey_ctx);
+        VerifyOrExit(settable != nullptr && OSSL_PARAM_locate_const(settable, OSSL_SIGNATURE_PARAM_NONCE_TYPE) != nullptr,
+                     ChipLogError(Crypto, "OSSL_SIGNATURE_PARAM_NONCE_TYPE not supported by provider context");
+                     error = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         unsigned int nonce_type = 1;
         OSSL_PARAM params[]     = {
             OSSL_PARAM_construct_uint(OSSL_SIGNATURE_PARAM_NONCE_TYPE, &nonce_type),
