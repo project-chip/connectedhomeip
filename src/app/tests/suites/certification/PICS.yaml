@@ -8805,6 +8805,80 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: RNCONC.S.A000a
 
+    # Smoke Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Smoke Concentration Measurement Cluster
+          as a server?"
+      id: SMOKECONC.S
+
+    - label:
+          "Does the device implement the Smoke Concentration Measurement Cluster
+          as a client?"
+      id: SMOKECONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: SMOKECONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: SMOKECONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: SMOKECONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: SMOKECONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: SMOKECONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: SMOKECONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: SMOKECONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: SMOKECONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: SMOKECONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: SMOKECONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: SMOKECONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: SMOKECONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: SMOKECONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: SMOKECONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: SMOKECONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: SMOKECONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: SMOKECONC.S.A000a
+
     ##  Fan control
 
     # Features

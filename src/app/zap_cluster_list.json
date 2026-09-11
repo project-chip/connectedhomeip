@@ -130,6 +130,7 @@
         "SCENES_CLUSTER": [],
         "SERVICE_AREA_CLUSTER": [],
         "SMOKE_CO_ALARM_CLUSTER": [],
+        "SMOKE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": [],
         "SOIL_MEASUREMENT_CLUSTER": [],
         "SWITCH_CLUSTER": [],
@@ -352,6 +353,9 @@
         "SCENES_CLUSTER": ["scenes-server"],
         "SERVICE_AREA_CLUSTER": ["service-area-server"],
         "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
+        "SMOKE_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
         "SOIL_MEASUREMENT_CLUSTER": ["soil-measurement-server"],
         "SWITCH_CLUSTER": ["switch-server"],
