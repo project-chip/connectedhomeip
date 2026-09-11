@@ -51,7 +51,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ kStep2MonitoredSubjectStep2 = 1001
 kStep2Key = b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
 
 
-class TC_ICDM_3_1(MatterBaseTest):
+class TC_ICDM_3_1(MatterTestCommissionedDevice):
 
     #
     # Class Helper functions

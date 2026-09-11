@@ -46,13 +46,13 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_I_2_4(MatterBaseTest):
+class TC_I_2_4(MatterTestCommissionedDevice):
     def desc_TC_I_2_4(self) -> str:
         return "[TC-I-2.4] Reporting requirements with server as DUT"
 

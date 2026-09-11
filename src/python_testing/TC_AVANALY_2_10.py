@@ -50,13 +50,13 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_10(MatterBaseTest, AVANALYTestBase, PAVSTTestBase, PAVSTIUtils):
+class TC_AVANALY_2_10(MatterTestCommissionedDevice, AVANALYTestBase, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_AVANALY_2_10(self) -> str:
         return "[TC-AVANALY-2.10] Validate PushAV Clip record for Ambient Context Trigger"
 

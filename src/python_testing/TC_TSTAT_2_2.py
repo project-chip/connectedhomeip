@@ -44,13 +44,13 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.Thermostat
 
 
-class TC_TSTAT_2_2(MatterBaseTest):
+class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
     def desc_TC_TSTAT_2_2(self) -> str:
         """Returns a description of this test"""

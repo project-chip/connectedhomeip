@@ -85,6 +85,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
@@ -99,7 +100,7 @@ CACHE_POLL_TIMEOUT_S = 70   # per-fabric NumCachedResults poll in step 13
 MAX_SCAN_MAX_TIME_S = 255
 
 
-class TC_COMPRO_2_8(COMPROBaseTest):
+class TC_COMPRO_2_8(MatterTestCommissionedDevice, COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:

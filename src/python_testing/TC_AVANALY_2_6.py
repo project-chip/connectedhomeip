@@ -45,13 +45,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_6(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_6(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_6(self) -> str:
         return "[TC-AVANALY-2.6] Validate AnalysisSessionStart and AnalysisSessionEnd event generation with Server as DUT"

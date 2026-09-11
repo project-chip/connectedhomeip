@@ -87,6 +87,7 @@ from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -94,7 +95,7 @@ logger = logging.getLogger(__name__)
 COMMISSIONING_BY_PROXY_DEVICE_TYPE = 0x0092
 
 
-class TC_COMPRO_2_9(COMPROBaseTest):
+class TC_COMPRO_2_9(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def desc_TC_COMPRO_2_9(self) -> str:
         return "[TC-COMPRO-2.9] Device Type Requirements with DUT as Server"

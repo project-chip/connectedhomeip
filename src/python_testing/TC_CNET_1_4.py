@@ -41,7 +41,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ kRootEndpointId = 0
 kSecondaryNetworkInterfaceDeviceTypeId = 0x0019
 
 
-class TC_CNET_1_4(MatterBaseTest):
+class TC_CNET_1_4(MatterTestCommissionedDevice):
     def steps_TC_CNET_1_4(self):
         return [TestStep(1, "TH is commissioned", is_commissioning=True),
                 TestStep(2, 'TH performs a wildcard read of the FeatureMap attribute on Network Commissioning clusters across all endpoints, and saves the response as `NetworkCommissioningResponse`'),

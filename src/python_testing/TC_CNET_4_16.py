@@ -22,7 +22,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_valid_uint8
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ log.setLevel(logging.INFO)
 PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET = "1111111122222222"
 
 
-class TC_CNET_4_16(MatterBaseTest):
+class TC_CNET_4_16(MatterTestCommissionedDevice):
 
     def steps_TC_CNET_4_16(self):
         return [TestStep("precondition", "TH is commissioned", is_commissioning=True),

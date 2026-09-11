@@ -40,11 +40,11 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue
+from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_CADMIN_1_19(CADMINBaseTest):
+class TC_CADMIN_1_19(MatterTestCommissionedDevice, CADMINBaseTest):
     # This test can take a long time to run especially in highly congested lab networks since it creates a lot of fabrics and commissions those to the DUT so we need to increase the timeout to run this test.
     @property
     def default_timeout(self) -> int:

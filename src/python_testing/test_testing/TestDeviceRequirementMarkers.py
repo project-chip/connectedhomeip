@@ -59,6 +59,7 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "test_testing/TestMatterTestingSupport.py",
         "test_testing/TestMatterDeviceGraph.py",
         "test_testing/TestDecorators.py",
+        "test_testing/TestAttributeSubscriptionLiveness.py",
     ],
     MatterTestCommissionedDevice: [
         "test_testing/TestBatchInvoke.py",
@@ -74,6 +75,19 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "test_testing/TestCreateNewController.py",
         "test_testing/TestCommissioningTimeSync.py",
         "test_testing/TestCleanupFramework.py",
+        # Representatives of the support-module bases: mixed bases carry the marker on the
+        # concrete class (CADMIN/ICDB_1_x), uniform bases carry it on the base and the tests
+        # single-inherit (SMOKECO/BINFO). All must resolve to Commissioned.
+        "TC_CADMIN_1_10.py",
+        "TC_ICDB_1_1.py",
+        "TC_SMOKECO_2_1.py",
+        "TC_BINFO_2_1.py",
+        # Representatives of the tests whose DUT is commissioned by the runner before the
+        # test body: a plain single-base test, one combining a marker-free mixin base, and
+        # one that opens a commissioning window for a *second* fabric mid-test.
+        "TC_EPALM_2_1.py",
+        "TC_AVANALY_2_1.py",
+        "TC_PWRTL_2_2.py",
     ],
     MatterTestCommissioner: [
         "test_testing/TestCommissioningStatusDetectionIntegration.py",
@@ -94,6 +108,22 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "TC_SC_TC_2_2.py",
         "TC_SC_TC_3_1.py",
         "TC_SC_TC_4_1.py",
+        # commission the primary DUT themselves (ICDB via commission_device; JF via joint-fabric
+        # pairing; SC_3_5 is a DUT-as-commissioner test). ICDB/JFADMIN_2_2 also exercise the mixed
+        # support bases (ICDBaseTest/CADMINBaseTest) that must stay marker-free.
+        "TC_ICDB_2_1_2_2.py",
+        "TC_ICDB_2_3.py",
+        "TC_ICDB_2_4.py", "TC_ICDB_2_5.py",
+        "TC_JFADMIN_1_1.py",
+        "TC_JFADMIN_1_2.py",
+        "TC_JFADMIN_1_4.py",
+        "TC_JFADMIN_2_1.py",
+        "TC_JFADMIN_2_2.py",
+        "TC_JFDS_2_1.py",
+        "TC_JFDS_2_2.py",
+        "TC_JFDS_2_3.py",
+        "TC_JFDS_2_4.py",
+        "TC_SC_3_5.py",
     ],
     MatterTestUncommissionedDevice: [
         "TC_DD_1_16_17.py",
@@ -254,6 +284,67 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
         if source_fallback:
             print(f"\n[TestDeviceRequirementMarkers] source-only (import deps unavailable): {source_fallback}",
                   file=sys.stderr)
+
+    def test_no_concrete_test_reaches_matterbasetest_unmarked(self):
+        """Coverage guard: every concrete test must declare its device requirement through a
+        marker (or an intermediate base such as BasicCompositionTests), never bare MatterBaseTest.
+
+        AST-scans the test modules (no imports needed, so it is independent of optional
+        dependencies) and resolves inheritance transitively through the in-tree helper bases
+        in support_modules/ and TC_*TestBase.py: a test whose only route to MatterBaseTest is
+        an unmarked helper base is just as unclassified as one naming MatterBaseTest directly,
+        so both are flagged. Only top-level classes that define a test method
+        (test_/steps_/desc_) are candidates -- mixin/base helpers may still derive from
+        MatterBaseTest directly (that is how a base shared by tests with *differing* device
+        requirements stays neutral), as may fixture classes nested inside a test method.
+        """
+        def base_names(class_def):
+            return {base.id if isinstance(base, ast.Name) else base.attr
+                    for base in class_def.bases if isinstance(base, (ast.Name, ast.Attribute))}
+
+        def defines_test(class_def):
+            return any(isinstance(body_node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                       and body_node.name.startswith(("test_", "steps_", "desc_")) for body_node in class_def.body)
+
+        # Names that settle the classification without resolving further: a marker, or the
+        # BasicCompositionTests dual-state base that stands in for one.
+        classified = _MARKER_NAMES | {"BasicCompositionTests"}
+
+        # Index every top-level class by name so an indirect base can be followed: the tests
+        # live alongside helper bases in support_modules/ and TC_*TestBase.py, which in turn
+        # derive from the framework bases under matter_testing_infrastructure. Same-named
+        # classes in different modules are merged, which can only under-report.
+        bases_by_class: dict[str, set[str]] = {}
+        candidates: list[tuple[str, str]] = []  # (module:class, class name)
+        test_modules = sorted(_PY_TESTING.glob("*.py")) + sorted((_PY_TESTING / "test_testing").glob("*.py"))
+        helper_modules = (sorted((_PY_TESTING / "support_modules").glob("*.py"))
+                          + sorted((_PY_TESTING / "matter_testing_infrastructure/matter/testing").glob("*.py")))
+        for path in test_modules + helper_modules:
+            for node in ast.parse(path.read_text()).body:
+                if not isinstance(node, ast.ClassDef):
+                    continue
+                bases_by_class.setdefault(node.name, set()).update(base_names(node))
+                if defines_test(node) and path in test_modules:
+                    candidates.append((f"{path.name}:{node.name}", node.name))
+
+        def routes(name: str, seen: set[str]) -> set[str]:
+            """Which of {'classified', 'bare'} the ancestry of `name` reaches."""
+            if name in classified:
+                return {"classified"}
+            if name == "MatterBaseTest":
+                return {"bare"}
+            if name in seen:
+                return set()
+            seen.add(name)
+            return set().union(*(routes(base, seen) for base in bases_by_class.get(name, ())), set())
+
+        # Only a test with no classified route at all is unclassified; reaching MatterBaseTest
+        # through a second, deliberately marker-free helper base is expected and fine.
+        offenders = [label for label, name in candidates
+                     if routes(name, set()) == {"bare"}]
+        self.assertEqual(offenders, [],
+                         "concrete tests must derive from a device-requirement marker, not bare "
+                         f"MatterBaseTest: {offenders}")
 
 
 if __name__ == "__main__":

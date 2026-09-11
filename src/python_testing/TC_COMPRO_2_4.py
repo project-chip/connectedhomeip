@@ -135,6 +135,7 @@ from support_modules.compro_support import COMPROBaseTest, EDFixture, commission
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -159,7 +160,7 @@ ED_NODE_ID = 0x1001
 _MINIMAL_MATTER_MSG = bytes(8)
 
 
-class TC_COMPRO_2_4(COMPROBaseTest):
+class TC_COMPRO_2_4(MatterTestCommissionedDevice, COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:

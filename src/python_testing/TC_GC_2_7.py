@@ -48,13 +48,13 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_7(MatterBaseTest):
+class TC_GC_2_7(MatterTestCommissionedDevice):
     def desc_TC_GC_2_7(self):
         return "[TC-GC-2.7] Multicast address policy and UsedMcastAddrCount with DUT as Server - PROVISIONAL"
 

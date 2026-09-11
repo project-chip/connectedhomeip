@@ -52,13 +52,13 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import arls_populated
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_ACL_2_11(MatterBaseTest):
+class TC_ACL_2_11(MatterTestCommissionedDevice):
 
     def pics_TC_ACL_2_11(self) -> list[str]:
         return ['ACL.S.F01']
