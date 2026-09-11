@@ -18,7 +18,16 @@
 #include "LoggingRvcOperationalStateDelegate.h"
 #include <lib/support/logging/CHIPLogging.h>
 
+<<<<<<< HEAD:examples/all-devices-app/all-devices-common/device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.cpp
 namespace chip::app::Clusters::OperationalState {
+=======
+#include <lib/support/CodeUtils.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484)):src/app/clusters/thermostat-server/ThermostatClusterAttributes.cpp
 
 void LoggingRvcOperationalStateDelegate::HandleGoHomeCommandCallback(GenericOperationalError & err)
 {

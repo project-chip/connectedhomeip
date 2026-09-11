@@ -122,7 +122,11 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
     }
 
     // If the preset hande doesn't exist in the Presets attribute, return NOT_FOUND.
+<<<<<<< HEAD
     if (!IsPresetHandlePresentInPresets(mDelegate, commandData.presetHandle))
+=======
+    if (!mPresets.IsPresetHandlePresentInPresets(commandData.presetHandle))
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
     {
         return Status::NotFound;
     }

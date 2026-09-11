@@ -8507,6 +8507,12 @@ endpoint 1 {
   }
 
   server cluster Thermostat {
+    emits event SystemModeChange;
+    emits event LocalTemperatureChange;
+    emits event SetpointChange;
+    emits event RunningStateChange;
+    emits event RunningModeChange;
+    emits event ActivePresetChange;
     ram      attribute localTemperature;
     ram      attribute absMinHeatSetpointLimit default = 0x02BC;
     ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
@@ -8538,10 +8544,20 @@ endpoint 1 {
     callback attribute thermostatSuggestions;
     callback attribute currentThermostatSuggestion;
     callback attribute thermostatSuggestionNotFollowingReason;
+<<<<<<< HEAD
+=======
+    callback attribute criticalFreezeProtection;
+    callback attribute criticalOverheatProtection;
+    callback attribute sensors;
+    callback attribute availableSensors;
+    callback attribute enabledSensors;
+    callback attribute numberOfSensorScheduleTransitions;
+    callback attribute sensorSchedule;
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0523;
+    ram      attribute featureMap default = 0x0F23;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;

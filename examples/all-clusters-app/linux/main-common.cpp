@@ -37,6 +37,16 @@
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
+<<<<<<< HEAD
+=======
+#include "thermostat-hold-delegate-impl.h"
+#include "thermostat-mode-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-sensors-delegate-impl.h"
+#include "thermostat-setpoints-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
+
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
 #include "tls-client-management-instance.h"
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
 
@@ -184,6 +194,21 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
 LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
+<<<<<<< HEAD
+=======
+constexpr EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
+static Clusters::Thermostat::ThermostatSensorsDelegate gSensorsDelegate(gThermostatEndpoint);
+
+using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
+    Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate,
+    Clusters::Thermostat::ThermostatHoldDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
+    Clusters::Thermostat::ThermostatSuggestionsDelegate, Clusters::Thermostat::ThermostatSensorsDelegate>;
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -207,8 +232,15 @@ void ApplicationInit()
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
+<<<<<<< HEAD
     Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1),
                                              &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+=======
+
+    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
+                                                            gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate,
+                                                            gSensorsDelegate);
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };

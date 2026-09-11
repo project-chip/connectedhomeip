@@ -15,12 +15,24 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+<<<<<<< HEAD:examples/all-devices-app/all-devices-common/device/capabilities/operational-state/BUILD.gn
 source_set("operational-state-delegate") {
   sources = [
     "impl/LoggingOperationalStateDelegate.cpp",
     "impl/LoggingOperationalStateDelegate.h",
     "impl/LoggingRvcOperationalStateDelegate.cpp",
     "impl/LoggingRvcOperationalStateDelegate.h",
+=======
+chip_test_suite("tests") {
+  output_name = "TestThermostatCluster"
+
+  test_sources = [
+    "TestThermostatAtomicAndPresets.cpp",
+    "TestThermostatCluster.cpp",
+    "TestThermostatSensors.cpp",
+    "TestThermostatSetpoints.cpp",
+    "TestThermostatSuggestionsAndHold.cpp",
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484)):src/app/clusters/thermostat-server/tests/BUILD.gn
   ]
 
   public_deps = [

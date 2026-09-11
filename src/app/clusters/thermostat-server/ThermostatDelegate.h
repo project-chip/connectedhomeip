@@ -106,6 +106,7 @@ public:
      */
     virtual CHIP_ERROR AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset) = 0;
 
+<<<<<<< HEAD
     /**
      * @brief Get the Preset at a given index in the pending presets list.
      *
@@ -115,6 +116,14 @@ public:
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the pending presets list.
      */
     virtual CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) = 0;
+=======
+    virtual int8_t GetLocalTemperatureCalibration() const { return 0; };
+    virtual Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration, bool & changed)
+    {
+        changed = false;
+        return Protocols::InteractionModel::Status::Success;
+    };
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
 
     /**
      * @brief Updates the presets attribute with the content of the pending presets list. If the preset in the pending presets list

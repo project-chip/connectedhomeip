@@ -266,7 +266,12 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         {
         case Presets::Id:
         case Schedules::Id:
+<<<<<<< HEAD
             auto attributeTimeout = mDelegate->GetMaxAtomicWriteTimeout(attributeId);
+=======
+        case SensorSchedule::Id: {
+            auto attributeTimeout = mDelegate.GetMaxAtomicWriteTimeout(attributeId);
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
 
             if (attributeTimeout.has_value())
             {
@@ -274,6 +279,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
                 maximumTimeout += attributeTimeout.value();
             }
             break;
+        }
         }
     }
 
@@ -290,7 +296,12 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         {
         case Presets::Id:
         case Schedules::Id:
+<<<<<<< HEAD
             statusCode = InAtomicWrite(MakeOptional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
+=======
+        case SensorSchedule::Id:
+            statusCode = InAtomicWrite(std::make_optional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
+>>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
             break;
         default:
             statusCode = Status::InvalidCommand;
