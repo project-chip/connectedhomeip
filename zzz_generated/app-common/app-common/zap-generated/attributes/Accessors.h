@@ -2649,6 +2649,10 @@ namespace SetpointHoldExpiryTimestamp {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
 } // namespace SetpointHoldExpiryTimestamp
 
+namespace NumberOfSensorScheduleTransitions {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
+} // namespace NumberOfSensorScheduleTransitions
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
@@ -2770,8 +2774,7 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace MistType {
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint,
-           DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>> & value); // MistTypeBitmap
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> * value); // MistTypeBitmap
 } // namespace MistType
 
 namespace Continuous {

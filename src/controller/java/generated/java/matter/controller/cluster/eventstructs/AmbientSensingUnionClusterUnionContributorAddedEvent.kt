@@ -25,11 +25,13 @@ import matter.tlv.TlvWriter
 
 class AmbientSensingUnionClusterUnionContributorAddedEvent(
   val addedContributor:
-    List<matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct>
+    List<matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct>,
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("AmbientSensingUnionClusterUnionContributorAddedEvent {\n")
     append("\taddedContributor : $addedContributor\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -41,12 +43,14 @@ class AmbientSensingUnionClusterUnionContributorAddedEvent(
         item.toTlv(AnonymousTag, this)
       }
       endArray()
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
 
   companion object {
     private const val TAG_ADDED_CONTRIBUTOR = 0
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -66,10 +70,11 @@ class AmbientSensingUnionClusterUnionContributorAddedEvent(
           }
           tlvReader.exitContainer()
         }
+      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
-      return AmbientSensingUnionClusterUnionContributorAddedEvent(addedContributor)
+      return AmbientSensingUnionClusterUnionContributorAddedEvent(addedContributor, fabricIndex)
     }
   }
 }

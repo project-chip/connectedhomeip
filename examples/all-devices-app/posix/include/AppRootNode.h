@@ -61,7 +61,7 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
     }
 
-    SingleEndpoint & RootDevice()
+    RootNode & RootDevice()
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         if (mEnabledFeatures.Has(EnabledFeatures::kWiFi))
@@ -72,7 +72,7 @@ public:
         return mRootNode;
     }
 
-    RootNode & GetRootNode() { return mRootNode; }
+    RootNode & GetRootNode() { return RootDevice(); }
 
 private:
     BitFlags<EnabledFeatures> mEnabledFeatures;
