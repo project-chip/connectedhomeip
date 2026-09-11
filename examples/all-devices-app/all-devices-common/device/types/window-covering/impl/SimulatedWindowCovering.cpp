@@ -26,8 +26,9 @@ namespace app {
 
 namespace {
 
-constexpr System::Clock::Milliseconds32 kTransitionInterval = System::Clock::Milliseconds32(500);
-constexpr Percent100ths kPositionStep                       = 500; // 5% step
+constexpr System::Clock::Milliseconds32 kTransitionInterval  = System::Clock::Milliseconds32(500);
+constexpr System::Clock::Milliseconds32 kCalibrationDuration = System::Clock::Milliseconds32(30000);
+constexpr Percent100ths kPositionStep                        = 500; // 5% step
 
 // Returns the next position, moved at most kPositionStep towards target.
 Percent100ths ComputeStepToTarget(Percent100ths current, Percent100ths target)
@@ -71,17 +72,8 @@ CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenData
 {
     ReturnErrorOnFailure(WindowCovering::Register(endpoint, provider, composition));
 
-    auto & cluster = WindowCoveringCluster();
-    if (cluster.GetCurrentPositionLiftPercent100ths().IsNull())
-    {
-        cluster.SetCurrentPositionLiftPercent100ths(
-            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-    }
-    if (cluster.GetCurrentPositionTiltPercent100ths().IsNull())
-    {
-        cluster.SetCurrentPositionTiltPercent100ths(
-            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-    }
+    // Lift/tilt current positions start null (uncalibrated), matching real hardware that doesn't
+    // know its position until it self-calibrates. See HandleMovement() for the calibration flow.
 
     return CHIP_NO_ERROR;
 }
@@ -111,6 +103,22 @@ CHIP_ERROR SimulatedWindowCovering::HandleMovement(Clusters::WindowCovering::Win
 {
     ChipLogProgress(DeviceLayer, "WindowCovering: HandleMovement type=%" PRIu16, static_cast<uint16_t>(type));
     auto & cluster = WindowCoveringCluster();
+
+    if (cluster.GetMode().Has(Mode::kCalibrationMode))
+    {
+        // Per spec 5.3.6.14.2, a movement command while in calibration mode triggers a
+        // self-calibration before the command executes. Defer this move until the fake
+        // calibration timer (started below) completes in TimerFired().
+        if (!mCalibrating)
+        {
+            mCalibrating = true;
+            cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
+            cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>());
+            mContext.timerDelegate.CancelTimer(this);
+            ReturnErrorOnFailure(mContext.timerDelegate.StartTimer(this, kCalibrationDuration));
+        }
+        return CHIP_NO_ERROR;
+    }
 
     if (type == Clusters::WindowCovering::WindowCoveringType::Lift)
     {
@@ -147,6 +155,11 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
     mContext.timerDelegate.CancelTimer(this);
     mMovingLift = false;
     mMovingTilt = false;
+
+    // Abort an in-progress fake calibration. Per spec 5.3.6.14.2, the only way to leave
+    // calibration mode is to complete the calibration routine, so we leave Mode's
+    // CalibrationMode bit set and positions null; the next movement command retries calibration.
+    mCalibrating = false;
 
     auto & cluster = WindowCoveringCluster();
 
@@ -196,6 +209,25 @@ void SimulatedWindowCovering::OnTargetPositionTiltChanged(DataModel::Nullable<Pe
 void SimulatedWindowCovering::TimerFired()
 {
     auto & cluster = WindowCoveringCluster();
+
+    if (mCalibrating)
+    {
+        // Fake calibration finished: resolve to a known position, per spec 5.3.6.14.2 leave
+        // calibration mode by completing the routine, then run the deferred move for each axis.
+        mCalibrating = false;
+        cluster.SetCurrentPositionLiftPercent100ths(
+            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+        cluster.SetCurrentPositionTiltPercent100ths(
+            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+
+        auto mode = cluster.GetMode();
+        mode.Clear(Mode::kCalibrationMode);
+        cluster.SetMode(mode);
+
+        LogErrorOnFailure(HandleMovement(Clusters::WindowCovering::WindowCoveringType::Lift));
+        LogErrorOnFailure(HandleMovement(Clusters::WindowCovering::WindowCoveringType::Tilt));
+        return;
+    }
 
     if (mMovingLift)
     {
