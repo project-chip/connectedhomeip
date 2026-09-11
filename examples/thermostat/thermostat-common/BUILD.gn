@@ -12,36 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-executable("thermostat-app") {
-  sources = [
-    "include/low-power/LowPowerManager.cpp",
-    "include/low-power/LowPowerManager.h",
-    "main.cpp",
-  ]
+import("${chip_root}/src/app/chip_data_model.gni")
 
-  deps = [
-    "${chip_root}/examples/platform/linux:app-main",
-    "${chip_root}/examples/thermostat/thermostat-common",
+config("config") {
+  include_dirs = [ "include" ]
+}
+
+source_set("thermostat-delegate-impl") {
+  sources = [
+    "src/thermostat-delegate-impl.cpp",
+    "src/thermostat-hold-delegate-impl.cpp",
+    "src/thermostat-occupancy-delegate-impl.cpp",
+    "src/thermostat-presets-delegate-impl.cpp",
+    "src/thermostat-sensors-delegate-impl.cpp",
+    "src/thermostat-setpoints-delegate-impl.cpp",
+    "src/thermostat-suggestions-delegate-impl.cpp",
+  ]
+  public_configs = [ ":config" ]
+  public_deps = [
+    "${chip_root}/src/app/clusters/thermostat-server",
     "${chip_root}/src/lib",
   ]
 }
 
+chip_data_model("thermostat-common") {
+  zap_file = "thermostat.zap"
+  is_server = true
 
-  include_dirs = [
-    "include",
-    "${chip_root}/examples/thermostat/thermostat-common/include",
-  ]
-
-  cflags = [ "-Wconversion" ]
-
-  output_dir = root_out_dir
-group("linux") {
-  deps = [ ":thermostat-app" ]
-}
-
-group("default") {
-  deps = [ ":linux" ]
+  public_deps = [ ":thermostat-delegate-impl" ]
 }
