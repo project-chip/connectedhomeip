@@ -32,6 +32,10 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
 #       --app-pipe /tmp/acs_fifo_3_3
+#       --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03
+#       --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
+#       --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 
+#       --float-arg PIXIT.ACS.Holdtime:10
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -71,7 +75,8 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # --script src/python_testing/TC_ACS_3_3.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03
 # --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
-# --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:10"
+# --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 
+# --float-arg PIXIT.ACS.Holdtime:10"
 
 
 class TC_ACS_3_3(MatterBaseTest):
@@ -151,8 +156,6 @@ class TC_ACS_3_3(MatterBaseTest):
         asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime_input, "Expected to be between HoldTimeMin and HoldTimeMax.")
         asserts.assert_less_equal(holdTime_input, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
         await self.write_single_attribute(attr.HoldTime(holdTime_input))
-        holdtime_dut = holdTime_input
-        await self.write_single_attribute(attr.HoldTime(holdtime_dut))
 
         post_prompt_settle_delay_seconds = 10  # seconds
         # ---------------------------------------------------------------
@@ -269,7 +272,7 @@ class TC_ACS_3_3(MatterBaseTest):
             # check AmbientContextDetectEnded event
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
-            if event.eventStartTimePos != NullValue:
+            if event.eventStartTimePos is not None:
                 asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimePos})
             else:
@@ -356,7 +359,7 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
             # asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
-            if event.eventStartTimePos != NullValue:
+            if event.eventStartTimePos is not None:
                 asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimePos}")
             else:
@@ -444,7 +447,7 @@ class TC_ACS_3_3(MatterBaseTest):
             self.step("5f", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys event field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event start time stored from the step 5d.")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
-            if event.eventStartTimePos != NullValue:
+            if event.eventStartTimePos is not None:
                 asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimePos}")
             else:
@@ -555,11 +558,11 @@ class TC_ACS_3_3(MatterBaseTest):
             self.step("6h", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event time stored from the step 6f.")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
-            if event.eventStartTimePos != NullValue:
-                asserts.assert_true((event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+            if event.eventStartTimePos is not None:
+                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimePos})
             else:
-                asserts.assert_true((event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimeSys})
 
         else:
