@@ -25,6 +25,7 @@
 #include <app/clusters/av-analysis-server/AvAnalysisCameraInteraction.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStorage.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStreamTable.h>
+#include <app/clusters/av-analysis-server/AvAnalysisWebRTCClient.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistenceProvider.h>
@@ -45,7 +46,7 @@ class AvAnalysisDelegate;
 // Callback type for notifying attribute changes
 using MarkDirtyCallback = std::function<void(AttributeId)>;
 
-class AvAnalysisServerLogic : public AvAnalysisCameraClient::Callback
+class AvAnalysisServerLogic : public AvAnalysisCameraClient::Callback, public AvAnalysisWebRTCClient::Callback
 {
 public:
     /**
@@ -78,11 +79,24 @@ public:
     /**
      * Sets the camera client used by a RemoteContextDetection instance to allocate/deallocate analysis
      * streams on the camera (not used with LocalContextDetection).
+     * Required before Startup; must outlive this instance.
      */
     void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mCameraClient = aCameraClient; }
 
+    /**
+     * Sets the WebRTC client used by a RemoteContextDetection instance to initiate/end the WebRTC
+     * sessions carrying analysis streams (not used with LocalContextDetection).
+     * Required before Startup; must outlive this instance, which cancels it on destruction.
+     */
+    void SetWebRTCClient(AvAnalysisWebRTCClient * aWebRTCClient) { mWebRTCClient = aWebRTCClient; }
+
     void OnVideoStreamAllocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
     void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
+
+    void OnSessionInitiated(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId, bool aOfferSent) override;
+    void OnSessionActive(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
+    void OnSessionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
+    void OnSessionEnded(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) override;
 
     EndpointId mEndpointId = kInvalidEndpointId;
 
@@ -149,29 +163,30 @@ public:
                                    Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds);
 
     // Active context tracking and events
-    CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, Optional<NodeId> aSourceNodeId = NullOptional,
-                                   bool aUseSpecificSessionId = false);
+    CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId = kUndefinedNodeId,
+                                   uint64_t aSourceStartTimestampUs = 0, bool aUseSpecificSessionId = false);
 
     CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
-                                    ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId = NullOptional);
+                                    ServerClusterContext * aContext, NodeId aSourceNodeId = kUndefinedNodeId,
+                                    uint64_t aSourceStartTimestampUs = 0);
 
     CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId,
                                                 const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
-                                                ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId = NullOptional);
+                                                ServerClusterContext * aContext);
 
     CHIP_ERROR NewContextDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext,
-                                  ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId = NullOptional);
+                                  ServerClusterContext * aContext);
 
     CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId,
                                        const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext,
-                                       ServerClusterContext * aContext, Optional<NodeId> aSourceNodeId = NullOptional);
+                                       ServerClusterContext * aContext);
 
-    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext,
-                                  Optional<NodeId> aSourceNodeId = NullOptional);
+    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext);
 
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
     AvAnalysisCameraClient * mCameraClient                       = nullptr;
+    AvAnalysisWebRTCClient * mWebRTCClient                       = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
     uint16_t mNextAnalysisSessionID                              = 0;
     std::vector<AvAnalysis::ActiveAmbientContextSession> mActiveSessions;
@@ -195,20 +210,28 @@ private:
     void MarkDirty(AttributeId aAttributeId);
 
     /**
-     * Command sub-handlers
+     * Abandons the in-flight camera interaction, if any, and every tracked WebRTC session.
      */
-    std::optional<DataModel::ActionReturnStatus>
-    ProcessEnableContextTriggers(const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleLocalEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                     const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleRemoteEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                      const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
+    void CancelCameraInteraction();
+
+    /**
+     * Answers a command parked on a camera interaction with Failure, for the paths that abandon the
+     * interaction rather than completing it.
+     */
+    void FailParkedCommand();
 
     /*
      * Command and event handler helper methods
      */
+    // Session ids are assigned per camera, so the camera is part of the key
+    AvAnalysis::AnalysisStreamEntry * FindByWebRTCSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
+    // Assigns the next session id not currently in use
+    CHIP_ERROR AllocateSessionId(uint16_t & aSessionId);
+    // The active session with this id
+    std::vector<AvAnalysis::ActiveAmbientContextSession>::iterator FindSession(uint16_t aSessionId);
+    // Names the session's source stream on a PerceivedContext, under RemoteContextDetection
+    void SetEventSource(AvAnalysis::Events::PerceivedContext::Type & aEvent,
+                        const AvAnalysis::ActiveAmbientContextSession & aSession);
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
     bool AreAllZoneIdsFound(const std::vector<uint16_t> & subset, const std::vector<uint16_t> & target);
     bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext);

@@ -127,6 +127,8 @@ public:
 
     void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mLogic.SetCameraClient(aCameraClient); }
 
+    void SetWebRTCClient(AvAnalysisWebRTCClient * aWebRTCClient) { mLogic.SetWebRTCClient(aWebRTCClient); }
+
     CHIP_ERROR Init() { return mLogic.Init(); }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -169,8 +171,12 @@ public:
                                    Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds);
 
     // Context detection and event generation
-    CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, Optional<NodeId> aSourceNodeId = NullOptional,
-                                   bool aUseSpecificSessionId = false);
+    /**
+     * Records an active session without generating an AnalysisSessionStart event, for a delegate reporting
+     * contexts of a session it started itself. Source arguments as for AnalysisSessionStart.
+     */
+    CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId = kUndefinedNodeId,
+                                   uint64_t aSourceStartTimestampUs = 0, bool aUseSpecificSessionId = false);
 
     /**
      * Invoked by the delegate when a new analysis session is initiated based on its own detection metrics. The server will
@@ -179,9 +185,14 @@ public:
      * @param aSessionId the server will manage all session Ids
      * @param aZoneList  the list of Zones that are relevant for the session, Null is used when this information is not available,
      * or all zones
+     * @param aSourceNodeId           With RemoteContextDetection: the camera node the analyzed stream comes from;
+     * every event of the session reports it. Not used with LocalContextDetection.
+     * @param aSourceStartTimestampUs With RemoteContextDetection: the start timestamp (epoch-us) of the analyzed stream,
+     * reported as given by the session's PerceivedContext events, where the field is mandatory. Not used with
+     * LocalContextDetection.
      */
     CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
-                                    Optional<NodeId> aSourceNodeId = NullOptional);
+                                    NodeId aSourceNodeId = kUndefinedNodeId, uint64_t aSourceStartTimestampUs = 0);
 
     /**
      * Invoked by the delegate to furnish details of the event that triggered the session. The server will generate a
@@ -192,8 +203,7 @@ public:
      *                           This will be validated against the set of known, enabled contexts by the server.
      */
     CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId,
-                                                const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
-                                                Optional<NodeId> aSourceNodeId = NullOptional);
+                                                const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext);
 
     /**
      * Invoked by the delegate for all newly detected analysis contexts as part of the current session. The server will generate a
@@ -203,8 +213,7 @@ public:
      * @param aNewContext the set (could be more than one) of contexts that are newly detected for the session.
      *                    This will be validated against the set of known, enabled contexts by the server.
      */
-    CHIP_ERROR NewContextDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext,
-                                  Optional<NodeId> aSourceNodeId = NullOptional);
+    CHIP_ERROR NewContextDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext);
 
     /**
      * Invoked by the delegate when a previously detected context is no longer present (e.g. a detected package has been
@@ -217,8 +226,7 @@ public:
      * the server.
      */
     CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId,
-                                       const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext,
-                                       Optional<NodeId> aSourceNodeId = NullOptional);
+                                       const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext);
 
     /**
      * Invoked by the delegate to indicate the conclusion of an analysis session that has been triggered. It is up to the
@@ -226,7 +234,7 @@ public:
      *
      * @param aSessionId         the sessionId for the current session, the method will fail if this is not known by the server
      */
-    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId, Optional<NodeId> aSourceNodeId = NullOptional);
+    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId);
 
 private:
     AvAnalysisServerLogic mLogic;

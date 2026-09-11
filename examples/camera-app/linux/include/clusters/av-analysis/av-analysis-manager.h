@@ -71,8 +71,7 @@ public:
                                        chip::Optional<uint16_t> aSessionId        = chip::NullOptional,
                                        chip::Optional<chip::NodeId> aSourceNodeId = chip::NullOptional);
 
-    CHIP_ERROR TriggerSessionEnd(chip::Optional<uint16_t> aSessionId        = chip::NullOptional,
-                                 chip::Optional<chip::NodeId> aSourceNodeId = chip::NullOptional);
+    CHIP_ERROR TriggerSessionEnd(chip::Optional<uint16_t> aSessionId = chip::NullOptional);
 
     uint16_t GetLatestSessionId() const { return mLatestSessionId; }
     bool HasActiveSession() const { return mHasActiveSession; }

@@ -26,13 +26,17 @@ class MockAvAnalysisDelegate : public AvAnalysisDelegate
 public:
     void ShutdownApp() override {}
 
-    CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override { return mZoneVerificationResult; }
 
-    bool CanAddContextTriggers() override { return true; }
+    bool CanAddContextTriggers() override { return mCanAddContextTriggers; }
 
     void ActiveAmbientContextTriggersUpdated() override {}
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override { return CHIP_NO_ERROR; }
+
+    // What the zone check and the capacity check answer
+    CHIP_ERROR mZoneVerificationResult = CHIP_NO_ERROR;
+    bool mCanAddContextTriggers        = true;
 };
 
 } // namespace Clusters
