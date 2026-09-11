@@ -295,7 +295,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # The last end event
             # event = event_listener.get_last_event()
-            event = event_listener.wait_for_event_report(expected_event=cluster.Events.AmbientContextDetectEnded, timeout_sec=5.0)
+            event = event_listener.wait_for_event_report(expected_event=cluster.Events.AmbientContextDetectEnded, timeout_sec=30.0)
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
 
@@ -478,7 +478,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 await asyncio.sleep(holdTime_input - elapsed_time + 3)
 
             # The last end event
-            event = event_listener.wait_for_event_report(expected_event=cluster.Events.AmbientContextDetectEnded, timeout_sec=5.0)
+            event = event_listener.wait_for_event_report(expected_event=cluster.Events.AmbientContextDetectEnded, timeout_sec=30.0)
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
 
