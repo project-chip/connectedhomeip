@@ -97,6 +97,7 @@ struct CachedMessage
     const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & GetMessageControl() const { return mMessageControl; }
     const chip::app::DataModel::Nullable<uint32_t> & GetStartTime() const { return mStartTime; }
     const chip::app::DataModel::Nullable<uint64_t> & GetDuration() const { return mDuration; }
+    const chip::app::Clusters::Messages::MessagePriorityEnum & GetPriority() const { return mPriority; }
     MessageState GetState() const { return mState; }
     void SetState(MessageState state) { mState = state; }
     chip::FabricIndex GetFabricIndex() const { return mFabricIndex; }
@@ -182,7 +183,7 @@ public:
 
     // Not part of the Delegate contract. Backs the `messages do-not-disturb` shell command.
     bool GetDoNotDisturb() const { return mDoNotDisturb; }
-    void SetDoNotDisturb(bool enabled) { mDoNotDisturb = enabled; }
+    void SetDoNotDisturb(bool enabled);
 
 private:
     enum class MessageTimerType : uint8_t
@@ -208,6 +209,9 @@ private:
     void ScheduleOrPresentMessage(chip::ByteSpan messageId);
     void PresentMessage(CachedMessage & message);
     void PresentOrSuppressMessage(std::list<CachedMessage>::iterator it);
+
+    // Present the messages that were held back while the device was muted.
+    void PresentQueuedMessages();
     void CompleteMessage(chip::ByteSpan messageId);
 
     void StartMessageTimer(chip::ByteSpan messageId, MessageTimerType type, uint32_t delayMs);

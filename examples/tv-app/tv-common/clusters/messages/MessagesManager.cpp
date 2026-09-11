@@ -234,13 +234,53 @@ void MessagesManager::ScheduleOrPresentMessage(ByteSpan messageId)
     PresentOrSuppressMessage(it);
 }
 
+void MessagesManager::SetDoNotDisturb(bool enabled)
+{
+    const bool wasEnabled = mDoNotDisturb;
+    mDoNotDisturb         = enabled;
+
+    // A High priority message held back while muted has to be presented once the device
+    // leaves the muted state, so release whatever is still queued.
+    if (wasEnabled && !enabled)
+    {
+        PresentQueuedMessages();
+    }
+}
+
+void MessagesManager::PresentQueuedMessages()
+{
+    for (CachedMessage & message : mCachedMessages)
+    {
+        if (message.GetState() == MessageState::kQueued)
+        {
+            PresentMessage(message);
+        }
+    }
+}
+
 void MessagesManager::PresentOrSuppressMessage(std::list<CachedMessage>::iterator it)
 {
     if (mDoNotDisturb)
     {
-        LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), true, it->GetFabricIndex()));
-        mCachedMessages.erase(it);
-        return;
+        // While muted, how a message is handled depends on its Priority: Low and Medium are
+        // dropped outright, High waits in the queue until the device is unmuted, and Critical
+        // is presented anyway.
+        switch (it->GetPriority())
+        {
+        case MessagePriorityEnum::kLow:
+        case MessagePriorityEnum::kMedium:
+            LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), true, it->GetFabricIndex()));
+            mCachedMessages.erase(it);
+            return;
+        case MessagePriorityEnum::kHigh:
+            // Reported as not presented but kept queued, so RemovedFromQueue is false.
+            LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), false, it->GetFabricIndex()));
+            return;
+        case MessagePriorityEnum::kCritical:
+            break;
+        default:
+            break;
+        }
     }
     PresentMessage(*it);
 }
