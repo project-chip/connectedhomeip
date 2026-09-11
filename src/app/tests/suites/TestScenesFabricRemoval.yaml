@@ -116,6 +116,26 @@ tests:
       cluster: "Groups"
       command: "RemoveAllGroups"
 
+    - label: "TH1 reads the Groupcast membership attribute."
+      PICS: "GC.S"
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "readAttribute"
+      attribute: "Membership"
+      response:
+          saveAs: membershipList
+
+    - label: "TH1 leaves all Groupcast groups."
+      PICS: "GC.S"
+      runIf: membershipList
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "LeaveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0
+
     - label: "TH 1 Add Group KeySet."
       cluster: "Group Key Management"
       endpoint: 0

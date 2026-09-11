@@ -145,6 +145,26 @@ tests:
       cluster: "Groups"
       command: "RemoveAllGroups"
 
+    - label: "TH reads the Groupcast membership attribute."
+      PICS: "GC.S"
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "readAttribute"
+      attribute: "Membership"
+      response:
+          saveAs: membershipList
+
+    - label: "TH leaves all Groupcast groups."
+      PICS: "GC.S"
+      runIf: membershipList
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "LeaveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0
+
     - label: "TH sends a AddGroup command to DUT for G1."
       PICS: "!GC.S"
       cluster: "Groups"
