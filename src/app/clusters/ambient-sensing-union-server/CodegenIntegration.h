@@ -1,5 +1,7 @@
 /*
+ *
  *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,17 +16,12 @@
  *    limitations under the License.
  */
 
-#include "OOBAccessors.h"
-#include "AmbientContextSensor.h"
-#include <lib/support/CodeUtils.h>
-#include <oob-accessors/clusters/AmbientContextOOBAccessor.h>
+#pragma once
 
-namespace chip::app {
+#include <app/clusters/ambient-sensing-union-server/AmbientSensingUnionCluster.h>
 
-void RegisterOOBAccessors(AmbientContextSensor & device, OOBAccessorRegistry & registry)
-{
-    LogErrorOnFailure(registry.Register(std::make_unique<AmbientContextOOBAccessor>(
-        device.AmbientContextSensingCluster(), device.AmbientSensingUnionCluster(), device.GetEndpointId())));
-}
+namespace chip::app::Clusters::AmbientSensingUnion {
 
-} // namespace chip::app
+AmbientSensingUnionCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+} // namespace chip::app::Clusters::AmbientSensingUnion

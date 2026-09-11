@@ -16,6 +16,7 @@
  */
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
+#include <app/clusters/ambient-sensing-union-server/AmbientSensingUnionCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
@@ -229,7 +230,10 @@ TEST_F(TestOOBAccessors, AmbientContextOOBAccessor)
     cluster.SetDelegate(&delegate);
     EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
 
-    auto accessor = std::make_unique<AmbientContextOOBAccessor>(cluster, 1);
+    Clusters::AmbientSensingUnionClusterT<4> unionCluster(Clusters::AmbientSensingUnionCluster::Config(1));
+    EXPECT_EQ(unionCluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
+
+    auto accessor = std::make_unique<AmbientContextOOBAccessor>(cluster, unionCluster, 1);
     EXPECT_EQ(registry.Register(std::move(accessor)), CHIP_NO_ERROR);
 
     uint8_t buffer[256];

@@ -71,6 +71,30 @@ CHIP_ERROR AmbientContextTranslator::TranslateAndExecute(EndpointId endpointId, 
     {
         return TranslateSetObjectCount(endpointId, json, registry);
     }
+    if (actionName == "AddAmbientSensingContributor")
+    {
+        return TranslateAddAmbientSensingContributor(endpointId, json, registry);
+    }
+    if (actionName == "RemoveAmbientSensingContributor")
+    {
+        return TranslateRemoveAmbientSensingContributor(endpointId, json, registry);
+    }
+    if (actionName == "AddAmbientSensingNonMatterContributor")
+    {
+        return TranslateAddAmbientSensingNonMatterContributor(endpointId, json, registry);
+    }
+    if (actionName == "RemoveAmbientSensingNonMatterContributor")
+    {
+        return TranslateRemoveAmbientSensingNonMatterContributor(endpointId, json, registry);
+    }
+    if (actionName == "UpdateAmbientSensingContributorStatus")
+    {
+        return TranslateUpdateAmbientSensingContributorStatus(endpointId, json, registry);
+    }
+    if (actionName == "SetAmbientSensingUnionName")
+    {
+        return TranslateSetAmbientSensingUnionName(endpointId, json, registry);
+    }
 
     return CHIP_ERROR_NOT_FOUND;
 }
@@ -216,6 +240,190 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetObjectCount(EndpointId endpoint
     VerifyOrReturnError(objectCount.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
     return DispatchAction(registry, "SetObjectCount"_span, endpointId, *objectCount);
+}
+
+namespace {
+
+NodeId ParseNodeIdFromJson(const Json::Value & json)
+{
+    if (!json.isMember("NodeId"))
+    {
+        return kUndefinedNodeId;
+    }
+    if (json["NodeId"].isString())
+    {
+        std::string s = json["NodeId"].asString();
+        return static_cast<NodeId>(strtoull(s.c_str(), nullptr, 0));
+    }
+    if (json["NodeId"].isIntegral())
+    {
+        return static_cast<NodeId>(json["NodeId"].asUInt64());
+    }
+    return kUndefinedNodeId;
+}
+
+} // namespace
+
+CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientSensingContributor(EndpointId endpointId, const Json::Value & json,
+                                                                           OOBAccessorRegistry & registry) const
+{
+    NodeId nodeId = ParseNodeIdFromJson(json);
+    VerifyOrReturnError(nodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto contributorEndpointIdOpt = ExtractUInt<EndpointId>(json, "ContributorEndpointId");
+    VerifyOrReturnError(contributorEndpointIdOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto statusOpt = ExtractUInt<uint8_t>(json, "Status");
+    VerifyOrReturnError(statusOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Estimate buffer: nodeId(8) + contributorEndpointId(4) + status(3) + optional name(128) + optional fabricIndex(3)
+    TlvMessageBuffer message(150);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(2), nodeId));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(3), *contributorEndpointIdOpt));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(4), *statusOpt));
+
+    if (json.isMember("ContributorName") && json["ContributorName"].isString())
+    {
+        std::string name = json["ContributorName"].asString();
+        ReturnErrorOnFailure(message.Writer().PutString(TLV::ContextTag(5), name.c_str()));
+    }
+
+    if (json.isMember("FabricIndex") && json["FabricIndex"].isIntegral())
+    {
+        auto fabricIndexOpt = ExtractUInt<FabricIndex>(json, "FabricIndex");
+        VerifyOrReturnError(fabricIndexOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(6), *fabricIndexOpt));
+    }
+
+    ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
+
+    ByteSpan payload;
+    ReturnErrorOnFailure(message.Finalize(payload));
+    return registry.HandleAction("AddAmbientSensingContributor"_span, payload);
+}
+
+CHIP_ERROR AmbientContextTranslator::TranslateRemoveAmbientSensingContributor(EndpointId endpointId, const Json::Value & json,
+                                                                              OOBAccessorRegistry & registry) const
+{
+    NodeId nodeId = ParseNodeIdFromJson(json);
+    VerifyOrReturnError(nodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto contributorEndpointIdOpt = ExtractUInt<EndpointId>(json, "ContributorEndpointId");
+    VerifyOrReturnError(contributorEndpointIdOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    TlvMessageBuffer message(16);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(2), nodeId));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(3), *contributorEndpointIdOpt));
+    ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
+
+    ByteSpan payload;
+    ReturnErrorOnFailure(message.Finalize(payload));
+    return registry.HandleAction("RemoveAmbientSensingContributor"_span, payload);
+}
+
+CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientSensingNonMatterContributor(EndpointId endpointId, const Json::Value & json,
+                                                                                    OOBAccessorRegistry & registry) const
+{
+    VerifyOrReturnError(json.isMember("ContributorName") && json["ContributorName"].isString(), CHIP_ERROR_INVALID_ARGUMENT);
+    std::string name = json["ContributorName"].asString();
+    VerifyOrReturnError(!name.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto statusOpt = ExtractUInt<uint8_t>(json, "Status");
+    VerifyOrReturnError(statusOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    TlvMessageBuffer message(name.size() + 16);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
+    ReturnErrorOnFailure(message.Writer().PutString(TLV::ContextTag(2), name.c_str()));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(3), *statusOpt));
+
+    if (json.isMember("FabricIndex") && json["FabricIndex"].isIntegral())
+    {
+        auto fabricIndexOpt = ExtractUInt<FabricIndex>(json, "FabricIndex");
+        VerifyOrReturnError(fabricIndexOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(4), *fabricIndexOpt));
+    }
+
+    ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
+
+    ByteSpan payload;
+    ReturnErrorOnFailure(message.Finalize(payload));
+    return registry.HandleAction("AddAmbientSensingNonMatterContributor"_span, payload);
+}
+
+CHIP_ERROR AmbientContextTranslator::TranslateRemoveAmbientSensingNonMatterContributor(EndpointId endpointId,
+                                                                                       const Json::Value & json,
+                                                                                       OOBAccessorRegistry & registry) const
+{
+    VerifyOrReturnError(json.isMember("ContributorName") && json["ContributorName"].isString(), CHIP_ERROR_INVALID_ARGUMENT);
+    std::string name = json["ContributorName"].asString();
+    VerifyOrReturnError(!name.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    return DispatchStringAction(registry, "RemoveAmbientSensingNonMatterContributor"_span, endpointId,
+                                CharSpan::fromCharString(name.c_str()));
+}
+
+CHIP_ERROR AmbientContextTranslator::TranslateUpdateAmbientSensingContributorStatus(EndpointId endpointId, const Json::Value & json,
+                                                                                    OOBAccessorRegistry & registry) const
+{
+    auto statusOpt = ExtractUInt<uint8_t>(json, "Status");
+    VerifyOrReturnError(statusOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    bool hasMatter    = json.isMember("NodeId");
+    bool hasNonMatter = json.isMember("ContributorName") && json["ContributorName"].isString();
+    VerifyOrReturnError(hasMatter || hasNonMatter, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Estimate: nodeId(8) + contributorEndpointId(4) + status(3) + name(128)
+    TlvMessageBuffer message(150);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(message.Writer().StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(1), endpointId));
+    ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(2), *statusOpt));
+
+    if (hasMatter)
+    {
+        NodeId nodeId = ParseNodeIdFromJson(json);
+        VerifyOrReturnError(nodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+
+        auto contributorEndpointIdOpt = ExtractUInt<EndpointId>(json, "ContributorEndpointId");
+        VerifyOrReturnError(contributorEndpointIdOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(3), nodeId));
+        ReturnErrorOnFailure(message.Writer().Put(TLV::ContextTag(4), *contributorEndpointIdOpt));
+    }
+    else
+    {
+        std::string name = json["ContributorName"].asString();
+        VerifyOrReturnError(!name.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(message.Writer().PutString(TLV::ContextTag(5), name.c_str()));
+    }
+
+    ReturnErrorOnFailure(message.Writer().EndContainer(outerType));
+
+    ByteSpan payload;
+    ReturnErrorOnFailure(message.Finalize(payload));
+    return registry.HandleAction("UpdateAmbientSensingContributorStatus"_span, payload);
+}
+
+CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientSensingUnionName(EndpointId endpointId, const Json::Value & json,
+                                                                         OOBAccessorRegistry & registry) const
+{
+    VerifyOrReturnError(json.isMember("UnionName") && json["UnionName"].isString(), CHIP_ERROR_INVALID_ARGUMENT);
+    std::string name = json["UnionName"].asString();
+    VerifyOrReturnError(!name.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    return DispatchStringAction(registry, "SetAmbientSensingUnionName"_span, endpointId, CharSpan::fromCharString(name.c_str()));
 }
 
 } // namespace chip::app::NamedPipe
