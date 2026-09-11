@@ -67,17 +67,6 @@ SimulatedWindowCovering::~SimulatedWindowCovering()
     mContext.timerDelegate.CancelTimer(this);
 }
 
-CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                             EndpointComposition composition)
-{
-    ReturnErrorOnFailure(WindowCovering::Register(endpoint, provider, composition));
-
-    // Lift/tilt current positions start null (uncalibrated), matching real hardware that doesn't
-    // know its position until it self-calibrates. See HandleMovement() for the calibration flow.
-
-    return CHIP_NO_ERROR;
-}
-
 void SimulatedWindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mContext.timerDelegate.CancelTimer(this);
@@ -166,9 +155,9 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
     // No need to freeze targets here: WindowCoveringCluster::HandleStopMotion() already sets
     // target = current for us right after this returns CHIP_NO_ERROR.
 
-    auto currentLift = cluster.GetCurrentPositionLiftPercent100ths();
-    auto currentTilt = cluster.GetCurrentPositionTiltPercent100ths();
-    auto opStatus    = cluster.GetOperationalStatus();
+    auto currentLift               = cluster.GetCurrentPositionLiftPercent100ths();
+    auto currentTilt               = cluster.GetCurrentPositionTiltPercent100ths();
+    [[maybe_unused]] auto opStatus = cluster.GetOperationalStatus();
 
     // Longest content is "65535\0" (max uint16_t), so 6 bytes covers either that or "NULL\0".
     StringBuilder<6> liftStr;

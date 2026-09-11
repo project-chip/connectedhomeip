@@ -33,7 +33,6 @@ public:
     explicit SimulatedWindowCovering(const Context & context);
     ~SimulatedWindowCovering() override;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // IdentifyDelegate implementation
