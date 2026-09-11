@@ -31,9 +31,9 @@ using chip::Protocols::InteractionModel::Status;
 
 ThermostatUserInterfaceConfigurationCluster::ThermostatUserInterfaceConfigurationCluster(EndpointId endpointId,
                                                                                          const Config & config) :
-    DefaultServerCluster({ endpointId, ThermostatUserInterfaceConfiguration::Id }),
-    mOptionalAttributes(config.optionalAttributes), mTemperatureDisplayMode(config.temperatureDisplayMode),
-    mKeypadLockout(config.keypadLockout), mScheduleProgrammingVisibility(config.scheduleProgrammingVisibility)
+    DefaultServerCluster({ endpointId, ThermostatUserInterfaceConfiguration::Id }), mOptionalAttributes(config.optionalAttributes),
+    mTemperatureDisplayMode(config.temperatureDisplayMode), mKeypadLockout(config.keypadLockout),
+    mScheduleProgrammingVisibility(config.scheduleProgrammingVisibility)
 {}
 
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::Attributes(const ConcreteClusterPath & path,
