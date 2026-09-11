@@ -64,6 +64,7 @@ CHIP_ERROR GetFactoryDataString(const FactoryDataString & str, char * buf, size_
 } // namespace
 
 namespace DeviceLayer {
+
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
 {
@@ -109,12 +110,6 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
         free(ptr); // Only free on failure
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
-
-    // LOG_INF("[ParseFactoryData - ParseFactoryData] DAC priv key len=%u", mFactoryData.dac_priv_key.len);
-    // LOG_HEXDUMP_INF(mFactoryData.dac_priv_key.data, mFactoryData.dac_priv_key.len, "DAC PRIV KEY");
-
-    // LOG_INF("[ParseFactoryData - ParseFactoryData] DAC cert len=%u", mFactoryData.dac_cert.len);
-    // LOG_HEXDUMP_INF(mFactoryData.dac_cert.data, mFactoryData.dac_cert.len, "DAC CERT");
 
     // Release the memory of mFactoryDataBuffer after complete parse
     free(ptr);
@@ -206,19 +201,11 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
 
     GetFactoryData(P_DACCert, mFactoryData.dac_cert.data, mFactoryData.dac_cert.len);
 
-    // LOG_INF("[SignWithDeviceAttestationKey] DAC cert len=%u", mFactoryData.dac_cert.len);
-    // LOG_HEXDUMP_INF(mFactoryData.dac_cert.data, mFactoryData.dac_cert.len, "mFactoryData.dac_cert.data");
-    // LOG_HEXDUMP_INF(P_DACCert, mFactoryData.dac_cert.len, "DAC CERT - P_DACCert");
-
     // Extract public key from DAC cert.
     ByteSpan dacCertSpan{ reinterpret_cast<uint8_t *>(P_DACCert), mFactoryData.dac_cert.len };
-    // LOG_INF("[SignWithDeviceAttestationKey] DAC cert len=%u", dacCertSpan.size());
-    // LOG_HEXDUMP_INF(dacCertSpan.data(), dacCertSpan.size(), "DAC CERT");
     chip::Crypto::P256PublicKey dacPublicKey;
 
     error = chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey);
-    // LOG_INF("[SignWithDeviceAttestationKey] DAC pub key len=%u", dacPublicKey.Length());
-    // LOG_HEXDUMP_INF(dacPublicKey.Bytes(), dacPublicKey.Length(), "DAC PUB KEY");
 
     free(P_DACCert);
     if (error != CHIP_NO_ERROR)
