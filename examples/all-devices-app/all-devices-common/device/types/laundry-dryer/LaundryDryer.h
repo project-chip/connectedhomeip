@@ -18,15 +18,15 @@
 #pragma once
 
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/operational-state-server/OperationalStateDelegate.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
 
 namespace chip::app {
 
 class LaundryDryer : public SingleEndpoint
 {
 public:
-    LaundryDryer();
+    explicit LaundryDryer(Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate);
     ~LaundryDryer() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -35,7 +35,7 @@ public:
     Clusters::OperationalState::OperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
 
 private:
-    Clusters::OperationalState::LoggingOperationalStateDelegate mDelegate;
+    Clusters::OperationalState::OperationalStateCluster::Delegate & mDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
 };
 

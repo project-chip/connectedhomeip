@@ -190,6 +190,10 @@ LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType & value);
 
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::DecodableType & value);
+
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType & value);
 
@@ -383,6 +387,12 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Structs::SensorScheduleTransitionStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Structs::ThermostatSuggestionStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -439,6 +449,9 @@ LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ProximityRanging::Structs::RangingConstraintStruct::DecodableType & value);
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,

@@ -62,20 +62,24 @@ public:
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
+        uint16_t minGuaranteedSubscriptionsPerFabric;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     };
 
-    RootNode(const Context & context) :
-        SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)), mContext(context)
-    {}
+    RootNode(const Context & context) : SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(kDeviceTypes)), mContext(context) {}
     ~RootNode() override = default;
 
+    using SingleEndpoint::Register;
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::BasicInformationCluster & BasicInformation() { return mBasicInformationCluster.Cluster(); }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 
 protected:
     Context mContext;
@@ -83,6 +87,12 @@ protected:
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
 private:
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    static constexpr DataModel::DeviceTypeEntry kDeviceTypes[] = { Device::Type::kRootNode, Device::Type::kOtaRequestor };
+#else
+    static constexpr DataModel::DeviceTypeEntry kDeviceTypes[] = { Device::Type::kRootNode };
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
     LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
         mAdministratorCommissioningCluster;

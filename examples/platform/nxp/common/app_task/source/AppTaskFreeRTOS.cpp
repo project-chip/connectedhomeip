@@ -85,6 +85,11 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+// Defined in the ot-nxp submodule (border_agent.c), which is a C source file.
+extern "C" const char sBaseServiceInstanceName[];
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TBR
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 chip::DeviceLayer::NetworkCommissioning::WiFiDriver * chip::NXP::App::AppTaskFreeRTOS::GetWifiDriverInstance()
@@ -231,3 +236,10 @@ void chip::NXP::App::AppTaskFreeRTOS::DispatchEvent(const AppEvent & event)
         ChipLogProgress(DeviceLayer, "Event received with no handler. Dropping event.");
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+chip::CharSpan chip::NXP::App::AppTaskFreeRTOS::GetBorderRouterName()
+{
+    return BuildBorderRouterName(sBaseServiceInstanceName);
+}
+#endif

@@ -2548,6 +2548,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentFabricIndex";
             break;
 
+        case MTRAttributeIDTypeClusterOperationalCredentialsAttributePQCDeviceAttestationProfileID:
+            result = @"PQCDeviceAttestationProfile";
+            break;
+
         case MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -6068,6 +6072,26 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ThermostatSuggestionNotFollowingReason";
             break;
 
+        case MTRAttributeIDTypeClusterThermostatAttributeSensorsID:
+            result = @"Sensors";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorsID:
+            result = @"AvailableSensors";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorsID:
+            result = @"EnabledSensors";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfSensorScheduleTransitionsID:
+            result = @"NumberOfSensorScheduleTransitions";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeSensorScheduleID:
+            result = @"SensorSchedule";
+            break;
+
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -6224,6 +6248,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster Humidistat attributes
+        case MTRAttributeIDTypeClusterHumidistatAttributeSupportedModesID:
+            result = @"SupportedModes";
+            break;
+
         case MTRAttributeIDTypeClusterHumidistatAttributeModeID:
             result = @"Mode";
             break;
@@ -6266,6 +6294,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterHumidistatAttributeOptimalID:
             result = @"Optimal";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeCondPumpEnabledID:
+            result = @"CondPumpEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeCondRunCountID:
+            result = @"CondRunCount";
             break;
 
         case MTRAttributeIDTypeClusterHumidistatAttributeGeneratedCommandListID:
@@ -7984,6 +8020,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SessionIDList";
             break;
 
+        case MTRAttributeIDTypeClusterProximityRangingAttributeRangingConstraintsID:
+            result = @"RangingConstraints";
+            break;
+
         case MTRAttributeIDTypeClusterProximityRangingAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -9554,6 +9594,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeCurrentConnectionsID:
             result = @"CurrentConnections";
+            break;
+
+        case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeMaxZonesID:
+            result = @"MaxZones";
             break;
 
         case MTRAttributeIDTypeClusterPushAVStreamTransportAttributeGeneratedCommandListID:
@@ -13453,6 +13497,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterPushAVStreamTransportCommandFindTransportID:
             result = @"FindTransport";
+            break;
+
+        case MTRCommandIDTypeClusterPushAVStreamTransportCommandUpdateMotionZoneOptionsID:
+            result = @"UpdateMotionZoneOptions";
             break;
 
         default:

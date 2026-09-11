@@ -43,9 +43,9 @@ using chip::Protocols::InteractionModel::Status;
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    // As per spec, 9 attributes are scenable in the color control cluster, if new scenables attributes are added, this value should
-    // be updated.
-    static constexpr uint8_t kColorControlScenableAttributesCount = 9;
+    // As per spec, 10 attributes are scenable in the color control cluster, if new scenables attributes are added, this value
+    // should be updated.
+    static constexpr uint8_t kColorControlScenableAttributesCount = 10; // XY + EnhancedHue + HS + Loop + Temp + Mode
 
     DefaultColorControlSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
     ~DefaultColorControlSceneHandler() override = default;
@@ -76,21 +76,21 @@ public:
             {
                 xValue = 0x616B; // Default X value according to spec
             }
-            AddAttributeValuePair<uint16_t>(pairs, Attributes::CurrentX::Id, xValue, attributeCount);
+            ReturnErrorOnFailure(AddAttributeValuePair(pairs, Attributes::CurrentX::Id, xValue, attributeCount));
 
             uint16_t yValue;
             if (Status::Success != Attributes::CurrentY::Get(endpoint, &yValue))
             {
                 yValue = 0x607D; // Default Y value according to spec
             }
-            AddAttributeValuePair<uint16_t>(pairs, Attributes::CurrentY::Id, yValue, attributeCount);
+            ReturnErrorOnFailure(AddAttributeValuePair(pairs, Attributes::CurrentY::Id, yValue, attributeCount));
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kEnhancedHue))
         {
             uint16_t hueValue = 0x0000;
             Attributes::EnhancedCurrentHue::Get(endpoint, &hueValue);
-            AddAttributeValuePair<uint16_t>(pairs, Attributes::EnhancedCurrentHue::Id, hueValue, attributeCount);
+            ReturnErrorOnFailure(AddAttributeValuePair(pairs, Attributes::EnhancedCurrentHue::Id, hueValue, attributeCount));
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kHueAndSaturation))
@@ -100,7 +100,14 @@ public:
             {
                 saturationValue = 0x00;
             }
-            AddAttributeValuePair<uint8_t>(pairs, Attributes::CurrentSaturation::Id, saturationValue, attributeCount);
+            ReturnErrorOnFailure(AddAttributeValuePair(pairs, Attributes::CurrentSaturation::Id, saturationValue, attributeCount));
+
+            uint8_t hueValue;
+            if (Status::Success != Attributes::CurrentHue::Get(endpoint, &hueValue))
+            {
+                hueValue = 0x00;
+            }
+            ReturnErrorOnFailure(AddAttributeValuePair(pairs, Attributes::CurrentHue::Id, hueValue, attributeCount));
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorLoop))
@@ -110,21 +117,22 @@ public:
             {
                 loopActiveValue = 0x00;
             }
-            AddAttributeValuePair<uint8_t>(pairs, Attributes::ColorLoopActive::Id, loopActiveValue, attributeCount);
+            ReturnErrorOnFailure(AddAttributeValuePair(pairs, Attributes::ColorLoopActive::Id, loopActiveValue, attributeCount));
 
             uint8_t loopDirectionValue;
             if (Status::Success != Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue))
             {
                 loopDirectionValue = 0x00;
             }
-            AddAttributeValuePair<uint8_t>(pairs, Attributes::ColorLoopDirection::Id, loopDirectionValue, attributeCount);
+            ReturnErrorOnFailure(
+                AddAttributeValuePair(pairs, Attributes::ColorLoopDirection::Id, loopDirectionValue, attributeCount));
 
             uint16_t loopTimeValue;
             if (Status::Success != Attributes::ColorLoopTime::Get(endpoint, &loopTimeValue))
             {
                 loopTimeValue = 0x0019; // Default loop time value according to spec
             }
-            AddAttributeValuePair<uint16_t>(pairs, Attributes::ColorLoopTime::Id, loopTimeValue, attributeCount);
+            ReturnErrorOnFailure(AddAttributeValuePair(pairs, Attributes::ColorLoopTime::Id, loopTimeValue, attributeCount));
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorTemperature))
@@ -134,7 +142,8 @@ public:
             {
                 temperatureValue = 0x00FA; // Default temperature value according to spec
             }
-            AddAttributeValuePair<uint16_t>(pairs, Attributes::ColorTemperatureMireds::Id, temperatureValue, attributeCount);
+            ReturnErrorOnFailure(
+                AddAttributeValuePair(pairs, Attributes::ColorTemperatureMireds::Id, temperatureValue, attributeCount));
         }
 
         EnhancedColorMode modeValue;
@@ -142,7 +151,8 @@ public:
         {
             modeValue = EnhancedColorMode::kCurrentXAndCurrentY; // Default mode value according to spec
         }
-        AddAttributeValuePair(pairs, Attributes::EnhancedColorMode::Id, to_underlying(modeValue), attributeCount);
+        ReturnErrorOnFailure(
+            AddAttributeValuePair(pairs, Attributes::EnhancedColorMode::Id, to_underlying(modeValue), attributeCount));
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs, attributeCount);
 
@@ -165,7 +175,7 @@ public:
         size_t attributeCount = 0;
         auto pair_iterator    = attributeValueList.begin();
 
-        // The color control cluster should have a maximum of 9 scenable attributes
+        // The color control cluster should have a maximum of kColorControlScenableAttributesCount scenable attributes
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
         VerifyOrReturnError(attributeCount <= kColorControlScenableAttributesCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -231,6 +241,13 @@ public:
                                                                           colorSaturationTransitionState->highLimit);
                 }
                 break;
+            case Attributes::CurrentHue::Id:
+                if (SupportsColorMode(endpoint, EnhancedColorMode::kCurrentHueAndCurrentSaturation))
+                {
+                    VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                    colorHueTransitionState->finalHue = decodePair.valueUnsigned8.Value();
+                }
+                break;
             case Attributes::ColorLoopActive::Id:
                 VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
                 loopActiveValue = decodePair.valueUnsigned8.Value();
@@ -292,8 +309,9 @@ public:
             {
             case EnhancedColorMode::kCurrentHueAndCurrentSaturation:
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
-                ColorControlServer::Instance().moveToSaturation(
-                    endpoint, static_cast<uint8_t>(colorSaturationTransitionState->finalValue), transitionTime10th);
+                ColorControlServer::Instance().moveToHueAndSaturation(
+                    endpoint, colorHueTransitionState->finalHue, static_cast<uint8_t>(colorSaturationTransitionState->finalValue),
+                    transitionTime10th, false);
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 break;
             case EnhancedColorMode::kCurrentXAndCurrentY:
@@ -351,11 +369,13 @@ private:
     /// @param value attribute value
     /// @param attributeCount number of attributes in the list, incremented by this function, used to keep track of how many
     /// attributes from the array are being used for the list to encode
-    template <typename Type>
-    void AddAttributeValuePair(ScenesManagement::Structs::AttributeValuePairStruct::Type * pairs, AttributeId id, Type value,
-                               size_t & attributeCount)
+    /// @return CHIP_NO_ERROR no errors, CHIP_ERROR_BUFFER_TOO_SMALL if we are trying to serialize past the array size
+    template <size_t N, typename Type>
+    CHIP_ERROR AddAttributeValuePair(ScenesManagement::Structs::AttributeValuePairStruct::Type (&pairs)[N], AttributeId id,
+                                     Type value, size_t & attributeCount)
     {
         static_assert((std::is_same_v<Type, uint8_t>) || (std::is_same_v<Type, uint16_t>), "Type must be uint8_t or uint16_t");
+        VerifyOrReturnError(attributeCount < N, CHIP_ERROR_BUFFER_TOO_SMALL);
 
         pairs[attributeCount].attributeID = id;
         if constexpr ((std::is_same_v<Type, uint8_t>) )
@@ -367,6 +387,7 @@ private:
             pairs[attributeCount].valueUnsigned16.SetValue(value);
         }
         attributeCount++;
+        return CHIP_NO_ERROR;
     }
 };
 static DefaultColorControlSceneHandler sColorControlSceneHandler;
@@ -1623,9 +1644,6 @@ Status ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, ui
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
 
     Status status = moveToHueAndSaturation(endpoint, hue, saturation, transitionTime, isEnhanced);
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return status;
 }
 
@@ -1804,9 +1822,6 @@ Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
 
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
     Status status = moveToSaturation(endpoint, commandData.saturation, commandData.transitionTime);
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return status;
 }
 
@@ -1972,9 +1987,6 @@ Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands:
         }
     }
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return Status::Success;
 }
 
@@ -2227,9 +2239,6 @@ Status ColorControlServer::moveToColorCommand(EndpointId endpoint, const Command
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     Status status = moveToColor(endpoint, commandData.colorX, commandData.colorY, commandData.transitionTime);
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return status;
 }
 
@@ -2779,9 +2788,6 @@ Status ColorControlServer::moveToColorTempCommand(EndpointId endpoint,
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     Status status = moveToColorTemp(endpoint, commandData.colorTemperatureMireds, commandData.transitionTime);
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return status;
 }
 

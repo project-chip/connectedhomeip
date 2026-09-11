@@ -31,31 +31,29 @@ namespace Humidistat {
 // Enum for ModeEnum
 enum class ModeEnum : uint8_t
 {
-    kOff          = 0x00,
-    kHumidifier   = 0x01,
-    kDehumidifier = 0x02,
-    kAuto         = 0x03,
-    kFanOnly      = 0x04,
+    kHumidifier   = 0x00,
+    kDehumidifier = 0x01,
+    kAuto         = 0x02,
+    kFanOnly      = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 4,
 };
 
 // Enum for SystemStateEnum
 enum class SystemStateEnum : uint8_t
 {
-    kOff           = 0x00,
-    kHumidifying   = 0x01,
-    kDehumidifying = 0x02,
-    kFan           = 0x03,
-    kIdle          = 0x04,
+    kHumidifying   = 0x00,
+    kDehumidifying = 0x01,
+    kFan           = 0x02,
+    kIdle          = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 4,
 };
 
 // Bitmap for Feature
@@ -70,6 +68,7 @@ enum class Feature : uint32_t
     kOptimal      = 0x40,
     kWarmMist     = 0x80,
     kColdMist     = 0x100,
+    kCondPump     = 0x200,
 };
 
 // Bitmap for MistTypeBitmap

@@ -43,6 +43,18 @@ namespace Clusters {
 namespace Humidistat {
 namespace Attributes {
 
+namespace SupportedModes {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::Humidistat::ModeEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::ModeEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::ModeEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Humidistat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedModes
 namespace Mode {
 struct TypeInfo
 {
@@ -175,6 +187,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Optimal
+namespace CondPumpEnabled {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Humidistat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CondPumpEnabled::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CondPumpEnabled
+namespace CondRunCount {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Humidistat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CondRunCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CondRunCount
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -214,6 +250,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::Mode::TypeInfo::DecodableType mode = static_cast<chip::app::Clusters::Humidistat::ModeEnum>(0);
         Attributes::SystemState::TypeInfo::DecodableType systemState =
             static_cast<chip::app::Clusters::Humidistat::SystemStateEnum>(0);
@@ -224,9 +261,11 @@ struct TypeInfo
         Attributes::TargetSetpoint::TypeInfo::DecodableType targetSetpoint = static_cast<chip::Percent>(0);
         Attributes::MistType::TypeInfo::DecodableType mistType =
             static_cast<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>(0);
-        Attributes::Continuous::TypeInfo::DecodableType continuous = static_cast<bool>(0);
-        Attributes::Sleep::TypeInfo::DecodableType sleep           = static_cast<bool>(0);
-        Attributes::Optimal::TypeInfo::DecodableType optimal       = static_cast<bool>(0);
+        Attributes::Continuous::TypeInfo::DecodableType continuous           = static_cast<bool>(0);
+        Attributes::Sleep::TypeInfo::DecodableType sleep                     = static_cast<bool>(0);
+        Attributes::Optimal::TypeInfo::DecodableType optimal                 = static_cast<bool>(0);
+        Attributes::CondPumpEnabled::TypeInfo::DecodableType condPumpEnabled = static_cast<bool>(0);
+        Attributes::CondRunCount::TypeInfo::DecodableType condRunCount       = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

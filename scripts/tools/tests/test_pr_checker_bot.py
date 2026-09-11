@@ -30,7 +30,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from pr_checker_bot import ELIGIBILITY_COMMENT_MARKER, PrCheckerBot, PRContext, UnresolvedThread, ValidationCheck  # noqa: E402
+from pr_checker_bot import (ELIGIBILITY_COMMENT_MARKER, MERGEABLE_BACKOFF_FACTOR, MERGEABLE_RETRY_LIMIT, PrCheckerBot,  # noqa: E402
+                            PRContext, UnresolvedThread, ValidationCheck)
 
 
 class TestPrCheckerBot(unittest.TestCase):
@@ -409,7 +410,7 @@ esp32:
 
         mock_pr.merge.assert_called_once_with(
             merge_method="squash",
-            commit_title="Test PR (Auto-merged by platform-bot)",
+            commit_title=f"Test PR (Auto-merged by platform-bot) (#{mock_pr.number})",
             sha="dummy_sha",
         )
 
@@ -1004,12 +1005,14 @@ esp32:
         comment_body = mock_pr.create_issue_comment.call_args[0][0]
         self.assertIn("PR has merge conflicts", comment_body)
 
-    def test_check_and_process_pr_merge_conflicts_computing(self) -> None:
+    @patch("time.sleep", return_value=None)
+    def test_check_and_process_pr_merge_conflicts_computing(self, mock_sleep: MagicMock) -> None:
         """Tests that a PR whose mergeability state is still computing is blocked."""
         files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
         reviews = [self.create_mock_review("doru91", "APPROVED")]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
         mock_pr.mergeable = None
+        self.mock_repo.get_pull.return_value = mock_pr
 
         self.bot.check_and_process_pr(mock_pr)
 
@@ -1017,6 +1020,7 @@ esp32:
         mock_pr.create_issue_comment.assert_called_once()
         comment_body = mock_pr.create_issue_comment.call_args[0][0]
         self.assertIn("Mergeability state is computing", comment_body)
+        mock_sleep.assert_called()
 
     def test_check_and_process_pr_dependabot_merge(self) -> None:
         """Tests that a Dependabot PR is merged when all checks pass."""
@@ -1127,7 +1131,7 @@ esp32:
         mock_pr.create_issue_comment.assert_not_called()
 
     def test_check_ci_ignores_old_non_critical_pending_suites(self) -> None:
-        """Tests that _check_ci_passed ignores pending non-critical suites older than 6 hours for Dependabot."""
+        """Tests that _check_ci_passed ignores pending non-critical suites older than 6 hours for any PR."""
         files = [self.create_mock_file("some/random/file.txt")]
         mock_pr = self.create_mock_pr(
             1, "Bump dependency", "dependabot[bot]", files, []
@@ -1184,6 +1188,20 @@ esp32:
         mock_buildjet_old_pending.conclusion = None
         mock_buildjet_old_pending.created_at = now - timedelta(hours=7)
 
+        # 8. Allowed non-critical suite (Mergify) - pending - old (7h > 6h) - should be ignored
+        mock_mergify_old_pending = MagicMock()
+        mock_mergify_old_pending.app.name = "Mergify"
+        mock_mergify_old_pending.status = "queued"
+        mock_mergify_old_pending.conclusion = None
+        mock_mergify_old_pending.created_at = now - timedelta(hours=7)
+
+        # 9. Allowed non-critical suite (coderabbitai) - pending - old (7h > 6h) - should be ignored
+        mock_coderabbitai_old_pending = MagicMock()
+        mock_coderabbitai_old_pending.app.name = "coderabbitai"
+        mock_coderabbitai_old_pending.status = "queued"
+        mock_coderabbitai_old_pending.conclusion = None
+        mock_coderabbitai_old_pending.created_at = now - timedelta(hours=7)
+
         # Test Case A: Only old non-critical pending suites present (and some passing suites to meet min 10 checks)
         # Should MERGE (ignore the old pending non-critical suites)
         mock_success_suite = MagicMock()
@@ -1195,7 +1213,9 @@ esp32:
             mock_testspace_old_pending,
             mock_sonarqube_old_pending,
             mock_buildjet_old_pending,
-        ] + [mock_success_suite] * 6
+            mock_mergify_old_pending,
+            mock_coderabbitai_old_pending,
+        ] + [mock_success_suite] * 4
 
         self.bot.check_and_process_pr(mock_pr)
         mock_pr.merge.assert_called_once()
@@ -1219,20 +1239,24 @@ esp32:
         mock_pr.merge.assert_not_called()
         mock_pr.reset_mock()
 
-        # Test Case D: Same old pending suite but PR is NOT from dependabot (e.g. platform merge)
-        # Should NOT merge (blocks because ignore is dependabot-specific)
+        # Test Case D: Same old pending suite but PR is non-Dependabot platform specific approved PR
+        # Should MERGE (stale-suite ignore applies to all PRs)
+        platform_files = [
+            self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")
+        ]
         mock_human_pr = self.create_mock_pr(
             2,
             "Platform changes",
             "doru91",
-            files,
+            platform_files,
             [self.create_mock_review("nxpdev", "APPROVED")],
         )
         self.mock_commit.get_check_suites.return_value = [
-            mock_non_critical_old_pending
-        ] + [mock_success_suite] * 9
+            mock_mergify_old_pending,
+            mock_non_critical_old_pending,
+        ] + [mock_success_suite] * 8
         self.bot.check_and_process_pr(mock_human_pr)
-        mock_human_pr.merge.assert_not_called()
+        mock_human_pr.merge.assert_called_once()
         mock_human_pr.reset_mock()
 
         # Test Case E: Old pending suite from unallowed app
@@ -1242,6 +1266,83 @@ esp32:
         ] + [mock_success_suite] * 9
         self.bot.check_and_process_pr(mock_pr)
         mock_pr.merge.assert_not_called()
+
+    @patch("time.sleep", return_value=None)
+    def test_mergeable_retry_success(self, mock_sleep: MagicMock) -> None:
+        """Tests that mergeable property retries and succeeds if state becomes available."""
+        mock_pr = MagicMock()
+        mock_pr.number = 1
+        mock_pr.mergeable = None
+        mock_pr.state = "open"
+
+        updated_pr = MagicMock()
+        updated_pr.number = 1
+        updated_pr.mergeable = True
+        updated_pr.state = "open"
+        self.mock_repo.get_pull.return_value = updated_pr
+
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+
+        self.assertTrue(context.mergeable)
+        self.mock_repo.get_pull.assert_called_once_with(1)
+        mock_sleep.assert_called_once_with(MERGEABLE_BACKOFF_FACTOR)
+
+    @patch("time.sleep", return_value=None)
+    def test_mergeable_retry_failure(self, mock_sleep: MagicMock) -> None:
+        """Tests that mergeable property retries and returns None if state stays computing."""
+        mock_pr = MagicMock()
+        mock_pr.number = 1
+        mock_pr.mergeable = None
+        mock_pr.state = "open"
+        self.mock_repo.get_pull.return_value = mock_pr
+
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+
+        from unittest.mock import call
+
+        self.assertIsNone(context.mergeable)
+        self.assertEqual(mock_sleep.call_count, MERGEABLE_RETRY_LIMIT)
+        expected_calls = [call(MERGEABLE_BACKOFF_FACTOR * i) for i in range(1, MERGEABLE_RETRY_LIMIT + 1)]
+        mock_sleep.assert_has_calls(expected_calls)
+        self.assertEqual(self.mock_repo.get_pull.call_count, MERGEABLE_RETRY_LIMIT)
+
+    @patch("time.sleep", return_value=None)
+    def test_mergeable_no_retry_if_closed(self, mock_sleep: MagicMock) -> None:
+        """Tests that mergeable property does not retry if the PR is closed."""
+        mock_pr = MagicMock()
+        mock_pr.number = 1
+        mock_pr.mergeable = None
+        mock_pr.state = "closed"
+
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+
+        self.assertIsNone(context.mergeable)
+        mock_sleep.assert_not_called()
+        self.mock_repo.get_pull.assert_not_called()
 
 
 if __name__ == "__main__":

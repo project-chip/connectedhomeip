@@ -55,18 +55,6 @@ enum class DatastoreAccessControlEntryPrivilegeEnum : uint8_t
     kUnknownEnumValue = 0,
 };
 
-// Enum for DatastoreGroupKeyMulticastPolicyEnum
-enum class DatastoreGroupKeyMulticastPolicyEnum : uint8_t
-{
-    kPerGroupID = 0x00,
-    kAllNodes   = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-
 // Enum for DatastoreGroupKeySecurityPolicyEnum
 enum class DatastoreGroupKeySecurityPolicyEnum : uint8_t
 {

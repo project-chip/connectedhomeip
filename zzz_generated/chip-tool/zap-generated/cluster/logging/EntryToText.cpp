@@ -1400,6 +1400,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "TrustedRootCertificates";
         case chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::Id:
             return "CurrentFabricIndex";
+        case chip::app::Clusters::OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id:
+            return "PQCDeviceAttestationProfile";
         case chip::app::Clusters::OperationalCredentials::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::OperationalCredentials::Attributes::AcceptedCommandList::Id:
@@ -3266,6 +3268,16 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentThermostatSuggestion";
         case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestionNotFollowingReason::Id:
             return "ThermostatSuggestionNotFollowingReason";
+        case chip::app::Clusters::Thermostat::Attributes::Sensors::Id:
+            return "Sensors";
+        case chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id:
+            return "AvailableSensors";
+        case chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id:
+            return "EnabledSensors";
+        case chip::app::Clusters::Thermostat::Attributes::NumberOfSensorScheduleTransitions::Id:
+            return "NumberOfSensorScheduleTransitions";
+        case chip::app::Clusters::Thermostat::Attributes::SensorSchedule::Id:
+            return "SensorSchedule";
         case chip::app::Clusters::Thermostat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Thermostat::Attributes::AcceptedCommandList::Id:
@@ -3347,6 +3359,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::Humidistat::Id: {
         switch (id)
         {
+        case chip::app::Clusters::Humidistat::Attributes::SupportedModes::Id:
+            return "SupportedModes";
         case chip::app::Clusters::Humidistat::Attributes::Mode::Id:
             return "Mode";
         case chip::app::Clusters::Humidistat::Attributes::SystemState::Id:
@@ -3369,6 +3383,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Sleep";
         case chip::app::Clusters::Humidistat::Attributes::Optimal::Id:
             return "Optimal";
+        case chip::app::Clusters::Humidistat::Attributes::CondPumpEnabled::Id:
+            return "CondPumpEnabled";
+        case chip::app::Clusters::Humidistat::Attributes::CondRunCount::Id:
+            return "CondRunCount";
         case chip::app::Clusters::Humidistat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Humidistat::Attributes::AcceptedCommandList::Id:
@@ -4250,6 +4268,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "BLTCSModeCapability";
         case chip::app::Clusters::ProximityRanging::Attributes::SessionIDList::Id:
             return "SessionIDList";
+        case chip::app::Clusters::ProximityRanging::Attributes::RangingConstraints::Id:
+            return "RangingConstraints";
         case chip::app::Clusters::ProximityRanging::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ProximityRanging::Attributes::AcceptedCommandList::Id:
@@ -5064,6 +5084,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedFormats";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id:
             return "CurrentConnections";
+        case chip::app::Clusters::PushAvStreamTransport::Attributes::MaxZones::Id:
+            return "MaxZones";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::PushAvStreamTransport::Attributes::AcceptedCommandList::Id:
@@ -6982,6 +7004,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ManuallyTriggerTransport";
         case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
             return "FindTransport";
+        case chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Id:
+            return "UpdateMotionZoneOptions";
         default:
             return "Unknown";
         }
@@ -7949,6 +7973,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Air Quality Sensor";
     case 0x0000002D:
         return "Air Purifier";
+    case 0x00000040:
+        return "Irrigation System";
     case 0x00000041:
         return "Water Freeze Detector";
     case 0x00000042:
@@ -7986,7 +8012,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x0000007C:
         return "Laundry Dryer";
     case 0x0000007D:
-        return "Humidifier/Dehumidifier";
+        return "Humidity Conditioner";
     case 0x00000090:
         return "Network Infrastructure Manager";
     case 0x00000091:
@@ -8039,6 +8065,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Camera Controller";
     case 0x00000148:
         return "Doorbell";
+    case 0x00000149:
+        return "AV Analysis Node";
     case 0x00000150:
         return "Ambient Context Sensor";
     case 0x00000152:
@@ -8087,10 +8115,16 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Electrical Energy Tariff";
     case 0x00000514:
         return "Electrical Meter";
+    case 0x00000515:
+        return "Arc Fault Circuit Interrupter";
     case 0x00000516:
         return "Electrical Circuit Breaker";
     case 0x00000517:
         return "Electrical Distribution Enclosure";
+    case 0x00000518:
+        return "Electrical Surge Protector";
+    case 0x00000519:
+        return "Residual Current Circuit Breaker";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:

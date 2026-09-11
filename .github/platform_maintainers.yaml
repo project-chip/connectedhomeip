@@ -72,6 +72,7 @@ realtek:
   maintainers:
     - pankore
     - shensaifeng
+    - xshuqun
   paths:
     - "src/platform/realtek/**"
     - "src/platform/Ameba/**"
@@ -103,6 +104,27 @@ stm32:
     - "config/stm32/**"
     - "third_party/st/**"
 
+tizen:
+  maintainers:
+    - dr-venkman
+  paths:
+    - "src/platform/Tizen/**"
+    - "examples/platform/tizen/**"
+    - "examples/**/tizen/**"
+    - "config/tizen/**"
+
+bouffalolab:
+   maintainers:
+     - wy-hh
+     - shchen-Lab
+     - stoneM2017
+   paths:
+     - "src/platform/bouffalolab/**"
+     - "examples/platform/bouffalolab/**"
+     - "examples/**/bouffalolab/**"
+     - "config/bouffalolab/**"
+     - "third_party/bouffalolab/**"
+
 # --- Proposals / Opt-In Templates ---
 
 # nrfconnect:
@@ -116,15 +138,6 @@ stm32:
 #     - "examples/**/nrfconnect/**"
 #     - "config/nrfconnect/**"
 # 
-# tizen:
-#   maintainers:
-#     - enkiusz
-#     - arkq
-#   paths:
-#     - "src/platform/Tizen/**"
-#     - "examples/platform/tizen/**"
-#     - "examples/**/tizen/**"
-#     - "config/tizen/**"
 # 
 # asr:
 #   maintainers:
@@ -143,15 +156,6 @@ stm32:
 #     - "examples/platform/beken/**"
 #     - "examples/**/beken/**"
 #     - "config/beken/**"
-# 
-# bouffalolab:
-#   maintainers:
-#     - wy-hh
-#   paths:
-#     - "src/platform/bouffalolab/**"
-#     - "examples/platform/bouffalolab/**"
-#     - "examples/**/bouffalolab/**"
-#     - "config/bouffalolab/**"
 # 
 # qpg:
 #   maintainers:

@@ -1586,6 +1586,9 @@ static BOOL AttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId aAtt
     case Attributes::CurrentFabricIndex::Id: {
         return YES;
     }
+    case Attributes::PQCDeviceAttestationProfile::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -4281,6 +4284,21 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
         return YES;
     }
+    case Attributes::Sensors::Id: {
+        return YES;
+    }
+    case Attributes::AvailableSensors::Id: {
+        return YES;
+    }
+    case Attributes::EnabledSensors::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfSensorScheduleTransitions::Id: {
+        return YES;
+    }
+    case Attributes::SensorSchedule::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -4401,6 +4419,9 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Humidistat;
     switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
     case Attributes::Mode::Id: {
         return YES;
     }
@@ -4432,6 +4453,12 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::Optimal::Id: {
+        return YES;
+    }
+    case Attributes::CondPumpEnabled::Id: {
+        return YES;
+    }
+    case Attributes::CondRunCount::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5744,6 +5771,9 @@ static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttribute
     case Attributes::SessionIDList::Id: {
         return YES;
     }
+    case Attributes::RangingConstraints::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -6949,6 +6979,9 @@ static BOOL AttributeIsSpecifiedInPushAVStreamTransportCluster(AttributeId aAttr
         return YES;
     }
     case Attributes::CurrentConnections::Id: {
+        return YES;
+    }
+    case Attributes::MaxZones::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

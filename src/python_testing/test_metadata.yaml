@@ -1,14 +1,54 @@
 # Tests that are NOT executed in CI, along with the reason on
 # why they are not.
 not_automated:
+    - name: TC_COMPRO_2_1.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_2.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_3.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_4.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_5.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_6.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_7.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_8.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_9.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
     - name: TC_DD_3_23.py
       reason:
-          NFC-Thread hardware setup needed for running this test-case and CI
-          does not support it
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_DD_3_24.py
       reason:
-          NFC-Thread hardware setup needed for running this test-case and CI
-          does not support it
+          NFC Reader needed for running this test-case and CI does not support
+          it
+    - name: TC_IDM_10_7.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_SC_TC_2_1.py
       reason: Test requires Thread MeshCoP hardware or simulation.
     - name: TC_SC_TC_2_2.py
@@ -61,6 +101,10 @@ not_automated:
       reason: Shared code for TC_EEM and TC_EPM, not a standalone test
     - name: TC_EGCTestBase.py
       reason: Shared code for TC_EGC, not a standalone test
+    - name: TC_EPALM_TestBase.py
+      reason: Shared code for TC_EPALM, not a standalone test
+    - name: TC_ESALM_TestBase.py
+      reason: Shared code for TC_ESALM, not a standalone test
     - name: TC_OpstateCommon.py
       reason: Shared code for TC_OPSTATE, not a standalone test
     - name: TC_pics_checker.py
@@ -184,11 +228,81 @@ not_automated:
       reason: Shared code for TC_GC, not a standalone test.
     - name: TC_S_common.py
       reason: Shared helper code for TC_S, not a standalone test.
+    - name: TC_OPCREDS_3_9.py
+      reason:
+          Needs a DUT started with a PQC-capable DAC provider, which the generic
+          CI harness does not set up.
+    - name: TC_DA_1_10.py
+      reason:
+          Needs a DUT started with a PQC-capable DAC provider and a PAA trust
+          store holding the matching ML-DSA PAA, which the generic CI harness
+          does not set up.
+    - name: TC_DA_1_12.py
+      reason:
+          Needs a DUT started with a PQC-capable DAC provider whose DAC
+          documents share one attestation key, plus a PAA trust store holding
+          the matching ML-DSA PAA, which the generic CI harness does not set up.
+    - name: TC_AUDIOCONTROLTestBase.py
+      reason: Shared code for TC_AUDIOCONTROL, not a standalone test.
+    - name: TC_MEDIAPLAYBACKTestBase.py
+      reason: Shared code for TC_MEDIAPLAYBACK, not a standalone test.
+    - name: TC_MESSTestBase.py
+      reason: Shared code for TC_MESS, not a standalone test.
+    - name: TC_MEDIAFILEMANAGEMENTTestBase.py
+      reason: Shared code for TC_MEDIAFILEMANAGEMENT, not a standalone test.
+    - name: TC_AUDIOCONTROL_2_1.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_2.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_3.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_4.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_5.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_6.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_7.py
+      reason: Pending tv-app in CI
+    - name: TC_AUDIOCONTROL_2_8.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAPLAYBACK_6_11.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAPLAYBACK_6_12.py
+      reason: Pending tv-app in CI
+    - name: TC_CONTENTLAUNCHER_10_10.py
+      reason: Pending tv-app in CI
+    - name: TC_MESS_1_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MESS_3_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_1_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_2_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_2_2.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_3_1.py
+      reason: Pending tv-app in CI
+    - name: TC_MEDIAFILEMANAGEMENT_3_2.py
+      reason: Pending tv-app in CI
+    - name: TC_CONTENTLAUNCHER_10_8.py
+      reason: Requires user interaction.
+    - name: TC_CONTENTLAUNCHER_10_9.py
+      reason: Requires a media URL PIXIT and user interaction.
+    - name: TC_ALOGIN_12_3.py
+      reason: Requires a user to complete an OAuth login on a second device.
+    - name: TC_MESS_3_2.py
+      reason: Requires real audio URI PIXITs and times actual playback.
+    - name: TC_MESS_3_3.py
+      reason: Requires an audio URI PIXIT and an operator to mute the DUT.
     # Items below MUST be fixed eventually.
     - name: TC_MCORE_FS_1_4.py
       reason:
           Very flaky in CI.
           https://github.com/project-chip/connectedhomeip/issues/71932
+    - name: TC_AVANALYTestBase.py
+      reason: Shared helper methods for AV Analysis tests, not a standalone test
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

@@ -1,1 +1,1 @@
-207 : [Silabs] Keep generative_ai; JDK 21; Bake SLT python/apack registry + slt CLI
+211 : [nrfconnect] Update nRF Connect SDK version in Docker to 3.4.0

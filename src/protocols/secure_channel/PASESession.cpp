@@ -33,7 +33,6 @@
 #include <string.h>
 
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -168,7 +167,7 @@ CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode
     Clear();
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
-    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext) }));
+    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan::fromCharString(kSpake2pContext)));
 
     mDelegate = delegate;
     ReturnErrorOnFailure(AllocateSecureSession(sessionManager));
@@ -373,9 +372,10 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     ReturnErrorOnFailure(tlvWriter.PutBoolean(AsTlvContextTag(PBKDFParamRequestTags::kHasPBKDFParameters), mHavePBKDFParameters));
 
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    mLocalSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
 
-    ReturnErrorOnFailure(EncodeSessionParameters(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionParams),
-                                                 mLocalMRPConfig.Value(), tlvWriter));
+    ReturnErrorOnFailure(
+        EncodeSessionParameters(AsTlvContextTag(PBKDFParamRequestTags::kInitiatorSessionParams), mLocalSessionParams, tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&req));
@@ -504,8 +504,9 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     }
 
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(EncodeSessionParameters(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams),
-                                                 mLocalMRPConfig.Value(), tlvWriter));
+    mLocalSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
+    ReturnErrorOnFailure(
+        EncodeSessionParameters(AsTlvContextTag(PBKDFParamResponseTags::kResponderSessionParams), mLocalSessionParams, tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&resp));

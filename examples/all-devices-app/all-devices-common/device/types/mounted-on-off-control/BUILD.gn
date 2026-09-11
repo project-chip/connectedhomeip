@@ -20,7 +20,24 @@ source_set("mounted-on-off-control") {
   sources = [
     "MountedOnOffControl.cpp",
     "MountedOnOffControl.h",
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
   ]
 
-  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/on-off-load:logging" ]
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/on-off-load:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+  ]
+}
+
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":mounted-on-off-control",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
 }

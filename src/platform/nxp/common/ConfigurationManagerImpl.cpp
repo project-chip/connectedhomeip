@@ -274,9 +274,33 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    CHIP_ERROR err;
-
+    CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "Performing factory reset");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    TEMPORARY_RETURN_IGNORED ThreadStackMgr().ClearAllSrpHostAndServices();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+// Lock the Thread stack to avoid unwanted interaction with settings NVS during factory reset.
+#if defined(CONFIG_OPENTHREAD) || defined(CONFIG_NET_L2_OPENTHREAD)
+#ifndef CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
+    // erase thread file system if we don't want to do a full NVS erase
+    ThreadStackMgr().ErasePersistentInfo();
+#endif
+    ThreadStackMgr().LockThreadStack();
+#endif
+
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
+    err = NXPConfig::FactoryResetEraseSettings();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "FactoryResetEraseSettings() failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+#else
+
+#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::FactoryDataPrvdImpl().FactoryReset();
+#endif
 
     err = NXPConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
@@ -284,16 +308,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    ThreadStackMgr().ErasePersistentInfo();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ConnectivityMgr().ErasePersistentInfo();
+#endif // CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
 
-#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::FactoryDataPrvdImpl().FactoryReset();
-#endif
-
-    /* Schedule a reset in the next idle call */
-    PlatformMgrImpl().ScheduleResetInIdle();
+    PlatformMgrImpl().Reset();
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)

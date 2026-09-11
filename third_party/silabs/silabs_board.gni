@@ -140,6 +140,14 @@ if (is_si917_board) {
 } else if (silabs_board == "BRD4187C") {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B220F1536IM48"
+} else if (silabs_board == "BRD2601B") {
+  silabs_family = "efr32mg24"
+  silabs_mcu = "EFR32MG24B310F1536IM48"
+
+  # ThunderBoards don't have a LCD,
+  show_qr_code = false
+  disable_lcd = true
+  sl_enable_rgb_led = true
 } else if (silabs_board == "BRD2703A") {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B020F1536IM48"
@@ -205,6 +213,9 @@ if (is_si917_board) {
 } else if (silabs_board == "BRD4118A") {
   silabs_family = "efr32mg26"
   silabs_mcu = "EFR32MG26B510F3200IL136"
+} else if (silabs_board == "BRD4120A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B410F3200IM68"
 } else if (silabs_board == "BRD2608A") {
   silabs_family = "efr32mg26"
   silabs_mcu = "EFR32MG26B510F3200IM68"
@@ -213,6 +224,11 @@ if (is_si917_board) {
   show_qr_code = false
   disable_lcd = true
   sl_enable_rgb_led = true
+
+  # Series 3 ----------
+} else if (silabs_board == "BRD4407A") {
+  silabs_family = "simg301"
+  silabs_mcu = "SIMG301M104LIL"
 
   # Custom Board ----------
 } else if (silabs_board == "CUSTOM") {
