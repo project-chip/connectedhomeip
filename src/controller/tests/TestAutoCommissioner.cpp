@@ -157,6 +157,39 @@ TEST_F(AutoCommissionerTest, FeaturesPassedTimeZoneValue)
     ASSERT_TRUE(commissioning_params.GetTimeZone().Value()[0].name.Value().data_equal("ARG"_span));
 }
 
+// Each stored time zone name must get its own row of mTimeZoneNames, so a second entry
+// cannot overwrite the first one's characters.
+TEST_F(AutoCommissionerTest, FeaturesPassedTimeZoneValuesDoNotOverlap)
+{
+    app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type sTimeZoneBuf[2];
+
+    constexpr CharSpan firstName  = "America/New_York"_span;
+    constexpr CharSpan secondName = "Europe/Berlin"_span;
+
+    sTimeZoneBuf[0].offset  = int32_t{ 10 };
+    sTimeZoneBuf[0].validAt = epochJanFirst2000;
+    sTimeZoneBuf[0].name.SetValue(firstName);
+
+    sTimeZoneBuf[1].offset  = int32_t{ 20 };
+    sTimeZoneBuf[1].validAt = epochJanFirst2001;
+    sTimeZoneBuf[1].name.SetValue(secondName);
+
+    app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> list(sTimeZoneBuf, 2);
+    mParams.SetTimeZone(list);
+
+    auto r = mCommissioner.SetCommissioningParameters(mParams);
+
+    auto commissioning_params = mCommissioner.GetCommissioningParameters();
+
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+    ASSERT_TRUE(commissioning_params.GetTimeZone().HasValue());
+    ASSERT_EQ(commissioning_params.GetTimeZone().Value().size(), size_t{ 2 });
+    ASSERT_TRUE(commissioning_params.GetTimeZone().Value()[0].name.HasValue());
+    ASSERT_TRUE(commissioning_params.GetTimeZone().Value()[1].name.HasValue());
+    EXPECT_TRUE(commissioning_params.GetTimeZone().Value()[0].name.Value().data_equal(firstName));
+    EXPECT_TRUE(commissioning_params.GetTimeZone().Value()[1].name.Value().data_equal(secondName));
+}
+
 TEST_F(AutoCommissionerTest, FeaturesPassedNTPValue)
 {
     constexpr CharSpan defaultNTPBuffer = "default"_span;
