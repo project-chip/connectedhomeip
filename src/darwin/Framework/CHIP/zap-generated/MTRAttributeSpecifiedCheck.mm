@@ -2590,6 +2590,43 @@ static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttribute
     }
     }
 }
+static BOOL AttributeIsSpecifiedInThermostatModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThermostatMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::CoreModeTags::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ThermostatMode attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInGroupcastCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Groupcast;
@@ -8021,6 +8058,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ScenesManagement::Id: {
         return AttributeIsSpecifiedInScenesManagementCluster(aAttributeId);
+    }
+    case Clusters::ThermostatMode::Id: {
+        return AttributeIsSpecifiedInThermostatModeCluster(aAttributeId);
     }
     case Clusters::Groupcast::Id: {
         return AttributeIsSpecifiedInGroupcastCluster(aAttributeId);
