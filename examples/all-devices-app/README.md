@@ -10,12 +10,12 @@ and clusters without requiring recompilation for each configuration.
 
 The Code-Driven paradigm offers several advantages:
 
--   **Unit Testable**: Allows clusters to be unit tested easily.
--   **Dynamic Data Model**: Allows applications to change their data model
-    dynamically at runtime without requiring recompilation.
--   **Composite Devices**: Supports multi-endpoint devices and bridges.
--   **Maintainability**: Decouples cluster implementations from application
-    configuration.
+- **Unit Testable**: Allows clusters to be unit tested easily.
+- **Dynamic Data Model**: Allows applications to change their data model
+  dynamically at runtime without requiring recompilation.
+- **Composite Devices**: Supports multi-endpoint devices and bridges.
+- **Maintainability**: Decouples cluster implementations from application
+  configuration.
 
 The application simulates various device types.
 
@@ -23,38 +23,36 @@ The application simulates various device types.
 
 The [`docs/`](docs/) directory contains documentation for this application:
 
--   **[Architecture & Design Patterns](docs/architecture.md)**: Describes the
-    Code-Driven Data Model, component hierarchies (`DeviceFactory`,
-    `SingleEndpoint`), and platform separation.
--   **[Starting Up & CLI Reference](docs/starting_up.md)**: Describes
-    application initialization, endpoint composition flags (`--device`), and
-    network settings.
--   **[Testing & Simulation Guide](docs/testing.md)**: Instructions for
-    `chip-tool` commissioning and executing automated Python regression suites
-    (`src/python_testing/`).
--   **[How to Add a New Simulated Device](docs/adding_new_device.md)**:
-    Instructions for implementing Matter devices, binding code-driven clusters,
-    and updating build configurations.
--   **[Custom Product Baseline Guide](docs/custom_product_baseline.md)**: Guide
-    on transitioning from this simulator baseline to a custom product
-    application.
+- **[Architecture & Design Patterns](docs/architecture.md)**: Describes the
+  Code-Driven Data Model, component hierarchies (`DeviceFactory`,
+  `SingleEndpoint`), and platform separation.
+- **[Starting Up & CLI Reference](docs/starting_up.md)**: Describes application
+  initialization, endpoint composition flags (`--device`), and network settings.
+- **[Testing & Simulation Guide](docs/testing.md)**: Instructions for
+  `chip-tool` commissioning and executing automated Python regression suites
+  (`src/python_testing/`).
+- **[How to Add a New Simulated Device](docs/adding_new_device.md)**:
+  Instructions for implementing Matter devices, binding code-driven clusters,
+  and updating build configurations.
+- **[Custom Product Baseline Guide](docs/custom_product_baseline.md)**: Guide on
+  transitioning from this simulator baseline to a custom product application.
 
 ## Architecture and File Structure
 
 The `all-devices-app` separates platform-agnostic code from platform-specific
 implementations:
 
--   **`all-devices-common/`**: Contains platform-agnostic code, including:
-    -   Core cluster logic and device interfaces.
-    -   Base device implementations.
-    -   The **`DeviceFactory`** (in
-        `all-devices-common/device-factory/DeviceFactory.h`), which enables
-        runtime registration and creation of supported device types.
--   **`esp32/`, `posix/`**: Contain platform-specific implementations (with
-    `posix/` containing `linux/` and `darwin/` subdirectories), entry points,
-    and build configurations.
-    -   For example, `posix/include/DeviceFactoryPlatformOverride.h` registers
-        platform-specific overrides for devices at build-time.
+- **`all-devices-common/`**: Contains platform-agnostic code, including:
+    - Core cluster logic and device interfaces.
+    - Base device implementations.
+    - The **`DeviceFactory`** (in
+      `all-devices-common/device-factory/DeviceFactory.h`), which enables
+      runtime registration and creation of supported device types.
+- **`esp32/`, `posix/`**: Contain platform-specific implementations (with
+  `posix/` containing `linux/` and `darwin/` subdirectories), entry points, and
+  build configurations.
+    - For example, `posix/include/DeviceFactoryPlatformOverride.h` registers
+      platform-specific overrides for devices at build-time.
 
 This separation ensures core logic remains reusable across operating systems and
 hardware platforms while allowing platform-specific driver integration.
@@ -64,54 +62,55 @@ hardware platforms while allowing platform-specific driver integration.
 The application supports the following device types (specified via the
 `--device` flag). Currently supported device types include:
 
--   `aggregator`
--   `air-purifier`
--   `air-quality-sensor`
--   `ambient-context-sensor`
--   `bridged-node`
--   `chime`
--   `commissioning-proxy`
--   `contact-sensor`
--   `cooktop`
--   `device-energy-management`
--   `dimmable-light`
--   `dimmable-plug-in-unit`
--   `dishwasher`
--   `electrical-sensor`
--   `extractor-hood`
--   `fan`
--   `fan-no-onoff`
--   `flow-sensor`
--   `generic-switch`
--   `humidity-sensor`
--   `laundry-dryer`
--   `laundry-washer`
--   `light-sensor`
--   `microwave-oven`
--   `mode-select`
--   `mounted-dimmable-load-control`
--   `mounted-on-off-control`
--   `network-infrastructure-manager`
--   `occupancy-sensor`
--   `on-off-light`
--   `on-off-light-switch`
--   `on-off-plug-in-unit`
--   `oven`
--   `power-source`
--   `pressure-sensor`
--   `proximity-ranger`
--   `rain-sensor`
--   `refrigerator`
--   `refrigerator-2`
--   `robotic-vacuum-cleaner`
--   `smoke-co-alarm`
--   `soil-sensor`
--   `speaker`
--   `temperature-sensor`
--   `water-freeze-detector`
--   `water-leak-detector`
--   `water-valve`
--   `window-covering`
+- `aggregator`
+- `air-purifier`
+- `air-quality-sensor`
+- `ambient-context-sensor`
+- `bridged-node`
+- `chime`
+- `commissioning-proxy`
+- `contact-sensor`
+- `cooktop`
+- `device-energy-management`
+- `dimmable-light`
+- `dimmable-plug-in-unit`
+- `dishwasher`
+- `electrical-sensor`
+- `extractor-hood`
+- `fan`
+- `fan-no-onoff`
+- `flow-sensor`
+- `generic-switch`
+- `humidity-sensor`
+- `laundry-dryer`
+- `laundry-washer`
+- `light-sensor`
+- `microwave-oven`
+- `mode-select`
+- `mounted-dimmable-load-control`
+- `mounted-on-off-control`
+- `network-infrastructure-manager`
+- `occupancy-sensor`
+- `on-off-light`
+- `on-off-light-switch`
+- `on-off-plug-in-unit`
+- `oven`
+- `oven-2`
+- `power-source`
+- `pressure-sensor`
+- `proximity-ranger`
+- `rain-sensor`
+- `refrigerator`
+- `refrigerator-2`
+- `robotic-vacuum-cleaner`
+- `smoke-co-alarm`
+- `soil-sensor`
+- `speaker`
+- `temperature-sensor`
+- `water-freeze-detector`
+- `water-leak-detector`
+- `water-valve`
+- `window-covering`
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -122,7 +121,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|ambient-context-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|water-freeze-detector|water-leak-detector|water-valve|window-covering>
+  --device <aggregator|air-purifier|air-quality-sensor|ambient-context-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|oven-2|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|water-freeze-detector|water-leak-detector|water-valve|window-covering>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
@@ -179,7 +178,7 @@ child, which gets extremely verbose:
 Using the `,bridged` modifier automatically handles the intermediate
 `bridged-node` injection:
 
--   **Explicit Bridged Device:**
+- **Explicit Bridged Device:**
 
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "chime:2,parent=1,bridged"
@@ -201,21 +200,21 @@ Using the `,bridged` modifier automatically handles the intermediate
 You can use the wildcard `*` to automatically instantiate all supported leaf
 device types. When an endpoint is specified, it represents the starting number.
 
--   **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
+- **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
 
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device "*:1"
     ```
 
--   **Parented Wildcard:** Start all devices from endpoint 2 sequentially and
-    make them all children of parent endpoint 1 (e.g., an aggregator).
+- **Parented Wildcard:** Start all devices from endpoint 2 sequentially and make
+  them all children of parent endpoint 1 (e.g., an aggregator).
 
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1"
     ```
 
--   **Compound Bridged Wildcard:** Automatically wraps every leaf device
-    generated by the wildcard in a dedicated `bridged-node` parent endpoint.
+- **Compound Bridged Wildcard:** Automatically wraps every leaf device generated
+  by the wildcard in a dedicated `bridged-node` parent endpoint.
 
     ```bash
     ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1,bridged"
@@ -259,25 +258,25 @@ setting a CP device up. The Wi-Fi PAF transport is unaffected.
 
 Two build switches gate the device itself:
 
--   `commissioning-proxy` must be in the device-factory enable list. All devices
-    are enabled by default; `all_devices_enabled_devices` in
-    `all-devices-common/device-factory/enabled_devices.gni` selects a subset.
--   `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY`, set for this app in
-    `posix/include/CHIPProjectAppConfig.h`, enables the Linux platform support
-    the transports call: the `BLEManagerImpl` proxy scan and peripheral→central
-    role switch, and the `ConnectivityManagerImpl` WiFi-PAF proxy entry points.
+- `commissioning-proxy` must be in the device-factory enable list. All devices
+  are enabled by default; `all_devices_enabled_devices` in
+  `all-devices-common/device-factory/enabled_devices.gni` selects a subset.
+- `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY`, set for this app in
+  `posix/include/CHIPProjectAppConfig.h`, enables the Linux platform support the
+  transports call: the `BLEManagerImpl` proxy scan and peripheral→central role
+  switch, and the `ConnectivityManagerImpl` WiFi-PAF proxy entry points.
 
 The compiled-in transport(s) follow this build configuration:
 
--   **WiFi-PAF** is included when `chip_device_config_enable_wifipaf` is true
-    (the default for Linux builds with WiFi enabled). When WiFi-PAF is compiled
-    in, the cluster advertises the `WiFiNetworkInterface` feature and the
-    `WiFiBand` attribute; the supported bands are derived from the `freq_list`
-    passed via `--wifipaf`. Note that WiFi-PAF scanning does not work on a stock
-    host: it needs a `wpa_supplicant` built with `CONFIG_NAN_USD` and the
-    `discovery_only` patch. See
-    [wpa_supplicant with the Matter NAN patch](all-devices-common/device/types/commissioning-proxy/README.md#2-wpa_supplicant-with-the-matter-nan-patch-proxy-device).
--   **BLE** is included when `chip_config_network_layer_ble` is true.
+- **WiFi-PAF** is included when `chip_device_config_enable_wifipaf` is true (the
+  default for Linux builds with WiFi enabled). When WiFi-PAF is compiled in, the
+  cluster advertises the `WiFiNetworkInterface` feature and the `WiFiBand`
+  attribute; the supported bands are derived from the `freq_list` passed via
+  `--wifipaf`. Note that WiFi-PAF scanning does not work on a stock host: it
+  needs a `wpa_supplicant` built with `CONFIG_NAN_USD` and the `discovery_only`
+  patch. See
+  [wpa_supplicant with the Matter NAN patch](all-devices-common/device/types/commissioning-proxy/README.md#2-wpa_supplicant-with-the-matter-nan-patch-proxy-device).
+- **BLE** is included when `chip_config_network_layer_ble` is true.
 
 The `-no-ble` build variants disable the BLE transport. With no transport
 compiled in the device is not registered with the factory at all, so
