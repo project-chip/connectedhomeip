@@ -564,7 +564,8 @@ class TC_ACE_1_6(MatterBaseTest):
                     previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
                     timeout_sec=30
                 )
-                asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey)
+                asserts.assert_equal(event_data.groupcastTestResult,
+                                     Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey)
                 asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
                                      "Incorrect destination IP address in event")
 
