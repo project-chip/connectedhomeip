@@ -46,73 +46,76 @@ class TrackingDelegate : public JointFabricDatastore::Delegate
 {
 public:
     CHIP_ERROR SyncNode(NodeId nodeId, const EndpointGroupIdEntryType & endpointGroupIDEntry,
-                        std::function<void()> onSuccess) override
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
         lastEndpointGroupSync    = endpointGroupIDEntry;
         hasLastEndpointGroupSync = true;
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const NodeKeySetEntryType & nodeKeySetEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const NodeKeySetEntryType & nodeKeySetEntry,
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
         lastNodeKeySetSync    = nodeKeySetEntry;
         hasLastNodeKeySetSync = true;
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const BindingEntryType & bindingEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const BindingEntryType & bindingEntry, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         lastBindingSync    = bindingEntry;
         hasLastBindingSync = true;
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, std::vector<BindingEntryType> & bindingEntries, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, std::vector<BindingEntryType> & bindingEntries,
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         lastAclSync    = aclEntry;
         hasLastAclSync = true;
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const std::vector<ACLEntryType> & aclEntries, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const std::vector<ACLEntryType> & aclEntries,
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const GroupKeySetType & groupKeySet, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const GroupKeySetType & groupKeySet, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
@@ -472,6 +475,74 @@ TEST(JointFabricDatastoreTest, RefreshNodeFetchesGroupKeySetsAndCommitsNode)
               JointFabricCluster::DatastoreStateEnum::kCommitted);
 }
 
+TEST(JointFabricDatastoreTest, AddGroupIDToEndpointForNodeAddsMissingNodeKeySet)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "controller-a"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "endpoint-a"_span), CHIP_NO_ERROR);
+
+    JointFabricCluster::Commands::AddGroup::DecodableType addGroup;
+    addGroup.groupID      = 10;
+    addGroup.friendlyName = "group-a"_span;
+    addGroup.groupKeySetID.SetNonNull(55);
+    addGroup.groupPermission = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum::kView;
+
+    ASSERT_EQ(store.AddGroup(addGroup), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+
+    const auto & nodeKeySet = store.GetNodeKeySetList()[0];
+    EXPECT_EQ(nodeKeySet.nodeID, 123u);
+    EXPECT_EQ(nodeKeySet.groupKeySetID, 55u);
+    EXPECT_EQ(nodeKeySet.statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+
+    ASSERT_TRUE(delegate.hasLastNodeKeySetSync);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.nodeID, 123u);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.groupKeySetID, 55u);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+
+    ASSERT_TRUE(delegate.hasLastEndpointGroupSync);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.nodeID, 123u);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.endpointID, 1u);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.groupID, 10u);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+}
+
+TEST(JointFabricDatastoreTest, AddGroupIDToEndpointForNodeIsIdempotentForDuplicateAssignments)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "controller-a"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "endpoint-a"_span), CHIP_NO_ERROR);
+
+    JointFabricCluster::Commands::AddGroup::DecodableType addGroup;
+    addGroup.groupID      = 10;
+    addGroup.friendlyName = "group-a"_span;
+    addGroup.groupKeySetID.SetNonNull(55);
+    addGroup.groupPermission = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum::kView;
+
+    ASSERT_EQ(store.AddGroup(addGroup), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+
+    delegate.ResetCapturedSyncs();
+
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+
+    EXPECT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetNodeKeySetList().size(), 1u);
+    EXPECT_FALSE(delegate.hasLastEndpointGroupSync);
+    EXPECT_FALSE(delegate.hasLastNodeKeySetSync);
+}
+
 TEST(JointFabricDatastoreTest, RemoveGroupIdFromEndpointSyncsDeletePendingEntries)
 {
     JointFabricDatastore store;
@@ -607,9 +678,9 @@ class DeferringBindingDelegate : public TrackingDelegate
 public:
     bool deferNext   = false;
     bool hasDeferred = false;
-    std::function<void()> deferred;
+    std::function<void(CHIP_ERROR)> deferred;
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const BindingEntryType & bindingEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const BindingEntryType & bindingEntry, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (deferNext)
         {
@@ -620,7 +691,7 @@ public:
         }
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
@@ -629,7 +700,7 @@ public:
     {
         if (hasDeferred && deferred)
         {
-            deferred();
+            deferred(CHIP_NO_ERROR);
         }
     }
 };
@@ -686,9 +757,9 @@ class DeferringAclDelegate : public TrackingDelegate
 public:
     bool deferNext   = false;
     bool hasDeferred = false;
-    std::function<void()> deferred;
+    std::function<void(CHIP_ERROR)> deferred;
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void()> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (deferNext)
         {
@@ -699,7 +770,7 @@ public:
         }
         if (onSuccess)
         {
-            onSuccess();
+            onSuccess(CHIP_NO_ERROR);
         }
         return CHIP_NO_ERROR;
     }
@@ -708,7 +779,7 @@ public:
     {
         if (hasDeferred && deferred)
         {
-            deferred();
+            deferred(CHIP_NO_ERROR);
         }
     }
 };
