@@ -54,7 +54,7 @@ class TC_HSTAT_2_3(HSTATBase):
     def pics_TC_HSTAT_2_3(self) -> list[str]:
         return [
             "HSTAT.S",
-            "HSTAT.S.F_SENSOR"
+            "HSTAT.S.F03"
         ]
 
     def desc_TC_HSTAT_2_3(self) -> str:
