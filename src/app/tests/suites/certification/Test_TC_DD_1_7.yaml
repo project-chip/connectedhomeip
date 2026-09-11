@@ -36,6 +36,10 @@ tests:
 
           The Manual Pairing Code shall meet the following requirements:
 
+          - 11 or 21 digits in length
+
+          For all codes that are printed or intended to be printed on product or packaging material:
+
           - Printed using a minimum font size of 6 points, typically producing a typeface height of 2.1 mm (6/72 inches)
 
           - Include dashes between the groups of Manual Pairing Code digits with the following spacing:

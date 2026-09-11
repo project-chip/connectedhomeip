@@ -63,6 +63,12 @@ public:
 
         virtual Protocols::InteractionModel::Status GetMaxHeatSetpointLimit(temperature & maxHeatSetpointLimit) const;
         virtual Protocols::InteractionModel::Status SetMaxHeatSetpointLimit(temperature maxHeatSetpointLimit, bool & changed);
+
+        virtual Protocols::InteractionModel::Status GetCriticalFreezeProtection(bool & enabled) const
+        {
+            enabled = false;
+            return Protocols::InteractionModel::Status::Success;
+        }
     };
 
     ThermostatHeatingSetpoints(ThermostatSetpointsBase & setpoints, Delegate & delegate) :

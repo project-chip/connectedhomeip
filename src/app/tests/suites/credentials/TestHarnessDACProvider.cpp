@@ -24,10 +24,10 @@
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPMemString.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <algorithm>
 #include <fstream>
 #include <string>
 
@@ -143,28 +143,13 @@ namespace Examples {
 
 namespace {
 
-ByteSpan ReadValue(Json::Value jsonValue, uint8_t * buffer, size_t bufferLen)
+CHIP_ERROR ReadJsonString(const Json::Value & value, CharSpan & out)
 {
-    const std::string value = jsonValue.asString();
-    if (value.size() == 0)
-    {
-        return ByteSpan();
-    }
-
-    size_t bytesLen = Encoding::HexToBytes(value.c_str(), value.size(), buffer, bufferLen);
-    return ByteSpan(buffer, bytesLen);
-}
-
-CharSpan ReadValue(Json::Value jsonValue, char * buffer, size_t bufferLen)
-{
-    const std::string value = jsonValue.asString();
-    if (value.size() == 0)
-    {
-        return CharSpan();
-    }
-
-    Platform::CopyString(buffer, bufferLen, value.c_str());
-    return CharSpan::fromCharString(buffer);
+    const char * begin;
+    const char * end;
+    VerifyOrReturnError(value.getString(&begin, &end), CHIP_ERROR_INVALID_ARGUMENT);
+    out = CharSpan(begin, static_cast<size_t>(end - begin));
+    return CHIP_NO_ERROR;
 }
 
 bool ReadValue(Json::Value jsonValue)
@@ -177,9 +162,53 @@ bool ReadValue(Json::Value jsonValue)
     return false;
 }
 
-uint16_t ReadUint16(Json::Value jsonValue)
+ByteSpan GetProfileDocument(DeviceAttestationCertProfile profile, ByteSpan legacy, ByteSpan pqc44, ByteSpan pqc65)
 {
-    return static_cast<uint16_t>(jsonValue.asUInt());
+    switch (profile)
+    {
+    case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
+        return legacy;
+    case DeviceAttestationCertProfile::kMlDsa44:
+        return pqc44;
+    case DeviceAttestationCertProfile::kMlDsa65:
+        return pqc65;
+    case DeviceAttestationCertProfile::kUnknownEnumValue:
+        return ByteSpan();
+    }
+
+    return ByteSpan();
+}
+
+BitMask<DeviceAttestationCertProfileBitmap> BuildProfileSupport(ByteSpan legacy, ByteSpan pqc44, ByteSpan pqc65)
+{
+    using SupportMask = BitMask<DeviceAttestationCertProfileBitmap>;
+    SupportMask support(0);
+
+    if (!legacy.empty())
+    {
+        support = SupportMask(
+            support.Raw() | static_cast<SupportMask::IntegerType>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy));
+    }
+    if (!pqc44.empty())
+    {
+        support = SupportMask(support.Raw() |
+                              static_cast<SupportMask::IntegerType>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44));
+    }
+    if (!pqc65.empty())
+    {
+        support = SupportMask(support.Raw() |
+                              static_cast<SupportMask::IntegerType>(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65));
+    }
+
+    return support;
+}
+
+CHIP_ERROR CopyDocumentSegment(ByteSpan document, size_t offset, MutableByteSpan & outBuffer, size_t & outDocumentSize)
+{
+    VerifyOrReturnError(offset < document.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    const size_t segmentSize = std::min(outBuffer.size(), document.size() - offset);
+    outDocumentSize          = document.size();
+    return CopySpanToMutableSpan(document.SubSpan(offset, segmentSize), outBuffer);
 }
 
 } // namespace
@@ -192,16 +221,6 @@ TestHarnessDACProvider::TestHarnessDACProvider()
 
 void TestHarnessDACProvider::Init(const char * filepath)
 {
-    static constexpr char kDacCertKey[]      = "dac_cert";
-    static constexpr char kDacPrivateKey[]   = "dac_private_key";
-    static constexpr char kDacPublicKey[]    = "dac_public_key";
-    static constexpr char kPaiCertKey[]      = "pai_cert";
-    static constexpr char kCertDecKey[]      = "certification_declaration";
-    static constexpr char kFirmwareInfoKey[] = "firmware_information";
-    static constexpr char kIsSuccessKey[]    = "is_success_case";
-    static constexpr char kDescription[]     = "description";
-    static constexpr char kPid[]             = "basic_info_pid";
-
     std::ifstream json(filepath, std::ifstream::binary);
     if (!json)
     {
@@ -209,79 +228,153 @@ void TestHarnessDACProvider::Init(const char * filepath)
         return;
     }
 
+    // Preserve the file-based API while sharing JSON parsing with in-memory callers.
+    CHIP_ERROR err = Init(json);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Error parsing json file: %s: %" CHIP_ERROR_FORMAT, StringOrNullMarker(filepath), err.Format());
+    }
+}
+
+CHIP_ERROR TestHarnessDACProvider::Init(std::istream & json)
+{
     Json::Reader reader;
     Json::Value root;
-    if (!reader.parse(json, root))
-    {
-        ChipLogError(AppServer, "Error parsing json file: %s", StringOrNullMarker(filepath));
-        return;
-    }
+    VerifyOrReturnError(reader.parse(json, root) && root.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     TestHarnessDACProviderData data;
 
-    if (root.isMember(kDacCertKey))
+    auto readPaiProfile = [](const Json::Value & value, DeviceAttestationCertProfile & outProfile) -> CHIP_ERROR {
+        VerifyOrReturnError(value.isIntegral() && value.isUInt(), CHIP_ERROR_INVALID_ARGUMENT);
+        const auto raw = value.asUInt();
+        VerifyOrReturnError(raw == static_cast<unsigned>(DeviceAttestationCertProfile::kEcdsaMatterLegacy) ||
+                                raw == static_cast<unsigned>(DeviceAttestationCertProfile::kMlDsa44) ||
+                                raw == static_cast<unsigned>(DeviceAttestationCertProfile::kMlDsa65),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+        outProfile = static_cast<DeviceAttestationCertProfile>(raw);
+        return CHIP_NO_ERROR;
+    };
+    if (root.isMember("pai_profile_ml_dsa_44"))
     {
-        static uint8_t buf[kMaxDERCertLength];
-        data.dacCert.SetValue(ReadValue(root[kDacCertKey], buf, sizeof(buf)));
+        ReturnErrorOnFailure(readPaiProfile(root["pai_profile_ml_dsa_44"], data.paiProfileMlDsa44));
+    }
+    if (root.isMember("pai_profile_ml_dsa_65"))
+    {
+        ReturnErrorOnFailure(readPaiProfile(root["pai_profile_ml_dsa_65"], data.paiProfileMlDsa65));
     }
 
-    if (root.isMember(kDacPrivateKey))
+    struct HexField
     {
-        static uint8_t buf[Crypto::kP256_PrivateKey_Length];
-        data.dacPrivateKey.SetValue(ReadValue(root[kDacPrivateKey], buf, sizeof(buf)));
+        const char * key;
+        size_t maxSize;
+        Optional<ByteSpan> & destination;
+        CharSpan hex;
+    };
+    HexField fields[] = {
+        { "dac_cert", kMaxDERCertLength, data.dacCert },
+        { "dac_private_key", Crypto::kP256_PrivateKey_Length, data.dacPrivateKey },
+        { "dac_public_key", Crypto::kP256_PublicKey_Length, data.dacPublicKey },
+        { "dac_cert_ml_dsa_44", kMaxDERCertLengthMlDsa44, data.pqcDacCertMlDsa44 },
+        { "dac_cert_ml_dsa_65", kMaxDERCertLengthMlDsa65, data.pqcDacCertMlDsa65 },
+        { "pai_cert", kMaxDERCertLength, data.paiCert },
+        { "pai_cert_ml_dsa_44", kMaxDERCertLengthMlDsa44, data.pqcPaiCertMlDsa44 },
+        { "pai_cert_ml_dsa_65", kMaxDERCertLengthMlDsa65, data.pqcPaiCertMlDsa65 },
+        { "certification_declaration", kMaxCMSSignedCDMessage, data.certificationDeclaration },
+        { "firmware_information", UINT8_MAX, data.firmwareInformation },
+    };
+
+    // Bound and validate every field before allocating the decoded fixture. JsonCpp
+    // owns the strings referenced by hex/description until this method returns.
+    size_t storageSize = 0;
+    for (auto & field : fields)
+    {
+        if (!root.isMember(field.key))
+        {
+            continue;
+        }
+        ReturnErrorOnFailure(ReadJsonString(root[field.key], field.hex));
+        VerifyOrReturnError(field.hex.size() % 2 == 0, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(field.hex.size() / 2 <= field.maxSize, CHIP_ERROR_INVALID_ARGUMENT);
+        for (char c : field.hex)
+        {
+            VerifyOrReturnError((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'),
+                                CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        storageSize += field.hex.size() / 2;
     }
 
-    if (root.isMember(kDacPublicKey))
+    CharSpan description;
+    if (root.isMember("description"))
     {
-        static uint8_t buf[Crypto::kP256_PublicKey_Length];
-        data.dacPublicKey.SetValue(ReadValue(root[kDacPublicKey], buf, sizeof(buf)));
+        ReturnErrorOnFailure(ReadJsonString(root["description"], description));
+        // The former 256-byte buffer reserved one byte for a null terminator.
+        VerifyOrReturnError(description.size() <= 255, CHIP_ERROR_INVALID_ARGUMENT);
+        storageSize += description.size();
+    }
+    if (root.isMember("is_success_case"))
+    {
+        VerifyOrReturnError(root["is_success_case"].isBool() || root["is_success_case"].isString(), CHIP_ERROR_INVALID_ARGUMENT);
+        data.isSuccessCase.SetValue(ReadValue(root["is_success_case"]));
+    }
+    if (root.isMember("basic_info_pid"))
+    {
+        const auto & pid = root["basic_info_pid"];
+        VerifyOrReturnError(pid.isIntegral() && pid.isUInt() && pid.asUInt() <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+        data.pid.SetValue(static_cast<uint16_t>(pid.asUInt()));
     }
 
-    if (root.isMember(kPaiCertKey))
+    Platform::ScopedMemoryBuffer<uint8_t> storage;
+    VerifyOrReturnError(storageSize == 0 || storage.Alloc(storageSize), CHIP_ERROR_NO_MEMORY);
+    size_t offset = 0;
+    for (auto & field : fields)
     {
-        static uint8_t buf[kMaxDERCertLength];
-        data.paiCert.SetValue(ReadValue(root[kPaiCertKey], buf, sizeof(buf)));
+        if (!root.isMember(field.key))
+        {
+            continue;
+        }
+        const size_t size = field.hex.size() / 2;
+        ByteSpan bytes;
+        if (size != 0)
+        {
+            uint8_t * dest = storage.Get() + offset;
+            VerifyOrReturnError(Encoding::HexToBytes(field.hex.data(), field.hex.size(), dest, size) == size,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+            bytes = ByteSpan(dest, size);
+            offset += size;
+        }
+        field.destination.SetValue(bytes);
     }
-
-    if (root.isMember(kCertDecKey))
+    if (root.isMember("description"))
     {
-        static uint8_t buf[kMaxCMSSignedCDMessage];
-        data.certificationDeclaration.SetValue(ReadValue(root[kCertDecKey], buf, sizeof(buf)));
-    }
-
-    if (root.isMember(kFirmwareInfoKey))
-    {
-        // TODO Use the correct maximum size
-        static uint8_t buf[UINT8_MAX];
-        data.firmwareInformation.SetValue(ReadValue(root[kFirmwareInfoKey], buf, sizeof(buf)));
-    }
-
-    if (root.isMember(kIsSuccessKey))
-    {
-        data.isSuccessCase.SetValue(ReadValue(root[kIsSuccessKey]));
-    }
-
-    if (root.isMember(kDescription))
-    {
-        constexpr size_t kMaxTestCaseDescriptionLen = 256;
-        static char buf[kMaxTestCaseDescriptionLen];
-        data.description.SetValue(ReadValue(root[kDescription], buf, sizeof(buf)));
-    }
-
-    if (root.isMember(kPid))
-    {
-        data.pid.SetValue(ReadUint16(root[kPid]));
+        CharSpan ownedDescription;
+        if (!description.empty())
+        {
+            auto * dest = reinterpret_cast<char *>(storage.Get() + offset);
+            memcpy(dest, description.data(), description.size());
+            ownedDescription = CharSpan(dest, description.size());
+        }
+        data.description.SetValue(ownedDescription);
     }
 
     Init(data);
+    mJsonStorage = std::move(storage);
+    return CHIP_NO_ERROR;
 }
 
 void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
 {
+    mJsonStorage.Free();
     mDacCert       = data.dacCert.HasValue() ? data.dacCert.Value() : DevelopmentCerts::kDacCert;
     mDacPrivateKey = data.dacPrivateKey.HasValue() ? data.dacPrivateKey.Value() : DevelopmentCerts::kDacPrivateKey;
     mDacPublicKey  = data.dacPublicKey.HasValue() ? data.dacPublicKey.Value() : DevelopmentCerts::kDacPublicKey;
     mPaiCert       = data.paiCert.HasValue() ? data.paiCert.Value() : DevelopmentCerts::kPaiCert;
+
+    mPqcDacCertMlDsa44 = data.pqcDacCertMlDsa44.HasValue() ? data.pqcDacCertMlDsa44.Value() : ByteSpan();
+    mPqcDacCertMlDsa65 = data.pqcDacCertMlDsa65.HasValue() ? data.pqcDacCertMlDsa65.Value() : ByteSpan();
+
+    mPqcPaiCertMlDsa44 = data.pqcPaiCertMlDsa44.HasValue() ? data.pqcPaiCertMlDsa44.Value() : ByteSpan();
+    mPqcPaiCertMlDsa65 = data.pqcPaiCertMlDsa65.HasValue() ? data.pqcPaiCertMlDsa65.Value() : ByteSpan();
+
     mCertificationDeclaration =
         data.certificationDeclaration.HasValue() ? data.certificationDeclaration.Value() : ByteSpan{ kCdForAllExamples };
     mIsSuccessCase = data.isSuccessCase.HasValue() ? data.isSuccessCase.Value() : true;
@@ -291,6 +384,45 @@ void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
     mFirmwareInformation = data.firmwareInformation.HasValue() ? data.firmwareInformation.Value() : ByteSpan();
 
     mPid = data.pid.ValueOr(0x8000);
+
+    // Only complete pairs can be selected. In particular, do not mix a DAC from
+    // one chain with a PAI from a different chain when a fixture is incomplete.
+    const bool has44 = !mPqcPaiCertMlDsa44.empty() && !mPqcDacCertMlDsa44.empty();
+    const bool has65 = !mPqcPaiCertMlDsa65.empty() && !mPqcDacCertMlDsa65.empty();
+    // The storage suffix declares the PAA algorithm for that chain. It does not
+    // describe the PAI's own key: pai_profile_ml_dsa_44/65 declare that separately.
+    // For example, a complete _ml_dsa_65 pair with pai_profile_ml_dsa_65 = 0
+    // contributes ML-DSA-65 to PAA support and only ECDSA to PAI/DAC support.
+    mProfileSupport = {
+        .PAASupportedProfiles =
+            BuildProfileSupport(mPaiCert, has44 ? mPqcPaiCertMlDsa44 : ByteSpan(), has65 ? mPqcPaiCertMlDsa65 : ByteSpan()),
+        .PAISupportedProfiles = BuildProfileSupport(mPaiCert, ByteSpan(), ByteSpan()),
+        .DACSupportedProfiles = BuildProfileSupport(mDacCert, ByteSpan(), ByteSpan()),
+    };
+    auto addPaiProfile = [this](DeviceAttestationCertProfile profile) {
+        switch (profile)
+        {
+        case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
+            mProfileSupport.PAISupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
+            break;
+        case DeviceAttestationCertProfile::kMlDsa44:
+            mProfileSupport.PAISupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsMlDsa44);
+            break;
+        case DeviceAttestationCertProfile::kMlDsa65:
+            mProfileSupport.PAISupportedProfiles.Set(DeviceAttestationCertProfileBitmap::kSupportsMlDsa65);
+            break;
+        case DeviceAttestationCertProfile::kUnknownEnumValue:
+            break;
+        }
+    };
+    if (has44)
+    {
+        addPaiProfile(data.paiProfileMlDsa44);
+    }
+    if (has65)
+    {
+        addPaiProfile(data.paiProfileMlDsa65);
+    }
 }
 
 CHIP_ERROR TestHarnessDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
@@ -298,9 +430,25 @@ CHIP_ERROR TestHarnessDACProvider::GetDeviceAttestationCert(MutableByteSpan & ou
     return CopySpanToMutableSpan(mDacCert, out_dac_buffer);
 }
 
+CHIP_ERROR TestHarnessDACProvider::GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile profile,
+                                                                      MutableByteSpan & out_dac_buffer)
+{
+    ByteSpan document = GetProfileDocument(profile, mDacCert, mPqcDacCertMlDsa44, mPqcDacCertMlDsa65);
+    VerifyOrReturnError(!document.empty(), CHIP_ERROR_NOT_IMPLEMENTED);
+    return CopySpanToMutableSpan(document, out_dac_buffer);
+}
+
 CHIP_ERROR TestHarnessDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
 {
     return CopySpanToMutableSpan(mPaiCert, out_pai_buffer);
+}
+
+CHIP_ERROR TestHarnessDACProvider::GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile profile,
+                                                                                   MutableByteSpan & out_pai_buffer)
+{
+    ByteSpan document = GetProfileDocument(profile, mPaiCert, mPqcPaiCertMlDsa44, mPqcPaiCertMlDsa65);
+    VerifyOrReturnError(!document.empty(), CHIP_ERROR_NOT_IMPLEMENTED);
+    return CopySpanToMutableSpan(document, out_pai_buffer);
 }
 
 CHIP_ERROR TestHarnessDACProvider::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
@@ -322,13 +470,52 @@ CHIP_ERROR TestHarnessDACProvider::SignWithDeviceAttestationKey(const ByteSpan &
     VerifyOrReturnError(!out_signature_buffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!message_to_sign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
     ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(mDacPrivateKey, mDacPublicKey));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);
+}
+
+DeviceAttestationProfileSupport TestHarnessDACProvider::GetDeviceAttestationProfileSupport() const
+{
+    return mProfileSupport;
+}
+
+DeviceAttestationCertProfile TestHarnessDACProvider::GetPreferredDeviceAttestationChainProfile() const
+{
+    if (!mPqcPaiCertMlDsa65.empty() && !mPqcDacCertMlDsa65.empty())
+    {
+        return DeviceAttestationCertProfile::kMlDsa65;
+    }
+    if (!mPqcPaiCertMlDsa44.empty() && !mPqcDacCertMlDsa44.empty())
+    {
+        return DeviceAttestationCertProfile::kMlDsa44;
+    }
+    return DeviceAttestationCertProfile::kEcdsaMatterLegacy;
+}
+
+CHIP_ERROR TestHarnessDACProvider::GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType documentType,
+                                                                       DeviceAttestationCertProfile profile, size_t offset,
+                                                                       MutableByteSpan & out_document_buffer,
+                                                                       size_t & out_document_size)
+{
+    ByteSpan document;
+    switch (documentType)
+    {
+    case DeviceAttestationDocumentType::kDACCertificate:
+        document = GetProfileDocument(profile, mDacCert, mPqcDacCertMlDsa44, mPqcDacCertMlDsa65);
+        break;
+    case DeviceAttestationDocumentType::kPAICertificate:
+        document = GetProfileDocument(profile, mPaiCert, mPqcPaiCertMlDsa44, mPqcPaiCertMlDsa65);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    VerifyOrReturnError(!document.empty(), CHIP_ERROR_NOT_IMPLEMENTED);
+    return CopyDocumentSegment(document, offset, out_document_buffer, out_document_size);
 }
 
 } // namespace Examples
