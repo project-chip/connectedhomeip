@@ -14190,7 +14190,7 @@
               "reportableChange": 0
             },
             {
-              "name": "AvailableSensors",
+              "name": "AvailableSensorHandles",
               "code": 90,
               "mfgCode": null,
               "side": "server",
@@ -14206,7 +14206,7 @@
               "reportableChange": 0
             },
             {
-              "name": "EnabledSensors",
+              "name": "EnabledSensorHandles",
               "code": 91,
               "mfgCode": null,
               "side": "server",
