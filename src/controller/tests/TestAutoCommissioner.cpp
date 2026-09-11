@@ -108,6 +108,17 @@ TEST_F(AutoCommissionerTest, DetectsCSRNonceExceedsBuffer)
     ASSERT_EQ(r, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+TEST_F(AutoCommissionerTest, DetectsPDCPossessionNonceExceedsBuffer)
+{
+    auto possession_nonce_buffer_up = std::make_unique<uint8_t[]>(CommissioningParameters::kPossessionNonceLen + 1);
+
+    mParams.SetPDCPossessionNonce(ByteSpan{ possession_nonce_buffer_up.get(), CommissioningParameters::kPossessionNonceLen + 1 });
+
+    auto r = mCommissioner.SetCommissioningParameters(mParams);
+
+    ASSERT_EQ(r, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 TEST_F(AutoCommissionerTest, FeaturesPassedDSTOffsetsValue)
 {
     app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type sDSTBuf;
@@ -698,6 +709,7 @@ TEST_F(AutoCommissionerTest, SetCommissioningParametersCopiesSpans)
     CommissioningParameters params{};
     params.SetAttestationNonce(sourceSpan32);
     params.SetCSRNonce(sourceSpan32);
+    params.SetPDCPossessionNonce(sourceSpan32);
     params.SetThreadOperationalDataset(sourceSpan32);
     params.SetWiFiCredentials(WiFiCredentials(sourceSpan32, sourceSpan32));
     params.SetCountryCode(sourceCountryCode);
@@ -711,6 +723,10 @@ TEST_F(AutoCommissionerTest, SetCommissioningParametersCopiesSpans)
     ASSERT_TRUE(storedParams.GetCSRNonce().HasValue());
     EXPECT_NE(storedParams.GetCSRNonce().Value().data(), sourceSpan32.data());
     EXPECT_TRUE(storedParams.GetCSRNonce().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetPDCPossessionNonce().HasValue());
+    EXPECT_NE(storedParams.GetPDCPossessionNonce().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetPDCPossessionNonce().Value().data_equal(sourceSpan32));
 
     ASSERT_TRUE(storedParams.GetThreadOperationalDataset().HasValue());
     EXPECT_NE(storedParams.GetThreadOperationalDataset().Value().data(), sourceSpan32.data());

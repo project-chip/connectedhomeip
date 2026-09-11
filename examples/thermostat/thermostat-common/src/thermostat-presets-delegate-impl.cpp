@@ -169,6 +169,8 @@ std::optional<System::Clock::Milliseconds16> ThermostatPresetsDelegate::GetMaxAt
     {
     case Attributes::Presets::Id:
         return std::chrono::milliseconds(3000);
+    case Attributes::SensorSchedule::Id:
+        return std::chrono::milliseconds(5000);
     default:
         return std::nullopt;
     }

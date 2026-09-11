@@ -23,6 +23,7 @@ chip_test_suite("tests") {
     "TestThermostatAtomicAndPresets.cpp",
     "TestThermostatCluster.cpp",
     "TestThermostatClusterSchedules.cpp",
+    "TestThermostatSensors.cpp",
     "TestThermostatSetpoints.cpp",
     "TestThermostatSuggestionsAndHold.cpp",
   ]

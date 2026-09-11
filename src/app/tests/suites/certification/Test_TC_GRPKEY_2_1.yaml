@@ -22,6 +22,18 @@ config:
     cluster: "Group Key Management"
     endpoint: 0
 
+    # Endpoint implementing the Groups cluster, used only to read the Groups
+    # cluster revision.
+    Groups.Endpoint: 1
+
+    # Groupcast is adopted when the GCAST feature is set and the Groups cluster
+    # revision is 5 or higher, or when the DUT does not implement the Groups
+    # cluster at all. The default value covers that last case: it is only
+    # overwritten when the Groups cluster is present and can be read.
+    GroupsClusterRevision:
+        type: int16u
+        defaultValue: 5
+
 tests:
     - label:
           "Step 0: Commission DUT to TH (can be skipped if done in a preceding
@@ -34,6 +46,76 @@ tests:
                 value: nodeId
 
     - label:
+          "Step 0: TH reads the FeatureMap attribute from the GroupKeyManagement
+          cluster on DUT."
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          saveAs: FeatureMapValue
+
+    - label: "Is the GCAST feature bit set?"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: (FeatureMapValue & 0x02)
+              - name: "Value2"
+                value: 0x02
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsGCASTFeatureSet
+
+    - label:
+          "Step 0: If the GCAST feature bit is set, TH reads the ClusterRevision
+          attribute from the Groups cluster on DUT."
+      PICS: G.S
+      runIf: IsGCASTFeatureSet
+      cluster: "Groups"
+      endpoint: Groups.Endpoint
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          saveAs: GroupsClusterRevision
+
+    - label:
+          "Step 0: Groupcast is adopted when the GCAST feature bit is set and
+          the Groups cluster revision is 5 or higher."
+      # UnsignedNumberEquals is used deliberately here. The YAML parser coerces
+      # each argument to its declared type at parse time, before runtime variable
+      # substitution.
+      # UnsignedNumberEquals declares numeric args, which leaves the expression
+      # intact so IsGCASTFeatureSet and GroupsClusterRevision are substituted and
+      # evaluated at runtime.
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: (IsGCASTFeatureSet and GroupsClusterRevision >= 5)
+              - name: "Value2"
+                value: 1
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsGroupcastAdopted
+
+    - label: "Step 0: Compute the inverse of the Groupcast adoption state."
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: IsGroupcastAdopted
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsGroupcastNotAdopted
+
+    - label:
           "Step 1: TH reads GroupKeyMap attribute from DUT using a
           fabric-filtered read."
       command: "readAttribute"
@@ -44,10 +126,22 @@ tests:
               type: list
 
     - label:
-          "Step 2: TH binds GroupId 0x0103 with GroupKeySetID 0x01a3 in the
-          GroupKeyMap attribute list on GroupKeyManagement cluster by writing
-          the GroupKeyMap attribute with one entry as follows: List item
-          1:,GroupId: 0x0103,GroupKeySetId: 0x01a3"
+          "Step 1: If Groupcast is adopted, verify that the GroupKeyMap list is
+          empty."
+      runIf: IsGroupcastAdopted
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      fabricFiltered: true
+      response:
+          value: []
+
+    - label:
+          "Step 2: If Groupcast is adopted, skip to step 4. Otherwise, TH binds
+          GroupId 0x0103 with GroupKeySetID 0x01a3 in the GroupKeyMap attribute
+          list on GroupKeyManagement cluster by writing the GroupKeyMap
+          attribute with one entry as follows: List item 1:,GroupId:
+          0x0103,GroupKeySetId: 0x01a3"
+      runIf: IsGroupcastNotAdopted
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -56,6 +150,7 @@ tests:
     - label:
           "Step 3: TH reads GroupKeyMap Attribute from the GroupKeyManagement
           cluster from DUT using a fabric-filtered read."
+      runIf: IsGroupcastNotAdopted
       command: "readAttribute"
       attribute: "GroupKeyMap"
       response:
@@ -63,7 +158,8 @@ tests:
 
     - label:
           "Step 4: TH reads GroupTable attribute from GroupKeyManagement cluster
-          on DUT."
+          on DUT. No group has been configured through the Groups cluster, and
+          the list is also required to be empty when Groupcast is adopted."
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -83,6 +179,16 @@ tests:
               maxValue: 65535
 
     - label:
+          "Step 5: If the GCAST feature bit is set, verify that
+          MaxGroupsPerFabric is 0."
+      PICS: GRPKEY.S.A0002
+      runIf: IsGCASTFeatureSet
+      command: "readAttribute"
+      attribute: "MaxGroupsPerFabric"
+      response:
+          value: 0
+
+    - label:
           "Step 6: TH reads MaxGroupKeysPerFabric attribute from
           GroupKeyManagement cluster on DUT using a fabric-filtered read."
       command: "readAttribute"
@@ -94,3 +200,17 @@ tests:
               type: int16u
               minValue: 1
               maxValue: 65535
+
+    - label:
+          "Step 7: If Groupcast is not adopted, skip this step. Otherwise, TH
+          writes to the GroupKeyMap attribute on GroupKeyManagement cluster on
+          DUT with one entry as follows: List item 1:, GroupId: 0x0103,
+          GroupKeySetId: 0x01a3"
+      PICS: GRPKEY.S.A0000
+      runIf: IsGroupcastAdopted
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
+      response:
+          error: INVALID_IN_STATE

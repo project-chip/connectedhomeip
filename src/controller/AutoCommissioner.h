@@ -79,6 +79,9 @@ private:
     // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set
     void SetCASEFailsafeTimerIfNeeded();
 
+    // Reset PDC parameters that should not carry over between network commissioning attempts.
+    void ClearPDCParameters();
+
     const ByteSpan GetDAC() { return mDAC.Span(); }
     const ByteSpan GetPAI() { return mPAI.Span(); }
 
@@ -168,6 +171,10 @@ private:
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
     char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
+    uint8_t mNetworkIdentity[CommissioningParameters::kMaxNetworkIdentityLen];
+    uint8_t mClientIdentity[CommissioningParameters::kMaxNetworkIdentityLen];
+    uint8_t mPossessionNonce[CommissioningParameters::kPossessionNonceLen];
+    uint8_t mPossessionSignature[CommissioningParameters::kPossessionSignatureLen];
 
     // Time zone is statically allocated because it is max 2 and not trivially destructible
     static constexpr size_t kMaxSupportedTimeZones = 2;

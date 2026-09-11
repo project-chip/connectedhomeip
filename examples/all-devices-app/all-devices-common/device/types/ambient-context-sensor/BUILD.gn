@@ -27,6 +27,7 @@ source_set("ambient-context-sensor") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/ambient-context-sensing-server",
+    "${chip_root}/src/app/clusters/ambient-sensing-union-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
