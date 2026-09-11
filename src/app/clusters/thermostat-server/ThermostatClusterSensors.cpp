@@ -79,7 +79,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(co
         return encoder.EncodeList([this](const auto & enc) -> CHIP_ERROR {
             for (size_t i = 0; true; i++)
             {
-                if (i >= kMaxSensorsListLength)
+                if (i > kMaxSensorsListLength)
                 {
                     ChipLogError(Zcl, "[Sensors] GetSensorAtIndex exceeds max number of sensors");
                     return CHIP_ERROR_INVALID_ARGUMENT;
@@ -99,7 +99,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(co
         return encoder.EncodeList([this](const auto & enc) -> CHIP_ERROR {
             for (size_t i = 0; true; i++)
             {
-                if (i >= kMaxSensorsListLength)
+                if (i > kMaxSensorsListLength)
                 {
                     ChipLogError(Zcl, "[Sensors] GetAvailableSensorAtIndex exceeds max number of sensors");
                     return CHIP_ERROR_INVALID_ARGUMENT;
@@ -119,7 +119,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(co
         return encoder.EncodeList([this](const auto & enc) -> CHIP_ERROR {
             for (size_t i = 0; true; i++)
             {
-                if (i >= kMaxSensorsListLength)
+                if (i > kMaxSensorsListLength)
                 {
                     ChipLogError(Zcl, "[Sensors] GetEnabledSensorAtIndex exceeds max number of sensors");
                     return CHIP_ERROR_INVALID_ARGUMENT;
