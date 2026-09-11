@@ -171,8 +171,8 @@ CodeDrivenClusters:
     - Temperature Control
     - Temperature Measurement
     - Thermostat
-    - Thermostat User Interface Configuration
     - Thermostat Mode
+    - Thermostat User Interface Configuration
     - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization
