@@ -372,12 +372,6 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetManufacturingDate(uint16_t 
 }
 
 template <class FlashFactoryData>
-CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetManufacturingDateString(char * buf, size_t bufSize)
-{
-    return GetFactoryDataString(mFactoryData.mfg_date_str, buf, bufSize);
-}
-
-template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetHardwareVersion(uint16_t & hardwareVersion)
 {
     VerifyOrReturnError(mFactoryData.hwVerPresent, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);

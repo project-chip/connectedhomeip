@@ -32,8 +32,6 @@ import cbor2 as cbor
 import cryptography.hazmat.backends
 import cryptography.x509
 import pyqrcode
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from intelhex import IntelHex
 
 TOOLS = {
@@ -458,14 +456,6 @@ def write_device_unique_data(args, out_dirs, pai_cert):
             else:
                 dacs = generate_dac_cert(int(row['Index']), args, out_dirs, int(row['Discriminator']),
                                          int(row['PIN Code']), pai_cert['key_pem'], pai_cert['cert_pem'])
-            dac_cert_storage = read_der_file(dacs[0])
-            dac_key_storage = read_key_bin_file(dacs[1])
-            if not args.secure_programming_verification:
-                nvs_memory_append('dac_cert', dac_cert_storage)
-                nvs_memory_append('dac_key', dac_key_storage)
-            else:
-                log.info("Secure programming verification enabled; DAC and its keys are not stored directly into factory data")
-
             nvs_memory_append('dac_cert', read_der_file(dacs[0]))
             nvs_memory_append('dac_key', read_key_bin_file(dacs[1]))
             nvs_memory_append('pai_cert', read_der_file(pai_cert['cert_der']))
@@ -480,42 +470,6 @@ def write_device_unique_data(args, out_dirs, pai_cert):
 
         return dacs
 
-
-def aes_encrypt(key, data):
-    # Ensure data is 16 bytes (AES block size)
-    assert len(data) == 16, "Data block for AES must be 16 bytes."
-    assert len(key) == 16, "AES key must be 16 bytes (128 bits)."
-
-    cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=default_backend())
-    encryptor = cipher.encryptor()
-    return encryptor.update(data) + encryptor.finalize()
-
-
-def save_dac_cert_and_keys(dac_cert, dac_key, chip_id, file_path):
-    with open(file_path, 'wb') as f:
-        # Write DAC private key length (2 bytes, little-endian)
-        dac_key_len = len(dac_key)
-        f.write(dac_key_len.to_bytes(2, 'little'))
-
-        # Encrypt DAC private key in two 16-byte segments
-        encrypted_key_part1 = aes_encrypt(chip_id, dac_key[:16])
-        encrypted_key_part2 = aes_encrypt(chip_id, dac_key[16:32])
-
-        # Write the encrypted DAC private key parts (32 bytes total)
-        f.write(encrypted_key_part1)
-        f.write(encrypted_key_part2)
-
-        # Pad the file with 0xFF to reach the 100th byte
-        f.write(b'\xFF' * (100 - f.tell()))
-
-        # Write DAC certificate length (2 bytes, little-endian)
-        dac_cert_len = len(dac_cert)
-        f.write(dac_cert_len.to_bytes(2, 'little'))
-
-        # Write DAC certificate data
-        f.write(dac_cert)
-
-    print(f"DAC certificate and key have been saved to {file_path}")
 
 
 def generate_partition(args, dacs_cert, out_dirs):
@@ -594,10 +548,7 @@ def add_additional_kv(args, serial_num):
         nvs_memory_append('rd_uid', args.rd_id_uid)
 
     # Add the serial-num
-    if args.disable_serial_num_storage:
-        log.info("Secure programming verification enabled; skipping serial-num")
-    else:
-        nvs_memory_append('sn', serial_num)
+    nvs_memory_append('sn', serial_num)
 
     nvs_memory_append('version', FACTORY_DATA_VERSION)
 
@@ -698,13 +649,6 @@ def get_and_validate_args():
     part_gen_args.add_argument('--offset', type=allow_any_int,
                                help='Partition offset - an address in devices NVM memory, where factory data will be stored')
     part_gen_args.add_argument('--size', type=allow_any_int, help='The maximum partition size')
-
-    secure_args = parser.add_argument_group('Secure programming verification options')
-    secure_args.add_argument("--secure-programming-verification", action="store_true",
-                             help="Enable secure programming mode. When set, the script will perform additional steps for secure programming verification.")
-    secure_args.add_argument("--chip-id", required=False, type=str, help="Chip ID in hex format (32 hex characters).")
-    secure_args.add_argument("--disable_serial_num_storage", action="store_true",
-                             help="Disable storage of serial-num in factorydata.")
 
     args = parser.parse_args()
 
