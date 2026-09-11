@@ -1070,7 +1070,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         elif len(download_error_events) - len(download_error_events_after_kill) == 1:
             # One event (as expected) was identified, retrieve the last one.
             event_download_error = download_error_events[-1].Data
+        else:
+            asserts.fail("More or one DownloadError events gathered %s", download_error_events)
 
+        asserts.assert_is_not_none(event_download_error, f"{step_number_s4}: no DownloadError was found")
         logger.info("DownloadError event: %s", event_download_error)
         asserts.assert_equal(event_download_error.softwareVersion, ota_image_version,
                              f"Expected Software version {ota_image_version}, found {event_download_error.softwareVersion}")
@@ -1360,6 +1363,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and event.Data.reason == Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kFailure:
                 failure_report = event.Data
 
+        asserts.assert_is_not_none(
+            failure_report, f"{step_number_s6}: no StateTransition event with newState kIdle and reason kFailure was found")
         # Review the Event data
         logger.info("State transition after killing the provider: %s", failure_report)
         self.verify_state_transition_event(failure_report,
