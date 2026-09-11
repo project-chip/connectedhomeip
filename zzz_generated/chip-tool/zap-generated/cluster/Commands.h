@@ -29914,10 +29914,10 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
-                                   credsIssuerConfig),                                                            //
-        make_unique<ReadAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "available-sensors", Attributes::AvailableSensors::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "enabled-sensors", Attributes::EnabledSensors::Id, credsIssuerConfig),     //
+                                   credsIssuerConfig),                                                                         //
+        make_unique<ReadAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, "available-sensor-handles", Attributes::AvailableSensorHandles::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "enabled-sensor-handles", Attributes::EnabledSensorHandles::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "number-of-sensor-schedule-transitions", Attributes::NumberOfSensorScheduleTransitions::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "sensor-schedule", Attributes::SensorSchedule::Id, credsIssuerConfig),              //
@@ -30222,10 +30222,11 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
-                                        credsIssuerConfig),                                                            //
-        make_unique<SubscribeAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "available-sensors", Attributes::AvailableSensors::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "enabled-sensors", Attributes::EnabledSensors::Id, credsIssuerConfig),     //
+                                        credsIssuerConfig),                                         //
+        make_unique<SubscribeAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "available-sensor-handles", Attributes::AvailableSensorHandles::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "enabled-sensor-handles", Attributes::EnabledSensorHandles::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-sensor-schedule-transitions",
                                         Attributes::NumberOfSensorScheduleTransitions::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "sensor-schedule", Attributes::SensorSchedule::Id, credsIssuerConfig),              //
