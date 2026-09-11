@@ -95,7 +95,7 @@ jobs:
 
             - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
               run: 
-                scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py https://github.com/telink-semi/tl_zephyr.git e87fbee38775b103bd676f8412e6a9d651f08d6b --sdk-repo https://github.com/telink-semi/tl_ble_sdk_zephyr.git --sdk-hash 3bddf885c0a1e4342393b7c6b668ece104c12102"
+                scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py https://github.com/telink-semi/tl_zephyr.git ec302e94cb2886f0c71515efbe7344b32449a9ff --sdk-repo https://github.com/telink-semi/tl_ble_sdk_zephyr.git --sdk-hash de6f125c8ae6d29c4a640ab3526b40ff8c3f0a20"
 
             - name: Download Factory Data tools
               uses: actions/download-artifact@v8
