@@ -43,7 +43,11 @@ CHIP_ERROR AmbientContextSensor::Register(chip::EndpointId endpoint, CodeDrivenD
     ReturnErrorOnFailure(provider.AddCluster(mAmbientContextSensingCluster.Registration()));
 
     // Create the ambient sensing union cluster
-    mAmbientSensingUnionCluster.Create(AmbientSensingUnionCluster::Config(endpoint));
+    mAmbientSensingUnionCluster.Create(AmbientSensingUnionCluster::Config(endpoint).WithUnionName("all-devices-sensing-union"_span));
+    ReturnErrorOnFailure(mAmbientSensingUnionCluster.Cluster().AddMatterContributor(/* nodeId= */ 1,
+                                                                                    /* endpointId= */ 1,
+                                                                                    Clusters::AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline,
+                                                                                    /* firstFabricIndex= */ 1));
     ReturnErrorOnFailure(provider.AddCluster(mAmbientSensingUnionCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);

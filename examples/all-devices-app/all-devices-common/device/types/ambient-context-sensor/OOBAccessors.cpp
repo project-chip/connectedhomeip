@@ -24,7 +24,7 @@ namespace chip::app {
 void RegisterOOBAccessors(AmbientContextSensor & device, OOBAccessorRegistry & registry)
 {
     LogErrorOnFailure(registry.Register(
-        std::make_unique<AmbientContextOOBAccessor>(device.AmbientContextSensingCluster(), device.GetEndpointId())));
+        std::make_unique<AmbientContextOOBAccessor>(device.AmbientContextSensingCluster(), device.AmbientSensingUnionCluster(), device.GetEndpointId())));
 }
 
 } // namespace chip::app
