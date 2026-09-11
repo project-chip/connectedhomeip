@@ -787,6 +787,62 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     EXPECT_TRUE(offWaitTimeReported);
 
     mClusterTester.GetDirtyList().clear();
+
+    // Verify that all writes are reported
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OnTime::Id, static_cast<uint16_t>(9)), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OffWaitTime::Id, static_cast<uint16_t>(9)), CHIP_NO_ERROR);
+
+    // Expect report since all writes are reported
+    onTimeReported      = false;
+    offWaitTimeReported = false;
+
+    for (auto & id : mClusterTester.GetDirtyList())
+    {
+        if (id.mAttributeId == Attributes::OnTime::Id)
+            onTimeReported = true;
+        if (id.mAttributeId == Attributes::OffWaitTime::Id)
+            offWaitTimeReported = true;
+    }
+    EXPECT_TRUE(onTimeReported);
+    EXPECT_TRUE(offWaitTimeReported);
+
+    mClusterTester.GetDirtyList().clear();
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OnTime::Id, static_cast<uint16_t>(100)), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OffWaitTime::Id, static_cast<uint16_t>(100)), CHIP_NO_ERROR);
+
+    // Expect report since all writes are reported
+    onTimeReported      = false;
+    offWaitTimeReported = false;
+
+    for (auto & id : mClusterTester.GetDirtyList())
+    {
+        if (id.mAttributeId == Attributes::OnTime::Id)
+            onTimeReported = true;
+        if (id.mAttributeId == Attributes::OffWaitTime::Id)
+            offWaitTimeReported = true;
+    }
+    EXPECT_TRUE(onTimeReported);
+    EXPECT_TRUE(offWaitTimeReported);
+
+    mClusterTester.GetDirtyList().clear();
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OnTime::Id, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::OffWaitTime::Id, static_cast<uint16_t>(0)), CHIP_NO_ERROR);
+
+    // Expect report since all writes are reported
+    onTimeReported      = false;
+    offWaitTimeReported = false;
+
+    for (auto & id : mClusterTester.GetDirtyList())
+    {
+        if (id.mAttributeId == Attributes::OnTime::Id)
+            onTimeReported = true;
+        if (id.mAttributeId == Attributes::OffWaitTime::Id)
+            offWaitTimeReported = true;
+    }
+    EXPECT_TRUE(onTimeReported);
+    EXPECT_TRUE(offWaitTimeReported);
 }
 
 TEST_F(TestOnOffLightingCluster, TestGlobalSceneControl)
