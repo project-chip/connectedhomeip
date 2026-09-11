@@ -207,10 +207,11 @@ class TC_DGGEN_2_1(MatterBaseTest):
 
         # STEP 7: ActiveRadioFaults
         self.step(7)
-        active_radio_faults = await self._read_dggen_attribute_expect_success(
-            endpoint=endpoint, attribute=attributes.ActiveRadioFaults)
-        self._assert_active_faults_list(active_radio_faults, enums.RadioFaultEnum, "ActiveRadioFaults", max_faults=7)
-        logger.info("ActiveRadioFaults: %s", active_radio_faults)
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ActiveRadioFaults):
+            active_radio_faults = await self._read_dggen_attribute_expect_success(
+              endpoint=endpoint, attribute=attributes.ActiveRadioFaults)
+            self._assert_active_faults_list(active_radio_faults, enums.RadioFaultEnum, "ActiveRadioFaults", max_faults=7)
+            logger.info("ActiveRadioFaults: %s", active_radio_faults)
 
         # STEP 8: ActiveNetworkFaults
         self.step(8)
