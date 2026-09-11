@@ -8692,8 +8692,8 @@ endpoint 1 {
     callback attribute criticalFreezeProtection;
     callback attribute criticalOverheatProtection;
     callback attribute sensors;
-    callback attribute availableSensors;
-    callback attribute enabledSensors;
+    callback attribute availableSensorHandles;
+    callback attribute enabledSensorHandles;
     callback attribute numberOfSensorScheduleTransitions;
     callback attribute sensorSchedule;
     callback attribute generatedCommandList;
