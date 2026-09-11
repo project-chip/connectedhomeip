@@ -21,26 +21,13 @@ assert(current_os == "zephyr")
 
 declare_args() {
   chip_build_example_providers = false
-  chip_build_codedriven_data_model = false
-  chip_build_ota_requestor = false
 }
 
 group("zephyr") {
-  deps = [
-    "${chip_root}/src/app/persistence:default",
-    "${chip_root}/src/lib",
-  ]
+  deps = [ "${chip_root}/src/lib" ]
 
   if (chip_build_tests) {
     deps += [ "${chip_root}/src:tests" ]
-  }
-
-  if (chip_build_codedriven_data_model) {
-    deps += [ "${chip_root}/src/data-model-providers/codedriven" ]
-  }
-
-  if (chip_build_ota_requestor) {
-    deps += [ "${chip_root}/src/app/clusters/ota-requestor" ]
   }
 
   if (chip_build_example_providers) {

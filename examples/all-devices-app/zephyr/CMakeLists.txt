@@ -99,17 +99,14 @@ endif()
 
 project(matter-all-devices-zephyr)
 
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+
 target_compile_options(app PRIVATE -Werror -Wno-error=format)
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 endif()
 
 target_compile_definitions(app PRIVATE ALL_DEVICES_ENABLED_DEVICE_COUNT=${ALL_DEVICES_ENABLED_DEVICE_COUNT})
-
-# Extension Point for a custom app task
-# if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/custom/CMakeLists.txt)
-#    include(${CMAKE_CURRENT_SOURCE_DIR}/custom/CMakeLists.txt)
-# endif()
 
 if(NOT APP_TASK_IMPL_HEADER STREQUAL "")
     target_compile_definitions(app PRIVATE APP_TASK_IMPL_HEADER="${APP_TASK_IMPL_HEADER}")
@@ -148,17 +145,10 @@ if(CONFIG_OPENTHREAD)
     )
 endif()
 
-# TODO wifi
+# TODO: Wi-Fi
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
-
-    # Not part of any GN target, so not in the chip library.
-    target_sources(app PRIVATE
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    )
+    chip_configure_cluster(app ota-requestor)
 
     if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
         set(ALL_DEVICES_OTA_BASE_NAME "zephyr")

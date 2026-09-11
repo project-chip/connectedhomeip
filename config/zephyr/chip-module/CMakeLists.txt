@@ -81,7 +81,7 @@ if(CONFIG_CHIP)
         endif()
     endif()
 
-    
+
     # IMU task has no Kconfig for priority; on RW platforms it is critical infrastructure,
     # so its priority is forced to cooperative to prevent starvation.
     if(CONFIG_SOC_FAMILY_NXP_RW)
@@ -127,9 +127,6 @@ if(CONFIG_CHIP)
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})
     matter_add_gn_arg_string("zephyr_cxx" ${CMAKE_CXX_COMPILER})
 
-    matter_add_gn_arg_bool("chip_build_codedriven_data_model" CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
-    matter_add_gn_arg_bool("chip_build_ota_requestor" CONFIG_CHIP_OTA_REQUESTOR)
-
     if(BOARD STREQUAL "native_sim")
         matter_add_gn_arg_string("target_cpu" "x86")
     elseif(BOARD STREQUAL "native_sim/native/64")
@@ -168,13 +165,25 @@ if(CONFIG_CHIP)
         DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
         GN_DEPENDENCIES kernel
     )
-    
+
     set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
-    
+
     target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
 
     set(GNU_STD_TARGET chip)
     include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
+
+    # //src/data-model-providers/codedriven is a GN source_set and is not part of
+    # libCHIP.a, so the module compiles the code-driven provider itself.
+    if(CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
+        zephyr_library_named(chip_codedriven_data_model)
+        target_sources(chip_codedriven_data_model PRIVATE
+            ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp
+        )
+        target_link_libraries(chip_codedriven_data_model PRIVATE chip)
+    endif()
 
     if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         target_link_options(chip INTERFACE
