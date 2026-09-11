@@ -170,8 +170,8 @@ if(CONFIG_CHIP)
 
     target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
 
-    set(GNU_STD_TARGET chip)
     include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
+    chip_enable_gnu_std(chip)
 
     # //src/data-model-providers/codedriven is a GN source_set and is not part of
     # libCHIP.a, so the module compiles the code-driven provider itself.
