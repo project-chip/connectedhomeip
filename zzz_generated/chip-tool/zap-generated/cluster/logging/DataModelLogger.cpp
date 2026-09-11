@@ -21607,6 +21607,47 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ThermostatSuggestionNotFollowingReason", 1, value);
         }
+<<<<<<< HEAD
+=======
+        case Thermostat::Attributes::CriticalFreezeProtection::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CriticalFreezeProtection", 1, value);
+        }
+        case Thermostat::Attributes::CriticalOverheatProtection::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CriticalOverheatProtection", 1, value);
+        }
+        case Thermostat::Attributes::Sensors::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Sensors", 1, value);
+        }
+        case Thermostat::Attributes::AvailableSensors::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AvailableSensors", 1, value);
+        }
+        case Thermostat::Attributes::EnabledSensors::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EnabledSensors", 1, value);
+        }
+        case Thermostat::Attributes::NumberOfSensorScheduleTransitions::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfSensorScheduleTransitions", 1, value);
+        }
+        case Thermostat::Attributes::SensorSchedule::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::Thermostat::Structs::SensorScheduleTransitionStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SensorSchedule", 1, value);
+        }
+>>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         case Thermostat::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

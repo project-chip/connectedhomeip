@@ -151,6 +151,23 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::
             return CurrentThermostatSuggestion::kMetadataEntry;
         case ThermostatSuggestionNotFollowingReason::Id:
             return ThermostatSuggestionNotFollowingReason::kMetadataEntry;
+<<<<<<< HEAD
+=======
+        case CriticalFreezeProtection::Id:
+            return CriticalFreezeProtection::kMetadataEntry;
+        case CriticalOverheatProtection::Id:
+            return CriticalOverheatProtection::kMetadataEntry;
+        case Sensors::Id:
+            return Sensors::kMetadataEntry;
+        case AvailableSensors::Id:
+            return AvailableSensors::kMetadataEntry;
+        case EnabledSensors::Id:
+            return EnabledSensors::kMetadataEntry;
+        case NumberOfSensorScheduleTransitions::Id:
+            return NumberOfSensorScheduleTransitions::kMetadataEntry;
+        case SensorSchedule::Id:
+            return SensorSchedule::kMetadataEntry;
+>>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         default:
             return std::nullopt;
         }

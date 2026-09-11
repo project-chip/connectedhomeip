@@ -14,7 +14,11 @@ namespace Thermostat {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
+<<<<<<< HEAD
 inline constexpr uint32_t kAttributesCount = 69;
+=======
+inline constexpr uint32_t kAttributesCount = 76;
+>>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 
 namespace LocalTemperature {
 inline constexpr AttributeId Id = 0x00000000;
@@ -272,6 +276,37 @@ namespace ThermostatSuggestionNotFollowingReason {
 inline constexpr AttributeId Id = 0x00000056;
 } // namespace ThermostatSuggestionNotFollowingReason
 
+<<<<<<< HEAD
+=======
+namespace CriticalFreezeProtection {
+inline constexpr AttributeId Id = 0x00000057;
+} // namespace CriticalFreezeProtection
+
+namespace CriticalOverheatProtection {
+inline constexpr AttributeId Id = 0x00000058;
+} // namespace CriticalOverheatProtection
+
+namespace Sensors {
+inline constexpr AttributeId Id = 0x00000059;
+} // namespace Sensors
+
+namespace AvailableSensors {
+inline constexpr AttributeId Id = 0x0000005A;
+} // namespace AvailableSensors
+
+namespace EnabledSensors {
+inline constexpr AttributeId Id = 0x0000005B;
+} // namespace EnabledSensors
+
+namespace NumberOfSensorScheduleTransitions {
+inline constexpr AttributeId Id = 0x0000005C;
+} // namespace NumberOfSensorScheduleTransitions
+
+namespace SensorSchedule {
+inline constexpr AttributeId Id = 0x0000005D;
+} // namespace SensorSchedule
+
+>>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

@@ -4281,6 +4281,30 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
         return YES;
     }
+<<<<<<< HEAD
+=======
+    case Attributes::CriticalFreezeProtection::Id: {
+        return YES;
+    }
+    case Attributes::CriticalOverheatProtection::Id: {
+        return YES;
+    }
+    case Attributes::Sensors::Id: {
+        return YES;
+    }
+    case Attributes::AvailableSensors::Id: {
+        return YES;
+    }
+    case Attributes::EnabledSensors::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfSensorScheduleTransitions::Id: {
+        return YES;
+    }
+    case Attributes::SensorSchedule::Id: {
+        return YES;
+    }
+>>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

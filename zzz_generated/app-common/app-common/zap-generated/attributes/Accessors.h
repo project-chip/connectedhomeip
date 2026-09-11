@@ -2796,6 +2796,21 @@ namespace SetpointHoldExpiryTimestamp {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
 } // namespace SetpointHoldExpiryTimestamp
 
+<<<<<<< HEAD
+=======
+namespace CriticalFreezeProtection {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
+} // namespace CriticalFreezeProtection
+
+namespace CriticalOverheatProtection {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
+} // namespace CriticalOverheatProtection
+
+namespace NumberOfSensorScheduleTransitions {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
+} // namespace NumberOfSensorScheduleTransitions
+
+>>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap

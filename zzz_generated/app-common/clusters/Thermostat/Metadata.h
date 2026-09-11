@@ -299,6 +299,45 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
+<<<<<<< HEAD
+=======
+namespace CriticalFreezeProtection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalFreezeProtection::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CriticalFreezeProtection
+namespace CriticalOverheatProtection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalOverheatProtection::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CriticalOverheatProtection
+namespace Sensors {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Sensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace Sensors
+namespace AvailableSensors {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AvailableSensors::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace AvailableSensors
+namespace EnabledSensors {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(EnabledSensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace EnabledSensors
+namespace NumberOfSensorScheduleTransitions {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfSensorScheduleTransitions::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace NumberOfSensorScheduleTransitions
+namespace SensorSchedule {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SensorSchedule::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace SensorSchedule
+>>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     LocalTemperature::kMetadataEntry,
     ControlSequenceOfOperation::kMetadataEntry,
