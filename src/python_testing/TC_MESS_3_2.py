@@ -38,6 +38,12 @@ _TRUNCATION_LIMIT_SEC = 20
 # DUT that does not truncate at all, since the audio under test runs well beyond 25s.
 _TRUNCATION_TOLERANCE_SEC = 5
 
+# A null Duration means "until changed", so the short message would never complete on a DUT
+# that supports MultiModalMessages. A finite Duration makes step 5 reachable on any DUT: such
+# devices complete on it, and audio-only devices take the minimum of it, the audio length and
+# 20 seconds, so the message still finishes.
+_SHORT_AUDIO_DURATION_MS = 10000
+
 
 class TC_MESS_3_2(MatterBaseTest, MESSTestBase):
 
@@ -104,6 +110,9 @@ class TC_MESS_3_2(MatterBaseTest, MESSTestBase):
         event_handler = await self.start_message_event_subscription(endpoint)
 
         self.step(1)
+        feature_map = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
+        supports_multi_modal = bool(feature_map & cluster.Bitmaps.Feature.kMultiModalMessages)
         mime_types = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.SupportedMimeTypes)
         matter_asserts.assert_list(mime_types, "SupportedMimeTypes", min_length=1)
@@ -113,7 +122,7 @@ class TC_MESS_3_2(MatterBaseTest, MESSTestBase):
         await self.send_present_message(
             endpoint, message_id=MESSAGE_ID_1, message_control=audio_control,
             priority=cluster.Enums.MessagePriorityEnum.kLow,
-            message_text="", message_uri=short_audio_uri)
+            message_text="", message_uri=short_audio_uri, duration_ms=_SHORT_AUDIO_DURATION_MS)
 
         self.step(3)
         self.wait_for_message_event(event_handler, events.MessageQueued, MESSAGE_ID_1, timeout_sec=timeout_sec)
@@ -131,6 +140,18 @@ class TC_MESS_3_2(MatterBaseTest, MESSTestBase):
             message_text="", message_uri=long_audio_uri)
 
         self.step(7)
+        if supports_multi_modal:
+            # The 20 second cap is specified for audio-only messages, "where the AudioMessage
+            # bit is set and the MultiModalMessages feature is not supported". This DUT
+            # supports it, so no truncation is required and the null Duration correctly leaves
+            # the message presented until changed. Cancel it so it does not outlive the test.
+            log.info("DUT supports MultiModalMessages, so the 20 second audio truncation rule "
+                     "does not apply; skipping the truncation check")
+            await self.send_cancel_message(endpoint, [MESSAGE_ID_2])
+            self.mark_current_step_skipped()
+            event_handler.cancel()
+            return
+
         # The events carry no timestamps that can be compared directly, so the elapsed wall
         # time between receiving MessagePresented and MessageComplete stands in for the
         # presentation length.
