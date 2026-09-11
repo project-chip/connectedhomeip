@@ -50,6 +50,13 @@ _MESSAGE_TEXT = "Hello from Matter"
 # have it in SupportedLanguageCodes.
 _UNSUPPORTED_LANGUAGE_CODE = "xx-XX"
 
+# A null Duration means "until changed", so the message would stay presented and never
+# complete. The spoken-only carve-out that lets the text-to-speech engine decide the length
+# only applies when the DUT does not support MultiModalMessages, so a finite Duration is what
+# makes step 5 reachable on any DUT: MMSG devices complete on it, and spoken-only devices
+# ignore it and complete when speech ends.
+_SPOKEN_MESSAGE_DURATION_MS = 2000
+
 
 class TC_MESS_3_1(MatterBaseTest, MESSTestBase):
 
@@ -115,7 +122,8 @@ class TC_MESS_3_1(MatterBaseTest, MESSTestBase):
         await self.send_present_message(
             endpoint, message_id=MESSAGE_ID_1, message_control=spoken_control,
             priority=cluster.Enums.MessagePriorityEnum.kLow,
-            message_text=_MESSAGE_TEXT, language_code=supported_lang_code)
+            message_text=_MESSAGE_TEXT, language_code=supported_lang_code,
+            duration_ms=_SPOKEN_MESSAGE_DURATION_MS)
 
         self.step(3)
         self.wait_for_message_event(event_handler, events.MessageQueued, MESSAGE_ID_1, timeout_sec=timeout_sec)
@@ -132,7 +140,8 @@ class TC_MESS_3_1(MatterBaseTest, MESSTestBase):
         await self.send_present_message(
             endpoint, message_id=MESSAGE_ID_2, message_control=spoken_control,
             priority=cluster.Enums.MessagePriorityEnum.kLow,
-            message_text=_MESSAGE_TEXT, language_code=_UNSUPPORTED_LANGUAGE_CODE)
+            message_text=_MESSAGE_TEXT, language_code=_UNSUPPORTED_LANGUAGE_CODE,
+            duration_ms=_SPOKEN_MESSAGE_DURATION_MS)
         self.wait_for_message_event(event_handler, events.MessagePresented, MESSAGE_ID_2, timeout_sec=timeout_sec)
         self.wait_for_message_event(event_handler, events.MessageComplete, MESSAGE_ID_2, timeout_sec=timeout_sec)
 
