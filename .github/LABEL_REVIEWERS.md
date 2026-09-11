@@ -69,6 +69,7 @@ GitHub usernames:
 ```
 
 ### Rules & Behaviors
+
 -   **Case-Insensitive**: Both label names and usernames are matched
     case-insensitively (`Security` matches `security`, `Cecille` matches
     `cecille`).
