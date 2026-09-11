@@ -472,15 +472,16 @@ struct TestDefaultAvAnalysisWebRTCClient : public ::testing::Test
         ASSERT_EQ(mClient.SendPendingICECandidates(), CHIP_NO_ERROR);
     }
 
-    // InterceptingWebRTCClient overrides EstablishSession.
     CASESessionManager mCASESessionManager;
-    InterceptingWebRTCClient mClient;
     RecordingCallback mCallback;
     FakePeerDelegate mPeerDelegate;
     StubRequestorDelegate mRequestorDelegate;
     // Not endpoint 1: the offer's OriginatingEndpointID must come from this registration and not
     // from a plausible default
     WebRTCTransportRequestor::WebRTCTransportRequestorCluster mRequestorCluster{ kRequestorEndpoint, mRequestorDelegate };
+    // Declared last: the client's destructor cancels through the delegate and the requestor
+    // cluster, so they must still be alive. InterceptingWebRTCClient overrides EstablishSession.
+    InterceptingWebRTCClient mClient;
 };
 
 TEST_F(TestDefaultAvAnalysisWebRTCClient, InitArgumentValidation)
