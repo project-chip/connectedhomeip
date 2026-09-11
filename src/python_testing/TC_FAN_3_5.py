@@ -84,7 +84,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("6", """[FC] LowestOff field test
                                             Iteratively send step commands with LowestOff set to True, Direction set to Decrease, and Wrap set to False.
-                                            Starting form the maximum fan attribute values and ending at the minimum fan attribute values (descending order).
+                                            Starting from the maximum fan attribute values and ending at the minimum fan attribute values (descending order).
                                             Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""", """
                                         SETUP
                                             - Initialize the PercentSetting attribute to 100
@@ -110,7 +110,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("7", """LowestOff field test
                                         Iteratively send step commands with LowestOff set to True, Direction set to Increase, and Wrap set to False.
-                                        Starting form the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
+                                        Starting from the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
                                         Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""", """
                                     SETUP
                                     - Initialize the PercentSetting attribute to 0
@@ -139,7 +139,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("9", """LowestOff field test
                                         Iteratively send step commands with LowestOff set to True, Direction set to Decrease, and Wrap set to False.
-                                        Starting form the maximum fan attribute values and ending at the minimum fan attribute values (descending order).
+                                        Starting from the maximum fan attribute values and ending at the minimum fan attribute values (descending order).
                                         Monitoring the Current attribute values primarily (PercentCurrent, SpeedCurrent).""", """
                                     SETUP
                                     - Initialize the PercentSetting attribute to 100
@@ -165,7 +165,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("10", """LowestOff field test
                                         Iteratively send step commands with LowestOff set to True, Direction set to Increase, and Wrap set to False.
-                                        Starting form the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
+                                        Starting from the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
                                         Monitoring the Current attribute values primarily (PercentCurrent, SpeedCurrent).""", """
                                     SETUP
                                     - Initialize the PercentSetting attribute to 0
@@ -194,7 +194,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("12", """LowestOff field test
                                         Iteratively send step commands with LowestOff set to False, Direction set to Decrease, and Wrap set to False.
-                                        Starting form the maximum fan attribute values and ending at the minimum PercentSetting attribute value above 0 (descending order).
+                                        Starting from the maximum fan attribute values and ending at the minimum PercentSetting attribute value above 0 (descending order).
                                         Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""", """
                                     SETUP
                                     - Initialize the PercentSetting attribute to 100
@@ -220,7 +220,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("13", """LowestOff field test
                                         Iteratively send step commands with LowestOff set to False, Direction set to Increase, and Wrap set to False.
-                                        Starting form the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
+                                        Starting from the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
                                         Monitoring the Setting attribute values primarily (PercentSetting, SpeedSetting).""", """
                                     SETUP
                                     - Initialize the PercentSetting attribute to 0
@@ -249,7 +249,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("15", """LowestOff field test
                                         Iteratively send step commands with LowestOff set to False, Direction set to Decrease, and Wrap set to False.
-                                        Starting form the maximum fan attribute values and ending at the minimum PercentSetting attribute value above 0 (descending order).
+                                        Starting from the maximum fan attribute values and ending at the minimum PercentSetting attribute value above 0 (descending order).
                                         Monitoring the Current attribute values primarily (PercentCurrent, SpeedCurrent).""", """
                                     SETUP
                                     - Initialize the PercentSetting attribute to 100
@@ -275,7 +275,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("16", """LowestOff field test
                                         Iteratively send step commands with LowestOff set to False, Direction set to Increase, and Wrap set to False.
-                                        Starting form the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
+                                        Starting from the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
                                         Monitoring the Current attribute values primarily (PercentCurrent, SpeedCurrent).""", """
                                     SETUP
                                     - Initialize the PercentSetting attribute to 0
@@ -1041,38 +1041,38 @@ class TC_FAN_3_5(MatterBaseTest):
         if step.direction == sd_enum.kDecrease and step.lowestOff:
             if not handle_current_values:
                 # - Verify that the attribute values all go to Off values
-                await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=speed_off)
+                await self.wrap_verify(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=speed_off)
                 # - Verify that the attribute values all go to the highest step values
-                await self.wrap_veirfy(step, percent_setting_expected=percent_setting_top,
+                await self.wrap_verify(step, percent_setting_expected=percent_setting_top,
                                        fan_mode_expected=fm_enum.kHigh, speed_setting_expected=speed_setting_top)
             else:
                 # - Verify that the attribute values all go to Off values
-                await self.wrap_veirfy(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=speed_off)
+                await self.wrap_verify(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=speed_off)
                 # - Verify that the attribute values all go to the highest step values
-                await self.wrap_veirfy(step, percent_setting_expected=percent_setting_top,
+                await self.wrap_verify(step, percent_setting_expected=percent_setting_top,
                                        percent_current_expected=percent_setting_top, speed_current_expected=speed_setting_top)
         elif step.direction == sd_enum.kDecrease and not step.lowestOff:
             # - Verify that the attribute values all go to the highest step values
             if not handle_current_values:
-                await self.wrap_veirfy(step, percent_setting_expected=percent_setting_top,
+                await self.wrap_verify(step, percent_setting_expected=percent_setting_top,
                                        fan_mode_expected=fm_enum.kHigh, speed_setting_expected=speed_setting_top)
             else:
-                await self.wrap_veirfy(step, percent_setting_expected=percent_setting_top,
+                await self.wrap_verify(step, percent_setting_expected=percent_setting_top,
                                        percent_current_expected=percent_setting_top, speed_current_expected=speed_setting_top)
         elif step.direction == sd_enum.kIncrease and step.lowestOff:
             # - Verify that the attribute values all go to Off values
             if not handle_current_values:
-                await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=speed_off)
+                await self.wrap_verify(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=speed_off)
             else:
-                await self.wrap_veirfy(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=speed_off)
+                await self.wrap_verify(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=speed_off)
         elif step.direction == sd_enum.kIncrease and not step.lowestOff:
             # - Verify that the PercentSetting attribute value goes to the minimum Step value above 0
             if not handle_current_values:
-                await self.wrap_veirfy(step, percent_setting_expected=self.percent_setting_per_step)
+                await self.wrap_verify(step, percent_setting_expected=self.percent_setting_per_step)
             else:
-                await self.wrap_veirfy(step, percent_setting_expected=self.percent_setting_per_step, percent_current_expected=self.percent_setting_per_step)
+                await self.wrap_verify(step, percent_setting_expected=self.percent_setting_per_step, percent_current_expected=self.percent_setting_per_step)
 
-    async def wrap_veirfy(
+    async def wrap_verify(
         self,
         step: Clusters.FanControl.Commands.Step,
         percent_setting_expected: int,
