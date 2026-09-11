@@ -206,6 +206,59 @@ CHIP_ERROR ModeBaseCluster::GetModeValueByModeTag(uint16_t modeTagValue, uint8_t
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
+bool ModeBaseCluster::IsSupportedCoreModeTag(uint16_t coreModeTag)
+{
+    uint16_t tag = 0;
+    CHIP_ERROR err;
+    for (uint8_t i = 0; (err = mAppDelegate.GetCoreModeTagByIndex(i, tag)) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
+    {
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "ModeBase: Failed to get core mode tag by index %u: %" CHIP_ERROR_FORMAT, i, err.Format());
+            return false;
+        }
+        if (tag == coreModeTag)
+        {
+            return true;
+        }
+    }
+    ChipLogDetail(Zcl, "ModeBase: Cannot find core mode tag %x", coreModeTag);
+    return false;
+}
+
+bool ModeBaseCluster::ModeHasTag(uint8_t mode, uint16_t tag)
+{
+    uint8_t value = 0;
+    CHIP_ERROR err;
+    for (uint8_t i = 0; (err = mAppDelegate.GetModeValueByIndex(i, value)) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
+    {
+        if (err != CHIP_NO_ERROR)
+        {
+            return false;
+        }
+        if (value != mode)
+        {
+            continue;
+        }
+        ModeTagStructType tagsBuffer[kMaxNumOfModeTags];
+        DataModel::List<ModeTagStructType> tags(tagsBuffer);
+        if (mAppDelegate.GetModeTagsByIndex(i, tags) != CHIP_NO_ERROR)
+        {
+            return false;
+        }
+        for (const auto & modeTag : tags)
+        {
+            if (modeTag.value == tag)
+            {
+                return true;
+            }
+        }
+        // No need to check other modes once we found the mode
+        break;
+    }
+    return false;
+}
+
 std::optional<DataModel::ActionReturnStatus>
 ModeBaseCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
@@ -215,6 +268,11 @@ ModeBaseCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         Commands::ChangeToMode::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
         return HandleChangeToMode(*handler, request.path, data);
+    }
+    case Commands::ChangeToModeByCoreTag::Id: {
+        Commands::ChangeToModeByCoreTag::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(input_arguments));
+        return HandleChangeToModeByCoreTag(*handler, request.path, data);
     }
     default:
         return Status::UnsupportedCommand;
@@ -236,6 +294,8 @@ DataModel::ActionReturnStatus ModeBaseCluster::ReadAttribute(const DataModel::Re
         return encoder.Encode(mStartUpMode);
     case OnMode::Id:
         return encoder.Encode(mOnMode);
+    case CoreModeTags::Id:
+        return encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR { return EncodeCoreModeTags(encod); });
     case FeatureMap::Id:
         return encoder.Encode(mFeature);
     default:
@@ -270,6 +330,7 @@ CHIP_ERROR ModeBaseCluster::Attributes(const ConcreteClusterPath & path, ReadOnl
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { mOptionalAttributeSet.IsSet(StartUpMode::Id), StartUpMode::kMetadataEntry },
         { mFeature.Has(Feature::kOnOff), OnMode::kMetadataEntry },
+        { mFeature.Has(Feature::kCoreModes), CoreModeTags::kMetadataEntry },
     };
 
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
@@ -281,7 +342,11 @@ CHIP_ERROR ModeBaseCluster::AcceptedCommands(const ConcreteClusterPath & path,
     // MicrowaveOvenMode is a special case. It does not support the ChangeToMode command.
     if (mPath.mClusterId != MicrowaveOvenMode::Id)
     {
-        return builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry });
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry }));
+    }
+    if (mFeature.Has(Feature::kCoreModes))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::ChangeToModeByCoreTag::kMetadataEntry }));
     }
     return CHIP_NO_ERROR;
 }
@@ -340,6 +405,75 @@ ModeBaseCluster::HandleChangeToMode(CommandHandler & commandObj, const ConcreteC
         else
         {
             ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);
+        }
+    }
+
+    commandObj.AddResponse(commandPath, response);
+    return std::nullopt;
+}
+
+std::optional<DataModel::ActionReturnStatus>
+ModeBaseCluster::HandleChangeToModeByCoreTag(CommandHandler & commandObj, const ConcreteCommandPath & commandPath,
+                                             const Commands::ChangeToModeByCoreTag::DecodableType & commandData)
+{
+    uint16_t newModeTag = commandData.newModeTag;
+    Commands::ChangeToModeResponse::Type response;
+
+    // If the value of the NewModeTag field does not appear in the CoreModeTags list,
+    // the ChangeToModeResponse command's Status field SHALL indicate UnsupportedMode and
+    // the StatusText field SHALL be included and MAY be used to indicate the issue, with a human readable string,
+    // or include an empty string. The value of the CurrentMode attribute SHALL remain unchanged.
+    if (!IsSupportedCoreModeTag(newModeTag))
+    {
+        ChipLogError(Zcl, "ModeBase: Core mode tag %u is not in the CoreModeTags list", newModeTag);
+        response.status = to_underlying(StatusCode::kUnsupportedMode);
+        commandObj.AddResponse(commandPath, response);
+        return std::nullopt;
+    }
+
+    // Determine an initial mode matching newModeTag.
+    // If the CurrentMode already includes newModeTag, prefer CurrentMode.
+    // Otherwise, find the first supported mode that includes newModeTag.
+    uint8_t newMode = mCurrentMode;
+    if (!ModeHasTag(mCurrentMode, newModeTag))
+    {
+        CHIP_ERROR err = GetModeValueByModeTag(newModeTag, newMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "ModeBase: Failed to find a supported mode with core mode tag %u", newModeTag);
+            response.status = to_underlying(StatusCode::kGenericFailure);
+            commandObj.AddResponse(commandPath, response);
+            return std::nullopt;
+        }
+    }
+
+    mAppDelegate.HandleChangeToModeByCoreTag(newModeTag, newMode, response);
+
+    if (response.status != to_underlying(StatusCode::kSuccess))
+    {
+        commandObj.AddResponse(commandPath, response);
+        return std::nullopt;
+    }
+
+    if (!IsSupportedMode(newMode) || !ModeHasTag(newMode, newModeTag))
+    {
+        ChipLogError(Zcl, "ModeBase: Mode %u is not supported or does not contain tag %u", newMode, newModeTag);
+        response.status = to_underlying(StatusCode::kGenericFailure);
+    }
+    else if (newMode == GetCurrentMode())
+    {
+        ChipLogProgress(Zcl, "ModeBase: HandleChangeToModeByCoreTag resulted in no change to CurrentMode (%u)", newMode);
+    }
+    else
+    {
+        Status status = UpdateCurrentMode(newMode);
+        if (status != Status::Success)
+        {
+            response.status = to_underlying(StatusCode::kGenericFailure);
+        }
+        else
+        {
+            ChipLogProgress(Zcl, "ModeBase: HandleChangeToModeByCoreTag changed to mode %u", newMode);
         }
     }
 
@@ -455,6 +589,23 @@ CHIP_ERROR ModeBaseCluster::EncodeSupportedModes(const AttributeValueEncoder::Li
         mode.modeTags = tags;
 
         ReturnErrorOnFailure(encoder.Encode(mode));
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ModeBaseCluster::EncodeCoreModeTags(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    for (uint8_t i = 0; true; i++)
+    {
+        uint16_t tag = 0;
+        auto err     = mAppDelegate.GetCoreModeTagByIndex(i, tag);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(tag));
     }
     return CHIP_NO_ERROR;
 }
