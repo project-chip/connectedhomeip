@@ -175,7 +175,6 @@ DataModel::ActionReturnStatus OnOffLightingCluster::WriteImpl(const DataModel::W
         uint16_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnValue(mOnTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-
         mOnTime = value;
         UpdateTimer();
         return Status::Success;
@@ -184,7 +183,6 @@ DataModel::ActionReturnStatus OnOffLightingCluster::WriteImpl(const DataModel::W
         uint16_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnValue(mOffWaitTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-
         mOffWaitTime = value;
         UpdateTimer();
         return Status::Success;
