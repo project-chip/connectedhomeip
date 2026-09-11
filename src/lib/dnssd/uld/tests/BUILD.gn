@@ -26,6 +26,7 @@ chip_test_suite("tests") {
     "TestOptRecord.cpp",
     "TestSig0Record.cpp",
     "TestUpdateBuilder.cpp",
+    "TestUpdateResponse.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

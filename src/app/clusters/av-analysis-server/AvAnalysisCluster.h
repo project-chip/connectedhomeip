@@ -156,6 +156,18 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    // Delegate interaction with server stored attributes
+    /**
+     * Invoked by the delegate when it needs to ensure that an application detected context has been enabled at the server
+     *
+     * @param aContext the context that has been detected, rendered as a Semantic Tag
+     * @param aZoneIds the zoneIds (one or more) in which context was detected, this can be null or absent.
+     *
+     * @return bool    true indicates that the context is active, note that a context with Null zones matches all triggering zones
+     */
+    bool IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext,
+                                   Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds);
+
     // Context detection and event generation
     CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, Optional<NodeId> aSourceNodeId = NullOptional,
                                    bool aUseSpecificSessionId = false);

@@ -62,6 +62,15 @@ class ElectricalAlarmTestBaseHelper(MatterTestCommissionedDevice):
     once, and each test case supplies its alarm, its bit, and its two trigger codes.
     """
 
+    def _log_notify(self, event, label: str) -> None:
+        """Record the decoded Notify fields so a log reader can check the expected outcome.
+
+        The assertions that follow prove the values; without this the log shows only that an event
+        arrived, and a reviewer can infer success from the absence of a failure rather than see it.
+        """
+        log.info("Notify (%s): Active=0x%08X Inactive=0x%08X State=0x%08X Mask=0x%08X",
+                 label, int(event.active), int(event.inactive), int(event.state), int(event.mask))
+
     async def send_test_event_trigger(self, code: int) -> None:
         await self.send_test_event_triggers(eventTrigger=code)
 
@@ -101,10 +110,12 @@ class ElectricalAlarmTestBaseHelper(MatterTestCommissionedDevice):
                      "Verify that the DUT response contains a map32 AlarmBitmap. Bit "
                      f"{bit} is 0 (alarm not yet active before test begins)."),
             TestStep(4, "TH establishes a subscription to State with MinIntervalFloor=0 and "
-                     "MaxIntervalCeiling=30.",
-                     "Subscription is established successfully."),
-            TestStep("4a", "TH awaits subscription report of an initial priming report for State.",
-                     "Priming report received carrying the current State value."),
+                     "MaxIntervalCeiling=30, and a subscription to the Notify event on the same "
+                     "interval.",
+                     "Both subscriptions are established successfully."),
+            TestStep("4a", "TH reads from the DUT the State to establish the baseline for the "
+                     "reports awaited in later steps.",
+                     f"Verify that the DUT response contains a map32 AlarmBitmap. Bit {bit} is 0."),
             TestStep(5, f"{trigger_cmd} with EventTrigger set to {trig_set} to simulate the "
                      f"{alarm_name} alarm condition.",
                      "Verify DUT responds w/ status SUCCESS(0x00)."),
@@ -222,6 +233,7 @@ class ElectricalAlarmTestBaseHelper(MatterTestCommissionedDevice):
 
         self.step(6)
         notify_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
+        self._log_notify(notify_event, "alarm raised")
         asserts.assert_true(notify_event.active & alarm_bit, f"Notify: {alarm_name} not set in Active")
         asserts.assert_false(notify_event.inactive & alarm_bit, f"Notify: {alarm_name} set in Inactive")
         asserts.assert_true(notify_event.state & alarm_bit, f"Notify: {alarm_name} not set in State")
@@ -249,6 +261,7 @@ class ElectricalAlarmTestBaseHelper(MatterTestCommissionedDevice):
 
             self.step(10)
             clear_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
+            self._log_notify(clear_event, "condition cleared")
             asserts.assert_true(clear_event.inactive & alarm_bit,
                                 f"Notify: {alarm_name} not set in Inactive on clear")
             asserts.assert_false(clear_event.active & alarm_bit,
@@ -291,6 +304,7 @@ class ElectricalAlarmTestBaseHelper(MatterTestCommissionedDevice):
             self.step("12b")
             if has_reset:
                 reset_event = event_sub.wait_for_event_report(cluster.Events.Notify, timeout_sec=30)
+                self._log_notify(reset_event, "reset")
                 asserts.assert_true(reset_event.inactive & alarm_bit,
                                     f"Notify: {alarm_name} not set in Inactive on Reset")
                 asserts.assert_false(reset_event.active & alarm_bit,
