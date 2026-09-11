@@ -168,7 +168,8 @@ class TC_FAN_3_5(MatterBaseTest):
                                         Starting form the minimum fan attribute values and ending at the maximum fan attribute values (ascending order).
                                         Monitoring the Current attribute values primarily (PercentCurrent, SpeedCurrent).""", """
                                     SETUP
-                                    - Initialize the PercentCurrent attribute to 0
+                                    - Initialize the PercentSetting attribute to 0
+                                        - Verify that the PercentCurrent attribute value is set to 0
                                         - Verify that the SpeedCurrent attribute value is set to 0
                                     - Subscribe to the PercentSetting, PercentCurrent, and SpeedCurrent attributes
                                     - Step: LowestOff=True, Direction=Increase, Wrap=False"""),
@@ -539,6 +540,26 @@ class TC_FAN_3_5(MatterBaseTest):
             f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({expected_value})"
         )
 
+    async def verify_percent_setting_init(self, percent_setting_init: int, handle_current_values: bool) -> None:
+        """Verifies the attributes a PercentSetting write of 0 or 100 is required to set (Percent Rules).
+
+        Setting runs check FanMode (Off or High) and SpeedSetting (0 or SpeedMax); Current runs check
+        PercentCurrent and SpeedCurrent for the same values.
+        """
+        cluster = Clusters.FanControl
+        attr = cluster.Attributes
+        fm_enum = cluster.Enums.FanModeEnum
+        asserts.assert_in(percent_setting_init, (0, self.percent_setting_max),
+                          f"[FC] PercentSetting initialization value must be 0 or {self.percent_setting_max}, got {percent_setting_init}")
+        speed_expected = self.get_expected_speed_setting(percent_setting_init)
+        if not handle_current_values:
+            fan_mode_expected = fm_enum.kOff if percent_setting_init == 0 else fm_enum.kHigh
+            await self.verify_expected_attribute_value(attr.FanMode, fan_mode_expected)
+            await self.verify_expected_attribute_value(attr.SpeedSetting, speed_expected)
+        else:
+            await self.verify_expected_attribute_value(attr.PercentCurrent, percent_setting_init)
+            await self.verify_expected_attribute_value(attr.SpeedCurrent, speed_expected)
+
     async def get_percent_setting_range_per_step(self):
         cluster = Clusters.FanControl
         attr = cluster.Attributes
@@ -704,6 +725,7 @@ class TC_FAN_3_5(MatterBaseTest):
             else:
                 percent_setting_init = self.percent_setting_max
         await self.write_setting(attr.PercentSetting, percent_setting_init)
+        await self.verify_percent_setting_init(percent_setting_init, handle_current_values)
         await self.subscribe_to_attributes(handle_current_values=handle_current_values)
 
         # *** NEXT STEP ***
