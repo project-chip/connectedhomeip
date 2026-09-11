@@ -43,13 +43,13 @@ from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.ElectricalGridConditions
 
 
-class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
+class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterTestCommissionedDevice):
     """Implementation of test case TC_EGC_2_3."""
 
     def desc_TC_EGC_2_3(self) -> str:
@@ -65,8 +65,7 @@ class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
 
     def steps_TC_EGC_2_3(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EGC.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EGC.TESTEVENTTRIGGER for Forecast Conditions Update Test Event",

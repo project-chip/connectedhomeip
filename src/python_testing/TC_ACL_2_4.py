@@ -40,13 +40,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_ACL_2_4(MatterBaseTest):
+class TC_ACL_2_4(MatterTestCommissionedDevice):
     # ACL entry counts in the test plan assume no framework secondary-controller ACL row.
     disable_wildcard_subscription = True
 
@@ -58,7 +58,7 @@ class TC_ACL_2_4(MatterBaseTest):
 
     def steps_TC_ACL_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH1 commissions DUT using admin node ID N1", is_commissioning=True),
+            TestStep(1, "TH1 commissions DUT using admin node ID N1"),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is stored as F1"),
             TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute and saves as acl_original",

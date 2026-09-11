@@ -42,18 +42,18 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_AVSUM_2_8(MatterBaseTest, AVSUMTestBase):
+class TC_AVSUM_2_8(MatterTestCommissionedDevice, AVSUMTestBase):
 
     def desc_TC_AVSUM_2_8(self) -> str:
         return "[TC-AVSUM-2.8] DPTZRelativeMove command validation"
 
     def steps_TC_AVSUM_2_8(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Send DPTZRelativeMove with an unknown stream ID, but valid Zoom Delta verify NotFound response"),
             TestStep(3, "Send a VideoStreamAllocate command to AVStreamManagement to allocate a video stream ID. Record the returned ID"),
             TestStep(4, "Send DPTZRelativeMove with the allocated stream ID, invalid Zoom Delta. Verify ConstraintError response"),

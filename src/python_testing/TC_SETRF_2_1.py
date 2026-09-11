@@ -49,6 +49,7 @@ from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.CommodityTariff
 
 
-class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
+class TC_SETRF_2_1(MatterTestCommissionedDevice, CommodityTariffTestBaseHelper):
     """Implementation of test case TC_SETRF_2_1."""
 
     def desc_TC_SETRF_2_1(self) -> str:
@@ -73,7 +74,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
 
         return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     "DUT is commissioned.", is_commissioning=True),
+                     "DUT is commissioned."),
             TestStep("2", "TH reads from the DUT the TariffInfo attribute.", """
                      - Verify that the DUT response contains a null or a value of TariffInformationStruct type;
                         - Verify that TariffLabel field has type string with max length 128 or null;

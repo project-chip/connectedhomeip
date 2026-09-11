@@ -51,20 +51,20 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_BOOL_2_2(MatterBaseTest):
+class TC_BOOL_2_2(MatterTestCommissionedDevice):
 
     def desc_TC_BOOL_2_2(self) -> str:
         return "[TC-BOOL-2.2] Primary Functionality with Server as DUT"
 
     def steps_TC_BOOL_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH", is_commissioning=True),
+            TestStep("1", "Commission DUT to TH"),
             TestStep("2", "TH reads FeatureMap attribute.", "DUT replies with FeatureMap attribute."),
             TestStep("3", "Bring the DUT into a state so StateValue is FALSE"),
             TestStep("4", "TH prompt operator to verify the device is in FALSE state"),

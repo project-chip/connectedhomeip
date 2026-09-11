@@ -48,13 +48,13 @@ from matter.clusters import Globals
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_3(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_3(self) -> str:
         return "[TC-PAVST-2.3] Allocate PushAV Transport with Server as DUT"
 
@@ -84,7 +84,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     def steps_TC_PAVST_2_3(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with `ConnectionID to remove any connections."),
             TestStep(2, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT",

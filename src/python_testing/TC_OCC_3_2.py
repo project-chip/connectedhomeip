@@ -62,13 +62,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_OCC_3_2(MatterBaseTest):
+class TC_OCC_3_2(MatterTestCommissionedDevice):
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_occupancy', False)
@@ -83,7 +83,7 @@ class TC_OCC_3_2(MatterBaseTest):
 
     def steps_TC_OCC_3_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH if not already done", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH if not already done"),
             TestStep(2, "TH establishes a wildcard subscription to all attributes on Occupancy Sensing Cluster on the endpoint under test. Subscription min interval = 0 and max interval = 30 seconds."),
             TestStep("3a", "Prepare DUT to be unoccupied state."),
             TestStep("3b", "TH reads DUT Occupancy attribute."),

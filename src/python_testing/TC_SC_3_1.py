@@ -37,7 +37,7 @@ import matter.case_capture as case_capture
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 # Matter spec constants (Section 4.4 / 4.13.2)
@@ -49,7 +49,7 @@ GENERAL_CODE_SUCCESS = 0
 PROTOCOL_CODE_SESSION_ESTABLISHMENT_SUCCESS = 0
 
 
-class TC_SC_3_1(MatterBaseTest):
+class TC_SC_3_1(MatterTestCommissionedDevice):
 
     @pics('MCORE.ROLE.COMMISSIONEE')
     @async_test_body
@@ -58,7 +58,7 @@ class TC_SC_3_1(MatterBaseTest):
         self.th = self.default_controller
         case_capture.SetObserver(self.th)
 
-        self.step("1a", "TH and the DUT are commissioned.", is_commissioning=True)
+        self.step("1a", "TH and the DUT are commissioned.")
         try:
             await self.th.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False)
         except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected

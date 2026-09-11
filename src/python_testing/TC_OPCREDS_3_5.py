@@ -42,18 +42,18 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
 
-class TC_OPCREDS_3_5(MatterBaseTest):
+class TC_OPCREDS_3_5(MatterTestCommissionedDevice):
 
     def pics_TC_OPCREDS_3_5(self):
         return ["OPCREDS.S"]
 
     def steps_TC_OPCREDS_3_5(self):
-        return [TestStep(1, "TH0 adds TH1 over CASE", "Commissioning is successful", is_commissioning=True),
+        return [TestStep(1, "TH0 adds TH1 over CASE", "Commissioning is successful"),
                 TestStep(2, "TH1 reads the NOCs attribute from the Node Operational Credentials cluster using a fabric-filtered read",
                          "Verify that the returned list has a single entry. Save the NOC field as noc_original and the ICAC field as icac_original"),
                 TestStep(3, "TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster",

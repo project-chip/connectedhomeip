@@ -41,7 +41,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ def acl_subject(cat: int) -> int:
     return 0xFFFFFFFD00000000 | cat
 
 
-class TC_ACE_1_3(MatterBaseTest):
+class TC_ACE_1_3(MatterTestCommissionedDevice):
 
     async def write_acl(self, acl):
         # This returns an attribute status
@@ -75,7 +75,7 @@ class TC_ACE_1_3(MatterBaseTest):
 
     def steps_TC_ACE_1_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH0 writes ACL all view on PIXIT.ACE.TESTENDPOINT"),
             TestStep(3, "TH1 reads EP0 descriptor - expect SUCCESS"),
             TestStep(4, "TH2 reads EP0 descriptor - expect SUCCESS"),

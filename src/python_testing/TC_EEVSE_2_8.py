@@ -45,13 +45,13 @@ from TC_EEVSE_Utils import EEVSEBaseTestHelper
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.EnergyEvse
 
 
-class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
+class TC_EEVSE_2_8(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
     """This test case verifies the primary functionality of the Energy EVSE
     Cluster server with the optional PlugAndCharge feature supported."""
 
@@ -65,7 +65,7 @@ class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_8(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH reads from the DUT the VehicleID attribute.",

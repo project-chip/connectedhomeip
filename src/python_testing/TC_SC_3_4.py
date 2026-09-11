@@ -45,7 +45,7 @@ from mobly import asserts
 from matter.exceptions import ChipStackError
 from matter.fault_injection import CHIPFaultId, FailAtFault, GetFaultCounter, ResetFaultCounters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 CHIP_ERROR_CODES = {
@@ -54,7 +54,7 @@ CHIP_ERROR_CODES = {
 }
 
 
-class TC_SC_3_4(MatterBaseTest):
+class TC_SC_3_4(MatterTestCommissionedDevice):
     disable_wildcard_subscription = True
 
     def desc_TC_SC_3_4(self) -> str:
@@ -63,7 +63,7 @@ class TC_SC_3_4(MatterBaseTest):
     def steps_TC_SC_3_4(self) -> list[TestStep]:
         return [
 
-            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT", is_commissioning=True),
+            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT"),
 
             TestStep(1, "TH constructs and sends a Sigma1 message with a resumptionID and NO initiatorResumeMIC to DUT",
                      "DUT sends a status report to the TH with a FAILURE general code , Protocol ID of SECURE_CHANNEL (0x0000), and Protocol Code of INVALID_PARAMETER (0X0002). DUT MUST perform no further processing after sending the status report."),

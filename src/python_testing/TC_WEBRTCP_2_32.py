@@ -44,11 +44,11 @@ from matter import ChipDeviceCtrl
 from matter.clusters import Globals
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_WebRTCP_2_32(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_32(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def desc_TC_WebRTCP_2_32(self) -> str:
         """Returns a description of this test"""
@@ -56,7 +56,7 @@ class TC_WebRTCP_2_32(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WebRTCP_2_32(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT commissioned and audio/video streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned and audio/video streams allocated"),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer using old scalar VideoStreamID and AudioStreamID fields (no VideoStreams/AudioStreams) => expect SolicitOfferResponse with deferredOffer=False"),
             TestStep(3, "Read CurrentSessions => expect 1; verify session has new list fields and old scalar fields absent"),

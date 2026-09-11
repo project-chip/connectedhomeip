@@ -47,12 +47,13 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_4_1(SoftwareUpdateBaseTest):
+class TC_SU_4_1(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     """[TC-SU-4.1] Verifying Cluster Attributes on OTA-R(DUT)"""
 
     # Reference variable for the OTA Software Update Requestor cluster.
@@ -67,7 +68,7 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
 
     def steps_TC_SU_4_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(
                 1,
                 "TH sends a write request for the DefaultOTAProviders Attribute on the first fabric to the DUT. "

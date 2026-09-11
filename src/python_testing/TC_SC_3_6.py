@@ -46,7 +46,7 @@ import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClustersObjects
 from matter.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
@@ -100,7 +100,7 @@ class ResubscriptionCatcher:
         return self._got_resubscription_event.is_set()
 
 
-class TC_SC_3_6(MatterBaseTest):
+class TC_SC_3_6(MatterTestCommissionedDevice):
     def setup_class(self):
         super().setup_class()
         self._subscriptions = []

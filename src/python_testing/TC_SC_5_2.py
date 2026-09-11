@@ -75,13 +75,13 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import _has_feature, async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SC_5_2(MatterBaseTest):
+class TC_SC_5_2(MatterTestCommissionedDevice):
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -103,7 +103,7 @@ class TC_SC_5_2(MatterBaseTest):
 
     def steps_TC_SC_5_2(self) -> list[TestStep]:
         return [
-            TestStep("0a", "Commissioning, already done", is_commissioning=True),
+            TestStep("0a", "Commissioning, already done"),
             TestStep("0b", "Run the remaining steps once for each endpoint with a groups cluster"),
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Manage privileges for groups 0x0101, 0x0102, and 0x0300, and maintain the current administrative privileges for the TH."),
             TestStep("2a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT to write GroupKeySetID 0x01a3."),

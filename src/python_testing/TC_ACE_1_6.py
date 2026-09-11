@@ -76,7 +76,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -86,7 +86,7 @@ log = logging.getLogger(__name__)
 # Try the test again from factory reset a few times.
 
 
-class TC_ACE_1_6(MatterBaseTest):
+class TC_ACE_1_6(MatterTestCommissionedDevice):
 
     def desc_TC_ACE_1_6(self) -> str:
         return "[TC-ACE-1.6] Group auth mode"
@@ -97,7 +97,7 @@ class TC_ACE_1_6(MatterBaseTest):
     def steps_TC_ACE_1_6(self) -> list[TestStep]:
         return [
             # --- 1. Shared Setup ---
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("1a", "TH finds a non-root endpoint (ep~1~ or PIXIT.G.ENDPOINT) implementing Groups cluster and a server cluster with commands requiring Operate privilege (if Groupcast enabled on RootNode) or verifies PIXIT.G.ENDPOINT is a valid non-root endpoint implementing Groups cluster (if Groupcast NOT enabled)"),
             TestStep("1b", "TH sends KeySetWrite command in GroupKeyManagement cluster for GroupKeySetID 0x01a3"),
             TestStep("1c", "TH sends KeySetWrite command in GroupKeyManagement cluster for GroupKeySetID 0x01a1"),

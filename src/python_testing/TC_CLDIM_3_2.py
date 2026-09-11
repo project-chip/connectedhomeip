@@ -43,7 +43,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ def current_latch_matcher(latch: bool) -> AttributeMatcher:
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 
-class TC_CLDIM_3_2(MatterBaseTest):
+class TC_CLDIM_3_2(MatterTestCommissionedDevice):
     async def read_cldim_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureDimension
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -67,7 +67,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
     def steps_TC_CLDIM_3_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If MotionLatching feature is not supported, skip remaining steps"),
             TestStep("2c", "Read LimitRange attribute"),

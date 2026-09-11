@@ -41,13 +41,13 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_ACL_2_8(MatterBaseTest):
+class TC_ACL_2_8(MatterTestCommissionedDevice):
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
@@ -526,7 +526,7 @@ class TC_ACL_2_8(MatterBaseTest):
     def steps_TC_ACL_2_8(self) -> list[TestStep]:
         return [
             TestStep(1, "TH1 commissions DUT using admin node ID N1",
-                     "DUT is commissioned on TH1 fabric", is_commissioning=True),
+                     "DUT is commissioned on TH1 fabric"),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is stored as F1"),
             TestStep(3, "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin node ID N2",

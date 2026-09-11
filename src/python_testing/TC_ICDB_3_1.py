@@ -72,6 +72,7 @@ from support_modules.icd_support import ICDBaseTest, ICDTestEventTriggerOperatio
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -83,14 +84,14 @@ modes = cluster.Enums.OperatingModeEnum
 clientTypeEnum = cluster.Enums.ClientTypeEnum
 
 
-class TC_ICDB_3_1(ICDBaseTest):
+class TC_ICDB_3_1(MatterTestCommissionedDevice, ICDBaseTest):
 
     def desc_TC_ICDB_3_1(self) -> str:
         return "[TC-ICDB-3.1] ICD Dynamic SIT/LIT - Verify OperatingMode transition between LIT and SIT when there is client registration [DUT as Server]"
 
     def steps_TC_ICDB_3_1(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep("1a", "TH reads from the DUT the RegisteredClients attribute.",
                      "RegisteredClients is empty. If not empty, TH sends command UnregisterClient to clear all clients in RegisteredClients."),
             TestStep("1b", "TH reads from the DUT the OperatingMode attribute.",

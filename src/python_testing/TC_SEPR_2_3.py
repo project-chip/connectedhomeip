@@ -51,7 +51,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.CommodityPrice
 
 
-class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
+class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterTestCommissionedDevice):
     """Implementation of test case TC_SEPR_2_3."""
 
     def desc_TC_SEPR_2_3(self) -> str:
@@ -79,8 +79,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
     def steps_TC_SEPR_2_3(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("1a", "Create CASE session connection via TCP",
                      "TCP connection established OK, set `tcp_support` to true, otherwise set `tcp_support` to false. "
                      "If `MCORE.SC.S.TCP` is declared, connection failure is a test failure."),

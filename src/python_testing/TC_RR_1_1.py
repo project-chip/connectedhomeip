@@ -53,7 +53,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.interaction_model import Status as StatusEnum
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
@@ -81,7 +81,7 @@ def generate_vid_verification_statement(fabric_index: int) -> bytes:
     return b"\x01" + (bytes(bytearray([fabric_index] * 84)))
 
 
-class TC_RR_1_1(MatterBaseTest):
+class TC_RR_1_1(MatterTestCommissionedDevice):
     # Avoid background wildcard subscription + extra ACL work during max-fabric commissioning
     disable_wildcard_subscription = True
 

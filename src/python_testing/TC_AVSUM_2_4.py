@@ -42,11 +42,11 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
+class TC_AVSUM_2_4(MatterTestCommissionedDevice, AVSUMTestBase):
 
     def verify_preset_matches(self, preset, position):
         if self.has_feature_mpan:
@@ -63,7 +63,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
 
     def steps_TC_AVSUM_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the value of MaxPresets, fail if unsupported."),
             TestStep(3, "Read the value of MPTZPresets, fail if unsupported"),
             TestStep(4, "Send a MPTZMovePreset command with a presetID of MaxPresets+1. Verify Constraint Error failure response."),

@@ -50,6 +50,7 @@ from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.CommodityTariff
 
 
-class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
+class TC_SETRF_3_1(MatterTestCommissionedDevice, CommodityTariffTestBaseHelper):
     """Implementation of test case TC_SETRF_3_1."""
 
     def desc_TC_SETRF_3_1(self) -> str:
@@ -74,7 +75,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
 
         return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     "DUT is commissioned to TH.", is_commissioning=True),
+                     "DUT is commissioned to TH."),
             TestStep("2", "Set up a subscription to the Commodity Tariff cluster attributes: MinIntervalFloor: 0, MaxIntervalCeiling: 10",
                      "Subscription successfully established."),
             TestStep("3", "TH reads from the DUT the TariffInfo attribute.", """

@@ -41,7 +41,7 @@ from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
@@ -78,7 +78,7 @@ def main_state_matcher(main_state: Clusters.ClosureControl.Attributes.MainState)
     return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
 
 
-class TC_CLCTRL_4_4(MatterBaseTest):
+class TC_CLCTRL_4_4(MatterTestCommissionedDevice):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -88,7 +88,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
     def steps_TC_CLCTRL_4_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "Read the AttributeList attribute to determine supported attributes",
                      "AttributeList of the ClosureControl cluster is returned by the DUT"),
             TestStep("2b", "Check if CountdownTime attribute is supported",

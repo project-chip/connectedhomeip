@@ -49,6 +49,7 @@ from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 
 from matter.clusters import MeterIdentification
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ log = logging.getLogger(__name__)
 cluster = MeterIdentification
 
 
-class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
+class TC_MTRID_2_1(MatterTestCommissionedDevice, MeterIdentificationTestBaseHelper):
     """Implementation of test case TC_MTRID_2_1."""
 
     def desc_TC_MTRID_2_1(self) -> str:
@@ -69,7 +70,7 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
 
     def steps_TC_MTRID_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
+            TestStep("1", "Commissioning, already done", "DUT is commissioned."),
             TestStep("2", "TH reads MeterType attribute", """
                      - DUT replies a null or a MeterTypeEnum value;
                      - Verify that value in range 0 - 2."""),

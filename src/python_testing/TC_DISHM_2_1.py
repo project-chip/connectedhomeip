@@ -71,13 +71,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_asserts import is_valid_int_value
-from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.matter_testing import MatterTestCommissionedDevice, matchers
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_DISHM_2_1(MatterBaseTest):
+class TC_DISHM_2_1(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -89,7 +89,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
     def steps_TC_DISHM_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute", "Verify that the DUT response contains a list of ModeOptionsStruct entries:"
                      "Verify that the list has two or more entries"
                      "Verify that PIXIT.DISHM.MODE_CHANGE_FAIL is one of supported_modes_dut"),
