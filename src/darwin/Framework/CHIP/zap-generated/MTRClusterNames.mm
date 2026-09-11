@@ -6123,6 +6123,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ThermostatSuggestionNotFollowingReason";
             break;
 
+        case MTRAttributeIDTypeClusterThermostatAttributeCriticalFreezeProtectionID:
+            result = @"CriticalFreezeProtection";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeCriticalOverheatProtectionID:
+            result = @"CriticalOverheatProtection";
+            break;
+
         case MTRAttributeIDTypeClusterThermostatAttributeSensorsID:
             result = @"Sensors";
             break;

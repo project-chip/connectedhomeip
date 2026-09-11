@@ -22019,6 +22019,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ThermostatSuggestionNotFollowingReason", 1, value);
         }
+        case Thermostat::Attributes::CriticalFreezeProtection::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CriticalFreezeProtection", 1, value);
+        }
+        case Thermostat::Attributes::CriticalOverheatProtection::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CriticalOverheatProtection", 1, value);
+        }
         case Thermostat::Attributes::Sensors::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::DecodableType>
                 value;

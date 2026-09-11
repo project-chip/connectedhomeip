@@ -12897,6 +12897,8 @@ public class ClusterIDMapping {
             ThermostatSuggestions(84L),
             CurrentThermostatSuggestion(85L),
             ThermostatSuggestionNotFollowingReason(86L),
+            CriticalFreezeProtection(87L),
+            CriticalOverheatProtection(88L),
             Sensors(89L),
             AvailableSensors(90L),
             EnabledSensors(91L),

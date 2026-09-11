@@ -368,6 +368,10 @@ bool ThermostatClusterBase::HasAttribute(AttributeId attributeId)
         return mConfig.mOptionalAttributes.SetpointChangeSourceTimestamp;
     case SetpointHoldExpiryTimestamp::Id:
         return mConfig.mOptionalAttributes.SetpointHoldExpiryTimestamp;
+    case CriticalFreezeProtection::Id:
+        return mConfig.mOptionalAttributes.CriticalFreezeProtection;
+    case CriticalOverheatProtection::Id:
+        return mConfig.mOptionalAttributes.CriticalOverheatProtection;
     case PresetTypes::Id:
     case NumberOfPresets::Id:
     case ActivePresetHandle::Id:
