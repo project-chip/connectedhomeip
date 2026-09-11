@@ -29,6 +29,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 
@@ -472,4 +473,60 @@ TEST(TestSpan, TestFromCharSpan)
     // These should be compile errors -- fromCharSpan only takes ByteSpan.
     // ByteSpan disallowed1 = ByteSpan::fromCharSpan(bytes);
     // CharSpan disallowed2 = CharSpan::fromCharSpan<const uint8_t>(chars);
+}
+
+// A zero-length TLV string yields a { nullptr, 0 } span, so these cases drive that value through
+// each copy helper. The assertions pin the normal contract; the null memmove argument itself is
+// reported only by -fsanitize=undefined.
+TEST(TestSpan, TestCopySpanToMutableSpanFromNullSource)
+{
+    const ByteSpan nullSource;
+    ASSERT_EQ(nullSource.data(), nullptr);
+
+    uint8_t buf[4] = { 1, 2, 3, 4 };
+    MutableByteSpan out(buf);
+    EXPECT_SUCCESS(CopySpanToMutableSpan(nullSource, out));
+    EXPECT_TRUE(out.empty());
+    EXPECT_EQ(buf[0], static_cast<uint8_t>(1));
+
+    MutableByteSpan nullOut;
+    EXPECT_SUCCESS(CopySpanToMutableSpan(nullSource, nullOut));
+    EXPECT_TRUE(nullOut.empty());
+}
+
+TEST(TestSpan, TestCopyCharSpanToMutableCharSpanFromNullSource)
+{
+    const CharSpan nullSource;
+    ASSERT_EQ(nullSource.data(), nullptr);
+
+    char buf[4] = { 'a', 'b', 'c', 'd' };
+    MutableCharSpan out(buf);
+    EXPECT_SUCCESS(CopyCharSpanToMutableCharSpan(nullSource, out));
+    EXPECT_TRUE(out.empty());
+    EXPECT_EQ(buf[0], 'a');
+
+    MutableCharSpan nullOut;
+    EXPECT_SUCCESS(CopyCharSpanToMutableCharSpan(nullSource, nullOut));
+    EXPECT_TRUE(nullOut.empty());
+}
+
+TEST(TestSpan, TestCopyCharSpanToMutableCharSpanWithTruncationFromNullSource)
+{
+    const CharSpan nullSource;
+    ASSERT_EQ(nullSource.data(), nullptr);
+
+    char buf[4] = { 'a', 'b', 'c', 'd' };
+    MutableCharSpan out(buf);
+    CopyCharSpanToMutableCharSpanWithTruncation(nullSource, out);
+    EXPECT_TRUE(out.empty());
+    EXPECT_EQ(buf[0], 'a');
+
+    MutableCharSpan nullOut;
+    CopyCharSpanToMutableCharSpanWithTruncation(nullSource, nullOut);
+    EXPECT_TRUE(nullOut.empty());
+
+    // Truncation means a non-empty source can reach the copy with a zero-size destination.
+    MutableCharSpan nullOutFromNonEmpty;
+    CopyCharSpanToMutableCharSpanWithTruncation("abc"_span, nullOutFromNonEmpty);
+    EXPECT_TRUE(nullOutFromNonEmpty.empty());
 }
