@@ -471,7 +471,6 @@ def write_device_unique_data(args, out_dirs, pai_cert):
         return dacs
 
 
-
 def generate_partition(args, dacs_cert, out_dirs):
     log.info(
         "Generating partition image: offset: 0x%X size: 0x%X",
