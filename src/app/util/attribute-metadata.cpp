@@ -242,7 +242,8 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
         outDefault.rawData = ByteSpan();
         return Status::NotFound;
     }
-    else if (isLongString)
+
+    if (isLongString)
     {
         uint16_t len       = Encoding::LittleEndian::Get16(ptr);
         size_t totalSize   = (len == 0xFFFF) ? 2 : static_cast<size_t>(2 + len);

@@ -8484,11 +8484,11 @@ endpoint 1 {
     callback attribute targetLevel;
     callback attribute defaultOpenLevel;
     callback attribute valveFault;
-    ram      attribute levelStep default = 2;
+    callback attribute levelStep default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap default = 3;
     callback attribute clusterRevision;
 
     handle command Open;
