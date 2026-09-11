@@ -54,6 +54,7 @@
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <stdio.h>
 #include <string.h>
 
 namespace chip {
@@ -72,6 +73,21 @@ using libssl_err_type            = uint32_t;
 #else
 using boringssl_uint_openssl_int = int;
 using libssl_err_type            = unsigned long;
+
+namespace detail {
+void AssertOpenSSLVersion()
+{
+    unsigned long build   = (OPENSSL_VERSION_NUMBER & 0xFFF00000lu); // mask to major / minor only
+    unsigned long runtime = OpenSSL_version_num();
+    if (runtime < build)
+    {
+        // This check runs pre-main(), so logging is probably not set up yet. This is the
+        // spiritual equivalent of a dynamic linker error, just write to stderr directly.
+        fprintf(stderr, "Insufficient OpenSSL runtime version (%lx), binary built for %lx+\n", runtime, build);
+        chipAbort();
+    }
+}
+} // namespace detail
 #endif // CHIP_CRYPTO_BORINGSSL
 
 #define kKeyLengthInBits 256
