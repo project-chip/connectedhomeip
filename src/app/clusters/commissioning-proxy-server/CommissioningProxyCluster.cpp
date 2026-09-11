@@ -338,15 +338,21 @@ CommissioningProxyCluster::HandleProxyDisconnectRequest(const DataModel::InvokeR
         {
             mTransports[i]->OnAllSessionsClosed();
         }
-
-        CHIP_ERROR stateErr = SetCPState(kState_CPDisconnected);
-        if (stateErr != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "HandleProxyDisconnectRequest: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
-        }
     }
+    SetDisconnectedIfLastSession();
 
     return Status::Success;
+}
+
+void CommissioningProxyCluster::SetDisconnectedIfLastSession()
+{
+    VerifyOrReturn(GetActiveSessionCount() == 0);
+
+    CHIP_ERROR stateErr = SetCPState(kState_CPDisconnected);
+    if (stateErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "SetDisconnectedIfLastSession: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
+    }
 }
 
 std::optional<DataModel::ActionReturnStatus>

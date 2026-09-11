@@ -93,6 +93,7 @@ CodeDrivenClusters:
     - Administrator Commissioning
     - Air Quality
     - Ambient Context Sensing
+    - Ambient Sensing Union
     - Audio Control
     - Basic Information
     - Binding
@@ -171,6 +172,7 @@ CodeDrivenClusters:
     - Temperature Measurement
     - Thermostat
     - Thermostat User Interface Configuration
+    - Thermostat Mode
     - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization

@@ -20,6 +20,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 
+#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -39,7 +40,7 @@
 
 #include "CHIPAttCert_test_vectors.h"
 
-#include <fstream>
+#include <sstream>
 
 using namespace chip;
 using namespace chip::Crypto;
@@ -120,6 +121,12 @@ TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Providers)
     err = example_dac_provider->GetFirmwareInformation(other_data_span);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(other_data_span.size(), 0u);
+    EXPECT_FALSE(example_dac_provider->HasRequiredPqcCredentials());
+    auto profileSupport = example_dac_provider->GetDeviceAttestationProfileSupport();
+    EXPECT_EQ(profileSupport.PAASupportedProfiles.Raw(),
+              BitMask<DeviceAttestationCertProfileBitmap>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy).Raw());
+    EXPECT_EQ(profileSupport.PAISupportedProfiles.Raw(), profileSupport.PAASupportedProfiles.Raw());
+    EXPECT_EQ(profileSupport.DACSupportedProfiles.Raw(), profileSupport.PAASupportedProfiles.Raw());
 }
 
 TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Signature)
@@ -158,6 +165,442 @@ TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Signature)
     // Verify round trip signature
     err = dac_public_key.ECDSA_validate_msg_signature(&kExampleMessage[0], sizeof(kExampleMessage), da_signature);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderDetectsProfileSpecificDocuments)
+{
+    using chip::Credentials::DeviceAttestationCertProfile;
+    using chip::Credentials::DeviceAttestationDocumentType;
+    using chip::Credentials::Examples::TestHarnessDACProvider;
+    using chip::Credentials::Examples::TestHarnessDACProviderData;
+
+    constexpr uint8_t kLegacyDac[] = { 0x01, 0x02, 0x03 };
+    constexpr uint8_t kPqcDac44[]  = { 0x11, 0x12, 0x13, 0x14 };
+    constexpr uint8_t kPqcDac65[]  = { 0x21, 0x22, 0x23, 0x24, 0x25 };
+    constexpr uint8_t kLegacyPai[] = { 0x31, 0x32 };
+    constexpr uint8_t kPqcPai44[]  = { 0x41, 0x42, 0x43 };
+    constexpr uint8_t kPqcPai65[]  = { 0x51, 0x52, 0x53, 0x54 };
+    constexpr uint8_t kLegacyCd[]  = { 0x61 };
+
+    TestHarnessDACProviderData data;
+    data.dacCert.SetValue(ByteSpan(kLegacyDac, sizeof(kLegacyDac)));
+    data.pqcDacCertMlDsa44.SetValue(ByteSpan(kPqcDac44, sizeof(kPqcDac44)));
+    data.pqcDacCertMlDsa65.SetValue(ByteSpan(kPqcDac65, sizeof(kPqcDac65)));
+    data.paiCert.SetValue(ByteSpan(kLegacyPai, sizeof(kLegacyPai)));
+    data.pqcPaiCertMlDsa44.SetValue(ByteSpan(kPqcPai44, sizeof(kPqcPai44)));
+    data.pqcPaiCertMlDsa65.SetValue(ByteSpan(kPqcPai65, sizeof(kPqcPai65)));
+    data.certificationDeclaration.SetValue(ByteSpan(kLegacyCd, sizeof(kLegacyCd)));
+
+    TestHarnessDACProvider nonPqcProvider;
+    EXPECT_FALSE(nonPqcProvider.HasRequiredPqcCredentials());
+
+    auto nonPqcSupport = nonPqcProvider.GetDeviceAttestationProfileSupport();
+    EXPECT_EQ(nonPqcSupport.DACSupportedProfiles.Raw(),
+              BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
+                  Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy)
+                  .Raw());
+    EXPECT_EQ(nonPqcSupport.PAISupportedProfiles.Raw(), nonPqcSupport.DACSupportedProfiles.Raw());
+
+    uint8_t buffer[32];
+    MutableByteSpan span(buffer);
+    EXPECT_EQ(nonPqcProvider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa44, span),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(nonPqcProvider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kMlDsa65, span),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    TestHarnessDACProvider pqcProvider;
+    // The default credentials remain legacy-only until PQC issuer documents are loaded.
+    EXPECT_FALSE(pqcProvider.HasRequiredPqcCredentials());
+    pqcProvider.Init(data);
+    EXPECT_TRUE(pqcProvider.HasRequiredPqcCredentials());
+
+    auto pqcSupport = pqcProvider.GetDeviceAttestationProfileSupport();
+    EXPECT_EQ(pqcSupport.PAASupportedProfiles.Raw(),
+              BitMask<Credentials::DeviceAttestationCertProfileBitmap>(
+                  Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy,
+                  Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa44,
+                  Credentials::DeviceAttestationCertProfileBitmap::kSupportsMlDsa65)
+                  .Raw());
+    EXPECT_EQ(pqcSupport.PAISupportedProfiles.Raw(), pqcSupport.PAASupportedProfiles.Raw());
+    EXPECT_EQ(pqcSupport.DACSupportedProfiles.Raw(), nonPqcSupport.DACSupportedProfiles.Raw());
+    EXPECT_EQ(pqcProvider.GetPreferredDeviceAttestationChainProfile(), DeviceAttestationCertProfile::kMlDsa65);
+
+    span = MutableByteSpan(buffer);
+    ASSERT_EQ(pqcProvider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa44, span), CHIP_NO_ERROR);
+    EXPECT_EQ(span.size(), sizeof(kPqcDac44));
+    EXPECT_EQ(0, memcmp(span.data(), kPqcDac44, sizeof(kPqcDac44)));
+
+    span = MutableByteSpan(buffer);
+    ASSERT_EQ(pqcProvider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kMlDsa65, span),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(span.size(), sizeof(kPqcPai65));
+    EXPECT_EQ(0, memcmp(span.data(), kPqcPai65, sizeof(kPqcPai65)));
+
+    span = MutableByteSpan(buffer);
+    ASSERT_EQ(pqcProvider.GetCertificationDeclaration(span), CHIP_NO_ERROR);
+    EXPECT_EQ(span.size(), sizeof(kLegacyCd));
+    EXPECT_EQ(0, memcmp(span.data(), kLegacyCd, sizeof(kLegacyCd)));
+
+    uint8_t segmentBuffer[2];
+    MutableByteSpan segmentSpan(segmentBuffer);
+    size_t documentSize = 0;
+    ASSERT_EQ(pqcProvider.GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType::kDACCertificate,
+                                                              DeviceAttestationCertProfile::kMlDsa44, 1, segmentSpan, documentSize),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(documentSize, sizeof(kPqcDac44));
+    EXPECT_EQ(segmentSpan.size(), sizeof(segmentBuffer));
+    EXPECT_EQ(0, memcmp(segmentSpan.data(), kPqcDac44 + 1, sizeof(segmentBuffer)));
+
+    constexpr uint8_t kMessageToSign[] = { 0x01, 0x02, 0x03 };
+    uint8_t signatureBuffer[Crypto::kP256_ECDSA_Signature_Length_Raw];
+    MutableByteSpan signatureSpan(signatureBuffer);
+
+    // Retrieving a profile-specific DAC must not change the key used by the legacy signing API.
+    span = MutableByteSpan(buffer);
+    ASSERT_EQ(pqcProvider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa44, span), CHIP_NO_ERROR);
+    EXPECT_EQ(pqcProvider.SignWithDeviceAttestationKey(ByteSpan(kMessageToSign), signatureSpan), CHIP_NO_ERROR);
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderRejectsUnknownEnums)
+{
+    using namespace chip::Credentials;
+    Examples::TestHarnessDACProvider provider;
+    uint8_t buffer[32];
+    MutableByteSpan span(buffer);
+    size_t documentSize = 0;
+
+    // Generated unknown sentinels do not identify a stored chain or a certificate document.
+    EXPECT_EQ(provider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kUnknownEnumValue, span),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(provider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kUnknownEnumValue, span),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(provider.GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType::kUnknownEnumValue,
+                                                           DeviceAttestationCertProfile::kEcdsaMatterLegacy, 0, span, documentSize),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(provider.GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType::kDACCertificate,
+                                                           DeviceAttestationCertProfile::kUnknownEnumValue, 0, span, documentSize),
+              CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestMixedChainSelection)
+{
+    using namespace chip::Credentials::Examples;
+    using Profile              = DeviceAttestationCertProfile;
+    constexpr uint8_t kDac44[] = { 0x11, 0x12, 0x13 };
+    constexpr uint8_t kPai44[] = { 0x21, 0x22, 0x23 };
+    constexpr uint8_t kDac65[] = { 0x31, 0x32, 0x33 };
+    constexpr uint8_t kPai65[] = { 0x41, 0x42, 0x43 };
+    TestHarnessDACProviderData data;
+    data.paiProfileMlDsa44 = Profile::kEcdsaMatterLegacy;
+    data.paiProfileMlDsa65 = Profile::kEcdsaMatterLegacy;
+    data.pqcDacCertMlDsa44.SetValue(ByteSpan(kDac44));
+    data.pqcPaiCertMlDsa44.SetValue(ByteSpan(kPai44));
+    data.pqcDacCertMlDsa65.SetValue(ByteSpan(kDac65));
+    TestHarnessDACProvider provider;
+    provider.Init(data);
+
+    // An incomplete stronger chain must not displace a complete pair.
+    EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), Profile::kMlDsa44);
+    EXPECT_FALSE(provider.GetDeviceAttestationProfileSupport().PAASupportedProfiles.HasAll(
+        DeviceAttestationCertProfileBitmap::kSupportsMlDsa65));
+    data.pqcPaiCertMlDsa65.SetValue(ByteSpan(kPai65));
+    provider.Init(data);
+    const auto selected = provider.GetPreferredDeviceAttestationChainProfile();
+    EXPECT_EQ(selected, Profile::kMlDsa65);
+    const auto profiles = provider.GetDeviceAttestationProfileSupport();
+    EXPECT_EQ(profiles.PAISupportedProfiles.Raw(),
+              BitMask<DeviceAttestationCertProfileBitmap>(DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy).Raw());
+    EXPECT_EQ(profiles.DACSupportedProfiles.Raw(), profiles.PAISupportedProfiles.Raw());
+    EXPECT_TRUE(provider.HasRequiredPqcCredentials());
+
+    for (auto type : { DeviceAttestationDocumentType::kDACCertificate, DeviceAttestationDocumentType::kPAICertificate })
+    {
+        const ByteSpan expected = type == DeviceAttestationDocumentType::kDACCertificate ? ByteSpan(kDac65) : ByteSpan(kPai65);
+        for (size_t offset = 0; offset < expected.size(); ++offset)
+        {
+            uint8_t buffer[1];
+            MutableByteSpan segment(buffer);
+            size_t documentSize = 0;
+            ASSERT_EQ(provider.GetDeviceAttestationDocumentSegment(type, selected, offset, segment, documentSize), CHIP_NO_ERROR);
+            EXPECT_EQ(documentSize, expected.size());
+            ASSERT_EQ(segment.size(), 1u);
+            EXPECT_EQ(segment[0], expected[offset]);
+        }
+    }
+
+    constexpr uint8_t kMessage[] = { 1, 2, 3 };
+    P256ECDSASignature signature;
+    MutableByteSpan signatureSpan(signature.Bytes(), signature.Capacity());
+    ASSERT_EQ(provider.SignWithDeviceAttestationKey(ByteSpan(kMessage), signatureSpan), CHIP_NO_ERROR);
+    ASSERT_EQ(signatureSpan.size(), kP256_ECDSA_Signature_Length_Raw);
+    ASSERT_EQ(signature.SetLength(signatureSpan.size()), CHIP_NO_ERROR);
+    P256PublicKey publicKey;
+    ASSERT_EQ(ExtractPubkeyFromX509Cert(DevelopmentCerts::kDacCert, publicKey), CHIP_NO_ERROR);
+    EXPECT_EQ(publicKey.ECDSA_validate_msg_signature(kMessage, sizeof(kMessage), signature), CHIP_NO_ERROR);
+
+    data.pqcDacCertMlDsa44.ClearValue();
+    data.pqcDacCertMlDsa65.ClearValue();
+    provider.Init(data);
+    EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), Profile::kEcdsaMatterLegacy);
+    EXPECT_FALSE(provider.HasRequiredPqcCredentials());
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestJsonIssuerProfilesAreIndependent)
+{
+    using namespace chip::Credentials::Examples;
+    struct IssuerProfiles
+    {
+        const char * suffix;
+        unsigned paiProfile;
+        uint8_t expectedPaaMask;
+        uint8_t expectedPaiMask;
+        DeviceAttestationCertProfile chain;
+    };
+    // Expected masks include the separate legacy chain supplied by default.
+    const IssuerProfiles cases[] = {
+        { "44", 0, 0x3, 0x1, DeviceAttestationCertProfile::kMlDsa44 },
+        { "44", 1, 0x3, 0x3, DeviceAttestationCertProfile::kMlDsa44 },
+        { "44", 2, 0x3, 0x5, DeviceAttestationCertProfile::kMlDsa44 },
+        { "65", 0, 0x5, 0x1, DeviceAttestationCertProfile::kMlDsa65 },
+        { "65", 1, 0x5, 0x3, DeviceAttestationCertProfile::kMlDsa65 },
+        { "65", 2, 0x5, 0x5, DeviceAttestationCertProfile::kMlDsa65 },
+    };
+    for (const auto & testCase : cases)
+    {
+        std::stringstream json;
+        // Opaque document bytes exercise JSON provisioning and metadata, not certificate validation.
+        json << "{\"pai_cert_ml_dsa_" << testCase.suffix << "\":\"010203\","
+             << "\"dac_cert_ml_dsa_" << testCase.suffix << "\":\"040506\","
+             << "\"pai_profile_ml_dsa_" << testCase.suffix << "\":" << testCase.paiProfile << "}";
+        ASSERT_TRUE(json.good());
+
+        TestHarnessDACProvider provider;
+        ASSERT_EQ(provider.Init(json), CHIP_NO_ERROR);
+        const auto profiles = provider.GetDeviceAttestationProfileSupport();
+        EXPECT_EQ(profiles.PAASupportedProfiles.Raw(), testCase.expectedPaaMask);
+        EXPECT_EQ(profiles.PAISupportedProfiles.Raw(), testCase.expectedPaiMask);
+        EXPECT_EQ(profiles.DACSupportedProfiles.Raw(), 0x1);
+        EXPECT_TRUE(provider.HasRequiredPqcCredentials());
+        EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), testCase.chain);
+
+        // Replacing the inventory with legacy credentials must clear PQC capability and selection.
+        std::istringstream legacyJson("{}");
+        ASSERT_EQ(provider.Init(legacyJson), CHIP_NO_ERROR);
+        const auto legacyProfiles = provider.GetDeviceAttestationProfileSupport();
+        EXPECT_EQ(legacyProfiles.PAASupportedProfiles.Raw(), 0x1);
+        EXPECT_EQ(legacyProfiles.PAISupportedProfiles.Raw(), 0x1);
+        EXPECT_EQ(legacyProfiles.DACSupportedProfiles.Raw(), 0x1);
+        EXPECT_FALSE(provider.HasRequiredPqcCredentials());
+        EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), DeviceAttestationCertProfile::kEcdsaMatterLegacy);
+    }
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestJsonRejectsInvalidIssuerProfiles)
+{
+    using namespace chip::Credentials::Examples;
+    for (const char * suffix : { "44", "65" })
+    {
+        // Only integer enumerators 0, 1 and 2 are valid. In particular, 258 must
+        // not truncate to ML-DSA-65, and the generated unknown sentinel (3) is invalid.
+        for (const char * invalidValue : { "3", "7", "255", "258", "4294967296", "-1", "1.5", "true", "null", "\"2\"", "[]", "{}" })
+        {
+            TestHarnessDACProvider provider;
+            std::istringstream validJson(R"({"pai_cert_ml_dsa_65":"010203", "dac_cert_ml_dsa_65":"040506",
+                                              "pai_profile_ml_dsa_65":0})");
+            ASSERT_EQ(provider.Init(validJson), CHIP_NO_ERROR);
+            const auto originalProfiles = provider.GetDeviceAttestationProfileSupport();
+
+            std::stringstream invalidJson;
+            invalidJson << R"({"pai_cert_ml_dsa_65":"aabbcc", "dac_cert_ml_dsa_65":"ddeeff", "pai_profile_ml_dsa_)" << suffix
+                        << "\":" << invalidValue << "}";
+            EXPECT_EQ(provider.Init(invalidJson), CHIP_ERROR_INVALID_ARGUMENT);
+            const auto profiles = provider.GetDeviceAttestationProfileSupport();
+            EXPECT_EQ(profiles.PAASupportedProfiles, originalProfiles.PAASupportedProfiles);
+            EXPECT_EQ(profiles.PAISupportedProfiles, originalProfiles.PAISupportedProfiles);
+            EXPECT_EQ(profiles.DACSupportedProfiles, originalProfiles.DACSupportedProfiles);
+            EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), DeviceAttestationCertProfile::kMlDsa65);
+
+            uint8_t buffer[3];
+            MutableByteSpan document(buffer);
+            ASSERT_EQ(provider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa65, document), CHIP_NO_ERROR);
+            constexpr uint8_t kExpectedDac[] = { 4, 5, 6 };
+            EXPECT_TRUE(document.data_equal(ByteSpan(kExpectedDac)));
+            document = MutableByteSpan(buffer);
+            ASSERT_EQ(provider.GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile::kMlDsa65, document),
+                      CHIP_NO_ERROR);
+            constexpr uint8_t kExpectedPai[] = { 1, 2, 3 };
+            EXPECT_TRUE(document.data_equal(ByteSpan(kExpectedPai)));
+        }
+    }
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestJsonStorageIsOwnedByEachProvider)
+{
+    using namespace chip::Credentials::Examples;
+    auto hex = [](ByteSpan bytes) {
+        constexpr char digits[] = "0123456789abcdef";
+        std::string result;
+        for (uint8_t byte : bytes)
+        {
+            result.push_back(digits[byte >> 4]);
+            result.push_back(digits[byte & 0xf]);
+        }
+        return result;
+    };
+    TestHarnessDACProvider first;
+    {
+        std::stringstream json;
+        json << R"({"dac_cert":"010203", "pai_cert":"010203",
+                     "dac_cert_ml_dsa_44":"010203", "pai_cert_ml_dsa_44":"010203",
+                     "dac_cert_ml_dsa_65":"010203", "pai_cert_ml_dsa_65":"010203",
+                     "certification_declaration":"010203", "firmware_information":"010203",
+                     "description":"first", "is_success_case":true, "basic_info_pid":123,
+                     "dac_private_key":")"
+             << hex(DevelopmentCerts::kDacPrivateKey) << R"(", "dac_public_key":")" << hex(DevelopmentCerts::kDacPublicKey)
+             << R"("})";
+        ASSERT_EQ(first.Init(json), CHIP_NO_ERROR);
+    }
+    auto checkFirst = [&]() {
+        constexpr uint8_t expected[] = { 1, 2, 3 };
+        uint8_t buffer[32];
+        for (auto profile : { DeviceAttestationCertProfile::kEcdsaMatterLegacy, DeviceAttestationCertProfile::kMlDsa44,
+                              DeviceAttestationCertProfile::kMlDsa65 })
+        {
+            MutableByteSpan document(buffer);
+            ASSERT_EQ(first.GetDeviceAttestationCertForProfile(profile, document), CHIP_NO_ERROR);
+            EXPECT_TRUE(document.data_equal(ByteSpan(expected)));
+            document = MutableByteSpan(buffer);
+            ASSERT_EQ(first.GetProductAttestationIntermediateCertForProfile(profile, document), CHIP_NO_ERROR);
+            EXPECT_TRUE(document.data_equal(ByteSpan(expected)));
+        }
+        MutableByteSpan document(buffer);
+        ASSERT_EQ(first.GetCertificationDeclaration(document), CHIP_NO_ERROR);
+        EXPECT_TRUE(document.data_equal(ByteSpan(expected)));
+        document = MutableByteSpan(buffer);
+        ASSERT_EQ(first.GetFirmwareInformation(document), CHIP_NO_ERROR);
+        EXPECT_TRUE(document.data_equal(ByteSpan(expected)));
+        EXPECT_TRUE(first.GetDescription().data_equal("first"_span));
+        EXPECT_TRUE(first.IsSuccessCase());
+        EXPECT_EQ(first.GetPid(), 123);
+        EXPECT_EQ(first.GetDeviceAttestationProfileSupport().PAASupportedProfiles.Raw(), 0x7);
+
+        Crypto::P256ECDSASignature signature;
+        MutableByteSpan signatureSpan(signature.Bytes(), signature.Capacity());
+        ASSERT_EQ(first.SignWithDeviceAttestationKey(ByteSpan(expected), signatureSpan), CHIP_NO_ERROR);
+        ASSERT_EQ(signature.SetLength(signatureSpan.size()), CHIP_NO_ERROR);
+        Crypto::P256PublicKey publicKey;
+        memcpy(publicKey.Bytes(), DevelopmentCerts::kDacPublicKey.data(), publicKey.Length());
+        EXPECT_EQ(publicKey.ECDSA_validate_msg_signature(expected, sizeof(expected), signature), CHIP_NO_ERROR);
+    };
+    {
+        TestHarnessDACProvider second;
+        std::istringstream json(R"({"dac_cert":"aabb", "pai_cert":"aabb",
+                                    "dac_cert_ml_dsa_44":"aabb", "pai_cert_ml_dsa_44":"aabb",
+                                    "dac_cert_ml_dsa_65":"aabb", "pai_cert_ml_dsa_65":"aabb",
+                                    "dac_private_key":"00", "dac_public_key":"00",
+                                    "certification_declaration":"aabb", "firmware_information":"aabb",
+                                    "description":"second", "is_success_case":false, "basic_info_pid":456})");
+        ASSERT_EQ(second.Init(json), CHIP_NO_ERROR);
+        checkFirst();
+        std::istringstream replacement(R"({"dac_cert":"ff", "description":"replacement"})");
+        ASSERT_EQ(second.Init(replacement), CHIP_NO_ERROR);
+        checkFirst();
+    }
+    checkFirst();
+
+    // Reinitializing from borrowed data drops the JSON fixture and preserves the allocation-free API.
+    constexpr uint8_t borrowed[] = { 9, 8 };
+    TestHarnessDACProviderData data;
+    data.dacCert.SetValue(ByteSpan(borrowed));
+    first.Init(data);
+    uint8_t buffer[3];
+    MutableByteSpan document(buffer);
+    ASSERT_EQ(first.GetDeviceAttestationCert(document), CHIP_NO_ERROR);
+    EXPECT_TRUE(document.data_equal(ByteSpan(borrowed)));
+    EXPECT_FALSE(first.HasRequiredPqcCredentials());
+    EXPECT_TRUE(first.GetDescription().empty());
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestJsonStorageBoundsAndValidation)
+{
+    using namespace chip::Credentials::Examples;
+    struct FieldLimit
+    {
+        const char * key;
+        size_t maxSize;
+    };
+    const FieldLimit fields[] = {
+        { "dac_cert", kMaxDERCertLength },
+        { "pai_cert", kMaxDERCertLength },
+        { "dac_private_key", Crypto::kP256_PrivateKey_Length },
+        { "dac_public_key", Crypto::kP256_PublicKey_Length },
+        { "dac_cert_ml_dsa_44", kMaxDERCertLengthMlDsa44 },
+        { "pai_cert_ml_dsa_44", kMaxDERCertLengthMlDsa44 },
+        { "dac_cert_ml_dsa_65", kMaxDERCertLengthMlDsa65 },
+        { "pai_cert_ml_dsa_65", kMaxDERCertLengthMlDsa65 },
+        { "certification_declaration", kMaxCMSSignedCDMessage },
+        { "firmware_information", UINT8_MAX },
+    };
+    for (const auto & field : fields)
+    {
+        TestHarnessDACProvider provider;
+        std::istringstream atLimit("{\"" + std::string(field.key) + "\":\"" + std::string(field.maxSize * 2, 'a') + "\"}");
+        ASSERT_EQ(provider.Init(atLimit), CHIP_NO_ERROR);
+        std::istringstream baseline(R"({"dac_cert":"010203", "description":"unchanged"})");
+        ASSERT_EQ(provider.Init(baseline), CHIP_NO_ERROR);
+        // Oversized, odd-length, non-hex and non-string inputs must be rejected without replacing the old fixture.
+        for (const auto & value : { "\"" + std::string((field.maxSize + 1) * 2, 'a') + "\"", std::string("\"0\""),
+                                    std::string("\"0g\""), std::string("null"), std::string("123") })
+        {
+            std::istringstream invalid("{\"" + std::string(field.key) + "\":" + value + "}");
+            EXPECT_EQ(provider.Init(invalid), CHIP_ERROR_INVALID_ARGUMENT);
+            uint8_t buffer[3];
+            MutableByteSpan document(buffer);
+            ASSERT_EQ(provider.GetDeviceAttestationCert(document), CHIP_NO_ERROR);
+            constexpr uint8_t expected[] = { 1, 2, 3 };
+            EXPECT_TRUE(document.data_equal(ByteSpan(expected)));
+            EXPECT_TRUE(provider.GetDescription().data_equal("unchanged"_span));
+        }
+    }
+
+    TestHarnessDACProvider provider;
+    std::istringstream descriptionAtLimit("{\"description\":\"" + std::string(255, 'x') + "\"}");
+    ASSERT_EQ(provider.Init(descriptionAtLimit), CHIP_NO_ERROR);
+    std::istringstream descriptionTooLong("{\"description\":\"" + std::string(256, 'y') + "\"}");
+    EXPECT_EQ(provider.Init(descriptionTooLong), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(provider.GetDescription().size(), 255u);
+    EXPECT_EQ(provider.GetDescription()[0], 'x');
+
+    // An explicitly empty field overrides defaults; an absent field uses them.
+    std::istringstream empty(R"({"dac_cert":"", "description":""})");
+    ASSERT_EQ(provider.Init(empty), CHIP_NO_ERROR);
+    uint8_t buffer[kMaxDERCertLength];
+    MutableByteSpan document(buffer);
+    ASSERT_EQ(provider.GetDeviceAttestationCert(document), CHIP_NO_ERROR);
+    EXPECT_TRUE(document.empty());
+    EXPECT_TRUE(provider.GetDescription().empty());
+    std::istringstream defaults("{}");
+    ASSERT_EQ(provider.Init(defaults), CHIP_NO_ERROR);
+    document = MutableByteSpan(buffer);
+    ASSERT_EQ(provider.GetDeviceAttestationCert(document), CHIP_NO_ERROR);
+    EXPECT_TRUE(document.data_equal(DevelopmentCerts::kDacCert));
+}
+
+TEST_F(TestDeviceAttestationCredentials, TestMalformedJsonPreservesCredentials)
+{
+    using namespace chip::Credentials::Examples;
+    TestHarnessDACProvider provider;
+    std::istringstream validJson(R"({"pai_cert_ml_dsa_65":"010203", "dac_cert_ml_dsa_65":"040506",
+                                  "pai_profile_ml_dsa_65":0})");
+    ASSERT_EQ(provider.Init(validJson), CHIP_NO_ERROR);
+    std::istringstream malformedJson("{");
+    // A truncated JSON object cannot be parsed and must not replace the loaded credentials.
+    EXPECT_EQ(provider.Init(malformedJson), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(provider.GetPreferredDeviceAttestationChainProfile(), DeviceAttestationCertProfile::kMlDsa65);
+    uint8_t buffer[3];
+    MutableByteSpan dac(buffer);
+    ASSERT_EQ(provider.GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile::kMlDsa65, dac), CHIP_NO_ERROR);
+    constexpr uint8_t kExpectedDac[] = { 4, 5, 6 };
+    EXPECT_TRUE(dac.data_equal(ByteSpan(kExpectedDac)));
 }
 
 static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,

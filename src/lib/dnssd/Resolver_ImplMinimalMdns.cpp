@@ -239,7 +239,7 @@ void PacketParser::ParseSrvRecords(const BytesRange & packet)
     mParsingState = RecordParsingState::kSrvInitialization;
     mPacketRange  = packet;
 
-    if (!ParsePacket(packet, this))
+    if (!ParseMdnsPacket(packet, this))
     {
         ChipLogError(Discovery, "DNSSD packet parsing failed (for SRV records)");
     }
@@ -255,7 +255,7 @@ void PacketParser::ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRa
     mPacketRange  = packet;
     mInterfaceId  = interface;
 
-    if (!ParsePacket(packet, this))
+    if (!ParseMdnsPacket(packet, this))
     {
         ChipLogError(Discovery, "DNSSD packet parsing failed (for non-srv records)");
     }
