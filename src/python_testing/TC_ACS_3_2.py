@@ -66,7 +66,7 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 class TC_ACS_3_2(MatterBaseTest):
 
     def pics_TC_ACS_3_2(self):
-    return ['ACS.S']
+        return ['ACS.S']
 
     def setup_test(self):
         super().setup_test()
