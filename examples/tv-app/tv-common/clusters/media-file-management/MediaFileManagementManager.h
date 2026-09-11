@@ -29,6 +29,9 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+
+class MediaFileManagementCluster;
+
 namespace MediaFileManagement {
 
 /**
@@ -99,6 +102,11 @@ public:
     /// Attach the BDX coordinator used to move file bytes out-of-band. Optional.
     void SetBdxCoordinator(BdxCoordinator * coordinator) { mBdxCoordinator = coordinator; }
 
+    /// Attach the cluster so that changes to the stored files can be reported to
+    /// subscribers. Optional; without it the attributes still read correctly but no
+    /// subscription reports are generated.
+    void SetCluster(MediaFileManagementCluster * cluster) { mCluster = cluster; }
+
     /// Resolve the on-disk data-blob path for a file id (used by the BDX layer).
     std::string DataFilePathForFile(uint64_t fileID) const { return DataFilePath(fileID); }
 
@@ -151,6 +159,11 @@ private:
     void LoadIndex();
     void SaveIndex();
 
+    // Report that the stored files changed. AvailableFiles and AvailableStorage both
+    // derive from the file list, so adding or removing a file changes both.
+    void NotifyStoredFilesChanged();
+
+    MediaFileManagementCluster * mCluster = nullptr;
     std::string mStorageDir;
     std::vector<FileEntry> mFiles;
     uint64_t mNextFileID = 1;

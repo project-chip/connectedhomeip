@@ -211,6 +211,10 @@ void ApplicationInit()
     }
     else
     {
+        // Let the manager report AvailableFiles/AvailableStorage when files are added or
+        // removed, so subscribers are not left holding a stale list.
+        gMediaFileManagementManager->SetCluster(&gMediaFileManagementServer->Cluster());
+
         // Bring up the BDX byte-transfer layer for the sharing commands.
         gMediaFileManagementBdxProvider.emplace();
         gMediaFileManagementBdxRequestor.emplace();

@@ -18,6 +18,8 @@
 
 #include "MediaFileManagementManager.h"
 
+#include <app/clusters/media-file-management-server/MediaFileManagementCluster.h>
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -227,6 +229,7 @@ uint64_t MediaFileManagementManager::AppendEntry(CharSpan name, uint64_t size, C
     const uint64_t assignedID = entry.fileID;
     mFiles.push_back(std::move(entry));
     SaveIndex();
+    NotifyStoredFilesChanged();
     return assignedID;
 }
 
@@ -283,6 +286,13 @@ Status MediaFileManagementManager::HandleAddFile(ScopedNodeId peer, const CharSp
     return Status::Success;
 }
 
+void MediaFileManagementManager::NotifyStoredFilesChanged()
+{
+    VerifyOrReturn(mCluster != nullptr);
+    mCluster->NotifyAttributeChanged(Attributes::AvailableFiles::Id);
+    mCluster->NotifyAttributeChanged(Attributes::AvailableStorage::Id);
+}
+
 Status MediaFileManagementManager::HandleDeleteFile(uint64_t fileID)
 {
     for (auto it = mFiles.begin(); it != mFiles.end(); ++it)
@@ -292,6 +302,7 @@ Status MediaFileManagementManager::HandleDeleteFile(uint64_t fileID)
             std::remove(DataFilePath(fileID).c_str());
             mFiles.erase(it);
             SaveIndex();
+            NotifyStoredFilesChanged();
             ChipLogProgress(Zcl, "MediaFileManagementManager: deleted file id %llu", static_cast<unsigned long long>(fileID));
             return Status::Success;
         }
