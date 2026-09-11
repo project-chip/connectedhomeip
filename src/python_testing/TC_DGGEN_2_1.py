@@ -199,10 +199,11 @@ class TC_DGGEN_2_1(MatterBaseTest):
 
         # STEP 6: ActiveHardwareFaults
         self.step(6)
-        active_hw_faults = await self._read_dggen_attribute_expect_success(
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ActiveHardwareFaults):
+            active_hw_faults = await self._read_dggen_attribute_expect_success(
             endpoint=endpoint, attribute=attributes.ActiveHardwareFaults)
-        self._assert_active_faults_list(active_hw_faults, enums.HardwareFaultEnum, "ActiveHardwareFaults", max_faults=11)
-        logger.info("ActiveHardwareFaults: %s", active_hw_faults)
+            self._assert_active_faults_list(active_hw_faults, enums.HardwareFaultEnum, "ActiveHardwareFaults", max_faults=11)
+            logger.info("ActiveHardwareFaults: %s", active_hw_faults)
 
         # STEP 7: ActiveRadioFaults
         self.step(7)
