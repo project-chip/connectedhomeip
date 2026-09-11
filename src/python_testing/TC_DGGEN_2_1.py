@@ -229,10 +229,11 @@ class TC_DGGEN_2_1(MatterBaseTest):
         # 10a-10d) require multi-hour waits and a mid-test factory reset, which are not
         # automatable; this validates the attribute's type, which is the automatable part.
         self.step(10)
-        total_operational_hours = await self._read_dggen_attribute_expect_success(
-            endpoint=endpoint, attribute=attributes.TotalOperationalHours)
-        matter_asserts.assert_valid_uint32(total_operational_hours, "TotalOperationalHours")
-        logger.info("TotalOperationalHours: %s", total_operational_hours)
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TotalOperationalHours):    
+            total_operational_hours = await self._read_dggen_attribute_expect_success(
+               endpoint=endpoint, attribute=attributes.TotalOperationalHours)
+            matter_asserts.assert_valid_uint32(total_operational_hours, "TotalOperationalHours")
+            logger.info("TotalOperationalHours: %s", total_operational_hours)
 
 
 if __name__ == "__main__":
