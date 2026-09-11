@@ -240,8 +240,19 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
 endif()
 
 # ==============================================================================
-# Define 'dfu-smp-image' target for building DFU over BT SMP image
+# DFU over BT SMP support: compile the DFUOverSMP source, common for all
+# Telink applications, and define 'dfu-smp-image' target for building
+# the DFU over BT SMP image
 # ==============================================================================
+
+if (CONFIG_MCUMGR_TRANSPORT_BT)
+    zephyr_library()
+    zephyr_library_sources(${CHIP_ROOT}/examples/platform/telink/util/src/DFUOverSMP.cpp)
+    target_include_directories(${ZEPHYR_CURRENT_LIBRARY} PRIVATE
+        ${CHIP_ROOT}/examples/platform/telink/util/include
+    )
+    zephyr_library_link_libraries(MCUBOOT_BOOTUTIL chip)
+endif()
 
 if (CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD)
     file(WRITE "${PROJECT_BINARY_DIR}/empty.txt" "")
