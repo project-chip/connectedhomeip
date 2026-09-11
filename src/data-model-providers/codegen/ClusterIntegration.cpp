@@ -50,12 +50,16 @@ bool FindEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fi
 /// on error 0 is returned
 uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
 {
-    uint32_t featureMap = 0;
+    AttributeDefaultValue defaultValue;
     Protocols::InteractionModel::Status status =
-        emberAfGetAttributeDefaultValueOr(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, featureMap, 0u);
+        emberAfGetAttributeDefaultValue(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, defaultValue);
     if (status == Protocols::InteractionModel::Status::Success)
     {
-        return featureMap;
+        return defaultValue.As<uint32_t>();
+    }
+    if (status == Protocols::InteractionModel::Status::NotFound)
+    {
+        return 0;
     }
 
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS

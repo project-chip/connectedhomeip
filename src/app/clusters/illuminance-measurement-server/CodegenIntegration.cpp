@@ -64,7 +64,7 @@ public:
         uint16_t tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
-            VerifyOrDie(Tolerance::GetDefault(endpointId, &tolerance) == Status::Success);
+            VerifyOrDie(Tolerance::GetDefaultOr(endpointId, &tolerance, 0) == Status::Success);
         }
 
         DataModel::Nullable<LightSensorTypeEnum> lightSensorType{};

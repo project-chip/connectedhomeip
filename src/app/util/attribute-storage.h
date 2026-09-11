@@ -26,7 +26,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <type_traits>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -513,76 +512,6 @@ EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
 /// Lookup default value for an attribute on an endpoint
 Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
                                                                     AttributeId attributeId, AttributeDefaultValue & outDefault);
-
-/**
- * @brief Retrieves the default value for an attribute on an endpoint, falling back to a specified
- *        value if the attribute is present on the endpoint but has no default in metadata.
- *
- * Returns Status::Success if the default value was found, or if not found and the fallback was assigned.
- * Returns Status::UnsupportedCluster or Status::UnsupportedAttribute if the cluster or attribute does
- * not exist on the endpoint.
- */
-template <typename T>
-Protocols::InteractionModel::Status emberAfGetAttributeDefaultValueOr(EndpointId endpoint, ClusterId clusterId,
-                                                                      AttributeId attributeId, T & outValue,
-                                                                      const T & fallback = {})
-{
-    AttributeDefaultValue defaultVal;
-    Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, clusterId, attributeId, defaultVal);
-    if (status == Protocols::InteractionModel::Status::Success)
-    {
-        if constexpr (std::is_same_v<T, CharSpan>)
-        {
-            outValue = defaultVal.ToCharSpan();
-        }
-        else if constexpr (std::is_same_v<T, ByteSpan>)
-        {
-            outValue = defaultVal.ToByteSpan();
-        }
-        else
-        {
-            outValue = defaultVal.As<T>();
-        }
-        return Protocols::InteractionModel::Status::Success;
-    }
-    if (status == Protocols::InteractionModel::Status::NotFound)
-    {
-        outValue = fallback;
-        return Protocols::InteractionModel::Status::Success;
-    }
-    return status;
-}
-
-template <typename T>
-Protocols::InteractionModel::Status emberAfGetAttributeDefaultValueOr(EndpointId endpoint, ClusterId clusterId,
-                                                                      AttributeId attributeId, DataModel::Nullable<T> & outValue,
-                                                                      const DataModel::Nullable<T> & fallback = {})
-{
-    AttributeDefaultValue defaultVal;
-    Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, clusterId, attributeId, defaultVal);
-    if (status == Protocols::InteractionModel::Status::Success)
-    {
-        if constexpr (std::is_same_v<T, CharSpan>)
-        {
-            outValue = defaultVal.ToNullableCharSpan();
-        }
-        else if constexpr (std::is_same_v<T, ByteSpan>)
-        {
-            outValue = defaultVal.ToNullableByteSpan();
-        }
-        else
-        {
-            outValue = defaultVal.AsNullable<T>();
-        }
-        return Protocols::InteractionModel::Status::Success;
-    }
-    if (status == Protocols::InteractionModel::Status::NotFound)
-    {
-        outValue = fallback;
-        return Protocols::InteractionModel::Status::Success;
-    }
-    return status;
-}
 
 } // namespace app
 } // namespace chip

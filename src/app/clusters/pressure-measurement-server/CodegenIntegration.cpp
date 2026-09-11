@@ -70,7 +70,7 @@ public:
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
             uint16_t tolerance{};
-            VerifyOrDie(Tolerance::GetDefault(endpointId, &tolerance) == Status::Success);
+            VerifyOrDie(Tolerance::GetDefaultOr(endpointId, &tolerance, 0) == Status::Success);
             config.WithTolerance(tolerance);
         }
 
@@ -91,7 +91,7 @@ public:
             if (optionalAttributeSet.IsSet(ScaledTolerance::Id))
             {
                 uint16_t scaledTolerance{};
-                VerifyOrDie(ScaledTolerance::GetDefault(endpointId, &scaledTolerance) == Status::Success);
+                VerifyOrDie(ScaledTolerance::GetDefaultOr(endpointId, &scaledTolerance, 0) == Status::Success);
                 config.WithScaledTolerance(scaledTolerance);
             }
         }
