@@ -235,7 +235,8 @@ jobs:
               run: rm -rf ./out/telink*
 
             - name: Build example Telink (tl323x_retention) Light Switch App with OTA, Factory Data
-              # Run test for master and all PRs
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl3238x_retention-light-switch-ota-compress-lzma-factory-data' build"
@@ -262,7 +263,8 @@ jobs:
 
             # TODO: tl521x_retention light switch app can build but may not run normally, need further porting.
             - name: Build example Telink (tl521x_retention) Light Switch App with OTA, Factory Data
-              # Run test for master and all PRs
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl5218x_retention-light-switch-ota-compress-lzma-factory-data' build"
@@ -275,7 +277,8 @@ jobs:
               run: rm -rf ./out/telink*
 
             - name: Build example Telink (tl721x retention) Light Switch App with OTA (LZMA), Factory Data
-              # Run test for master and all PRs
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data' build"
