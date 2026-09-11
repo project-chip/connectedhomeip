@@ -44,7 +44,7 @@ import time
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import async_test_body, has_cluster, pics, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -65,6 +65,9 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 
 class TC_ACS_3_2(MatterBaseTest):
 
+    def pics_TC_ACS_3_2(self):
+    return ['ACS.S']
+
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
@@ -80,9 +83,7 @@ class TC_ACS_3_2(MatterBaseTest):
         # Delay for pipe command to be processed (otherwise tests are flaky)
         time.sleep(0.001)
 
-    @pics('ACS.S')
     @async_test_body
-    @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     async def test_TC_ACS_3_2(self):
         """[TC-ACS-3.2] Cluster endpoint"""
 
