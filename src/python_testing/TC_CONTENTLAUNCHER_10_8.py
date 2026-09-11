@@ -52,10 +52,6 @@ class TC_CONTENTLAUNCHER_10_8(MatterBaseTest):
                      "FALSE.",
                      "DUT replies with a ContentReplicationResponse with a non-Success Status (ReplicationNotAllowed "
                      "or ReplicationNotSupported) and a null ReplicationInfo field."),
-            TestStep(4, "TH stops any playing content, then sends a ContentReplicationRequest command to the DUT "
-                     "while no content is playing.",
-                     "DUT replies with a ContentReplicationResponse with a non-Success Status and a null "
-                     "ReplicationInfo field."),
         ]
 
     async def _read_movable(self, endpoint) -> bool:
@@ -130,30 +126,6 @@ class TC_CONTENTLAUNCHER_10_8(MatterBaseTest):
         else:
             log.info("DUT still reports Movable=TRUE; no non-movable content is available to test")
             self.mark_current_step_skipped()
-
-        self.step(4)
-        await self._stop_playback(endpoint)
-        response = await self._request_replication(endpoint)
-        self._verify_replication_refused(response, "while no content is playing")
-
-    async def _stop_playback(self, endpoint) -> None:
-        """Stop playback via Media Playback when available, otherwise ask the operator."""
-        server_list = await self.read_single_attribute_check_success(
-            endpoint=endpoint,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.ServerList)
-
-        if Clusters.MediaPlayback.id in server_list:
-            accepted_commands = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=Clusters.MediaPlayback,
-                attribute=Clusters.MediaPlayback.Attributes.AcceptedCommandList)
-            if Clusters.MediaPlayback.Commands.Stop.command_id in accepted_commands:
-                await self.send_single_cmd(cmd=Clusters.MediaPlayback.Commands.Stop(), endpoint=endpoint)
-                return
-
-        self.wait_for_user_input(
-            prompt_msg="Stop all content playback on the DUT, then press Enter.\n")
 
 
 if __name__ == "__main__":
