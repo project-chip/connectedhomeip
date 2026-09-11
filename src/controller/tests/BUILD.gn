@@ -57,6 +57,8 @@ chip_test_suite("tests") {
       "TestAutoCommissioner.cpp",
       "TestICDManagementResponses.cpp",
       "TestNetworkConfigResponses.cpp",
+      "TestNetworkIdentityManagementRegistrar.cpp",
+      "TestPDCCommissioning.cpp",
       "TestParseICDInfo.cpp",
     ]
 
@@ -79,6 +81,7 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:constants",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/controller",

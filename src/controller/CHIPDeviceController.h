@@ -1058,6 +1058,43 @@ private:
                             const app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
     static void OnConnectNetworkResponse(
         void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
+
+    /* Callbacks for the NetworkIdentityRegistrar during PDC commissioning. */
+    static void OnNetworkIdentityAvailable(void * context, CHIP_ERROR status, ByteSpan networkIdentity);
+    static void OnClientRegistered(void * context, CHIP_ERROR status, bool determinate);
+
+    /* Revocation completion callbacks. OnClientUnregistered() is the base variant, installed whenever
+       nothing is waiting on the revocation; it reports a failure and resets mCall back to itself. The
+       variants below carry on with whatever the caller that installed them was waiting to do, and each
+       has to call the base variant first, so that a re-entrant rollback finds mCall back at its
+       resting state -- which RollBackNetworkClientIdentity() asserts. */
+    static void OnClientUnregistered(void * context, CHIP_ERROR status);
+    static void OnClientUnregisteredFromNetworkConfigResponseCompleteStage(void * context, CHIP_ERROR status);
+    static void OnClientUnregisteredFromCleanupFinishCommissioning(void * context, CHIP_ERROR status);
+
+    /* Validates the Network Client Identity the commissionee generated for itself and verifies its
+       signature over (clientIdentity || nonce), proving it holds the corresponding private key.
+       Outputs the identity's key identifier, which is what a rollback needs. */
+    static CHIP_ERROR VerifyNetworkClientIdentity(ByteSpan clientIdentity, ByteSpan possessionSignature, ByteSpan nonce,
+                                                  Credentials::MutableCertificateKeyId outClientIdentifier);
+
+    /* Revokes the Network Client Identity registration made during the kPDCRegisterClientIdentity
+       stage, if we still hold that obligation. Idempotent.
+
+       Returns true if the revocation is in flight, in which case the caller may replace
+       mOnNetworkClientUnregistrationCallback.mCall with one of the variants above to carry on once
+       the registrar is done. Returns false if there was nothing to revoke, the registrar failed
+       the call outright, or it completed re-entrantly: in all of these cases the caller has to
+       carry on by itself, and the callback has been left at the base variant. */
+    bool RollBackNetworkClientIdentity();
+
+    /* Reports a Network Client Identity that we registered on behalf of a commissionee and are unable
+       to revoke again, for whichever of the several reasons `detail` describes. The entry it stands
+       for survives on the network, where only an out-of-band audit against the fabric can find it, so
+       this log line is the only record of which identity to go looking for. */
+    void ReportUnrevokedNetworkClientIdentity(Credentials::CertificateKeyId clientIdentifier, const char * reason,
+                                              CHIP_ERROR error = CHIP_NO_ERROR);
+
     static void OnCommissioningCompleteResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
@@ -1194,6 +1231,46 @@ private:
         Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile;
         CertificateChainRequestTracker requestTracker;
     };
+    chip::Callback::Callback<OnNetworkIdentityAvailableFunct> mOnNetworkIdentityRequestCallback;
+    chip::Callback::Callback<OnClientRegisteredFunct> mOnNetworkClientRegistrationCallback;
+
+    // Tracks the Network Client Identity revocation in flight, if any. Its mCall rests at the base
+    // OnClientUnregistered() variant, and a caller that needs to carry on once the revocation lands
+    // swaps in one of the other variants; RollBackNetworkClientIdentity() may only be entered at the
+    // resting state, and cancels (and reports) a revocation still using the callback object when it
+    // needs it for a new one. See those declarations above for the full invariants.
+    chip::Callback::Callback<OnClientUnregisteredFunct> mOnNetworkClientUnregistrationCallback;
+
+    // A Network Client Identity we have registered with a NetworkIdentityRegistrar on behalf of
+    // the commissionee, which we owe a matching UnregisterClient() unless the commissionee ends up
+    // actually using it. Taken on by the kPDCRegisterClientIdentity stage if (and only if)
+    // CommissioningParameters::GetManagePDCClientIdentityRollback() is true, and discharged by
+    // RollBackNetworkClientIdentity(). Note the obligation is taken on before the registrar is
+    // called and survives a registration that fails, unless the registrar reports the failure as
+    // determinate; see OnClientRegistered(). The identifier is recorded with the registration
+    // because the delegate is free to clear or overwrite the PDCClientIdentity parameter it is
+    // derived from at any time. Note we only manage one outstanding registration at a time, since
+    // we expect initial commissioning to provision exactly one operational network connection: the
+    // ConnectNetwork / operational discovery / CommissioningComplete flow only validates one set
+    // of connection parameters.
+    struct NetworkClientRegistration
+    {
+        bool HasValue() const { return registrar != nullptr; }
+        void Clear() { registrar = nullptr; }
+
+        NetworkIdentityRegistrar * registrar = nullptr; // the registrar the identity was registered with
+        Credentials::CertificateKeyIdStorage clientIdentifier{};
+    };
+    NetworkClientRegistration mNetworkClientRegistration;
+
+    // The Network Client Identity of the revocation in flight, or of the last one we gave up on.
+    // Only used for logging, but kept apart from mNetworkClientRegistration because that copy is
+    // overwritten by the next registration, which a revocation left running can outlive.
+    Credentials::CertificateKeyIdStorage mRevokedClientIdentifier{};
+
+    // The node OnClientUnregisteredFromCleanupFinishCommissioning() has to report on.
+    // Captured because CommissioningStageComplete() clears mDeviceBeingCommissioned.
+    NodeId mOnNetworkClientUnregistrationFinishNodeId = kUndefinedNodeId;
 
     SetUpCodePairer mSetUpCodePairer;
     CertificateChainRequestState mCertificateChainRequestState;

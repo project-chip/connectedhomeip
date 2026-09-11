@@ -481,7 +481,9 @@ DeviceCommissioner::DeviceCommissioner() :
     mOnDeviceConnectionRetryCallback(OnDeviceConnectionRetryFn, this),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
-    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
+    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mOnNetworkIdentityRequestCallback(OnNetworkIdentityAvailable, this),
+    mOnNetworkClientRegistrationCallback(OnClientRegistered, this),
+    mOnNetworkClientUnregistrationCallback(OnClientUnregistered, this), mSetUpCodePairer(this)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     (void) mPeerAdminJFAdminClusterEndpointId;
@@ -566,6 +568,23 @@ void DeviceCommissioner::Shutdown()
     }
 
     CancelCommissioningInteractions();
+
+    // A synchronous shutdown cannot carry out a rollback: revoking a Network Client Identity takes a
+    // round trip to the network, and we are about to stop being able to make one. Rather than issue a
+    // RemoveClient that almost certainly will not get out, say clearly what has been left behind.
+    // Note this is the one place a revocation in flight has to be abandoned rather than left running:
+    // the registrar is holding a callback that points at us, and we are about to go away.
+    if (mOnNetworkClientUnregistrationCallback.IsRegistered())
+    {
+        mOnNetworkClientUnregistrationCallback.Cancel();
+        ReportUnrevokedNetworkClientIdentity(mRevokedClientIdentifier, "commissioner shut down (unregister in progress)");
+    }
+    if (mNetworkClientRegistration.HasValue())
+    {
+        ReportUnrevokedNetworkClientIdentity(mNetworkClientRegistration.clientIdentifier,
+                                             "commissioner shut down (unregister pending)");
+        mNetworkClientRegistration.Clear();
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     if (mUdcTransportMgr != nullptr)
@@ -1238,6 +1257,28 @@ void DeviceCommissioner::CancelCommissioningInteractions()
     {
         ChipLogDetail(Controller, "Cancelling CASE setup for step '%s'", StageToString(mCommissioningStage));
         CancelCASECallbacks();
+    }
+    if (mOnNetworkIdentityRequestCallback.IsRegistered())
+    {
+        ChipLogDetail(Controller, "Cancelling network identity request for step '%s'", StageToString(mCommissioningStage));
+        mOnNetworkIdentityRequestCallback.Cancel();
+    }
+    if (mOnNetworkClientRegistrationCallback.IsRegistered())
+    {
+        ChipLogDetail(Controller, "Cancelling network client registration for step '%s'", StageToString(mCommissioningStage));
+        mOnNetworkClientRegistrationCallback.Cancel();
+    }
+    if (mOnNetworkClientUnregistrationCallback.mCall != OnClientUnregistered)
+    {
+        // Drop the continuation waiting on the revocation, since it belongs to the attempt being
+        // cancelled, whose caller is completed by other means from here. Note we deliberately do not
+        // cancel the revocation itself: this attempt being over is no reason to leave a stale client
+        // registration behind, and the revocation is not an interaction of this attempt anyway (the
+        // registration it undoes was given up when it was issued). So we let it run to completion and
+        // simply do nothing in particular once it does.
+        ChipLogDetail(Controller, "Dropping the continuation of a network client revocation for step '%s'",
+                      StageToString(mCommissioningStage));
+        mOnNetworkClientUnregistrationCallback.mCall = OnClientUnregistered;
     }
 }
 
@@ -2141,9 +2182,11 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
     // At this point, proxy == mDeviceBeingCommissioned, nodeId == mDeviceBeingCommissioned->GetDeviceId()
 
     mCommissioningCompletionStatus = completionStatus;
-
     if (completionStatus.err == CHIP_NO_ERROR)
     {
+        // Commissioning succeeded, so the Client Network Identity (if any) will not be rolled back.
+        mNetworkClientRegistration.Clear();
+
         // CommissioningStageComplete uses mDeviceBeingCommissioned, which can
         // be commissionee if we are cleaning up before we've gone operational.  Normally
         // that would not happen in this non-error case, _except_ if we were told to skip sending
@@ -2164,8 +2207,16 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         }
         // Send the callbacks, we're done.
         SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
+        return;
     }
-    else if (completionStatus.err == CHIP_ERROR_CANCELLED)
+
+    // A Network Client Identity is only of use to the commissionee if it ends up on the network we
+    // registered it for, so if we did register one we need to roll it back because commissioning failed.
+    // Note this is independent of whether the network configuration we wrote to the commissionee itself
+    // is ever removed: that is left to a retry or to the failsafe.
+    bool identityRollbackOngoing = RollBackNetworkClientIdentity();
+
+    if (completionStatus.err == CHIP_ERROR_CANCELLED)
     {
         // If we're cleaning up because cancellation has been requested via StopPairing(), expire the failsafe
         // in the background and reset our state synchronously, so a new commissioning attempt can be started.
@@ -2199,6 +2250,21 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         // If we were already doing network setup, we need to retain the pase session and start again from network setup stage.
         // We do not need to reset the failsafe here because we want to keep everything on the device up to this point, so just
         // send the completion callbacks (see "Commissioning Flows Error Handling" in the spec).
+        //
+        // This is the case the application is most likely to answer by retrying, possibly against a different network, so wait
+        // for any Network Client Identity rollback to complete before we complete commissioning. This ensures the registrar
+        // is idle at that point and can be swapped out if necessary without having to abandon an in-progress rollback.
+        if (identityRollbackOngoing)
+        {
+            // Finish from OnClientUnregisteredFromCleanupFinishCommissioning() instead of here. A StopPairing() in this
+            // window discards the continuation (CancelCommissioningInteractions() resets mCall), but the attempt is still
+            // completed exactly once: StopPairing() follows up with CommissioningStageComplete(CHIP_ERROR_CANCELLED), and a
+            // non-OK error short-circuits GetNextCommissioningStageInternal() to kCleanup (rather than kError), which
+            // re-enters here and finishes synchronously via the CHIP_ERROR_CANCELLED branch above.
+            mOnNetworkClientUnregistrationCallback.mCall = OnClientUnregisteredFromCleanupFinishCommissioning;
+            mOnNetworkClientUnregistrationFinishNodeId   = nodeId;
+            return;
+        }
         CommissioningStageComplete(CHIP_NO_ERROR);
         SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
     }
@@ -2217,6 +2283,15 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
             CleanupDoneAfterError();
         }
     }
+}
+
+void DeviceCommissioner::OnClientUnregisteredFromCleanupFinishCommissioning(void * context, CHIP_ERROR status)
+{
+    OnClientUnregistered(context, status); // call base variant first
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+    commissioner->SendCommissioningCompleteCallbacks(commissioner->mOnNetworkClientUnregistrationFinishNodeId,
+                                                     commissioner->mCommissioningCompletionStatus);
 }
 
 void DeviceCommissioner::OnDisarmFailsafe(void * context,
@@ -2792,8 +2867,10 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
         {
             if (features.Has(NetworkCommissioning::Feature::kWiFiNetworkInterface))
             {
-                ChipLogProgress(Controller, "NetworkCommissioning Features: has WiFi. endpointid = %u", path.mEndpointId);
-                info.network.wifi.endpoint = path.mEndpointId;
+                info.network.wifi.endpoint                     = path.mEndpointId;
+                info.network.wifi.supportsPerDeviceCredentials = features.Has(NetworkCommissioning::Feature::kPerDeviceCredentials);
+                ChipLogProgress(Controller, "NetworkCommissioning Features: has WiFi. endpointid = %u pdc = %u", path.mEndpointId,
+                                info.network.wifi.supportsPerDeviceCredentials);
             }
             else if (features.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
             {
@@ -3325,12 +3402,29 @@ CHIP_ERROR DeviceCommissioner::ICDRegistrationInfoReady()
     return CHIP_NO_ERROR;
 }
 
+// Checks the Per-Device Credentials fields of a NetworkConfigResponse from a commissionee we
+// configured for PDC. Only their shape is checked here: the possession signature is verified against
+// the nonce during kPDCRegisterClientIdentity, which is where the nonce is to hand.
+static CHIP_ERROR
+ValidatePDCClientIdentityResponse(const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
+{
+    VerifyOrReturnError(data.clientIdentity.HasValue(), CHIP_ERROR_MISSING_TLV_ELEMENT,
+                        ChipLogError(Controller, "Commissionee did not return a Network Client Identity"));
+    VerifyOrReturnError(data.clientIdentity.Value().size() <= CommissioningParameters::kMaxNetworkIdentityLen,
+                        CHIP_ERROR_MESSAGE_TOO_LONG,
+                        ChipLogError(Controller, "Commissionee returned an oversized Network Client Identity"));
+    VerifyOrReturnError(data.possessionSignature.HasValue(), CHIP_ERROR_MISSING_TLV_ELEMENT,
+                        ChipLogError(Controller, "Commissionee did not prove possession of its Network Client Identity"));
+    VerifyOrReturnError(data.possessionSignature.Value().size() == CommissioningParameters::kPossessionSignatureLen,
+                        CHIP_ERROR_INVALID_SIGNATURE,
+                        ChipLogError(Controller, "Commissionee returned a possession signature of the wrong length"));
+    return CHIP_NO_ERROR;
+}
+
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
                                                  const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    CommissioningDelegate::CommissioningReport report;
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received NetworkConfig response, networkingStatus=%u", to_underlying(data.networkingStatus));
 
@@ -3343,12 +3437,174 @@ void DeviceCommissioner::OnNetworkConfigResponse(void * context,
     }
     else if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
     {
-        err = CHIP_ERROR_INTERNAL;
         // Preserve debugText alongside the status enum so callers can distinguish
         // ambiguous statuses (e.g. kAuthFailure: "wrong password" vs "regulatory restriction").
+        CommissioningDelegate::CommissioningReport report;
         report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus, data.debugText.ValueOr(CharSpan{}));
+        commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
+        return;
     }
-    commissioner->CommissioningStageComplete(err, report);
+
+    // Removing the Wi-Fi configuration takes any Network Client Identity it was using with it, so
+    // there is no longer any point in the commissionee holding access to that network. If the
+    // revocation is happening asynchronously, set up the callback to finish this stage only once
+    // it finishes, so that a retry can register another Network Client Identity, against this
+    // registrar or a different one.
+    if (commissioner->mCommissioningStage == CommissioningStage::kRemoveWiFiNetworkConfig &&
+        commissioner->RollBackNetworkClientIdentity())
+    {
+        commissioner->mOnNetworkClientUnregistrationCallback.mCall = OnClientUnregisteredFromNetworkConfigResponseCompleteStage;
+        return;
+    }
+
+    CommissioningDelegate::CommissioningReport report;
+    if (commissioner->mCommissioningStage == kWiFiNetworkSetup &&
+        commissioner->mCommissioningDelegate->GetCommissioningParameters().GetPDCNetworkIdentity().HasValue())
+    {
+        // We configured the commissionee for Per-Device Credentials, so it owes us the Network Client
+        // Identity it generated for itself along with a signature proving it holds the corresponding
+        // private key. Check the shape of that here rather than leaving it to the delegate, so that a
+        // commissionee failing to hold up its end fails this stage like any other Network Commissioning
+        // problem and gets the same failover to the secondary network.
+        CHIP_ERROR err = ValidatePDCClientIdentityResponse(data);
+        if (err != CHIP_NO_ERROR)
+        {
+            commissioner->CommissioningStageComplete(err, report);
+            return;
+        }
+        report.Set<PDCClientIdentityInfo>(data.clientIdentity.Value(), data.possessionSignature.Value());
+    }
+
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
+void DeviceCommissioner::OnClientUnregisteredFromNetworkConfigResponseCompleteStage(void * context, CHIP_ERROR status)
+{
+    OnClientUnregistered(context, status); // call base variant first
+    static_cast<DeviceCommissioner *>(context)->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
+void DeviceCommissioner::OnNetworkIdentityAvailable(void * context, CHIP_ERROR error, ByteSpan networkIdentity)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kPDCGetNetworkIdentity);
+
+    CommissioningDelegate::CommissioningReport report;
+    Credentials::CertificateKeyIdStorage networkIdentifier;
+    SuccessOrExitAction(error, ChipLogFailure(error, Controller, "Failed to obtain Network Identity"));
+
+    error = Credentials::ValidateChipNetworkIdentity(networkIdentity, Credentials::MutableCertificateKeyId(networkIdentifier));
+    SuccessOrExitAction(error, ChipLogFailure(error, Controller, "Registrar provided an invalid Network Identity"));
+
+    ChipLogProgress(Controller, "Obtained Network Identity " ChipLogFormatKeyId, ChipLogValueKeyId(networkIdentifier));
+    report.Set<PDCNetworkIdentityInfo>(networkIdentity);
+exit:
+    commissioner->CommissioningStageComplete(error, report);
+}
+
+CHIP_ERROR DeviceCommissioner::VerifyNetworkClientIdentity(ByteSpan clientIdentity, ByteSpan possessionSignature, ByteSpan nonce,
+                                                           Credentials::MutableCertificateKeyId outClientIdentifier)
+{
+    // Validating the identity also gives us the key identifier we need to roll the registration back.
+    ReturnErrorAndLogOnFailure(Credentials::ValidateChipNetworkIdentity(clientIdentity, outClientIdentifier), Controller,
+                               "Commissionee returned an invalid Network Client Identity");
+
+    // These were checked when the commissionee returned them (see ValidatePDCClientIdentityResponse) and
+    // the nonce when it was accepted as a parameter, so a mismatch here is a plumbing error on the part
+    // of the delegate rather than something the commissionee did. Not logged for that reason.
+    VerifyOrReturnError(clientIdentity.size() <= CommissioningParameters::kMaxNetworkIdentityLen, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(nonce.size() == CommissioningParameters::kPossessionNonceLen, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(possessionSignature.size() == CommissioningParameters::kPossessionSignatureLen,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    // The commissionee proves possession of the identity's private key by signing
+    // (NetworkClientIdentity || PossessionNonce).
+    uint8_t tbsMessage[CommissioningParameters::kMaxNetworkIdentityLen + CommissioningParameters::kPossessionNonceLen];
+    memcpy(tbsMessage, clientIdentity.data(), clientIdentity.size());
+    memcpy(tbsMessage + clientIdentity.size(), nonce.data(), nonce.size());
+
+    Credentials::P256PublicKeySpan publicKeySpan;
+    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(clientIdentity, publicKeySpan));
+    Crypto::P256PublicKey publicKey(publicKeySpan);
+
+    Crypto::P256ECDSASignature signature;
+    static_assert(signature.Capacity() >= CommissioningParameters::kPossessionSignatureLen);
+    ReturnErrorOnFailure(signature.SetLength(possessionSignature.size()));
+    memcpy(signature.Bytes(), possessionSignature.data(), possessionSignature.size());
+
+    ReturnErrorAndLogOnFailure(publicKey.ECDSA_validate_msg_signature(tbsMessage, clientIdentity.size() + nonce.size(), signature),
+                               Controller, "Commissionee failed to prove possession of its Network Client Identity");
+    return CHIP_NO_ERROR;
+}
+
+void DeviceCommissioner::ReportUnrevokedNetworkClientIdentity(Credentials::CertificateKeyId clientIdentifier, const char * reason,
+                                                              CHIP_ERROR error)
+{
+    ChipLogError(Controller, "Network Client Identity " ChipLogFormatKeyId " left registered: %s%s%s",
+                 ChipLogValueKeyId(clientIdentifier), reason, //
+                 (error != CHIP_NO_ERROR ? " - " : ""),       //
+                 (error != CHIP_NO_ERROR ? error.AsString() : ""));
+}
+
+bool DeviceCommissioner::RollBackNetworkClientIdentity()
+{
+    VerifyOrReturnValue(mNetworkClientRegistration.HasValue(), false);
+
+    // If we have a revocation in flight, it can only be using the base (background) variant of the
+    // callback. Otherwise we wouldn't be able to safely abandon it here. This means we're also already
+    // set up for UnregisterClient() below completing synchronously, which calls the base variant only.
+    VerifyOrDie(mOnNetworkClientUnregistrationCallback.mCall == OnClientUnregistered);
+
+    // If there is still a rollback ongoing, we need to abandon it now, since we
+    // need the callback object to keep track of this new revocation request.
+    // This is an obscure corner case, and can only happen with a background rollback.
+    if (mOnNetworkClientUnregistrationCallback.IsRegistered())
+    {
+        mOnNetworkClientUnregistrationCallback.Cancel();
+        ReportUnrevokedNetworkClientIdentity(mRevokedClientIdentifier, "unregistration abandoned for subsequent rollback");
+    }
+
+    // Remember which identity we are giving up, for the benefit of the logging above and in
+    // OnClientUnregistered(): the registration this came from is about to be cleared, and a later
+    // one may overwrite its identifier while this revocation is still in flight.
+    mRevokedClientIdentifier = mNetworkClientRegistration.clientIdentifier;
+
+    ChipLogProgress(Controller, "Revoking commissionee Network Client Identity " ChipLogFormatKeyId,
+                    ChipLogValueKeyId(mRevokedClientIdentifier));
+    NetworkIdentityRegistrar * registrar = mNetworkClientRegistration.registrar;
+    mNetworkClientRegistration.Clear(); // it is the revocation's business from here, however it turns out
+    registrar->UnregisterClient(mRevokedClientIdentifier, &mOnNetworkClientUnregistrationCallback);
+    return mOnNetworkClientUnregistrationCallback.IsRegistered();
+}
+
+void DeviceCommissioner::OnClientUnregistered(void * context, CHIP_ERROR status)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    if (status != CHIP_NO_ERROR)
+    {
+        commissioner->ReportUnrevokedNetworkClientIdentity(commissioner->mRevokedClientIdentifier, "unregister failed", status);
+    }
+
+    // Reset the callback function pointer to this base variant
+    commissioner->mOnNetworkClientUnregistrationCallback.mCall = OnClientUnregistered;
+}
+
+void DeviceCommissioner::OnClientRegistered(void * context, CHIP_ERROR status, bool determinate)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kPDCRegisterClientIdentity);
+
+    ChipLogFailure(status, Controller, "Failed to register Network Client Identity (%s)",
+                   determinate ? "no rollback needed" : "rollback may be necessary");
+
+    // Only a determinate failure (where we know the client definitely wasn't registered) lets us
+    // safely skip the rollback. This covers cases like failing to connect to the NIM at all, or
+    // never getting the command out; anything that leaves the outcome open is revoked instead.
+    if (status != CHIP_NO_ERROR && determinate)
+    {
+        commissioner->mNetworkClientRegistration.Clear();
+    }
+    commissioner->CommissioningStageComplete(status);
 }
 
 void DeviceCommissioner::OnConnectNetworkResponse(
@@ -3600,9 +3856,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     case CommissioningStage::kScanNetworks: {
         NetworkCommissioning::Commands::ScanNetworks::Type request;
-        if (params.GetWiFiCredentials().HasValue())
+        auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+        if (wiFiCredentialsParam.HasValue())
         {
-            request.ssid.Emplace(params.GetWiFiCredentials().Value().ssid);
+            request.ssid.Emplace(wiFiCredentialsParam.Value().ssid);
         }
         request.breadcrumb.Emplace(breadcrumb);
         CHIP_ERROR err = SendCommissioningCommand(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
@@ -3967,17 +4224,65 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         CommissioningStageComplete(err);
         return;
     }
+    case CommissioningStage::kPDCGetNetworkIdentity: {
+        auto * registrar = params.GetWiFiNetworkIdentityRegistrar();
+        if (registrar == nullptr)
+        {
+            ChipLogError(Controller, "Missing NetworkIdentityRegistrar");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+
+        // Async call, completes via OnNetworkIdentityAvailableFn (may be called synchronously).
+        registrar->GetNetworkIdentity(&mOnNetworkIdentityRequestCallback);
+        return;
+    }
     case CommissioningStage::kWiFiNetworkSetup: {
-        if (!params.GetWiFiCredentials().HasValue())
+        auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+        if (!wiFiCredentialsParam.HasValue())
         {
             ChipLogError(Controller, "No wifi credentials specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
 
+        auto & credentials = wiFiCredentialsParam.Value();
         NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
-        request.ssid        = params.GetWiFiCredentials().Value().ssid;
-        request.credentials = params.GetWiFiCredentials().Value().credentials;
+        request.ssid = credentials.ssid;
+
+        // The presence or absence of the PDC Network identity selects the kind of Wi-Fi setup we're being asked to perform.
+        if (params.GetPDCNetworkIdentity().HasValue())
+        {
+            // PDC commissioning: The credentials field must be left empty in this case; the
+            // commissionee will generate a Network Client Identity and sign our nonce with it to
+            // prove possession of the corresponding private key.
+            if (!params.GetPDCPossessionNonce().HasValue())
+            {
+                ChipLogError(Controller, "No possession nonce found");
+                CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+                return;
+            }
+            if (params.GetPDCPossessionNonce().Value().size() != CommissioningParameters::kPossessionNonceLen)
+            {
+                ChipLogError(Controller, "Invalid possession nonce");
+                CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+                return;
+            }
+            request.networkIdentity.Emplace(params.GetPDCNetworkIdentity().Value());
+            request.possessionNonce.Emplace(params.GetPDCPossessionNonce().Value());
+        }
+        else
+        {
+            // Plain Wi-Fi commissioning (passphrase or open network)
+            if (!credentials.hasCredentials)
+            {
+                ChipLogError(Controller, "No plain wifi credentials specified");
+                CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+                return;
+            }
+            request.credentials = credentials.credentials;
+        }
+
         request.breadcrumb.Emplace(breadcrumb);
         CHIP_ERROR err = SendCommissioningCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
         if (err != CHIP_NO_ERROR)
@@ -3989,6 +4294,57 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
+    case CommissioningStage::kPDCRegisterClientIdentity: {
+        auto * registrar = params.GetWiFiNetworkIdentityRegistrar();
+        if (registrar == nullptr)
+        {
+            ChipLogError(Controller, "Missing NetworkIdentityRegistrar");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        if (!params.GetPDCClientIdentity().HasValue() || !params.GetPDCPossessionNonce().HasValue() ||
+            !params.GetPDCPossessionSignature().HasValue())
+        {
+            ChipLogError(Controller, "Missing Network Client Identity registration parameters");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+
+        // We support a single outstanding registration at a time. A delegate that wants to keep
+        // several Network Client Identities alive calls SetManagePDCClientIdentityRollback(false), in
+        // which case nothing is ever outstanding here and this does not apply.
+        if (mNetworkClientRegistration.HasValue())
+        {
+            ChipLogError(Controller, "A previously registered Network Client Identity is still outstanding");
+            CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+
+        ByteSpan clientIdentity = params.GetPDCClientIdentity().Value();
+
+        Credentials::CertificateKeyIdStorage clientIdentifier;
+        CHIP_ERROR err = VerifyNetworkClientIdentity(clientIdentity, params.GetPDCPossessionSignature().Value(),
+                                                     params.GetPDCPossessionNonce().Value(),
+                                                     Credentials::MutableCertificateKeyId(clientIdentifier));
+        if (err != CHIP_NO_ERROR)
+        {
+            CommissioningStageComplete(err);
+            return;
+        }
+
+        if (params.GetManagePDCClientIdentityRollback())
+        {
+            // Keep track of this registration since we may need to roll it back.
+            mNetworkClientRegistration.registrar        = registrar;
+            mNetworkClientRegistration.clientIdentifier = clientIdentifier;
+        }
+
+        // Async call, completes via OnClientRegisteredFn (may be called synchronously).
+        ChipLogProgress(Controller, "Registering commissionee Network Client Identity " ChipLogFormatKeyId,
+                        ChipLogValueKeyId(clientIdentifier));
+        registrar->RegisterClient(clientIdentity, &mOnNetworkClientRegistrationCallback);
+        return;
+    }
     case CommissioningStage::kThreadNetworkSetup: {
         if (!params.GetThreadOperationalDataset().HasValue())
         {
@@ -4018,14 +4374,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ExtendFailsafeBeforeNetworkEnable(proxy, params, step);
         break;
     case CommissioningStage::kWiFiNetworkEnable: {
-        if (!params.GetWiFiCredentials().HasValue())
+        auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+        if (!wiFiCredentialsParam.HasValue())
         {
             ChipLogError(Controller, "No wifi credentials specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
-        request.networkID = params.GetWiFiCredentials().Value().ssid;
+        request.networkID = wiFiCredentialsParam.Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4146,14 +4503,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     }
     case CommissioningStage::kRemoveWiFiNetworkConfig: {
-        if (!params.GetWiFiCredentials().HasValue())
+        auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+        if (!wiFiCredentialsParam.HasValue())
         {
             ChipLogError(Controller, "No Wi-Fi credentials configured at commissioner!");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         NetworkCommissioning::Commands::RemoveNetwork::Type request;
-        request.networkID = params.GetWiFiCredentials().Value().ssid;
+        request.networkID = wiFiCredentialsParam.Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);
         CHIP_ERROR err = SendCommissioningCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
         if (err != CHIP_NO_ERROR)

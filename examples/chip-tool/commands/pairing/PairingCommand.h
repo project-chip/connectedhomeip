@@ -21,6 +21,7 @@
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
+#include <controller/NetworkIdentityManagementRegistrar.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
@@ -80,8 +81,8 @@ public:
         CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
         mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
-        mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this),
-        mOnProxyConnectedCallback(OnProxyDeviceConnected, this),
+        mComplex_DSTOffsets(&mDSTOffsetList), mPDCRegistrarIdleCallback(OnPDCRegistrarIdle, this),
+        mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this), mOnProxyConnectedCallback(OnProxyDeviceConnected, this),
         mOnProxyConnectionFailureCallback(OnProxyDeviceConnectionFailed, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
@@ -116,6 +117,19 @@ public:
             AddArgument("password", &mPassword);
             AddArgument("operationalDataset", &mOperationalDataset);
             break;
+        }
+
+        if (networkType == PairingNetworkType::WiFi || networkType == PairingNetworkType::WiFiOrThread)
+        {
+            AddArgument(
+                "pdc-netim-node-id", 0, UINT64_MAX, &mPDCRegistrarNodeId,
+                "Node ID on this fabric hosting a Network Identity Management cluster that can grant the commissionee "
+                "access to the Wi-Fi network using Per-Device Credentials (PDC). If given, PDC is used whenever the "
+                "commissionee supports it, and 'password' only serves as a fallback for commissionees that do not. "
+                "Pass \"-\" as the password to require PDC, as distinct from an empty password, which means an open network.");
+            AddArgument("pdc-netim-endpoint-id", 0, UINT16_MAX, &mPDCRegistrarEndpointId,
+                        "Endpoint on the Network Infrastructure Manager hosting the Network Identity Management cluster. "
+                        "Defaults to 1.");
         }
 
         switch (mode)
@@ -278,6 +292,7 @@ public:
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(120)); }
+    void Shutdown() override;
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -310,6 +325,23 @@ private:
     CHIP_ERROR PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uint16_t index);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
+    chip::Controller::WiFiCredentials GetWiFiCredentials();
+
+    /**
+     * Finishes the command with the given status, once nothing is left to wind down. Paths that
+     * end a pairing run go through here rather than calling SetCommandExitStatus() directly, so
+     * that a Network Client Identity revocation still in flight gets to complete first.
+     */
+    void FinishCommand(CHIP_ERROR aExitErr);
+
+    /**
+     * If the PDC registrar still has a Network Client Identity revocation in flight -- which the
+     * commissioner issues without waiting for it -- shut it down gracefully and defer exiting with
+     * aExitErr until it is done, so the entry does not survive us on the network. Returns true if the
+     * exit was deferred, in which case the caller must not set an exit status itself.
+     */
+    bool DeferExitForPDCRegistrar(CHIP_ERROR aExitErr);
+    static void OnPDCRegistrarIdle(void * context);
     CHIP_ERROR MaybeDisplayTermsAndConditions(chip::Controller::CommissioningParameters & params);
     CHIP_ERROR
     GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopCommissionParams);
@@ -360,6 +392,15 @@ private:
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
+    // Network Infrastructure Manager to obtain Wi-Fi Per-Device Credentials from, if any.
+    chip::Optional<NodeId> mPDCRegistrarNodeId;
+    chip::Optional<chip::EndpointId> mPDCRegistrarEndpointId;
+    // Built from the two arguments above by RunCommand() and released again by Shutdown(), so that
+    // it outlives the commissioning attempt whose CommissioningParameters point at it.
+    std::optional<chip::Controller::NetworkIdentityManagementRegistrar> mPDCRegistrar;
+    chip::Callback::Callback<chip::Controller::OnNetworkIdentityRegistrarIdleFunct> mPDCRegistrarIdleCallback;
+    // Exit status to deliver once the registrar reports itself idle.
+    CHIP_ERROR mPDCRegistrarExitErr     = CHIP_NO_ERROR;
     char * mOnboardingPayload           = nullptr;
     uint64_t mDiscoveryFilterCode       = 0;
     char * mDiscoveryFilterInstanceName = nullptr;

@@ -251,6 +251,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/test-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/thermostat-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thread-border-router-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thread-network-directory-cluster.xml \
@@ -974,6 +975,13 @@ jobs:
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang"
 
+            - name: Build linux-x64-tv-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-tv-app-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-tv-app-${BUILD_VARIANT}-clang"
+
             - name: Build linux-x64-python-bindings
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
@@ -1171,6 +1179,7 @@ jobs:
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "TV_APP: objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}-clang/chip-tv-app" >> /tmp/test_env.yaml
                   echo "WATER_HEATER_APP: objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}-clang-test/matter-water-heater-app" >> /tmp/test_env.yaml
                   echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
                   # keep-sorted: end
@@ -1187,7 +1196,14 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_network_identity.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_full_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_min_pics.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_OPCREDS_3_9.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_SC_7_1.py'
+                  # The ML-DSA cases here need hazmat.primitives.asymmetric.mldsa; the
+                  # cryptography>=46 floor in src/python_testing/requirements.txt is what keeps
+                  # them running rather than silently skipping.
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_pqc_support.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_10.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_12.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestAttributeSubscriptionLiveness.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDeviceRequirementMarkers.py'

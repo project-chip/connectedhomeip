@@ -28,6 +28,7 @@ import pathlib
 import re
 import select
 import shlex
+import shutil
 import sys
 import threading
 import time
@@ -569,11 +570,22 @@ class FactoryResetType(enum.Enum):
                 yield match.group("path")
 
 
+# The tv-app's media store
+TV_APP_MEDIA_DIR = "/tmp/chip-media-files"
+
+
 def factory_reset_config_removal(app_args: str, script_args: str, reset_type: FactoryResetType = None):
     """Handles app factory reset requests by removing configuration and storage files."""
     for path in reset_type.config_files(app_args, script_args):
         log.info("Removing config/storage file, path: '%s'...", path)
-        pathlib.Path(path).unlink(missing_ok=True)
+
+        # Targets the specific tv-app media directory if found, which
+        # unlink can't remove, so using shutil.rmtree instead.
+        if path == TV_APP_MEDIA_DIR:
+            with contextlib.suppress(FileNotFoundError):
+                shutil.rmtree(path)
+        else:
+            pathlib.Path(path).unlink(missing_ok=True)
 
 
 if __name__ == '__main__':

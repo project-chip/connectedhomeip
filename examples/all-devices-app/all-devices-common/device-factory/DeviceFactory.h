@@ -29,12 +29,14 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
+#include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
@@ -348,6 +350,17 @@ private:
                                                "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
+        {
+            RegisterCreator("color-temperature-light", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
         {
             RegisterCreator("contact-sensor", [this]() {
@@ -435,6 +448,17 @@ private:
                 });
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_EXTENDED_COLOR_LIGHT)
+        {
+            RegisterCreator("extended-color-light", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingExtendedColorLight>(LoggingExtendedColorLight::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
         {
             RegisterCreator("mounted-dimmable-load-control", [this]() {
@@ -512,14 +536,61 @@ private:
         {
             RegisterCreator("oven", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingOven>(mContext->timerDelegate);
+                // Tagged with PositionTag::kTop to disambiguate from oven-2 under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kOvenTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingOven>(mContext->timerDelegate,
+                                               LoggingOven::Config{
+                                                   .cavityCount = 1,
+                                                   .tagList     = Span(&kOvenTag, 1),
+                                               });
+            });
+            RegisterCreator("oven-2", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from oven (see comment above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kOven2Tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingOven>(mContext->timerDelegate,
+                                               LoggingOven::Config{
+                                                   .cavityCount = 2,
+                                                   .tagList     = Span(&kOven2Tag, 1),
+                                               });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_REFRIGERATOR)
         {
             RegisterCreator("refrigerator", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate);
+                // Tagged with PositionTag::kTop to disambiguate from refrigerator-2 under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigeratorTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
+                                                       LoggingRefrigerator::Config{
+                                                           .tagList = Span(&kRefrigeratorTag, 1),
+                                                       });
+            });
+            RegisterCreator("refrigerator-2", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from refrigerator (see comment above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigerator2Tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
+                                                       LoggingRefrigerator::Config{
+                                                           .cabinetCount = 2,
+                                                           .tagList      = Span(&kRefrigerator2Tag, 1),
+                                                       });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
