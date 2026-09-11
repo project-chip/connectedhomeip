@@ -32,6 +32,10 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
 #       --app-pipe /tmp/acs_fifo_3_1
+#       --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03
+#       --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
+#       --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 
+#       --float-arg PIXIT.ACS.Holdtime:30
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
