@@ -94,7 +94,7 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
     else if (operation == UDPEndPointImplSockets::MulticastOperation::kLeave)
     {
         status = net_ipv6_mld_leave(iface, &in6Addr);
-        VerifyOrReturnError(status == 0, System::MapErrorZephyr(status));
+        VerifyOrReturnError((status == 0 || status == -ENETDOWN), System::MapErrorZephyr(status));
     }
     else
     {
