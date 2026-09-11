@@ -290,7 +290,8 @@ class TC_ACS_3_1(MatterBaseTest):
                 await asyncio.sleep(holdTime_input - elapsed_time + 1)
 
             # The last end event
-            event = event_listener.get_last_event()
+            # event = event_listener.get_last_event()
+            event = event_listener.wait_for_event_report(expected_event=cluster.Events.AmbientContextDetectEnded, timeout_sec=5.0)
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
 
@@ -473,30 +474,32 @@ class TC_ACS_3_1(MatterBaseTest):
                 await asyncio.sleep(holdTime_input - elapsed_time + 3)
 
             # The last end event
-            event = event_listener.get_last_event()
+            event = event_listener.wait_for_event_report(expected_event=cluster.Events.AmbientContextDetectEnded, timeout_sec=5.0)
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
 
         self.step("7", "TH reads the AmbientContextType attribute. Verify that the AmbientContextType attribute contains an empty list and the Boolean attributes related the step 5a or 6a are False.")
         # Check the boolean attributes are set to False
         if humanActivityDetected and self.HumanActivitySupported:
-            subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
-            humanActivityDetected = subscription_bool_expected[-1].value
-            asserts.assert_true(not humanActivityDetected, "Failed to get HumanActivityDetected being False.")
-
+            # subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.HumanActivityDetected]
+            # humanActivityDetected = subscription_bool_expected[-1].value
+            # asserts.assert_true(not humanActivityDetected, "Failed to get HumanActivityDetected being False.")
+            attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint_id, attribute=cluster.Attributes.HumanActivityDetected, value=False)],timeout_sec=10)
+            log.info("Received HumanActivityDetected False.")
+            
         if objectIdentified and self.ObjectIdentificationSupported:
-            subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectIdentified]
-            objectIdentified = subscription_bool_expected[-1].value
-            asserts.assert_true(not objectIdentified, "Failed to get ObjectIdentified being False.")
+            attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint_id, attribute=cluster.Attributes.ObjectIdentified, value=False)],timeout_sec=10)
+            log.info("Received ObjectIdentified False.")
 
         if audioContextDetected and self.SoundIdentificationSupported:
-            subscription_bool_expected = attrib_listener.attribute_reports[cluster.Attributes.AudioContextDetected]
-            audioContextDetected = subscription_bool_expected[-1].value
-            asserts.assert_true(not audioContextDetected, "Failed to get audioContextDetected being False.")
+            attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint_id, attribute=cluster.Attributes.AudioContextDetected, value=False)],timeout_sec=10)
+            log.info("Received AudioContextDetected False.")
 
         # check the subscription of AmbientContextType attribute (to be empty list)
-        subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][-1].value
-        asserts.assert_true(len(subscription_expected) == 0, "AmbientContext attribute is not empty.")
+        #subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][-1].value
+        #asserts.assert_true(len(subscription_expected) == 0, "AmbientContext attribute is not empty.")
+        attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint_id, attribute=cluster.Attributes.AmbientContextType, value=[])],timeout_sec=10)
+        log.info("Received AmbientContextType empty.")
 
         attrib_listener.reset()
 
