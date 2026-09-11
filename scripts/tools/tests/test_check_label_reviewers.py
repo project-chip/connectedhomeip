@@ -26,10 +26,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from check_label_reviewers import (DEFAULT_OVERRIDE_LABEL, DEFAULT_OVERRIDE_LABELS, LabelEvaluation,  # noqa: E402
-                                   LabelRule, check_override_present, evaluate_pr_labels, extract_approvers,
-                                   find_active_override, generate_step_summary, is_sme_review_satisfied,
-                                   parse_label_config)
+from check_label_reviewers import LabelEvaluation  # noqa: E402
+from check_label_reviewers import (LabelRule, check_override_present, evaluate_pr_labels, extract_approvers, find_active_override,
+                                   generate_step_summary, is_sme_review_satisfied, parse_label_config)
 
 
 class TestParseLabelConfig(unittest.TestCase):
