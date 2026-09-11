@@ -155,8 +155,8 @@ public:
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
     void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override
     {
-        sIsCommissioningFailed = true;
-        isComissioningStarted  = false;
+        AppTaskCommon::sIsCommissioningFailed = true;
+        isComissioningStarted                 = false;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     void OnCommissioningWindowClosed() override
@@ -237,7 +237,6 @@ static void PowerOnNetworkCheck(void)
     {
         return;
     }
-    k_work_schedule(&sDelayedFactoryResetWork, K_SECONDS(2));
 }
 #endif
 
@@ -967,7 +966,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #endif
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
-        sIsNetworkAttached    = ConnectivityMgr().sIsNetworkAttached();
+        sIsNetworkAttached    = ConnectivityMgr().IsThreadAttached();
 #ifdef CONFIG_TFLM_FEATURE
         if (sIsNetworkProvisioned && sIsNetworkAttached)
         {
