@@ -151,7 +151,7 @@ public:
             features.Has(FanControl::Feature::kAuto) ? FanModeSequenceEnum::kOffLowHighAuto : FanModeSequenceEnum::kOffLowHigh;
 
         FanModeSequenceEnum fanModeSequence = defaultFanModeSequence;
-        if (FanModeSequence::GetDefault(endpointId, &fanModeSequence) != Status::Success)
+        if (FanModeSequence::GetDefault(endpointId, fanModeSequence) != Status::Success)
         {
             fanModeSequence = defaultFanModeSequence;
         }
@@ -166,7 +166,7 @@ public:
         if (features.Has(FanControl::Feature::kMultiSpeed))
         {
             uint8_t speedMax = 100;
-            if (SpeedMax::GetDefault(endpointId, &speedMax) != Status::Success)
+            if (SpeedMax::GetDefault(endpointId, speedMax) != Status::Success)
             {
                 speedMax = 100;
             }
@@ -175,7 +175,7 @@ public:
         if (features.Has(FanControl::Feature::kRocking))
         {
             BitMask<RockBitmap> rockSupport;
-            if (RockSupport::GetDefault(endpointId, &rockSupport) != Status::Success)
+            if (RockSupport::GetDefault(endpointId, rockSupport) != Status::Success)
             {
                 rockSupport = BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound);
             }
@@ -184,7 +184,7 @@ public:
         if (features.Has(FanControl::Feature::kWind))
         {
             BitMask<WindBitmap> windSupport;
-            if (WindSupport::GetDefault(endpointId, &windSupport) != Status::Success)
+            if (WindSupport::GetDefault(endpointId, windSupport) != Status::Success)
             {
                 windSupport = BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind);
             }

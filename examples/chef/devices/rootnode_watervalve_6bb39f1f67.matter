@@ -2003,19 +2003,19 @@ endpoint 1 {
     emits event ValveStateChanged;
     emits event ValveFault;
     callback attribute openDuration;
-    ram      attribute defaultOpenDuration;
+    callback attribute defaultOpenDuration;
     callback attribute remainingDuration;
     callback attribute currentState;
     callback attribute targetState;
     callback attribute currentLevel;
     callback attribute targetLevel;
-    ram      attribute defaultOpenLevel default = 100;
+    callback attribute defaultOpenLevel default = 100;
     callback attribute valveFault;
-    ram      attribute levelStep default = 1;
+    callback attribute levelStep default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
+    callback attribute featureMap default = 2;
     callback attribute clusterRevision;
 
     handle command Open;

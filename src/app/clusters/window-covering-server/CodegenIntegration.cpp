@@ -137,13 +137,13 @@ public:
         // are passed to the constructor via Config (per the Default Value Rule). If a default is
         // not present in ZAP, the Config's own default (spec conformance value) is used.
         WindowCovering::Type type{};
-        if (Attributes::Type::GetDefault(endpointId, &type) == Status::Success)
+        if (Attributes::Type::GetDefault(endpointId, type) == Status::Success)
         {
             config.WithType(type);
         }
 
         WindowCovering::EndProductType endProductType{};
-        if (Attributes::EndProductType::GetDefault(endpointId, &endProductType) == Status::Success)
+        if (Attributes::EndProductType::GetDefault(endpointId, endProductType) == Status::Success)
         {
             config.WithEndProductType(endProductType);
         }
@@ -153,13 +153,13 @@ public:
         auto & cluster = gServers[clusterInstanceIndex].Cluster();
 
         chip::BitMask<WindowCovering::ConfigStatus> configStatus;
-        if (Attributes::ConfigStatus::GetDefault(endpointId, &configStatus) == Status::Success)
+        if (Attributes::ConfigStatus::GetDefault(endpointId, configStatus) == Status::Success)
         {
             cluster.SetConfigStatus(configStatus);
         }
 
         chip::BitMask<WindowCovering::Mode> mode;
-        if (Attributes::Mode::GetDefault(endpointId, &mode) == Status::Success)
+        if (Attributes::Mode::GetDefault(endpointId, mode) == Status::Success)
         {
             cluster.SetMode(mode);
         }

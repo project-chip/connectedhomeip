@@ -584,6 +584,20 @@ void ResetMockNodeConfig()
 } // namespace Testing
 } // namespace chip
 
+namespace chip {
+namespace app {
+
+Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
+                                                                    AttributeId attributeId, AttributeDefaultValue & outDefault)
+{
+    const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId);
+    VerifyOrReturnError(metadata != nullptr, Protocols::InteractionModel::Status::UnsupportedAttribute);
+    return emberAfGetAttributeDefaultValue(metadata, outDefault);
+}
+
+} // namespace app
+} // namespace chip
+
 void emAfCallShutdowns(MatterClusterShutdownType shutdownType)
 {
     // No-op in mock: no real clusters to shut down.

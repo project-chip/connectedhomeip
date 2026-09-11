@@ -36,7 +36,7 @@ BitFlags<Feature> ReadFeatureMap(EndpointId endpointId)
     // RAM attribute store. Only the ZAP-configured default is available (GetDefault),
     // which is the correct source for the statically-configured feature map.
     uint32_t rawFeatureMap = 0;
-    if (Attributes::FeatureMap::GetDefault(endpointId, &rawFeatureMap) != Status::Success)
+    if (Attributes::FeatureMap::GetDefault(endpointId, rawFeatureMap) != Status::Success)
     {
         rawFeatureMap = 0;
     }

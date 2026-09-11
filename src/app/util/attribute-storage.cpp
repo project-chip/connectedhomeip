@@ -16,6 +16,7 @@
  */
 #include <app/util/attribute-storage.h>
 
+#include <algorithm>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
@@ -1346,7 +1347,11 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
                         size_t defaultValueSizeForBigEndianNudger = 0;
                         // Bypasses compiler warning about unused variable for little endian platforms.
                         (void) defaultValueSizeForBigEndianNudger;
-                        if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
+                        if (am->HasEmptyDefault())
+                        {
+                            ptr = nullptr;
+                        }
+                        else if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
                         {
                             // This is intentionally 2 and not 4 bytes since defaultValue in min/max
                             // attributes is still uint16_t.
@@ -1632,3 +1637,26 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     emberAfIncreaseDataVersion(path);
     CodegenDataModelProvider::Instance().NotifyAttributeChanged(path, chip::app::DataModel::AttributeChangeType::kReportable);
 }
+
+namespace chip {
+namespace app {
+
+Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                       AttributeDefaultValue & outDefault)
+{
+    const EmberAfCluster * cluster = emberAfFindServerCluster(endpoint, clusterId);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedCluster);
+
+    for (uint16_t i = 0; i < cluster->attributeCount; ++i)
+    {
+        if (cluster->attributes[i].attributeId == attributeId)
+        {
+            return emberAfGetAttributeDefaultValue(&cluster->attributes[i], outDefault);
+        }
+    }
+
+    return Status::UnsupportedAttribute;
+}
+
+} // namespace app
+} // namespace chip
