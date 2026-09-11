@@ -519,7 +519,11 @@ def save_dac_cert_and_keys(dac_cert, dac_key, chip_id, file_path):
 
 
 def generate_partition(args, dacs_cert, out_dirs):
-    log.info(f'Generating partition image: offset: 0x{args.offset:X} size: 0x{args.size:X}')
+    log.info(
+        "Generating partition image: offset: 0x%X size: 0x%X",
+        args.offset,
+        args.size,
+    )
     cbor_data = cbor.dumps(NVS_MEMORY)
     # Create hex file
     if len(cbor_data) > args.size:
