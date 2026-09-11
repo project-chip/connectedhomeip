@@ -54,6 +54,7 @@ public:
     void PopulateTargets(uint16_t numDays, uint16_t numChargingTargetsPerDay);
 
     void SetTargets();
+    CHIP_ERROR SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & schedules);
     void CheckTargets();
 
 private:
@@ -102,29 +103,21 @@ TEST_F(TestEvseTargetsStorage, TestPartial2)
     CheckTargets();
 }
 
-TEST_F(TestEvseTargetsStorage, TestEmptyDayOfWeekBitmask)
+TEST_F(TestEvseTargetsStorage, TestEmptyDayOfWeekBitmaskWithSevenExistingSchedules)
 {
-    // Test that SetTargets rejects a schedule with DayOfWeekForSequence = 0x00
-    // This is a defensive check - the cluster-level ValidateTargets should catch this first,
-    // but the delegate should also reject it as an invalid argument.
+    PopulateTargets(ENERGY_EVSE_SET_TARGETS_DAYS_IN_A_WEEK, 0);
+    SetTargets();
+    CheckTargets();
 
-    TestPersistentStorageDelegate storageDelegate;
-    EvseTargetsDelegate etd;
-
-    EXPECT_SUCCESS(etd.Init(&storageDelegate));
-
-    // Create a target with valid data
     EnergyEvse::Structs::ChargingTargetStruct::Type target;
-    target.targetTimeMinutesPastMidnight = 480; // 8:00 AM
+    target.targetTimeMinutesPastMidnight = 480;
     target.targetSoC.SetValue(80);
-    target.addedEnergy.SetValue(10000);
 
     // Create a schedule with an empty DayOfWeekForSequence bitmask (invalid!)
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type schedule;
-    schedule.dayOfWeekForSequence = chip::BitMask<EnergyEvse::TargetDayOfWeekBitmap>(0); // Empty - invalid!
+    schedule.dayOfWeekForSequence = chip::BitMask<EnergyEvse::TargetDayOfWeekBitmap>(0);
     schedule.chargingTargets      = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(&target, 1);
 
-    // Encode the schedule list for SetTargets
     uint8_t store[1024];
     TLV::TLVWriter writer;
     writer.Init(store, sizeof(store));
@@ -135,7 +128,6 @@ TEST_F(TestEvseTargetsStorage, TestEmptyDayOfWeekBitmask)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    // Decode and attempt to SetTargets
     TLV::TLVReader reader;
     reader.Init(store);
     EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
@@ -144,13 +136,10 @@ TEST_F(TestEvseTargetsStorage, TestEmptyDayOfWeekBitmask)
     err = DataModel::Decode(reader, decodableScheduleList);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    // SetTargets should reject the empty bitmask
-    err = etd.SetTargets(decodableScheduleList);
-    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+    // Merging this schedule must not write past the seven-entry target array.
+    EXPECT_EQ(SetTargets(decodableScheduleList), CHIP_ERROR_NO_MEMORY);
 
-    // Verify no data was persisted
-    const DataModel::List<const EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> & targets = etd.GetTargets();
-    EXPECT_EQ(targets.size(), 0u);
+    CheckTargets();
 }
 
 bool TestEvseTargetsStorage::CompTargets(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & targets1,
@@ -257,8 +246,13 @@ void TestEvseTargetsStorage::SetTargets()
         mEtdInitialised = true;
     }
 
-    CHIP_ERROR err = mEtd.SetTargets(mDecodableChargingTargetSchedulesList);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(SetTargets(mDecodableChargingTargetSchedulesList), CHIP_NO_ERROR);
+}
+
+CHIP_ERROR TestEvseTargetsStorage::SetTargets(
+    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & schedules)
+{
+    return mEtd.SetTargets(schedules);
 }
 
 void TestEvseTargetsStorage::CheckTargets()
