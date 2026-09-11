@@ -21,6 +21,11 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
+<<<<<<< HEAD
+=======
+#include <clusters/Groups/Metadata.h>
+#include <lib/support/AutoRelease.h>
+>>>>>>> 6d6b9e6 (Groupcast: Group adoption logic. (#43725))
 
 using namespace chip;
 using namespace chip::app;
@@ -34,6 +39,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 [[maybe_unused]] constexpr uint32_t kGroupKeyClusterRevisionBeforeGroupcast = 2;
+constexpr uint32_t kGroupsClusterRevisionBeforeGroupcast                    = 4;
 
 struct GroupTableCodec
 {
@@ -141,8 +147,15 @@ struct KeySetReadAllIndicesResponse
         return CHIP_NO_ERROR;
     }
 };
+
 CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    // If the GCAST feature is set, and Group Revision > 4, this attribute SHALL be empty
+    if (provider.IsGroupcastEnabled() && GroupKeyManagementCluster::IsGroupcastAdopted())
+    {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+
     return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
@@ -179,6 +192,12 @@ CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provid
 CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     auto fabric_index = aDecoder.AccessingFabricIndex();
+
+    // If the GCAST feature is set, and Group Revision > 4, this attribute cannot be written
+    if (provider.IsGroupcastEnabled() && GroupKeyManagementCluster::IsGroupcastAdopted())
+    {
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
 
     if (!aPath.IsListItemOperation())
     {
@@ -236,6 +255,12 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
 
 CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    // If the GCAST feature is set, and Group Revision > 4, this attribute SHALL be empty
+    if (provider.IsGroupcastEnabled() && GroupKeyManagementCluster::IsGroupcastAdopted())
+    {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+
     return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
@@ -267,6 +292,11 @@ CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, GroupDataProvider & provide
 
 CHIP_ERROR ReadMaxGroupsPerFabric(GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    // If the GCAST feature is set, and Group Revision > 4, this attribute SHALL be 0
+    if (provider.IsGroupcastEnabled() && GroupKeyManagementCluster::IsGroupcastAdopted())
+    {
+        return aEncoder.Encode(static_cast<uint16_t>(0));
+    }
     return aEncoder.Encode(provider.GetMaxGroupsPerFabric());
 }
 
@@ -589,11 +619,25 @@ HandleKeySetReadAllIndices(CommandHandler * commandObj, const ConcreteCommandPat
     keysIt->Release();
     return std::nullopt;
 }
+
 } // namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+GroupKeyManagementCluster::GroupKeyManagementCluster(Context && context) :
+    GroupKeyManagementCluster(std::move(context),
+                              BitFlags<GroupKeyManagement::Feature>(CHIP_CONFIG_ENABLE_GROUPCAST
+                                                                        ? GroupKeyManagement::Feature::kGroupcast
+                                                                        : GroupKeyManagement::Feature(0)))
+{}
+
+GroupKeyManagementCluster::GroupKeyManagementCluster(Context && context, BitFlags<GroupKeyManagement::Feature> features) :
+    DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mContext(std::move(context))
+{
+    mContext.groupDataProvider.SetGroupcastEnabled(features.Has(GroupKeyManagement::Feature::kGroupcast));
+}
 
 std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                       chip::TLV::TLVReader & input_arguments,
@@ -650,6 +694,10 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
         if (IsMCSPSupported())
         {
             features.Set(Clusters::GroupKeyManagement::Feature::kCacheAndSync);
+        }
+        else if (mContext.groupDataProvider.IsGroupcastEnabled())
+        {
+            features.Set(Clusters::GroupKeyManagement::Feature::kGroupcast);
         }
         return encoder.Encode(features);
     }
@@ -719,6 +767,11 @@ CHIP_ERROR GroupKeyManagementCluster::GeneratedCommands(const ConcreteClusterPat
         Commands::KeySetReadResponse::Id,
     };
     return builder.ReferenceExisting(kGeneratedCommands);
+}
+
+bool GroupKeyManagementCluster::GroupKeyManagementCluster::IsGroupcastAdopted()
+{
+    return Groups::kRevision > kGroupsClusterRevisionBeforeGroupcast;
 }
 
 } // namespace Clusters
