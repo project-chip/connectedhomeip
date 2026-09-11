@@ -32,6 +32,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
@@ -665,6 +666,24 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogDetail(Ble, "Received notification of closed CHIPoBLE connection (con %u)", conId);
     LogErrorOnFailure(CloseConnection(conId));
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (!IsInitialized())
+    {
+        // Continue the deferred ConnectNetwork command after the commissioning transport has been shut down.
+        LogErrorOnFailure(DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent());
+    }
+#endif
+}
+
+void BLEManagerImpl::CheckNonConcurrentBleClosing()
+{
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (IsBleClosing())
+    {
+        // The ConnectNetwork response has finished transmitting, so the commissioning transport can now be closed.
+        LogErrorOnFailure(DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent());
+    }
+#endif
 }
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
