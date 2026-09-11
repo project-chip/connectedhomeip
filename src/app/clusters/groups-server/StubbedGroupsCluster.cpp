@@ -142,7 +142,7 @@ std::optional<DataModel::ActionReturnStatus> StubbedGroupsCluster::InvokeCommand
 
                     return Status::Success;
                 }()),
-                .groupID = request_data.groupID,
+                .groupID = groupId,
             });
 
         if (mGroupDataProvider.ConsumeAuxAclNotificationNeeded())
