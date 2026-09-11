@@ -18,6 +18,7 @@
 #include <app/clusters/ambient-sensing-union-server/AmbientSensingUnionCluster.h>
 
 #include <algorithm>
+#include <app/data-model-provider/EventsGenerator.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/String.h>
@@ -233,7 +234,7 @@ static bool IsValidContributorStatus(UnionContributorStatusEnum status)
 
 CHIP_ERROR AmbientSensingUnionCluster::AddMatterContributor(NodeId nodeId, EndpointId endpointId,
                                                             AmbientSensingUnion::UnionContributorStatusEnum status,
-                                                            const CharSpan & name)
+                                                            FabricIndex fabricIndex, const CharSpan & name)
 {
     VerifyOrReturnError(nodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(endpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -254,10 +255,11 @@ CHIP_ERROR AmbientSensingUnionCluster::AddMatterContributor(NodeId nodeId, Endpo
 
     // Initialize entry
     entry->Clear();
-    entry->nodeId     = nodeId;
-    entry->endpointId = endpointId;
-    entry->status     = status;
-    entry->active     = true;
+    entry->nodeId       = nodeId;
+    entry->endpointId   = endpointId;
+    entry->fabricIndex  = fabricIndex;
+    entry->status       = status;
+    entry->active       = true;
     if (!name.empty())
     {
         entry->SetName(name);
@@ -314,7 +316,8 @@ CHIP_ERROR AmbientSensingUnionCluster::UpdateMatterContributorStatus(NodeId node
 // =============================================================================
 
 CHIP_ERROR AmbientSensingUnionCluster::AddNonMatterContributor(const CharSpan & name,
-                                                               AmbientSensingUnion::UnionContributorStatusEnum status)
+                                                               AmbientSensingUnion::UnionContributorStatusEnum status,
+                                                               FabricIndex fabricIndex)
 {
     VerifyOrReturnError(IsValidContributorStatus(status), CHIP_ERROR_INVALID_ARGUMENT);
     // ContributorName is mandatory when NodeID is NULL
@@ -336,8 +339,9 @@ CHIP_ERROR AmbientSensingUnionCluster::AddNonMatterContributor(const CharSpan & 
     // Initialize entry
     entry->Clear();
     entry->SetName(name);
-    entry->status = status;
-    entry->active = true;
+    entry->fabricIndex = fabricIndex;
+    entry->status      = status;
+    entry->active      = true;
     mContributorCount++;
 
     NotifyAttributeChanged(UnionContributorList::Id);
@@ -399,7 +403,10 @@ void AmbientSensingUnionCluster::EmitContributorAddedEvent(const ContributorEntr
     Events::UnionContributorAdded::Type event;
     event.addedContributor = DataModel::List<const AmbientSensingUnion::Structs::UnionContributorStruct::Type>(&contributor, 1);
 
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    EventOptions options(mPath.mEndpointId, event);
+    options.mFabricIndex = entry.fabricIndex;
+    DataModel::internal::SimpleEventPayloadWriter writer(&event, &DataModel::internal::EncodeTypedEventPayload<Events::UnionContributorAdded::Type>);
+    DataModel::internal::GenerateEvent(options, mContext->interactionContext.eventsGenerator, writer, true);
 }
 
 void AmbientSensingUnionCluster::EmitContributorRemovedEvent(const ContributorEntry & entry)
@@ -412,7 +419,10 @@ void AmbientSensingUnionCluster::EmitContributorRemovedEvent(const ContributorEn
     Events::UnionContributorRemoved::Type event;
     event.removedContributor = DataModel::List<const AmbientSensingUnion::Structs::UnionContributorStruct::Type>(&contributor, 1);
 
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    EventOptions options(mPath.mEndpointId, event);
+    options.mFabricIndex = entry.fabricIndex;
+    DataModel::internal::SimpleEventPayloadWriter writer(&event, &DataModel::internal::EncodeTypedEventPayload<Events::UnionContributorRemoved::Type>);
+    DataModel::internal::GenerateEvent(options, mContext->interactionContext.eventsGenerator, writer, true);
 }
 
 void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const ContributorEntry & entry,
@@ -420,23 +430,26 @@ void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const Contrib
 {
     VerifyOrReturn(mContext != nullptr);
 
-    uint8_t contributorIndex = 0;
-    uint8_t activeIndex      = 0;
-    for (size_t i = 0; i < mCapacity; i++)
+    AmbientSensingUnion::Structs::ContributorStatusChangeStruct::Type statusChange;
+    if (entry.IsMatter())
     {
-        if (mContributors[i].active)
+        statusChange.contributorNodeID.SetNonNull(entry.nodeId);
+        statusChange.contributorEndpointID.SetNonNull(entry.endpointId);
+        if (entry.nameLength > 0)
         {
-            if (&mContributors[i] == &entry)
-            {
-                contributorIndex = activeIndex;
-                break;
-            }
-            activeIndex++;
+            statusChange.contributorName.SetNonNull(entry.GetName());
+        }
+        else
+        {
+            statusChange.contributorName.SetNull();
         }
     }
-
-    AmbientSensingUnion::Structs::ContributorStatusChangeStruct::Type statusChange;
-    statusChange.contributorIndex          = contributorIndex;
+    else
+    {
+        statusChange.contributorNodeID.SetNull();
+        statusChange.contributorEndpointID.SetNull();
+        statusChange.contributorName.SetNonNull(entry.GetName());
+    }
     statusChange.previousContributorStatus = previousStatus;
     statusChange.currentContributorStatus  = entry.status;
 
@@ -444,7 +457,10 @@ void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const Contrib
     event.contributorStatusChange =
         DataModel::List<const AmbientSensingUnion::Structs::ContributorStatusChangeStruct::Type>(&statusChange, 1);
 
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    EventOptions options(mPath.mEndpointId, event);
+    options.mFabricIndex = entry.fabricIndex;
+    DataModel::internal::SimpleEventPayloadWriter writer(&event, &DataModel::internal::EncodeTypedEventPayload<Events::UnionContributorStatusChanged::Type>);
+    DataModel::internal::GenerateEvent(options, mContext->interactionContext.eventsGenerator, writer, true);
 }
 
 // =============================================================================

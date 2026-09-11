@@ -58,6 +58,7 @@ public:
     {
         NodeId nodeId         = kUndefinedNodeId;
         EndpointId endpointId = kInvalidEndpointId;
+        FabricIndex fabricIndex = kUndefinedFabricIndex;
         AmbientSensingUnion::UnionContributorStatusEnum status =
             AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOffline;
         bool active = false;
@@ -77,12 +78,13 @@ public:
 
         void Clear()
         {
-            nodeId     = kUndefinedNodeId;
-            endpointId = kInvalidEndpointId;
-            status     = AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOffline;
-            active     = false;
-            nameLength = 0;
-            name[0]    = '\0';
+            nodeId      = kUndefinedNodeId;
+            endpointId  = kInvalidEndpointId;
+            fabricIndex = kUndefinedFabricIndex;
+            status      = AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOffline;
+            active      = false;
+            nameLength  = 0;
+            name[0]     = '\0';
         }
 
         void CopyTo(AmbientSensingUnion::Structs::UnionContributorStruct::Type & dest) const
@@ -108,6 +110,7 @@ public:
                 dest.contributorName.SetNonNull(GetName());
             }
             dest.contributorStatus = status;
+            dest.fabricIndex       = fabricIndex;
         }
     };
 
@@ -164,6 +167,7 @@ public:
     CHIP_ERROR AddMatterContributor(NodeId nodeId, EndpointId endpointId,
                                     AmbientSensingUnion::UnionContributorStatusEnum status =
                                         AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline,
+                                    FabricIndex fabricIndex = kUndefinedFabricIndex,
                                     const CharSpan & name = CharSpan());
     CHIP_ERROR RemoveMatterContributor(NodeId nodeId, EndpointId endpointId);
     CHIP_ERROR UpdateMatterContributorStatus(NodeId nodeId, EndpointId endpointId,
@@ -171,7 +175,8 @@ public:
 
     CHIP_ERROR AddNonMatterContributor(const CharSpan & name,
                                        AmbientSensingUnion::UnionContributorStatusEnum status =
-                                           AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline);
+                                           AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline,
+                                       FabricIndex fabricIndex = kUndefinedFabricIndex);
     CHIP_ERROR RemoveNonMatterContributor(const CharSpan & name);
     CHIP_ERROR UpdateNonMatterContributorStatus(const CharSpan & name, AmbientSensingUnion::UnionContributorStatusEnum status);
 
