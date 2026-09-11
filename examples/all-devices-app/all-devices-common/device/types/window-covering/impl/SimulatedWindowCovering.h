@@ -57,8 +57,9 @@ protected:
     void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    bool mMovingLift = false;
-    bool mMovingTilt = false;
+    bool mMovingLift  = false;
+    bool mMovingTilt  = false;
+    bool mCalibrating = false;
 
     LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };

@@ -95,7 +95,7 @@ public:
         }
     }
 
-    void OnModeChanged(chip::BitMask<Mode> newMode) override
+    void OnModeChanged(chip::BitMask<WindowCovering::Mode> newMode) override
     {
         if (mWrapped)
         {
@@ -103,7 +103,7 @@ public:
         }
     }
 
-    void OnSafetyStatusChanged(chip::BitMask<SafetyStatus> newSafetyStatus) override
+    void OnSafetyStatusChanged(chip::BitMask<WindowCovering::SafetyStatus> newSafetyStatus) override
     {
         if (mWrapped)
         {
@@ -111,7 +111,7 @@ public:
         }
     }
 
-    void OnConfigStatusChanged(chip::BitMask<ConfigStatus> newConfigStatus) override
+    void OnConfigStatusChanged(chip::BitMask<WindowCovering::ConfigStatus> newConfigStatus) override
     {
         if (mWrapped)
         {
