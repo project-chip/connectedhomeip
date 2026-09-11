@@ -37,7 +37,8 @@ import yaml
 
 DEFAULT_REPO = "project-chip/connectedhomeip"
 DEFAULT_CONFIG_PATH = ".github/label_reviewers.yaml"
-DEFAULT_OVERRIDE_LABEL = "no-sme-check-required"
+DEFAULT_OVERRIDE_LABELS = ("no-sme-check-required", "sdk-maintainer-approved")
+DEFAULT_OVERRIDE_LABEL = DEFAULT_OVERRIDE_LABELS[0]
 
 
 @dataclass
@@ -178,13 +179,30 @@ def evaluate_pr_labels(
     return evaluations
 
 
+def find_active_override(
+    pr_labels: list[str],
+    override_labels: str | list[str] | tuple[str, ...] = DEFAULT_OVERRIDE_LABELS,
+) -> str | None:
+    """Returns the matching override label name if present on the PR, or None."""
+    if isinstance(override_labels, str):
+        target_list = [override_labels]
+    else:
+        target_list = list(override_labels)
+
+    clean_pr_labels = {l.strip().lower(): l.strip() for l in pr_labels if l and l.strip()}
+    for target in target_list:
+        key = target.strip().lower()
+        if key in clean_pr_labels:
+            return clean_pr_labels[key]
+    return None
+
+
 def check_override_present(
     pr_labels: list[str],
-    override_label: str = DEFAULT_OVERRIDE_LABEL,
+    override_labels: str | list[str] | tuple[str, ...] = DEFAULT_OVERRIDE_LABELS,
 ) -> bool:
-    """Checks if the override label is attached to the PR (case-insensitive)."""
-    target = override_label.strip().lower()
-    return any(l.strip().lower() == target for l in pr_labels if l and l.strip())
+    """Checks if any override label is attached to the PR (case-insensitive)."""
+    return find_active_override(pr_labels, override_labels) is not None
 
 
 def is_sme_review_satisfied(
@@ -292,9 +310,9 @@ def write_step_summary(summary_path: str, summary_markdown: str) -> None:
 def sync_labels_to_github(
     repo: str,
     config_mapping: dict[str, LabelRule],
-    override_label: str = DEFAULT_OVERRIDE_LABEL,
+    override_labels: str | list[str] | tuple[str, ...] = DEFAULT_OVERRIDE_LABELS,
 ) -> list[str]:
-    """Ensures all configured labels and the override label exist in the GitHub repository using gh CLI."""
+    """Ensures all configured labels and override labels exist in the GitHub repository using gh CLI."""
     cmd = ["gh", "label", "list", "--repo", repo, "--limit", "1000", "--json", "name"]
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
@@ -308,32 +326,35 @@ def sync_labels_to_github(
 
     created: list[str] = []
 
-    if override_label and override_label.strip().lower() not in existing_labels:
-        logging.info(
-            f"Override label '{override_label}' does not exist on {repo}. Creating..."
-        )
-        create_cmd = [
-            "gh",
-            "label",
-            "create",
-            override_label,
-            "--repo",
-            repo,
-            "--description",
-            "Override to bypass required SME reviews",
-            "--color",
-            "fbca04",
-        ]
-        try:
-            subprocess.run(create_cmd, capture_output=True, text=True, check=True)
-            created.append(override_label)
+    target_override_labels = [override_labels] if isinstance(override_labels, str) else list(override_labels)
+
+    for o_label in target_override_labels:
+        if o_label and o_label.strip().lower() not in existing_labels:
             logging.info(
-                f"✅ Successfully created override label '{override_label}' on GitHub."
+                f"Override label '{o_label}' does not exist on {repo}. Creating..."
             )
-        except subprocess.CalledProcessError as e:
-            logging.warning(
-                f"Could not create override label '{override_label}': {e.stderr.strip()}"
-            )
+            create_cmd = [
+                "gh",
+                "label",
+                "create",
+                o_label,
+                "--repo",
+                repo,
+                "--description",
+                "Override to bypass required SME reviews",
+                "--color",
+                "fbca04",
+            ]
+            try:
+                subprocess.run(create_cmd, capture_output=True, text=True, check=True)
+                created.append(o_label)
+                logging.info(
+                    f"✅ Successfully created override label '{o_label}' on GitHub."
+                )
+            except subprocess.CalledProcessError as e:
+                logging.warning(
+                    f"Could not create override label '{o_label}': {e.stderr.strip()}"
+                )
 
     for key, rule in config_mapping.items():
         if key not in existing_labels:
@@ -397,8 +418,9 @@ def main() -> int:
     )
     parser.add_argument(
         "--override-label",
-        default=DEFAULT_OVERRIDE_LABEL,
-        help=f"Label name that bypasses SME review checks (default: {DEFAULT_OVERRIDE_LABEL})",
+        action="append",
+        dest="override_labels",
+        help=f"Label name that bypasses SME review checks (can be specified multiple times; default: {', '.join(DEFAULT_OVERRIDE_LABELS)})",
     )
     parser.add_argument(
         "--log-level",
@@ -408,6 +430,13 @@ def main() -> int:
     )
 
     args = parser.parse_args()
+
+    override_labels: list[str] = []
+    if args.override_labels:
+        for item in args.override_labels:
+            override_labels.extend([s.strip() for s in item.split(",") if s.strip()])
+    else:
+        override_labels = list(DEFAULT_OVERRIDE_LABELS)
 
     logging.basicConfig(
         level=getattr(logging, args.log_level.upper()),
@@ -433,7 +462,7 @@ def main() -> int:
 
     if args.sync_labels:
         logging.info(f"Syncing labels from {args.config} to repository {args.repo}...")
-        created = sync_labels_to_github(args.repo, config_mapping, args.override_label)
+        created = sync_labels_to_github(args.repo, config_mapping, override_labels)
         if created:
             print(f"Created {len(created)} new label(s) on GitHub: {', '.join(created)}")
         else:
@@ -467,9 +496,10 @@ def main() -> int:
     approvers = extract_approvers(pr_data)
     logging.info(f"Active approved reviews from: {sorted(approvers) or 'None'}")
 
-    overridden = check_override_present(pr_labels, args.override_label)
+    active_override = find_active_override(pr_labels, override_labels)
+    overridden = active_override is not None
     if overridden:
-        print(f"⚠️  Override label '{args.override_label}' is present on this PR.")
+        print(f"⚠️  Override label '{active_override}' is present on this PR.")
         print("   SME review check is bypassed.\n" + "=" * 72)
 
     evaluations = evaluate_pr_labels(pr_labels, config_mapping, approvers)
@@ -493,7 +523,7 @@ def main() -> int:
             elif overridden:
                 print(f"  [{idx}] Label: '{ev.rule.name}'")
                 print(f"      Required SMEs: {req_smes}")
-                print(f"      Status:        ⚪ OVERRIDDEN by '{args.override_label}'\n")
+                print(f"      Status:        ⚪ OVERRIDDEN by '{active_override}'\n")
             else:
                 print(f"  [{idx}] Label: '{ev.rule.name}'")
                 print(f"      Required SMEs: {req_smes}")
@@ -540,12 +570,12 @@ def main() -> int:
             pr_author,
             passed,
             overridden=overridden,
-            override_label=args.override_label,
+            override_label=active_override or (override_labels[0] if override_labels else DEFAULT_OVERRIDE_LABEL),
         )
         write_step_summary(gh_summary, summary_md)
 
     if overridden:
-        print(f"⚠️ BYPASSED: SME review check overridden by '{args.override_label}'.\n")
+        print(f"⚠️ BYPASSED: SME review check overridden by '{active_override}'.\n")
         return 0
 
     if passed:

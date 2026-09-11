@@ -26,9 +26,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from check_label_reviewers import (DEFAULT_OVERRIDE_LABEL, LabelEvaluation, LabelRule,  # noqa: E402
-                                   check_override_present, evaluate_pr_labels, extract_approvers,
-                                   generate_step_summary, is_sme_review_satisfied, parse_label_config)
+from check_label_reviewers import (DEFAULT_OVERRIDE_LABEL, DEFAULT_OVERRIDE_LABELS, LabelEvaluation,  # noqa: E402
+                                   LabelRule, check_override_present, evaluate_pr_labels, extract_approvers,
+                                   find_active_override, generate_step_summary, is_sme_review_satisfied,
+                                   parse_label_config)
 
 
 class TestParseLabelConfig(unittest.TestCase):
@@ -220,13 +221,21 @@ class TestCheckOverridePresent(unittest.TestCase):
         pr_labels = ["bug", "no-sme-check-required", "security"]
         self.assertTrue(check_override_present(pr_labels))
 
+    def test_sdk_maintainer_approved_exact_match(self) -> None:
+        pr_labels = ["bug", "sdk-maintainer-approved", "security"]
+        self.assertTrue(check_override_present(pr_labels))
+
     def test_override_label_case_insensitive(self) -> None:
         pr_labels = ["No-SME-Check-Required"]
         self.assertTrue(check_override_present(pr_labels))
+        pr_labels_maintainer = ["SDK-Maintainer-Approved"]
+        self.assertTrue(check_override_present(pr_labels_maintainer))
 
     def test_override_label_with_surrounding_whitespace(self) -> None:
         pr_labels = ["  no-sme-check-required  "]
         self.assertTrue(check_override_present(pr_labels))
+        pr_labels_maintainer = ["  sdk-maintainer-approved  "]
+        self.assertTrue(check_override_present(pr_labels_maintainer))
 
     def test_override_label_not_present(self) -> None:
         pr_labels = ["bug", "security", "enhancement"]
@@ -237,8 +246,24 @@ class TestCheckOverridePresent(unittest.TestCase):
 
     def test_custom_override_label(self) -> None:
         pr_labels = ["exempt-from-sme"]
-        self.assertTrue(check_override_present(pr_labels, override_label="exempt-from-sme"))
-        self.assertFalse(check_override_present(pr_labels, override_label="other-label"))
+        self.assertTrue(check_override_present(pr_labels, override_labels="exempt-from-sme"))
+        self.assertTrue(check_override_present(pr_labels, override_labels=["exempt-from-sme", "other"]))
+        self.assertFalse(check_override_present(pr_labels, override_labels="other-label"))
+
+    def test_find_active_override(self) -> None:
+        self.assertIsNone(find_active_override(["bug", "feature"]))
+        self.assertEqual(
+            find_active_override(["bug", "sdk-maintainer-approved"]),
+            "sdk-maintainer-approved",
+        )
+        self.assertEqual(
+            find_active_override(["SDK-Maintainer-Approved"]),
+            "SDK-Maintainer-Approved",
+        )
+        self.assertEqual(
+            find_active_override(["no-sme-check-required", "sdk-maintainer-approved"]),
+            "no-sme-check-required",
+        )
 
 
 class TestEvaluatePrLabels(unittest.TestCase):
@@ -467,6 +492,28 @@ class TestEndToEndJsonEvaluation(unittest.TestCase):
 
         evaluations = evaluate_pr_labels(pr_labels, config, approvers)
         self.assertTrue(is_sme_review_satisfied(evaluations, overridden=overridden))
+
+    def test_full_evaluation_flow_with_sdk_maintainer_approved(self) -> None:
+        mock_gh_json = {
+            "title": "Core maintenance refactor approved by SDK maintainer",
+            "author": {"login": "contributor"},
+            "state": "OPEN",
+            "labels": [
+                {"name": "core"},
+                {"name": "sdk-maintainer-approved"},
+            ],
+            "latestReviews": [],
+        }
+        config = {
+            "core": LabelRule(name="core", smes=["lead_dev"]),
+        }
+        approvers = extract_approvers(mock_gh_json)
+        pr_labels = [l["name"] for l in mock_gh_json.get("labels", [])]
+        active_override = find_active_override(pr_labels)
+        self.assertEqual(active_override, "sdk-maintainer-approved")
+
+        evaluations = evaluate_pr_labels(pr_labels, config, approvers)
+        self.assertTrue(is_sme_review_satisfied(evaluations, overridden=bool(active_override)))
 
 
 if __name__ == "__main__":
