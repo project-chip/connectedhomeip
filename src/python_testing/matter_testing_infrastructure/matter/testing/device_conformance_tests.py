@@ -294,12 +294,8 @@ class DeviceConformanceTests(BasicCompositionTests):
 
 
             # This is a manually curated list of cluster revisions that are in-progress in the SDK, but have landed in the spec
-<< << << < HEAD
-            in_progress_revisions = [Clusters.BasicInformation.id, Clusters.PowerSource.id, Clusters.NetworkCommissioning.id]
-== == == =
             in_progress_revisions = [Clusters.BasicInformation.id, Clusters.PowerSource.id,
-                                     Clusters.NetworkCommissioning.id, Clusters.OperationalCredentials.id, Clusters.ScenesManagement.id]
->>>>>> > adab760([Scenes] SceneValid Logic Branching(  # 74045))
+                                     Clusters.NetworkCommissioning.id, Clusters.ScenesManagement.id]
             ignore_revisions.extend(in_progress_revisions)
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
