@@ -40,7 +40,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import async_test_body, has_cluster, pics, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -77,7 +77,7 @@ class TC_ACS_2_1(MatterBaseTest):
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
-        
+
     @async_test_body
     async def test_TC_ACS_2_1(self):
         endpoint = self.get_endpoint()
