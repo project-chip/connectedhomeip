@@ -44,7 +44,7 @@ import time
 
 from mobly import asserts
 from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, WIFI_TECHNOLOGIES, BLTCSModeEnum,
-                              Feature, ProximityRangingTestBase, RangingRoleEnum, RangingTechEnum)
+                              BLTCSSecurityLevelEnum, Feature, ProximityRangingTestBase, RangingRoleEnum, RangingTechEnum)
 
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
@@ -253,8 +253,16 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             resp_r2 = await self.send_start_ranging(make_r(), node_id=self.reflector_node_id)
             self._assert_session_id(resp_i2.sessionID)
             self._assert_session_id(resp_r2.sessionID)
+            # The plan asks the new SessionID be "higher than the previous ... or a
+            # smaller value due to wrap-around from the limited field size". For a
+            # uint8 that disjunction admits every value except the previous one, so
+            # "differs from the previous" is the strongest falsifiable check the
+            # field allows; a strict > would wrongly fail a conformant wrap. Checked
+            # on both DUTs (previously only DUT_I).
             asserts.assert_not_equal(resp_i2.sessionID, resp_i.sessionID,
-                                     "New DUT_I SessionID must differ from the previous one")
+                                     "New DUT_I SessionID must differ from the previous one (higher, or wrapped)")
+            asserts.assert_not_equal(resp_r2.sessionID, resp_r.sessionID,
+                                     "New DUT_R SessionID must differ from the previous one (higher, or wrapped)")
             await self._collect_and_check_cadence(cb_i, resp_i2.sessionID, validate)
 
             # f: SessionIDList includes both new ids
@@ -345,6 +353,18 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             # below its reported maximum -- an assumption the plan does not state.
             level_i = await self.read_proxr_attribute(_PROXR.Attributes.BLTCSSecurityLevel, node_id=self.dut_node_id)
             level_r = await self.read_proxr_attribute(_PROXR.Attributes.BLTCSSecurityLevel, node_id=self.reflector_node_id)
+            # Validate both reported values are known enum members before taking
+            # min(). assert_valid_enum only type-checks, and the SDK coerces any
+            # out-of-range decoded value to kUnknownEnumValue (a valid member), so
+            # the type check alone is vacuous; also reject kUnknownEnumValue so an
+            # out-of-range or unknown level fails here rather than silently
+            # participating in the negotiation below.
+            matter_asserts.assert_valid_enum(level_i, "DUT_I BLTCSSecurityLevel", BLTCSSecurityLevelEnum)
+            matter_asserts.assert_valid_enum(level_r, "DUT_R BLTCSSecurityLevel", BLTCSSecurityLevelEnum)
+            asserts.assert_not_equal(level_i, BLTCSSecurityLevelEnum.kUnknownEnumValue,
+                                     "DUT_I BLTCSSecurityLevel must be a known (in-range) value")
+            asserts.assert_not_equal(level_r, BLTCSSecurityLevelEnum.kUnknownEnumValue,
+                                     "DUT_R BLTCSSecurityLevel must be a known (in-range) value")
             self.blt_level = min(level_i, level_r)
             # BLTCSMode: negotiate a mode supported by BOTH devices (the plan's "a
             # mode supported by both") from their BLTCSModeCapability values.

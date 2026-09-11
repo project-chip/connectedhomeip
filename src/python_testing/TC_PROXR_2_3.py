@@ -42,8 +42,9 @@ import logging
 
 from mobly import asserts
 from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, UNKNOWN_PEER_BLE_DEVICE_ID,
-                              UNKNOWN_PEER_DEV_IK, WIFI_TECHNOLOGIES, BLTCSModeEnum, Feature, ProximityRangingTestBase,
-                              RangingRoleEnum, RangingSessionStatusEnum, RangingTechEnum, StatusCodeEnum)
+                              UNKNOWN_PEER_DEV_IK, WIFI_TECHNOLOGIES, BLTCSModeEnum, BLTCSSecurityLevelEnum, Feature,
+                              ProximityRangingTestBase, RangingRoleEnum, RangingSessionStatusEnum, RangingTechEnum,
+                              StatusCodeEnum)
 
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
@@ -201,6 +202,11 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
             status = self.wait_session_status(cb_i, resp_i.sessionID, _EVENT_TIMEOUT_S)
             asserts.assert_equal(status.status, RangingSessionStatusEnum.kPeerNotFound,
                                  "DUT_I must report PeerNotFound for an unknown peer")
+            # DUT_R received a feasible request (its peer is DUT_I's real identity),
+            # so its session runs to EndTime rather than ending on PeerNotFound. We
+            # only wait on DUT_I here, so stop DUT_R's session for hermetic cleanup;
+            # tolerate it having already self-terminated.
+            await self.stop_ranging_best_effort(resp_r.sessionID, node_id=self.reflector_node_id)
         finally:
             cb_i.cancel()
             cb_r.cancel()
@@ -296,6 +302,18 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
             # below its reported maximum -- an assumption the plan does not state.
             level_i = await self.read_proxr_attribute(_PROXR.Attributes.BLTCSSecurityLevel, node_id=self.dut_node_id)
             level_r = await self.read_proxr_attribute(_PROXR.Attributes.BLTCSSecurityLevel, node_id=self.reflector_node_id)
+            # Validate both reported values are known enum members before taking
+            # min(). assert_valid_enum only type-checks, and the SDK coerces any
+            # out-of-range decoded value to kUnknownEnumValue (a valid member), so
+            # the type check alone is vacuous; also reject kUnknownEnumValue so an
+            # out-of-range or unknown level fails here rather than silently
+            # participating in the negotiation below.
+            matter_asserts.assert_valid_enum(level_i, "DUT_I BLTCSSecurityLevel", BLTCSSecurityLevelEnum)
+            matter_asserts.assert_valid_enum(level_r, "DUT_R BLTCSSecurityLevel", BLTCSSecurityLevelEnum)
+            asserts.assert_not_equal(level_i, BLTCSSecurityLevelEnum.kUnknownEnumValue,
+                                     "DUT_I BLTCSSecurityLevel must be a known (in-range) value")
+            asserts.assert_not_equal(level_r, BLTCSSecurityLevelEnum.kUnknownEnumValue,
+                                     "DUT_R BLTCSSecurityLevel must be a known (in-range) value")
             self.blt_level = min(level_i, level_r)
             # BLTCSMode: negotiate a mode supported by BOTH devices from their
             # BLTCSModeCapability values (the plan's "a mode supported by both").

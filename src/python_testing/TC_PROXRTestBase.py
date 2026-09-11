@@ -28,6 +28,7 @@ reflector/responder (DUT_R) and commission it onto the DUT's fabric; the helpers
 here own that lifecycle so 2.3 and 2.4 share exactly one implementation.
 """
 
+import contextlib
 import logging
 import os
 import queue
@@ -240,6 +241,7 @@ class ProximityRangingTestBase:
     def build_wifi_request(self, *, role, peer_wifi_ik, pmk, start_time=0, end_time=6,
                            interval=None, min_distance=None, max_distance=None,
                            technology=RangingTechEnum.kWiFiRoundTripTimeRanging):
+        self._assert_key_len(peer_wifi_ik, DEVICE_IDENTITY_KEY_LEN, "peerWiFiDevIK")
         self._assert_key_len(pmk, PMK_LEN, "PMK")
         return _PROXR.Commands.StartRangingRequest(
             technology=technology,
@@ -251,6 +253,7 @@ class ProximityRangingTestBase:
     def build_blt_request(self, *, role, peer_blt_ik, ltk, security_level, mode,
                           start_time=0, end_time=6, interval=None,
                           min_distance=None, max_distance=None):
+        self._assert_key_len(peer_blt_ik, DEVICE_IDENTITY_KEY_LEN, "peerBLTDevIK")
         self._assert_key_len(ltk, LTK_LEN, "LTK")
         return _PROXR.Commands.StartRangingRequest(
             technology=RangingTechEnum.kBluetoothChannelSounding,
@@ -283,6 +286,16 @@ class ProximityRangingTestBase:
             endpoint = self.get_endpoint()
         return await self.send_single_cmd(
             cmd=_PROXR.Commands.StopRangingRequest(sessionID=session_id), node_id=node_id, endpoint=endpoint)
+
+    async def stop_ranging_best_effort(self, session_id, node_id=None, endpoint=None):
+        """Hermetic cleanup for a responder session that is still running: send
+        StopRanging but tolerate the session having already self-terminated at its
+        EndTime (NOT_FOUND / INVALID_IN_STATE). Bounding the session here keeps a
+        finite-MaxConcurrentSessions DUT from accumulating leftover sessions across
+        sequential steps, without reintroducing a hard StopRanging that would race
+        the session's own EndTime expiry."""
+        with contextlib.suppress(InteractionModelError):
+            await self.send_stop_ranging(session_id, node_id=node_id, endpoint=endpoint)
 
     async def expect_start_ranging_status(self, cmd, expected_cluster_status: int, node_id=None, endpoint=None):
         """Send StartRangingRequest and assert it is rejected with a specific
@@ -361,7 +374,10 @@ class ProximityRangingTestBase:
         self._reflector_discriminator = random.randint(2048, 4095)
         # all-devices-app has no --passcode flag; it uses the SDK default passcode.
         self._reflector_passcode = 20202021
-        self._reflector_port = 5546
+        # Reflector secure port defaults to 5546 but is overridable so two runs on
+        # one host (e.g. concurrent 2.3 and 2.4) can pick distinct ports and not
+        # collide. Provide via --int-arg th_reflector_port:<port>.
+        self._reflector_port = int(self.user_params.get("th_reflector_port", 5546))
         self.reflector = Subprocess(
             app, "--device", "proximity-ranger:1",
             "--KVS", self._reflector_kvs,
