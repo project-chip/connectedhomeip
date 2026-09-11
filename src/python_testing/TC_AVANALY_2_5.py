@@ -133,7 +133,12 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
                              "Expected stream state to be PendingInitiation")
 
         self.step(7)
-        await self.send_activate_analysis_stream_cmd(endpoint, analysis_stream_id=stream_id)
+        # O.c: exactly one endpoint field is required. It names the camera's endpoint hosting
+        # WebRTCTransportProvider, found from that node's Descriptor as a controller would find it.
+        server_lists = await self.default_controller.ReadAttribute(nodeId=node_id, attributes=[Clusters.Descriptor.Attributes.ServerList])
+        webrtc_endpoint = next(ep for ep, data in server_lists.items()
+                               if Clusters.WebRTCTransportProvider.id in data[Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+        await self.send_activate_analysis_stream_cmd(endpoint, analysis_stream_id=stream_id, webrtc_endpoint_id=webrtc_endpoint)
 
         self.step(8)
         analysis_streams = await self.read_avanaly_attribute_expect_success(endpoint, attributes.AnalysisStreams)
