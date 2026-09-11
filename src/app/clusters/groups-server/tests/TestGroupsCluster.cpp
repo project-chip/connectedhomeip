@@ -99,11 +99,11 @@ public:
     void SetUp() override
     {
         mCluster       = std::make_unique<GroupsClusterImpl>(kTestEndpointId,
-                                                             GroupsClusterImpl::Context{
+                                                       GroupsClusterImpl::Context{
                                                                  .groupDataProvider   = mGroupDataProvider,
                                                                  .scenesIntegration   = &mScenesDelegate,
                                                                  .identifyIntegration = &mIdentifyDelegate,
-                                                             });
+                                                       });
         mClusterTester = std::make_unique<ClusterTester>(*mCluster);
 
         mGroupDataProvider.SetStorageDelegate(&mClusterTester->GetServerClusterContext().storage);
