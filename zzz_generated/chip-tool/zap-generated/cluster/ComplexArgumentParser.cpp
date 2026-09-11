@@ -2661,6 +2661,49 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalCredentials
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(
+    const char * label, chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type & request,
+    Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.PAASupportedProfiles",
+                                                                  "PAASupportedProfiles", value.isMember("PAASupportedProfiles")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.PAISupportedProfiles",
+                                                                  "PAISupportedProfiles", value.isMember("PAISupportedProfiles")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.DACSupportedProfiles",
+                                                                  "DACSupportedProfiles", value.isMember("DACSupportedProfiles")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "PAASupportedProfiles");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.PAASupportedProfiles, value["PAASupportedProfiles"]));
+    valueCopy.removeMember("PAASupportedProfiles");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "PAISupportedProfiles");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.PAISupportedProfiles, value["PAISupportedProfiles"]));
+    valueCopy.removeMember("PAISupportedProfiles");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "DACSupportedProfiles");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.DACSupportedProfiles, value["DACSupportedProfiles"]));
+    valueCopy.removeMember("DACSupportedProfiles");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.PAASupportedProfiles);
+    ComplexArgumentParser::Finalize(request.PAISupportedProfiles);
+    ComplexArgumentParser::Finalize(request.DACSupportedProfiles);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type & request,
                                         Json::Value & value)
@@ -3152,6 +3195,75 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Stru
     ComplexArgumentParser::Finalize(request.sceneValid);
     ComplexArgumentParser::Finalize(request.remainingCapacity);
     ComplexArgumentParser::Finalize(request.fabricIndex);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ThermostatMode::Structs::ModeTagStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ModeTagStruct.value", "value", value.isMember("value")));
+
+    char labelWithMember[kMaxLabelLength];
+    if (value.isMember("mfgCode"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "mfgCode");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.mfgCode, value["mfgCode"]));
+    }
+    valueCopy.removeMember("mfgCode");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "value");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.value, value["value"]));
+    valueCopy.removeMember("value");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ThermostatMode::Structs::ModeTagStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.mfgCode);
+    ComplexArgumentParser::Finalize(request.value);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ThermostatMode::Structs::ModeOptionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ModeOptionStruct.label", "label", value.isMember("label")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ModeOptionStruct.mode", "mode", value.isMember("mode")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ModeOptionStruct.modeTags", "modeTags", value.isMember("modeTags")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "label");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
+    valueCopy.removeMember("label");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "mode");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.mode, value["mode"]));
+    valueCopy.removeMember("mode");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "modeTags");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.modeTags, value["modeTags"]));
+    valueCopy.removeMember("modeTags");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ThermostatMode::Structs::ModeOptionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.label);
+    ComplexArgumentParser::Finalize(request.mode);
+    ComplexArgumentParser::Finalize(request.modeTags);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -5713,6 +5825,107 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::S
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::SensorScheduleTransitionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorScheduleTransitionStruct.dayOfWeek", "dayOfWeek",
+                                                                  value.isMember("dayOfWeek")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorScheduleTransitionStruct.transitionTime", "transitionTime",
+                                                                  value.isMember("transitionTime")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorScheduleTransitionStruct.enabledSensors", "enabledSensors",
+                                                                  value.isMember("enabledSensors")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeek");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeek, value["dayOfWeek"]));
+    valueCopy.removeMember("dayOfWeek");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitionTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTime, value["transitionTime"]));
+    valueCopy.removeMember("transitionTime");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enabledSensors");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enabledSensors, value["enabledSensors"]));
+    valueCopy.removeMember("enabledSensors");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::SensorScheduleTransitionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.dayOfWeek);
+    ComplexArgumentParser::Finalize(request.transitionTime);
+    ComplexArgumentParser::Finalize(request.enabledSensors);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatSensorStruct.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatSensorStruct.sensorHandle", "sensorHandle",
+                                                                  value.isMember("sensorHandle")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ThermostatSensorStruct.cluster", "cluster", value.isMember("cluster")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    valueCopy.removeMember("name");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sensorHandle");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sensorHandle, value["sensorHandle"]));
+    valueCopy.removeMember("sensorHandle");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "cluster");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.cluster, value["cluster"]));
+    valueCopy.removeMember("cluster");
+
+    if (value.isMember("endpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    }
+    valueCopy.removeMember("endpoint");
+
+    if (value.isMember("node"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "node");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.node, value["node"]));
+    }
+    valueCopy.removeMember("node");
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.name);
+    ComplexArgumentParser::Finalize(request.sensorHandle);
+    ComplexArgumentParser::Finalize(request.cluster);
+    ComplexArgumentParser::Finalize(request.endpoint);
+    ComplexArgumentParser::Finalize(request.node);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Thermostat::Structs::ThermostatSuggestionStruct::Type & request,
                                         Json::Value & value)
 {
@@ -6179,8 +6392,12 @@ ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ContributorStatusChangeStruct.contributorIndex",
-                                                                  "contributorIndex", value.isMember("contributorIndex")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ContributorStatusChangeStruct.contributorNodeID",
+                                                                  "contributorNodeID", value.isMember("contributorNodeID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
+        "ContributorStatusChangeStruct.contributorEndpointID", "contributorEndpointID", value.isMember("contributorEndpointID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ContributorStatusChangeStruct.contributorName",
+                                                                  "contributorName", value.isMember("contributorName")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ContributorStatusChangeStruct.previousContributorStatus",
                                                                   "previousContributorStatus",
                                                                   value.isMember("previousContributorStatus")));
@@ -6189,9 +6406,18 @@ ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("currentContributorStatus")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "contributorIndex");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.contributorIndex, value["contributorIndex"]));
-    valueCopy.removeMember("contributorIndex");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "contributorNodeID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.contributorNodeID, value["contributorNodeID"]));
+    valueCopy.removeMember("contributorNodeID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "contributorEndpointID");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.contributorEndpointID, value["contributorEndpointID"]));
+    valueCopy.removeMember("contributorEndpointID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "contributorName");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.contributorName, value["contributorName"]));
+    valueCopy.removeMember("contributorName");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "previousContributorStatus");
     ReturnErrorOnFailure(
@@ -6203,15 +6429,25 @@ ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::Setup(labelWithMember, request.currentContributorStatus, value["currentContributorStatus"]));
     valueCopy.removeMember("currentContributorStatus");
 
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
 void ComplexArgumentParser::Finalize(
     chip::app::Clusters::AmbientSensingUnion::Structs::ContributorStatusChangeStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.contributorIndex);
+    ComplexArgumentParser::Finalize(request.contributorNodeID);
+    ComplexArgumentParser::Finalize(request.contributorEndpointID);
+    ComplexArgumentParser::Finalize(request.contributorName);
     ComplexArgumentParser::Finalize(request.previousContributorStatus);
     ComplexArgumentParser::Finalize(request.currentContributorStatus);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -6250,6 +6486,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.contributorStatus, value["contributorStatus"]));
     valueCopy.removeMember("contributorStatus");
 
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -6259,6 +6502,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::AmbientSensingUnion::S
     ComplexArgumentParser::Finalize(request.contributorEndpointID);
     ComplexArgumentParser::Finalize(request.contributorName);
     ComplexArgumentParser::Finalize(request.contributorStatus);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
