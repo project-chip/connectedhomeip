@@ -12,16 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
 
-source_set("groups-server") {
+source_set("groups-cluster-context") {
+  sources = [ "GroupsClusterContext.h" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/identify-server:delegates",
+    "${chip_root}/src/credentials",
+  ]
+}
+
+source_set("groups-cluster") {
   sources = [
-    "GroupsCluster.cpp",
-    "GroupsCluster.h",
+    "GroupsClusterImpl.cpp",
+    "GroupsClusterImpl.h",
   ]
 
   public_deps = [
+    ":groups-cluster-context",
     "${chip_root}/src/app/clusters/access-control-server:access-control-event-helper",
-    "${chip_root}/src/app/clusters/identify-server:delegates",
     "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/credentials",
@@ -29,4 +39,36 @@ source_set("groups-server") {
     "${chip_root}/zzz_generated/app-common/clusters/GroupKeyManagement",
     "${chip_root}/zzz_generated/app-common/clusters/Groups",
   ]
+}
+
+source_set("stubbed-groups-cluster") {
+  sources = [
+    "StubbedGroupsCluster.cpp",
+    "StubbedGroupsCluster.h",
+  ]
+
+  public_deps = [
+    ":groups-cluster-context",
+    "${chip_root}/src/app/clusters/access-control-server:access-control-event-helper",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/tracing:macros",
+    "${chip_root}/zzz_generated/app-common/clusters/Groups",
+  ]
+}
+
+# GroupsCluster.h aliases one of the two implementations above. Its includes are
+# guarded by CHIP_CONFIG_USE_STUBBED_GROUPS_CLUSTER, which gn check cannot
+# evaluate, so they are marked nogncheck and the dependency is selected here
+# instead.
+source_set("groups-server") {
+  sources = [ "GroupsCluster.h" ]
+
+  public_deps = [ "${chip_root}/src/app:app_config" ]
+
+  if (chip_config_use_stubbed_groups_cluster) {
+    public_deps += [ ":stubbed-groups-cluster" ]
+  } else {
+    public_deps += [ ":groups-cluster" ]
+  }
 }

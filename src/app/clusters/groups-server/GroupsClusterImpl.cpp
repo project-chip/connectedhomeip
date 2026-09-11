@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/groups-server/GroupsCluster.h>
+#include <app/clusters/groups-server/GroupsClusterImpl.h>
 
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/access-control-server/AccessControlEventHelper.h>
@@ -153,14 +153,15 @@ struct GroupMembershipResponse
 
 } // namespace
 
-CHIP_ERROR GroupsCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR GroupsClusterImpl::Attributes(const ConcreteClusterPath & path,
+                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
     return listBuilder.Append(Attributes::kMandatoryMetadata, {});
 }
 
-CHIP_ERROR GroupsCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                           ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR GroupsClusterImpl::AcceptedCommands(const ConcreteClusterPath & path,
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
 
@@ -176,7 +177,7 @@ CHIP_ERROR GroupsCluster::AcceptedCommands(const ConcreteClusterPath & path,
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
-CHIP_ERROR GroupsCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
+CHIP_ERROR GroupsClusterImpl::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     using namespace Commands;
 
@@ -190,8 +191,8 @@ CHIP_ERROR GroupsCluster::GeneratedCommands(const ConcreteClusterPath & path, Re
     return builder.ReferenceExisting(kGeneratedCommands);
 }
 
-DataModel::ActionReturnStatus GroupsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                           AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus GroupsClusterImpl::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                               AttributeValueEncoder & encoder)
 {
     using namespace Attributes;
 
@@ -210,8 +211,9 @@ DataModel::ActionReturnStatus GroupsCluster::ReadAttribute(const DataModel::Read
     }
 }
 
-std::optional<DataModel::ActionReturnStatus>
-GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> GroupsClusterImpl::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                              TLV::TLVReader & input_arguments,
+                                                                              CommandHandler * handler)
 {
     using namespace Commands;
 
@@ -359,7 +361,7 @@ GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVR
     }
 }
 
-Status GroupsCluster::AddGroup(GroupId groupID, CharSpan groupName, const chip::Access::SubjectDescriptor & subjectDescriptor)
+Status GroupsClusterImpl::AddGroup(GroupId groupID, CharSpan groupName, const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     FabricIndex fabricIndex = subjectDescriptor.fabricIndex;
     VerifyOrReturnError(IsValidGroupId(groupID), Status::ConstraintError);
