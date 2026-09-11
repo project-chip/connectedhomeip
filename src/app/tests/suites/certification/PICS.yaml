@@ -3992,6 +3992,10 @@ PICS:
           AddGroupIfIdentifying Command?"
       id: G.C.C05.Tx
 
+    # Groupcast Cluster Test Plan
+    - label: "Does the device implement the Groupcast cluster as a server?"
+      id: GC.S
+
     # HEPA Filter Monitoring Cluster Test Plan
     - label:
           "Does the device implement the HEPA Filter Monitoring cluster as a

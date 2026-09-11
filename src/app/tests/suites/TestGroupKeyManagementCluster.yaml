@@ -89,10 +89,20 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read maxGroupsPerFabric"
+    - label: "Read maxGroupsPerFabric when Groups is used"
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "MaxGroupsPerFabric"
       response:
+          constraints:
+              minValue: 4
+
+    - label: "Read maxGroupsPerFabric when Groupcast is used"
+      PICS: "GC.S"
+      command: "readAttribute"
+      attribute: "MaxGroupsPerFabric"
+      response:
+          #values: 0 TODO: remove MinConstraint and expect 0 when PR#43725 lands
           constraints:
               minValue: 4
 
@@ -753,6 +763,7 @@ tests:
 
     - label: "Add Group 1"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -768,8 +779,23 @@ tests:
               - name: "GroupID"
                 value: 0x0101
 
+    - label: "Groupcast JoinGroup 1"
+      PICS: "GC.S"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a1
+
     - label: "Add Group 2"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -785,8 +811,23 @@ tests:
               - name: "GroupID"
                 value: 0x0102
 
+    - label: "Groupcast JoinGroup 2"
+      PICS: "GC.S"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a2
+
     - label: "Add Group 3"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -802,8 +843,23 @@ tests:
               - name: "GroupID"
                 value: 0x0103
 
+    - label: "Groupcast JoinGroup 3"
+      PICS: "GC.S"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0103
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a1
+
     - label: "Add Group 4"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -819,9 +875,24 @@ tests:
               - name: "GroupID"
                 value: 0x0104
 
+    - label: "Groupcast JoinGroup 4"
+      PICS: "GC.S"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0104
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a2
+
     - label: "Add Group 5"
       identity: "beta"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -837,7 +908,23 @@ tests:
               - name: "GroupID"
                 value: 0x0105
 
+    - label: "Groupcast JoinGroup 5"
+      PICS: "GC.S"
+      identity: "beta"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0105
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Read GroupTable from alpha"
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -869,7 +956,21 @@ tests:
                   },
               ]
 
+    - label: "Read GroupTable from alpha"
+      PICS: "GC.S"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0102, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0103, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0104, Endpoints: [1] },
+              ]
+
     - label: "Read GroupTable from alpha without fabric filtering"
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       fabricFiltered: false
@@ -900,6 +1001,37 @@ tests:
                       Endpoints: [1],
                       GroupName: "Group #4",
                   },
+                  {
+                      FabricIndex: 2,
+                      GroupId: 0x0105,
+                      Endpoints: [1],
+                      GroupName: "Group #5",
+                  },
+              ]
+
+    - label: "Read GroupTable from alpha without fabric filtering"
+      PICS: "GC.S"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0102, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0103, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0104, Endpoints: [1] },
+                  { FabricIndex: 2, GroupId: 0x0105, Endpoints: [1] },
+              ]
+
+    - label: "Read GroupTable from beta"
+      identity: "beta"
+      PICS: "!GC.S"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
                   {
                       FabricIndex: 2,
                       GroupId: 0x0105,
@@ -910,21 +1042,15 @@ tests:
 
     - label: "Read GroupTable from beta"
       identity: "beta"
+      PICS: "GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       response:
-          value:
-              [
-                  {
-                      FabricIndex: 2,
-                      GroupId: 0x0105,
-                      Endpoints: [1],
-                      GroupName: "Group #5",
-                  },
-              ]
+          value: [{ FabricIndex: 2, GroupId: 0x0105, Endpoints: [1] }]
 
     - label: "Read GroupTable from beta without fabric filtering"
       identity: "beta"
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       fabricFiltered: false
@@ -961,6 +1087,22 @@ tests:
                       Endpoints: [1],
                       GroupName: "Group #5",
                   },
+              ]
+
+    - label: "Read GroupTable from beta without fabric filtering"
+      identity: "beta"
+      PICS: "GC.S"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0102, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0103, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0104, Endpoints: [1] },
+                  { FabricIndex: 2, GroupId: 0x0105, Endpoints: [1] },
               ]
 
     # Try to add enough groups on fabric gamma that the group table does not fit in a packet.
@@ -991,6 +1133,7 @@ tests:
     - label: "Add Group 1 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1006,9 +1149,25 @@ tests:
               - name: "GroupID"
                 value: 0x0101
 
+    - label: "Groupcast JoinGroup 1 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 2 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1024,9 +1183,25 @@ tests:
               - name: "GroupID"
                 value: 0x0102
 
+    - label: "Groupcast JoinGroup 2 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 3 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1042,9 +1217,25 @@ tests:
               - name: "GroupID"
                 value: 0x0103
 
+    - label: "Groupcast JoinGroup 3 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0103
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 4 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1060,9 +1251,25 @@ tests:
               - name: "GroupID"
                 value: 0x0104
 
+    - label: "Groupcast JoinGroup 4 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0104
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 5 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1078,9 +1285,25 @@ tests:
               - name: "GroupID"
                 value: 0x0105
 
+    - label: "Groupcast JoinGroup 5 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0105
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 6 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1096,9 +1319,25 @@ tests:
               - name: "GroupID"
                 value: 0x0106
 
+    - label: "Groupcast JoinGroup 6 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0106
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 7 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1114,9 +1353,25 @@ tests:
               - name: "GroupID"
                 value: 0x0107
 
+    - label: "Groupcast JoinGroup 7 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0107
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 8 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1132,9 +1387,25 @@ tests:
               - name: "GroupID"
                 value: 0x0108
 
+    - label: "Groupcast JoinGroup 8 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0108
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 9 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1150,9 +1421,25 @@ tests:
               - name: "GroupID"
                 value: 0x0109
 
+    - label: "Groupcast JoinGroup 9 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0109
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 10 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1168,9 +1455,25 @@ tests:
               - name: "GroupID"
                 value: 0x010a
 
+    - label: "Groupcast JoinGroup 10 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x010a
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 11 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1186,9 +1489,25 @@ tests:
               - name: "GroupID"
                 value: 0x010b
 
+    - label: "Groupcast JoinGroup 11 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x010b
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Add Group 12 on gamma"
       identity: "gamma"
       cluster: "Groups"
+      PICS: "!GC.S"
       endpoint: 1
       command: "AddGroup"
       arguments:
@@ -1204,8 +1523,24 @@ tests:
               - name: "GroupID"
                 value: 0x010c
 
+    - label: "Groupcast JoinGroup 12 on gamma"
+      PICS: "GC.S"
+      identity: "gamma"
+      cluster: "Groupcast"
+      endpoint: 0
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x010c
+              - name: "Endpoints"
+                value: [1]
+              - name: "KeySetID"
+                value: 0x01a3
+
     - label: "Read GroupTable from gamma without fabric filtering"
       identity: "gamma"
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       fabricFiltered: false
@@ -1316,6 +1651,34 @@ tests:
                   },
               ]
 
+    - label: "Read GroupTable from gamma without fabric filtering"
+      identity: "gamma"
+      PICS: "GC.S"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0102, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0103, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0104, Endpoints: [1] },
+                  { FabricIndex: 2, GroupId: 0x0105, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x0101, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x0102, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x0103, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x0104, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x0105, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x0106, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x0107, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x0108, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x0109, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x010a, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x010b, Endpoints: [1] },
+                  { FabricIndex: 3, GroupId: 0x010c, Endpoints: [1] },
+              ]
+
     - label: "KeySet Remove 1"
       command: "KeySetRemove"
       arguments:
@@ -1392,6 +1755,7 @@ tests:
                 value: 0x0101
 
     - label: "Read GroupTable 2"
+      PICS: "!GC.S"
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -1415,6 +1779,18 @@ tests:
                       Endpoints: [1],
                       GroupName: "Group #4",
                   },
+              ]
+
+    - label: "Read GroupTable 2"
+      PICS: "GC.S"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0102, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0103, Endpoints: [1] },
+                  { FabricIndex: 1, GroupId: 0x0104, Endpoints: [1] },
               ]
 
     - label: "Remove All"
