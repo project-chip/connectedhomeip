@@ -194,14 +194,14 @@ class TC_DGGEN_2_1(MatterBaseTest):
             boot_reason = await self._read_dggen_attribute_expect_success(endpoint=endpoint, attribute=attributes.BootReason)
             matter_asserts.assert_valid_enum(boot_reason, "BootReason", enums.BootReasonEnum)
             asserts.assert_not_equal(boot_reason, enums.BootReasonEnum.kUnknownEnumValue,
-                                 "BootReason is not a defined BootReason value.")
+                                     "BootReason is not a defined BootReason value.")
             logger.info("BootReason: %s", boot_reason)
 
         # STEP 6: ActiveHardwareFaults
         self.step(6)
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ActiveHardwareFaults):
             active_hw_faults = await self._read_dggen_attribute_expect_success(
-            endpoint=endpoint, attribute=attributes.ActiveHardwareFaults)
+                endpoint=endpoint, attribute=attributes.ActiveHardwareFaults)
             self._assert_active_faults_list(active_hw_faults, enums.HardwareFaultEnum, "ActiveHardwareFaults", max_faults=11)
             logger.info("ActiveHardwareFaults: %s", active_hw_faults)
 
@@ -209,7 +209,7 @@ class TC_DGGEN_2_1(MatterBaseTest):
         self.step(7)
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ActiveRadioFaults):
             active_radio_faults = await self._read_dggen_attribute_expect_success(
-              endpoint=endpoint, attribute=attributes.ActiveRadioFaults)
+                endpoint=endpoint, attribute=attributes.ActiveRadioFaults)
             self._assert_active_faults_list(active_radio_faults, enums.RadioFaultEnum, "ActiveRadioFaults", max_faults=7)
             logger.info("ActiveRadioFaults: %s", active_radio_faults)
 
@@ -217,7 +217,7 @@ class TC_DGGEN_2_1(MatterBaseTest):
         self.step(8)
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ActiveNetworkFaults):
             active_network_faults = await self._read_dggen_attribute_expect_success(
-              endpoint=endpoint, attribute=attributes.ActiveNetworkFaults)
+                endpoint=endpoint, attribute=attributes.ActiveNetworkFaults)
             self._assert_active_faults_list(active_network_faults, enums.NetworkFaultEnum, "ActiveNetworkFaults", max_faults=4)
             logger.info("ActiveNetworkFaults: %s", active_network_faults)
 
@@ -233,9 +233,9 @@ class TC_DGGEN_2_1(MatterBaseTest):
         # 10a-10d) require multi-hour waits and a mid-test factory reset, which are not
         # automatable; this validates the attribute's type, which is the automatable part.
         self.step(10)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TotalOperationalHours):    
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TotalOperationalHours):
             total_operational_hours = await self._read_dggen_attribute_expect_success(
-               endpoint=endpoint, attribute=attributes.TotalOperationalHours)
+                endpoint=endpoint, attribute=attributes.TotalOperationalHours)
             matter_asserts.assert_valid_uint32(total_operational_hours, "TotalOperationalHours")
             logger.info("TotalOperationalHours: %s", total_operational_hours)
 
