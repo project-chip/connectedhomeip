@@ -37,6 +37,15 @@
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
+<<<<<<< HEAD
+=======
+#include "thermostat-hold-delegate-impl.h"
+#include "thermostat-mode-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-setpoints-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
+
+>>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
 #include "tls-client-management-instance.h"
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
 

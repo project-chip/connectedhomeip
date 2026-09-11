@@ -141,7 +141,11 @@ void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
 void MatterServiceAreaPluginServerInitCallback() {}
 void MatterWaterHeaterManagementPluginServerInitCallback() {}
 void MatterWaterHeaterModePluginServerInitCallback() {}
+<<<<<<< HEAD
 void MatterCommodityPricePluginServerInitCallback() {}
+=======
+void MatterThermostatModePluginServerInitCallback() {}
+>>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
 void MatterCommodityTariffPluginServerInitCallback() {}
 void MatterElectricalGridConditionsPluginServerInitCallback() {}
 void MatterElectricalProtectionAlarmPluginServerInitCallback() {}

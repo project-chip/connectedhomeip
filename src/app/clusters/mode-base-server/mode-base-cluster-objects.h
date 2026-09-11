@@ -34,8 +34,15 @@
 #include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/Metadata.h>
 #include <clusters/RvcCleanMode/Metadata.h>
 #include <clusters/RvcRunMode/Metadata.h>
+#include <clusters/ThermostatMode/AttributeIds.h>
+#include <clusters/ThermostatMode/Attributes.h>
+#include <clusters/ThermostatMode/CommandIds.h>
+#include <clusters/ThermostatMode/Commands.h>
+#include <clusters/ThermostatMode/Enums.h>
+#include <clusters/ThermostatMode/Metadata.h>
 #include <clusters/WaterHeaterMode/Metadata.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/TypeTraits.h>
 
 #include <utility>
 
@@ -61,10 +68,20 @@ static constexpr ClusterRevisionEntry kAliasedClusters[] = {
     { RvcRunMode::Id, RvcRunMode::kRevision },
     { WaterHeaterMode::Id, WaterHeaterMode::kRevision },
 };
+<<<<<<< HEAD
 
 // All aliased clusters share features, mandatory attributes, and commands (except MicrowaveOvenMode).
 using Feature      = DeviceEnergyManagementMode::Feature;
 namespace Commands = DeviceEnergyManagementMode::Commands;
+=======
+constexpr ClusterEntry kRvcCleanMode    = { RvcCleanMode::Id, RvcCleanMode::kRevision };
+constexpr ClusterEntry kRvcRunMode      = { RvcRunMode::Id, RvcRunMode::kRevision };
+constexpr ClusterEntry kThermostatMode  = { ThermostatMode::Id, ThermostatMode::kRevision };
+constexpr ClusterEntry kWaterHeaterMode = { WaterHeaterMode::Id, WaterHeaterMode::kRevision };
+
+// All aliased clusters share mandatory attributes and commands (except MicrowaveOvenMode).
+namespace Commands = ThermostatMode::Commands;
+>>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
 
 namespace Attributes {
 
@@ -83,7 +100,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace StartUpMode
 
 namespace OnMode {
@@ -98,8 +115,10 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OnMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace OnMode
+
+namespace CoreModeTags = ThermostatMode::Attributes::CoreModeTags;
 
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     SupportedModes::kMetadataEntry,
@@ -139,4 +158,14 @@ enum class StatusCode : uint8_t
     kInvalidInMode   = 0x3,
 };
 
+<<<<<<< HEAD
+=======
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff     = 0x1,
+    kCoreModes = to_underlying(ThermostatMode::Feature::kCoreModes),
+};
+
+>>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
 } // namespace chip::app::Clusters::ModeBase

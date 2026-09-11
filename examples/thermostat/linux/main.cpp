@@ -25,6 +25,14 @@
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 #include "thermostat-delegate-impl.h"
+<<<<<<< HEAD
+=======
+#include "thermostat-hold-delegate-impl.h"
+#include "thermostat-mode-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-setpoints-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
+>>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
 
 using namespace chip;
 using namespace chip::app;

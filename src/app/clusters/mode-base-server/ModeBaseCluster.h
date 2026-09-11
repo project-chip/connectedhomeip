@@ -116,6 +116,19 @@ public:
     // Get mode value by mode tag
     CHIP_ERROR GetModeValueByModeTag(uint16_t modeTag, uint8_t & value);
 
+    /**
+     * This function returns true if the core mode tag given matches one of the supported core mode tags, otherwise false.
+     * @param coreModeTag The core mode tag to check.
+     */
+    bool IsSupportedCoreModeTag(uint16_t coreModeTag);
+
+    /**
+     * This function returns true if the given mode's tag list includes the specified mode tag, otherwise false.
+     * @param mode The mode ID.
+     * @param tag The tag to check for.
+     */
+    bool ModeHasTag(uint8_t mode, uint16_t tag);
+
 private:
     const BitMask<ModeBase::Feature> mFeature;
     const OptionalAttributeSet mOptionalAttributeSet;
@@ -136,6 +149,13 @@ private:
     std::optional<DataModel::ActionReturnStatus>
     HandleChangeToMode(CommandHandler & commandObj, const ConcreteCommandPath & commandPath,
                        const ModeBase::Commands::ChangeToMode::DecodableType & commandData);
+
+    /**
+     * Internal change-to-mode-by-core-tag command handler function.
+     */
+    std::optional<DataModel::ActionReturnStatus>
+    HandleChangeToModeByCoreTag(CommandHandler & commandObj, const ConcreteCommandPath & commandPath,
+                                const ModeBase::Commands::ChangeToModeByCoreTag::DecodableType & commandData);
 
     /**
      * Helper function that loads all the persistent attributes from the KVS. These attributes are CurrentMode,
@@ -165,6 +185,12 @@ private:
      * @param encoder The encoder to encode the supported modes into.
      */
     CHIP_ERROR EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    /**
+     * Helper function that encodes the core mode tags.
+     * @param encoder The encoder to encode the core mode tags into.
+     */
+    CHIP_ERROR EncodeCoreModeTags(const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
 } // namespace chip::app::Clusters
