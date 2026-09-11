@@ -42,7 +42,7 @@
 
 """Define Matter test case TC_COMMTR_2_1."""
 
-from TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
+from support_modules.TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches

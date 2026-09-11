@@ -39,7 +39,7 @@ import os
 import tempfile
 
 from mobly import asserts
-from TC_WEBRTCRTestBase import WEBRTCRTestBase
+from support_modules.TC_WEBRTCRTestBase import WEBRTCRTestBase
 
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body

@@ -43,7 +43,7 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_EEVSE_Utils import EEVSEBaseTestHelper
+from support_modules.TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

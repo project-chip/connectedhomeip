@@ -45,7 +45,7 @@
 import logging
 
 from mobly import asserts
-from TC_SEPRTestBase import CommodityPriceTestBaseHelper
+from support_modules.TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

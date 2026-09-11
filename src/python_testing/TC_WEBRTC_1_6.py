@@ -17,8 +17,8 @@
 import logging
 
 from mobly import asserts
-from TC_WEBRTC_Utils import WebRTCTestHelper
-from test_plan_support import commission_if_required
+from support_modules.TC_WEBRTC_Utils import WebRTCTestHelper
+from support_modules.test_plan_support import commission_if_required
 
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportProvider

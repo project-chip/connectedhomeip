@@ -54,7 +54,7 @@ import asyncio
 import logging
 
 from mobly import asserts
-from test_plan_support import commission_if_required, read_attribute, verify_success
+from support_modules.test_plan_support import commission_if_required, read_attribute, verify_success
 
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects

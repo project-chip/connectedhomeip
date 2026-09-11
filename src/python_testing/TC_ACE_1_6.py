@@ -68,8 +68,8 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_GC_common import (get_feature_map, get_iana_multicast_address, get_operate_only_commands, get_per_group_multicast_address,
-                          is_groupcast_on_root_node)
+from support_modules.TC_GC_common import (get_feature_map, get_iana_multicast_address, get_operate_only_commands,
+                                          get_per_group_multicast_address, is_groupcast_on_root_node)
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

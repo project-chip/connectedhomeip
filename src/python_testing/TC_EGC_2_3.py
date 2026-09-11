@@ -39,7 +39,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
+from support_modules.TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches

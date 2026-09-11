@@ -45,7 +45,7 @@ import typing
 from dataclasses import dataclass
 
 from mobly import asserts
-from TC_EPALM_TestBase import ElectricalProtectionAlarmTestBaseHelper
+from support_modules.TC_EPALM_TestBase import ElectricalProtectionAlarmTestBaseHelper
 
 import matter.clusters as Clusters
 from matter import ChipUtility
