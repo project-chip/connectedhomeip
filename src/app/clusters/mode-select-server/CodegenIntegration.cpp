@@ -82,7 +82,6 @@ public:
 
 struct ModeSelectEntry
 {
-    char descriptionBuffer[64]; // persistent backing store for Description attribute
     SupportedModesManagerDelegate delegate;
     LazyRegisteredServerCluster<CodegenModeSelectCluster> server;
 };
@@ -119,12 +118,11 @@ public:
         }
 #endif
 
-        // Read Description from Ember RAM storage (ZAP default = "Coffee" in all-clusters-app).
-        // descriptionBuffer is in gEntries (global) so the CharSpan remains valid for the cluster lifetime.
-        chip::MutableCharSpan descSpan(entry.descriptionBuffer, sizeof(entry.descriptionBuffer));
+        // Read Description from attribute metadata (points directly to flash).
+        chip::CharSpan descSpan;
         if (Attributes::Description::GetDefault(endpointId, descSpan) != Status::Success)
         {
-            descSpan = chip::MutableCharSpan(entry.descriptionBuffer, 0);
+            descSpan = chip::CharSpan();
         }
 
         // Read StandardNamespace from Ember RAM storage (ZAP default = null).
@@ -137,7 +135,7 @@ public:
         ModeSelectCluster::Config config{
             .featureMap             = BitMask<Feature>(featureMap),
             .optionalAttributeSet   = optionalAttributeSet,
-            .description            = chip::CharSpan(entry.descriptionBuffer, descSpan.size()),
+            .description            = descSpan,
             .standardNamespace      = standardNamespace,
             .onOffValueForStartUp   = onOffValueForStartUp,
             .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
