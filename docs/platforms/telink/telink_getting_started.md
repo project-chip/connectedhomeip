@@ -12,10 +12,6 @@ platforms.
 | ------------ | ----------- | -------------- | :-------------: | ------------------------------------------------------------- |
 | `tl3238x`    | TL323X      | C1T388A20_V1.1 |      2 MB       | Matter only by default, Dual-mode (Matter + Zigbee) supported |
 
-> See the [Release Notes](./releases/telink_release_notes.md) for the exact chip
-> versions, EVK versions, and per-example support matrix validated in each
-> release.
-
 ### Hardware
 
 | Hardware          | Description                                     |
@@ -49,11 +45,6 @@ tightly coupled and must be used as a matched pair:
 
 Both are required — the Matter SDK cannot be built without the Zephyr SDK, and
 the Zephyr SDK alone does not provide Matter support.
-
-> ⚠️ **Version pairing:** Each Telink Matter release is validated against a
-> specific Telink Zephyr SDK tag. Using a different Zephyr revision may cause
-> build failures or runtime issues. See the
-> [Release Notes](./releases/telink_release_notes.md) for the matched pair.
 
 ## Step 1: Set up the Telink Zephyr SDK
 
@@ -176,12 +167,12 @@ The on-board buttons and LEDs provide basic control and status feedback:
 
 ## Next steps
 
--   [Telink Release Notes](./releases/telink_release_notes.md) — version info,
-    chip/EVK versions, per-example support matrix, and resource usage tables.
--   [Telink Zephyr Getting Started](https://github.com/telink-semi/tl_zephyr/blob/dev-tlk_v4.1/doc/telink/getting_started/index.md)
-    — Zephyr SDK setup, BDT flashing details, and board overviews.
--   Per-example `README.md` files under `examples/<app>/telink/` —
-    example-specific build commands, button/LED mappings, and chip-tool usage.
+chip/EVK versions, per-example support matrix, and resource usage tables.
+
+- [Telink Zephyr Getting Started](https://github.com/telink-semi/tl_zephyr/blob/dev-tlk_v4.1/doc/telink/getting_started/index.md)
+  — Zephyr SDK setup, BDT flashing details, and board overviews.
+- Per-example `README.md` files under `examples/<app>/telink/` —
+  example-specific build commands, button/LED mappings, and chip-tool usage.
 
 ## Appendix: TL3238X build configurations
 
@@ -220,21 +211,21 @@ MB flash, Software Version 2 for DFU/OTA images, etc.).
 
 ### Lighting App
 
--   TL3238X:
-    [tl3238x_README.md](../../../examples/lighting-app/telink/boards/tl3238x_README.md)
--   TL5218X:
-    [tl5218x_README.md](../../../examples/lighting-app/telink/boards/tl5218x_README.md)
--   TL7218X:
-    [tl7218x_README.md](../../../examples/lighting-app/telink/boards/tl7218x_README.md)
+- TL3238X:
+  [tl3238x_README.md](../../../examples/lighting-app/telink/boards/tl3238x_README.md)
+- TL5218X:
+  [tl5218x_README.md](../../../examples/lighting-app/telink/boards/tl5218x_README.md)
+- TL7218X:
+  [tl7218x_README.md](../../../examples/lighting-app/telink/boards/tl7218x_README.md)
 
 ### Light Switch App
 
--   TL3238X Retention:
-    [tl3238x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl3238x_retention_README.md)
--   TL5218X Retention:
-    [tl5218x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl5218x_retention_README.md)
--   TL7218X Retention:
-    [tl7218x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl7218x_retention_README.md)
+- TL3238X Retention:
+  [tl3238x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl3238x_retention_README.md)
+- TL5218X Retention:
+  [tl5218x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl5218x_retention_README.md)
+- TL7218X Retention:
+  [tl7218x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl7218x_retention_README.md)
 
 ## FAQ
 
@@ -259,6 +250,3 @@ git branch --show-current     # should be dev-tlk_v1.5
 git checkout dev-tlk_v1.5     # switch if needed
 ./scripts/checkout_submodules.py --platform telink,linux
 ```
-
-See the [Release Notes](./releases/telink_release_notes.md) for the matched
-branch of each release.
