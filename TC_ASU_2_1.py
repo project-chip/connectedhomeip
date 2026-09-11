@@ -39,7 +39,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -61,9 +61,7 @@ MAX_UINT64 = 0xFFFFFFFFFFFFFFFF
 
 class TC_ASU_2_1(MatterBaseTest):
 
-    def pics_TC_ASU_2_1(self):
-        return ['ASU.S']
-
+    @pics('ASU.S')
     @async_test_body
     async def test_TC_ASU_2_1(self):
         """[TC-ASU-2.1] Cluster endpoint"""
