@@ -103,6 +103,26 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     // Note that all of the copy operations use memmove() instead of memcpy(), because the caller
     // may be passing a modified shallow copy of our CommissioningParmeters, i.e. where various spans
     // already point into the buffers we're copying into, and memcpy() with overlapping buffers is UB.
+    //
+    // Note: Only the parameters that are inputs are copied from params below. Output-only
+    // parameters that we populate ourselves as commissioning progresses (the generated NOC chain,
+    // the PDC network and client identities, the attestation elements) are cleared here and left
+    // for the stage that produces them to set again.
+    //
+    // Dropping them is safe because the delegate only gets to call us back mid-commissioning at
+    // kICDGetRegistrationInfo and kNeedsNetworkCreds, both of which are past kSendNOC: the attestation
+    // values were consumed at kAttestationVerification, and the CSR and NOC chain by kSendNOC, while the
+    // PDC values are not produced until the network setup stages that follow. A retry walks the flow back
+    // to kScanNetworks, but CommissioningStepFinished() clears the PDC parameters before the delegate is
+    // asked for credentials again, so there is nothing stale to carry forward either. State that does have
+    // to outlive a rewrite is deliberately kept out of CommissioningParameters: mDeviceCommissioningInfo
+    // and the network attempt type here, and the pending Network Client Identity rollback in the
+    // DeviceCommissioner.
+    //
+    // Note this assignment also replaces the scalar parameters, including ones we derived from the
+    // commissionee ourselves. Of those only the failsafe timer is read again after a delegate callback
+    // (at kFailsafeBeforeWiFiEnable / kFailsafeBeforeThreadEnable), and losing it there is harmless: the
+    // fail-safe is already armed with the recommended value and never gets shortened.
     mParams = params;
     mParams.ClearExternalBufferDependentValues();
 
@@ -115,10 +135,11 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetThreadOperationalDataset(dataset);
     }
 
-    if (params.GetWiFiCredentials().HasValue())
+    auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+    if (wiFiCredentialsParam.HasValue())
     {
-        WiFiCredentials creds = params.GetWiFiCredentials().Value(); // shallow struct copy
-        ReturnErrorOnFailure(RelocateSpan(creds.ssid, mSsid),        //
+        WiFiCredentials & creds = wiFiCredentialsParam.Value();
+        ReturnErrorOnFailure(RelocateSpan(creds.ssid, mSsid), //
                              ChipLogError(Controller, "WiFiCredentials.ssid is too large"));
         ReturnErrorOnFailure(RelocateSpan(creds.credentials, mCredentials),
                              ChipLogError(Controller, "WiFiCredentials.credentials is too large"));
@@ -162,6 +183,18 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         ChipLogProgress(Controller, "Setting CSR nonce to random value");
         ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce)));
         mParams.SetCSRNonce(ByteSpan(mCSRNonce));
+    }
+
+    // Unlike the CSR nonce above, we only copy a PDC possession nonce that was actually supplied; the
+    // fallback to a random value happens lazily in kPDCGetNetworkIdentity, i.e. only once we know we
+    // are going to use PDC at all. Leaving mParams without a nonce here is what signals that.
+    if (params.GetPDCPossessionNonce().HasValue())
+    {
+        ByteSpan possessionNonce = params.GetPDCPossessionNonce().Value();
+        ReturnErrorOnFailure(RelocateSpan(possessionNonce, mPossessionNonce, /* exactSize = */ true),
+                             ChipLogError(Controller, "PDC possession nonce length is invalid"));
+        ChipLogProgress(Controller, "Setting PDC possession nonce from parameters");
+        mParams.SetPDCPossessionNonce(possessionNonce);
     }
 
     if (params.GetDSTOffsets().HasValue())
@@ -259,6 +292,14 @@ const CommissioningParameters & AutoCommissioner::GetCommissioningParameters() c
     return mParams;
 }
 
+void AutoCommissioner::ClearPDCParameters()
+{
+    mParams.ClearPDCNetworkIdentity();
+    mParams.ClearPDCPossessionNonce();
+    mParams.ClearPDCClientIdentity();
+    mParams.ClearPDCPossessionSignature();
+}
+
 CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
     auto nextStage = GetNextCommissioningStageInternal(currentStage, lastErr);
@@ -332,14 +373,32 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(Commi
 
     if (networkToUse == NetworkType::kWiFi)
     {
-        if (mParams.GetWiFiCredentials().HasValue())
+        // We need credentials, request them if necessary.
+        auto wiFiCredentialsParam = mParams.GetWiFiCredentials(); // optional copied by value
+        VerifyOrReturnValue(wiFiCredentialsParam.HasValue(), CommissioningStage::kRequestWiFiCredentials);
+
+        auto & credentials = wiFiCredentialsParam.Value();
+        if (credentials.registrar != nullptr)
         {
-            // Just go ahead and set that up.
-            return CommissioningStage::kWiFiNetworkSetup;
+            if (mDeviceCommissioningInfo.network.wifi.supportsPerDeviceCredentials)
+            {
+                // We will use PDC, so we need to obtain the Network Identity if we don't have it yet.
+                VerifyOrReturnValue(mParams.GetPDCNetworkIdentity().HasValue(), CommissioningStage::kPDCGetNetworkIdentity);
+            }
+            else if (credentials.hasCredentials)
+            {
+                ChipLogProgress(Controller, "Commissionee does not support PDC, using plain Wi-Fi credentials instead");
+            }
+            else
+            {
+                // Nothing to configure the commissionee with. Fall through to kWiFiNetworkSetup and let it
+                // fail there, so that this counts as a network setup failure and we reach the secondary
+                // network (if any) via the normal failover path.
+                ChipLogError(Controller, "Commissionee does not support PDC and no plain Wi-Fi credentials are available");
+            }
         }
 
-        // We need credentials but don't have them.  We need to ask for those.
-        return CommissioningStage::kRequestWiFiCredentials;
+        return CommissioningStage::kWiFiNetworkSetup;
     }
 
     // networkToUse must be kThread here.
@@ -492,7 +551,18 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kNeedsNetworkCreds;
     case CommissioningStage::kNeedsNetworkCreds:
         return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
+    case CommissioningStage::kPDCGetNetworkIdentity:
+        // We now have the Network Identity, so this will select kWiFiNetworkSetup.
+        return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
     case CommissioningStage::kWiFiNetworkSetup:
+        if (mParams.GetPDCNetworkIdentity().HasValue())
+        {
+            // We're configuring the commissionee for PDC, so the Network Client Identity it
+            // provided from kWiFiNetworkSetup needs to be registered before ConnectNetwork.
+            return CommissioningStage::kPDCRegisterClientIdentity;
+        }
+        return CommissioningStage::kFailsafeBeforeWiFiEnable;
+    case CommissioningStage::kPDCRegisterClientIdentity:
         return CommissioningStage::kFailsafeBeforeWiFiEnable;
     case CommissioningStage::kThreadNetworkSetup:
         return CommissioningStage::kFailsafeBeforeThreadEnable;
@@ -622,6 +692,9 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage) const
     case CommissioningStage::kRemoveWiFiNetworkConfig:
     case CommissioningStage::kRemoveThreadNetworkConfig:
         return kRootEndpointId;
+    case CommissioningStage::kPDCGetNetworkIdentity:
+    case CommissioningStage::kPDCRegisterClientIdentity:
+        return kInvalidEndpointId; // interact with the NetworkIdentityRegistrar, not with the commissionee
     default:
         return kRootEndpointId;
     }
@@ -777,6 +850,7 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
 
 void AutoCommissioner::CleanupCommissioning()
 {
+    ClearPDCParameters();
     ResetNetworkAttemptType();
     mPAI.Free();
     mDAC.Free();
@@ -850,9 +924,15 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // TODO: This doesn't actually work, because in order to provide credentials someone
             // had to SetWiFiCredentials() or SetThreadOperationalDataset() on our params, so
             // IsScanNeeded() will no longer test true for that network technology.
+            // Scanning is the wrong condition in any case: the question is whether the application
+            // is able to supply another set of credentials, which a CommissioningParameters flag
+            // along the lines of RetryNetworkCredentials would say directly.
             //
             // TODO: A retry also has to remove the configuration we just wrote before writing
-            // another one, (unless it is for the same NetworkID).
+            // another one, (unless it is for the same NetworkID). Under PDC this is not just
+            // untidy: the Network Client Identity registered for the old configuration is only
+            // rolled back on RemoveNetwork or a failed attempt, so kPDCRegisterClientIdentity will
+            // refuse to register a second one while it is still outstanding.
             if (IsScanNeeded())
             {
                 if (completionStatus.err == CHIP_NO_ERROR)
@@ -863,6 +943,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 // Walk back the completed stage to kScanNetworks.
                 // This will allow the app to try another network.
                 report.stageCompleted = CommissioningStage::kScanNetworks;
+
+                ClearPDCParameters(); // parameters from a failed attempt are no longer valid / useful
             }
         }
 
@@ -879,6 +961,13 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // implement that functionality, for example), treat that as a network failure stage and
             // try the other network type.
             if (stage == kRequestThreadCredentials || stage == kRequestWiFiCredentials || stage == kNeedsNetworkCreds)
+            {
+                return true;
+            }
+
+            // Likewise if we could not reach the network's Network Identity Management provider to
+            // obtain a Network Identity: the other network type might still work.
+            if (stage == kPDCGetNetworkIdentity)
             {
                 return true;
             }
@@ -1023,7 +1112,39 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kICDRegistration:
             // Noting to do. DevicePairingDelegate will handle this.
             break;
+        case CommissioningStage::kPDCGetNetworkIdentity: {
+            ByteSpan networkIdentity = report.Get<PDCNetworkIdentityInfo>().networkIdentity;
+            ReturnErrorOnFailure(RelocateSpan(networkIdentity, mNetworkIdentity));
+            mParams.SetPDCNetworkIdentity(networkIdentity);
+
+            // Use a random possession nonce for kWiFiNetworkSetup unless the application supplied one.
+            if (!mParams.GetPDCPossessionNonce().HasValue())
+            {
+                ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mPossessionNonce, sizeof(mPossessionNonce)));
+                mParams.SetPDCPossessionNonce(ByteSpan(mPossessionNonce));
+            }
+            break;
+        }
         case CommissioningStage::kWiFiNetworkSetup:
+            mWroteNetworkConfig = true;
+            if (mParams.GetPDCNetworkIdentity().HasValue())
+            {
+                // We configured the commissionee for PDC, so it returned a client identity along with
+                // proof that it holds the corresponding private key, both already checked for shape by
+                // the DeviceCommissioner (which verifies the proof itself during
+                // kPDCRegisterClientIdentity). Note that we need to copy the underlying bytes: the
+                // report spans point into the response message buffer.
+                const auto & info = report.Get<PDCClientIdentityInfo>();
+
+                ByteSpan clientIdentity = info.clientIdentity;
+                ReturnErrorOnFailure(RelocateSpan(clientIdentity, mClientIdentity));
+                mParams.SetPDCClientIdentity(clientIdentity);
+
+                ByteSpan possessionSignature = info.possessionSignature;
+                ReturnErrorOnFailure(RelocateSpan(possessionSignature, mPossessionSignature, /* exactSize = */ true));
+                mParams.SetPDCPossessionSignature(possessionSignature);
+            }
+            break;
         case CommissioningStage::kThreadNetworkSetup:
             mWroteNetworkConfig = true;
             break;

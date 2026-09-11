@@ -22,6 +22,7 @@
 #include "ThermostatClusterHold.h"
 #include "ThermostatClusterOccupancy.h"
 #include "ThermostatClusterPresets.h"
+#include "ThermostatClusterSensors.h"
 #include "ThermostatClusterSetpoints.h"
 #include "ThermostatClusterSuggestions.h"
 #include <clusters/Thermostat/Metadata.h>
@@ -73,7 +74,8 @@ public:
     static constexpr bool kHasHold             = detail::kArgsHasDelegate<ThermostatHold::Delegate, Delegates...>;
     static constexpr bool kHasSuggestions      = detail::kArgsHasDelegate<ThermostatSuggestions::Delegate, Delegates...>;
     static constexpr bool kHasOccupancy        = detail::kArgsHasDelegate<ThermostatOccupancy::Delegate, Delegates...>;
-    static constexpr bool kRequiresAtomicWrite = kHasPresets;
+    static constexpr bool kHasSensors          = detail::kArgsHasDelegate<ThermostatSensors::Delegate, Delegates...>;
+    static constexpr bool kRequiresAtomicWrite = kHasPresets || kHasSensors;
 
     static_assert(!kHasSuggestions || kHasPresets, "Suggestions feature requires Presets feature");
     static_assert(kHasHeating || kHasCooling, "Thermostat cluster must implement either heating or cooling");
@@ -88,7 +90,9 @@ public:
             detail::MakeFeature<kHasPresets, ThermostatPresets>(*this, mAtomicWriteSession, std::forward_as_tuple(delegates...))),
         mSuggestions(
             detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(*this, mPresets, std::forward_as_tuple(delegates...))),
-        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(*this, std::forward_as_tuple(delegates...)))
+        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(*this, std::forward_as_tuple(delegates...))),
+        mSensors(
+            detail::MakeFeature<kHasSensors, ThermostatSensors>(*this, mAtomicWriteSession, std::forward_as_tuple(delegates...)))
     {
         static_assert(sizeof...(Delegates) > 0, "ThermostatCluster requires at least one delegate");
         static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
@@ -171,6 +175,13 @@ public:
                 return *status;
             }
         }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.ReadAttribute(request, encoder))
+            {
+                return *status;
+            }
+        }
         return ThermostatClusterBase::ReadAttribute(request, encoder);
     }
 
@@ -180,6 +191,13 @@ public:
         if constexpr (kHasPresets)
         {
             if (auto status = mPresets.WriteAttribute(request, decoder))
+            {
+                return *status;
+            }
+        }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.WriteAttribute(request, decoder))
             {
                 return *status;
             }
@@ -309,6 +327,10 @@ public:
         {
             ReturnErrorOnFailure(mOccupancy.Attributes(path, builder));
         }
+        if constexpr (kHasSensors)
+        {
+            ReturnErrorOnFailure(mSensors.Attributes(path, builder));
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -332,6 +354,13 @@ public:
                 return *status;
             }
         }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.OnAtomicWriteBegin(attributeId))
+            {
+                return *status;
+            }
+        }
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -340,6 +369,13 @@ public:
         if constexpr (kHasPresets)
         {
             if (auto status = mPresets.OnAtomicWritePrecommit(attributeId))
+            {
+                return *status;
+            }
+        }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.OnAtomicWritePrecommit(attributeId))
             {
                 return *status;
             }
@@ -356,6 +392,13 @@ public:
                 return *status;
             }
         }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.OnAtomicWriteCommit(attributeId))
+            {
+                return *status;
+            }
+        }
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -368,6 +411,13 @@ public:
                 return *status;
             }
         }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.OnAtomicWriteRollback(attributeId))
+            {
+                return *status;
+            }
+        }
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -376,6 +426,13 @@ public:
         if constexpr (kHasPresets)
         {
             if (auto timeout = mPresets.GetMaxAtomicWriteTimeout(attributeId))
+            {
+                return timeout;
+            }
+        }
+        if constexpr (kHasSensors)
+        {
+            if (auto timeout = mSensors.GetMaxAtomicWriteTimeout(attributeId))
             {
                 return timeout;
             }
@@ -404,6 +461,12 @@ public:
         case Attributes::CurrentThermostatSuggestion::Id:
         case Attributes::ThermostatSuggestionNotFollowingReason::Id:
             return mFeatures.Has(Feature::kThermostatSuggestions);
+        case Attributes::Sensors::Id:
+        case Attributes::AvailableSensors::Id:
+        case Attributes::EnabledSensors::Id:
+        case Attributes::NumberOfSensorScheduleTransitions::Id:
+        case Attributes::SensorSchedule::Id:
+            return mFeatures.Has(Feature::kThermostatSensors);
         default:
             return ThermostatClusterBase::HasAttribute(attributeId);
         }
@@ -416,6 +479,7 @@ private:
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasPresets, ThermostatPresets, std::monostate> mPresets;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasSuggestions, ThermostatSuggestions, std::monostate> mSuggestions;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasSensors, ThermostatSensors, std::monostate> mSensors;
 };
 
 /**
@@ -431,7 +495,7 @@ ThermostatCluster(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatClu
 using FullFeaturedThermostatCluster =
     ThermostatCluster<Thermostat::Delegate, ThermostatHeatingSetpoints::Delegate, ThermostatCoolingSetpoints::Delegate,
                       ThermostatAutoSetpoints::Delegate, ThermostatHold::Delegate, ThermostatPresets::Delegate,
-                      ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
+                      ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate, ThermostatSensors::Delegate>;
 
 } // namespace Thermostat
 } // namespace Clusters

@@ -278,6 +278,8 @@
 #include <clusters/TestHiddenManufacturerSpecific/MetadataProvider.h>
 #include <clusters/Thermostat/Ids.h>
 #include <clusters/Thermostat/MetadataProvider.h>
+#include <clusters/ThermostatMode/Ids.h>
+#include <clusters/ThermostatMode/MetadataProvider.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Ids.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/MetadataProvider.h>
 #include <clusters/ThreadBorderRouterManagement/Ids.h>
@@ -1015,6 +1017,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == Thermostat::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Thermostat::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThermostatMode::Id) || ...))
+    {
+        if (id == ThermostatMode::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ThermostatMode::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThermostatUserInterfaceConfiguration::Id) || ...))
     {
