@@ -322,6 +322,10 @@ if (chip_build_tests) {
     deps = []
     tests = []
 
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      tests += [ "${chip_root}/examples/all-clusters-app/linux/tests" ]
+    }
+
     # NXP: EVSE tests depend on ot-simulation; missing headers
     # in ot-nxp OpenThread cause build failure, so we exclude them here.
     if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
