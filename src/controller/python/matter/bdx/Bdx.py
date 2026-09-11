@@ -199,7 +199,7 @@ def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callab
     return res
 
 
-def AcceptTransferAndSendData(transfer: c_void_p, data: bytearray, transferComplete: Future):
+def AcceptTransferAndSendData(transfer: c_void_p, data: bytes | bytearray, transferComplete: Future):
     ''' Accepts a BDX transfer with the intent of sending data.
 
     The data will be copied by C++.
@@ -210,8 +210,12 @@ def AcceptTransferAndSendData(transfer: c_void_p, data: bytearray, transferCompl
     handle = GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(complete_transaction))
+    # c_char_p only accepts bytes or an integer address, so a bytearray (which is what
+    # BdxTransfer holds) has to be converted first. The result is bound to a local so it
+    # outlives the c_char_p for the duration of the call.
+    payload = bytes(data)
     res = builtins.chipStack.Call(
-        lambda: handle.pychip_Bdx_AcceptTransferAndSendData(transfer, c_char_p(data), len(data), complete_transaction)
+        lambda: handle.pychip_Bdx_AcceptTransferAndSendData(transfer, c_char_p(payload), len(payload), complete_transaction)
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(complete_transaction))
