@@ -513,6 +513,7 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeAbortsOnSuggestionLookupFa
     EXPECT_FALSE(mSuggestionsDelegate.mCurrentSuggestion.IsNull());
     EXPECT_FALSE(mSuggestionsDelegate.mReEvaluateCalled);
     EXPECT_FALSE(tester.IsAttributeDirty(Attributes::ThermostatSuggestions::Id));
+    EXPECT_FALSE(tester.IsAttributeDirty(CurrentThermostatSuggestion::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -646,7 +647,14 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeReportsCurrentSuggestionCh
     EXPECT_TRUE(mSuggestionsDelegate.mCurrentSuggestion.IsNull());
     EXPECT_FALSE(mSuggestionsDelegate.mReEvaluateCalled);
     EXPECT_TRUE(tester.IsAttributeDirty(Attributes::ThermostatSuggestions::Id));
-    EXPECT_TRUE(tester.IsAttributeDirty(CurrentThermostatSuggestion::Id));
+
+    // Notified exactly once: the abort path's own notification must not be duplicated by anything else running
+    // afterwards (there is nothing else here, but this pins the "exactly once" contract the way the double-notify
+    // test below does for the successful-cascade path).
+    auto & dirtyList = tester.GetDirtyList();
+    auto currentSuggestionPath =
+        ConcreteAttributePath(cluster.GetPaths()[0].mEndpointId, cluster.GetPaths()[0].mClusterId, CurrentThermostatSuggestion::Id);
+    EXPECT_EQ(std::count(dirtyList.begin(), dirtyList.end(), currentSuggestionPath), 1);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
