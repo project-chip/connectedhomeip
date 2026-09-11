@@ -72,7 +72,7 @@ TEST(CertificateChainRequestTracker, ReassemblesCertificateLargerThanLegacyLimit
     constexpr uint16_t segmentSize = CertificateChainRequestTracker::kDefaultSegmentSize;
     for (uint16_t segment = 0; segment < 3; ++segment)
     {
-        const size_t offset = segment * segmentSize;
+        const size_t offset = static_cast<size_t>(segment) * segmentSize;
         const bool last     = segment == 2;
         ASSERT_EQ(tracker.HandleResponse(document.SubSpan(offset, last ? sizeof(certificate) - offset : segmentSize),
                                          MakeOptional<uint16_t>(static_cast<uint16_t>(sizeof(certificate))),

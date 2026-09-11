@@ -421,6 +421,10 @@ TEST_F(TestOperationalCredentials, TestCertificateChainDocumentSizeLimit)
     auto accepted = tester.Invoke(request);
     ASSERT_TRUE(accepted.IsSuccess());
     ASSERT_TRUE(accepted.response.has_value());
+    if (!accepted.response.has_value())
+    {
+        return;
+    }
     ASSERT_TRUE(accepted.response->totalDocumentSize.HasValue());
     EXPECT_EQ(accepted.response->totalDocumentSize.Value(), Credentials::kMaxDERCertLengthMlDsa65);
 
