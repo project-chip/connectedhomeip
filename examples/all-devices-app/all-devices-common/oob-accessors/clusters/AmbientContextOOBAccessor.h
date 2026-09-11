@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
+#include <app/clusters/ambient-sensing-union-server/AmbientSensingUnionCluster.h>
 #include <lib/core/DataModelTypes.h>
 #include <oob-accessors/OOBAccessor.h>
 
@@ -25,8 +26,10 @@ namespace chip::app {
 class AmbientContextOOBAccessor : public OOBAccessor
 {
 public:
-    AmbientContextOOBAccessor(Clusters::AmbientContextSensingCluster & cluster, EndpointId endpointId) :
-        mCluster(cluster), mEndpointId(endpointId)
+    AmbientContextOOBAccessor(Clusters::AmbientContextSensingCluster & cluster, Clusters::AmbientSensingUnionCluster & unionCluster,
+                              EndpointId endpointId) :
+        mCluster(cluster),
+        mUnionCluster(unionCluster), mEndpointId(endpointId)
     {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
@@ -37,8 +40,15 @@ private:
     std::optional<CHIP_ERROR> HandleSetPredictedActivity(ByteSpan tlvData) const;
     std::optional<CHIP_ERROR> HandleSetSensorFusionSupported(ByteSpan tlvData) const;
     std::optional<CHIP_ERROR> HandleSetObjectCount(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleAddAmbientSensingContributor(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleRemoveAmbientSensingContributor(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleAddAmbientSensingNonMatterContributor(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleRemoveAmbientSensingNonMatterContributor(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleUpdateAmbientSensingContributorStatus(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleSetAmbientSensingUnionName(ByteSpan tlvData) const;
 
     Clusters::AmbientContextSensingCluster & mCluster;
+    Clusters::AmbientSensingUnionCluster & mUnionCluster;
     EndpointId mEndpointId;
 };
 

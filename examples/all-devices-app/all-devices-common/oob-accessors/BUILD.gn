@@ -58,6 +58,7 @@ source_set("oob-accessors") {
     ":all_devices_config_buildconfig",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/clusters/ambient-context-sensing-server",
+    "${chip_root}/src/app/clusters/ambient-sensing-union-server",
     "${chip_root}/src/app/clusters/basic-information",
     "${chip_root}/src/app/clusters/boolean-state-server",
     "${chip_root}/src/app/clusters/electrical-energy-measurement-server",
