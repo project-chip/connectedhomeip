@@ -20,9 +20,14 @@ source_set("camera-av-settings-user-level-management-server") {
     "CameraAvSettingsUserLevelManagementCluster.h",
     "CameraAvSettingsUserLevelManagementLogic.cpp",
     "CameraAvSettingsUserLevelManagementLogic.h",
+    "CodegenCameraAvSettingsUserLevelManagementCluster.cpp",
+    "CodegenCameraAvSettingsUserLevelManagementCluster.h",
+    "MigrateCameraAvSettingsUserLevelManagementServerStorage.cpp",
+    "MigrateCameraAvSettingsUserLevelManagementServerStorage.h",
   ]
 
   deps = [
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
