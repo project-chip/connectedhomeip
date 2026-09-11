@@ -176,12 +176,12 @@ The on-board buttons and LEDs provide basic control and status feedback:
 
 ## Next steps
 
-- [Telink Release Notes](./releases/telink_release_notes.md) — version info,
-  chip/EVK versions, per-example support matrix, and resource usage tables.
-- [Telink Zephyr Getting Started](https://github.com/telink-semi/tl_zephyr/blob/dev-tlk_v4.1/doc/telink/getting_started/index.md)
-  — Zephyr SDK setup, BDT flashing details, and board overviews.
-- Per-example `README.md` files under `examples/<app>/telink/` —
-  example-specific build commands, button/LED mappings, and chip-tool usage.
+-   [Telink Release Notes](./releases/telink_release_notes.md) — version info,
+    chip/EVK versions, per-example support matrix, and resource usage tables.
+-   [Telink Zephyr Getting Started](https://github.com/telink-semi/tl_zephyr/blob/dev-tlk_v4.1/doc/telink/getting_started/index.md)
+    — Zephyr SDK setup, BDT flashing details, and board overviews.
+-   Per-example `README.md` files under `examples/<app>/telink/` —
+    example-specific build commands, button/LED mappings, and chip-tool usage.
 
 ## Appendix: TL3238X build configurations
 
@@ -220,21 +220,21 @@ MB flash, Software Version 2 for DFU/OTA images, etc.).
 
 ### Lighting App
 
-- TL3238X:
-  [tl3238x_README.md](../../../examples/lighting-app/telink/boards/tl3238x_README.md)
-- TL5218X:
-  [tl5218x_README.md](../../../examples/lighting-app/telink/boards/tl5218x_README.md)
-- TL7218X:
-  [tl7218x_README.md](../../../examples/lighting-app/telink/boards/tl7218x_README.md)
+-   TL3238X:
+    [tl3238x_README.md](../../../examples/lighting-app/telink/boards/tl3238x_README.md)
+-   TL5218X:
+    [tl5218x_README.md](../../../examples/lighting-app/telink/boards/tl5218x_README.md)
+-   TL7218X:
+    [tl7218x_README.md](../../../examples/lighting-app/telink/boards/tl7218x_README.md)
 
 ### Light Switch App
 
-- TL3238X Retention:
-  [tl3238x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl3238x_retention_README.md)
-- TL5218X Retention:
-  [tl5218x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl5218x_retention_README.md)
-- TL7218X Retention:
-  [tl7218x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl7218x_retention_README.md)
+-   TL3238X Retention:
+    [tl3238x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl3238x_retention_README.md)
+-   TL5218X Retention:
+    [tl5218x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl5218x_retention_README.md)
+-   TL7218X Retention:
+    [tl7218x_retention_README.md](../../../examples/light-switch-app/telink/boards/tl7218x_retention_README.md)
 
 ## FAQ
 

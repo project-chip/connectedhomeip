@@ -47,41 +47,41 @@ defined:
 `DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)`
 `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(clusterRevision)`
 
-- These three macros are used to declare a list of attributes for use within a
-  cluster. The declaration must begin with the
-  `DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN` macro which will define the name of the
-  allocated attribute structure. Each attribute is then added by the
-  `DECLARE_DYNAMIC_ATTRIBUTE` macro. Finally,
-  `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END` macro should be used to close the
-  definition.
+-   These three macros are used to declare a list of attributes for use within a
+    cluster. The declaration must begin with the
+    `DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN` macro which will define the name of
+    the allocated attribute structure. Each attribute is then added by the
+    `DECLARE_DYNAMIC_ATTRIBUTE` macro. Finally,
+    `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END` macro should be used to close the
+    definition.
 
-- All attributes defined with these macros will be configured as
-  `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
-  will rely on the application to maintain storage for the attribute.
-  Consequently, reads or writes to these attributes must be handled within the
-  application by the `emberAfExternalAttributeWriteCallback` and
-  `emberAfExternalAttributeReadCallback` functions. See the bridge application's
-  `main.cpp` for an example of this implementation.
+-   All attributes defined with these macros will be configured as
+    `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
+    will rely on the application to maintain storage for the attribute.
+    Consequently, reads or writes to these attributes must be handled within the
+    application by the `emberAfExternalAttributeWriteCallback` and
+    `emberAfExternalAttributeReadCallback` functions. See the bridge
+    application's `main.cpp` for an example of this implementation.
 
 `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName)`
 `DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)`
 `DECLARE_DYNAMIC_CLUSTER_LIST_END`
 
-- These three macros are used to declare a list of clusters for use within a
-  endpoint. The declaration must begin with the
-  `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN` macro which will define the name of the
-  allocated cluster structure. Each cluster is then added by the
-  `DECLARE_DYNAMIC_CLUSTER` macro referencing attribute list previously defined
-  by the `DECLARE_DYNAMIC_ATTRIBUTE...` macros and the lists of
-  incoming/outgoing commands terminated by kInvalidCommandId (or nullptr if
-  there aren't any commands in the list). Finally,
-  `DECLARE_DYNAMIC_CLUSTER_LIST_END` macro should be used to close the
-  definition.
+-   These three macros are used to declare a list of clusters for use within a
+    endpoint. The declaration must begin with the
+    `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN` macro which will define the name of the
+    allocated cluster structure. Each cluster is then added by the
+    `DECLARE_DYNAMIC_CLUSTER` macro referencing attribute list previously
+    defined by the `DECLARE_DYNAMIC_ATTRIBUTE...` macros and the lists of
+    incoming/outgoing commands terminated by kInvalidCommandId (or nullptr if
+    there aren't any commands in the list). Finally,
+    `DECLARE_DYNAMIC_CLUSTER_LIST_END` macro should be used to close the
+    definition.
 
 `DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)`
 
-- This macro is used to declare an endpoint and its associated cluster list,
-  which must be previously defined by the `DECLARE_DYNAMIC_CLUSTER...` macros.
+-   This macro is used to declare an endpoint and its associated cluster list,
+    which must be previously defined by the `DECLARE_DYNAMIC_CLUSTER...` macros.
 
 ## Supported devices
 
@@ -220,6 +220,7 @@ be used to specify the the effect. It is able to be in following effects:
     ```
 
     here:
+
     - **onoff** is name of cluster
     - **on** command to the cluster
     - **1** ID of Node
@@ -232,6 +233,7 @@ be used to specify the the effect. It is able to be in following effects:
     ```
 
     here:
+
     - **onoff** is name of cluster
     - **off** command to the cluster
     - **1** ID of Node
@@ -244,6 +246,7 @@ be used to specify the the effect. It is able to be in following effects:
     ```
 
     here:
+
     - **onoff** is name of cluster
     - **read** command to the cluster
     - **on-off** attribute to read
@@ -257,6 +260,7 @@ be used to specify the the effect. It is able to be in following effects:
     ```
 
     here:
+
     - **levelcontrol** is name of cluster
     - **move-to-level** command to the cluster
     - **32** brightness value
@@ -282,13 +286,13 @@ be used to specify the the effect. It is able to be in following effects:
 OTA feature enabled by default only for ota-requestor-app example. To enable OTA
 feature for another Telink example:
 
-- set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
-  file.
+-   set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
+    file.
 
 After build application with enabled OTA feature, use next binary files:
 
-- merged.bin - main binary to flash PCB (Use at least 2MB PCB).
-- matter.ota - binary for OTA Provider
+-   merged.bin - main binary to flash PCB (Use at least 2MB PCB).
+-   matter.ota - binary for OTA Provider
 
 All binaries has the same SW version. To test OTA “matter.ota” should have
 higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
@@ -296,45 +300,48 @@ corresponding “prj.conf” conﬁguration file.
 
 Usage of OTA:
 
-- Build the [Linux OTA Provider](../../ota-provider-app/linux)
+-   Build the [Linux OTA Provider](../../ota-provider-app/linux)
 
     ```
     ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
     ```
 
-- Run the Linux OTA Provider with OTA image.
+-   Run the Linux OTA Provider with OTA image.
 
     ```
     ./chip-ota-provider-app -f matter.ota
     ```
 
-- Provision the Linux OTA Provider using chip-tool
+-   Provision the Linux OTA Provider using chip-tool
 
     ```
     ./chip-tool pairing onnetwork ${OTA_PROVIDER_NODE_ID} 20202021
     ```
 
     here:
-    - \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
 
-- Configure the ACL of the ota-provider-app to allow access
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+
+-   Configure the ACL of the ota-provider-app to allow access
 
     ```
     ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' ${OTA_PROVIDER_NODE_ID} 0
     ```
 
     here:
-    - \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
 
-- Use the chip-tool to announce the ota-provider-app to start the OTA process
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+
+-   Use the chip-tool to announce the ota-provider-app to start the OTA process
 
     ```
     ./chip-tool otasoftwareupdaterequestor announce-otaprovider ${OTA_PROVIDER_NODE_ID} 0 0 0 ${DEVICE_NODE_ID} 0
     ```
 
     here:
-    - \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
-    - \${DEVICE_NODE_ID} is the node id of paired device
+
+    -   \${OTA_PROVIDER_NODE_ID} is the node id of Linux OTA Provider
+    -   \${DEVICE_NODE_ID} is the node id of paired device
 
 Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
 OTA provider for applying the image. Device will restart on successful

@@ -280,7 +280,7 @@ def parse_dotconfig(config_path):
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found: {config_path}")
 
-    with open(config_path, 'r') as f:
+    with open(config_path) as f:
         for line in f:
             line = line.strip()
             if line.startswith('CONFIG_'):

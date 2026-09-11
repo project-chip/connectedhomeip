@@ -16,19 +16,19 @@ can:
 
 ## Files
 
-- `docs/platforms/telink/releases/generate_and_update_matter_notes.py` - main
-  build and update script (alongside the release note working copy)
-- `docs/platforms/telink/releases/telink_release_notes.md` - release note
-  working copy (in the same directory as the script; the script reads and
-  updates it in-place, only replacing the Resource Usage section while
-  preserving the remaining static content). At release time,
-  `scripts/tools/telink/package_telink_firmware.sh` snapshots it into a
-  versioned `telink_release_notes_<version>.md`.
-- `README.md` - Telink Matter SDK documentation
-- `build_for_release/` - root directory for all output
-    - `build_logs/` - directory containing all build logs
-    - `firmware/` - directory containing all board firmware files and zip
-      archives
+-   `docs/platforms/telink/releases/generate_and_update_matter_notes.py` - main
+    build and update script (alongside the release note working copy)
+-   `docs/platforms/telink/releases/telink_release_notes.md` - release note
+    working copy (in the same directory as the script; the script reads and
+    updates it in-place, only replacing the Resource Usage section while
+    preserving the remaining static content). At release time,
+    `scripts/tools/telink/package_telink_firmware.sh` snapshots it into a
+    versioned `telink_release_notes_<version>.md`.
+-   `README.md` - Telink Matter SDK documentation
+-   `build_for_release/` - root directory for all output
+    -   `build_logs/` - directory containing all build logs
+    -   `firmware/` - directory containing all board firmware files and zip
+        archives
 
 ## Usage
 
@@ -56,14 +56,14 @@ python3 docs/platforms/telink/releases/generate_and_update_matter_notes.py
 
 This will:
 
-- Build all Telink board Matter samples using `build_examples.py`
-- Save logs to the `build_for_release/build_logs/` directory
-- Extract memory usage information from the logs
-- Update the `docs/platforms/telink/releases/telink_release_notes.md` file (only
-  the Resource Usage section is replaced; the remaining static content is
-  preserved)
-- Collect all firmware files into the `build_for_release/firmware/` directory
-- Create a separate firmware zip archive per board
+-   Build all Telink board Matter samples using `build_examples.py`
+-   Save logs to the `build_for_release/build_logs/` directory
+-   Extract memory usage information from the logs
+-   Update the `docs/platforms/telink/releases/telink_release_notes.md` file
+    (only the Resource Usage section is replaced; the remaining static content
+    is preserved)
+-   Collect all firmware files into the `build_for_release/firmware/` directory
+-   Create a separate firmware zip archive per board
 
 ### 2. Update the release notes only (skip building)
 
@@ -86,14 +86,14 @@ Use this option when firmware collection and packaging are not needed.
 
 Each board's zip archive contains:
 
-- `board_name/sample_name/zephyr.bin` - binary firmware file
-- `board_name/sample_name/zephyr.elf` - ELF firmware file
-- `board_name/sample_name/zephyr.hex` - Intel HEX firmware file (if present)
-- `board_name/sample_name/zephyr.dts` - devicetree file
-- `board_name/sample_name/.config` - configuration file
-- `board_name/sample_name/zephyr.signed.bin` - signed OTA firmware (if OTA is
-  enabled)
-- `board_name/sample_name/mcuboot.bin` - MCUboot firmware (if present)
+-   `board_name/sample_name/zephyr.bin` - binary firmware file
+-   `board_name/sample_name/zephyr.elf` - ELF firmware file
+-   `board_name/sample_name/zephyr.hex` - Intel HEX firmware file (if present)
+-   `board_name/sample_name/zephyr.dts` - devicetree file
+-   `board_name/sample_name/.config` - configuration file
+-   `board_name/sample_name/zephyr.signed.bin` - signed OTA firmware (if OTA is
+    enabled)
+-   `board_name/sample_name/mcuboot.bin` - MCUboot firmware (if present)
 
 ## Supported boards
 
@@ -112,18 +112,20 @@ Each board's zip archive contains:
 
 ## Script features
 
-- Structured class design, easy to maintain and extend
-- Built on top of `build_examples.py`, consistent with Matter CI
-- Updates the release note file in-place, keeping all static content consistent
-- Resource Usage section uses a table format, clearly showing memory usage of
-  each sample on each board
-- Only the Resource Usage section is updated; other sections are left unchanged
-- Supports adding new boards and sample applications
-- Detailed log output
-- Build step can be skipped to update directly from existing logs
-- Automatically collects firmware files and creates a separate zip archive per
-  board
-- Option to skip firmware collection and packaging
+-   Structured class design, easy to maintain and extend
+-   Built on top of `build_examples.py`, consistent with Matter CI
+-   Updates the release note file in-place, keeping all static content
+    consistent
+-   Resource Usage section uses a table format, clearly showing memory usage of
+    each sample on each board
+-   Only the Resource Usage section is updated; other sections are left
+    unchanged
+-   Supports adding new boards and sample applications
+-   Detailed log output
+-   Build step can be skipped to update directly from existing logs
+-   Automatically collects firmware files and creates a separate zip archive per
+    board
+-   Option to skip firmware collection and packaging
 
 ## Adding a new board or sample
 
@@ -153,30 +155,30 @@ it into a versioned archive file based on the git tag.
 
 The build target format is `telink-<board>-<app>[-<options>]`, for example:
 
-- `telink-tl3238x-light-ota-factory-data-4mb` - TL3238X lighting application
-  with OTA, Factory Data, 4MB Flash
-- `telink-tl3238x-light-ota-compress-lzma-factory-data-dual-mode` - TL3238X
-  lighting application with OTA, LZMA, Factory Data, BLE + Thread concurrent
-  mode
-- `telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data` -
-  TL7218X Retention light switch application
-- `telink-tl7218x-light-ota-compress-lzma-factory-data-dual-mode` - TL7218X
-  lighting application with OTA, LZMA, Factory Data, BLE + Thread concurrent
-  mode
-- `telink-tl5218x-light-ota-factory-data-4mb` - TL521X lighting application with
-  OTA, Factory Data, 4MB Flash
-- `telink-tl5218x-light-ota-factory-data-4mb` - TL521X lighting application with
-  OTA, Factory Data, 4MB Flash, Dual-Mode
+-   `telink-tl3238x-light-ota-factory-data-4mb` - TL3238X lighting application
+    with OTA, Factory Data, 4MB Flash
+-   `telink-tl3238x-light-ota-compress-lzma-factory-data-dual-mode` - TL3238X
+    lighting application with OTA, LZMA, Factory Data, BLE + Thread concurrent
+    mode
+-   `telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data` -
+    TL7218X Retention light switch application
+-   `telink-tl7218x-light-ota-compress-lzma-factory-data-dual-mode` - TL7218X
+    lighting application with OTA, LZMA, Factory Data, BLE + Thread concurrent
+    mode
+-   `telink-tl5218x-light-ota-factory-data-4mb` - TL521X lighting application
+    with OTA, Factory Data, 4MB Flash
+-   `telink-tl5218x-light-ota-factory-data-4mb` - TL521X lighting application
+    with OTA, Factory Data, 4MB Flash, Dual-Mode
 
 Available options:
 
-- `ota` - enable OTA support
-- `factory-data` - enable Factory Data support
-- `compress-lzma` - enable LZMA compression
-- `shell` - enable Shell
-- `rpc` - enable Pigweed RPC
-- `dfu-smp` - enable DFU over SMP
-- `4mb` - 4MB Flash
-- `log-progress` - reduce log output (progress and errors only)
-- `nfc-payload` - NFC Payload support
-- `dual-mode` - enable BLE + Thread concurrent mode (TL323X, TL721X)
+-   `ota` - enable OTA support
+-   `factory-data` - enable Factory Data support
+-   `compress-lzma` - enable LZMA compression
+-   `shell` - enable Shell
+-   `rpc` - enable Pigweed RPC
+-   `dfu-smp` - enable DFU over SMP
+-   `4mb` - 4MB Flash
+-   `log-progress` - reduce log output (progress and errors only)
+-   `nfc-payload` - NFC Payload support
+-   `dual-mode` - enable BLE + Thread concurrent mode (TL323X, TL721X)

@@ -7,11 +7,11 @@ This tool is designed to generate factory partitions for mass production.
 Please make sure you have had the following tools before using the generator
 tool.
 
-- [CHIP Certificate Tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/chip-cert)
+-   [CHIP Certificate Tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/chip-cert)
 
-- [SPAKE2P Parameters Tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/spake2p)
+-   [SPAKE2P Parameters Tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/spake2p)
 
-- [chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+-   [chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
 
 ### [Build Matter tools](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#build-for-the-host-os-linux-or-macos)
 
@@ -149,17 +149,17 @@ out
 
 Tool generates following output files:
 
-- Partition Binary : `factory_data.bin` and `factory_data.hex`
-- Partition JSON : `summary.json`
-- Onboarding codes : `onb_codes.csv`
-- QR Code image : `qrcode.png`
+-   Partition Binary : `factory_data.bin` and `factory_data.hex`
+-   Partition JSON : `summary.json`
+-   Onboarding codes : `onb_codes.csv`
+-   QR Code image : `qrcode.png`
 
 Other intermediate files are stored in `internal/` directory:
 
-- PAI Certificate : `pai_cert.der`
-- DAC Certificates : `DAC_cert.der` and `DAC_cert.pem`
-- DAC Private Key : `DAC_private_key.bin`
-- DAC Public Key : `DAC_public_key.bin`
+-   PAI Certificate : `pai_cert.der`
+-   DAC Certificates : `DAC_cert.der` and `DAC_cert.pem`
+-   DAC Private Key : `DAC_private_key.bin`
+-   DAC Public Key : `DAC_public_key.bin`
 
 Above files are stored at `out/<vid_pid>/<SN>`. Each device is identified with
 an unique SN.

@@ -519,7 +519,7 @@ def save_dac_cert_and_keys(dac_cert, dac_key, chip_id, file_path):
 
 
 def generate_partition(args, dacs_cert, out_dirs):
-    log.info('Generating partition image: offset: 0x{:X} size: 0x{:X}'.format(args.offset, args.size))
+    log.info(f'Generating partition image: offset: 0x{args.offset:X} size: 0x{args.size:X}')
     cbor_data = cbor.dumps(NVS_MEMORY)
     # Create hex file
     if len(cbor_data) > args.size:
@@ -790,7 +790,7 @@ def main():
         for i in range(args.count):
             pai_cert = {}
             serial_num_str = format(serial_num_int + i, 'x')
-            log.info("Generating for {}".format(serial_num_str))
+            log.info(f"Generating for {serial_num_str}")
             dev_sn_file.write(serial_num_str + '\n')
             out_dirs = setup_out_dir(out_dir_top, args, serial_num_str)
             add_additional_kv(args, serial_num_str)
