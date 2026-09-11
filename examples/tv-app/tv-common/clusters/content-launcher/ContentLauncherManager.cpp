@@ -17,6 +17,7 @@
  */
 
 #include "ContentLauncherManager.h"
+#include "media-playback/MediaPlaybackManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <clusters/ContentLauncher/Metadata.h>
@@ -192,6 +193,12 @@ void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * comman
                                               const chip::app::ConcreteCommandPath & commandPath, uint16_t presetID)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandlePlayPreset presetID=%u", presetID);
+
+    if (presetID > 0)
+    {
+        MediaPlaybackManager::SetCurrentContent(commandPath.mEndpointId, static_cast<size_t>(presetID - 1));
+    }
+
     commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
 }
 

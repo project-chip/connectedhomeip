@@ -68,6 +68,11 @@ public:
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
+    // Selects which content the ContentInfo attribute describes and reports the change, so
+    // that ContentInfo tracks whatever is actually playing. The Content Launcher calls this
+    // when a preset starts playing.
+    static void SetCurrentContent(chip::EndpointId endpoint, size_t contentIndex);
+
 protected:
     // NOTE: it does not make sense to have default state of playing with a speed of 0, but
     // the CI test cases expect these values, and need to be fixed.

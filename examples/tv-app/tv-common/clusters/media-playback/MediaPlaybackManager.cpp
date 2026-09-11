@@ -18,8 +18,10 @@
 #include "MediaPlaybackManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <clusters/MediaPlayback/Metadata.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
 #include <string>
@@ -28,6 +30,16 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
 using namespace chip::literals;
 using namespace chip::Uint8;
+
+namespace {
+
+// One title per Content Launcher preset, in preset order, so that switching presets
+// changes what ContentInfo reports.
+constexpr chip::CharSpan kContentTitles[] = { "Morning News"_span, "Evening Playlist"_span };
+
+size_t gCurrentContentIndex = 0;
+
+} // namespace
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
@@ -116,9 +128,17 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableCommands(AttributeValueEncode
 CHIP_ERROR MediaPlaybackManager::HandleGetContentInfo(AttributeValueEncoder & aEncoder)
 {
     Structs::ContentInfoStruct::Type contentInfo;
-    contentInfo.contentType = MediaType::kTVShow;
-    contentInfo.title       = chip::MakeOptional(chip::app::DataModel::MakeNullable("Example Show"_span));
+    contentInfo.contentType = MediaType::kGeneric;
+    contentInfo.title       = chip::MakeOptional(MakeNullable(kContentTitles[gCurrentContentIndex]));
     return aEncoder.Encode(contentInfo);
+}
+
+void MediaPlaybackManager::SetCurrentContent(chip::EndpointId endpoint, size_t contentIndex)
+{
+    VerifyOrReturn(contentIndex < MATTER_ARRAY_SIZE(kContentTitles));
+
+    gCurrentContentIndex = contentIndex;
+    MatterReportingAttributeChangeCallback(endpoint, Id, Attributes::ContentInfo::Id);
 }
 
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
