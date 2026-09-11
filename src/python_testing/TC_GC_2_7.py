@@ -40,8 +40,8 @@ import random
 import secrets
 
 from mobly import asserts
-from support_modules.TC_GC_common import (generate_membership_entry_matcher, generate_usedMcastAddrCount_entry_matcher,
-                                          get_feature_map, valid_endpoints_list)
+from support_modules.gc_common import (generate_membership_entry_matcher, generate_usedMcastAddrCount_entry_matcher,
+                                       get_feature_map, valid_endpoints_list)
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

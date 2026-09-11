@@ -39,7 +39,7 @@
 import random
 
 from mobly import asserts
-from support_modules.TC_AVSUMTestBase import AVSUMTestBase
+from support_modules.avsum_testbase import AVSUMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status

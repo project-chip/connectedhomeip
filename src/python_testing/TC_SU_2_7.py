@@ -55,7 +55,7 @@ import logging
 from time import time
 
 from mobly import asserts
-from support_modules.TC_SUTestBase import SoftwareUpdateBaseTest
+from support_modules.su_testbase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

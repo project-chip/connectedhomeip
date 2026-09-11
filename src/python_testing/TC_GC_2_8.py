@@ -38,8 +38,8 @@ import asyncio
 import logging
 
 from mobly import asserts
-from support_modules.TC_GC_common import (find_colliding_epoch_key, generate_fabric_under_test_matcher, get_feature_map,
-                                          get_iana_multicast_address, get_operate_only_commands)
+from support_modules.gc_common import (find_colliding_epoch_key, generate_fabric_under_test_matcher, get_feature_map,
+                                       get_iana_multicast_address, get_operate_only_commands)
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

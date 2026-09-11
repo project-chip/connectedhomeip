@@ -37,7 +37,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from support_modules.TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
+from support_modules.opstate_common import TC_OPSTATE_BASE, TestInfo
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body

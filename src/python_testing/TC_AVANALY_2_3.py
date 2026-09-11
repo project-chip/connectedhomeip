@@ -38,7 +38,7 @@
 import logging
 
 from mobly import asserts
-from support_modules.TC_AVANALYTestBase import AVANALYTestBase
+from support_modules.avanaly_testbase import AVANALYTestBase
 
 import matter.clusters as Clusters
 from matter.clusters import Globals

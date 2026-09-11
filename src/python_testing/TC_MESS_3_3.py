@@ -17,7 +17,7 @@
 import logging
 
 from mobly import asserts
-from support_modules.TC_MESSTestBase import MESSAGE_ID_1, MESSAGE_ID_2, MESSTestBase
+from support_modules.mess_testbase import MESSAGE_ID_1, MESSAGE_ID_2, MESSTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
