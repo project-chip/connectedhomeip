@@ -543,7 +543,30 @@ private:
         {
             RegisterCreator("refrigerator", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate);
+                // Tagged with PositionTag::kTop to disambiguate from refrigerator-2 under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigeratorTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
+                                                       LoggingRefrigerator::Config{
+                                                           .tagList = Span(&kRefrigeratorTag, 1),
+                                                       });
+            });
+            RegisterCreator("refrigerator-2", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from refrigerator (see comment above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigerator2Tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
+                                                       LoggingRefrigerator::Config{
+                                                           .cabinetCount = 2,
+                                                           .tagList      = Span(&kRefrigerator2Tag, 1),
+                                                       });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
