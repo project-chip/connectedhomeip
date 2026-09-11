@@ -193,6 +193,9 @@ private:
 
     // Supported MIME types advertised via the SupportedMimeTypes attribute.
     static const std::vector<std::string> kSupportedMimeTypes;
+
+    // True when the MIME type is one of the entries reported by SupportedMimeTypes.
+    static bool IsSupportedMimeType(const CharSpan & mimeType);
 };
 
 } // namespace MediaFileManagement

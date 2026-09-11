@@ -250,9 +250,35 @@ bool MediaFileManagementManager::GetFileById(uint64_t fileID, Structs::FileDescr
     return false;
 }
 
+bool MediaFileManagementManager::IsSupportedMimeType(const CharSpan & mimeType)
+{
+    for (const std::string & supported : kSupportedMimeTypes)
+    {
+        if (mimeType.data_equal(CharSpan(supported.data(), supported.size())))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 Status MediaFileManagementManager::HandleAddFile(ScopedNodeId peer, const CharSpan & name, uint64_t size, const CharSpan & mimeType,
                                                  const CharSpan & imageUri, Commands::AddFileResponse::Type & response)
 {
+    // A file with no name or no content does not describe anything that can be stored.
+    if (name.empty() || size == 0)
+    {
+        response.status = FileStatusEnum::kInvalidRequest;
+        return Status::Success;
+    }
+
+    // Only the MIME types advertised by SupportedMimeTypes can be stored.
+    if (!IsSupportedMimeType(mimeType))
+    {
+        response.status = FileStatusEnum::kUnsupportedMimeType;
+        return Status::Success;
+    }
+
     // Reject files that would exceed the advertised capacity.
     if (size > GetAvailableStorage())
     {
