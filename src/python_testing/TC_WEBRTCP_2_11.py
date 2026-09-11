@@ -39,8 +39,8 @@ import logging
 import time
 
 from mobly import asserts
-from TC_WEBRTCPTestBase import WEBRTCPTestBase
-from test_plan_support import commission_if_required
+from support_modules.TC_WEBRTCPTestBase import WEBRTCPTestBase
+from support_modules.test_plan_support import commission_if_required
 
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider

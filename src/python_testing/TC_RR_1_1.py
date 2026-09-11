@@ -46,7 +46,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from mobly import asserts
-from TC_GC_common import get_feature_map, is_groupcast_on_root_node
+from support_modules.TC_GC_common import get_feature_map, is_groupcast_on_root_node
 from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
 
 import matter.clusters as Clusters

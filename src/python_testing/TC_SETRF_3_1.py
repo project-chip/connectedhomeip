@@ -45,7 +45,7 @@
 import logging
 
 from mobly import asserts
-from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
+from support_modules.TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body

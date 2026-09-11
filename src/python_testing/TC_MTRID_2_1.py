@@ -45,7 +45,7 @@
 import logging
 
 from mobly import asserts
-from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
+from support_modules.TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 
 from matter.clusters import MeterIdentification
 from matter.testing.decorators import async_test_body

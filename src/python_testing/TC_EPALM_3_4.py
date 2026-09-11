@@ -42,7 +42,7 @@
 
 import logging
 
-from TC_EPALM_TestBase import ElectricalProtectionAlarmTestBaseHelper
+from support_modules.TC_EPALM_TestBase import ElectricalProtectionAlarmTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches

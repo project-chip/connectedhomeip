@@ -41,7 +41,7 @@ import tempfile
 import time
 
 from mobly import asserts
-from TC_WEBRTCRTestBase import WEBRTCRTestBase
+from support_modules.TC_WEBRTCRTestBase import WEBRTCRTestBase
 
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess

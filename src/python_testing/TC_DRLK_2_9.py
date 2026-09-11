@@ -38,8 +38,8 @@ import logging
 import random
 import string
 
-from drlk_2_x_common import DRLK_COMMON
 from mobly import asserts
+from support_modules.drlk_2_x_common import DRLK_COMMON
 
 import matter.clusters as Clusters
 import matter.testing.matchers as matchers

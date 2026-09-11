@@ -39,7 +39,7 @@
 import logging
 
 from mobly import asserts
-from TC_WEBRTCPTestBase import WEBRTCPTestBase
+from support_modules.TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

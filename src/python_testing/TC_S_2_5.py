@@ -55,7 +55,7 @@ import logging
 import typing
 
 from mobly import asserts
-from TC_GC_common import is_groupcast_on_root_node
+from support_modules.TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

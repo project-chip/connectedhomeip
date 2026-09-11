@@ -40,8 +40,8 @@
 import logging
 
 from mobly import asserts
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
-from TC_PAVSTTestBase import PAVSTTestBase
+from support_modules.TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
+from support_modules.TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable

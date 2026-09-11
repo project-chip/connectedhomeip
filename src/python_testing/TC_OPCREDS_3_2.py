@@ -36,8 +36,8 @@
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
-from test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
-                               verify_commissioning_successful, verify_success)
+from support_modules.test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
+                                               verify_commissioning_successful, verify_success)
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body

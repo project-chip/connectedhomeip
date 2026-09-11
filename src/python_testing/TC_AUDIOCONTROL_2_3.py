@@ -33,7 +33,7 @@
 
 import logging
 
-from TC_AUDIOCONTROLTestBase import AUDIOCONTROLTestBase
+from support_modules.TC_AUDIOCONTROLTestBase import AUDIOCONTROLTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches

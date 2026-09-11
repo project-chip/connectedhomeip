@@ -33,7 +33,7 @@
 
 import logging
 
-from TC_MESSTestBase import has_spoken_or_audio_messages
+from support_modules.TC_MESSTestBase import has_spoken_or_audio_messages
 
 import matter.clusters as Clusters
 from matter.testing import matter_asserts

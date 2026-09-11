@@ -47,7 +47,7 @@
 import logging
 
 from mobly import asserts
-from TC_DEMTestBase import DEMTestBase
+from support_modules.TC_DEMTestBase import DEMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status

@@ -35,9 +35,9 @@
 
 import random
 
-import test_plan_support
 from mobly import asserts
-from TC_TLSCLIENT_Base import TC_TLSCLIENT_Base
+from support_modules import test_plan_support
+from support_modules.TC_TLSCLIENT_Base import TC_TLSCLIENT_Base
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status

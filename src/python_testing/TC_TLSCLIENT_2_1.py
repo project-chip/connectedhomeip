@@ -33,9 +33,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import test_plan_support
 from mobly import asserts
-from TC_TLS_Utils import TLSUtils
+from support_modules import test_plan_support
+from support_modules.TC_TLS_Utils import TLSUtils
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches

@@ -53,7 +53,7 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_SUTestBase import SoftwareUpdateBaseTest
+from support_modules.TC_SUTestBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

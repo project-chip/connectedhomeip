@@ -36,7 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
-from TC_AVSUMTestBase import AVSUMTestBase
+from support_modules.TC_AVSUMTestBase import AVSUMTestBase
 
 import matter.clusters as Clusters
 from matter.clusters import Globals
