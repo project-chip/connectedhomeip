@@ -225,6 +225,9 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_not_equal(
                 ep1, None, "Could not find an endpoint with both operate privilege commands and Groups cluster.")
 
+            groups_cluster_rev = await self.read_single_attribute_check_success(
+                cluster=Clusters.Groups, attribute=Clusters.Groups.Attributes.ClusterRevision, endpoint=ep1)
+
             log.info("Endpoint value for ep~1~ used for test steps with groupcast cluster: %s", ep1)
             log.info("Targeted cluster used for groupcast case is: %s (%s)",
                      operate_only_command.cluster_object.__name__, operate_only_command.cluster_object.id)
@@ -529,8 +532,6 @@ class TC_ACE_1_6(MatterBaseTest):
                                  "Incorrect destination IP address in event")
 
             # Step 20b-20g: Edit GroupKeyMap (only supported when Groupcast is not adopted, i.e. Groups cluster revision <= 4)
-            groups_cluster_rev = await self.read_single_attribute_check_success(
-                cluster=Clusters.Groups, attribute=Clusters.Groups.Attributes.ClusterRevision, endpoint=ep1)
             if groups_cluster_rev <= 4:
                 # Step 20b: Write empty key map
                 self.step("20b")
