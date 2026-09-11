@@ -252,6 +252,16 @@ not_automated:
           Needs a DUT started with a PQC-capable DAC provider whose DAC
           documents share one attestation key, plus a PAA trust store holding
           the matching ML-DSA PAA, which the generic CI harness does not set up.
+    - name: TC_DA_1_11.py
+      reason:
+          DUT-Commissioner test that spawns the TH commissionee itself and needs
+          PQC-capable DAC provider JSON fixtures, which the generic CI harness
+          does not set up.
+    - name: TC_DA_1_13.py
+      reason:
+          DUT-Commissioner test that spawns the TH commissionee itself and needs
+          PQC-capable DAC provider JSON fixtures, which the generic CI harness
+          does not set up.
     - name: TC_AUDIOCONTROLTestBase.py
       reason: Shared code for TC_AUDIOCONTROL, not a standalone test.
     - name: TC_MEDIAPLAYBACKTestBase.py
