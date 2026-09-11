@@ -215,10 +215,11 @@ class TC_DGGEN_2_1(MatterBaseTest):
 
         # STEP 8: ActiveNetworkFaults
         self.step(8)
-        active_network_faults = await self._read_dggen_attribute_expect_success(
-            endpoint=endpoint, attribute=attributes.ActiveNetworkFaults)
-        self._assert_active_faults_list(active_network_faults, enums.NetworkFaultEnum, "ActiveNetworkFaults", max_faults=4)
-        logger.info("ActiveNetworkFaults: %s", active_network_faults)
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ActiveNetworkFaults):
+            active_network_faults = await self._read_dggen_attribute_expect_success(
+              endpoint=endpoint, attribute=attributes.ActiveNetworkFaults)
+            self._assert_active_faults_list(active_network_faults, enums.NetworkFaultEnum, "ActiveNetworkFaults", max_faults=4)
+            logger.info("ActiveNetworkFaults: %s", active_network_faults)
 
         # STEP 9: TestEventTriggersEnabled
         self.step(9)
