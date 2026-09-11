@@ -26,9 +26,10 @@ namespace chip::app {
 class AmbientContextOOBAccessor : public OOBAccessor
 {
 public:
-    AmbientContextOOBAccessor(Clusters::AmbientContextSensingCluster & cluster,
-                               Clusters::AmbientSensingUnionCluster & unionCluster, EndpointId endpointId) :
-        mCluster(cluster), mUnionCluster(unionCluster), mEndpointId(endpointId)
+    AmbientContextOOBAccessor(Clusters::AmbientContextSensingCluster & cluster, Clusters::AmbientSensingUnionCluster & unionCluster,
+                              EndpointId endpointId) :
+        mCluster(cluster),
+        mUnionCluster(unionCluster), mEndpointId(endpointId)
     {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;

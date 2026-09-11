@@ -461,7 +461,7 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientSensingCont
     uint8_t statusRaw                = 0;
     bool hasStatus                   = false;
     CharSpan contributorName;
-    FabricIndex fabricIndex          = kUndefinedFabricIndex;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
@@ -577,13 +577,13 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientSensingNonM
     TLV::TLVType outerType;
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
 
-    EndpointId endpointId    = kInvalidEndpointId;
-    bool hasEndpointId       = false;
+    EndpointId endpointId = kInvalidEndpointId;
+    bool hasEndpointId    = false;
     CharSpan contributorName;
-    bool hasContributorName  = false;
-    uint8_t statusRaw        = 0;
-    bool hasStatus           = false;
-    FabricIndex fabricIndex  = kUndefinedFabricIndex;
+    bool hasContributorName = false;
+    uint8_t statusRaw       = 0;
+    bool hasStatus          = false;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
@@ -637,8 +637,8 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleRemoveAmbientSensingN
     TLV::TLVType outerType;
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
 
-    EndpointId endpointId   = kInvalidEndpointId;
-    bool hasEndpointId      = false;
+    EndpointId endpointId = kInvalidEndpointId;
+    bool hasEndpointId    = false;
     CharSpan contributorName;
     bool hasContributorName = false;
 

@@ -68,7 +68,6 @@ private:
                                                               OOBAccessorRegistry & registry) const;
     CHIP_ERROR TranslateSetAmbientSensingUnionName(EndpointId endpointId, const Json::Value & json,
                                                    OOBAccessorRegistry & registry) const;
-
 };
 
 } // namespace chip::app::NamedPipe

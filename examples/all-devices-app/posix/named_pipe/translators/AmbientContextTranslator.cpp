@@ -96,7 +96,6 @@ CHIP_ERROR AmbientContextTranslator::TranslateAndExecute(EndpointId endpointId, 
         return TranslateSetAmbientSensingUnionName(endpointId, json, registry);
     }
 
-
     return CHIP_ERROR_NOT_FOUND;
 }
 
@@ -266,7 +265,7 @@ NodeId ParseNodeIdFromJson(const Json::Value & json)
 } // namespace
 
 CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientSensingContributor(EndpointId endpointId, const Json::Value & json,
-                                                                            OOBAccessorRegistry & registry) const
+                                                                           OOBAccessorRegistry & registry) const
 {
     NodeId nodeId = ParseNodeIdFromJson(json);
     VerifyOrReturnError(nodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -308,7 +307,7 @@ CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientSensingContributor(Endpo
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateRemoveAmbientSensingContributor(EndpointId endpointId, const Json::Value & json,
-                                                                               OOBAccessorRegistry & registry) const
+                                                                              OOBAccessorRegistry & registry) const
 {
     NodeId nodeId = ParseNodeIdFromJson(json);
     VerifyOrReturnError(nodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -330,9 +329,8 @@ CHIP_ERROR AmbientContextTranslator::TranslateRemoveAmbientSensingContributor(En
     return registry.HandleAction("RemoveAmbientSensingContributor"_span, payload);
 }
 
-CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientSensingNonMatterContributor(EndpointId endpointId,
-                                                                                     const Json::Value & json,
-                                                                                     OOBAccessorRegistry & registry) const
+CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientSensingNonMatterContributor(EndpointId endpointId, const Json::Value & json,
+                                                                                    OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("ContributorName") && json["ContributorName"].isString(), CHIP_ERROR_INVALID_ARGUMENT);
     std::string name = json["ContributorName"].asString();
@@ -364,8 +362,8 @@ CHIP_ERROR AmbientContextTranslator::TranslateAddAmbientSensingNonMatterContribu
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateRemoveAmbientSensingNonMatterContributor(EndpointId endpointId,
-                                                                                        const Json::Value & json,
-                                                                                        OOBAccessorRegistry & registry) const
+                                                                                       const Json::Value & json,
+                                                                                       OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("ContributorName") && json["ContributorName"].isString(), CHIP_ERROR_INVALID_ARGUMENT);
     std::string name = json["ContributorName"].asString();
@@ -375,9 +373,8 @@ CHIP_ERROR AmbientContextTranslator::TranslateRemoveAmbientSensingNonMatterContr
                                 CharSpan::fromCharString(name.c_str()));
 }
 
-CHIP_ERROR AmbientContextTranslator::TranslateUpdateAmbientSensingContributorStatus(EndpointId endpointId,
-                                                                                     const Json::Value & json,
-                                                                                     OOBAccessorRegistry & registry) const
+CHIP_ERROR AmbientContextTranslator::TranslateUpdateAmbientSensingContributorStatus(EndpointId endpointId, const Json::Value & json,
+                                                                                    OOBAccessorRegistry & registry) const
 {
     auto statusOpt = ExtractUInt<uint8_t>(json, "Status");
     VerifyOrReturnError(statusOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -420,14 +417,13 @@ CHIP_ERROR AmbientContextTranslator::TranslateUpdateAmbientSensingContributorSta
 }
 
 CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientSensingUnionName(EndpointId endpointId, const Json::Value & json,
-                                                                          OOBAccessorRegistry & registry) const
+                                                                         OOBAccessorRegistry & registry) const
 {
     VerifyOrReturnError(json.isMember("UnionName") && json["UnionName"].isString(), CHIP_ERROR_INVALID_ARGUMENT);
     std::string name = json["UnionName"].asString();
     VerifyOrReturnError(!name.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    return DispatchStringAction(registry, "SetAmbientSensingUnionName"_span, endpointId,
-                                CharSpan::fromCharString(name.c_str()));
+    return DispatchStringAction(registry, "SetAmbientSensingUnionName"_span, endpointId, CharSpan::fromCharString(name.c_str()));
 }
 
 } // namespace chip::app::NamedPipe
