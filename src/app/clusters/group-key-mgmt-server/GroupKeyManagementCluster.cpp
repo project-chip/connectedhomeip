@@ -21,13 +21,10 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
-<<<<<<< HEAD
-=======
 #include <clusters/Groups/Metadata.h>
 #include <lib/support/AutoRelease.h>
-    >>>>>>> 6d6b9e6 (Groupcast: Group adoption logic. (#43725))
 
-    using namespace chip;
+using namespace chip;
 using namespace chip::app;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters;
