@@ -35,6 +35,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/ESP32/BLEManagerImpl.h>
@@ -201,6 +202,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     SuccessOrExit(err);
 
     memset(reinterpret_cast<void *>(mCons), 0, sizeof(mCons));
+    mNumGAPCons           = 0;
     mServiceMode          = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mAppIf                = ESP_GATT_IF_NONE;
     mServiceAttrHandle    = 0;
@@ -226,6 +228,7 @@ void BLEManagerImpl::_Shutdown()
 {
     CancelBleAdvTimeoutTimer();
 
+    mFlags.Clear(Flags::kNetworkHandoffPending);
     BleLayer::Shutdown();
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
 
@@ -908,6 +911,38 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     LogErrorOnFailure(CloseConnection(conId));
 }
 
+void BLEManagerImpl::CompleteNetworkHandoffIfReady()
+{
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (mFlags.Has(Flags::kNetworkHandoffPending) && mNumGAPCons == 0)
+    {
+        mFlags.Clear(Flags::kNetworkHandoffPending);
+        // The close-all-BLE event was queued first; start the operational network after the last GATT disconnect.
+        LogErrorOnFailure(DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent());
+    }
+#endif
+}
+
+void BLEManagerImpl::CheckNonConcurrentBleClosing()
+{
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (IsBleClosing() && !mFlags.Has(Flags::kNetworkHandoffPending))
+    {
+        // The ConnectNetwork response has finished transmitting, so the commissioning transport can now be closed.
+        CHIP_ERROR err = DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+        if (err == CHIP_NO_ERROR)
+        {
+            mFlags.Set(Flags::kNetworkHandoffPending);
+            CompleteNetworkHandoffIfReady();
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to schedule non-concurrent BLE handoff: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+#endif
+}
+
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
     switch (bleErr)
@@ -1450,6 +1485,7 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
     {
     case ESP_GATTS_CONNECT_EVT:
         ChipLogProgress(DeviceLayer, "BLE GATT connection established (con %u)", param->connect.conn_id);
+        mNumGAPCons++;
 
         // Allocate a connection state record for the new connection.
         GetConnectionState(param->mtu.conn_id, true);
@@ -1693,6 +1729,11 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
     ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", param->disconnect.conn_id,
                     param->disconnect.reason);
 
+    if (mNumGAPCons > 0)
+    {
+        mNumGAPCons--;
+    }
+
     // If this was a CHIPoBLE connection, release the associated connection state record
     // and post an event to deliver a connection error to the CHIPoBLE layer.
     if (ReleaseConnectionState(param->disconnect.conn_id))
@@ -1723,6 +1764,7 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
         mFlags.Clear(Flags::kAdvertisingConfigured);
         LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
     }
+    CompleteNetworkHandoffIfReady();
 }
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
