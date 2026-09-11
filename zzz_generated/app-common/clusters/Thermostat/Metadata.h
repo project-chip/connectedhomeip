@@ -299,6 +299,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
+namespace CriticalFreezeProtection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalFreezeProtection::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CriticalFreezeProtection
+namespace CriticalOverheatProtection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalOverheatProtection::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CriticalOverheatProtection
 namespace Sensors {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Sensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),

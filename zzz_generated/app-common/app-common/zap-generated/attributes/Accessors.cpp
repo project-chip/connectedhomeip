@@ -19280,6 +19280,34 @@ Protocols::InteractionModel::Status GetDefault(
 
 } // namespace ThermostatSuggestionNotFollowingReason
 
+namespace CriticalFreezeProtection {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    *value = defaultVal.As<bool>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace CriticalFreezeProtection
+
+namespace CriticalOverheatProtection {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    *value = defaultVal.As<bool>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace CriticalOverheatProtection
+
 namespace NumberOfSensorScheduleTransitions {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)

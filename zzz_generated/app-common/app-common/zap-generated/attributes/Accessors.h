@@ -4419,6 +4419,14 @@ Protocols::InteractionModel::Status GetDefault(
     DataModel::Nullable<chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>> & value);
 } // namespace ThermostatSuggestionNotFollowingReason
 
+namespace CriticalFreezeProtection {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value);
+} // namespace CriticalFreezeProtection
+
+namespace CriticalOverheatProtection {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value);
+} // namespace CriticalOverheatProtection
+
 namespace NumberOfSensorScheduleTransitions {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value);
 } // namespace NumberOfSensorScheduleTransitions

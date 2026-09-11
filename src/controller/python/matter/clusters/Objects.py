@@ -34315,6 +34315,8 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="thermostatSuggestions", Tag=0x00000054, Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]]),
                 ClusterObjectFieldDescriptor(Label="currentThermostatSuggestion", Tag=0x00000055, Type=typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct]),
                 ClusterObjectFieldDescriptor(Label="thermostatSuggestionNotFollowingReason", Tag=0x00000056, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="criticalFreezeProtection", Tag=0x00000057, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="criticalOverheatProtection", Tag=0x00000058, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="sensors", Tag=0x00000059, Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]]),
                 ClusterObjectFieldDescriptor(Label="availableSensors", Tag=0x0000005A, Type=typing.Optional[typing.List[bytes]]),
                 ClusterObjectFieldDescriptor(Label="enabledSensors", Tag=0x0000005B, Type=typing.Optional[typing.List[bytes]]),
@@ -34391,6 +34393,8 @@ class Thermostat(Cluster):
     thermostatSuggestions: typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]] = None
     currentThermostatSuggestion: typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct] = None
     thermostatSuggestionNotFollowingReason: typing.Union[None, Nullable, uint] = None
+    criticalFreezeProtection: typing.Optional[bool] = None
+    criticalOverheatProtection: typing.Optional[bool] = None
     sensors: typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]] = None
     availableSensors: typing.Optional[typing.List[bytes]] = None
     enabledSensors: typing.Optional[typing.List[bytes]] = None
@@ -36041,6 +36045,38 @@ class Thermostat(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
             value: typing.Union[None, Nullable, uint] = None
+
+        @dataclass
+        class CriticalFreezeProtection(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000057
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class CriticalOverheatProtection(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000058
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
 
         @dataclass
         class Sensors(ClusterAttributeDescriptor):
