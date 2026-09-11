@@ -3843,9 +3843,6 @@ PICS:
     - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
       id: GRPKEY.S.A0003
 
-    - label: "Does the device implement the GroupcastAdoption attribute?"
-      id: GRPKEY.S.A0004
-
     #
     # server commandsGenerated
     #
