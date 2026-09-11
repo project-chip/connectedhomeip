@@ -45,11 +45,10 @@ public:
         Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
         VerifyOrDie(groupDataProvider != nullptr); // we require app main to set this before cluster startup
 
-        gServer.Create(
-            GroupKeyManagementCluster::Context{
-                .fabricTable       = Server::GetInstance().GetFabricTable(),
-                .groupDataProvider = *groupDataProvider,
-            }); // Ignore the featureMap argument since fetchFeatureMap==false
+        gServer.Create(GroupKeyManagementCluster::Context{
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .groupDataProvider = *groupDataProvider,
+        }); // Ignore the featureMap argument since fetchFeatureMap==false
         return gServer.Registration();
     }
 
