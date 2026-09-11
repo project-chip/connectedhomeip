@@ -21,7 +21,6 @@ include(${APP_DIR}/cmake/board_files.cmake)
 all_devices_board_name(${BOARD} _board_name)
 
 all_devices_find_board_file(${APP_DIR}/boards ${_board_name}.overlay _board_overlay)
-all_devices_append_image_files(zephyr_DTC_OVERLAY_FILE ${_board_overlay})
 all_devices_append_image_files(mcuboot_EXTRA_DTC_OVERLAY_FILE ${_board_overlay})
 
 all_devices_find_board_file(${APP_DIR}/boards ${_board_name}.conf _board_conf EXCLUDE_FLAT)

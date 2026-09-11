@@ -22,7 +22,7 @@ set(ALL_DEVICES_BOARD_VENDOR_SUBDIRECTORIES
 
 # Strips the revision and qualifiers from BOARD.
 function(all_devices_board_name board out_var)
-    if(NOT "${board}" MATCHES "^([^@/]+)(@[^@/]+)?(/[^@]+)?$")
+    if(NOT "${board}" MATCHES "^([^@/]+)(@[^@/]+)?(/.*)?$")
         message(FATAL_ERROR "Invalid BOARD value: ${board}")
     endif()
     set(${out_var} "${CMAKE_MATCH_1}" PARENT_SCOPE)
