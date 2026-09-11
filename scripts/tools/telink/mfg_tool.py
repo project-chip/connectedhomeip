@@ -790,7 +790,7 @@ def main():
         for i in range(args.count):
             pai_cert = {}
             serial_num_str = format(serial_num_int + i, 'x')
-            log.info(f"Generating for {serial_num_str}")
+            log.info("Generating for %s", serial_num_str)
             dev_sn_file.write(serial_num_str + '\n')
             out_dirs = setup_out_dir(out_dir_top, args, serial_num_str)
             add_additional_kv(args, serial_num_str)
