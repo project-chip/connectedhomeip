@@ -16,7 +16,11 @@
  */
 #pragma once
 
+#include "ThermostatDelegate.h"
+#include "ThermostatSetpointsDelegate.h"
+
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
@@ -26,6 +30,10 @@ namespace chip::app {
 class WaterHeater : public SingleEndpoint, public Clusters::WaterHeaterManagement::Delegate, public TimerContext
 {
 public:
+
+using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
+    Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate>;
+
     explicit WaterHeater(TimerDelegate & timerDelegate);
     ~WaterHeater() override;
 
@@ -56,6 +64,8 @@ private:
 
     TimerDelegate & mTimerDelegate;
     CodeDrivenDataModelProvider * mProvider = nullptr;
+    std::unique_ptr<Clusters::Thermostat::ThermostatDelegate> mThermostatDelegate;
+    std::unique_ptr<Clusters::Thermostat::ThermostatSetpointsDelegate> mThermostatSetpointsDelegate;
 
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeaterTypes{
         Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap::kImmersionElement1
@@ -64,6 +74,7 @@ private:
     Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
 
     LazyRegisteredServerCluster<Clusters::WaterHeaterManagement::WaterHeaterManagementCluster> mWaterHeaterManagementCluster;
+    LazyRegisteredServerCluster<ThermostatClusterType> mThermostatCluster;
 };
 
 } // namespace chip::app

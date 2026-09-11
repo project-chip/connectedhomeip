@@ -15,13 +15,16 @@
  *    limitations under the License.
  */
 #include <device/types/water-heater/WaterHeater.h>
-
 #include <clusters/WaterHeaterManagement/AttributeIds.h>
 #include <clusters/WaterHeaterManagement/ClusterId.h>
+#include <clusters/Thermostat/ClusterId.h>
+#include <clusters/Thermostat/AttributeIds.h>
+#include <app/clusters/thermostat-server/ThermostatClusterBase.h>
 #include <devices/Types.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WaterHeaterManagement;
 using namespace chip::app::Clusters::WaterHeaterManagement::Attributes;
 using chip::Protocols::InteractionModel::Status;
@@ -29,8 +32,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip::app {
 
 WaterHeater::WaterHeater(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)), mTimerDelegate(timerDelegate)
-{}
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)), mTimerDelegate(timerDelegate) {}
 
 WaterHeater::~WaterHeater()
 {
@@ -47,6 +49,13 @@ CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
 
     mWaterHeaterManagementCluster.Create(endpoint, *this, static_cast<Feature>(0));
     ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterManagementCluster.Registration()));
+
+    mThermostatDelegate = std::make_unique<Thermostat::ThermostatDelegate>(endpoint);
+    mThermostatSetpointsDelegate = std::make_unique<Thermostat::ThermostatSetpointsDelegate>(endpoint);
+    mThermostatCluster.Create(endpoint, static_cast<Thermostat::Feature>(0), 
+        Thermostat::ThermostatClusterBase::Config(Thermostat::OptionalAttributes(), mTimerDelegate),
+        *mThermostatDelegate, *mThermostatSetpointsDelegate);
+    ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();

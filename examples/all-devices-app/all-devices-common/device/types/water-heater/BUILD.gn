@@ -19,6 +19,10 @@ source_set("water-heater") {
   sources = [
     "WaterHeater.cpp",
     "WaterHeater.h",
+    "ThermostatDelegate.h",
+    "ThermostatDelegate.cpp",
+    "ThermostatSetpointsDelegate.cpp",
+    "ThermostatSetpointsDelegate.h",
   ]
 
   public_deps = [
