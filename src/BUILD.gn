@@ -161,7 +161,6 @@ if (chip_build_tests) {
       "${chip_root}/src/app/persistence/tests",
       "${chip_root}/src/app/server-cluster/tests",
       "${chip_root}/src/app/server/tests",
-      "${chip_root}/src/controller/python/matter/case_capture/tests",
       "${chip_root}/src/credentials/tests/jcm",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
@@ -220,6 +219,16 @@ if (chip_build_tests) {
 
         # keep-sorted: end
       ]
+    }
+
+    if (current_os != "zephyr") {
+      # Python-controller-only code: the completed-handshake queue is built on
+      # std::mutex/std::condition_variable, which the Zephyr toolchain (libstdc++
+      # without gthreads) does not provide, and on Zephyr
+      # Transport::PeerAddress::kMaxToStringSize (interface names up to
+      # Z_DEVICE_MAX_NAME_LEN) exceeds the record's address buffer.
+      tests +=
+          [ "${chip_root}/src/controller/python/matter/case_capture/tests" ]
     }
 
     if (current_os != "zephyr") {
