@@ -342,6 +342,8 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         // If found is false, then there were no existing entries for the dayOfWeekForSequence. Add a new entry
         if (!found)
         {
+            VerifyOrReturnError(updatedChargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_NO_MEMORY);
+
             // Copy the new chargingTargets
             updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
             CHIP_ERROR err = updatedChargingTargets.AllocAndCopy(newChargingTargetSchedule.chargingTargets);
