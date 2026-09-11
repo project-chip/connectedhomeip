@@ -270,15 +270,5 @@ set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
 )
 
-if(CONFIG_CHIP_ENABLE_GROUPCAST)
-    list(APPEND ALL_DEVICES_CLUSTER_SOURCES
-        "${CHIP_ROOT}/src/app/clusters/groups-server/StubbedGroupsCluster.cpp"
-    )
-else()
-    list(APPEND ALL_DEVICES_CLUSTER_SOURCES
-        "${CHIP_ROOT}/src/app/clusters/groups-server/GroupsCluster.cpp"
-    )
-endif()
-
 # No extra include directories beyond ALL_DEVICES_COMMON_DIR (for <device/...> paths).
 set(ALL_DEVICES_EXTRA_INCLUDE_DIRS)

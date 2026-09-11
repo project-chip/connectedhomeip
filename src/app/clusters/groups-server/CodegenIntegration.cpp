@@ -14,23 +14,18 @@
  *    limitations under the License.
  */
 
-#include <app/AppConfig.h>
+#include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/static-cluster-config/Groups.h>
 #include <app/util/config.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
-#if CHIP_CONFIG_USE_STUBBED_GROUPS_CLUSTER
-#include <app/clusters/groups-server/StubbedGroupsCluster.h> // nogncheck
-#else
-#include <app/clusters/groups-server/GroupsCluster.h> // nogncheck
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/CodegenIntegration.h> // nogncheck
 #endif
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
 #include <app/clusters/identify-server/CodegenIntegration.h> // nogncheck
 #endif
-#endif // CHIP_CONFIG_USE_STUBBED_GROUPS_CLUSTER
 
 using namespace chip;
 using namespace chip::app;
@@ -42,11 +37,7 @@ namespace {
 constexpr size_t kGroupsFixedClusterCount = Groups::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kGroupsMaxClusterCount   = kGroupsFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-#if CHIP_CONFIG_USE_STUBBED_GROUPS_CLUSTER
-LazyRegisteredServerCluster<StubbedGroupsCluster> gServers[kGroupsMaxClusterCount];
-#else
 LazyRegisteredServerCluster<GroupsCluster> gServers[kGroupsMaxClusterCount];
-#endif
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -57,27 +48,16 @@ public:
         Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
         VerifyOrDie(groupDataProvider != nullptr);
 
-#if CHIP_CONFIG_USE_STUBBED_GROUPS_CLUSTER
-        gServers[clusterInstanceIndex].Create(endpointId,
-                                              StubbedGroupsCluster::Context{
-                                                  .groupDataProvider = *groupDataProvider,
-                                              });
-#else
         gServers[clusterInstanceIndex].Create(endpointId,
                                               GroupsCluster::Context{
-                                                  .groupDataProvider   = *groupDataProvider,
+                                                  .groupDataProvider = *groupDataProvider,
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-                                                  .scenesIntegration   = ScenesManagement::FindClusterOnEndpoint(endpointId),
-#else
-                                                  .scenesIntegration   = nullptr,
+                                                  .scenesIntegration = ScenesManagement::FindClusterOnEndpoint(endpointId),
 #endif
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
                                                   .identifyIntegration = FindIdentifyClusterOnEndpoint(endpointId),
-#else
-                                                  .identifyIntegration = nullptr,
 #endif
                                               });
-#endif // CHIP_CONFIG_USE_STUBBED_GROUPS_CLUSTER
         return gServers[clusterInstanceIndex].Registration();
     }
 

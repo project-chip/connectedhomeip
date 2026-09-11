@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app/clusters/fan-control-server/FanControlCluster.h>
-#include <app/clusters/groups-server/StubbedGroupsCluster.h>
+#include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/scenes-server/SceneTable.h>
@@ -70,7 +70,7 @@ public:
     Clusters::OnOffCluster * OnOffCluster() { return mContext.includeOnOffCluster ? &mOnOffCluster.Cluster() : nullptr; }
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::ScenesManagementCluster & ScenesManagementCluster() { return mScenesManagementCluster.Cluster(); }
-    Clusters::StubbedGroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
+    Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
 
 protected:
     FanLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::FanControl::Delegate & fanDelegate,
@@ -108,7 +108,7 @@ private:
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
-    LazyRegisteredServerCluster<Clusters::StubbedGroupsCluster> mGroupsCluster;
+    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };
 
 } // namespace app

@@ -98,7 +98,12 @@ CHIP_ERROR DimmableLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModel
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
-    mGroupsCluster.Create(endpoint, StubbedGroupsCluster::Context{ .groupDataProvider = mContext.groupDataProvider });
+    mGroupsCluster.Create(endpoint,
+                          GroupsCluster::Context{
+                              .groupDataProvider   = mContext.groupDataProvider,
+                              .scenesIntegration   = &mScenesManagementCluster.Cluster(),
+                              .identifyIntegration = &mIdentifyCluster.Cluster(),
+                          });
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
     // We have scenes enabled, so make sure handlers are registered so we can

@@ -16,7 +16,9 @@
  */
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/clusters/groups-server/GroupsClusterContext.h>
+#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Groups/Commands.h>
 #include <clusters/Groups/Ids.h>
@@ -26,18 +28,17 @@
 
 namespace chip::app::Clusters {
 
-/// Compatibility-only Groups cluster implementation for revision 5 and later, where groupcast
-/// owns group membership: the commands that would add or report groups fail with InvalidInState.
-/// Applications should use the `GroupsCluster` alias from GroupsCluster.h rather than naming this
-/// class directly.
-class StubbedGroupsCluster : public DefaultServerCluster
+/// Full Groups cluster implementation: group membership can be managed through the cluster
+/// commands. Applications should use the `GroupsCluster` alias from GroupsCluster.h rather than
+/// naming this class directly.
+class GroupsClusterImpl : public DefaultServerCluster
 {
 public:
-    /// Shared with the full implementation; only `groupDataProvider` is used here.
     using Context = GroupsClusterContext;
 
-    StubbedGroupsCluster(EndpointId endpointId, const Context & context) :
-        DefaultServerCluster({ endpointId, Groups::Id }), mGroupDataProvider(context.groupDataProvider)
+    GroupsClusterImpl(EndpointId endpointId, const Context & context) :
+        DefaultServerCluster({ endpointId, Groups::Id }), mGroupDataProvider(context.groupDataProvider),
+        mScenesIntegration(context.scenesIntegration), mIdentifyIntegration(context.identifyIntegration)
     {}
 
     // ServerClusterInterface
@@ -53,6 +54,11 @@ public:
 
 private:
     Credentials::GroupDataProvider & mGroupDataProvider;
+    scenes::ScenesIntegrationDelegate * mScenesIntegration;
+    IdentifyIntegrationDelegate * mIdentifyIntegration;
+
+    Protocols::InteractionModel::Status AddGroup(GroupId groupID, CharSpan groupName,
+                                                 const chip::Access::SubjectDescriptor & subjectDescriptor);
 };
 
 } // namespace chip::app::Clusters
