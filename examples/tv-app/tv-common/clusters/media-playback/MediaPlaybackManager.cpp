@@ -135,6 +135,11 @@ void MediaPlaybackManager::SetCurrentContent(chip::EndpointId endpoint, size_t c
     MatterReportingAttributeChangeCallback(endpoint, Id, Attributes::AvailableCommands::Id);
 }
 
+size_t MediaPlaybackManager::GetCurrentContentIndex()
+{
+    return gCurrentContentIndex;
+}
+
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here

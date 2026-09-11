@@ -73,6 +73,9 @@ public:
     // when a preset starts playing.
     static void SetCurrentContent(chip::EndpointId endpoint, size_t contentIndex);
 
+    /// Index into the content catalog of whatever is currently playing.
+    static size_t GetCurrentContentIndex();
+
 protected:
     // NOTE: it does not make sense to have default state of playing with a speed of 0, but
     // the CI test cases expect these values, and need to be fixed.

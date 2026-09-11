@@ -50,13 +50,17 @@ struct Entry
     uint8_t presetID;
     chip::CharSpan name;
     chip::Span<const chip::CommandId> availableCommands;
+    // URL another device can use to pick this content up, returned in the
+    // ContentReplicationResponse.
+    chip::CharSpan replicationUrl;
 };
 
 // Keeping both clusters on this single list is what stops the Presets attribute and the
 // content that Media Playback describes from drifting apart.
 inline constexpr Entry kEntries[] = {
-    { 1, "Morning News"_span, chip::Span<const chip::CommandId>(kLiveCommands) },
-    { 2, "Evening Playlist"_span, chip::Span<const chip::CommandId>(kOnDemandCommands) },
+    { 1, "Morning News"_span, chip::Span<const chip::CommandId>(kLiveCommands), "https://example.com/live/morning-news"_span },
+    { 2, "Evening Playlist"_span, chip::Span<const chip::CommandId>(kOnDemandCommands),
+      "https://example.com/vod/evening-playlist"_span },
 };
 
 } // namespace MediaContentCatalog
