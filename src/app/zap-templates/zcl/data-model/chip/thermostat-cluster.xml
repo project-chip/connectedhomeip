@@ -225,6 +225,23 @@ Alchemy: v1.7.10
     <item name="UserDefined" value="0xFE"/>
   </enum>
 
+  <struct name="SensorScheduleTransitionStruct">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="DayOfWeek" type="ScheduleDayOfWeekBitmap"/>
+    <item fieldId="1" name="TransitionTime" type="int16u" max="1439"/>
+    <item fieldId="2" name="EnabledSensors" array="true" type="octet_string" length="32"/>
+  </struct>
+
+  <struct name="ThermostatSensorStruct">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="Name" type="char_string" length="64"/>
+    <item fieldId="1" name="SensorHandle" type="octet_string" length="16"/>
+    <item fieldId="2" name="Cluster" type="cluster_id"/>
+    <item fieldId="3" name="Endpoint" type="endpoint_no" optional="true"/>
+    <item fieldId="4" name="Node" type="node_id" optional="true"/>
+    <item fieldId="5" name="FabricIndex" type="fabric_idx" optional="true"/>
+  </struct>
+
   <struct name="ThermostatSuggestionStruct">
     <cluster code="0x0201"/>
     <item fieldId="0" name="UniqueID" type="int8u"/>
@@ -341,6 +358,9 @@ Alchemy: v1.7.10
         <optionalConform>
           <feature name="PRES"/>
         </optionalConform>
+      </feature>
+      <feature bit="11" code="SENSORS" name="ThermostatSensors" summary="Thermostat supports scheduling sensors" apiMaturity="provisional">
+        <provisionalConform/>
       </feature>
     </features>
     <!-- Attributes -->
@@ -678,6 +698,49 @@ Alchemy: v1.7.10
         <optionalConform>
           <feature name="COOL"/>
         </optionalConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute code="0x0059" side="server" name="Sensors" define="SENSORS" type="array" entryType="ThermostatSensorStruct" length="32" optional="true" apiMaturity="provisional">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute code="0x005A" side="server" name="AvailableSensors" define="AVAILABLE_SENSORS" type="array" entryType="octet_string" length="32" writable="true" optional="true" apiMaturity="provisional">
+      <access op="write" privilege="manage"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute code="0x005B" side="server" name="EnabledSensors" define="ENABLED_SENSORS" type="array" entryType="octet_string" length="32" writable="true" optional="true" apiMaturity="provisional">
+      <access op="write" privilege="manage"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute code="0x005C" side="server" name="NumberOfSensorScheduleTransitions" define="NUMBER_OF_SENSOR_SCHEDULE_TRANSITIONS" type="int8u" optional="true" apiMaturity="provisional">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute code="0x005D" side="server" name="SensorSchedule" define="SENSOR_SCHEDULE" type="array" entryType="SensorScheduleTransitionStruct" mustUseAtomicWrite="true" length="255" writable="true" optional="true" apiMaturity="provisional">
+      <access op="write" privilege="manage"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="SENSORS"/>
+        </mandatoryConform>
       </otherwiseConform>
     </attribute>
     <!-- Client Commands -->

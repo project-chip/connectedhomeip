@@ -51,8 +51,8 @@ public:
         Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause) override;
     Protocols::InteractionModel::Status CancelRequest() override;
     Protocols::InteractionModel::Status
-    PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower, const DataModel::Nullable<int64_t> maxPower,
-                            const uint32_t duration, Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause) override;
+    PowerRangeAdjustRequest(const Optional<int64_t> minPower, const Optional<int64_t> maxPower, const uint32_t duration,
+                            Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause) override;
     Protocols::InteractionModel::Status CancelPowerRangeAdjustRequest() override;
 
     Clusters::DeviceEnergyManagement::ESATypeEnum GetESAType() override;

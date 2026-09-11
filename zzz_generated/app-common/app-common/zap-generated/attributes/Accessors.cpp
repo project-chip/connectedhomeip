@@ -13886,6 +13886,26 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 } // namespace CriticalOverheatProtection
 
+namespace NumberOfSensorScheduleTransitions {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace NumberOfSensorScheduleTransitions
+
 namespace FeatureMap {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
@@ -14423,8 +14443,8 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace MistType {
 
-Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>> & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> * value)
 {
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>;
     Traits::StorageType temp;
@@ -14432,14 +14452,11 @@ GetDefault(EndpointId endpoint, DataModel::Nullable<chip::BitMask<chip::app::Clu
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::Humidistat::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        value.SetNull();
+        return Protocols::InteractionModel::Status::ConstraintError;
     }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
+    *value = Traits::StorageToWorking(temp);
     return status;
 }
 

@@ -309,6 +309,32 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalOverheatProtec
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace CriticalOverheatProtection
+namespace Sensors {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Sensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace Sensors
+namespace AvailableSensors {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AvailableSensors::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace AvailableSensors
+namespace EnabledSensors {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(EnabledSensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace EnabledSensors
+namespace NumberOfSensorScheduleTransitions {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfSensorScheduleTransitions::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace NumberOfSensorScheduleTransitions
+namespace SensorSchedule {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SensorSchedule::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace SensorSchedule
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     LocalTemperature::kMetadataEntry,
     ControlSequenceOfOperation::kMetadataEntry,

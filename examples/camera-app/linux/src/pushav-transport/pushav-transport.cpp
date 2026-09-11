@@ -493,12 +493,13 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneIds count: [%zu], Sensitivity: [%d]",
                     (uint16_t) activationReason, zoneIds.size(), sensitivity);
 
-    // Handle edge case where zoneIds is empty
-    if (zoneIds.empty())
-    {
-        ChipLogProgress(Camera, "PushAVTransport trigger transport ignored - empty zoneIds list provided");
-        return;
-    }
+    // Handle edge case where zoneIds is empty - commenting this out for now. This logic is NOT per spec, and empty set
+    // of zoneIds simply means the entire frame, it is entirely valid.
+    // if (zoneIds.empty())
+    // {
+    //     ChipLogProgress(Camera, "PushAVTransport trigger transport ignored - empty zoneIds list provided");
+    //     return;
+    // }
 
     // For a single motion event with multiple zones, we need to check if any zone should trigger
     bool shouldProcessTrigger = false;
@@ -518,7 +519,8 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     mActivationReason                 = chip::MakeOptional(activationReason);
 
     // Check if trigger should be processed based on transport type
-    if (mTransportTriggerType == TransportTriggerTypeEnum::kCommand)
+    if ((mTransportTriggerType == TransportTriggerTypeEnum::kCommand) ||
+        (mTransportTriggerType == TransportTriggerTypeEnum::kAmbientContext))
     {
         shouldProcessTrigger = true;
     }

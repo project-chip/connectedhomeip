@@ -2548,6 +2548,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentFabricIndex";
             break;
 
+        case MTRAttributeIDTypeClusterOperationalCredentialsAttributePQCDeviceAttestationProfileID:
+            result = @"PQCDeviceAttestationProfile";
+            break;
+
         case MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -6074,6 +6078,26 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThermostatAttributeCriticalOverheatProtectionID:
             result = @"CriticalOverheatProtection";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeSensorsID:
+            result = @"Sensors";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorsID:
+            result = @"AvailableSensors";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorsID:
+            result = @"EnabledSensors";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfSensorScheduleTransitionsID:
+            result = @"NumberOfSensorScheduleTransitions";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeSensorScheduleID:
+            result = @"SensorSchedule";
             break;
 
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/FixedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
@@ -49,6 +50,7 @@
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #include <atomic>
+#include <cstring>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
 #include <vector>
@@ -59,6 +61,34 @@
 
 namespace chip {
 namespace DeviceLayer {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+struct NanPeerInfo
+{
+    uint8_t mac[6]{};
+    uint16_t vid           = 0;
+    uint16_t pid           = 0;
+    uint16_t discriminator = 0;
+    uint8_t opcode         = 0;
+    uint16_t srvProtoType  = 0;
+
+    std::vector<uint8_t> storage; // ExtendedData storage
+    bool hasExtendedData = false;
+    uint16_t band        = 0; // WiFiBandBitmap value derived from scan frequency; 0 = unknown
+
+    /// Two reports are the same peer when the MAC and discriminator match.
+    bool operator==(const NanPeerInfo & o) const
+    {
+        return memcmp(mac, o.mac, sizeof(mac)) == 0 && discriminator == o.discriminator;
+    }
+};
+
+struct ScanTimerCtx
+{
+    chip::DeviceLayer::ConnectivityManagerImpl * self = nullptr;
+    guint subscribe_id;
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 // Records when the radio can carry Wi-Fi PAF frames
@@ -126,6 +156,7 @@ public:
                                  OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
     CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
+    uint32_t GetPendingConnectSubscribeId() const { return mPendingConnectSubscribeId; }
     void OnDiscoveryResult(GVariant * obj);
     void OnReplied(GVariant * obj);
     void OnNanReceive(GVariant * obj);
@@ -153,6 +184,66 @@ public:
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+public:
+    void ScanNanReceive(GVariant * obj);
+    void ScanNanSubscribeTerminated(guint subscribe_id, gchar * reason);
+    void ScanDiscoveryResult(GVariant * discov_info);
+    using PafScanResultsCallback = void (*)(void * context, const std::vector<NanPeerInfo> & results);
+    CHIP_ERROR WiFiPAFScan(uint8_t scanMaxTime, PafScanResultsCallback cb, void * cbContext);
+    /** Per-peer callback fired each time a new NAN discovery result arrives
+     *  during a background scan (including re-discoveries, to allow TTL reset). */
+    using BgScanDiscoveryCallback = void (*)(void * ctx, const NanPeerInfo & peer);
+
+    /**
+     * Start a continuous background NAN discovery scan.
+     * @param cb      Called on every discovery result (including duplicates).
+     * @param cbCtx   Passed unchanged to cb.
+     * @return CHIP_ERROR_BUSY if a one-shot scan is already running.
+     */
+    CHIP_ERROR WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx);
+
+    /**
+     * Stop the background scan started by WiFiPAFStartBackgroundScan.
+     * No-op if no background scan is active.
+     */
+    void WiFiPAFStopBackgroundScan();
+
+private:
+    /// Peers seen by the current scan, as a rolling window. Bounded at the same value the
+    /// CommissioningProxy cluster caps a ProxyScanResponse.
+    static constexpr size_t kMaxScanPeers = CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS;
+    std::vector<NanPeerInfo> mNanScanPeers;
+    /// Index of the oldest entry, overwritten next once the window is full.
+    size_t mNanScanPeersNext        = 0;
+    PafScanResultsCallback mScanCb  = nullptr;
+    void * mScanCbContext           = nullptr;
+    uint32_t mActiveScanSubscribeId = 0; // subscribe_id of the current one-shot scan
+    void FinishWiFiPAFScan(ScanTimerCtx * ctx);
+
+    BgScanDiscoveryCallback mBgScanCb = nullptr;
+    void * mBgScanCbCtx               = nullptr;
+    uint32_t mBgScanSubscribeId       = 0;
+    uint32_t mScanFreq                = 0; // freq (MHz) used for the current scan (one-shot or background)
+
+    // Handler IDs for the three scan GLib signals (nandiscovery-result, nanreceive,
+    // nansubscribe-terminated).  Stored so DisconnectScanSignals() can remove exactly
+    // the scan handlers without disturbing PAF connect-path handlers on the same signals.
+    gulong mScanSignalIds[3] = {};
+
+    /** Connect the scan GLib signal handlers.  Must be called before NANSubscribe;
+     *  see the definition for why.  Caller must hold mWpaSupplicantMutex. */
+    void ConnectScanSignals() CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /** Disconnect the scan GLib signal handlers registered by ConnectScanSignals().
+     *  Uses stored handler IDs so it does not accidentally remove connect-path
+     *  handlers on the same signals. */
+    void DisconnectScanSignals();
+
+    /** As DisconnectScanSignals(), for callers that already hold mWpaSupplicantMutex. */
+    void DisconnectScanSignalsLocked() CHIP_REQUIRES(mWpaSupplicantMutex);
+#endif
 
 private:
     CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
@@ -235,6 +326,7 @@ private:
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
     uint16_t mApFreq;
+    uint32_t mPendingConnectSubscribeId = 0; // set by _WiFiPAFSubscribe, read by app layer on timeout
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
     // The resource checking is needed right before sending data packets that they are initialized and connected.
