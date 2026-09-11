@@ -42,6 +42,7 @@ from __future__ import annotations
 import hashlib
 import os
 import time
+from typing import NamedTuple
 
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -311,3 +312,69 @@ def encode_network_administrator_secret(created: int, raw_secret: bytes | None =
             + bytes([0x26, 0x02]) + created.to_bytes(4, "little")
             + bytes([0x30, 0x03, NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH]) + raw_secret
             + bytes([0x18]))
+
+
+class NetworkAdministratorSecret(NamedTuple):
+    """The decoded fields of a Network Administrator Shared Secret."""
+
+    version: int
+    created: int
+    raw_secret: bytes
+
+
+def decode_network_administrator_secret(encoded: bytes) -> NetworkAdministratorSecret:
+    """Decodes a NASS as returned by ExportAdminSecret.
+
+    Mirrors ``chip::Crypto::DecodeNetworkAdministratorSecret``: an anonymous TLV struct
+    holding version [1], created [2] and raw-secret [3] in tag order, with no trailing
+    fields. ``created`` is accepted in any unsigned width because the TLV writer emits
+    the smallest encoding that fits the value, but each field's TLV type is enforced, so
+    the returned ``version`` and ``created`` are always ints and ``raw_secret`` bytes.
+
+    Raises:
+        ValueError: If the encoding is not a well-formed NASS.
+    """
+    if not encoded.startswith(bytes([0x15])) or not encoded.endswith(bytes([0x18])):
+        raise ValueError("NASS must be an anonymous TLV structure")
+
+    body = encoded[1:-1]
+    offset = 0
+    fields: dict[int, int | bytes] = {}
+    for expected_tag in (1, 2, 3):
+        if offset + 2 > len(body):
+            raise ValueError(f"NASS is truncated before field {expected_tag}")
+        control, tag = body[offset], body[offset + 1]
+        if tag != expected_tag:
+            raise ValueError(f"NASS field {expected_tag} is missing or out of tag order (found tag {tag})")
+        offset += 2
+        if expected_tag in (1, 2):
+            # Context-tagged unsigned integer, 1/2/4/8 bytes of little-endian value.
+            if control not in (0x24, 0x25, 0x26, 0x27):
+                raise ValueError(f"NASS field {expected_tag} must be an unsigned integer, but carries TLV control "
+                                 f"byte 0x{control:02x}")
+            width = 1 << (control - 0x24)
+            value: int | bytes = int.from_bytes(body[offset:offset + width], "little")
+        else:
+            # Context-tagged octet string with a single-byte length prefix.
+            if control != 0x30:
+                raise ValueError(f"NASS field {expected_tag} must be an octet string, but carries TLV control "
+                                 f"byte 0x{control:02x}")
+            if offset >= len(body):
+                raise ValueError(f"NASS is truncated before the length of field {expected_tag}")
+            width = body[offset]
+            offset += 1
+            value = body[offset:offset + width]
+        if offset + width > len(body):
+            raise ValueError(f"NASS is truncated inside field {expected_tag}")
+        offset += width
+        fields[expected_tag] = value
+
+    if offset != len(body):
+        raise ValueError("NASS carries unexpected trailing fields")
+
+    version, created, raw_secret = fields[1], fields[2], fields[3]
+    if version != 0:
+        raise ValueError(f"NASS version must be 0, got {version}")
+    if len(raw_secret) != NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH:
+        raise ValueError(f"NASS raw secret must be {NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH} bytes, got {len(raw_secret)}")
+    return NetworkAdministratorSecret(version=version, created=created, raw_secret=raw_secret)
