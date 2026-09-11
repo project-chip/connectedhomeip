@@ -135,10 +135,11 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetThreadOperationalDataset(dataset);
     }
 
-    if (params.GetWiFiCredentials().HasValue())
+    auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+    if (wiFiCredentialsParam.HasValue())
     {
-        WiFiCredentials creds = params.GetWiFiCredentials().Value(); // shallow struct copy
-        ReturnErrorOnFailure(RelocateSpan(creds.ssid, mSsid),        //
+        WiFiCredentials & creds = wiFiCredentialsParam.Value();
+        ReturnErrorOnFailure(RelocateSpan(creds.ssid, mSsid), //
                              ChipLogError(Controller, "WiFiCredentials.ssid is too large"));
         ReturnErrorOnFailure(RelocateSpan(creds.credentials, mCredentials),
                              ChipLogError(Controller, "WiFiCredentials.credentials is too large"));
@@ -373,9 +374,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(Commi
     if (networkToUse == NetworkType::kWiFi)
     {
         // We need credentials, request them if necessary.
-        VerifyOrReturnValue(mParams.GetWiFiCredentials().HasValue(), CommissioningStage::kRequestWiFiCredentials);
+        auto wiFiCredentialsParam = mParams.GetWiFiCredentials(); // optional copied by value
+        VerifyOrReturnValue(wiFiCredentialsParam.HasValue(), CommissioningStage::kRequestWiFiCredentials);
 
-        auto credentials = mParams.GetWiFiCredentials().Value(); // GetWiFiCredentials() returns a shallow copy (spans / pointers)
+        auto & credentials = wiFiCredentialsParam.Value();
         if (credentials.registrar != nullptr)
         {
             if (mDeviceCommissioningInfo.network.wifi.supportsPerDeviceCredentials)

@@ -3659,9 +3659,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     case CommissioningStage::kScanNetworks: {
         NetworkCommissioning::Commands::ScanNetworks::Type request;
-        if (params.GetWiFiCredentials().HasValue())
+        auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+        if (wiFiCredentialsParam.HasValue())
         {
-            request.ssid.Emplace(params.GetWiFiCredentials().Value().ssid);
+            request.ssid.Emplace(wiFiCredentialsParam.Value().ssid);
         }
         request.breadcrumb.Emplace(breadcrumb);
         CHIP_ERROR err = SendCommissioningCommand(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
@@ -4034,14 +4035,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         return;
     }
     case CommissioningStage::kWiFiNetworkSetup: {
-        if (!params.GetWiFiCredentials().HasValue())
+        auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+        if (!wiFiCredentialsParam.HasValue())
         {
             ChipLogError(Controller, "No wifi credentials specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
 
-        auto credentials = params.GetWiFiCredentials().Value();
+        auto & credentials = wiFiCredentialsParam.Value();
         NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
         request.ssid = credentials.ssid;
 
@@ -4169,14 +4171,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ExtendFailsafeBeforeNetworkEnable(proxy, params, step);
         break;
     case CommissioningStage::kWiFiNetworkEnable: {
-        if (!params.GetWiFiCredentials().HasValue())
+        auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+        if (!wiFiCredentialsParam.HasValue())
         {
             ChipLogError(Controller, "No wifi credentials specified");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
-        request.networkID = params.GetWiFiCredentials().Value().ssid;
+        request.networkID = wiFiCredentialsParam.Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4297,14 +4300,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     }
     case CommissioningStage::kRemoveWiFiNetworkConfig: {
-        if (!params.GetWiFiCredentials().HasValue())
+        auto wiFiCredentialsParam = params.GetWiFiCredentials(); // optional copied by value
+        if (!wiFiCredentialsParam.HasValue())
         {
             ChipLogError(Controller, "No Wi-Fi credentials configured at commissioner!");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         NetworkCommissioning::Commands::RemoveNetwork::Type request;
-        request.networkID = params.GetWiFiCredentials().Value().ssid;
+        request.networkID = wiFiCredentialsParam.Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);
         CHIP_ERROR err = SendCommissioningCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
         if (err != CHIP_NO_ERROR)
