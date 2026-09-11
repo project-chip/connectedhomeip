@@ -21,7 +21,7 @@
 #include <lib/shell/streamer.h>
 
 // Forward declaration of the function defined in main.cpp
-void SetDeviceTypeAndRestart(const std::string & deviceType);
+CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType);
 
 namespace chip {
 namespace Shell {
@@ -66,9 +66,12 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    streamer_printf(streamer_get(), "Device type set to: %s. Restarting...\r\n", deviceType);
-
-    SetDeviceTypeAndRestart(std::string(deviceType));
+    CHIP_ERROR err = SetDeviceTypeAndRestart(std::string(deviceType));
+    if (err != CHIP_NO_ERROR)
+    {
+        streamer_printf(streamer_get(), "Failed to set device type '%s': %" CHIP_ERROR_FORMAT "\r\n", deviceType, err.Format());
+        return err;
+    }
 
     return CHIP_NO_ERROR;
 }

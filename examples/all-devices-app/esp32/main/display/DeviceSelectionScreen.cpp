@@ -23,8 +23,9 @@
 #include "ScreenManager.h"
 #include <device-factory/DeviceFactory.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-void SetDeviceTypeAndRestart(const std::string & deviceType);
+CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType);
 const std::string & GetActiveDeviceType();
 
 DeviceSelectionListModel::DeviceSelectionListModel()
@@ -45,7 +46,7 @@ DeviceSelectionListModel::DeviceSelectionListModel()
         mItems.push_back({ activeLabel, []() { ScreenManager::PopScreen(); } });
 
         // Include All Bridged option
-        mItems.push_back({ "    All Bridged (*)", []() { SetDeviceTypeAndRestart("*"); } });
+        mItems.push_back({ "    All Bridged (*)", []() { LogErrorOnFailure(SetDeviceTypeAndRestart("*")); } });
     }
 
     auto & deviceFactory = chip::app::NoHooksDeviceFactory::GetInstance();
@@ -59,7 +60,7 @@ DeviceSelectionListModel::DeviceSelectionListModel()
         std::string label = "    " + deviceType;
         std::string dev   = deviceType;
 
-        mItems.push_back({ label, [dev]() { SetDeviceTypeAndRestart(dev); } });
+        mItems.push_back({ label, [dev]() { LogErrorOnFailure(SetDeviceTypeAndRestart(dev)); } });
     }
 }
 

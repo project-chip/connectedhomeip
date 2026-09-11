@@ -303,7 +303,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     if (gDeviceType == "*" || gDeviceType == "aggregator")
     {
-        if (deviceFactory.IsValidDevice("aggregator"))
+        if (deviceFactory.IsValidDevice("aggregator") && deviceFactory.IsValidDevice("bridged-node"))
         {
             auto aggregator = deviceFactory.Create("aggregator");
             if (aggregator.device == nullptr)
@@ -562,14 +562,14 @@ const std::string & GetActiveDeviceType()
     return gDeviceType;
 }
 
-void SetDeviceTypeAndRestart(const std::string & deviceType)
+CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType)
 {
     ESP_LOGI(TAG, "Saving device type '%s' to NVS and restarting...", deviceType.c_str());
     CHIP_ERROR err = ESP32Config::WriteConfigValueStr(kConfigKey_DeviceType, deviceType.c_str());
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to save device type to NVS: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
+        return err;
     }
 
 #if CONFIG_HAVE_DISPLAY
@@ -581,6 +581,7 @@ void SetDeviceTypeAndRestart(const std::string & deviceType)
 
     vTaskDelay(pdMS_TO_TICKS(300));
     esp_restart();
+    return CHIP_NO_ERROR;
 }
 
 extern "C" void app_main()

@@ -91,7 +91,11 @@ void InitDeviceDisplay()
     }
     for (int i = 0; i < BUTTON_NUMBER; ++i)
     {
-        gButtons[i].Init();
+        esp_err_t btnErr = gButtons[i].Init();
+        if (btnErr != ESP_OK)
+        {
+            ESP_LOGE(TAG, "Failed to initialize button %d: %s", i + 1, esp_err_to_name(btnErr));
+        }
     }
 #endif // CONFIG_DEVICE_TYPE_M5STACK
 
