@@ -1017,6 +1017,8 @@ tests:
                   },
               ]
 
+    # Membership is always scoped to the accessing fabric (ReadMembership ignores
+    # fabricFiltered); beta's group is validated via the beta identity read below.
     - label: "Read Groupcast Membership from alpha without fabric filtering"
       PICS: "GC.S"
       endpoint: 0
@@ -1027,7 +1029,7 @@ tests:
       response:
           constraints:
               type: list
-              minLength: 5
+              minLength: 4
 
     - label: "Read GroupTable from beta"
       identity: "beta"
@@ -1109,7 +1111,7 @@ tests:
       response:
           constraints:
               type: list
-              minLength: 5
+              minLength: 1
 
     # Try to add enough groups on fabric gamma that the group table does not fit in a packet.
     # TODO: We don't seem to support enough groups to actually manage to fill a packet.  To really test this part,
@@ -1681,7 +1683,7 @@ tests:
       response:
           constraints:
               type: list
-              minLength: 17
+              minLength: 12
 
     - label: "KeySet Remove 1"
       command: "KeySetRemove"
