@@ -120,11 +120,11 @@ class TC_FAN_3_5(MatterBaseTest):
                                     - Step: LowestOff=True, Direction=Increase, Wrap=False"""),
 
                 TestStep("7a", """TH sends Step commands iteratively""", """
-                                        Max PercentSetting Check
-                                            - Verify that the PercentSetting attribute value reaches 100
+                                        Highest Step Check
+                                            - Verify that the PercentSetting attribute value reaches the highest step value: the value an additional Step command no longer changes (100 when the DUT's highest step is SpeedMax). Store value for future reference.
                                         No Wrap Check
-                                            - When the PercentSetting attribute value reaches 100:
-                                                - Send an additional Step command to verify that PercentSetting stays at 100"""),
+                                            - When the PercentSetting attribute value reaches the highest step value:
+                                                - Send an additional Step command to verify that PercentSetting stays at the highest step value"""),
 
                 TestStep("7b", """Read the resulting attribute reports from each subscription""", """
                                         - Verify that the attribute report values from each subscription are in ascending order
@@ -174,11 +174,11 @@ class TC_FAN_3_5(MatterBaseTest):
                                     - Step: LowestOff=True, Direction=Increase, Wrap=False"""),
 
                 TestStep("10a", """TH sends Step commands iteratively""", """
-                                    Max PercentSetting Check
-                                        - Verify that the PercentSetting attribute value reaches 100
+                                    Highest Step Check
+                                        - Verify that the PercentSetting attribute value reaches the highest step value stored in step 7a
                                     No Wrap Check
-                                        - When the PercentSetting attribute value reaches 100:
-                                            - Send an additional Step command to verify that PercentSetting stays at 100"""),
+                                        - When the PercentSetting attribute value reaches the highest step value:
+                                            - Send an additional Step command to verify that PercentSetting stays at the highest step value"""),
 
                 TestStep("10b", """Read the resulting attribute reports from each subscription""", """
                                     - Verify that the attribute report values from each subscription are in ascending order
@@ -229,11 +229,11 @@ class TC_FAN_3_5(MatterBaseTest):
                                     - Step: LowestOff=True, Direction=Increase, Wrap=False"""),
 
                 TestStep("13a", """TH sends Step commands iteratively""", """
-                                    Max PercentSetting Check
-                                        - Verify that the PercentSetting attribute value reaches 100
+                                    Highest Step Check
+                                        - Verify that the PercentSetting attribute value reaches the highest step value stored in step 7a
                                     No Wrap Check
-                                        - When the PercentSetting attribute value reaches 100:
-                                            - Send an additional Step command to verify that PercentSetting stays at 100"""),
+                                        - When the PercentSetting attribute value reaches the highest step value:
+                                            - Send an additional Step command to verify that PercentSetting stays at the highest step value"""),
 
                 TestStep("13b", """Read the resulting attribute reports from each subscription""", """
                                     - Verify that the attribute report values from each subscription are in ascending order
@@ -284,11 +284,11 @@ class TC_FAN_3_5(MatterBaseTest):
                                     - Step: LowestOff=False, Direction=Increase, Wrap=False"""),
 
                 TestStep("16a", """TH sends Step commands iteratively""", """
-                                    Max PercentSetting Check
-                                        - Verify that the PercentSetting attribute value reaches 100
+                                    Highest Step Check
+                                        - Verify that the PercentSetting attribute value reaches the highest step value stored in step 7a
                                     No Wrap Check
-                                        - When the PercentSetting attribute value reaches 100:
-                                            - Send an additional Step command to verify that PercentSetting stays at 100"""),
+                                        - When the PercentSetting attribute value reaches the highest step value:
+                                            - Send an additional Step command to verify that PercentSetting stays at the highest step value"""),
 
                 TestStep("16b", """Read the resulting attribute reports from each subscription""", """
                                     - Verify that the attribute report values from each subscription are in ascending order
@@ -311,7 +311,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("18a", """TH sends Step commands with the requested parameters""", """
                                     - Verify that the attribute values reach the Off values (PercentSetting=0, FanMode=Off, SpeedSetting=0)
-                                    - Send an additional Step command and verify that the values wrap to the High values (PercentSetting=100, FanMode=High, SpeedSetting=SpeedMax)"""),
+                                    - Send an additional Step command and verify that the values wrap to the highest step values (PercentSetting=highest step value from step 7a, FanMode=High, SpeedSetting=ceil(SpeedMax * PercentSetting / 100))"""),
 
                 TestStep("19", """Wrap field test
                                         Verify Step command wrap behavior with LowestOff=False, Direction=Decrease, Wrap=True.
@@ -322,7 +322,7 @@ class TC_FAN_3_5(MatterBaseTest):
                                     - Step: LowestOff=False, Direction=Decrease, Wrap=True"""),
 
                 TestStep("19a", """TH sends a Step command with the requested parameters""", """
-                                    - Verify that the attribute values wrap to the High values (PercentSetting=100, FanMode=High, SpeedSetting=SpeedMax)"""),
+                                    - Verify that the attribute values wrap to the highest step values (PercentSetting=highest step value from step 7a, FanMode=High, SpeedSetting=ceil(SpeedMax * PercentSetting / 100))"""),
 
                 TestStep("20", """Wrap field test
                                         Verify Step command wrap behavior with LowestOff=True, Direction=Increase, Wrap=True.
@@ -356,7 +356,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("22a", """TH sends Step commands with the requested parameters""", """
                                     - Verify that the attribute values reach the Off values (PercentCurrent=0, SpeedCurrent=0)
-                                    - Send an additional Step command and verify that the values wrap to the High values (PercentCurrent=100, SpeedCurrent=SpeedMax)"""),
+                                    - Send an additional Step command and verify that the values wrap to the highest step values (PercentCurrent=highest step value from step 7a, SpeedCurrent=ceil(SpeedMax * PercentCurrent / 100))"""),
 
                 TestStep("23", """Wrap field test
                                         Verify Step command wrap behavior with LowestOff=False, Direction=Decrease, Wrap=True.
@@ -367,7 +367,7 @@ class TC_FAN_3_5(MatterBaseTest):
                                     - Step: LowestOff=False, Direction=Decrease, Wrap=True"""),
 
                 TestStep("23a", """TH sends a Step command with the requested parameters""", """
-                                    - Verify that the attribute values wrap to the High values (PercentCurrent=100, SpeedCurrent=SpeedMax)"""),
+                                    - Verify that the attribute values wrap to the highest step values (PercentCurrent=highest step value from step 7a, SpeedCurrent=ceil(SpeedMax * PercentCurrent / 100))"""),
 
                 TestStep("24", """Wrap field test
                                         Verify Step command wrap behavior with LowestOff=True, Direction=Increase, Wrap=True.
@@ -562,12 +562,40 @@ class TC_FAN_3_5(MatterBaseTest):
         percent_setting_sub.cancel()
         log.info("[FC] PercentSetting range per Step: %s", self.percent_setting_per_step)
 
-    def get_expected_percent_setting(self, step: Clusters.FanControl.Commands.Step) -> int:
+    def get_expected_percent_setting(self, step: Clusters.FanControl.Commands.Step) -> int | None:
+        """Returns the PercentSetting value a Step run without wrap is expected to end at.
+
+        Decrease ends at the lowest step value: 0 when LowestOff is set, otherwise the first step above 0
+        measured in step 5. Increase ends at the highest step value, which the spec leaves to the
+        implementation: None until it has been observed (see `lowest_off_field_conditions_test`).
+        """
         cluster = Clusters.FanControl
         sd_enum = cluster.Enums.StepDirectionEnum
 
         min_percent_setting = 0 if step.lowestOff else self.percent_setting_per_step
-        return 100 if step.direction == sd_enum.kIncrease else min_percent_setting
+        return self.percent_setting_top if step.direction == sd_enum.kIncrease else min_percent_setting
+
+    def get_expected_speed_setting(self, percent_setting: int) -> int:
+        """Returns the speed value the Percent Rules derive from a percent value: ceil(SpeedMax * percent / 100)."""
+        return -(-self.speed_max * percent_setting // 100)
+
+    def get_expected_speed_settings(self, percent_settings: list[int]) -> list[int]:
+        """Returns the speed report values expected for a sequence of reported percent values.
+
+        Each percent maps through `get_expected_speed_setting`; consecutive repeats are collapsed
+        because an unchanged attribute produces no report.
+        """
+        expected = []
+        for percent_setting in percent_settings:
+            speed_setting = self.get_expected_speed_setting(percent_setting)
+            if not expected or expected[-1] != speed_setting:
+                expected.append(speed_setting)
+        return expected
+
+    @staticmethod
+    def drop_trailing_value(values: list, value: Any) -> list:
+        """Returns `values` without its last element when that element equals `value`."""
+        return values[:-1] if values and values[-1] == value else values
 
     async def lowest_off_field_conditions_test(self, step: Clusters.FanControl.Commands.Step) -> None:
         cluster = Clusters.FanControl
@@ -575,7 +603,9 @@ class TC_FAN_3_5(MatterBaseTest):
         percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
         self.percent_setting_from_queue = []
 
-        # Get the expected final PercentSetting value based on the Step command parameters
+        # Get the expected final PercentSetting value based on the Step command parameters. For an
+        # Increase run this is None until the highest step value has been observed once: it is then
+        # discovered below as the value an additional Step command no longer changes.
         percent_setting_expected = self.get_expected_percent_setting(step)
         if step.direction == cluster.Enums.StepDirectionEnum.kDecrease and not step.wrap and not step.lowestOff:
             log.info("[FC] Step command: %s, percent_setting_expected: %s", step, percent_setting_expected)
@@ -589,17 +619,29 @@ class TC_FAN_3_5(MatterBaseTest):
             await self.send_step_command(step)
 
             # Read the resulting PercentSetting attribute report value from the queue
-            percent_setting = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
+            percent_setting_report = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
 
             # Detect if the step increase resulted in a change in PercentSetting, if so,
             # add it to the `percent_setting_from_queue` list for subsequent comparisons
-            if percent_setting is not None:
-                percent_setting_last = percent_setting
-                self.percent_setting_from_queue.append(percent_setting)
-            else:
-                percent_setting = percent_setting_last
+            if percent_setting_report is not None:
+                percent_setting_last = percent_setting_report
+                self.percent_setting_from_queue.append(percent_setting_report)
+            percent_setting = percent_setting_last
 
             log.info("[FC] PercentSetting attribute report value: %s", percent_setting)
+
+            # Highest step value not yet known: it is reached when a Step command no longer changes
+            # PercentSetting. A missing report alone is not taken as proof (it could still be in
+            # flight), so the attribute is read to confirm the value held before recording it.
+            if percent_setting_expected is None and percent_setting_report is None and percent_setting_last is not None:
+                percent_setting_read = await self.read_setting(attr.PercentSetting)
+                if percent_setting_read == percent_setting_last:
+                    self.percent_setting_top = percent_setting_last
+                    percent_setting_expected = percent_setting_last
+                    log.info("[FC] Highest step value (PercentSetting) reached: %s", percent_setting_expected)
+                else:
+                    log.info("[FC] PercentSetting report pending (read %s, last report %s), continuing",
+                             percent_setting_read, percent_setting_last)
 
             # Once PercentSetting reaches the expected value, send an extra Step command to verify
             # that the PercentSetting attribute report value stays at the expected value (no wrap)
@@ -619,7 +661,7 @@ class TC_FAN_3_5(MatterBaseTest):
             # attribute value was never reached
             if i == 100:
                 asserts.fail(
-                    f"[FC] The expected PercentSetting attribute value ({percent_setting_expected}) was never reached, the last reported value is ({percent_setting})."
+                    f"[FC] The expected PercentSetting attribute value ({percent_setting_expected if percent_setting_expected is not None else 'highest step value'}) was never reached, the last reported value is ({percent_setting})."
                 )
 
             log.info("[FC] percent_setting_from_queue: %s", self.percent_setting_from_queue)
@@ -768,40 +810,31 @@ class TC_FAN_3_5(MatterBaseTest):
             dependent_values1 = percent_current_values_produced
             dependent_values2 = speed_current_values_produced
 
-        # Get SpeedMax range
-        speed_max_range = range(0, self.speed_max + 1)
-
-        # Determine the initialization attribute values to remove
+        # Determine the initialization FanMode value and remove it from the full FanMode range
         if not handle_current_values:
             fan_mode_remove = fm_enum.kOff if percent_setting_init == 0 else fm_enum.kHigh
-            speed_setting_remove = 0 if percent_setting_init == 0 else self.speed_max
-        else:
-            speed_current_remove = 0 if percent_setting_init == 0 else self.speed_max
-
-        # Remove initialization attribute values from the full attribute value ranges
-        if not handle_current_values:
             fan_modes_init_removed = [x for x in self.fan_modes if x != fan_mode_remove]
-            speed_setting_init_removed = [x for x in speed_max_range if x != speed_setting_remove]
-        else:
-            speed_current_init_removed = [x for x in speed_max_range if x != speed_current_remove]
 
         # When the Step command has direction=decrease and lowestOff=False, the zero or Off state will never be reached,
-        # therefore we also prepare removal of that element from the full attribute value ranges for that case
+        # therefore we also prepare removal of that element from the full FanMode range for that case
         trim = slice(None, -1) if (step.direction == sd_enum.kDecrease and not step.lowestOff) else slice(None)
+
+        # The speed-oriented values are derived from the PercentSetting values actually reported
+        # (speed = ceil(SpeedMax * percent / 100), Percent Rules). The Step ladder is implementation
+        # specific, so the reports cannot be assumed to visit every speed value from 0 to SpeedMax.
+        speed_expected = self.get_expected_speed_settings(percent_setting_values_produced)
 
         # Determine the final expected attribute values lists for comparison with the produced values
         if not handle_current_values:
             fan_modes_expected = fan_modes_init_removed[trim] if step.direction == sd_enum.kIncrease else list(
                 reversed(fan_modes_init_removed))[trim]
-            speed_setting_expected = speed_setting_init_removed[trim] if step.direction == sd_enum.kIncrease else list(
-                reversed(speed_setting_init_removed))[trim]
+            speed_setting_expected = speed_expected
         else:
             # PercentCurrent tracks PercentSetting, so the expected values are the PercentSetting
             # values actually reported during stepping, not a list derived from the PercentCurrent
             # reports themselves (which would compare the reports against a copy of themselves).
             percent_current_expected = percent_setting_values_produced
-            speed_current_expected = speed_current_init_removed[trim] if step.direction == sd_enum.kIncrease else list(
-                reversed(speed_current_init_removed))[trim]
+            speed_current_expected = speed_expected
 
         if not handle_current_values:
             log.info("[FC] fan_modes_expected: %s", fan_modes_expected)
@@ -881,15 +914,19 @@ class TC_FAN_3_5(MatterBaseTest):
                 self.baseline_percent_current_desc = dependent_values_produced1[trim]
                 self.baseline_speed_current_desc = dependent_values_produced2[trim]
 
-        # if step.direction == sd_enum.kIncrease and step.lowestOff:
+        # The ascending runs end at the highest step value. The descending runs start from
+        # PercentSetting=100 (FanMode High, SpeedSetting SpeedMax) and never report that start
+        # state, so it is dropped from the ascending values only when it is the highest step value.
+        # A highest step below 100 is reported by both directions and is kept.
         if step.direction == sd_enum.kIncrease:
-            self.baseline_percent_setting_asc = percent_setting_values_produced[:-1]
+            fm_enum = Clusters.FanControl.Enums.FanModeEnum
+            self.baseline_percent_setting_asc = self.drop_trailing_value(percent_setting_values_produced, self.percent_setting_max)
             if not handle_current_values:
-                self.baseline_fan_mode_asc = dependent_values_produced1[:-1]
-                self.baseline_speed_setting_asc = dependent_values_produced2[:-1]
+                self.baseline_fan_mode_asc = self.drop_trailing_value(dependent_values_produced1, fm_enum.kHigh)
+                self.baseline_speed_setting_asc = self.drop_trailing_value(dependent_values_produced2, self.speed_max)
             else:
-                self.baseline_percent_current_asc = dependent_values_produced1[:-1]
-                self.baseline_speed_current_asc = dependent_values_produced2[:-1]
+                self.baseline_percent_current_asc = self.drop_trailing_value(dependent_values_produced1, self.percent_setting_max)
+                self.baseline_speed_current_asc = self.drop_trailing_value(dependent_values_produced2, self.speed_max)
 
     def verify_baseline_values(self, handle_current_values: bool) -> None:
         """
@@ -961,23 +998,34 @@ class TC_FAN_3_5(MatterBaseTest):
         fm_enum = cluster.Enums.FanModeEnum
         sd_enum = cluster.Enums.StepDirectionEnum
 
+        # Wrapping from the lowest step lands on the highest step value recorded on the first Step
+        # Increase run (100 when the DUT's highest step is SpeedMax), with the speed derived from it.
+        asserts.assert_is_not_none(self.percent_setting_top,
+                                   "[FC] The highest step value must be recorded (Step Increase run) before the Wrap tests")
+        percent_setting_top = self.percent_setting_top
+        speed_setting_top = self.get_expected_speed_setting(percent_setting_top)
+
         if step.direction == sd_enum.kDecrease and step.lowestOff:
             if not handle_current_values:
                 # - Verify that the attribute values all go to Off values
                 await self.wrap_veirfy(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=0)
-                # - Verify that the attribute values all go to High values
-                await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
+                # - Verify that the attribute values all go to the highest step values
+                await self.wrap_veirfy(step, percent_setting_expected=percent_setting_top,
+                                       fan_mode_expected=fm_enum.kHigh, speed_setting_expected=speed_setting_top)
             else:
                 # - Verify that the attribute values all go to Off values
                 await self.wrap_veirfy(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=0)
-                # - Verify that the attribute values all go to High values
-                await self.wrap_veirfy(step, percent_setting_expected=100, percent_current_expected=100, speed_current_expected=self.speed_max)
+                # - Verify that the attribute values all go to the highest step values
+                await self.wrap_veirfy(step, percent_setting_expected=percent_setting_top,
+                                       percent_current_expected=percent_setting_top, speed_current_expected=speed_setting_top)
         elif step.direction == sd_enum.kDecrease and not step.lowestOff:
-            # - Verify that the attribute values all go to High values
+            # - Verify that the attribute values all go to the highest step values
             if not handle_current_values:
-                await self.wrap_veirfy(step, percent_setting_expected=100, fan_mode_expected=fm_enum.kHigh, speed_setting_expected=self.speed_max)
+                await self.wrap_veirfy(step, percent_setting_expected=percent_setting_top,
+                                       fan_mode_expected=fm_enum.kHigh, speed_setting_expected=speed_setting_top)
             else:
-                await self.wrap_veirfy(step, percent_setting_expected=100, percent_current_expected=100, speed_current_expected=self.speed_max)
+                await self.wrap_veirfy(step, percent_setting_expected=percent_setting_top,
+                                       percent_current_expected=percent_setting_top, speed_current_expected=speed_setting_top)
         elif step.direction == sd_enum.kIncrease and step.lowestOff:
             # - Verify that the attribute values all go to Off values
             if not handle_current_values:
@@ -1069,6 +1117,9 @@ class TC_FAN_3_5(MatterBaseTest):
         self.timeout_sec: float = 1
         self.percent_setting_per_step: int | None = None
         self.percent_setting_max = 100
+        # Highest step value (PercentSetting) observed on the first Step Increase run. The spec pins
+        # only the lowest step (LowestOff), so the highest one is discovered rather than assumed to be 100.
+        self.percent_setting_top: int | None = None
 
         # *** STEP 1 ***
         # Commissioning already done
