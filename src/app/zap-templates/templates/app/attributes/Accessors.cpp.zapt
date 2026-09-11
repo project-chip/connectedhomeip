@@ -42,25 +42,15 @@ namespace {{asUpperCamelCase label}} {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{#if (isString type)}}{{#if isNullable}}DataModel::Nullable<chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span> &{{else}}chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span &{{/if}}{{else}}{{accessorGetterType this}}{{/if}} value)
 {
-    AttributeDefaultValue defaultVal;
-    Protocols::InteractionModel::Status status =
-        emberAfGetAttributeDefaultValue(endpoint, {{>clusterId}}, Id, defaultVal);
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-
     {{~#if (isString type)}}
-    {{#if isNullable}}
-    value = defaultVal.ToNullable{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span();
-    {{else}}
-    value = defaultVal.To{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span();
-    {{/if}}
-    return Protocols::InteractionModel::Status::Success;
+    return emberAfGetAttributeDefaultValueOr(endpoint, {{>clusterId}}, Id, value);
     {{else}}
     {{#if isNullable}}
-    value = defaultVal.AsNullable<{{accessorTraitType type}}>();
+    return emberAfGetAttributeDefaultValueOr(endpoint, {{>clusterId}}, Id, value);
     {{else}}
-    *value = defaultVal.As<{{accessorTraitType type}}>();
+    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
+    return emberAfGetAttributeDefaultValueOr(endpoint, {{>clusterId}}, Id, *value);
     {{/if}}
-    return Protocols::InteractionModel::Status::Success;
     {{/if}}
 }
 

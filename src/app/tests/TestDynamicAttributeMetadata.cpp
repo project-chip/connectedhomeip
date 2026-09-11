@@ -256,4 +256,69 @@ TEST(TestDynamicAttributeMetadata, EndpointLevelLookup)
     Testing::ResetMockNodeConfig();
 }
 
+TEST(TestDynamicAttributeMetadata, GetAttributeDefaultValueOr)
+{
+    constexpr EndpointId kTestEndpointId = 1;
+    constexpr ClusterId kTestClusterId   = 0xFFF1'0001;
+
+    Testing::MockNodeConfig nodeConfig({
+        Testing::MockEndpointConfig(kTestEndpointId,
+                                    {
+                                        Testing::MockClusterConfig(kTestClusterId,
+                                                                   {
+                                                                       Testing::MockAttributeConfig(0x0001, sTestDynamicAttrs[0]),
+                                                                       Testing::MockAttributeConfig(0x0002, sTestDynamicAttrs[1]),
+                                                                       Testing::MockAttributeConfig(0x0007, sTestDynamicAttrs[6]),
+                                                                   }),
+                                    }),
+    });
+
+    Testing::SetMockNodeConfig(nodeConfig);
+
+    // Existing attribute with explicit default
+    uint8_t u8Val = 0;
+    EXPECT_EQ(emberAfGetAttributeDefaultValueOr(kTestEndpointId, kTestClusterId, 0x0002, u8Val, static_cast<uint8_t>(99)),
+              Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(u8Val, 42);
+
+    // Existing attribute with NO default in metadata: falls back to specified fallback
+    u8Val = 0;
+    EXPECT_EQ(emberAfGetAttributeDefaultValueOr(kTestEndpointId, kTestClusterId, 0x0001, u8Val, static_cast<uint8_t>(77)),
+              Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(u8Val, 77);
+
+    // Existing attribute with NO default in metadata: default-constructed fallback (0)
+    uint8_t u8DefaultFallback = 99;
+    EXPECT_EQ(emberAfGetAttributeDefaultValueOr(kTestEndpointId, kTestClusterId, 0x0001, u8DefaultFallback),
+              Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(u8DefaultFallback, 0);
+
+    // String attribute with explicit default
+    CharSpan strVal;
+    EXPECT_EQ(emberAfGetAttributeDefaultValueOr(kTestEndpointId, kTestClusterId, 0x0007, strVal),
+              Protocols::InteractionModel::Status::Success);
+    EXPECT_TRUE(strVal.data_equal("Hello"_span));
+
+    // String attribute with NO default: fallback
+    EXPECT_EQ(emberAfGetAttributeDefaultValueOr(kTestEndpointId, kTestClusterId, 0x0001, strVal, "Fallback"_span),
+              Protocols::InteractionModel::Status::Success);
+    EXPECT_TRUE(strVal.data_equal("Fallback"_span));
+
+    // Nullable attribute with NO default: defaults to Null
+    DataModel::Nullable<uint8_t> nullableVal(123);
+    EXPECT_EQ(emberAfGetAttributeDefaultValueOr(kTestEndpointId, kTestClusterId, 0x0001, nullableVal),
+              Protocols::InteractionModel::Status::Success);
+    EXPECT_TRUE(nullableVal.IsNull());
+
+    // Non-existent attribute returns UnsupportedAttribute
+    EXPECT_EQ(emberAfGetAttributeDefaultValueOr(kTestEndpointId, kTestClusterId, 0x9999, u8Val),
+              Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    // Non-existent endpoint/cluster returns UnsupportedAttribute
+    EXPECT_EQ(emberAfGetAttributeDefaultValueOr(99, kTestClusterId, 0x0002, u8Val),
+              Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    Testing::ResetMockNodeConfig();
+}
+
 } // namespace
