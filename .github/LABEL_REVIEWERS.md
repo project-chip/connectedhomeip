@@ -81,6 +81,10 @@ GitHub usernames:
 -   **OR-Logic across Labels**: If a PR has multiple designated labels attached
     (e.g., both `security` and `certification`), approval from at least **one**
     reviewer from **any** of the attached labels' lists satisfies the check.
+-   **Override Label (`no-sme-check-required`)**: Attaching the
+    `no-sme-check-required` label to a PR bypasses the SME review requirement
+    completely, allowing emergency fixes or exempt PRs to pass the status check
+    without designated SME sign-off.
 -   **Author Self-Approval Exclusion**: A PR author **cannot approve their own
     PR**. Even if the author is listed as an SME for a label, another reviewer
     from that label's list must provide the approval.
@@ -163,6 +167,12 @@ page:
 
 Removing and re-adding the monitored label (or adding any other label) triggers
 the `labeled` / `unlabeled` PR event and immediately re-evaluates the check.
+
+### Method 5: Emergency Override (`no-sme-check-required`)
+
+If a PR needs to merge without designated SME review (e.g. an emergency hotfix
+or exempt change), attach the `no-sme-check-required` label to the pull request.
+The check will immediately pass and record that the SME review was bypassed.
 
 ---
 

@@ -37,6 +37,7 @@ import yaml
 
 DEFAULT_REPO = "project-chip/connectedhomeip"
 DEFAULT_CONFIG_PATH = ".github/label_reviewers.yaml"
+DEFAULT_OVERRIDE_LABEL = "no-sme-check-required"
 
 
 @dataclass
@@ -177,9 +178,21 @@ def evaluate_pr_labels(
     return evaluations
 
 
-def is_sme_review_satisfied(evaluations: list[LabelEvaluation]) -> bool:
-    """Returns True if no monitored labels are present, or if ANY label has at least one SME approval."""
-    if not evaluations:
+def check_override_present(
+    pr_labels: list[str],
+    override_label: str = DEFAULT_OVERRIDE_LABEL,
+) -> bool:
+    """Checks if the override label is attached to the PR (case-insensitive)."""
+    target = override_label.strip().lower()
+    return any(l.strip().lower() == target for l in pr_labels if l and l.strip())
+
+
+def is_sme_review_satisfied(
+    evaluations: list[LabelEvaluation],
+    overridden: bool = False,
+) -> bool:
+    """Returns True if overridden, no monitored labels are present, or ANY label has at least one SME approval."""
+    if overridden or not evaluations:
         return True
     return any(ev.satisfied for ev in evaluations)
 
@@ -190,6 +203,8 @@ def generate_step_summary(
     pr_title: str,
     pr_author: str,
     passed: bool,
+    overridden: bool = False,
+    override_label: str = DEFAULT_OVERRIDE_LABEL,
 ) -> str:
     """Builds a GitHub Actions Markdown Step Summary."""
     md = []
@@ -197,11 +212,17 @@ def generate_step_summary(
     md.append(f"**Title**: {pr_title}  ")
     md.append(f"**Author**: @{pr_author}  \n")
 
-    if not evaluations:
+    if overridden:
         md.append(
-            "> ℹ️ **No monitored SME review labels attached.**  \n"
-            "> This PR does not currently require specialized subject matter expert sign-off."
+            f"> ⚠️ **SME Review Requirement Bypassed**: Override label `{override_label}` is attached to this PR.\n"
         )
+
+    if not evaluations:
+        if not overridden:
+            md.append(
+                "> ℹ️ **No monitored SME review labels attached.**  \n"
+                "> This PR does not currently require specialized subject matter expert sign-off."
+            )
         return "\n".join(md)
 
     md.append("| Label | Status | Required SMEs | Approved By |")
@@ -213,13 +234,21 @@ def generate_step_summary(
         if ev.satisfied:
             status_icon = "✅ Approved"
             approvers_str = ", ".join([f"@{u}" for u in ev.approvers])
+        elif overridden:
+            status_icon = f"⚪ Overridden (`{override_label}`)"
+            approvers_str = "*None*"
         else:
             status_icon = "⚪ Satisfied (by other label)" if passed else "❌ Missing"
             approvers_str = "*None*"
         md.append(f"| {label_code} | {status_icon} | {req_smes} | {approvers_str} |")
 
     md.append("")
-    if passed:
+    if overridden:
+        md.append(
+            "> ⚠️ **SME Review Requirement Bypassed via Override Label.**  \n"
+            f"> The `{override_label}` label was applied to skip SME sign-off."
+        )
+    elif passed:
         all_matching_approvers = sorted({f"@{u}" for ev in evaluations for u in ev.approvers})
         if all_matching_approvers:
             md.append(
@@ -260,8 +289,12 @@ def write_step_summary(summary_path: str, summary_markdown: str) -> None:
         logging.warning(f"Failed writing to GITHUB_STEP_SUMMARY: {e}")
 
 
-def sync_labels_to_github(repo: str, config_mapping: dict[str, LabelRule]) -> list[str]:
-    """Ensures all configured labels exist in the GitHub repository using gh CLI."""
+def sync_labels_to_github(
+    repo: str,
+    config_mapping: dict[str, LabelRule],
+    override_label: str = DEFAULT_OVERRIDE_LABEL,
+) -> list[str]:
+    """Ensures all configured labels and the override label exist in the GitHub repository using gh CLI."""
     cmd = ["gh", "label", "list", "--repo", repo, "--limit", "1000", "--json", "name"]
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
@@ -274,6 +307,34 @@ def sync_labels_to_github(repo: str, config_mapping: dict[str, LabelRule]) -> li
         existing_labels = set()
 
     created: list[str] = []
+
+    if override_label and override_label.strip().lower() not in existing_labels:
+        logging.info(
+            f"Override label '{override_label}' does not exist on {repo}. Creating..."
+        )
+        create_cmd = [
+            "gh",
+            "label",
+            "create",
+            override_label,
+            "--repo",
+            repo,
+            "--description",
+            "Override to bypass required SME reviews",
+            "--color",
+            "fbca04",
+        ]
+        try:
+            subprocess.run(create_cmd, capture_output=True, text=True, check=True)
+            created.append(override_label)
+            logging.info(
+                f"✅ Successfully created override label '{override_label}' on GitHub."
+            )
+        except subprocess.CalledProcessError as e:
+            logging.warning(
+                f"Could not create override label '{override_label}': {e.stderr.strip()}"
+            )
+
     for key, rule in config_mapping.items():
         if key not in existing_labels:
             logging.info(
@@ -335,6 +396,11 @@ def main() -> int:
         help="Validate the syntax and format of the configuration file and exit.",
     )
     parser.add_argument(
+        "--override-label",
+        default=DEFAULT_OVERRIDE_LABEL,
+        help=f"Label name that bypasses SME review checks (default: {DEFAULT_OVERRIDE_LABEL})",
+    )
+    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
@@ -367,7 +433,7 @@ def main() -> int:
 
     if args.sync_labels:
         logging.info(f"Syncing labels from {args.config} to repository {args.repo}...")
-        created = sync_labels_to_github(args.repo, config_mapping)
+        created = sync_labels_to_github(args.repo, config_mapping, args.override_label)
         if created:
             print(f"Created {len(created)} new label(s) on GitHub: {', '.join(created)}")
         else:
@@ -401,6 +467,11 @@ def main() -> int:
     approvers = extract_approvers(pr_data)
     logging.info(f"Active approved reviews from: {sorted(approvers) or 'None'}")
 
+    overridden = check_override_present(pr_labels, args.override_label)
+    if overridden:
+        print(f"⚠️  Override label '{args.override_label}' is present on this PR.")
+        print("   SME review check is bypassed.\n" + "=" * 72)
+
     evaluations = evaluate_pr_labels(pr_labels, config_mapping, approvers)
 
     if not evaluations:
@@ -409,7 +480,7 @@ def main() -> int:
         passed = True
     else:
         print(f"Found {len(evaluations)} monitored SME label(s) on this PR:\n")
-        passed = is_sme_review_satisfied(evaluations)
+        passed = is_sme_review_satisfied(evaluations, overridden=overridden)
         all_matching_approvers = sorted({u for ev in evaluations for u in ev.approvers})
 
         for idx, ev in enumerate(evaluations, 1):
@@ -419,6 +490,10 @@ def main() -> int:
                 print(f"  [{idx}] Label: '{ev.rule.name}'")
                 print(f"      Required SMEs: {req_smes}")
                 print(f"      Status:        ✅ APPROVED by {approver_mentions}\n")
+            elif overridden:
+                print(f"  [{idx}] Label: '{ev.rule.name}'")
+                print(f"      Required SMEs: {req_smes}")
+                print(f"      Status:        ⚪ OVERRIDDEN by '{args.override_label}'\n")
             else:
                 print(f"  [{idx}] Label: '{ev.rule.name}'")
                 print(f"      Required SMEs: {req_smes}")
@@ -447,6 +522,7 @@ def main() -> int:
             gh_output,
             {
                 "passed": "true" if passed else "false",
+                "overridden": "true" if overridden else "false",
                 "total_monitored_labels": str(len(evaluations)),
                 "missing_count": "0" if passed else str(len(missing_labels)),
                 "approved_labels": ",".join(approved_labels),
@@ -458,9 +534,19 @@ def main() -> int:
     gh_summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if gh_summary:
         summary_md = generate_step_summary(
-            evaluations, pr_number, pr_title, pr_author, passed
+            evaluations,
+            pr_number,
+            pr_title,
+            pr_author,
+            passed,
+            overridden=overridden,
+            override_label=args.override_label,
         )
         write_step_summary(gh_summary, summary_md)
+
+    if overridden:
+        print(f"⚠️ BYPASSED: SME review check overridden by '{args.override_label}'.\n")
+        return 0
 
     if passed:
         print("✅ SUCCESS: SME review requirement has been satisfied.\n")

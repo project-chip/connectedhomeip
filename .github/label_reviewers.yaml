@@ -37,6 +37,8 @@
 #   - If a PR has no designated labels attached, the check passes automatically.
 #   - If multiple designated labels are attached, approval from ANY one reviewer
 #     across any of the associated labels' lists satisfies the check.
+#   - Override Label: Attaching "no-sme-check-required" to a PR completely
+#     bypasses the SME approval check.
 #
 # Format:
 #   <label_name>:

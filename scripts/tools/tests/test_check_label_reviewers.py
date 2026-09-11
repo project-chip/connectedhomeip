@@ -26,7 +26,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from check_label_reviewers import (LabelEvaluation, LabelRule, evaluate_pr_labels, extract_approvers,  # noqa: E402
+from check_label_reviewers import (DEFAULT_OVERRIDE_LABEL, LabelEvaluation, LabelRule,  # noqa: E402
+                                   check_override_present, evaluate_pr_labels, extract_approvers,
                                    generate_step_summary, is_sme_review_satisfied, parse_label_config)
 
 
@@ -212,6 +213,34 @@ class TestExtractApprovers(unittest.TestCase):
         self.assertEqual(extract_approvers(empty_data), set())
 
 
+class TestCheckOverridePresent(unittest.TestCase):
+    """Tests checking for the presence of override labels."""
+
+    def test_default_override_label_exact_match(self) -> None:
+        pr_labels = ["bug", "no-sme-check-required", "security"]
+        self.assertTrue(check_override_present(pr_labels))
+
+    def test_override_label_case_insensitive(self) -> None:
+        pr_labels = ["No-SME-Check-Required"]
+        self.assertTrue(check_override_present(pr_labels))
+
+    def test_override_label_with_surrounding_whitespace(self) -> None:
+        pr_labels = ["  no-sme-check-required  "]
+        self.assertTrue(check_override_present(pr_labels))
+
+    def test_override_label_not_present(self) -> None:
+        pr_labels = ["bug", "security", "enhancement"]
+        self.assertFalse(check_override_present(pr_labels))
+
+    def test_override_label_empty_labels(self) -> None:
+        self.assertFalse(check_override_present([]))
+
+    def test_custom_override_label(self) -> None:
+        pr_labels = ["exempt-from-sme"]
+        self.assertTrue(check_override_present(pr_labels, override_label="exempt-from-sme"))
+        self.assertFalse(check_override_present(pr_labels, override_label="other-label"))
+
+
 class TestEvaluatePrLabels(unittest.TestCase):
     """Tests evaluating PR labels against configured rules and approvers."""
 
@@ -287,6 +316,15 @@ class TestEvaluatePrLabels(unittest.TestCase):
         self.assertTrue(evaluations[0].satisfied)
         self.assertEqual(evaluations[0].approvers, ["alice"])
 
+    def test_overridden_satisfies_check_even_without_approvals(self) -> None:
+        rule = LabelRule(name="Security", smes=["alice"])
+        ev = LabelEvaluation(rule=rule, present_on_pr=True, approvers=[])
+        self.assertFalse(is_sme_review_satisfied([ev]))
+        self.assertTrue(is_sme_review_satisfied([ev], overridden=True))
+
+    def test_overridden_satisfies_check_with_no_evaluations(self) -> None:
+        self.assertTrue(is_sme_review_satisfied([], overridden=True))
+
 
 class TestGenerateStepSummary(unittest.TestCase):
     """Tests generating GitHub Actions Markdown step summaries."""
@@ -324,6 +362,23 @@ class TestGenerateStepSummary(unittest.TestCase):
 
         self.assertIn("| `Security` | ❌ Missing | @alice, @bob | *None* |", summary)
         self.assertIn("Review Required", summary)
+
+    def test_summary_overridden_with_monitored_labels(self) -> None:
+        rule = LabelRule(name="Security", smes=["alice"])
+        evals = [LabelEvaluation(rule=rule, present_on_pr=True, approvers=[])]
+        summary = generate_step_summary(
+            evals, 100, "Security patch", "author1", True, overridden=True, override_label="no-sme-check-required"
+        )
+        self.assertIn("SME Review Requirement Bypassed", summary)
+        self.assertIn("no-sme-check-required", summary)
+        self.assertIn("| `Security` | ⚪ Overridden (`no-sme-check-required`) | @alice | *None* |", summary)
+
+    def test_summary_overridden_no_monitored_labels(self) -> None:
+        summary = generate_step_summary(
+            [], 100, "No labels PR", "author1", True, overridden=True, override_label="no-sme-check-required"
+        )
+        self.assertIn("SME Review Requirement Bypassed", summary)
+        self.assertIn("no-sme-check-required", summary)
 
 
 class TestEndToEndJsonEvaluation(unittest.TestCase):
@@ -390,6 +445,28 @@ class TestEndToEndJsonEvaluation(unittest.TestCase):
         evaluations = evaluate_pr_labels(pr_labels, config, approvers)
 
         self.assertFalse(is_sme_review_satisfied(evaluations))
+
+    def test_full_evaluation_flow_with_override_label(self) -> None:
+        mock_gh_json = {
+            "title": "Emergency hotfix for crypto issue",
+            "author": {"login": "contributor"},
+            "state": "OPEN",
+            "labels": [
+                {"name": "security"},
+                {"name": "no-sme-check-required"},
+            ],
+            "latestReviews": [],
+        }
+        config = {
+            "security": LabelRule(name="security", smes=["sme_alice", "sme_bob"]),
+        }
+        approvers = extract_approvers(mock_gh_json)
+        pr_labels = [l["name"] for l in mock_gh_json.get("labels", [])]
+        overridden = check_override_present(pr_labels)
+        self.assertTrue(overridden)
+
+        evaluations = evaluate_pr_labels(pr_labels, config, approvers)
+        self.assertTrue(is_sme_review_satisfied(evaluations, overridden=overridden))
 
 
 if __name__ == "__main__":
