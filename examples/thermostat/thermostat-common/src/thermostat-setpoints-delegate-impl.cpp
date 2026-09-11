@@ -45,18 +45,18 @@ CHIP_ERROR ThermostatSetpointsDelegate::Startup(ServerClusterContext & context)
     VerifyOrReturnError(provider != nullptr, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     AttributePersistence persistence(*provider);
 
-    if (auto status = AbsMinCoolSetpointLimit::GetDefault(mEndpointId, &mAbsMinCoolSetpointLimit); status != Status::Success)
+    if (auto status = AbsMinCoolSetpointLimit::GetDefault(mEndpointId, mAbsMinCoolSetpointLimit); status != Status::Success)
     {
         mAbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
     }
 
-    if (auto status = AbsMaxCoolSetpointLimit::GetDefault(mEndpointId, &mAbsMaxCoolSetpointLimit); status != Status::Success)
+    if (auto status = AbsMaxCoolSetpointLimit::GetDefault(mEndpointId, mAbsMaxCoolSetpointLimit); status != Status::Success)
     {
         mAbsMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
     }
 
     temperature defaultMinCoolLimit;
-    if (auto status = MinCoolSetpointLimit::GetDefault(mEndpointId, &defaultMinCoolLimit); status != Status::Success)
+    if (auto status = MinCoolSetpointLimit::GetDefault(mEndpointId, defaultMinCoolLimit); status != Status::Success)
     {
         defaultMinCoolLimit = mAbsMinCoolSetpointLimit;
     }
@@ -64,39 +64,39 @@ CHIP_ERROR ThermostatSetpointsDelegate::Startup(ServerClusterContext & context)
                                       defaultMinCoolLimit);
 
     temperature defaultMaxCoolLimit;
-    if (auto status = MaxCoolSetpointLimit::GetDefault(mEndpointId, &defaultMaxCoolLimit); status != Status::Success)
+    if (auto status = MaxCoolSetpointLimit::GetDefault(mEndpointId, defaultMaxCoolLimit); status != Status::Success)
     {
         defaultMaxCoolLimit = mAbsMaxCoolSetpointLimit;
     }
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxCoolSetpointLimit::Id }, mMaxCoolSetpointLimit,
                                       defaultMaxCoolLimit);
 
-    if (auto status = OccupiedCoolingSetpoint::GetDefault(mEndpointId, &mOccupiedCoolingSetpoint); status != Status::Success)
+    if (auto status = OccupiedCoolingSetpoint::GetDefault(mEndpointId, mOccupiedCoolingSetpoint); status != Status::Success)
     {
         mOccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
     }
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, OccupiedCoolingSetpoint::Id }, mOccupiedCoolingSetpoint,
                                       mOccupiedCoolingSetpoint);
 
-    if (auto status = UnoccupiedCoolingSetpoint::GetDefault(mEndpointId, &mUnoccupiedCoolingSetpoint); status != Status::Success)
+    if (auto status = UnoccupiedCoolingSetpoint::GetDefault(mEndpointId, mUnoccupiedCoolingSetpoint); status != Status::Success)
     {
         mUnoccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
     }
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, UnoccupiedCoolingSetpoint::Id }, mUnoccupiedCoolingSetpoint,
                                       mUnoccupiedCoolingSetpoint);
 
-    if (auto status = AbsMinHeatSetpointLimit::GetDefault(mEndpointId, &mAbsMinHeatSetpointLimit); status != Status::Success)
+    if (auto status = AbsMinHeatSetpointLimit::GetDefault(mEndpointId, mAbsMinHeatSetpointLimit); status != Status::Success)
     {
         mAbsMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
     }
 
-    if (auto status = AbsMaxHeatSetpointLimit::GetDefault(mEndpointId, &mAbsMaxHeatSetpointLimit); status != Status::Success)
+    if (auto status = AbsMaxHeatSetpointLimit::GetDefault(mEndpointId, mAbsMaxHeatSetpointLimit); status != Status::Success)
     {
         mAbsMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
     }
 
     temperature defaultMinHeatLimit;
-    if (auto status = MinHeatSetpointLimit::GetDefault(mEndpointId, &defaultMinHeatLimit); status != Status::Success)
+    if (auto status = MinHeatSetpointLimit::GetDefault(mEndpointId, defaultMinHeatLimit); status != Status::Success)
     {
         defaultMinHeatLimit = mAbsMinHeatSetpointLimit;
     }
@@ -104,21 +104,21 @@ CHIP_ERROR ThermostatSetpointsDelegate::Startup(ServerClusterContext & context)
                                       defaultMinHeatLimit);
 
     temperature defaultMaxHeatLimit;
-    if (auto status = MaxHeatSetpointLimit::GetDefault(mEndpointId, &defaultMaxHeatLimit); status != Status::Success)
+    if (auto status = MaxHeatSetpointLimit::GetDefault(mEndpointId, defaultMaxHeatLimit); status != Status::Success)
     {
         defaultMaxHeatLimit = mAbsMaxHeatSetpointLimit;
     }
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MaxHeatSetpointLimit::Id }, mMaxHeatSetpointLimit,
                                       defaultMaxHeatLimit);
 
-    if (auto status = OccupiedHeatingSetpoint::GetDefault(mEndpointId, &mOccupiedHeatingSetpoint); status != Status::Success)
+    if (auto status = OccupiedHeatingSetpoint::GetDefault(mEndpointId, mOccupiedHeatingSetpoint); status != Status::Success)
     {
         mOccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
     }
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, OccupiedHeatingSetpoint::Id }, mOccupiedHeatingSetpoint,
                                       mOccupiedHeatingSetpoint);
 
-    if (auto status = UnoccupiedHeatingSetpoint::GetDefault(mEndpointId, &mUnoccupiedHeatingSetpoint); status != Status::Success)
+    if (auto status = UnoccupiedHeatingSetpoint::GetDefault(mEndpointId, mUnoccupiedHeatingSetpoint); status != Status::Success)
     {
         mUnoccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
     }
@@ -142,7 +142,7 @@ Protocols::InteractionModel::Status ThermostatSetpointsDelegate::GetMinDeadband(
 
     // The deadband is stored as a SignedTemperature, which is an int8_t in tenths of a degree
     int8_t deadBand = static_cast<int8_t>(kDefaultDeadBand / 10);
-    MinSetpointDeadBand::GetDefault(mEndpointId, &deadBand);
+    MinSetpointDeadBand::GetDefault(mEndpointId, deadBand);
     persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id }, deadBand, deadBand);
     minDeadband = static_cast<int16_t>(deadBand * 10);
     return Status::Success;

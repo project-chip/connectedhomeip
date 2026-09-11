@@ -44,13 +44,12 @@ namespace Attributes {
 
 namespace IdentifyTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Identify::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -58,13 +57,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace IdentifyType {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Identify::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Identify::IdentifyTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::Identify::IdentifyTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -72,13 +70,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Identify::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -86,13 +83,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Identify::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -107,13 +103,12 @@ namespace Attributes {
 namespace NameSupport {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Groups::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -121,13 +116,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Groups::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -135,13 +129,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Groups::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -155,13 +148,12 @@ namespace Attributes {
 
 namespace OnOff {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::OnOff::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -211,13 +203,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace GlobalSceneControl {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::OnOff::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -267,13 +258,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace OnTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::OnOff::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -323,13 +313,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace OffWaitTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::OnOff::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -482,13 +471,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::OnOff::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -538,13 +526,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::OnOff::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -700,14 +687,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace RemainingTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -758,14 +744,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace MinLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -816,14 +801,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace MaxLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -874,14 +858,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace CurrentFrequency {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -932,14 +915,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace MinFrequency {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -990,14 +972,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace MaxFrequency {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1049,14 +1030,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace Options {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1109,14 +1089,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 
 namespace OnOffTransitionTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1667,14 +1646,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1725,14 +1703,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LevelControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1789,14 +1766,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PulseWidthModulation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1847,14 +1823,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PulseWidthModulation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1925,14 +1900,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Descriptor::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1940,14 +1914,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Descriptor::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1961,13 +1934,12 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Binding::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1975,13 +1947,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Binding::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1995,14 +1966,13 @@ namespace Attributes {
 
 namespace SubjectsPerAccessControlEntry {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AccessControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2010,14 +1980,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace TargetsPerAccessControlEntry {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AccessControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2025,14 +1994,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace AccessControlEntriesPerFabric {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AccessControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2040,14 +2008,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AccessControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2055,14 +2022,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AccessControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2089,13 +2055,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Actions::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2103,13 +2068,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Actions::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2123,14 +2087,13 @@ namespace Attributes {
 
 namespace DataModelRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2152,14 +2115,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace VendorID {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::VendorId>();
+    value = defaultVal.As<chip::VendorId>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2181,14 +2143,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace ProductID {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2224,14 +2185,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace HardwareVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2253,14 +2213,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace SoftwareVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2352,14 +2311,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace LocalConfigDisabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2367,14 +2325,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace Reachable {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2396,14 +2353,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace SpecificationVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2411,14 +2367,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace MaxPathsPerInvoke {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2426,14 +2381,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace ConfigurationVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2441,14 +2395,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2456,14 +2409,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2477,14 +2429,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2492,14 +2443,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2513,14 +2463,13 @@ namespace Attributes {
 
 namespace UpdatePossible {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2529,14 +2478,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 namespace UpdateState {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum * value)
+                                               chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2558,14 +2506,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2573,14 +2520,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2608,14 +2554,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LocalizationConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2623,14 +2568,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LocalizationConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2645,14 +2589,13 @@ namespace Attributes {
 namespace HourFormat {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::TimeFormatLocalization::HourFormatEnum * value)
+                                               chip::app::Clusters::TimeFormatLocalization::HourFormatEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeFormatLocalization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum>();
+    value = defaultVal.As<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2661,14 +2604,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace ActiveCalendarType {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum * value)
+                                               chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeFormatLocalization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2676,14 +2618,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeFormatLocalization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2691,14 +2632,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeFormatLocalization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2712,14 +2652,13 @@ namespace Attributes {
 
 namespace TemperatureUnit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::UnitLocalization::TempUnitEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::UnitLocalization::TempUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitLocalization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::UnitLocalization::TempUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::UnitLocalization::TempUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2727,14 +2666,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitLocalization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2742,14 +2680,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitLocalization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2763,14 +2700,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSourceConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2821,14 +2757,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSourceConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2885,14 +2820,13 @@ namespace Attributes {
 
 namespace Status {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>();
+    value = defaultVal.As<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -2944,14 +2878,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace Order {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -3259,14 +3192,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace WiredCurrentType {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -3418,14 +3350,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace WiredNominalVoltage {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -3476,14 +3407,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace WiredMaximumCurrent {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -3534,14 +3464,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace WiredPresent {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -3892,14 +3821,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace BatChargeLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PowerSource::BatChargeLevelEnum>();
+    value = defaultVal.As<chip::app::Clusters::PowerSource::BatChargeLevelEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -3951,14 +3879,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace BatReplacementNeeded {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4009,14 +3936,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace BatReplaceability {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>();
+    value = defaultVal.As<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4068,14 +3994,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace BatPresent {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4184,14 +4109,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 namespace BatCommonDesignation {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::PowerSource::BatCommonDesignationEnum * value)
+                                               chip::app::Clusters::PowerSource::BatCommonDesignationEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>();
+    value = defaultVal.As<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4358,14 +4282,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 namespace BatApprovedChemistry {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::PowerSource::BatApprovedChemistryEnum * value)
+                                               chip::app::Clusters::PowerSource::BatApprovedChemistryEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>();
+    value = defaultVal.As<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4417,14 +4340,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace BatCapacity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4475,14 +4397,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace BatQuantity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4533,14 +4454,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace BatChargeState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PowerSource::BatChargeStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::PowerSource::BatChargeStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4692,14 +4612,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace BatFunctionalWhileCharging {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4850,14 +4769,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4908,14 +4826,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerSource::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4929,14 +4846,13 @@ namespace Attributes {
 
 namespace Breadcrumb {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4945,14 +4861,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 namespace RegulatoryConfig {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum * value)
+                                               chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4961,14 +4876,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace LocationCapability {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum * value)
+                                               chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4976,14 +4890,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace SupportsConcurrentConnection {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -4991,14 +4904,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace TCAcceptedVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5006,14 +4918,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace TCMinRequiredVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5021,14 +4932,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace TCAcknowledgements {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5036,14 +4946,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace TCAcknowledgementsRequired {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5094,14 +5003,13 @@ GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::General
 
 namespace IsCommissioningWithoutPower {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5109,14 +5017,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5124,14 +5031,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5145,14 +5051,13 @@ namespace Attributes {
 
 namespace MaxNetworks {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5160,14 +5065,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace ScanMaxTimeSeconds {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5175,14 +5079,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace ConnectMaxTimeSeconds {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5190,14 +5093,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace InterfaceEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5250,14 +5152,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 namespace SupportedThreadFeatures {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5265,14 +5166,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::NetworkCommis
 
 namespace ThreadVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5280,14 +5180,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5295,14 +5194,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5316,14 +5214,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DiagnosticLogs::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5331,14 +5228,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DiagnosticLogs::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5352,14 +5248,13 @@ namespace Attributes {
 
 namespace RebootCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5367,14 +5262,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace UpTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5382,14 +5276,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace TotalOperationalHours {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5397,14 +5290,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace BootReason {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::GeneralDiagnostics::BootReasonEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::GeneralDiagnostics::BootReasonEnum>();
+    value = defaultVal.As<chip::app::Clusters::GeneralDiagnostics::BootReasonEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5412,14 +5304,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace TestEventTriggersEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5427,14 +5318,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5442,14 +5332,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GeneralDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5463,14 +5352,13 @@ namespace Attributes {
 
 namespace CurrentHeapFree {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SoftwareDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5478,14 +5366,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace CurrentHeapUsed {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SoftwareDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5493,14 +5380,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace CurrentHeapHighWatermark {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SoftwareDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5508,14 +5394,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SoftwareDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5523,14 +5408,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SoftwareDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5629,14 +5513,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace OverrunCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5714,14 +5597,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace DetachedRoleCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5729,14 +5611,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace ChildRoleCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5744,14 +5625,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace RouterRoleCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5759,14 +5639,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace LeaderRoleCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5774,14 +5653,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace AttachAttemptCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5789,14 +5667,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace PartitionIdChangeCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5804,14 +5681,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace BetterPartitionAttachAttemptCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5819,14 +5695,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace ParentChangeCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5834,14 +5709,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace TxTotalCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5849,14 +5723,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxUnicastCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5864,14 +5737,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxBroadcastCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5879,14 +5751,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxAckRequestedCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5894,14 +5765,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxAckedCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5909,14 +5779,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxNoAckRequestedCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5924,14 +5793,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxDataCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5939,14 +5807,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxDataPollCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5954,14 +5821,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxBeaconCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5969,14 +5835,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxBeaconRequestCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5984,14 +5849,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxOtherCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -5999,14 +5863,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxRetryCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6014,14 +5877,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxDirectMaxRetryExpiryCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6029,14 +5891,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxIndirectMaxRetryExpiryCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6044,14 +5905,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxErrCcaCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6059,14 +5919,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxErrAbortCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6074,14 +5933,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace TxErrBusyChannelCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6089,14 +5947,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxTotalCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6104,14 +5961,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxUnicastCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6119,14 +5975,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxBroadcastCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6134,14 +5989,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxDataCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6149,14 +6003,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxDataPollCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6164,14 +6017,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxBeaconCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6179,14 +6031,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxBeaconRequestCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6194,14 +6045,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxOtherCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6209,14 +6059,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxAddressFilteredCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6224,14 +6073,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxDestAddrFilteredCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6239,14 +6087,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxDuplicatedCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6254,14 +6101,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxErrNoFrameCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6269,14 +6115,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxErrUnknownNeighborCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6284,14 +6129,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxErrInvalidSrcAddrCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6299,14 +6143,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxErrSecCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6314,14 +6157,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxErrFcsCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6329,14 +6171,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace RxErrOtherCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6428,14 +6269,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6443,14 +6283,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6648,14 +6487,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6663,14 +6501,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6713,14 +6550,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PacketRxCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6728,14 +6564,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace PacketTxCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6743,14 +6578,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace TxErrCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6758,14 +6592,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace CollisionCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6773,14 +6606,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace OverrunCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6802,14 +6634,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace TimeSinceReset {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6817,14 +6648,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6832,14 +6662,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6868,14 +6697,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 namespace Granularity {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::TimeSynchronization::GranularityEnum * value)
+                                               chip::app::Clusters::TimeSynchronization::GranularityEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeSynchronization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::TimeSynchronization::GranularityEnum>();
+    value = defaultVal.As<chip::app::Clusters::TimeSynchronization::GranularityEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6884,14 +6712,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace TimeSource {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::TimeSynchronization::TimeSourceEnum * value)
+                                               chip::app::Clusters::TimeSynchronization::TimeSourceEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeSynchronization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::TimeSynchronization::TimeSourceEnum>();
+    value = defaultVal.As<chip::app::Clusters::TimeSynchronization::TimeSourceEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6928,14 +6755,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 namespace TimeZoneDatabase {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum * value)
+                                               chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeSynchronization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum>();
+    value = defaultVal.As<chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6943,14 +6769,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace NTPServerAvailable {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeSynchronization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6958,14 +6783,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace TimeZoneListMaxSize {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeSynchronization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6973,14 +6797,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace DSTOffsetListMaxSize {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeSynchronization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -6988,14 +6811,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace SupportsDNSResolve {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeSynchronization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7003,14 +6825,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeSynchronization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7018,14 +6839,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TimeSynchronization::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7053,14 +6873,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace VendorID {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::VendorId>();
+    value = defaultVal.As<chip::VendorId>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7082,14 +6901,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace ProductID {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7111,14 +6929,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace HardwareVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7140,14 +6957,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace SoftwareVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7239,14 +7055,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace Reachable {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7268,14 +7083,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace ConfigurationVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7283,14 +7097,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7298,14 +7111,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7319,13 +7131,12 @@ namespace Attributes {
 
 namespace NumberOfPositions {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Switch::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7333,13 +7144,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace CurrentPosition {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Switch::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7347,13 +7157,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MultiPressMax {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Switch::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7361,13 +7170,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Switch::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7375,13 +7183,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Switch::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7396,14 +7203,13 @@ namespace Attributes {
 namespace WindowStatus {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AdministratorCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum>();
+    value = defaultVal.As<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7439,14 +7245,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AdministratorCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7454,14 +7259,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AdministratorCommissioning::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7475,14 +7279,13 @@ namespace Attributes {
 
 namespace SupportedFabrics {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OperationalCredentials::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7490,14 +7293,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace CommissionedFabrics {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OperationalCredentials::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7505,14 +7307,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace CurrentFabricIndex {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OperationalCredentials::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7520,14 +7321,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OperationalCredentials::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7535,14 +7335,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OperationalCredentials::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7556,14 +7355,13 @@ namespace Attributes {
 
 namespace MaxGroupsPerFabric {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GroupKeyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7571,14 +7369,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace MaxGroupKeysPerFabric {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GroupKeyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7586,14 +7383,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GroupKeyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7601,14 +7397,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::GroupKeyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7622,14 +7417,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FixedLabel::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7637,14 +7431,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FixedLabel::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7658,13 +7451,12 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::UserLabel::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7672,13 +7464,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::UserLabel::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7692,14 +7483,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProxyConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7750,14 +7540,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProxyConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7814,14 +7603,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProxyDiscovery::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7872,14 +7660,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProxyDiscovery::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7936,14 +7723,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProxyValid::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -7994,14 +7780,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProxyValid::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8058,14 +7843,13 @@ namespace Attributes {
 
 namespace StateValue {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8073,14 +7857,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8088,14 +7871,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8109,14 +7891,13 @@ namespace Attributes {
 
 namespace IdleModeDuration {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8124,14 +7905,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ActiveModeDuration {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8139,14 +7919,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ActiveModeThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8154,14 +7933,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace ICDCounter {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8169,14 +7947,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClientsSupportedPerFabric {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8185,14 +7962,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 namespace UserActiveModeTriggerHint {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8214,14 +7990,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 
 namespace OperatingMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::IcdManagement::OperatingModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::IcdManagement::OperatingModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8229,14 +8004,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace MaximumCheckInBackOff {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8244,14 +8018,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8259,14 +8032,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IcdManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8309,14 +8081,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 namespace OperationalState {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum * value)
+                                               chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OvenCavityOperationalState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8324,14 +8095,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OvenCavityOperationalState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8339,14 +8109,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OvenCavityOperationalState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8360,13 +8129,12 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::OvenMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8374,13 +8142,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::OvenMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8388,13 +8155,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::OvenMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8423,14 +8189,13 @@ GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Laundry
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LaundryDryerControls::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8438,14 +8203,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LaundryDryerControls::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8460,14 +8224,13 @@ namespace Attributes {
 namespace Topology {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum * value)
+                                               chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControlledCabinetTopology::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum>();
+    value = defaultVal.As<chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8523,14 +8286,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControlledCabinetTopology::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8582,14 +8344,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControlledCabinetTopology::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8675,14 +8436,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ModeSelect::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8718,14 +8478,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ModeSelect::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8733,14 +8492,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ModeSelect::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8754,14 +8512,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LaundryWasherMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8769,14 +8526,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LaundryWasherMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8784,14 +8540,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LaundryWasherMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8805,14 +8560,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8820,14 +8574,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8835,14 +8588,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8871,14 +8623,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 namespace NumberOfRinses {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum * value)
+                                               chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LaundryWasherControls::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>();
+    value = defaultVal.As<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8886,14 +8637,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LaundryWasherControls::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8901,14 +8651,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::LaundryWasherControls::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8922,14 +8671,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RvcRunMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8937,14 +8685,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RvcRunMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8952,14 +8699,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RvcRunMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8973,14 +8719,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RvcCleanMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -8988,14 +8733,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RvcCleanMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9003,14 +8747,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RvcCleanMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9024,14 +8767,13 @@ namespace Attributes {
 
 namespace TemperatureSetpoint {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9039,14 +8781,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace MinTemperature {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9054,14 +8795,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace MaxTemperature {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9069,14 +8809,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace Step {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9084,14 +8823,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace SelectedTemperatureLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9099,14 +8837,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9114,14 +8851,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9136,14 +8872,13 @@ namespace Attributes {
 namespace Mask {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RefrigeratorAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9152,14 +8887,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace State {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RefrigeratorAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9168,14 +8902,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace Supported {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RefrigeratorAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9183,14 +8916,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RefrigeratorAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9198,14 +8930,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RefrigeratorAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9219,14 +8950,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DishwasherMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9234,14 +8964,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DishwasherMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9249,14 +8978,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DishwasherMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9270,14 +8998,13 @@ namespace Attributes {
 
 namespace AirQuality {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AirQuality::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::AirQuality::AirQualityEnum>();
+    value = defaultVal.As<chip::app::Clusters::AirQuality::AirQualityEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9285,14 +9012,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AirQuality::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9300,14 +9026,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AirQuality::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9321,14 +9046,13 @@ namespace Attributes {
 
 namespace ExpressedState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9336,14 +9060,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace SmokeState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9351,14 +9074,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace COState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9366,14 +9088,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace BatteryAlert {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9381,14 +9102,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace DeviceMuted {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9396,14 +9116,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace TestInProgress {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9411,14 +9130,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace HardwareFaultAlert {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9426,14 +9144,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace EndOfServiceAlert {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9441,14 +9158,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace InterconnectSmokeAlarm {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9456,14 +9172,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace InterconnectCOAlarm {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9472,14 +9187,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 namespace ContaminationState {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum * value)
+                                               chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9487,14 +9201,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace SmokeSensitivityLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9502,14 +9215,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace ExpiryDate {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9517,14 +9229,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Unmounted {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9532,14 +9243,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9547,14 +9257,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeCoAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9569,14 +9278,13 @@ namespace Attributes {
 namespace Mask {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DishwasherAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9585,14 +9293,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace Latch {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DishwasherAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9601,14 +9308,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace State {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DishwasherAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9617,14 +9323,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace Supported {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DishwasherAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9632,14 +9337,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DishwasherAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9647,14 +9351,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DishwasherAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9668,14 +9371,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9683,14 +9385,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9698,14 +9399,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9719,14 +9419,13 @@ namespace Attributes {
 
 namespace CookTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9734,14 +9433,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace MaxCookTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9749,14 +9447,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace PowerSetting {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9764,14 +9461,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MinPower {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9779,14 +9475,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MaxPower {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9794,14 +9489,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace PowerStep {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9809,14 +9503,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace SelectedWattIndex {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9824,14 +9517,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace WattRating {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9839,14 +9531,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9854,14 +9545,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MicrowaveOvenControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9904,14 +9594,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 namespace OperationalState {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::OperationalState::OperationalStateEnum * value)
+                                               chip::app::Clusters::OperationalState::OperationalStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OperationalState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::OperationalState::OperationalStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::OperationalState::OperationalStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9919,14 +9608,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OperationalState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9934,14 +9622,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OperationalState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9983,14 +9670,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace OperationalState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RvcOperationalState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -9998,14 +9684,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RvcOperationalState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10013,14 +9698,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RvcOperationalState::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10034,14 +9718,13 @@ namespace Attributes {
 
 namespace SceneTableSize {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ScenesManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10049,14 +9732,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ScenesManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10064,14 +9746,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ScenesManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10085,14 +9766,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThermostatMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10114,14 +9794,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThermostatMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10129,14 +9808,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThermostatMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10150,13 +9828,12 @@ namespace Attributes {
 
 namespace MaxMembershipCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Groupcast::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10164,13 +9841,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace MaxMcastAddrCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Groupcast::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10178,13 +9854,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace UsedMcastAddrCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Groupcast::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10192,13 +9867,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FabricUnderTest {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::FabricIndex * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::FabricIndex & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Groupcast::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::FabricIndex>();
+    value = defaultVal.As<chip::FabricIndex>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10206,13 +9880,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Fabric
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Groupcast::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10220,13 +9893,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Groupcast::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10240,14 +9912,13 @@ namespace Attributes {
 
 namespace Condition {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::HepaFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10256,14 +9927,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 namespace DegradationDirection {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum * value)
+                                               chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::HepaFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum>();
+    value = defaultVal.As<chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10272,14 +9942,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace ChangeIndication {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum * value)
+                                               chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::HepaFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum>();
+    value = defaultVal.As<chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10287,14 +9956,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace InPlaceIndicator {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::HepaFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10316,14 +9984,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::HepaFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10331,14 +9998,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::HepaFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10352,14 +10018,13 @@ namespace Attributes {
 
 namespace Condition {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10368,14 +10033,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 namespace DegradationDirection {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum>();
+    value = defaultVal.As<chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10384,14 +10048,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMonito
 namespace ChangeIndication {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum * value)
+                                               chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum>();
+    value = defaultVal.As<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10399,14 +10062,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace InPlaceIndicator {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10428,14 +10090,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10443,14 +10104,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10464,14 +10124,13 @@ namespace Attributes {
 
 namespace Condition {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10523,14 +10182,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value
 namespace DegradationDirection {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum * value)
+                                               chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum>();
+    value = defaultVal.As<chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10586,14 +10244,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 namespace ChangeIndication {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum * value)
+                                               chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum>();
+    value = defaultVal.As<chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10647,14 +10304,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace InPlaceIndicator {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10805,14 +10461,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10863,14 +10518,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10927,14 +10581,13 @@ namespace Attributes {
 
 namespace CurrentSensitivityLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10942,14 +10595,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace SupportedSensitivityLevels {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10957,14 +10609,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace DefaultSensitivityLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10973,14 +10624,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 namespace AlarmsActive {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -10989,14 +10639,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateC
 namespace AlarmsSuppressed {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11005,14 +10654,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateC
 namespace AlarmsEnabled {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11021,14 +10669,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateC
 namespace AlarmsSupported {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11037,14 +10684,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateC
 namespace SensorFault {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11052,14 +10698,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateC
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11067,14 +10712,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BooleanStateConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11202,14 +10846,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace DefaultOpenLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11218,14 +10861,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 namespace ValveFault {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11233,14 +10875,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ValveConfigur
 
 namespace LevelStep {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11248,14 +10889,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11263,14 +10903,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11285,14 +10924,13 @@ namespace Attributes {
 namespace PowerMode {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum * value)
+                                               chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalPowerMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11300,14 +10938,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace NumberOfMeasurementTypes {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalPowerMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11497,14 +11134,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalPowerMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11512,14 +11148,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalPowerMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11533,14 +11168,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11548,14 +11182,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11613,14 +11246,13 @@ namespace Attributes {
 namespace HeaterTypes {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11629,14 +11261,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeaterMa
 namespace HeatDemand {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11644,14 +11275,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeaterMa
 
 namespace TankVolume {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11659,14 +11289,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace EstimatedHeatRequired {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11674,14 +11303,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace TankPercentage {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11690,14 +11318,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 namespace BoostState {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::WaterHeaterManagement::BoostStateEnum * value)
+                                               chip::app::Clusters::WaterHeaterManagement::BoostStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::WaterHeaterManagement::BoostStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::WaterHeaterManagement::BoostStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11705,14 +11332,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11720,14 +11346,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11741,14 +11366,13 @@ namespace Attributes {
 
 namespace TariffUnit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Globals::TariffUnitEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Globals::TariffUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommodityPrice::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Globals::TariffUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::Globals::TariffUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11756,14 +11380,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommodityPrice::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11771,14 +11394,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommodityPrice::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11792,13 +11414,12 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Messages::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11848,13 +11469,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Messages::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11911,14 +11531,13 @@ namespace Attributes {
 namespace ESAType {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::DeviceEnergyManagement::ESATypeEnum * value)
+                                               chip::app::Clusters::DeviceEnergyManagement::ESATypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::DeviceEnergyManagement::ESATypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::DeviceEnergyManagement::ESATypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11926,14 +11545,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace ESACanGenerate {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11942,14 +11560,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 namespace ESAState {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::DeviceEnergyManagement::ESAStateEnum * value)
+                                               chip::app::Clusters::DeviceEnergyManagement::ESAStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::DeviceEnergyManagement::ESAStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::DeviceEnergyManagement::ESAStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11957,14 +11574,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace AbsMinPower {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11972,14 +11588,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace AbsMaxPower {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -11988,14 +11603,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 namespace OptOutState {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum * value)
+                                               chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12003,14 +11617,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12018,14 +11631,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12054,14 +11666,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace SupplyState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::EnergyEvse::SupplyStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::EnergyEvse::SupplyStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::EnergyEvse::SupplyStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::EnergyEvse::SupplyStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12069,14 +11680,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace FaultState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::EnergyEvse::FaultStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::EnergyEvse::FaultStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::EnergyEvse::FaultStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::EnergyEvse::FaultStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12112,14 +11722,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace CircuitCapacity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12127,14 +11736,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace MinimumChargeCurrent {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12142,14 +11750,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace MaximumChargeCurrent {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12157,14 +11764,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace MaximumDischargeCurrent {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12172,14 +11778,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace UserMaximumChargeCurrent {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12187,14 +11792,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace RandomizationDelayWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12370,14 +11974,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12385,14 +11988,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvse::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12406,14 +12008,13 @@ namespace Attributes {
 
 namespace CurrentEnergyBalance {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyPreference::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12421,14 +12022,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace CurrentLowPowerModeSensitivity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyPreference::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12436,14 +12036,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyPreference::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12451,14 +12050,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyPreference::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12472,14 +12070,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerTopology::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12487,14 +12084,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PowerTopology::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12508,14 +12104,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvseMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12523,14 +12118,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvseMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12538,14 +12132,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EnergyEvseMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12559,14 +12152,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12574,14 +12166,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12589,14 +12180,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterHeaterMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12610,14 +12200,13 @@ namespace Attributes {
 
 namespace CurrentMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12625,14 +12214,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12640,14 +12228,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12675,14 +12262,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalGridConditions::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12690,14 +12276,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalGridConditions::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12755,14 +12340,13 @@ namespace Attributes {
 namespace Mask {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12771,14 +12355,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace Latch {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12787,14 +12370,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace State {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12803,14 +12385,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace Supported {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12818,14 +12399,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace OverVoltageThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12833,14 +12413,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace UnderVoltageThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12848,14 +12427,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace OverFrequencyThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12863,14 +12441,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace UnderFrequencyThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12878,14 +12455,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace OverPowerThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12893,14 +12469,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace UnderPowerThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12908,14 +12483,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace OverCurrentThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12923,14 +12497,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace UnderCurrentThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12938,14 +12511,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace PowerImportThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12953,14 +12525,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace PowerExportThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12968,14 +12539,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -12983,14 +12553,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -13509,14 +13078,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalDistribution::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -13567,14 +13135,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalDistribution::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -13632,14 +13199,13 @@ namespace Attributes {
 namespace Mask {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalProtectionAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -13648,14 +13214,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace State {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalProtectionAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -13664,14 +13229,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace Supported {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalProtectionAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -13695,14 +13259,13 @@ GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalProtectionAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -13710,14 +13273,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ElectricalProtectionAlarm::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -13834,13 +13396,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace LockType {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::DoorLock::DlLockType>();
+    value = defaultVal.As<chip::app::Clusters::DoorLock::DlLockType>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -13891,13 +13452,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace ActuatorEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14050,13 +13610,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace DoorOpenEvents {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14106,13 +13665,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace DoorClosedEvents {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14162,13 +13720,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace OpenPeriod {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14218,13 +13775,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace NumberOfTotalUsersSupported {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14274,13 +13830,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace NumberOfPINUsersSupported {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14330,13 +13885,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace NumberOfRFIDUsersSupported {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14386,13 +13940,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace NumberOfWeekDaySchedulesSupportedPerUser {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14442,13 +13995,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace NumberOfYearDaySchedulesSupportedPerUser {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14498,13 +14050,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace NumberOfHolidaySchedulesSupported {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14554,13 +14105,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace MaxPINCodeLength {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14610,13 +14160,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace MinPINCodeLength {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14666,13 +14215,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace MaxRFIDCodeLength {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14722,13 +14270,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace MinRFIDCodeLength {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14779,13 +14326,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 namespace CredentialRulesSupport {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> * value)
+                                               chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14838,13 +14384,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace NumberOfCredentialsSupportedPerUser {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -14950,13 +14495,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 
 namespace LEDSettings {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15006,13 +14550,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace AutoRelockTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15062,13 +14605,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace SoundVolume {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15118,13 +14660,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace OperatingMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::DoorLock::OperatingModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::DoorLock::OperatingModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15176,13 +14717,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 namespace SupportedOperatingModes {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> * value)
+                                               chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15237,13 +14777,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 namespace DefaultConfigurationRegister {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> * value)
+                                               chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15297,13 +14836,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace EnableLocalProgramming {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15353,13 +14891,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace EnableOneTouchLocking {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15409,13 +14946,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace EnableInsideStatusLED {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15465,13 +15001,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace EnablePrivacyModeButton {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15522,13 +15057,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 namespace LocalProgrammingFeatures {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> * value)
+                                               chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15582,13 +15116,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace WrongCodeEntryLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15638,13 +15171,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace UserCodeTemporaryDisableTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15694,13 +15226,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace SendPINOverTheAir {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15750,13 +15281,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace RequirePINforRemoteOperation {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15806,13 +15336,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace ExpiringUserTimeout {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15914,13 +15443,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AliroBLEAdvertisingVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15928,13 +15456,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace NumberOfAliroCredentialIssuerKeysSupported {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15942,13 +15469,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace NumberOfAliroEndpointKeysSupported {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -15956,13 +15482,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16012,13 +15537,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::DoorLock::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16074,14 +15598,13 @@ namespace Attributes {
 
 namespace Type {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::WindowCovering::Type * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::WindowCovering::Type & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::WindowCovering::Type>();
+    value = defaultVal.As<chip::app::Clusters::WindowCovering::Type>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16089,14 +15612,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace PhysicalClosedLimitLift {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16104,14 +15626,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace PhysicalClosedLimitTilt {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16147,14 +15668,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace NumberOfActuationsLift {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16162,14 +15682,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace NumberOfActuationsTilt {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16178,14 +15697,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 namespace ConfigStatus {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> * value)
+                                               chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16222,14 +15740,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 namespace OperationalStatus {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> * value)
+                                               chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16265,14 +15782,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace EndProductType {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::WindowCovering::EndProductType * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::WindowCovering::EndProductType & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::WindowCovering::EndProductType>();
+    value = defaultVal.As<chip::app::Clusters::WindowCovering::EndProductType>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16308,14 +15824,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace InstalledOpenLimitLift {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16323,14 +15838,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace InstalledClosedLimitLift {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16338,14 +15852,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace InstalledOpenLimitTilt {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16353,14 +15866,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace InstalledClosedLimitTilt {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16369,14 +15881,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 namespace Mode {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::WindowCovering::Mode> * value)
+                                               chip::BitMask<chip::app::Clusters::WindowCovering::Mode> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16385,14 +15896,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace SafetyStatus {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> * value)
+                                               chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16400,14 +15910,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16415,14 +15924,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WindowCovering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16450,14 +15958,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace MainState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureControl::MainStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureControl::MainStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ClosureControl::MainStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::ClosureControl::MainStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16466,14 +15973,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 namespace LatchControlModes {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16481,14 +15987,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16496,14 +16001,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16517,14 +16021,13 @@ namespace Attributes {
 
 namespace Resolution {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent100ths * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent100ths & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent100ths>();
+    value = defaultVal.As<chip::Percent100ths>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16532,14 +16035,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace StepValue {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent100ths * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent100ths & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent100ths>();
+    value = defaultVal.As<chip::Percent100ths>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16547,14 +16049,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace Unit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureDimension::ClosureUnitEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureDimension::ClosureUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ClosureDimension::ClosureUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::ClosureDimension::ClosureUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16563,14 +16064,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 namespace TranslationDirection {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ClosureDimension::TranslationDirectionEnum * value)
+                                               chip::app::Clusters::ClosureDimension::TranslationDirectionEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ClosureDimension::TranslationDirectionEnum>();
+    value = defaultVal.As<chip::app::Clusters::ClosureDimension::TranslationDirectionEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16578,14 +16078,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace RotationAxis {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureDimension::RotationAxisEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureDimension::RotationAxisEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ClosureDimension::RotationAxisEnum>();
+    value = defaultVal.As<chip::app::Clusters::ClosureDimension::RotationAxisEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16593,14 +16092,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace Overflow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureDimension::OverflowEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureDimension::OverflowEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ClosureDimension::OverflowEnum>();
+    value = defaultVal.As<chip::app::Clusters::ClosureDimension::OverflowEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16609,14 +16107,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 namespace ModulationType {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ClosureDimension::ModulationTypeEnum * value)
+                                               chip::app::Clusters::ClosureDimension::ModulationTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ClosureDimension::ModulationTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::ClosureDimension::ModulationTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16625,14 +16122,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace LatchControlModes {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16640,14 +16136,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ClosureDimens
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16655,14 +16150,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ClosureDimension::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16704,14 +16198,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ServiceArea::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -16719,14 +16212,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ServiceArea::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -18041,14 +17533,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 namespace PumpStatus {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -18104,14 +17595,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 namespace EffectiveOperationMode {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum * value)
+                                               chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -18166,14 +17656,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 namespace EffectiveControlMode {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum * value)
+                                               chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -18728,14 +18217,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 namespace OperationMode {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum * value)
+                                               chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -18790,14 +18278,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 namespace ControlMode {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum * value)
+                                               chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -18851,14 +18338,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -18909,14 +18395,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19002,14 +18487,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 namespace Occupancy {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19017,14 +18501,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace AbsMinHeatSetpointLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19032,14 +18515,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace AbsMaxHeatSetpointLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19047,14 +18529,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace AbsMinCoolSetpointLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19062,14 +18543,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace AbsMaxCoolSetpointLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19077,14 +18557,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace PICoolingDemand {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19092,14 +18571,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace PIHeatingDemand {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19108,14 +18586,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 namespace HVACSystemTypeConfiguration {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19123,14 +18600,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace LocalTemperatureCalibration {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int8_t>();
+    value = defaultVal.As<int8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19138,14 +18614,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * val
 
 namespace OccupiedCoolingSetpoint {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19153,14 +18628,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace OccupiedHeatingSetpoint {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19168,14 +18642,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace UnoccupiedCoolingSetpoint {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19183,14 +18656,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace UnoccupiedHeatingSetpoint {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19198,14 +18670,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace MinHeatSetpointLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19213,14 +18684,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace MaxHeatSetpointLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19228,14 +18698,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace MinCoolSetpointLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19243,14 +18712,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace MaxCoolSetpointLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19258,14 +18726,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace MinSetpointDeadBand {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int8_t>();
+    value = defaultVal.As<int8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19274,14 +18741,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * val
 namespace RemoteSensing {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19290,14 +18756,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace ControlSequenceOfOperation {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value)
+                                               chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19305,14 +18770,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace SystemMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::SystemModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::SystemModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19321,14 +18785,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 namespace ThermostatRunningMode {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Thermostat::ThermostatRunningModeEnum * value)
+                                               chip::app::Clusters::Thermostat::ThermostatRunningModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19336,14 +18799,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace StartOfWeek {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::StartOfWeekEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::StartOfWeekEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::StartOfWeekEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::StartOfWeekEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19351,14 +18813,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace NumberOfWeeklyTransitions {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19366,14 +18827,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace NumberOfDailyTransitions {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19382,14 +18842,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 namespace TemperatureSetpointHold {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum * value)
+                                               chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19412,14 +18871,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 namespace ThermostatProgrammingOperationMode {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19428,14 +18886,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::P
 namespace ThermostatRunningState {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19444,14 +18901,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace SetpointChangeSource {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Thermostat::SetpointChangeSourceEnum * value)
+                                               chip::app::Clusters::Thermostat::SetpointChangeSourceEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::SetpointChangeSourceEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::SetpointChangeSourceEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19473,14 +18929,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace SetpointChangeSourceTimestamp {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19572,14 +19027,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace EmergencyHeatDelta {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19587,14 +19041,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace ACType {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::ACTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::ACTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19602,14 +19055,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace ACCapacity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19617,14 +19069,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace ACRefrigerantType {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19632,14 +19083,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace ACCompressorType {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCompressorTypeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCompressorTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::ACCompressorTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::ACCompressorTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19648,14 +19098,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 namespace ACErrorCode {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19663,14 +19112,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace ACLouverPosition {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACLouverPositionEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACLouverPositionEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::ACLouverPositionEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::ACLouverPositionEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19692,14 +19140,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace ACCapacityformat {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Thermostat::ACCapacityFormatEnum>();
+    value = defaultVal.As<chip::app::Clusters::Thermostat::ACCapacityFormatEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19707,14 +19154,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace NumberOfPresets {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19722,14 +19168,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace NumberOfSchedules {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19737,14 +19182,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace NumberOfScheduleTransitions {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19808,14 +19252,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace MaxThermostatSuggestions {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19839,14 +19282,13 @@ Protocols::InteractionModel::Status GetDefault(
 
 namespace CriticalFreezeProtection {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19854,14 +19296,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace CriticalOverheatProtection {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19869,14 +19310,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace NumberOfSensorScheduleTransitions {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19884,14 +19324,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19899,14 +19338,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Thermostat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19920,14 +19358,13 @@ namespace Attributes {
 
 namespace FanMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::FanControl::FanModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::FanControl::FanModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19935,14 +19372,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace FanModeSequence {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::FanControl::FanModeSequenceEnum>();
+    value = defaultVal.As<chip::app::Clusters::FanControl::FanModeSequenceEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19964,14 +19400,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PercentCurrent {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -19979,14 +19414,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace SpeedMax {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20008,14 +19442,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace SpeedCurrent {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20024,14 +19457,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 namespace RockSupport {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20040,14 +19472,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace RockSetting {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20056,14 +19487,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace WindSupport {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20072,14 +19502,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace WindSetting {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20087,14 +19516,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace AirflowDirection {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::AirflowDirectionEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::AirflowDirectionEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::FanControl::AirflowDirectionEnum>();
+    value = defaultVal.As<chip::app::Clusters::FanControl::AirflowDirectionEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20102,14 +19530,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20117,14 +19544,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FanControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20139,14 +19565,13 @@ namespace Attributes {
 namespace TemperatureDisplayMode {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20203,14 +19628,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 namespace KeypadLockout {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum * value)
+                                               chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum>();
+    value = defaultVal.As<chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20268,14 +19692,13 @@ namespace ScheduleProgrammingVisibility {
 
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint,
-           chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum * value)
+           chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum>();
+    value = defaultVal.As<chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20334,14 +19757,13 @@ Set(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfigurati
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20393,14 +19815,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20458,14 +19879,13 @@ namespace Attributes {
 
 namespace Mode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Humidistat::ModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::Humidistat::ModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20473,14 +19893,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace SystemState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Humidistat::SystemStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::Humidistat::SystemStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20488,14 +19907,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace UserSetpoint {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20503,14 +19921,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace MinSetpoint {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20518,14 +19935,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace MaxSetpoint {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20533,14 +19949,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace Step {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20548,14 +19963,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace TargetSetpoint {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::Percent>();
+    value = defaultVal.As<chip::Percent>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20564,14 +19978,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 namespace MistType {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20579,14 +19992,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace Continuous {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20594,14 +20006,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace Sleep {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20609,14 +20020,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace Optimal {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20624,14 +20034,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace CondPumpEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20639,14 +20048,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace CondRunCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20654,14 +20062,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20669,14 +20076,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20690,14 +20096,13 @@ namespace Attributes {
 
 namespace CurrentHue {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20748,14 +20153,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace CurrentSaturation {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20806,14 +20210,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace RemainingTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20864,14 +20267,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace CurrentX {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20922,14 +20324,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace CurrentY {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -20981,14 +20382,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace DriftCompensation {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ColorControl::DriftCompensationEnum * value)
+                                               chip::app::Clusters::ColorControl::DriftCompensationEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ColorControl::DriftCompensationEnum>();
+    value = defaultVal.As<chip::app::Clusters::ColorControl::DriftCompensationEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -21097,14 +20497,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 
 namespace ColorTemperatureMireds {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -21155,14 +20554,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace ColorMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ColorControl::ColorModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ColorControl::ColorModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ColorControl::ColorModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::ColorControl::ColorModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -21215,14 +20613,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 namespace Options {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -21375,14 +20772,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace Primary1X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -21433,14 +20829,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace Primary1Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -21591,14 +20986,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace Primary2X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -21649,14 +21043,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace Primary2Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -21807,14 +21200,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace Primary3X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -21865,14 +21257,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace Primary3Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22023,14 +21414,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace Primary4X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22081,14 +21471,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace Primary4Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22239,14 +21628,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace Primary5X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22297,14 +21685,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace Primary5Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22455,14 +21842,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace Primary6X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22513,14 +21899,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace Primary6Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22671,14 +22056,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace WhitePointX {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22729,14 +22113,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace WhitePointY {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22787,14 +22170,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace ColorPointRX {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -22845,14 +22227,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace ColorPointRY {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23003,14 +22384,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace ColorPointGX {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23061,14 +22441,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace ColorPointGY {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23219,14 +22598,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace ColorPointBX {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23277,14 +22655,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace ColorPointBY {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23435,14 +22812,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace EnhancedCurrentHue {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23494,14 +22870,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace EnhancedColorMode {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ColorControl::EnhancedColorModeEnum * value)
+                                               chip::app::Clusters::ColorControl::EnhancedColorModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ColorControl::EnhancedColorModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::ColorControl::EnhancedColorModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23553,14 +22928,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace ColorLoopActive {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23611,14 +22985,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace ColorLoopDirection {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23669,14 +23042,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace ColorLoopTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23727,14 +23099,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace ColorLoopStartEnhancedHue {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23785,14 +23156,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace ColorLoopStoredEnhancedHue {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23844,14 +23214,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace ColorCapabilities {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23906,14 +23275,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace ColorTempPhysicalMinMireds {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -23964,14 +23332,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace ColorTempPhysicalMaxMireds {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -24022,14 +23389,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace CoupleColorTempToLevelMinMireds {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -24180,14 +23546,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -24238,14 +23603,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ColorControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -24302,14 +23666,13 @@ namespace Attributes {
 
 namespace PhysicalMinLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BallastConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -24360,14 +23723,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace PhysicalMaxLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BallastConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -24419,14 +23781,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 namespace BallastStatus {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BallastConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -24481,14 +23842,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace MinLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BallastConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -24539,14 +23899,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace MaxLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BallastConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -24797,14 +24156,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace LampQuantity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BallastConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25170,14 +24528,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 namespace LampAlarmMode {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BallastConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25332,14 +24689,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BallastConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25390,14 +24746,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::BallastConfiguration::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25482,14 +24837,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DynamicLighting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25497,14 +24851,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::DynamicLighting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25560,14 +24913,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace Tolerance {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IlluminanceMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25590,14 +24942,13 @@ GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Illumin
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IlluminanceMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25605,14 +24956,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::IlluminanceMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25668,14 +25018,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace Tolerance {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25683,14 +25032,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25698,14 +25046,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TemperatureMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25761,14 +25108,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace Tolerance {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PressureMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25818,14 +25164,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace ScaledTolerance {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PressureMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25833,14 +25178,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace Scale {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PressureMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int8_t>();
+    value = defaultVal.As<int8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25848,14 +25192,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * val
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PressureMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25863,14 +25206,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PressureMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25926,14 +25268,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace Tolerance {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FlowMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25941,14 +25282,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FlowMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -25956,14 +25296,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FlowMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26019,14 +25358,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace Tolerance {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26034,14 +25372,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26049,14 +25386,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26071,14 +25407,13 @@ namespace Attributes {
 namespace Occupancy {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26087,14 +25422,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace OccupancySensorType {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum * value)
+                                               chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26103,14 +25437,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace OccupancySensorTypeBitmap {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26118,14 +25451,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::OccupancySens
 
 namespace HoldTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26133,14 +25465,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace PIROccupiedToUnoccupiedDelay {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26148,14 +25479,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace PIRUnoccupiedToOccupiedDelay {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26163,14 +25493,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace PIRUnoccupiedToOccupiedThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26178,14 +25507,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace UltrasonicOccupiedToUnoccupiedDelay {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26193,14 +25521,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace UltrasonicUnoccupiedToOccupiedDelay {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26208,14 +25535,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace UltrasonicUnoccupiedToOccupiedThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26223,14 +25549,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace PhysicalContactOccupiedToUnoccupiedDelay {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26238,14 +25563,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace PhysicalContactUnoccupiedToOccupiedDelay {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26253,14 +25577,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace PhysicalContactUnoccupiedToOccupiedThreshold {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26268,14 +25591,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26283,14 +25605,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OccupancySensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26360,14 +25681,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26389,14 +25709,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26404,14 +25723,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26420,14 +25738,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * valu
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26436,14 +25753,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentration
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26452,14 +25768,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentration
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26467,14 +25782,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26482,14 +25796,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26603,14 +25916,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26632,14 +25944,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26647,14 +25958,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26663,14 +25973,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * valu
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26679,14 +25988,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationM
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26695,14 +26003,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationM
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26710,14 +26017,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26725,14 +26031,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26846,14 +26151,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26875,14 +26179,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26890,14 +26193,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26906,14 +26208,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * valu
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26922,14 +26223,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentratio
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26938,14 +26238,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentratio
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26953,14 +26252,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -26968,14 +26266,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27089,14 +26386,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27118,14 +26414,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27133,14 +26428,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27149,14 +26443,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * valu
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum * value)
+                                               chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27165,14 +26458,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum * value)
+                                               chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27181,14 +26473,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27196,14 +26487,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27211,14 +26501,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27331,14 +26620,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27360,14 +26648,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27375,14 +26662,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27391,14 +26677,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * valu
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum * value)
+                                               chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27407,14 +26692,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum * value)
+                                               chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27423,14 +26707,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27438,14 +26721,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27453,14 +26735,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27573,14 +26854,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27602,14 +26882,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27617,14 +26896,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27633,14 +26911,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * valu
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27649,14 +26926,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMe
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27665,14 +26941,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMe
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27680,14 +26955,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27695,14 +26969,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27816,14 +27089,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27845,14 +27117,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27860,14 +27131,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27876,14 +27146,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * valu
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum * value)
+                                               chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27892,14 +27161,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum * value)
+                                               chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27908,14 +27176,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27923,14 +27190,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -27938,14 +27204,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28058,14 +27323,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28087,14 +27351,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28102,14 +27365,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28118,14 +27380,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * valu
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum * value)
+                                               chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28134,14 +27395,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum * value)
+                                               chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28150,14 +27410,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28165,14 +27424,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28180,14 +27438,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28300,14 +27557,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(
         endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28329,14 +27585,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(
         endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28344,14 +27599,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(
         endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28361,14 +27615,13 @@ namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint,
-           chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum * value)
+           chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(
         endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28378,14 +27631,13 @@ namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint,
-           chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum * value)
+           chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(
         endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28394,14 +27646,13 @@ GetDefault(EndpointId endpoint,
 namespace LevelValue {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(
         endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28409,14 +27660,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoun
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(
         endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28424,14 +27674,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(
         endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28546,14 +27795,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28575,14 +27823,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28590,14 +27837,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28606,14 +27852,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * valu
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum * value)
+                                               chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28622,14 +27867,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum * value)
+                                               chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28638,14 +27882,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28653,14 +27896,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28668,14 +27910,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28746,14 +27987,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SoilMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28761,14 +28001,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SoilMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28782,14 +28021,13 @@ namespace Attributes {
 
 namespace HumanActivityDetected {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientContextSensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28797,14 +28035,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace ObjectIdentified {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientContextSensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28812,14 +28049,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace AudioContextDetected {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientContextSensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28827,14 +28063,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace ObjectCountThresholdReached {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientContextSensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28842,14 +28077,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace ObjectCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientContextSensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28857,14 +28091,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace SimultaneousDetectionLimit {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientContextSensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28872,14 +28105,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace HoldTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientContextSensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28887,14 +28119,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientContextSensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28902,14 +28133,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientContextSensing::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28938,14 +28168,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSp
 namespace UnionHealth {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum * value)
+                                               chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientSensingUnion::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum>();
+    value = defaultVal.As<chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28953,14 +28182,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientSensingUnion::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -28968,14 +28196,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AmbientSensingUnion::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29003,14 +28230,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSp
 
 namespace BLEDeviceID {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProximityRanging::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29033,14 +28259,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSp
 namespace BLTCSSecurityLevel {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum * value)
+                                               chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProximityRanging::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum>();
+    value = defaultVal.As<chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29048,14 +28273,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace BLTCSModeCapability {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProximityRanging::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29063,14 +28287,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProximityRanging::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29078,14 +28301,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ProximityRanging::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29499,14 +28721,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace PeakMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29657,14 +28878,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace AverageMeasuredValueWindow {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29715,14 +28935,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace Uncertainty {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29774,14 +28993,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, float value)
 namespace MeasurementUnit {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementUnitEnum * value)
+                                               chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementUnitEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementUnitEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementUnitEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29837,14 +29055,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 namespace MeasurementMedium {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementMediumEnum * value)
+                                               chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementMediumEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementMediumEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementMediumEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29900,14 +29117,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 namespace LevelValue {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::SmokeConcentrationMeasurement::LevelValueEnum * value)
+                                               chip::app::Clusters::SmokeConcentrationMeasurement::LevelValueEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::SmokeConcentrationMeasurement::LevelValueEnum>();
+    value = defaultVal.As<chip::app::Clusters::SmokeConcentrationMeasurement::LevelValueEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -29961,14 +29177,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30019,14 +29234,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::SmokeConcentrationMeasurement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30083,14 +29297,13 @@ namespace Attributes {
 
 namespace ClientTableSize {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkIdentityManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30098,14 +29311,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkIdentityManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30113,14 +29325,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::NetworkIdentityManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30162,14 +29373,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WiFiNetworkManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30177,14 +29387,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WiFiNetworkManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30226,14 +29435,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSp
 
 namespace ThreadVersion {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadBorderRouterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30241,14 +29449,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace InterfaceEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadBorderRouterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30284,14 +29491,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadBorderRouterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30299,14 +29505,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadBorderRouterManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30334,14 +29539,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace ThreadNetworkTableSize {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDirectory::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30349,14 +29553,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDirectory::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30407,14 +29610,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadNetworkDirectory::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30472,14 +29674,13 @@ namespace Attributes {
 namespace Transport {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissioningProxy::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30487,14 +29688,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace ScanMaxTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissioningProxy::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30502,14 +29702,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MaxSessions {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissioningProxy::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30517,14 +29716,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MaxCachedResults {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissioningProxy::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30532,14 +29730,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace NumCachedResults {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissioningProxy::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30547,14 +29744,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace CacheTimeout {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissioningProxy::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30563,14 +29759,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 namespace WiFiBand {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> * value)
+                                               chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissioningProxy::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30578,14 +29773,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissioningProxy::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30593,14 +29787,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissioningProxy::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30726,13 +29919,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::WakeOnLan::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30783,13 +29975,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::WakeOnLan::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30846,13 +30037,12 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Channel::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30902,13 +30092,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Channel::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -30964,14 +30153,13 @@ namespace Attributes {
 
 namespace CurrentTarget {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TargetNavigator::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31022,14 +30210,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TargetNavigator::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31080,14 +30267,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TargetNavigator::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31144,14 +30330,13 @@ namespace Attributes {
 
 namespace CurrentState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaPlayback::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::MediaPlayback::PlaybackStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::MediaPlayback::PlaybackStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31403,14 +30588,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace PlaybackSpeed {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaPlayback::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31661,14 +30845,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaPlayback::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31719,14 +30902,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaPlayback::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31783,14 +30965,13 @@ namespace Attributes {
 
 namespace CurrentInput {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaInput::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31841,14 +31022,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaInput::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31899,14 +31079,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaInput::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -31963,13 +31142,12 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::LowPower::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32019,13 +31197,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::LowPower::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32081,14 +31258,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::KeypadInput::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32139,14 +31315,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::KeypadInput::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32204,14 +31379,13 @@ namespace Attributes {
 namespace SupportedStreamingProtocols {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentLauncher::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32266,14 +31440,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace Movable {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentLauncher::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32324,14 +31497,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentLauncher::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32382,14 +31554,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentLauncher::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32446,14 +31617,13 @@ namespace Attributes {
 
 namespace CurrentOutput {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioOutput::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32504,14 +31674,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioOutput::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32562,14 +31731,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioOutput::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32626,14 +31794,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ApplicationLauncher::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32684,14 +31851,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ApplicationLauncher::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32805,14 +31971,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 
 namespace VendorID {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ApplicationBasic::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::VendorId>();
+    value = defaultVal.As<chip::VendorId>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32920,14 +32085,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 
 namespace ProductID {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ApplicationBasic::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -32979,14 +32143,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace Status {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum * value)
+                                               chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ApplicationBasic::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum>();
+    value = defaultVal.As<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33095,14 +32258,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ApplicationBasic::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33153,14 +32315,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ApplicationBasic::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33217,14 +32378,13 @@ namespace Attributes {
 
 namespace OAuthLoggedIn {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AccountLogin::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33275,14 +32435,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AccountLogin::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33333,14 +32492,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AccountLogin::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33397,14 +32555,13 @@ namespace Attributes {
 
 namespace Enabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33569,14 +32726,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 
 namespace ScreenDailyTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33627,14 +32783,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace RemainingScreenTime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33685,14 +32840,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace BlockUnrated {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33743,14 +32897,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33801,14 +32954,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33865,14 +33017,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentAppObserver::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33923,14 +33074,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ContentAppObserver::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -33987,14 +33137,13 @@ namespace Attributes {
 
 namespace TotalStorage {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaFileManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34002,14 +33151,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace AvailableStorage {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaFileManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34017,14 +33165,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaFileManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34032,14 +33179,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MediaFileManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34053,14 +33199,13 @@ namespace Attributes {
 
 namespace SoftMuted {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34068,14 +33213,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace PhysicallyMuted {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34083,14 +33227,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace Volume {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34098,14 +33241,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace MinDeviceVolume {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34113,14 +33255,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace MaxDeviceVolume {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34128,14 +33269,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace MaxDeviceVolumeDB {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34143,14 +33283,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace MaxUserVolume {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34158,14 +33297,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace DefaultStepSize {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34173,14 +33311,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace SetVolumeUnmutePolicy {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::AudioControl::UnmutePolicyEnum>();
+    value = defaultVal.As<chip::app::Clusters::AudioControl::UnmutePolicyEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34188,14 +33325,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace IncreaseVolumeUnmutePolicy {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::AudioControl::UnmutePolicyEnum>();
+    value = defaultVal.As<chip::app::Clusters::AudioControl::UnmutePolicyEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34203,14 +33339,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace IncreaseVolumeUnmuteVolume {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmuteVolumeEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmuteVolumeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::AudioControl::UnmuteVolumeEnum>();
+    value = defaultVal.As<chip::app::Clusters::AudioControl::UnmuteVolumeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34218,14 +33353,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace DecreaseVolumeUnmutePolicy {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::AudioControl::UnmutePolicyEnum>();
+    value = defaultVal.As<chip::app::Clusters::AudioControl::UnmutePolicyEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34261,14 +33395,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace Bass {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34276,14 +33409,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace Mid {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34291,14 +33423,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace Treble {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34306,14 +33437,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace MinCorrection {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34321,14 +33451,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace MaxCorrection {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34336,14 +33465,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34351,14 +33479,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AudioControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34372,14 +33499,13 @@ namespace Attributes {
 
 namespace MaxUserDefinedZones {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ZoneManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34387,14 +33513,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MaxZones {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ZoneManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34402,14 +33527,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace SensitivityMax {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ZoneManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34417,14 +33541,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace Sensitivity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ZoneManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34432,14 +33555,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ZoneManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34447,14 +33569,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::ZoneManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34468,14 +33589,13 @@ namespace Attributes {
 
 namespace MaxConcurrentEncoders {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34483,14 +33603,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MaxEncodedPixelRate {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34498,14 +33617,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace NightVisionUsesInfrared {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34513,14 +33631,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace MaxContentBufferSize {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34529,14 +33646,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 namespace TwoWayTalkSupport {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum * value)
+                                               chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum>();
+    value = defaultVal.As<chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34544,14 +33660,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace MaxNetworkBandwidth {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34559,14 +33674,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace CurrentFrameRate {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34574,14 +33688,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace HDRModeEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34589,14 +33702,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace SoftRecordingPrivacyModeEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34604,14 +33716,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace SoftLivestreamPrivacyModeEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34619,14 +33730,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace HardPrivacyModeOn {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34635,14 +33745,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 namespace NightVision {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum * value)
+                                               chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>();
+    value = defaultVal.As<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34651,14 +33760,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 namespace NightVisionIllum {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum * value)
+                                               chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>();
+    value = defaultVal.As<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34666,14 +33774,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 namespace SpeakerMuted {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34681,14 +33788,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace SpeakerVolumeLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34696,14 +33802,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace SpeakerMaxLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34711,14 +33816,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace SpeakerMinLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34726,14 +33830,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MicrophoneMuted {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34741,14 +33844,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace MicrophoneVolumeLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34756,14 +33858,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MicrophoneMaxLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34771,14 +33872,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MicrophoneMinLevel {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34786,14 +33886,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MicrophoneAGCEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34801,14 +33900,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace ImageRotation {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34816,14 +33914,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace ImageFlipHorizontal {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34831,14 +33928,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace ImageFlipVertical {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34846,14 +33942,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace LocalVideoRecordingEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34861,14 +33956,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace LocalSnapshotRecordingEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34876,14 +33970,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace StatusLightEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34891,14 +33984,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace StatusLightBrightness {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Globals::ThreeLevelAutoEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Globals::ThreeLevelAutoEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Globals::ThreeLevelAutoEnum>();
+    value = defaultVal.As<chip::app::Clusters::Globals::ThreeLevelAutoEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34906,14 +33998,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 
 namespace ImageRotationDiscreteAngles {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34921,14 +34012,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34936,14 +34026,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvStreamManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34957,14 +34046,13 @@ namespace Attributes {
 
 namespace MaxPresets {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34972,14 +34060,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace ZoomMax {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -34987,14 +34074,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace TiltMin {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35002,14 +34088,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace TiltMax {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35017,14 +34102,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace PanMin {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35032,14 +34116,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 
 namespace PanMax {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35048,14 +34131,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * va
 namespace MovementState {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum * value)
+GetDefault(EndpointId endpoint, chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum>();
+    value = defaultVal.As<chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35063,14 +34145,13 @@ GetDefault(EndpointId endpoint, chip::app::Clusters::CameraAvSettingsUserLevelMa
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35078,14 +34159,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35143,14 +34223,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WebRTCTransportProvider::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35201,14 +34280,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WebRTCTransportProvider::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35265,14 +34343,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WebRTCTransportRequestor::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35323,14 +34400,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::WebRTCTransportRequestor::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35401,14 +34477,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PushAvStreamTransport::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35416,14 +34491,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::PushAvStreamTransport::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35437,13 +34511,12 @@ namespace Attributes {
 
 namespace SelectedChime {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Chime::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35451,13 +34524,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace Enabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Chime::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35465,13 +34537,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Chime::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35479,13 +34550,12 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::Chime::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35499,14 +34569,13 @@ namespace Attributes {
 
 namespace MaxAnalysisStreamCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AvAnalysis::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35557,14 +34626,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace CurrentAnalysisStreamCount {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AvAnalysis::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35615,14 +34683,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace TrackingEnabled {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AvAnalysis::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35673,14 +34740,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AvAnalysis::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -35731,14 +34797,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::AvAnalysis::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36408,14 +35473,13 @@ Set(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommodityTariff::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36466,14 +35530,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommodityTariff::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36530,14 +35593,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EcosystemInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36588,14 +35650,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::EcosystemInformation::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36653,14 +35714,13 @@ namespace Attributes {
 namespace SupportedDeviceCategories {
 
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> * value)
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissionerControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36668,14 +35728,13 @@ GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::CommissionerC
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissionerControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36683,14 +35742,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommissionerControl::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36761,14 +35819,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
 
 namespace AnchorNodeID {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::NodeId * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::NodeId & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::JointFabricDatastore::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::NodeId>();
+    value = defaultVal.As<chip::NodeId>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36819,14 +35876,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::NodeId value)
 
 namespace AnchorVendorID {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::JointFabricDatastore::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::VendorId>();
+    value = defaultVal.As<chip::VendorId>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36934,14 +35990,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::JointFabricDatastore::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -36992,14 +36047,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::JointFabricDatastore::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37156,14 +36210,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::JointFabricAdministrator::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37214,14 +36267,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::JointFabricAdministrator::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37278,14 +36330,13 @@ namespace Attributes {
 
 namespace MaxRootCertificates {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TlsCertificateManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37293,14 +36344,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace MaxClientCertificates {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TlsCertificateManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37308,14 +36358,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TlsCertificateManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37323,14 +36372,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TlsCertificateManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37344,14 +36392,13 @@ namespace Attributes {
 
 namespace MaxProvisioned {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TlsClientManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37359,14 +36406,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TlsClientManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37374,14 +36420,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TlsClientManagement::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37452,14 +36497,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MeterIdentification::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37467,14 +36511,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::MeterIdentification::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37574,14 +36617,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommodityMetering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37632,14 +36674,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::CommodityMetering::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37696,14 +36737,13 @@ namespace Attributes {
 
 namespace Boolean {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37755,14 +36795,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 namespace Bitmap8 {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> * value)
+                                               chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37816,14 +36855,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 namespace Bitmap16 {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> * value)
+                                               chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37877,14 +36915,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 namespace Bitmap32 {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> * value)
+                                               chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37938,14 +36975,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 namespace Bitmap64 {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> * value)
+                                               chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>();
+    value = defaultVal.As<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37998,14 +37034,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 
 namespace Int8u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38056,14 +37091,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace Int16u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38114,14 +37148,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace Int24u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<OddSizedInteger<3, false>>();
+    value = defaultVal.As<OddSizedInteger<3, false>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38172,14 +37205,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace Int32u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38230,14 +37262,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace Int40u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<OddSizedInteger<5, false>>();
+    value = defaultVal.As<OddSizedInteger<5, false>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38288,14 +37319,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value)
 
 namespace Int48u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<OddSizedInteger<6, false>>();
+    value = defaultVal.As<OddSizedInteger<6, false>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38346,14 +37376,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value)
 
 namespace Int56u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<OddSizedInteger<7, false>>();
+    value = defaultVal.As<OddSizedInteger<7, false>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38404,14 +37433,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value)
 
 namespace Int64u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38462,14 +37490,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value)
 
 namespace Int8s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int8_t>();
+    value = defaultVal.As<int8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38520,14 +37547,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value)
 
 namespace Int16s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38578,14 +37604,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 
 namespace Int24s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<OddSizedInteger<3, true>>();
+    value = defaultVal.As<OddSizedInteger<3, true>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38636,14 +37661,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int32_t value)
 
 namespace Int32s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int32_t>();
+    value = defaultVal.As<int32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38694,14 +37718,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int32_t value)
 
 namespace Int40s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<OddSizedInteger<5, true>>();
+    value = defaultVal.As<OddSizedInteger<5, true>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38752,14 +37775,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
 
 namespace Int48s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<OddSizedInteger<6, true>>();
+    value = defaultVal.As<OddSizedInteger<6, true>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38810,14 +37832,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
 
 namespace Int56s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<OddSizedInteger<7, true>>();
+    value = defaultVal.As<OddSizedInteger<7, true>>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38868,14 +37889,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
 
 namespace Int64s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int64_t>();
+    value = defaultVal.As<int64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38926,14 +37946,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value)
 
 namespace Enum8 {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -38984,14 +38003,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace Enum16 {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39042,14 +38060,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace FloatSingle {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<float>();
+    value = defaultVal.As<float>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39100,14 +38117,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, float value)
 
 namespace FloatDouble {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, double * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, double & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<double>();
+    value = defaultVal.As<double>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39386,14 +38402,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 
 namespace EpochUs {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint64_t>();
+    value = defaultVal.As<uint64_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39444,14 +38459,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value)
 
 namespace EpochS {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39502,14 +38516,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace VendorId {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::VendorId>();
+    value = defaultVal.As<chip::VendorId>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39560,14 +38573,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::VendorId valu
 
 namespace EnumAttr {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::UnitTesting::SimpleEnum>();
+    value = defaultVal.As<chip::app::Clusters::UnitTesting::SimpleEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39619,14 +38631,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace RangeRestrictedInt8u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39677,14 +38688,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace RangeRestrictedInt8s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int8_t>();
+    value = defaultVal.As<int8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39735,14 +38745,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value)
 
 namespace RangeRestrictedInt16u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39793,14 +38802,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace RangeRestrictedInt16s {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<int16_t>();
+    value = defaultVal.As<int16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39851,14 +38859,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 
 namespace TimedWriteBoolean {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39909,14 +38916,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace GeneralErrorBoolean {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39924,14 +38930,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace ClusterErrorBoolean {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39939,14 +38944,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace GlobalEnum {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<chip::app::Clusters::Globals::TestGlobalEnum>();
+    value = defaultVal.As<chip::app::Clusters::Globals::TestGlobalEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39998,14 +39002,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 namespace UnsupportedAttributeRequiringAdminPrivilege {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -40056,14 +39059,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace Unsupported {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -40114,14 +39116,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace ReadFailureCode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -40172,14 +39173,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace FailureInt32U {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -43461,14 +42461,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace WriteOnlyInt8u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -43624,14 +42623,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -43682,14 +42680,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -43740,14 +42737,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 
 namespace MeiInt8u {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::UnitTesting::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint8_t>();
+    value = defaultVal.As<uint8_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -43804,14 +42800,13 @@ namespace Attributes {
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FaultInjection::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -43862,14 +42857,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::FaultInjection::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -43926,13 +42920,12 @@ namespace Attributes {
 
 namespace FlipFlop {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::SampleMei::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -43983,13 +42976,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::SampleMei::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -44040,13 +43032,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status = emberAfGetAttributeDefaultValue(endpoint, Clusters::SampleMei::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -44103,14 +43094,13 @@ namespace Attributes {
 
 namespace TestAttribute {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TestHiddenManufacturerSpecific::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<bool>();
+    value = defaultVal.As<bool>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -44161,14 +43151,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TestHiddenManufacturerSpecific::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint32_t>();
+    value = defaultVal.As<uint32_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -44219,14 +43208,13 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 namespace ClusterRevision {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::TestHiddenManufacturerSpecific::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<uint16_t>();
+    value = defaultVal.As<uint16_t>();
     return Protocols::InteractionModel::Status::Success;
 }
 

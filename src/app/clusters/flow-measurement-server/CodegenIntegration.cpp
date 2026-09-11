@@ -72,7 +72,7 @@ public:
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
             uint16_t tolerance{};
-            VerifyOrDie(Tolerance::GetDefaultOr(endpointId, &tolerance, 0) == Status::Success);
+            VerifyOrDie(Tolerance::GetDefaultOr(endpointId, tolerance, 0) == Status::Success);
             config.WithTolerance(tolerance);
         }
 

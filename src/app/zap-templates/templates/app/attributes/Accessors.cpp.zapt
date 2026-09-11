@@ -39,8 +39,9 @@ namespace {{asUpperCamelCase label}} {
 
 {{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
 {{#*inline "sizingBytes"}}{{#if (isShortString type)}}1{{else}}2{{/if}}{{/inline}}
+{{#*inline "accessorDefaultType"}}{{#if (isString type)}}{{#if isNullable}}DataModel::Nullable<chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span> &{{else}}chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span &{{/if}}{{else}}{{#if isNullable}}{{accessorGetterType this}}{{else}}{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} &{{/if}}{{/if}}{{/inline}}
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{#if (isString type)}}{{#if isNullable}}DataModel::Nullable<chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span> &{{else}}chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span &{{/if}}{{else}}{{accessorGetterType this}}{{/if}} value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{>accessorDefaultType}} value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
@@ -58,8 +59,7 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{#if (isStr
     {{#if isNullable}}
     value = defaultVal.AsNullable<{{accessorTraitType type}}>();
     {{else}}
-    VerifyOrReturnError(value != nullptr, Protocols::InteractionModel::Status::Failure);
-    *value = defaultVal.As<{{accessorTraitType type}}>();
+    value = defaultVal.As<{{accessorTraitType type}}>();
     {{/if}}
     return Protocols::InteractionModel::Status::Success;
     {{/if}}

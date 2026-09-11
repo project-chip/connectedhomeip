@@ -70,7 +70,7 @@ public:
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
             uint16_t tolerance{};
-            VerifyOrDie(Tolerance::GetDefaultOr(endpointId, &tolerance, 0) == Status::Success);
+            VerifyOrDie(Tolerance::GetDefaultOr(endpointId, tolerance, 0) == Status::Success);
             config.WithTolerance(tolerance);
         }
 
@@ -84,14 +84,14 @@ public:
 
             VerifyOrDie(MinScaledValue::GetDefault(endpointId, minScaledValue) == Status::Success);
             VerifyOrDie(MaxScaledValue::GetDefault(endpointId, maxScaledValue) == Status::Success);
-            VerifyOrDie(Scale::GetDefault(endpointId, &scale) == Status::Success);
+            VerifyOrDie(Scale::GetDefault(endpointId, scale) == Status::Success);
 
             config.WithExtendedFeature(minScaledValue, maxScaledValue, scale);
 
             if (optionalAttributeSet.IsSet(ScaledTolerance::Id))
             {
                 uint16_t scaledTolerance{};
-                VerifyOrDie(ScaledTolerance::GetDefaultOr(endpointId, &scaledTolerance, 0) == Status::Success);
+                VerifyOrDie(ScaledTolerance::GetDefaultOr(endpointId, scaledTolerance, 0) == Status::Success);
                 config.WithScaledTolerance(scaledTolerance);
             }
         }

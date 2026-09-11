@@ -75,14 +75,14 @@ public:
 
         // Get the DefaultOpenLevel
         Percent defaultOpenLevel{};
-        if (DefaultOpenLevel::GetDefault(endpointId, &defaultOpenLevel) != Status::Success)
+        if (DefaultOpenLevel::GetDefault(endpointId, defaultOpenLevel) != Status::Success)
         {
             defaultOpenLevel = ValveConfigurationAndControlCluster::kDefaultOpenLevel;
         }
 
         // Get the LevelStep
         uint8_t levelStep{};
-        if (LevelStep::GetDefault(endpointId, &levelStep) != Status::Success)
+        if (LevelStep::GetDefault(endpointId, levelStep) != Status::Success)
         {
             levelStep = ValveConfigurationAndControlCluster::kDefaultLevelStep;
         }

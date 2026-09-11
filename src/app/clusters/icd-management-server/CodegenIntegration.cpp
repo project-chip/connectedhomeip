@@ -58,7 +58,7 @@ public:
 
         // Get UserActiveModeTriggerHint
         BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
-        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::GetDefault(endpointId, &userActiveModeTriggerHint) !=
+        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::GetDefault(endpointId, userActiveModeTriggerHint) !=
             Protocols::InteractionModel::Status::Success)
         {
             ChipLogError(Zcl, "Failed to get UserActiveModeTriggerHint, using default (0)");

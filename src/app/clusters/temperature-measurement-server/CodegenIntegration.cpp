@@ -64,7 +64,7 @@ public:
         uint16_t tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
-            VerifyOrDie(Tolerance::GetDefaultOr(endpointId, &tolerance, 0) == Status::Success);
+            VerifyOrDie(Tolerance::GetDefaultOr(endpointId, tolerance, 0) == Status::Success);
         }
 
         gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet,
