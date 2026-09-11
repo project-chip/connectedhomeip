@@ -38,7 +38,7 @@
 
 
 from mobly import asserts
-from TC_AVANALYTestBase import AVANALYTestBase
+from support_modules.avanaly_testbase import AVANALYTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status

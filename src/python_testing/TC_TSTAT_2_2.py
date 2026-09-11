@@ -38,7 +38,7 @@
 import queue
 
 from mobly import asserts
-from TC_TSTAT_Utils import ThermostatSimulator, ThermostatState
+from support_modules.tstat_utils import ThermostatSimulator, ThermostatState
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status

@@ -44,7 +44,7 @@
 """Define Matter test case TC_DEM_2_5."""
 
 from mobly import asserts
-from TC_DEMTestBase import DEMTestBase
+from support_modules.dem_testbase import DEMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status

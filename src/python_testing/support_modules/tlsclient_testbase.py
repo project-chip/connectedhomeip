@@ -17,8 +17,8 @@
 
 from datetime import timedelta
 
-import test_plan_support
-from TC_TLS_Utils import TLSUtils
+from support_modules import test_plan_support
+from support_modules.tls_utils import TLSUtils
 
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep

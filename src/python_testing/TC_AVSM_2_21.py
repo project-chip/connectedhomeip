@@ -40,7 +40,7 @@ import logging
 import random
 
 from mobly import asserts
-from TC_AVSMTestBase import AVSMTestBase
+from support_modules.avsm_testbase import AVSMTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
