@@ -190,11 +190,12 @@ class TC_DGGEN_2_1(MatterBaseTest):
 
         # STEP 5: BootReason after the step 4c reboot (a reboot has just occurred, no need to reboot again)
         self.step(5)
-        boot_reason = await self._read_dggen_attribute_expect_success(endpoint=endpoint, attribute=attributes.BootReason)
-        matter_asserts.assert_valid_enum(boot_reason, "BootReason", enums.BootReasonEnum)
-        asserts.assert_not_equal(boot_reason, enums.BootReasonEnum.kUnknownEnumValue,
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.BootReason):
+            boot_reason = await self._read_dggen_attribute_expect_success(endpoint=endpoint, attribute=attributes.BootReason)
+            matter_asserts.assert_valid_enum(boot_reason, "BootReason", enums.BootReasonEnum)
+            asserts.assert_not_equal(boot_reason, enums.BootReasonEnum.kUnknownEnumValue,
                                  "BootReason is not a defined BootReason value.")
-        logger.info("BootReason: %s", boot_reason)
+            logger.info("BootReason: %s", boot_reason)
 
         # STEP 6: ActiveHardwareFaults
         self.step(6)
