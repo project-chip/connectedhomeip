@@ -59,10 +59,7 @@ public:
     {
         return SetEnabledSensors(newEnabledSensors);
     }
-    CHIP_ERROR SetEnabledSensorHandles(Span<const ByteSpan> newEnabledSensors)
-    {
-        return SetEnabledSensors(newEnabledSensors);
-    }
+    CHIP_ERROR SetEnabledSensorHandles(Span<const ByteSpan> newEnabledSensors) { return SetEnabledSensors(newEnabledSensors); }
 
     BitMask<ScheduleDayOfWeekBitmap> GetDayOfWeek() const;
     uint16_t GetTransitionTime() const;

@@ -531,22 +531,26 @@ TEST_F(ThermostatTestFixture, TestWriteAvailableSensorsAppendItem)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Append configured handle kHandle0
-    EXPECT_EQ(AppendItemWithSubject(cluster, AvailableSensorHandles::Id, tester.GetCommandHandler().GetSubjectDescriptor(), kHandle0),
-              Status::Success);
+    EXPECT_EQ(
+        AppendItemWithSubject(cluster, AvailableSensorHandles::Id, tester.GetCommandHandler().GetSubjectDescriptor(), kHandle0),
+        Status::Success);
     EXPECT_EQ(mSensorsDelegate.mAvailableSensors.size(), 1u);
 
     // Append configured handle kHandle1
-    EXPECT_EQ(AppendItemWithSubject(cluster, AvailableSensorHandles::Id, tester.GetCommandHandler().GetSubjectDescriptor(), kHandle1),
-              Status::Success);
+    EXPECT_EQ(
+        AppendItemWithSubject(cluster, AvailableSensorHandles::Id, tester.GetCommandHandler().GetSubjectDescriptor(), kHandle1),
+        Status::Success);
     EXPECT_EQ(mSensorsDelegate.mAvailableSensors.size(), 2u);
 
     // Append duplicate handle kHandle0 -> ConstraintError
-    EXPECT_EQ(AppendItemWithSubject(cluster, AvailableSensorHandles::Id, tester.GetCommandHandler().GetSubjectDescriptor(), kHandle0),
-              Status::ConstraintError);
+    EXPECT_EQ(
+        AppendItemWithSubject(cluster, AvailableSensorHandles::Id, tester.GetCommandHandler().GetSubjectDescriptor(), kHandle0),
+        Status::ConstraintError);
 
     // Append unconfigured handle kHandle2 -> ConstraintError
-    EXPECT_EQ(AppendItemWithSubject(cluster, AvailableSensorHandles::Id, tester.GetCommandHandler().GetSubjectDescriptor(), kHandle2),
-              Status::ConstraintError);
+    EXPECT_EQ(
+        AppendItemWithSubject(cluster, AvailableSensorHandles::Id, tester.GetCommandHandler().GetSubjectDescriptor(), kHandle2),
+        Status::ConstraintError);
 
     // Append handle > 16 bytes -> ConstraintError
     uint8_t tooLargeData[17] = { 0 };
@@ -592,12 +596,14 @@ TEST_F(ThermostatTestFixture, TestWriteEnabledSensorsReplaceAll)
     // Write EnabledSensors with s1 (not available) -> ConstraintError
     ByteSpan enabledInvalid[] = { kHandle0, kHandle1 };
     auto invalidPayload       = DataModel::List<const ByteSpan>(enabledInvalid, 2);
-    EXPECT_EQ(tester.WriteAttribute(EnabledSensorHandles::Id, invalidPayload, ListWritingPattern::ReplaceAll), Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(EnabledSensorHandles::Id, invalidPayload, ListWritingPattern::ReplaceAll),
+              Status::ConstraintError);
 
     // Write EnabledSensors with duplicate handles -> ConstraintError
     ByteSpan enabledDuplicate[] = { kHandle0, kHandle0 };
     auto duplicatePayload       = DataModel::List<const ByteSpan>(enabledDuplicate, 2);
-    EXPECT_EQ(tester.WriteAttribute(EnabledSensorHandles::Id, duplicatePayload, ListWritingPattern::ReplaceAll), Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(EnabledSensorHandles::Id, duplicatePayload, ListWritingPattern::ReplaceAll),
+              Status::ConstraintError);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
