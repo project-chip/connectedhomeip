@@ -386,6 +386,12 @@ list(APPEND filter_out "-Iconfig")
 idf_build_get_property(config_dir CONFIG_DIR)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-I${config_dir}")
 
+# GN generates dependencies with -MMD. Some ESP-IDF system headers include
+# sdkconfig.h before Matter's platform configuration headers do, which causes
+# GCC to omit sdkconfig.h from the dependency file. Force it to be included
+# first so Kconfig changes rebuild the affected Matter sources.
+target_compile_options(${COMPONENT_LIB} PRIVATE "-include${config_dir}/sdkconfig.h")
+
 if (CONFIG_CHIP_USE_OT_ENDPOINT)
     idf_component_get_property(openthread_dir openthread COMPONENT_DIR)
     target_compile_options(${COMPONENT_LIB} PRIVATE "-I${openthread_dir}/private_include")
