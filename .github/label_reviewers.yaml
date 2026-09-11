@@ -22,7 +22,7 @@
 #
 # When a pull request has one or more of these labels attached, the
 # "check-label-reviewers" GitHub Action verifies that at least one reviewer from
-# EACH matching label's list has submitted an APPROVED review.
+# ANY of the matching labels' lists has submitted an APPROVED review.
 #
 # Documentation: See .github/LABEL_REVIEWERS.md for complete instructions on:
 #   - Creating labels on GitHub
@@ -35,8 +35,8 @@
 #   - Quotes around usernames are optional (e.g. username, 'username', or "username").
 #   - PR authors cannot approve their own PRs (author approvals are ignored).
 #   - If a PR has no designated labels attached, the check passes automatically.
-#   - If multiple designated labels are attached, EVERY label requires at least one
-#     approval from its respective reviewer list.
+#   - If multiple designated labels are attached, approval from ANY one reviewer
+#     across any of the associated labels' lists satisfies the check.
 #
 # Format:
 #   <label_name>:

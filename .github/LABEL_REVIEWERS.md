@@ -69,7 +69,6 @@ GitHub usernames:
 ```
 
 ### Rules & Behaviors
-
 -   **Case-Insensitive**: Both label names and usernames are matched
     case-insensitively (`Security` matches `security`, `Cecille` matches
     `cecille`).
@@ -78,12 +77,9 @@ GitHub usernames:
 -   **Quotes Optional**: Usernames can be unquoted or enclosed in quotes
     (`username`, `'username'`, or `"username"`). Quotes are not required for
     standard GitHub usernames.
--   **OR-Logic per Label**: At least **one** listed reviewer from the label's
-    list must approve the PR.
--   **AND-Logic across Labels**: If a PR has multiple designated labels attached
-    (e.g., both `security` and `certification`), **every** attached label
-    requires at least one approval from its respective reviewer list (approval
-    required for each domain).
+-   **OR-Logic across Labels**: If a PR has multiple designated labels attached
+    (e.g., both `security` and `certification`), approval from at least **one**
+    reviewer from **any** of the attached labels' lists satisfies the check.
 -   **Author Self-Approval Exclusion**: A PR author **cannot approve their own
     PR**. Even if the author is listed as an SME for a label, another reviewer
     from that label's list must provide the approval.

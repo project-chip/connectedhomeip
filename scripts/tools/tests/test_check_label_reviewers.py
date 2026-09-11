@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 # pylint: disable=wrong-import-position
 from check_label_reviewers import (LabelEvaluation, LabelRule, evaluate_pr_labels, extract_approvers,  # noqa: E402
-                                   generate_step_summary, parse_label_config)
+                                   generate_step_summary, is_sme_review_satisfied, parse_label_config)
 
 
 class TestParseLabelConfig(unittest.TestCase):
@@ -256,16 +256,27 @@ class TestEvaluatePrLabels(unittest.TestCase):
 
         self.assertEqual(len(evaluations), 2)
         self.assertTrue(all(ev.satisfied for ev in evaluations))
+        self.assertTrue(is_sme_review_satisfied(evaluations))
 
-    def test_multi_label_partial_approval_fails(self) -> None:
+    def test_multi_label_one_approval_satisfies_overall_check(self) -> None:
         pr_labels = ["Security", "data-model"]
-        approvers = {"alice"}  # Security approved, data-model missing
+        approvers = {"alice"}  # Security approved, data-model unreviewed
         evaluations = evaluate_pr_labels(pr_labels, self.config, approvers)
 
         self.assertEqual(len(evaluations), 2)
         eval_dict = {ev.rule.name: ev.satisfied for ev in evaluations}
         self.assertTrue(eval_dict["Security"])
         self.assertFalse(eval_dict["Data-Model"])
+        # Overall check passes because at least one SME from ANY label approved
+        self.assertTrue(is_sme_review_satisfied(evaluations))
+
+    def test_multi_label_no_sme_approvals_fails_overall_check(self) -> None:
+        pr_labels = ["Security", "data-model"]
+        approvers = {"external_reviewer"}
+        evaluations = evaluate_pr_labels(pr_labels, self.config, approvers)
+
+        self.assertEqual(len(evaluations), 2)
+        self.assertFalse(is_sme_review_satisfied(evaluations))
 
     def test_case_insensitive_label_and_username_matching(self) -> None:
         pr_labels = ["sEcUrItY"]
@@ -291,7 +302,20 @@ class TestGenerateStepSummary(unittest.TestCase):
         summary = generate_step_summary(evals, 100, "Security patch", "author1", True)
 
         self.assertIn("| `Security` | ✅ Approved | @alice, @bob | @alice |", summary)
-        self.assertIn("All SME Review Requirements Met!", summary)
+        self.assertIn("SME Review Requirement Met!", summary)
+
+    def test_summary_multi_label_partially_approved(self) -> None:
+        rule1 = LabelRule(name="Security", smes=["alice"])
+        rule2 = LabelRule(name="Data-Model", smes=["bob"])
+        evals = [
+            LabelEvaluation(rule=rule1, present_on_pr=True, approvers=["alice"]),
+            LabelEvaluation(rule=rule2, present_on_pr=True, approvers=[]),
+        ]
+        summary = generate_step_summary(evals, 100, "Security patch", "author1", True)
+
+        self.assertIn("| `Security` | ✅ Approved | @alice | @alice |", summary)
+        self.assertIn("| `Data-Model` | ⚪ Satisfied (by other label) | @bob | *None* |", summary)
+        self.assertIn("SME Review Requirement Met!", summary)
 
     def test_summary_missing_approval_label(self) -> None:
         rule = LabelRule(name="Security", smes=["alice", "bob"])
@@ -305,7 +329,7 @@ class TestGenerateStepSummary(unittest.TestCase):
 class TestEndToEndJsonEvaluation(unittest.TestCase):
     """Tests end-to-end evaluation using simulated GitHub CLI JSON output."""
 
-    def test_full_evaluation_flow(self) -> None:
+    def test_full_evaluation_flow_with_one_matching_sme(self) -> None:
         # 1. Mock JSON output matching `gh pr view --json author,title,state,labels,latestReviews`
         mock_gh_json = {
             "title": "Add secure channel encryption",
@@ -340,13 +364,32 @@ class TestEndToEndJsonEvaluation(unittest.TestCase):
 
         # 5. Evaluate
         evaluations = evaluate_pr_labels(pr_labels, config, approvers)
-        all_passed = all(ev.satisfied for ev in evaluations)
+        # "security" is approved by sme_alice; under ANY-reviewer logic, check passes!
+        self.assertTrue(is_sme_review_satisfied(evaluations))
 
-        # "security" is approved by sme_alice; "core" is missing approval from lead_dev
-        self.assertFalse(all_passed)
-        eval_status = {ev.rule.name: ev.satisfied for ev in evaluations}
-        self.assertTrue(eval_status["security"])
-        self.assertFalse(eval_status["core"])
+    def test_full_evaluation_flow_missing_all_smes(self) -> None:
+        mock_gh_json = {
+            "title": "Add secure channel encryption",
+            "author": {"login": "contributor"},
+            "state": "OPEN",
+            "labels": [
+                {"name": "security"},
+                {"name": "core"},
+            ],
+            "latestReviews": [
+                {"author": {"login": "contributor"}, "state": "APPROVED"},  # self-approval
+                {"author": {"login": "peer_reviewer"}, "state": "APPROVED"},  # not an SME
+            ],
+        }
+        config = {
+            "security": LabelRule(name="security", smes=["sme_alice", "sme_bob"]),
+            "core": LabelRule(name="core", smes=["lead_dev"]),
+        }
+        approvers = extract_approvers(mock_gh_json)
+        pr_labels = [l["name"] for l in mock_gh_json.get("labels", [])]
+        evaluations = evaluate_pr_labels(pr_labels, config, approvers)
+
+        self.assertFalse(is_sme_review_satisfied(evaluations))
 
 
 if __name__ == "__main__":

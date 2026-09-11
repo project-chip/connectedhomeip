@@ -17,8 +17,8 @@
 
 """SME (Subject Matter Expert) Label Reviewer Checker for Pull Requests.
 
-Verifies that for each designated label attached to a pull request, at least one
-designated SME username from the corresponding configuration has approved the PR.
+Verifies that for PRs with designated labels attached, at least one designated
+SME username from any of the matching labels' lists has approved the PR.
 Uses the GitHub CLI (`gh`) to fetch PR reviews and labels.
 """
 
@@ -177,12 +177,19 @@ def evaluate_pr_labels(
     return evaluations
 
 
+def is_sme_review_satisfied(evaluations: list[LabelEvaluation]) -> bool:
+    """Returns True if no monitored labels are present, or if ANY label has at least one SME approval."""
+    if not evaluations:
+        return True
+    return any(ev.satisfied for ev in evaluations)
+
+
 def generate_step_summary(
     evaluations: list[LabelEvaluation],
     pr_number: int,
     pr_title: str,
     pr_author: str,
-    all_passed: bool,
+    passed: bool,
 ) -> str:
     """Builds a GitHub Actions Markdown Step Summary."""
     md = []
@@ -207,21 +214,28 @@ def generate_step_summary(
             status_icon = "✅ Approved"
             approvers_str = ", ".join([f"@{u}" for u in ev.approvers])
         else:
-            status_icon = "❌ Missing"
+            status_icon = "⚪ Satisfied (by other label)" if passed else "❌ Missing"
             approvers_str = "*None*"
         md.append(f"| {label_code} | {status_icon} | {req_smes} | {approvers_str} |")
 
     md.append("")
-    if all_passed:
-        md.append(
-            "> ✅ **All SME Review Requirements Met!**  \n"
-            "> At least one designated reviewer from each required label has approved this PR."
-        )
+    if passed:
+        all_matching_approvers = sorted({f"@{u}" for ev in evaluations for u in ev.approvers})
+        if all_matching_approvers:
+            md.append(
+                "> ✅ **SME Review Requirement Met!**  \n"
+                f"> At least one designated reviewer ({', '.join(all_matching_approvers)}) has approved this PR."
+            )
+        else:
+            md.append(
+                "> ✅ **SME Review Requirement Met!**  \n"
+                "> This PR does not require SME approval."
+            )
     else:
-        missing_count = sum(1 for ev in evaluations if not ev.satisfied)
+        all_req_smes = sorted({f"@{u}" for ev in evaluations for u in ev.rule.smes})
         md.append(
-            f"> ❌ **Review Required**: {missing_count} label(s) are missing required SME approval.  \n"
-            "> Please request review from at least one of the listed subject matter experts."
+            "> ❌ **Review Required**: Missing SME approval.  \n"
+            f"> Please request review from at least one SME from any of the required label lists: {', '.join(all_req_smes)}."
         )
 
     return "\n".join(md)
@@ -392,10 +406,12 @@ def main() -> int:
     if not evaluations:
         print("ℹ️  No designated SME review labels attached to this PR.")
         print("   Check passed automatically.\n" + "=" * 72)
-        all_passed = True
+        passed = True
     else:
         print(f"Found {len(evaluations)} monitored SME label(s) on this PR:\n")
-        all_passed = True
+        passed = is_sme_review_satisfied(evaluations)
+        all_matching_approvers = sorted({u for ev in evaluations for u in ev.approvers})
+
         for idx, ev in enumerate(evaluations, 1):
             req_smes = ", ".join([f"@{u}" for u in ev.rule.smes])
             if ev.satisfied:
@@ -404,13 +420,20 @@ def main() -> int:
                 print(f"      Required SMEs: {req_smes}")
                 print(f"      Status:        ✅ APPROVED by {approver_mentions}\n")
             else:
-                all_passed = False
                 print(f"  [{idx}] Label: '{ev.rule.name}'")
                 print(f"      Required SMEs: {req_smes}")
-                print("      Status:        ❌ MISSING APPROVAL")
-                print(
-                    f"      Action:        Requires at least one approval from: {req_smes}\n"
-                )
+                if passed:
+                    print(
+                        f"      Status:        ⚪ Not directly reviewed (requirement satisfied by {', '.join([f'@{u}' for u in all_matching_approvers])})\n"
+                    )
+                else:
+                    print("      Status:        ❌ MISSING APPROVAL\n")
+
+        if not passed:
+            all_smes = sorted({f"@{u}" for ev in evaluations for u in ev.rule.smes})
+            print(
+                f"  Action: Requires at least one approval from any of: {', '.join(all_smes)}\n"
+            )
         print("=" * 72)
 
     # Output parameters for GitHub Actions
@@ -423,11 +446,11 @@ def main() -> int:
         write_github_outputs(
             gh_output,
             {
-                "passed": "true" if all_passed else "false",
+                "passed": "true" if passed else "false",
                 "total_monitored_labels": str(len(evaluations)),
-                "missing_count": str(len(missing_labels)),
+                "missing_count": "0" if passed else str(len(missing_labels)),
                 "approved_labels": ",".join(approved_labels),
-                "missing_labels": ",".join(missing_labels),
+                "missing_labels": "" if passed else ",".join(missing_labels),
             },
         )
 
@@ -435,12 +458,12 @@ def main() -> int:
     gh_summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if gh_summary:
         summary_md = generate_step_summary(
-            evaluations, pr_number, pr_title, pr_author, all_passed
+            evaluations, pr_number, pr_title, pr_author, passed
         )
         write_step_summary(gh_summary, summary_md)
 
-    if all_passed:
-        print("✅ SUCCESS: All required SME reviews have been satisfied.\n")
+    if passed:
+        print("✅ SUCCESS: SME review requirement has been satisfied.\n")
         return 0
 
     print("❌ FAILURE: Missing required SME review approval(s).\n")
