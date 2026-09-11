@@ -47,6 +47,7 @@
 #include <psa/crypto.h>
 #endif
 #include <lib/core/CHIPCore.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -216,43 +217,40 @@ void ProviderSequenceDoesNotCrash(const std::vector<std::tuple<uint8_t, uint16_t
             (void) provider->RemoveKeySet(fabric, c);
             break;
         case 19: {
-            // Release is mandatory: the iterator pools are fixed-size.
-            if (auto * it = provider->IterateGroupInfo(fabric))
+            // AutoRelease matters: the iterator pools are fixed-size.
+            if (AutoRelease it(provider->IterateGroupInfo(fabric)); it)
             {
                 GroupInfo info;
                 (void) it->Count();
                 while (it->Next(info))
                 {
                 }
-                it->Release();
             }
-            if (auto * it = provider->IterateGroupKeys(fabric))
+            if (AutoRelease it(provider->IterateGroupKeys(fabric)); it)
             {
                 GroupKey key;
                 (void) it->Count();
                 while (it->Next(key))
                 {
                 }
-                it->Release();
             }
-            if (auto * it = provider->IterateKeySets(fabric))
+            if (AutoRelease it(provider->IterateKeySets(fabric)); it)
             {
                 KeySet keySet;
                 (void) it->Count();
                 while (it->Next(keySet))
                 {
                 }
-                it->Release();
             }
-            if (auto * it =
-                    provider->IterateEndpoints(fabric, (a & 1) ? std::make_optional(static_cast<GroupId>(b)) : std::nullopt))
+            if (AutoRelease it(
+                    provider->IterateEndpoints(fabric, (a & 1) ? std::make_optional(static_cast<GroupId>(b)) : std::nullopt));
+                it)
             {
                 GroupDataProvider::GroupEndpoint endpoint;
                 (void) it->Count();
                 while (it->Next(endpoint))
                 {
                 }
-                it->Release();
             }
             break;
         }
@@ -267,14 +265,13 @@ void ProviderSequenceDoesNotCrash(const std::vector<std::tuple<uint8_t, uint16_t
             (void) provider->RemoveEndpoint(fabric, static_cast<EndpointId>(b));
             break;
         case 23:
-            if (auto * it = provider->IterateGroupSessions(a))
+            if (AutoRelease it(provider->IterateGroupSessions(a)); it)
             {
                 GroupDataProvider::GroupSession session;
                 (void) it->Count();
                 while (it->Next(session))
                 {
                 }
-                it->Release();
             }
             break;
         default:

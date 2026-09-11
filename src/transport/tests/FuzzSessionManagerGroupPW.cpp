@@ -44,6 +44,7 @@
 #endif
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -407,14 +408,15 @@ constexpr NodeId kManualSourceNodeIds[] = { 0x0000000011223344ULL, 0x00000000000
 // Built field by field because PrepareMessage fixes the source node id, counter and control
 // flag internally, leaving the arms keyed on those unreachable through it. Privacy off keeps
 // the frame verifiable; receive handles both forms.
-bool BuildManualGroupFrame(Fixture & fx, bool controlMsg, uint8_t sourceSelector, uint32_t counter, uint8_t payloadType,
-                           const std::vector<uint8_t> & payload, std::vector<uint8_t> & out)
+CHIP_ERROR BuildManualGroupFrame(Fixture & fx, bool controlMsg, uint8_t sourceSelector, uint32_t counter, uint8_t payloadType,
+                                 const std::vector<uint8_t> & payload, std::vector<uint8_t> & out)
 {
     GroupDataProvider * groups = GetGroupDataProvider();
-    VerifyOrReturnValue(groups != nullptr, false);
+    VerifyOrReturnError(groups != nullptr, CHIP_ERROR_INTERNAL);
 
     Crypto::SymmetricKeyContext * keyContext = groups->GetKeyContext(fx.fabricIndex, kGroupId);
-    VerifyOrReturnValue(keyContext != nullptr, false);
+    VerifyOrReturnError(keyContext != nullptr, CHIP_ERROR_INTERNAL);
+    AutoRelease<Crypto::SymmetricKeyContext> keyContextOwner(keyContext);
 
     const NodeId sourceNodeId = kManualSourceNodeIds[sourceSelector % MATTER_ARRAY_SIZE(kManualSourceNodeIds)];
 
@@ -431,24 +433,17 @@ bool BuildManualGroupFrame(Fixture & fx, bool controlMsg, uint8_t sourceSelector
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::Id, payloadType);
 
     System::PacketBufferHandle msg = MessagePacketBuffer::NewWithData(payload.data(), payload.size());
-    if (msg.IsNull())
-    {
-        keyContext->Release();
-        return false;
-    }
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     CryptoContext cryptoContext(keyContext);
     CryptoContext::NonceStorage nonce;
-    bool ok = CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), sourceNodeId) ==
-            CHIP_NO_ERROR &&
-        SecureMessageCodec::Encrypt(cryptoContext, nonce, payloadHeader, packetHeader, msg) == CHIP_NO_ERROR &&
-        packetHeader.EncodeBeforeData(msg) == CHIP_NO_ERROR;
-
-    keyContext->Release();
-    VerifyOrReturnValue(ok, false);
+    ReturnErrorOnFailure(
+        CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), sourceNodeId));
+    ReturnErrorOnFailure(SecureMessageCodec::Encrypt(cryptoContext, nonce, payloadHeader, packetHeader, msg));
+    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msg));
 
     out.assign(msg->Start(), msg->Start() + msg->DataLength());
-    return true;
+    return CHIP_NO_ERROR;
 }
 
 void GroupManualFrameDoesNotCrash(bool controlMsg, uint8_t sourceSelector, uint32_t counter, uint8_t payloadType,
@@ -459,7 +454,7 @@ void GroupManualFrameDoesNotCrash(bool controlMsg, uint8_t sourceSelector, uint3
     ApplyTestingMode(fx, testingEnabled);
 
     std::vector<uint8_t> datagram;
-    if (!BuildManualGroupFrame(fx, controlMsg, sourceSelector, counter, payloadType, payload, datagram))
+    if (BuildManualGroupFrame(fx, controlMsg, sourceSelector, counter, payloadType, payload, datagram) != CHIP_NO_ERROR)
     {
         return;
     }
