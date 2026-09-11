@@ -16,6 +16,7 @@
  */
 
 #include "MediaPlaybackManager.h"
+#include "MediaContentCatalog.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
@@ -32,24 +33,6 @@ using namespace chip::literals;
 using namespace chip::Uint8;
 
 namespace {
-
-constexpr chip::CharSpan kContentTitles[] = { "Morning News"_span, "Evening Playlist"_span };
-
-constexpr chip::CommandId kLiveContentCommands[] = {
-    Commands::Play::Id,
-    Commands::Pause::Id,
-    Commands::Stop::Id,
-};
-
-constexpr chip::CommandId kOnDemandContentCommands[] = {
-    Commands::Play::Id,     Commands::Pause::Id,  Commands::Stop::Id,        Commands::Next::Id,
-    Commands::Previous::Id, Commands::Rewind::Id, Commands::FastForward::Id, Commands::Seek::Id,
-};
-
-constexpr chip::Span<const chip::CommandId> kContentCommands[] = {
-    chip::Span<const chip::CommandId>(kLiveContentCommands),
-    chip::Span<const chip::CommandId>(kOnDemandContentCommands),
-};
 
 size_t gCurrentContentIndex = 0;
 
@@ -127,7 +110,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
 CHIP_ERROR MediaPlaybackManager::HandleGetAvailableCommands(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (chip::CommandId commandId : kContentCommands[gCurrentContentIndex])
+        for (chip::CommandId commandId : MediaContentCatalog::kEntries[gCurrentContentIndex].availableCommands)
         {
             ReturnErrorOnFailure(encoder.Encode(commandId));
         }
@@ -139,13 +122,13 @@ CHIP_ERROR MediaPlaybackManager::HandleGetContentInfo(AttributeValueEncoder & aE
 {
     Structs::ContentInfoStruct::Type contentInfo;
     contentInfo.contentType = MediaType::kGeneric;
-    contentInfo.title       = chip::MakeOptional(MakeNullable(kContentTitles[gCurrentContentIndex]));
+    contentInfo.title       = chip::MakeOptional(MakeNullable(MediaContentCatalog::kEntries[gCurrentContentIndex].name));
     return aEncoder.Encode(contentInfo);
 }
 
 void MediaPlaybackManager::SetCurrentContent(chip::EndpointId endpoint, size_t contentIndex)
 {
-    VerifyOrReturn(contentIndex < MATTER_ARRAY_SIZE(kContentTitles));
+    VerifyOrReturn(contentIndex < MATTER_ARRAY_SIZE(MediaContentCatalog::kEntries));
 
     gCurrentContentIndex = contentIndex;
     MatterReportingAttributeChangeCallback(endpoint, Id, Attributes::ContentInfo::Id);

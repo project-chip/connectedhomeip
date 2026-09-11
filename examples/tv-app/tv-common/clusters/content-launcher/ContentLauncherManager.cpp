@@ -17,11 +17,14 @@
  */
 
 #include "ContentLauncherManager.h"
+#include "MediaContentCatalog.h"
 #include "media-playback/MediaPlaybackManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <clusters/ContentLauncher/Metadata.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <list>
 #include <string>
@@ -194,12 +197,18 @@ void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * comman
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandlePlayPreset presetID=%u", presetID);
 
-    if (presetID > 0)
+    for (size_t index = 0; index < MATTER_ARRAY_SIZE(MediaContentCatalog::kEntries); index++)
     {
-        MediaPlaybackManager::SetCurrentContent(commandPath.mEndpointId, static_cast<size_t>(presetID - 1));
+        if (MediaContentCatalog::kEntries[index].presetID == presetID)
+        {
+            MediaPlaybackManager::SetCurrentContent(commandPath.mEndpointId, index);
+            commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
+            return;
+        }
     }
 
-    commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
+    commandObj->AddStatus(
+        commandPath, chip::Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusEnum::kPresetNotFound));
 }
 
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
@@ -229,19 +238,15 @@ bool ContentLauncherManager::HandleGetMovable()
 
 CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
 {
-    using namespace chip::literals;
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetPresets");
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        ContentPresetStructType preset1;
-        preset1.presetID   = 1;
-        preset1.presetName = "Morning News"_span;
-        ReturnErrorOnFailure(encoder.Encode(preset1));
-
-        ContentPresetStructType preset2;
-        preset2.presetID   = 2;
-        preset2.presetName = "Evening Playlist"_span;
-        ReturnErrorOnFailure(encoder.Encode(preset2));
-
+        for (const MediaContentCatalog::Entry & entry : MediaContentCatalog::kEntries)
+        {
+            ContentPresetStructType preset;
+            preset.presetID   = entry.presetID;
+            preset.presetName = entry.name;
+            ReturnErrorOnFailure(encoder.Encode(preset));
+        }
         return CHIP_NO_ERROR;
     });
 }
