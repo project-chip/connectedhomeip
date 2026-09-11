@@ -508,11 +508,16 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # reject" Expected Outcome in steps 15/17 is correct. See DECISIONS.md.
         if wifi_tech is not None:
             self.step(15)
+            # One PMK shared by both requests of the pair, as in every other step:
+            # the plan requires the PMK be "a random number common for both DUT_I
+            # and DUT_R". Two independent rnd() calls here would hand the peers
+            # different credentials.
+            pmk = rnd(PMK_LEN)
             await self._expect_both_infeasible(
                 self.build_wifi_request(role=RangingRoleEnum.kWiFiSubscriberRole, peer_wifi_ik=self.wifi_ik_r,
-                                        pmk=rnd(PMK_LEN), min_distance=1000, max_distance=1, technology=wifi_tech),
+                                        pmk=pmk, min_distance=1000, max_distance=1, technology=wifi_tech),
                 self.build_wifi_request(role=RangingRoleEnum.kWiFiPublisherRole, peer_wifi_ik=self.wifi_ik_i,
-                                        pmk=rnd(PMK_LEN), min_distance=1000, max_distance=1, technology=wifi_tech))
+                                        pmk=pmk, min_distance=1000, max_distance=1, technology=wifi_tech))
         else:
             self._skip(15, wifi_reason)
 

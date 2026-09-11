@@ -394,20 +394,38 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # The plan gives RangingInstanceInterval to DUT_I (the active initiator)
         # only; DUT_R's request lists just StartTime 0 and EndTime 600 (interval
         # omitted). The responder makers therefore pass interval=None.
+        #
+        # Key material is generated ONCE PER TECHNOLOGY here and captured by both
+        # makers of the pair. The plan requires the PMK / LTK / SessionKey to be
+        # "a random number common for both DUT_I and DUT_R"; generating inside the
+        # maker lambda (which is invoked separately per role) handed the initiator
+        # and the reflector DIFFERENT credentials, so the peers could not agree on
+        # the same ranging session.
+        #
+        # Peer identities are looked up by attribute NAME at invocation time with
+        # no getattr default. A maker is constructed even for a block that will
+        # skip, but only INVOKED for a block that runs, and a running block implies
+        # steps 3/4/5 stored the identity. A missing attribute is therefore a real
+        # defect and must raise, not silently substitute 16 zero bytes: zeros would
+        # satisfy the 16-byte length guard and reach the DUT as a valid-looking
+        # wrong identity (and a defaulted BLTCSSecurityLevel of 0 is the Unknown
+        # level, which the step-4 validation exists to reject).
         def _v_wifi(d):
             self.assert_time_of_measurement_present(d)
             asserts.assert_false(d.distance is NullValue, "Distance must not be null")
             matter_asserts.assert_valid_uint16(d.distance, "Distance")
             asserts.assert_equal(d.wiFiDevIK, self.wifi_ik_r, "RangingResult WiFiDevIK must equal DUT_R's WiFiDevIK")
 
-        def _mk_wifi(role, peer, interval):
-            return lambda: self.build_wifi_request(role=role, peer_wifi_ik=peer, pmk=rnd(PMK_LEN),
+        wifi_pmk = rnd(PMK_LEN)
+
+        def _mk_wifi(role, peer_attr, interval):
+            return lambda: self.build_wifi_request(role=role, peer_wifi_ik=getattr(self, peer_attr), pmk=wifi_pmk,
                                                    start_time=0, end_time=_PERIODIC_END_TIME_S,
                                                    interval=interval, technology=wifi_tech)
         await self._run_periodic_block(
             6, wifi_tech, wifi_reason,
-            _mk_wifi(RangingRoleEnum.kWiFiSubscriberRole, getattr(self, "wifi_ik_r", b"\x00" * 16), _PERIODIC_INTERVAL_S),
-            _mk_wifi(RangingRoleEnum.kWiFiPublisherRole, getattr(self, "wifi_ik_i", b"\x00" * 16), None),
+            _mk_wifi(RangingRoleEnum.kWiFiSubscriberRole, "wifi_ik_r", _PERIODIC_INTERVAL_S),
+            _mk_wifi(RangingRoleEnum.kWiFiPublisherRole, "wifi_ik_i", None),
             _v_wifi, caps_i, caps_r)
 
         def _v_blt(d):
@@ -416,15 +434,17 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             matter_asserts.assert_valid_uint16(d.distance, "Distance")
             asserts.assert_equal(d.BLTDevIK, self.blt_ik_r, "RangingResult BLTDevIK must equal DUT_R's BLTDevIK")
 
-        def _mk_blt(role, peer, interval):
-            return lambda: self.build_blt_request(role=role, peer_blt_ik=peer, ltk=rnd(LTK_LEN),
-                                                  security_level=getattr(self, "blt_level", 0), mode=self.blt_mode,
+        blt_ltk = rnd(LTK_LEN)
+
+        def _mk_blt(role, peer_attr, interval):
+            return lambda: self.build_blt_request(role=role, peer_blt_ik=getattr(self, peer_attr), ltk=blt_ltk,
+                                                  security_level=self.blt_level, mode=self.blt_mode,
                                                   start_time=0, end_time=_PERIODIC_END_TIME_S,
                                                   interval=interval)
         await self._run_periodic_block(
             7, blt_run_tech, blt_reason,
-            _mk_blt(RangingRoleEnum.kBLTInitiatorRole, getattr(self, "blt_ik_r", b"\x00" * 16), _PERIODIC_INTERVAL_S),
-            _mk_blt(RangingRoleEnum.kBLTReflectorRole, getattr(self, "blt_ik_i", b"\x00" * 16), None),
+            _mk_blt(RangingRoleEnum.kBLTInitiatorRole, "blt_ik_r", _PERIODIC_INTERVAL_S),
+            _mk_blt(RangingRoleEnum.kBLTReflectorRole, "blt_ik_i", None),
             _v_blt, caps_i, caps_r)
 
         def _v_ble(d):
@@ -433,14 +453,17 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             matter_asserts.assert_valid_int8(d.rssi, "RSSI")
             matter_asserts.assert_valid_int8(d.txPower, "TxPower")
 
-        def _mk_ble(role, peer, interval):
-            return lambda: self.build_ble_request(role=role, peer_ble_device_id=peer, session_key=rnd(SESSION_KEY_LEN),
+        ble_session_key = rnd(SESSION_KEY_LEN)
+
+        def _mk_ble(role, peer_attr, interval):
+            return lambda: self.build_ble_request(role=role, peer_ble_device_id=getattr(self, peer_attr),
+                                                  session_key=ble_session_key,
                                                   start_time=0, end_time=_PERIODIC_END_TIME_S,
                                                   interval=interval)
         await self._run_periodic_block(
             8, ble_tech, ble_reason,
-            _mk_ble(RangingRoleEnum.kBLEScanningRole, getattr(self, "ble_id_r", 0), _PERIODIC_INTERVAL_S),
-            _mk_ble(RangingRoleEnum.kBLEBeaconRole, getattr(self, "ble_id_i", 0), None),
+            _mk_ble(RangingRoleEnum.kBLEScanningRole, "ble_id_r", _PERIODIC_INTERVAL_S),
+            _mk_ble(RangingRoleEnum.kBLEBeaconRole, "ble_id_i", None),
             _v_ble, caps_i, caps_r)
 
 
