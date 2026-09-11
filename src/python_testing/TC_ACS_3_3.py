@@ -271,7 +271,7 @@ class TC_ACS_3_3(MatterBaseTest):
             self.step("3f", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys event field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event start time stored from the step 3d.")
             # check AmbientContextDetectEnded event
             event = event_listener.wait_for_event_report(
-                cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
+                cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_input))
             if event.eventStartTimePos is not None:
                 asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimePos})
@@ -357,7 +357,7 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("4f", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys event field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event start time stored from the step 4d.")
             event = event_listener.wait_for_event_report(
-                cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
+                cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_input))
             # asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
             if event.eventStartTimePos is not None:
                 asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
@@ -446,7 +446,7 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("5f", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys event field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event start time stored from the step 5d.")
             event = event_listener.wait_for_event_report(
-                cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
+                cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_input))
             if event.eventStartTimePos is not None:
                 asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimePos}")
@@ -557,7 +557,7 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("6h", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event time stored from the step 6f.")
             event = event_listener.wait_for_event_report(
-                cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_dut))
+                cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdtime_input))
             if event.eventStartTimePos is not None:
                 asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimePos})
