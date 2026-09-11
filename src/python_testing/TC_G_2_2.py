@@ -417,7 +417,7 @@ class TC_G_2_2(MatterBaseTest):
                 cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0
             )
             asserts.assert_true(
-                all(entry.endpoint != self.matter_test_config.endpoint for entry in groupTableList),
+                all(self.matter_test_config.endpoint not in entry.endpoints for entry in groupTableList),
                 f"Unexpected group entries found for endpoint {self.matter_test_config.endpoint}: {groupTableList}",
             )
 
@@ -444,7 +444,7 @@ class TC_G_2_2(MatterBaseTest):
                 cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0
             )
             asserts.assert_true(
-                all(entry.endpoint != self.matter_test_config.endpoint for entry in groupTableList),
+                all(self.matter_test_config.endpoint not in entry.endpoints for entry in groupTableList),
                 f"Unexpected group entries found for endpoint {self.matter_test_config.endpoint}: {groupTableList}",
             )
             self.mark_all_remaining_steps_skipped("25")
