@@ -69,13 +69,16 @@ SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 
 class TC_ACS_2_1(MatterBaseTest):
 
-    @pics('ACS.S')
-    @async_test_body
-    @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
+    # @pics('ACS.S')
+    # @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
+    def pics_TC_ACS_2_1(self):
+        return ['ACS.S']
+
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
-
+        
+    @async_test_body
     async def test_TC_ACS_2_1(self):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
