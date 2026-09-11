@@ -365,9 +365,23 @@ Status MediaFileManagementManager::HandleGetSharedFile(ScopedNodeId peer, uint16
     ChipLogProgress(Zcl, "MediaFileManagementManager: GetSharedFile responseID=%u", responseID);
 
     uint64_t fileID = 0;
-    if (mBdxCoordinator == nullptr || !mBdxCoordinator->LookupSharedFile(peer, responseID, fileID))
+    if (mBdxCoordinator == nullptr)
     {
         response.status = FileStatusEnum::kFileNotAvailable;
+        return Status::Success;
+    }
+
+    switch (mBdxCoordinator->LookupSharedFile(peer, responseID, fileID))
+    {
+    case SharedFileLookupResult::kAvailable:
+        break;
+    case SharedFileLookupResult::kRetrieved:
+        // The token was genuinely issued to this client, it is just spent.
+        response.status = FileStatusEnum::kFileNotAvailable;
+        return Status::Success;
+    case SharedFileLookupResult::kUnknown:
+        // A ResponseID this client was never given is not an authentic token.
+        response.status = FileStatusEnum::kAuthenticationFailed;
         return Status::Success;
     }
 

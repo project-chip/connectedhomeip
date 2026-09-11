@@ -46,26 +46,32 @@ namespace MediaFileManagement {
  * designator for the file data itself is the file's Name; the thumbnail uses
  * the explicit `bdx://` ImageUri.
  */
-class MediaFileManagementBdxCoordinator : public BdxCoordinator
+class MediaFileManagementBdxCoordinator : public BdxCoordinator, public MediaFileManagementBdxProvider::RetrievalObserver
 {
 public:
     MediaFileManagementBdxCoordinator(MediaFileManagementManager & manager, MediaFileManagementBdxProvider & provider,
                                       MediaFileManagementBdxRequestor & requestor, MediaFileManagementCluster & cluster) :
-        mManager(manager),
-        mProvider(provider), mRequestor(requestor), mCluster(cluster)
+        mManager(manager), mProvider(provider), mRequestor(requestor), mCluster(cluster)
     {}
 
     CHIP_ERROR StartIncomingFileTransfer(ScopedNodeId peer, uint64_t fileID, CharSpan fileName, uint64_t size,
                                          CharSpan thumbnailUri) override;
     CHIP_ERROR ShareFileWithClient(ScopedNodeId peer, uint16_t requestID, uint64_t fileID, CharSpan fileName) override;
-    bool LookupSharedFile(ScopedNodeId peer, uint16_t responseID, uint64_t & fileID) override;
+    SharedFileLookupResult LookupSharedFile(ScopedNodeId peer, uint16_t responseID, uint64_t & fileID) override;
     CHIP_ERROR MakeSelfBdxUri(uint64_t fileID, CharSpan designator, MutableCharSpan & out) override;
+
+    // MediaFileManagementBdxProvider::RetrievalObserver
+    void OnSharedFileRetrieved(ScopedNodeId peer, const char * designator) override;
 
 private:
     struct SharedEntry
     {
         ScopedNodeId peer;
         uint64_t fileID;
+        // Designator the file is served under, used to retire the entry once the
+        // client has pulled it.
+        std::string designator;
+        bool retrieved = false;
     };
 
     // Resolve this device's own operational node-id on the peer's fabric.

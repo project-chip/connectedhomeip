@@ -208,10 +208,17 @@ void MediaFileManagementBdxProvider::HandleTransferSessionOutput(TransferSession
     }
     case TransferSession::OutputEventType::kAckReceived:
         break;
-    case TransferSession::OutputEventType::kAckEOFReceived:
+    case TransferSession::OutputEventType::kAckEOFReceived: {
         ChipLogProgress(BDX, "MediaFileManagementBdxProvider: transfer complete");
+        // Report before Reset(), which clears the active designator.
+        const auto grant = mGrants.find(mFileDesignator);
+        if (mRetrievalObserver != nullptr && grant != mGrants.end())
+        {
+            mRetrievalObserver->OnSharedFileRetrieved(grant->second.peer, mFileDesignator);
+        }
         Reset();
         break;
+    }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "MediaFileManagementBdxProvider: StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
         Reset();

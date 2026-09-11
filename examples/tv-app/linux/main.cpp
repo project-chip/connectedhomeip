@@ -222,6 +222,9 @@ void ApplicationInit()
                                                    *gMediaFileManagementBdxRequestor, gMediaFileManagementServer->Cluster());
         gMediaFileManagementManager->SetBdxCoordinator(&*gMediaFileManagementBdxCoordinator);
 
+        // Retire a shared file's ResponseID once the client has actually pulled the bytes.
+        gMediaFileManagementBdxProvider->SetRetrievalObserver(&*gMediaFileManagementBdxCoordinator);
+
         // The provider serves incoming (client-initiated) BDX pulls, so it must
         // be the unsolicited handler for the BDX protocol. This tv-app is a
         // combined server + commissioner: the commissioner owns a *separate*

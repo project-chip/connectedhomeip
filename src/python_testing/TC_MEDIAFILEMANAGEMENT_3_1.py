@@ -166,16 +166,15 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
                     f"SupportedMimeTypes filter of ['{shared_mime_type}']")
 
         self.step(5)
-        # Steps 5 and 6 expect different statuses, so they must exercise different inputs:
-        # this step replays a ResponseID the DUT really did issue and has already served
-        # (step 3), which is no longer redeemable but is still an authentic token.
-        response = await self.send_get_shared_file(endpoint, consumed_response_id)
-        asserts.assert_equal(
-            response.status, cluster.Enums.FileStatusEnum.kFileNotAvailable,
-            f"GetSharedFile replaying the consumed ResponseID {consumed_response_id} should return "
-            f"FileNotAvailable (4), got {response.status}")
-        asserts.assert_true(response.fileDescription in (None, NullValue),
-                            "GetSharedFileResponse must carry a null FileDescription when the file is unavailable")
+        # A ResponseID is spent when the client actually pulls the file over BDX, not when
+        # GetSharedFile resolves it, so reaching this state means retrieving the file first.
+        # That retrieval is client-initiated, and the controller's BDX API only ever waits
+        # for a peer to initiate a transfer (PrepareToSend/PrepareToReceive), so the TH
+        # cannot drive one. Replaying the ResponseID here would still resolve, and asserting
+        # FileNotAvailable would fail a conformant DUT.
+        log.info("Cannot verify the spent-ResponseID case: the TH has no way to initiate the BDX "
+                 "retrieval that spends ResponseID %d", consumed_response_id)
+        self.mark_current_step_skipped()
 
         self.step(6)
         # A ResponseID the DUT never issued is not an authentic token, so it must be
