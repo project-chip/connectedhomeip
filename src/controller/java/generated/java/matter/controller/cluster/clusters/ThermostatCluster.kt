@@ -312,24 +312,26 @@ class ThermostatCluster(private val controller: MatterController, private val en
     object SubscriptionEstablished : SensorsAttributeSubscriptionState()
   }
 
-  class AvailableSensorsAttribute(val value: List<ByteArray>?)
+  class AvailableSensorHandlesAttribute(val value: List<ByteArray>?)
 
-  sealed class AvailableSensorsAttributeSubscriptionState {
-    data class Success(val value: List<ByteArray>?) : AvailableSensorsAttributeSubscriptionState()
+  sealed class AvailableSensorHandlesAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) :
+      AvailableSensorHandlesAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : AvailableSensorsAttributeSubscriptionState()
+    data class Error(val exception: Exception) : AvailableSensorHandlesAttributeSubscriptionState()
 
-    object SubscriptionEstablished : AvailableSensorsAttributeSubscriptionState()
+    object SubscriptionEstablished : AvailableSensorHandlesAttributeSubscriptionState()
   }
 
-  class EnabledSensorsAttribute(val value: List<ByteArray>?)
+  class EnabledSensorHandlesAttribute(val value: List<ByteArray>?)
 
-  sealed class EnabledSensorsAttributeSubscriptionState {
-    data class Success(val value: List<ByteArray>?) : EnabledSensorsAttributeSubscriptionState()
+  sealed class EnabledSensorHandlesAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) :
+      EnabledSensorHandlesAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : EnabledSensorsAttributeSubscriptionState()
+    data class Error(val exception: Exception) : EnabledSensorHandlesAttributeSubscriptionState()
 
-    object SubscriptionEstablished : EnabledSensorsAttributeSubscriptionState()
+    object SubscriptionEstablished : EnabledSensorHandlesAttributeSubscriptionState()
   }
 
   class SensorScheduleAttribute(val value: List<ThermostatClusterSensorScheduleTransitionStruct>?)
@@ -8424,7 +8426,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readAvailableSensorsAttribute(): AvailableSensorsAttribute {
+  suspend fun readAvailableSensorHandlesAttribute(): AvailableSensorHandlesAttribute {
     val ATTRIBUTE_ID: UInt = 90u
 
     val attributePath =
@@ -8446,7 +8448,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Availablesensors attribute not found in response" }
+    requireNotNull(attributeData) { "Availablesensorhandles attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -8463,10 +8465,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
         null
       }
 
-    return AvailableSensorsAttribute(decodedValue)
+    return AvailableSensorHandlesAttribute(decodedValue)
   }
 
-  suspend fun writeAvailableSensorsAttribute(
+  suspend fun writeAvailableSensorHandlesAttribute(
     value: List<ByteArray>,
     timedWriteTimeout: Duration? = null,
   ) {
@@ -8513,10 +8515,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun subscribeAvailableSensorsAttribute(
+  suspend fun subscribeAvailableSensorHandlesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<AvailableSensorsAttributeSubscriptionState> {
+  ): Flow<AvailableSensorHandlesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 90u
     val attributePaths =
       listOf(
@@ -8535,7 +8537,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            AvailableSensorsAttributeSubscriptionState.Error(
+            AvailableSensorHandlesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -8549,7 +8551,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Availablesensors attribute not found in Node State update"
+            "Availablesensorhandles attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -8567,16 +8569,16 @@ class ThermostatCluster(private val controller: MatterController, private val en
               null
             }
 
-          decodedValue?.let { emit(AvailableSensorsAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(AvailableSensorHandlesAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(AvailableSensorsAttributeSubscriptionState.SubscriptionEstablished)
+          emit(AvailableSensorHandlesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readEnabledSensorsAttribute(): EnabledSensorsAttribute {
+  suspend fun readEnabledSensorHandlesAttribute(): EnabledSensorHandlesAttribute {
     val ATTRIBUTE_ID: UInt = 91u
 
     val attributePath =
@@ -8598,7 +8600,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Enabledsensors attribute not found in response" }
+    requireNotNull(attributeData) { "Enabledsensorhandles attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -8615,10 +8617,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
         null
       }
 
-    return EnabledSensorsAttribute(decodedValue)
+    return EnabledSensorHandlesAttribute(decodedValue)
   }
 
-  suspend fun writeEnabledSensorsAttribute(
+  suspend fun writeEnabledSensorHandlesAttribute(
     value: List<ByteArray>,
     timedWriteTimeout: Duration? = null,
   ) {
@@ -8665,10 +8667,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun subscribeEnabledSensorsAttribute(
+  suspend fun subscribeEnabledSensorHandlesAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<EnabledSensorsAttributeSubscriptionState> {
+  ): Flow<EnabledSensorHandlesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 91u
     val attributePaths =
       listOf(
@@ -8687,7 +8689,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            EnabledSensorsAttributeSubscriptionState.Error(
+            EnabledSensorHandlesAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -8701,7 +8703,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Enabledsensors attribute not found in Node State update"
+            "Enabledsensorhandles attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -8719,10 +8721,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
               null
             }
 
-          decodedValue?.let { emit(EnabledSensorsAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(EnabledSensorHandlesAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(EnabledSensorsAttributeSubscriptionState.SubscriptionEstablished)
+          emit(EnabledSensorHandlesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

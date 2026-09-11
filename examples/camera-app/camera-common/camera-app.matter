@@ -103,6 +103,12 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -183,6 +189,11 @@ enum MeasurementTypeEnum : enum16 {
   kReactiveEnergy = 15;
   kApparentEnergy = 16;
   kSoilMoisture = 17;
+}
+
+enum MediumType : enum8 {
+  kAir = 0;
+  kWater = 1;
 }
 
 enum PositionTag : enum8 {
@@ -341,7 +352,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -415,7 +426,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -673,7 +684,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 6;
+  revision 7;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -761,7 +772,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
   provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  provisional readonly attribute optional int32u configurationVersion = 24;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -941,7 +952,7 @@ cluster LocalizationConfiguration = 43 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 3;
+  revision 4;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -2237,6 +2248,7 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -2457,7 +2469,7 @@ cluster UserLabel = 65 {
 
 /** This cluster provides an interface to manage regions of interest, or Zones, which can be either manufacturer or user defined. */
 cluster ZoneManagement = 1360 {
-  revision 1;
+  revision 2;
 
   enum StatusCodeEnum : enum8 {
     kZoneNotFound = 2;
@@ -2493,6 +2505,7 @@ cluster ZoneManagement = 1360 {
     kPerZoneSensitivity = 0x2;
     kUserDefined = 0x4;
     kFocusZones = 0x8;
+    kRemoteZones = 0x10;
   }
 
   struct TwoDCartesianVertexStruct {
@@ -2512,6 +2525,8 @@ cluster ZoneManagement = 1360 {
     ZoneTypeEnum zoneType = 1;
     ZoneSourceEnum zoneSource = 2;
     optional TwoDCartesianZoneStruct twoDCartesianZone = 3;
+    optional node_id nodeID = 4;
+    optional endpoint_no endpointID = 5;
   }
 
   struct ZoneTriggerControlStruct {
@@ -2526,11 +2541,15 @@ cluster ZoneManagement = 1360 {
   info event ZoneTriggered = 0 {
     int16u zone = 0;
     ZoneEventTriggeredReasonEnum reason = 1;
+    optional node_id nodeID = 2;
+    optional endpoint_no endpointID = 3;
   }
 
   info event ZoneStopped = 1 {
     int16u zone = 0;
     ZoneEventStoppedReasonEnum reason = 1;
+    optional node_id nodeID = 2;
+    optional endpoint_no endpointID = 3;
   }
 
   readonly attribute optional int8u maxUserDefinedZones = 0;
@@ -2548,6 +2567,8 @@ cluster ZoneManagement = 1360 {
 
   request struct CreateTwoDCartesianZoneRequest {
     TwoDCartesianZoneStruct zone = 0;
+    optional nullable node_id nodeID = 1;
+    optional nullable endpoint_no endpointID = 2;
   }
 
   response struct CreateTwoDCartesianZoneResponse = 1 {
@@ -2557,6 +2578,8 @@ cluster ZoneManagement = 1360 {
   request struct UpdateTwoDCartesianZoneRequest {
     int16u zoneID = 0;
     TwoDCartesianZoneStruct zone = 1;
+    optional nullable node_id nodeID = 2;
+    optional nullable endpoint_no endpointID = 3;
   }
 
   request struct RemoveZoneRequest {
@@ -2585,7 +2608,7 @@ cluster ZoneManagement = 1360 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 5;
+  revision 3;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -3464,7 +3487,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_camera = 322, version 1;
+  device type ma_camera = 322, version 2;
 
 
   server cluster Identify {
@@ -3480,7 +3503,7 @@ endpoint 1 {
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -3543,7 +3566,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command AllocatePushTransport;
     handle command DeallocatePushTransport;

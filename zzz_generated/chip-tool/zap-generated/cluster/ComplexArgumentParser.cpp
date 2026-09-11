@@ -468,6 +468,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TestGlobalStruct.name", "name", value.isMember("name")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("TestGlobalStruct.myBitmap", "myBitmap", value.isMember("myBitmap")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TestGlobalStruct.myEnum", "myEnum", value.isMember("myEnum")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
@@ -478,11 +479,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.myBitmap, value["myBitmap"]));
     valueCopy.removeMember("myBitmap");
 
-    if (value.isMember("myEnum"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "myEnum");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.myEnum, value["myEnum"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "myEnum");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.myEnum, value["myEnum"]));
     valueCopy.removeMember("myEnum");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
@@ -2676,6 +2674,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(
                                                                   "PAISupportedProfiles", value.isMember("PAISupportedProfiles")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.DACSupportedProfiles",
                                                                   "DACSupportedProfiles", value.isMember("DACSupportedProfiles")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.CDSupportedProfiles",
+                                                                  "CDSupportedProfiles", value.isMember("CDSupportedProfiles")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "PAASupportedProfiles");
@@ -2693,6 +2693,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(
         ComplexArgumentParser::Setup(labelWithMember, request.DACSupportedProfiles, value["DACSupportedProfiles"]));
     valueCopy.removeMember("DACSupportedProfiles");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "CDSupportedProfiles");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.CDSupportedProfiles, value["CDSupportedProfiles"]));
+    valueCopy.removeMember("CDSupportedProfiles");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -2702,6 +2706,7 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.PAASupportedProfiles);
     ComplexArgumentParser::Finalize(request.PAISupportedProfiles);
     ComplexArgumentParser::Finalize(request.DACSupportedProfiles);
+    ComplexArgumentParser::Finalize(request.CDSupportedProfiles);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -5837,8 +5842,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("dayOfWeek")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorScheduleTransitionStruct.transitionTime", "transitionTime",
                                                                   value.isMember("transitionTime")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorScheduleTransitionStruct.enabledSensors", "enabledSensors",
-                                                                  value.isMember("enabledSensors")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SensorScheduleTransitionStruct.enabledSensorHandles",
+                                                                  "enabledSensorHandles", value.isMember("enabledSensorHandles")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeek");
@@ -5849,9 +5854,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTime, value["transitionTime"]));
     valueCopy.removeMember("transitionTime");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enabledSensors");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enabledSensors, value["enabledSensors"]));
-    valueCopy.removeMember("enabledSensors");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enabledSensorHandles");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.enabledSensorHandles, value["enabledSensorHandles"]));
+    valueCopy.removeMember("enabledSensorHandles");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -5860,7 +5866,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::S
 {
     ComplexArgumentParser::Finalize(request.dayOfWeek);
     ComplexArgumentParser::Finalize(request.transitionTime);
-    ComplexArgumentParser::Finalize(request.enabledSensors);
+    ComplexArgumentParser::Finalize(request.enabledSensorHandles);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -8982,6 +8988,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("twoDCartesianZone");
 
+    if (value.isMember("nodeID"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nodeID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nodeID, value["nodeID"]));
+    }
+    valueCopy.removeMember("nodeID");
+
+    if (value.isMember("endpointID"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpointID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpointID, value["endpointID"]));
+    }
+    valueCopy.removeMember("endpointID");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8991,6 +9011,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ZoneManagement::Struct
     ComplexArgumentParser::Finalize(request.zoneType);
     ComplexArgumentParser::Finalize(request.zoneSource);
     ComplexArgumentParser::Finalize(request.twoDCartesianZone);
+    ComplexArgumentParser::Finalize(request.nodeID);
+    ComplexArgumentParser::Finalize(request.endpointID);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

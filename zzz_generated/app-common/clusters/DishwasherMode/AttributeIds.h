@@ -14,7 +14,7 @@ namespace DishwasherMode {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 7;
+inline constexpr uint32_t kAttributesCount = 8;
 
 namespace SupportedModes {
 inline constexpr AttributeId Id = 0x00000000;
@@ -23,6 +23,10 @@ inline constexpr AttributeId Id = 0x00000000;
 namespace CurrentMode {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
+
+namespace CoreModeTags {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace CoreModeTags
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

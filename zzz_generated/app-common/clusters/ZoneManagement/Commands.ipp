@@ -35,6 +35,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kZone), zone);
+    encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
+    encoder.Encode(to_underlying(Fields::kEndpointID), endpointID);
     return encoder.Finalize();
 }
 
@@ -51,6 +53,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kZone))
         {
             err = DataModel::Decode(reader, zone);
+        }
+        else if (__context_tag == to_underlying(Fields::kNodeID))
+        {
+            err = DataModel::Decode(reader, nodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpointID))
+        {
+            err = DataModel::Decode(reader, endpointID);
         }
 
         ReturnErrorOnFailure(err);
@@ -92,6 +102,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kZoneID), zoneID);
     encoder.Encode(to_underlying(Fields::kZone), zone);
+    encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
+    encoder.Encode(to_underlying(Fields::kEndpointID), endpointID);
     return encoder.Finalize();
 }
 
@@ -112,6 +124,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kZone))
         {
             err = DataModel::Decode(reader, zone);
+        }
+        else if (__context_tag == to_underlying(Fields::kNodeID))
+        {
+            err = DataModel::Decode(reader, nodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpointID))
+        {
+            err = DataModel::Decode(reader, endpointID);
         }
 
         ReturnErrorOnFailure(err);

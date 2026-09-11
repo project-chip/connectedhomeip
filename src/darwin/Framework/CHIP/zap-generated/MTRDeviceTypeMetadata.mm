@@ -37,6 +37,8 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x00000017, MTRDeviceTypeClass::Simple, @"Solar Power" },
     { 0x00000018, MTRDeviceTypeClass::Simple, @"Battery Storage" },
     { 0x00000019, MTRDeviceTypeClass::Utility, @"Secondary Network Interface" },
+    { 0x00000020, MTRDeviceTypeClass::Simple, @"Streaming Audio Player" },
+    { 0x00000021, MTRDeviceTypeClass::Simple, @"Casting Audio Player" },
     { 0x00000022, MTRDeviceTypeClass::Simple, @"Speaker" },
     { 0x00000023, MTRDeviceTypeClass::Simple, @"Casting Video Player" },
     { 0x00000024, MTRDeviceTypeClass::Simple, @"Content App" },
@@ -123,6 +125,7 @@ static /* constexpr */ const MTRDeviceTypeData knownDeviceTypes[] = {
     { 0x00000517, MTRDeviceTypeClass::Simple, @"Electrical Distribution Enclosure" },
     { 0x00000518, MTRDeviceTypeClass::Simple, @"Electrical Surge Protector" },
     { 0x00000519, MTRDeviceTypeClass::Simple, @"Residual Current Circuit Breaker" },
+    { 0x00000520, MTRDeviceTypeClass::Simple, @"Auxiliary Load Switch" },
     { 0x00000840, MTRDeviceTypeClass::Simple, @"Control Bridge" },
     { 0x00000850, MTRDeviceTypeClass::Simple, @"On/Off Sensor" },
 };

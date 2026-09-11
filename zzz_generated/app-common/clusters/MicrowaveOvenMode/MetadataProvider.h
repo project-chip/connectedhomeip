@@ -27,6 +27,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::MicrowaveOve
             return SupportedModes::kMetadataEntry;
         case CurrentMode::Id:
             return CurrentMode::kMetadataEntry;
+        case CoreModeTags::Id:
+            return CoreModeTags::kMetadataEntry;
         default:
             return std::nullopt;
         }

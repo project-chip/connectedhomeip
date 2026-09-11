@@ -143,6 +143,10 @@ class TC_SC_5_1(MatterBaseTest):
     async def run_test_against_endpoint(self, groups_endpoint: int):
         dev_ctrl = self.default_controller
         groupcast_enabled = await is_groupcast_on_root_node(self)
+        groups_cluster_rev = await self.read_single_attribute_check_success(
+            cluster=Clusters.Groups,
+            attribute=Clusters.Groups.Attributes.ClusterRevision,
+            endpoint=groups_endpoint)
 
         group_names_supported = False
         if not groupcast_enabled:
@@ -261,13 +265,17 @@ class TC_SC_5_1(MatterBaseTest):
                 groupID=0x0104, endpoints=join_endpoints, keySetID=0x01a4,
                 key=bytes.fromhex("e0e1e2e3e4e5e6e7e8e9eaebecedeeef")))
 
-            # Step 9b: Groupcast-created key set is visible in GroupKeyMap
+            # Step 9b: Groupcast-created key set is visible in GroupKeyMap (if Groupcast not adopted)
             self.step("9b")
             group_key_map = await self.read_single_attribute_check_success(
                 cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap, endpoint=0)
-            mappings = [(entry.groupId, entry.groupKeySetID) for entry in group_key_map]
-            asserts.assert_in((0x0104, 0x01a4), mappings,
-                              "GroupKeyMap missing Groupcast-created GroupID 0x0104 -> KeySetID 0x01a4")
+            if groups_cluster_rev <= 4:
+                mappings = [(entry.groupId, entry.groupKeySetID) for entry in group_key_map]
+                asserts.assert_in((0x0104, 0x01a4), mappings,
+                                  "GroupKeyMap missing Groupcast-created GroupID 0x0104 -> KeySetID 0x01a4")
+            else:
+                # When Groups cluster revision > 4, Groupcast is adopted and GroupKeyMap is empty
+                asserts.assert_equal(len(group_key_map), 0, "GroupKeyMap should be empty when Groupcast is adopted")
 
             # Step 9c: KeySetRead returns the auto-created GroupKeySet
             self.step("9c")
@@ -305,9 +313,12 @@ class TC_SC_5_1(MatterBaseTest):
         self.step("11")
         group_key_map = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap, endpoint=0)
-        asserts.assert_equal(len(group_key_map), 1, "GroupKeyMap should have 1 entry")
-        asserts.assert_equal(group_key_map[0].groupId, 0x0103, "GroupKeyMap groupId mismatch")
-        asserts.assert_equal(group_key_map[0].groupKeySetID, 0x01a3, "GroupKeyMap groupKeySetID mismatch")
+        if not groupcast_enabled or groups_cluster_rev <= 4:
+            asserts.assert_equal(len(group_key_map), 1, "GroupKeyMap should have 1 entry")
+            asserts.assert_equal(group_key_map[0].groupId, 0x0103, "GroupKeyMap groupId mismatch")
+            asserts.assert_equal(group_key_map[0].groupKeySetID, 0x01a3, "GroupKeyMap groupKeySetID mismatch")
+        else:
+            asserts.assert_equal(len(group_key_map), 0, "GroupKeyMap should be empty when Groupcast is adopted")
 
         # Step 12a: GroupTable (GroupNames supported)
         if not groupcast_enabled and group_names_supported:

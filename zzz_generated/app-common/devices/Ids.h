@@ -57,7 +57,7 @@ constexpr DeviceTypeId kRootNodeDeviceTypeId  = 0x00000016;
 constexpr uint8_t kRootNodeDeviceTypeRevision = 5;
 
 constexpr DeviceTypeId kSolarPowerDeviceTypeId  = 0x00000017;
-constexpr uint8_t kSolarPowerDeviceTypeRevision = 1;
+constexpr uint8_t kSolarPowerDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kBatteryStorageDeviceTypeId  = 0x00000018;
 constexpr uint8_t kBatteryStorageDeviceTypeRevision = 2;
@@ -65,11 +65,17 @@ constexpr uint8_t kBatteryStorageDeviceTypeRevision = 2;
 constexpr DeviceTypeId kSecondaryNetworkInterfaceDeviceTypeId  = 0x00000019;
 constexpr uint8_t kSecondaryNetworkInterfaceDeviceTypeRevision = 1;
 
+constexpr DeviceTypeId kStreamingAudioPlayerDeviceTypeId  = 0x00000020;
+constexpr uint8_t kStreamingAudioPlayerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kCastingAudioPlayerDeviceTypeId  = 0x00000021;
+constexpr uint8_t kCastingAudioPlayerDeviceTypeRevision = 1;
+
 constexpr DeviceTypeId kSpeakerDeviceTypeId  = 0x00000022;
-constexpr uint8_t kSpeakerDeviceTypeRevision = 1;
+constexpr uint8_t kSpeakerDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kCastingVideoPlayerDeviceTypeId  = 0x00000023;
-constexpr uint8_t kCastingVideoPlayerDeviceTypeRevision = 2;
+constexpr uint8_t kCastingVideoPlayerDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kContentAppDeviceTypeId  = 0x00000024;
 constexpr uint8_t kContentAppDeviceTypeRevision = 2;
@@ -78,7 +84,7 @@ constexpr DeviceTypeId kModeSelectDeviceTypeId  = 0x00000027;
 constexpr uint8_t kModeSelectDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kBasicVideoPlayerDeviceTypeId  = 0x00000028;
-constexpr uint8_t kBasicVideoPlayerDeviceTypeRevision = 2;
+constexpr uint8_t kBasicVideoPlayerDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kCastingVideoClientDeviceTypeId  = 0x00000029;
 constexpr uint8_t kCastingVideoClientDeviceTypeRevision = 2;
@@ -93,7 +99,7 @@ constexpr DeviceTypeId kAirQualitySensorDeviceTypeId  = 0x0000002C;
 constexpr uint8_t kAirQualitySensorDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kAirPurifierDeviceTypeId  = 0x0000002D;
-constexpr uint8_t kAirPurifierDeviceTypeRevision = 3;
+constexpr uint8_t kAirPurifierDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kIrrigationSystemDeviceTypeId  = 0x00000040;
 constexpr uint8_t kIrrigationSystemDeviceTypeRevision = 1;
@@ -120,7 +126,7 @@ constexpr DeviceTypeId kTemperatureControlledCabinetDeviceTypeId  = 0x00000071;
 constexpr uint8_t kTemperatureControlledCabinetDeviceTypeRevision = 6;
 
 constexpr DeviceTypeId kRoomAirConditionerDeviceTypeId  = 0x00000072;
-constexpr uint8_t kRoomAirConditionerDeviceTypeRevision = 4;
+constexpr uint8_t kRoomAirConditionerDeviceTypeRevision = 5;
 
 constexpr DeviceTypeId kLaundryWasherDeviceTypeId  = 0x00000073;
 constexpr uint8_t kLaundryWasherDeviceTypeRevision = 2;
@@ -132,7 +138,7 @@ constexpr DeviceTypeId kDishwasherDeviceTypeId  = 0x00000075;
 constexpr uint8_t kDishwasherDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kSmokeCoAlarmDeviceTypeId  = 0x00000076;
-constexpr uint8_t kSmokeCoAlarmDeviceTypeRevision = 2;
+constexpr uint8_t kSmokeCoAlarmDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kCookSurfaceDeviceTypeId  = 0x00000077;
 constexpr uint8_t kCookSurfaceDeviceTypeRevision = 2;
@@ -213,7 +219,7 @@ constexpr DeviceTypeId kAudioDoorbellDeviceTypeId  = 0x00000141;
 constexpr uint8_t kAudioDoorbellDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kCameraDeviceTypeId  = 0x00000142;
-constexpr uint8_t kCameraDeviceTypeRevision = 1;
+constexpr uint8_t kCameraDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kVideoDoorbellDeviceTypeId  = 0x00000143;
 constexpr uint8_t kVideoDoorbellDeviceTypeRevision = 1;
@@ -249,16 +255,16 @@ constexpr DeviceTypeId kWindowCoveringControllerDeviceTypeId  = 0x00000203;
 constexpr uint8_t kWindowCoveringControllerDeviceTypeRevision = 5;
 
 constexpr DeviceTypeId kClosureDeviceTypeId  = 0x00000230;
-constexpr uint8_t kClosureDeviceTypeRevision = 1;
+constexpr uint8_t kClosureDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kClosurePanelDeviceTypeId  = 0x00000231;
-constexpr uint8_t kClosurePanelDeviceTypeRevision = 1;
+constexpr uint8_t kClosurePanelDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kClosureControllerDeviceTypeId  = 0x0000023E;
 constexpr uint8_t kClosureControllerDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kThermostatDeviceTypeId  = 0x00000301;
-constexpr uint8_t kThermostatDeviceTypeRevision = 7;
+constexpr uint8_t kThermostatDeviceTypeRevision = 8;
 
 constexpr DeviceTypeId kTemperatureSensorDeviceTypeId  = 0x00000302;
 constexpr uint8_t kTemperatureSensorDeviceTypeRevision = 3;
@@ -279,7 +285,7 @@ constexpr DeviceTypeId kHumiditySensorDeviceTypeId  = 0x00000307;
 constexpr uint8_t kHumiditySensorDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kHeatPumpDeviceTypeId  = 0x00000309;
-constexpr uint8_t kHeatPumpDeviceTypeRevision = 1;
+constexpr uint8_t kHeatPumpDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kThermostatControllerDeviceTypeId  = 0x0000030A;
 constexpr uint8_t kThermostatControllerDeviceTypeRevision = 2;
@@ -291,7 +297,7 @@ constexpr DeviceTypeId kDeviceEnergyManagementDeviceTypeId  = 0x0000050D;
 constexpr uint8_t kDeviceEnergyManagementDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kWaterHeaterDeviceTypeId  = 0x0000050F;
-constexpr uint8_t kWaterHeaterDeviceTypeRevision = 1;
+constexpr uint8_t kWaterHeaterDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kElectricalSensorDeviceTypeId  = 0x00000510;
 constexpr uint8_t kElectricalSensorDeviceTypeRevision = 2;
@@ -303,7 +309,7 @@ constexpr DeviceTypeId kMeterReferencePointDeviceTypeId  = 0x00000512;
 constexpr uint8_t kMeterReferencePointDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kElectricalEnergyTariffDeviceTypeId  = 0x00000513;
-constexpr uint8_t kElectricalEnergyTariffDeviceTypeRevision = 1;
+constexpr uint8_t kElectricalEnergyTariffDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kElectricalMeterDeviceTypeId  = 0x00000514;
 constexpr uint8_t kElectricalMeterDeviceTypeRevision = 1;
@@ -322,6 +328,9 @@ constexpr uint8_t kElectricalSurgeProtectorDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kResidualCurrentCircuitBreakerDeviceTypeId  = 0x00000519;
 constexpr uint8_t kResidualCurrentCircuitBreakerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kAuxiliaryLoadSwitchDeviceTypeId  = 0x00000520;
+constexpr uint8_t kAuxiliaryLoadSwitchDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kControlBridgeDeviceTypeId  = 0x00000840;
 constexpr uint8_t kControlBridgeDeviceTypeRevision = 4;

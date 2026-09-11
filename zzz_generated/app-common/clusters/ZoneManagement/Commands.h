@@ -83,7 +83,9 @@ namespace Commands {
 namespace CreateTwoDCartesianZone {
 enum class Fields : uint8_t
 {
-    kZone = 0,
+    kZone       = 0,
+    kNodeID     = 1,
+    kEndpointID = 2,
 };
 
 struct Type
@@ -94,6 +96,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
 
     Structs::TwoDCartesianZoneStruct::Type zone;
+    Optional<DataModel::Nullable<chip::NodeId>> nodeID;
+    Optional<DataModel::Nullable<chip::EndpointId>> endpointID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -110,6 +114,8 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     Structs::TwoDCartesianZoneStruct::DecodableType zone;
+    Optional<DataModel::Nullable<chip::NodeId>> nodeID;
+    Optional<DataModel::Nullable<chip::EndpointId>> endpointID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -150,8 +156,10 @@ public:
 namespace UpdateTwoDCartesianZone {
 enum class Fields : uint8_t
 {
-    kZoneID = 0,
-    kZone   = 1,
+    kZoneID     = 0,
+    kZone       = 1,
+    kNodeID     = 2,
+    kEndpointID = 3,
 };
 
 struct Type
@@ -163,6 +171,8 @@ public:
 
     uint16_t zoneID = static_cast<uint16_t>(0);
     Structs::TwoDCartesianZoneStruct::Type zone;
+    Optional<DataModel::Nullable<chip::NodeId>> nodeID;
+    Optional<DataModel::Nullable<chip::EndpointId>> endpointID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -180,6 +190,8 @@ public:
 
     uint16_t zoneID = static_cast<uint16_t>(0);
     Structs::TwoDCartesianZoneStruct::DecodableType zone;
+    Optional<DataModel::Nullable<chip::NodeId>> nodeID;
+    Optional<DataModel::Nullable<chip::EndpointId>> endpointID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

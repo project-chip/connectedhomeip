@@ -19,6 +19,7 @@ Support module for IDM (Interaction Data Model) test modules containing shared f
 """
 
 import asyncio
+import contextlib
 import copy
 import inspect
 import logging
@@ -37,6 +38,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.conformance import is_disallowed
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
@@ -692,10 +694,21 @@ class IDMBaseTest(BasicCompositionTests):
             # violation generation.
             return None
         type_min, type_max = type_range
-        if constraints.max_value is not None and constraints.max_value < type_max:
-            return constraints.max_value + 1
-        if constraints.min_value is not None and constraints.min_value > type_min:
-            return constraints.min_value - 1
+        allowed_values = self._allowed_numeric_values(constraints)
+
+        if constraints.max_value is not None:
+            val = constraints.max_value + 1
+            while val in allowed_values and val <= type_max:
+                val += 1
+            if val not in allowed_values and val <= type_max:
+                return val
+
+        if constraints.min_value is not None:
+            val = constraints.min_value - 1
+            while val in allowed_values and val >= type_min:
+                val -= 1
+            if val not in allowed_values and val >= type_min:
+                return val
 
         return None
 
@@ -952,6 +965,20 @@ class IDMBaseTest(BasicCompositionTests):
         except ValueError:
             return None
 
+    @staticmethod
+    def _allowed_numeric_values(constraints: Constraints) -> set[int | float]:
+        """Parse 'allowed' constraint entries into numeric values, if any."""
+        if not constraints.allowed:
+            return set()
+        values: set[int | float] = set()
+        for v in constraints.allowed:
+            with contextlib.suppress(ValueError):
+                values.add(int(v, 0))
+                continue
+            with contextlib.suppress(ValueError):
+                values.add(float(v))
+        return values
+
     async def _resolved_command_field_constraints(self, info: CommandFieldInfo) -> Constraints:
         """Return a copy of the field's constraints with dynamic references resolved against the DUT."""
         constraints = copy.copy(info.field.constraints)
@@ -1014,12 +1041,22 @@ class IDMBaseTest(BasicCompositionTests):
             # numeric types are out of scope for automated violation generation.
             return violations
         type_min, type_max = type_range
-        if constraints.max_value is not None and constraints.max_value < type_max:
-            violations.append((f"value {constraints.max_value + 1} > max {constraints.max_value}",
-                               constraints.max_value + 1))
-        if constraints.min_value is not None and constraints.min_value > type_min:
-            violations.append((f"value {constraints.min_value - 1} < min {constraints.min_value}",
-                               constraints.min_value - 1))
+        allowed_values = self._allowed_numeric_values(constraints)
+
+        if constraints.max_value is not None:
+            val = constraints.max_value + 1
+            while val in allowed_values and val <= type_max:
+                val += 1
+            if val not in allowed_values and val <= type_max:
+                violations.append((f"value {val} > max {constraints.max_value}", val))
+
+        if constraints.min_value is not None:
+            val = constraints.min_value - 1
+            while val in allowed_values and val >= type_min:
+                val -= 1
+            if val not in allowed_values and val >= type_min:
+                violations.append((f"value {val} < min {constraints.min_value}", val))
+
         return violations
 
     def _generate_valid_command_field_value(self, field: XmlDataTypeComponent) -> Any | None:
@@ -1052,6 +1089,9 @@ class IDMBaseTest(BasicCompositionTests):
                 return constraints.min_value
             if constraints.max_value is not None and constraints.max_value < 0:
                 return constraints.max_value
+            allowed_nums = self._allowed_numeric_values(constraints)
+            if allowed_nums:
+                return next(iter(allowed_nums))
         return None
 
     async def check_command_constraint(self, info: CommandFieldInfo) -> ConstraintProbeResult:
@@ -1859,9 +1899,14 @@ class IDMBaseTest(BasicCompositionTests):
                 continue
 
             xml_attr = xml_cluster.attributes[attribute_id]
+
+            # Skip obsolete/disallowed attributes (e.g. obsolete in spec)
+            if is_disallowed(xml_attr.conformance):
+                continue
+
             write_access = xml_attr.write_access
 
-            if write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
+            if write_access is not None and write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
                 writable_attrs.append(attribute_id)
 
         return writable_attrs
@@ -1949,6 +1994,9 @@ class IDMBaseTest(BasicCompositionTests):
                         # ignored per spec (backwards compatibility).
                         # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1119-minsetpointdeadband-attribute
                         Clusters.Thermostat.Attributes.MinSetpointDeadBand,
+                        # UserSetpoint may snap to nearest step (e.g. step=5). Adding 1 to cached_val
+                        # might snap back to the original value, resulting in no value change and no report.
+                        Clusters.Humidistat.Attributes.UserSetpoint,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
                         log.debug("%s: Skipping %s - known to have write constraints", test_step, attribute.__name__)

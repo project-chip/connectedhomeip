@@ -189,6 +189,10 @@ DataModel::ActionReturnStatus LevelControlCluster::WriteAttribute(const DataMode
     case Attributes::OnLevel::Id: {
         DataModel::Nullable<uint8_t> onLevel;
         ReturnErrorOnFailure(decoder.Decode(onLevel));
+        if (!onLevel.IsNull())
+        {
+            VerifyOrReturnError(IsValidLevel(onLevel.Value()), Status::ConstraintError);
+        }
         SetOnLevel(onLevel);
         return Status::Success;
     }
