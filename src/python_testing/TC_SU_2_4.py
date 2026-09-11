@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,7 +64,11 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SU_2_4(SoftwareUpdateBaseTest):
-    """This test case verifies that the DUT behaves according to the spec when it is applying the software update."""
+    """TC-SU-2.4: Verifies that after the DUT (OTA-R) downloads a software image
+    from the OTA-P, it sends an ApplyUpdateRequest carrying the correct fields:
+    UpdateToken must match the token the OTA-P issued in the preceding
+    QueryImageResponse, and NewVersion must match the software version of the
+    image that was downloaded."""
     # Reference variable for the OTA Software Update Provider cluster.
     provider_port = None
     provider_kvs_path = None
@@ -78,6 +82,14 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
     requestor_node_id = None
     ota_image_download_timeout = 0
     disable_wildcard_subscription = True
+
+    @property
+    def default_timeout(self) -> int:
+        # Used by the framework when --timeout is not passed on the command line.
+        # OTA needs a long wall-clock budget: the image download can run 4-6 minutes,
+        # plus apply and reboot on top. CI still passes --timeout 2100 explicitly in
+        # the test-runner-runs block, which takes precedence over this default.
+        return 2100
 
     @async_test_body
     async def setup_test(self):
@@ -99,6 +111,9 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*6)
         logger.info("Image download timeout is set to %s seconds", self.ota_image_download_timeout)
 
+        # Safety guard: teardown clears files whose path starts with provider_kvs_path
+        # via clear_kvs, so restrict the prefix to /tmp to make sure a stray value on
+        # --string-arg provider_kvs_path can't take out arbitrary files elsewhere on the host.
         if not self.provider_kvs_path.startswith('/tmp'):
             asserts.fail("Provider KVS path must be placed in the /tmp directory.")
 
@@ -106,14 +121,10 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
             asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")
 
         if not self.provider_app_path:
-            asserts.fail("Missing provider app path . Speficy using --string-arg provider_app_path:<provider_app_path>")
+            asserts.fail("Missing provider app path . Specify using --string-arg provider_app_path:<provider_app_path>")
 
         if not self.ota_image:
-            asserts.fail("Missing ota image path . Speficy using --string-arg ota_image:<ota_image>")
-
-        if self.matter_test_config.timeout is None or self.matter_test_config.timeout <= 0:
-            asserts.fail(
-                "Test timeout parameter must be defined and  greater than 0. A good timeout can be 1800 seconds or 30 minutes [ --timeout 1800 ]")
+            asserts.fail("Missing ota image path . Specify using --string-arg ota_image:<ota_image>")
 
         # TC-SU-2.4 needs the provider named pipes in order to read back both the last
         # QueryImageResponse (to get the UpdateToken issued to the DUT) and the last
@@ -148,7 +159,6 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
             filter=self.provider_discriminator
         )
         await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, endpoint=0, requestor_node_id=self.requestor_node_id)
-        logger.info("About to write acl entries")
         await self.create_acl_entry(dev_ctrl=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
 
     @async_test_body
