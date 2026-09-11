@@ -249,8 +249,8 @@ void TestEvseTargetsStorage::SetTargets()
     EXPECT_EQ(SetTargets(mDecodableChargingTargetSchedulesList), CHIP_NO_ERROR);
 }
 
-CHIP_ERROR TestEvseTargetsStorage::SetTargets(
-    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & schedules)
+CHIP_ERROR
+TestEvseTargetsStorage::SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & schedules)
 {
     return mEtd.SetTargets(schedules);
 }
