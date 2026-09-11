@@ -2071,6 +2071,38 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
     return global_data_types, problems
 
 
+# BasicInformation.SpecificationVersion value for each pre-built data model. Matter 1.2 has no
+# SpecificationVersion attribute, so it is intentionally absent here.
+# Every PrebuiltDataModelDirectory other than k1_2 must appear as a value, which
+# TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete enforces.
+_SPEC_VERSION_TO_DM: dict[int, PrebuiltDataModelDirectory] = {
+    0x01030000: PrebuiltDataModelDirectory.k1_3,
+    0x01040000: PrebuiltDataModelDirectory.k1_4,
+    0x01040100: PrebuiltDataModelDirectory.k1_4_1,
+    0x01040200: PrebuiltDataModelDirectory.k1_4_2,
+    0x01050000: PrebuiltDataModelDirectory.k1_5,
+    0x01050100: PrebuiltDataModelDirectory.k1_5_1,
+    0x01060000: PrebuiltDataModelDirectory.k1_6,
+    0x01060100: PrebuiltDataModelDirectory.k1_6_1,
+}
+
+# BasicInformation.DataModelRevision reported by a node certified against each pre-built data
+# model. Several Matter releases share a DataModelRevision, so this is not one entry per
+# specification version. Every PrebuiltDataModelDirectory must appear as a key, which
+# TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete enforces.
+_DM_TO_DATA_MODEL_REVISION: dict[PrebuiltDataModelDirectory, int] = {
+    PrebuiltDataModelDirectory.k1_2: 17,
+    PrebuiltDataModelDirectory.k1_3: 17,
+    PrebuiltDataModelDirectory.k1_4: 18,
+    PrebuiltDataModelDirectory.k1_4_1: 18,
+    PrebuiltDataModelDirectory.k1_4_2: 19,
+    PrebuiltDataModelDirectory.k1_5: 19,
+    PrebuiltDataModelDirectory.k1_5_1: 20,
+    PrebuiltDataModelDirectory.k1_6: 21,
+    PrebuiltDataModelDirectory.k1_6_1: 21,
+}
+
+
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
     ''' Returns the data model directory for a given specification revision.
 
@@ -2084,18 +2116,20 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         # The expression (specification_version & uint(0xFFFF00FF)) might be inferred as int by mypy.
         specification_version = typing.cast(uint, specification_version & uint(0xFFFF00FF))
 
-    version_to_dm = {
-        0x01030000: PrebuiltDataModelDirectory.k1_3,
-        0x01040000: PrebuiltDataModelDirectory.k1_4,
-        0x01040100: PrebuiltDataModelDirectory.k1_4_1,
-        0x01040200: PrebuiltDataModelDirectory.k1_4_2,
-        0x01050000: PrebuiltDataModelDirectory.k1_5,
-        0x01050100: PrebuiltDataModelDirectory.k1_5_1,
-        0x01060000: PrebuiltDataModelDirectory.k1_6,
-        0x01060100: PrebuiltDataModelDirectory.k1_6_1,
-    }
-
-    if specification_version not in version_to_dm:
+    if specification_version not in _SPEC_VERSION_TO_DM:
         raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")
 
-    return version_to_dm[specification_version]
+    return _SPEC_VERSION_TO_DM[specification_version]
+
+
+def data_model_revision_from_dm(data_model_directory: PrebuiltDataModelDirectory) -> int:
+    ''' Returns the BasicInformation.DataModelRevision expected of a node certified against a data model.
+
+        input: PrebuiltDataModelDirectory
+        output: the DataModelRevision value that data model requires
+        raises: ConformanceException if the given data model has no known DataModelRevision
+    '''
+    if data_model_directory not in _DM_TO_DATA_MODEL_REVISION:
+        raise ConformanceException(f"No known DataModelRevision for {data_model_directory.name}")
+
+    return _DM_TO_DATA_MODEL_REVISION[data_model_directory]

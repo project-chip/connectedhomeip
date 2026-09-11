@@ -15,7 +15,9 @@
 #    limitations under the License.
 #
 
+import re
 import xml.etree.ElementTree as ElementTree
+from pathlib import Path
 
 import jinja2
 from mobly import asserts
@@ -25,9 +27,10 @@ from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
-from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
-                                         add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
-                                         combine_derived_clusters_with_base, get_data_model_directory)
+from matter.testing.spec_parsing import (_DM_TO_DATA_MODEL_REVISION, _SPEC_VERSION_TO_DM, ClusterParser, DataModelLevel,
+                                         PrebuiltDataModelDirectory, XmlCluster, add_cluster_data_from_xml, build_xml_clusters,
+                                         check_clusters_for_unknown_commands, combine_derived_clusters_with_base,
+                                         data_model_revision_from_dm, get_data_model_directory)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
@@ -261,6 +264,51 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
   </commands>
 </cluster>
 """
+
+# This file lives at <repo root>/src/python_testing/test_testing/, so the repository root is three
+# directories up. Derive it from __file__ rather than the working directory: only CI happens to run
+# these tests from the repository root.
+_CHIP_ROOT = Path(__file__).resolve().parents[3]
+_REVISIONS_HEADER = _CHIP_ROOT / "src" / "app" / "SpecificationDefinedRevisions.h"
+
+# Repo-relative names, so failure messages name the file to edit.
+_REVISIONS_HEADER_NAME = "src/app/SpecificationDefinedRevisions.h"
+_SPEC_PARSING_NAME = "src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py"
+
+
+def _spec_version_from_dirname(dirname: str) -> int:
+    # SpecificationVersion is 1 byte major, 1 byte minor, 1 byte dot and 1 reserved byte, so it is
+    # derivable from the data model directory name.
+    parts = [int(part) for part in dirname.split(".")]
+    # Reject anything that does not encode exactly rather than truncating or aliasing it. There is
+    # no field for a fourth component, and each component has to fit its own byte: 1.6.1.1 would
+    # truncate to 1.6.1 and 1.6.256 would alias 1.7, either of which would make a wrong mapping key
+    # look correct.
+    asserts.assert_in(len(parts), (2, 3),
+                      f"data_model/{dirname}/ is not a major.minor[.dot] version - SpecificationVersion "
+                      "has no field to encode it")
+    asserts.assert_true(all(part <= 0xFF for part in parts),
+                        f"data_model/{dirname}/ has a component that does not fit in one byte, so it has no "
+                        "SpecificationVersion encoding")
+    parts += [0, 0]
+    return (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8)
+
+
+def _header_constant(name: str) -> int:
+    # Fail loudly when the constant cannot be located. A regex that silently matched nothing would
+    # skip the assertion these tests exist to make, which is worse than having no test at all.
+    asserts.assert_true(_REVISIONS_HEADER.is_file(), f"Expected the revision constants at {_REVISIONS_HEADER}")
+    header = _REVISIONS_HEADER.read_text(encoding="utf-8")
+    # The trailing "=" is what keeps kInteractionModelRevision from also matching kInteractionModelRevisionTag.
+    matches = re.findall(rf"\b{name}\s*=\s*(0[xX][0-9a-fA-F]+|[0-9]+)\s*;", header)
+    asserts.assert_equal(len(matches), 1,
+                         f"Expected exactly one definition of {name} in {_REVISIONS_HEADER_NAME}, found {len(matches)} - "
+                         "the header was restructured, update _header_constant in this file")
+    literal = matches[0]
+    # Explicit base rather than int(literal, 0), which rejects a zero-padded decimal.
+    if literal.lower().startswith("0x"):
+        return int(literal, 16)
+    return int(literal, 10)
 
 
 class TestSpecParsingSupport(CertificationUnitTestNoDevice):
@@ -725,6 +773,76 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         for attribute_id in (0x0000, 0x0002, 0x0003):
             asserts.assert_false(xml_cluster.attributes[attribute_id].scene,
                                  f"Attribute {attribute_id:#06x} should not carry the Scene (S) quality")
+
+    def test_prebuilt_data_model_mappings_complete(self):
+        # Adding a PrebuiltDataModelDirectory member requires hand-updating three mappings that
+        # nothing else cross-checks. Missing any of them only surfaces when a test runs against a
+        # DUT reporting the new version, so assert coverage of every member here instead.
+        selectable = set(_SPEC_VERSION_TO_DM.values())
+        for data_model in PrebuiltDataModelDirectory:
+            try:
+                dirname = data_model.dirname
+            except KeyError:
+                asserts.fail(f"{data_model.name} has no dirname - update PrebuiltDataModelDirectory.dirname")
+            asserts.assert_true(dirname, f"{data_model.name} has an empty dirname")
+
+            asserts.assert_in(data_model, _DM_TO_DATA_MODEL_REVISION,
+                              f"{data_model.name} has no DataModelRevision - add an entry to _DM_TO_DATA_MODEL_REVISION")
+
+            # Matter 1.2 predates the SpecificationVersion attribute, so it is selected from
+            # endpoint contents rather than from a specification version.
+            if data_model is PrebuiltDataModelDirectory.k1_2:
+                continue
+
+            asserts.assert_in(data_model, selectable,
+                              f"{data_model.name} is not reachable from any SpecificationVersion - "
+                              "add an entry to _SPEC_VERSION_TO_DM")
+
+        # The keys are hand-written hex, so confirm each one is the SpecificationVersion encoding of
+        # the directory it maps to. A transposed key would silently select the wrong data model for
+        # a DUT reporting that version.
+        for spec_version, data_model in _SPEC_VERSION_TO_DM.items():
+            derived_spec_version = _spec_version_from_dirname(data_model.dirname)
+            asserts.assert_equal(derived_spec_version, spec_version,
+                                 f"_SPEC_VERSION_TO_DM maps 0x{spec_version:08X} to {data_model.name} "
+                                 f"(data_model/{data_model.dirname}/), but that version encodes as "
+                                 f"0x{derived_spec_version:08X} - fix the key in {_SPEC_PARSING_NAME}")
+
+    def test_data_model_revision_from_dm(self):
+        asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_3), 17,
+                             "Incorrect DataModelRevision for 1.3")
+        asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_4_1), 18,
+                             "Incorrect DataModelRevision for 1.4.1")
+        asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_6_1), 21,
+                             "Incorrect DataModelRevision for 1.6.1")
+
+    def test_revision_constants_self_consistent(self):
+        # kDataModelRevision sat at 19 across the 1.5.1, 1.6 and 1.6.1 bumps while
+        # kSpecificationVersion was updated every time, because nothing tied the two constants
+        # together (fixed in PR #72874). TC_BINFO_2_1 now catches this against a running device;
+        # checking it here as well reports it in milliseconds instead of after an app build.
+        #
+        # This deliberately says nothing about whether kSpecificationVersion is the newest
+        # specification the SDK has data models for. Checking that would only trade one
+        # easy-to-forget step for another, and falling behind is caught at the test events anyway.
+        header_spec_version = _header_constant("kSpecificationVersion")
+        asserts.assert_in(header_spec_version, _SPEC_VERSION_TO_DM,
+                          f"{_REVISIONS_HEADER_NAME} sets kSpecificationVersion = 0x{header_spec_version:08X}, which is not a "
+                          f"known specification version - add it to _SPEC_VERSION_TO_DM in {_SPEC_PARSING_NAME}")
+        data_model = _SPEC_VERSION_TO_DM[header_spec_version]
+
+        asserts.assert_in(data_model, _DM_TO_DATA_MODEL_REVISION,
+                          f"{data_model.name} has no DataModelRevision - add an entry for it to "
+                          f"_DM_TO_DATA_MODEL_REVISION in {_SPEC_PARSING_NAME}")
+        expected_data_model_revision = data_model_revision_from_dm(data_model)
+        header_data_model_revision = _header_constant("kDataModelRevision")
+        asserts.assert_equal(header_data_model_revision, expected_data_model_revision,
+                             f"{_REVISIONS_HEADER_NAME} sets kDataModelRevision = {header_data_model_revision}, but "
+                             f"SpecificationVersion 0x{header_spec_version:08X} (Matter {data_model.dirname}) requires "
+                             f"{expected_data_model_revision}. Set kDataModelRevision = {expected_data_model_revision} in "
+                             f"{_REVISIONS_HEADER_NAME}, or correct _DM_TO_DATA_MODEL_REVISION[PrebuiltDataModelDirectory."
+                             f"{data_model.name}] in {_SPEC_PARSING_NAME} if that is not the DataModelRevision of Matter "
+                             f"{data_model.dirname}.")
 
 
 if __name__ == "__main__":
