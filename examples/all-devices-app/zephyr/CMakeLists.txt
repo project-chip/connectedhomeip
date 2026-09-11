@@ -99,8 +99,6 @@ endif()
 
 project(matter-all-devices-zephyr)
 
-include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
-
 target_compile_options(app PRIVATE -Werror -Wno-error=format)
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
@@ -122,8 +120,6 @@ target_include_directories(app PRIVATE
     src
     include
     ${ALL_DEVICES_COMMON_DIR}
-    ${CHIP_ROOT}/src/data-model-providers/codedriven
-    ${CHIP_ROOT}/src/data-model-providers
     ${CMAKE_CURRENT_BINARY_DIR} # for generated app_config/enabled_devices.h
 )
 
@@ -135,13 +131,6 @@ target_sources(app PRIVATE
     include/Buttons.h
     src/Buttons.cpp
     src/main.cpp
-
-    # Code-driven data model
-    ${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
-    ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp
-    ${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
-    ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
-    ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
 
     # all-devices-common
     ${ALL_DEVICES_DEVICE_SOURCES}
@@ -163,16 +152,13 @@ endif()
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
 
+    # Not part of any GN target, so not in the chip library.
     target_sources(app PRIVATE
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestorAttributes.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestorCluster.cpp
     )
-
-    include(${CHIP_ROOT}/config/zephyr/ota-image.cmake)
 
     if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
         set(ALL_DEVICES_OTA_BASE_NAME "zephyr")

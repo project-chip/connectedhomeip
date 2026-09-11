@@ -30,6 +30,10 @@ endchoice
 config CHIP_ENABLE_PAIRING_AUTOSTART
 	default y
 
+# The app builds its data model at run time.
+config CHIP_DATA_MODEL_CODEDRIVEN
+	default y
+
 config CHIP_OTA_REQUESTOR
 	default n
 	imply STREAM_FLASH

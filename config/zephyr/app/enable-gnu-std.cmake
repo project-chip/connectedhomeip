@@ -3,4 +3,7 @@ target_compile_options(gnu17
     INTERFACE 
         $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>
         -D_DEFAULT_SOURCE)
-target_link_libraries(app PRIVATE gnu17)
+if(NOT DEFINED GNU_STD_TARGET)
+    set(GNU_STD_TARGET app)
+endif()
+target_link_libraries(${GNU_STD_TARGET} PRIVATE gnu17)

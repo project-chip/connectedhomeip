@@ -44,6 +44,11 @@ if(CONFIG_CHIP)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_kconfig_defaults.cmake)
 
+    # Defines chip_ota_image(), which applications call to package their binary.
+    if(CONFIG_CHIP_OTA_IMAGE_BUILD)
+        include(${CHIP_ROOT}/config/zephyr/ota-image.cmake)
+    endif()
+
     # Prepare compiler flags
 
     # CHIP_CFLAGS can be optionally defined by the application to pass additional
@@ -92,7 +97,7 @@ if(CONFIG_CHIP)
     zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
     matter_add_cxxflags("${ZEPHYR_GNU_CPP_STD}")
 
-    # Set up custom OpenThread configuration
+        # Set up custom OpenThread configuration
     if(CONFIG_CHIP_OPENTHREAD_CONFIG)
         get_filename_component(CHIP_OPENTHREAD_CONFIG
             ${CONFIG_CHIP_OPENTHREAD_CONFIG}
@@ -121,6 +126,9 @@ if(CONFIG_CHIP)
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})
     matter_add_gn_arg_string("zephyr_cxx" ${CMAKE_CXX_COMPILER})
+
+    matter_add_gn_arg_bool("chip_build_codedriven_data_model" CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
+    matter_add_gn_arg_bool("chip_build_ota_requestor" CONFIG_CHIP_OTA_REQUESTOR)
 
     if(BOARD STREQUAL "native_sim")
         matter_add_gn_arg_string("target_cpu" "x86")
@@ -164,6 +172,9 @@ if(CONFIG_CHIP)
     set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
     
     target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
+
+    set(GNU_STD_TARGET chip)
+    include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
 
     if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         target_link_options(chip INTERFACE
