@@ -484,14 +484,11 @@ class TC_CGEN_2_2(MatterBaseTest):
         log.info('Step #20 - TH1 Original size of the trusted_root list: %s', trusted_roots_list_size)
 
         self.step(21)
-        # Commissioning stage numbers - we should find a better way to match these to the C++ code
-        # CommissioningDelegate.h
-        # TODO: https://github.com/project-chip/connectedhomeip/issues/36629
-        kFindOperationalForCommissioningComplete = 30
+        stage = ChipDeviceCtrl.CommissioningStage.FindOperationalForCommissioningComplete
         log.info(
-            'Step #21 - TH2 Commissioning stage SetTestCommissionerPrematureCompleteAfter enum: %s', kFindOperationalForCommissioningComplete)
+            'Step #21 - TH2 Commissioning stage SetTestCommissionerPrematureCompleteAfter enum: %s', stage)
 
-        resp = TH2.SetTestCommissionerPrematureCompleteAfter(kFindOperationalForCommissioningComplete)
+        resp = TH2.SetTestCommissionerPrematureCompleteAfter(stage)
         log.info('Step #21 - TH2 Commissioning DOES NOT send the CommissioningComplete command')
 
         # TH2.SetSkipCommissioningComplete(True)

@@ -45,7 +45,7 @@ import matter.clusters as Clusters
 import matter.clusters.enum
 import matter.FabricAdmin
 from matter import ChipDeviceCtrl
-from matter.ChipDeviceCtrl import CommissioningParameters
+from matter.ChipDeviceCtrl import CommissioningParameters, CommissioningStage
 from matter.exceptions import ChipStackError
 from matter.native import PyChipError
 from matter.testing.decorators import async_test_body
@@ -53,17 +53,6 @@ from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
-
-# Commissioning stage numbers - we should find a better way to match these to the C++ code
-# TODO: https://github.com/project-chip/connectedhomeip/issues/36629
-kArmFailsafe = 3
-kConfigRegulatory = 4
-kSendPAICertificateRequest = 9
-kSendDACCertificateRequest = 10
-kSendAttestationRequest = 11
-kSendOpCertSigningRequest = 15
-kSendTrustedRootCert = 18
-kSendNOC = 19
 
 
 class TC_CGEN_2_4(MatterBaseTest):
@@ -106,22 +95,19 @@ class TC_CGEN_2_4(MatterBaseTest):
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-        # kArmFailsafe, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(kArmFailsafe, matter.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # kConfigRegulatory, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(kConfigRegulatory, matter.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # kSendPAICertificateRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(kSendPAICertificateRequest, matter.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # kSendDACCertificateRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(kSendDACCertificateRequest, matter.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # kSendAttestationRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(kSendAttestationRequest, matter.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # kSendOpCertSigningRequest, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(kSendOpCertSigningRequest, matter.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # kSendTrustedRootCert, expect General error 0x7e (UNSUPPORTED_ACCESS)
-        await self.CommissionToStageSendCompleteAndCleanup(kSendTrustedRootCert, matter.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
-        # kSendNOC, expect cluster error InvalidAuthentication
-        await self.CommissionToStageSendCompleteAndCleanup(kSendNOC, matter.native.ErrorSDKPart.IM_CLUSTER_STATUS, 0x02)
+
+        # Stages that arm the failsafe or run under it: expect General error 0x7e (UNSUPPORTED_ACCESS)
+        for stage in (CommissioningStage.ArmFailSafe,
+                      CommissioningStage.ConfigRegulatory,
+                      CommissioningStage.SendPAICertificateRequest,
+                      CommissioningStage.SendDACCertificateRequest,
+                      CommissioningStage.SendAttestationRequest,
+                      CommissioningStage.SendOpCertSigningRequest,
+                      CommissioningStage.SendTrustedRootCert):
+            await self.CommissionToStageSendCompleteAndCleanup(stage, matter.native.ErrorSDKPart.IM_GLOBAL_STATUS, 0x7e)
+        # SendNOC, expect cluster error InvalidAuthentication
+        await self.CommissionToStageSendCompleteAndCleanup(
+            CommissioningStage.SendNOC, matter.native.ErrorSDKPart.IM_CLUSTER_STATUS, 0x02)
 
         log.info('Step 15 - TH1 opens a commissioning window')
         params = await self.OpenCommissioningWindow()
