@@ -34,7 +34,7 @@
 import logging
 
 from mobly import asserts
-from support_modules.TC_MEDIAPLAYBACKTestBase import MEDIAPLAYBACKTestBase
+from support_modules.mediaplayback_testbase import MEDIAPLAYBACKTestBase
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

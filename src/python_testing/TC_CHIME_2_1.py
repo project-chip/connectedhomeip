@@ -50,7 +50,7 @@
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
-from support_modules.TC_CHIMETestBase import CHIMETestBase
+from support_modules.chime_testbase import CHIMETestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches

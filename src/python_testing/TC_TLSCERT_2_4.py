@@ -35,7 +35,7 @@
 
 from mobly import asserts
 from support_modules import test_plan_support
-from support_modules.TC_TLSCERT_Base import TC_TLSCERT_Base
+from support_modules.tlscert_testbase import TC_TLSCERT_Base
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status

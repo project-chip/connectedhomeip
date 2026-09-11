@@ -41,7 +41,7 @@
 
 import asyncio
 
-from support_modules.TC_EEVSE_Utils import EEVSEBaseTestHelper
+from support_modules.eevse_utils import EEVSEBaseTestHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

@@ -39,7 +39,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from support_modules.TC_ESALM_TestBase import AlarmBitmap, ElectricalAlarmTestBaseHelper, cluster
+from support_modules.esalm_testbase import AlarmBitmap, ElectricalAlarmTestBaseHelper, cluster
 
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.runner import TestStep, default_matter_test_main

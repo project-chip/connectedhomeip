@@ -40,7 +40,7 @@ import random
 import secrets
 
 from mobly import asserts
-from support_modules.TC_GC_common import get_feature_map, valid_endpoints_list
+from support_modules.gc_common import get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

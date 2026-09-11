@@ -36,7 +36,7 @@
 import logging
 
 from mobly import asserts
-from support_modules.TC_MEDIAFILEMANAGEMENTTestBase import MEDIAFILEMANAGEMENTTestBase
+from support_modules.mediafilemanagement_testbase import MEDIAFILEMANAGEMENTTestBase
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

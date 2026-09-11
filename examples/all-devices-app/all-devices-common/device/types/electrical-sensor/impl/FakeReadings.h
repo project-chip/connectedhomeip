@@ -27,7 +27,7 @@
 class FakeReadings : public chip::TimerContext, public chip::TestEventTriggerHandler
 {
     // Values match the energy-reporting test helpers in
-    // src/python_testing/support_modules/TC_EnergyReporting_Utils.py (send_test_event_trigger_*).
+    // src/python_testing/support_modules/energy_reporting_utils.py (send_test_event_trigger_*).
     enum class EnergyReportingTrigger : uint64_t
     {
         // Stop Fake readings

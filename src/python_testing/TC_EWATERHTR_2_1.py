@@ -44,7 +44,7 @@
 import logging
 
 from mobly import asserts
-from support_modules.TC_EWATERHTRBase import EWATERHTRBase
+from support_modules.ewaterhtr_testbase import EWATERHTRBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
