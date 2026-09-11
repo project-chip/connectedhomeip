@@ -185,3 +185,159 @@ TEST_F(TestThermostatUserInterfaceConfigurationCluster, SetterTest)
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+
+TEST_F(TestThermostatUserInterfaceConfigurationCluster, TemperatureDisplayModeDelegate)
+{
+    struct TestDelegate : ThermostatUserInterfaceConfiguration::Delegate
+    {
+        void OnTemperatureDisplayModeChanged(TemperatureDisplayModeEnum value) override
+        {
+            EXPECT_EQ(value, TemperatureDisplayModeEnum::kFahrenheit);
+            EXPECT_EQ(cluster->GetTemperatureDisplayMode(), value);
+            ++calls;
+        }
+
+        ThermostatUserInterfaceConfigurationCluster * cluster = nullptr;
+        unsigned calls                                        = 0;
+    } delegate;
+
+    ThermostatUserInterfaceConfigurationCluster::Config config;
+    config.optionalAttributes.Set<ScheduleProgrammingVisibility::Id>();
+    ThermostatUserInterfaceConfigurationCluster cluster(kRootEndpointId, config);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+    delegate.cluster = &cluster;
+    cluster.SetDelegate(&delegate);
+
+    // No-op writes and invalid enum values must not reach the application.
+    EXPECT_EQ(cluster.SetTemperatureDisplayMode(TemperatureDisplayModeEnum::kCelsius), Status::Success);
+    EXPECT_EQ(tester.WriteAttribute(TemperatureDisplayMode::Id, TemperatureDisplayModeEnum::kCelsius), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetTemperatureDisplayMode(TemperatureDisplayModeEnum::kUnknownEnumValue), Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(TemperatureDisplayMode::Id, TemperatureDisplayModeEnum::kUnknownEnumValue),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(delegate.calls, 0u);
+
+    EXPECT_EQ(tester.WriteAttribute(TemperatureDisplayMode::Id, TemperatureDisplayModeEnum::kFahrenheit), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetTemperatureDisplayMode(), TemperatureDisplayModeEnum::kFahrenheit);
+    EXPECT_EQ(delegate.calls, 1u);
+    EXPECT_EQ(cluster.SetTemperatureDisplayMode(TemperatureDisplayModeEnum::kFahrenheit), Status::Success);
+    EXPECT_EQ(delegate.calls, 1u);
+
+    cluster.SetDelegate(nullptr);
+    EXPECT_EQ(cluster.SetTemperatureDisplayMode(TemperatureDisplayModeEnum::kCelsius), Status::Success);
+    EXPECT_EQ(delegate.calls, 1u);
+    cluster.SetDelegate(&delegate);
+    EXPECT_EQ(cluster.SetTemperatureDisplayMode(TemperatureDisplayModeEnum::kFahrenheit), Status::Success);
+    EXPECT_EQ(cluster.GetTemperatureDisplayMode(), TemperatureDisplayModeEnum::kFahrenheit);
+    EXPECT_EQ(delegate.calls, 2u);
+
+    cluster.SetDelegate(nullptr);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestThermostatUserInterfaceConfigurationCluster, KeypadLockoutDelegate)
+{
+    struct TestDelegate : ThermostatUserInterfaceConfiguration::Delegate
+    {
+        void OnKeypadLockoutChanged(KeypadLockoutEnum value) override
+        {
+            EXPECT_EQ(value, KeypadLockoutEnum::kLockout3);
+            EXPECT_EQ(cluster->GetKeypadLockout(), value);
+            ++calls;
+        }
+
+        ThermostatUserInterfaceConfigurationCluster * cluster = nullptr;
+        unsigned calls                                        = 0;
+    } delegate;
+
+    ThermostatUserInterfaceConfigurationCluster::Config config;
+    config.optionalAttributes.Set<ScheduleProgrammingVisibility::Id>();
+    ThermostatUserInterfaceConfigurationCluster cluster(kRootEndpointId, config);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+    delegate.cluster = &cluster;
+    cluster.SetDelegate(&delegate);
+
+    // No-op writes and invalid enum values must not reach the application.
+    EXPECT_EQ(cluster.SetKeypadLockout(KeypadLockoutEnum::kNoLockout), Status::Success);
+    EXPECT_EQ(tester.WriteAttribute(KeypadLockout::Id, KeypadLockoutEnum::kNoLockout), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetKeypadLockout(KeypadLockoutEnum::kUnknownEnumValue), Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(KeypadLockout::Id, KeypadLockoutEnum::kUnknownEnumValue),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(delegate.calls, 0u);
+
+    EXPECT_EQ(tester.WriteAttribute(KeypadLockout::Id, KeypadLockoutEnum::kLockout3), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetKeypadLockout(), KeypadLockoutEnum::kLockout3);
+    EXPECT_EQ(delegate.calls, 1u);
+    EXPECT_EQ(cluster.SetKeypadLockout(KeypadLockoutEnum::kLockout3), Status::Success);
+    EXPECT_EQ(delegate.calls, 1u);
+
+    cluster.SetDelegate(nullptr);
+    EXPECT_EQ(cluster.SetKeypadLockout(KeypadLockoutEnum::kNoLockout), Status::Success);
+    EXPECT_EQ(delegate.calls, 1u);
+    cluster.SetDelegate(&delegate);
+    EXPECT_EQ(cluster.SetKeypadLockout(KeypadLockoutEnum::kLockout3), Status::Success);
+    EXPECT_EQ(cluster.GetKeypadLockout(), KeypadLockoutEnum::kLockout3);
+    EXPECT_EQ(delegate.calls, 2u);
+
+    cluster.SetDelegate(nullptr);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestThermostatUserInterfaceConfigurationCluster, ScheduleProgrammingVisibilityDelegate)
+{
+    struct TestDelegate : ThermostatUserInterfaceConfiguration::Delegate
+    {
+        void OnScheduleProgrammingVisibilityChanged(ScheduleProgrammingVisibilityEnum value) override
+        {
+            EXPECT_EQ(value, ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied);
+            EXPECT_EQ(cluster->GetScheduleProgrammingVisibility(), value);
+            ++calls;
+        }
+
+        ThermostatUserInterfaceConfigurationCluster * cluster = nullptr;
+        unsigned calls                                        = 0;
+    } delegate;
+
+    ThermostatUserInterfaceConfigurationCluster::Config config;
+    config.optionalAttributes.Set<ScheduleProgrammingVisibility::Id>();
+    ThermostatUserInterfaceConfigurationCluster cluster(kRootEndpointId, config);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+    delegate.cluster = &cluster;
+    cluster.SetDelegate(&delegate);
+
+    // No-op writes and invalid enum values must not reach the application.
+    EXPECT_EQ(cluster.SetScheduleProgrammingVisibility(ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted),
+              Status::Success);
+    EXPECT_EQ(
+        tester.WriteAttribute(ScheduleProgrammingVisibility::Id, ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted),
+        CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetScheduleProgrammingVisibility(ScheduleProgrammingVisibilityEnum::kUnknownEnumValue),
+              Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(ScheduleProgrammingVisibility::Id, ScheduleProgrammingVisibilityEnum::kUnknownEnumValue),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(delegate.calls, 0u);
+
+    EXPECT_EQ(
+        tester.WriteAttribute(ScheduleProgrammingVisibility::Id, ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied),
+        CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetScheduleProgrammingVisibility(), ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied);
+    EXPECT_EQ(delegate.calls, 1u);
+    EXPECT_EQ(cluster.SetScheduleProgrammingVisibility(ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied),
+              Status::Success);
+    EXPECT_EQ(delegate.calls, 1u);
+
+    cluster.SetDelegate(nullptr);
+    EXPECT_EQ(cluster.SetScheduleProgrammingVisibility(ScheduleProgrammingVisibilityEnum::kScheduleProgrammingPermitted),
+              Status::Success);
+    EXPECT_EQ(delegate.calls, 1u);
+    cluster.SetDelegate(&delegate);
+    EXPECT_EQ(cluster.SetScheduleProgrammingVisibility(ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied),
+              Status::Success);
+    EXPECT_EQ(cluster.GetScheduleProgrammingVisibility(), ScheduleProgrammingVisibilityEnum::kScheduleProgrammingDenied);
+    EXPECT_EQ(delegate.calls, 2u);
+
+    cluster.SetDelegate(nullptr);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}

@@ -31,9 +31,9 @@ using chip::Protocols::InteractionModel::Status;
 
 ThermostatUserInterfaceConfigurationCluster::ThermostatUserInterfaceConfigurationCluster(EndpointId endpointId,
                                                                                          const Config & config) :
-    DefaultServerCluster({ endpointId, ThermostatUserInterfaceConfiguration::Id }),
-    mOptionalAttributes(config.optionalAttributes), mTemperatureDisplayMode(config.temperatureDisplayMode),
-    mKeypadLockout(config.keypadLockout), mScheduleProgrammingVisibility(config.scheduleProgrammingVisibility)
+    DefaultServerCluster({ endpointId, ThermostatUserInterfaceConfiguration::Id }), mOptionalAttributes(config.optionalAttributes),
+    mTemperatureDisplayMode(config.temperatureDisplayMode), mKeypadLockout(config.keypadLockout),
+    mScheduleProgrammingVisibility(config.scheduleProgrammingVisibility)
 {}
 
 CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::Attributes(const ConcreteClusterPath & path,
@@ -102,7 +102,10 @@ Status ThermostatUserInterfaceConfigurationCluster::SetTemperatureDisplayMode(Te
         return Status::ConstraintError;
     }
 
-    SetAttributeValue(mTemperatureDisplayMode, value, TemperatureDisplayMode::Id);
+    if (SetAttributeValue(mTemperatureDisplayMode, value, TemperatureDisplayMode::Id) && mDelegate != nullptr)
+    {
+        mDelegate->OnTemperatureDisplayModeChanged(value);
+    }
     return Status::Success;
 }
 
@@ -113,7 +116,10 @@ Status ThermostatUserInterfaceConfigurationCluster::SetKeypadLockout(KeypadLocko
         return Status::ConstraintError;
     }
 
-    SetAttributeValue(mKeypadLockout, value, KeypadLockout::Id);
+    if (SetAttributeValue(mKeypadLockout, value, KeypadLockout::Id) && mDelegate != nullptr)
+    {
+        mDelegate->OnKeypadLockoutChanged(value);
+    }
     return Status::Success;
 }
 
@@ -124,7 +130,10 @@ Status ThermostatUserInterfaceConfigurationCluster::SetScheduleProgrammingVisibi
         return Status::ConstraintError;
     }
 
-    SetAttributeValue(mScheduleProgrammingVisibility, value, ScheduleProgrammingVisibility::Id);
+    if (SetAttributeValue(mScheduleProgrammingVisibility, value, ScheduleProgrammingVisibility::Id) && mDelegate != nullptr)
+    {
+        mDelegate->OnScheduleProgrammingVisibilityChanged(value);
+    }
     return Status::Success;
 }
 

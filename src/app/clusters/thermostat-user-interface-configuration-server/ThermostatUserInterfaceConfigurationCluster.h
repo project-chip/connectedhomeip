@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Attributes.h>
@@ -53,6 +54,8 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    void SetDelegate(ThermostatUserInterfaceConfiguration::Delegate * delegate) { mDelegate = delegate; }
+
     Protocols::InteractionModel::Status
     SetTemperatureDisplayMode(ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
     Protocols::InteractionModel::Status SetKeypadLockout(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value);
@@ -70,6 +73,7 @@ public:
     }
 
 protected:
+    ThermostatUserInterfaceConfiguration::Delegate * mDelegate = nullptr;
     const OptionalAttributeSet mOptionalAttributes;
     ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum mTemperatureDisplayMode;
     ThermostatUserInterfaceConfiguration::KeypadLockoutEnum mKeypadLockout;

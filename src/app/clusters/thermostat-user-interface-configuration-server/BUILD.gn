@@ -19,6 +19,7 @@ source_set("thermostat-user-interface-configuration-server") {
   sources = [
     "ThermostatUserInterfaceConfigurationCluster.cpp",
     "ThermostatUserInterfaceConfigurationCluster.h",
+    "ThermostatUserInterfaceConfigurationDelegate.h",
   ]
 
   public_deps = [
