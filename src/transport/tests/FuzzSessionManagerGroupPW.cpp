@@ -85,6 +85,17 @@ const uint8_t kEpochKeySecond[16]  = {
     0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf
 };
 
+// An empty std::vector's data() may be null, and PacketBufferHandle::NewWithData passes it
+// straight to memcpy, which UBSan's nonnull check rejects. Empty inputs stay in the domain.
+System::PacketBufferHandle MakeBuf(const std::vector<uint8_t> & bytes)
+{
+    if (bytes.empty())
+    {
+        return MessagePacketBuffer::New(0);
+    }
+    return MessagePacketBuffer::NewWithData(bytes.data(), bytes.size());
+}
+
 // The delegate is the ExchangeManager boundary, past everything measured here, so a
 // no-op removes no check.
 class NoopDelegate : public SessionMessageDelegate
@@ -293,7 +304,7 @@ void GroupDispatchDoesNotCrash(bool useRawDomain, bool testingEnabled, const std
         datagram[2] = static_cast<uint8_t>((fx.sessionId >> 8) & 0xff);
     }
 
-    PacketBufferHandle msg = MessagePacketBuffer::NewWithData(datagram.data(), datagram.size());
+    PacketBufferHandle msg = MakeBuf(datagram);
     if (msg.IsNull())
     {
         return;
@@ -371,7 +382,7 @@ void GroupValidEncryptedDoesNotCrash(uint8_t payloadType, bool needsAck, bool te
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::Id, payloadType);
     payloadHeader.SetNeedsAck(needsAck);
 
-    System::PacketBufferHandle payloadBuf = MessagePacketBuffer::NewWithData(payload.data(), payload.size());
+    System::PacketBufferHandle payloadBuf = MakeBuf(payload);
     if (payloadBuf.IsNull())
     {
         return;
@@ -432,7 +443,7 @@ CHIP_ERROR BuildManualGroupFrame(Fixture & fx, bool controlMsg, uint8_t sourceSe
     PayloadHeader payloadHeader;
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::Id, payloadType);
 
-    System::PacketBufferHandle msg = MessagePacketBuffer::NewWithData(payload.data(), payload.size());
+    System::PacketBufferHandle msg = MakeBuf(payload);
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     CryptoContext cryptoContext(keyContext);
@@ -459,7 +470,7 @@ void GroupManualFrameDoesNotCrash(bool controlMsg, uint8_t sourceSelector, uint3
         return;
     }
 
-    PacketBufferHandle msg = MessagePacketBuffer::NewWithData(datagram.data(), datagram.size());
+    PacketBufferHandle msg = MakeBuf(datagram);
     if (msg.IsNull())
     {
         return;

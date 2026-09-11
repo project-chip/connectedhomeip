@@ -66,7 +66,9 @@ using KeySet    = GroupDataProvider::KeySet;
 constexpr FabricIndex kFuzzFabric = 1;
 
 // Reused across inputs so a sequence acts on accumulated state; the pools are fixed-size,
-// so it cannot grow without bound.
+// so it cannot grow without bound. Storage left behind by RemoveFabric therefore builds up
+// over many inputs, which a per-input reset would hide. The cost is that a crash may need its
+// predecessors to reproduce; re-run the corpus in order.
 struct Fixture
 {
     TestPersistentStorageDelegate storage;

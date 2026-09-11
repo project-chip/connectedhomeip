@@ -97,6 +97,17 @@ const uint8_t kEpochKeys[kMaxFabrics][16] = {
 
 // The delegate is the ExchangeManager boundary, past everything measured here, so a
 // no-op removes no check.
+// An empty std::vector's data() may be null, and PacketBufferHandle::NewWithData passes it
+// straight to memcpy, which UBSan's nonnull check rejects. Empty inputs stay in the domain.
+System::PacketBufferHandle MakeBuf(const std::vector<uint8_t> & bytes)
+{
+    if (bytes.empty())
+    {
+        return MessagePacketBuffer::New(0);
+    }
+    return MessagePacketBuffer::NewWithData(bytes.data(), bytes.size());
+}
+
 class NoopDelegate : public SessionMessageDelegate
 {
 public:
@@ -323,7 +334,7 @@ void GroupPeerTableDoesNotCorrupt(const std::vector<Record> & records)
             continue;
         }
 
-        PacketBufferHandle msg = MessagePacketBuffer::NewWithData(datagram.data(), datagram.size());
+        PacketBufferHandle msg = MakeBuf(datagram);
         if (msg.IsNull())
         {
             continue;
@@ -449,7 +460,7 @@ void GroupSendThenReceiveDoesNotCrash(uint8_t fabricSel, uint8_t typeSel, const 
         break;
     }
 
-    System::PacketBufferHandle payloadBuf = MessagePacketBuffer::NewWithData(payload.data(), payload.size());
+    System::PacketBufferHandle payloadBuf = MakeBuf(payload);
     if (payloadBuf.IsNull())
     {
         return;
