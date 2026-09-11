@@ -169,8 +169,8 @@ class TC_ACS_2_1(MatterBaseTest):
                                           "AmbientContextTypeSupported should be less than equalt to SimultaneousDetectLimit.")
 
                 for context in ambientContextType:
-                    nsID = context.ambientContextSensed.namespaceID
-                    tagID = context.ambientContextSensed.tag
+                    nsID = context.ambientContextSensed[0].namespaceID
+                    tagID = context.ambientContextSensed[0].tag
 
                     if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
                         asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
@@ -292,7 +292,7 @@ class TC_ACS_2_1(MatterBaseTest):
                     asserts.assert_greater_equal(endTime, startTime+1, "EndTimestamp must be greater than StartTimestamp.")
 
                     # Confidence
-                    asserts.assert_less_than(0, predictedActivity.confidence,
+                    asserts.assert_greater(predictedActivity.confidence, 0,
                                              "Expected the percentage greater than 0 and less than equat to 100.")
                     asserts.assert_less_equal(predictedActivity.confidence, 100,
                                               "Expected the percentage greater than 0 and less than equat to 100.")
@@ -318,7 +318,7 @@ class TC_ACS_2_1(MatterBaseTest):
                                     asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
                                                               "Tag number doesn't exit in IdentifiedSound namesapce.")
                                 else:
-                                    asserts.assert_error("Namespace is not matching to the features.")
+                                    asserts.fail("Namespace is not matching to the features.")
 
                 if self.ObjectCountingSupported and predictedActivity:
                     self.step("13b", "If DUT supports PredictedActivity feature, then TH reads the PredictedActivity attribute. Verify that DUT response contains StartTimestamp epoch-s data less than equal to EndTimestamp-1 and EndTimestamp epoch-s data greater than equal to StartTimestamp-1 and Verify that DUT response contains Confidence field that is a percentage data between 0 and 100. If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data that includes namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.")
