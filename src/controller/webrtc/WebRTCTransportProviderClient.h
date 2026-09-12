@@ -22,20 +22,18 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
-#include <controller/python/matter/native/PyChipError.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/core/TLV.h>
 
-using PyObject                        = void *;
-using OnCommandSenderResponseCallback = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                 chip::CommandId commandId, size_t index,
-                                                 std::underlying_type_t<chip::Protocols::InteractionModel::Status> status,
-                                                 chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
-using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,
-                                              std::underlying_type_t<chip::Protocols::InteractionModel::Status> status,
-                                              chip::ClusterStatus clusterStatus, PyChipError chiperror);
-using OnCommandSenderDoneCallback     = void (*)(PyObject appContext);
+using OnCommandResponseCallback = void (*)(void * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                           chip::CommandId commandId, size_t index,
+                                           chip::Protocols::InteractionModel::Status status, chip::ClusterStatus clusterStatus,
+                                           const uint8_t * payload, uint32_t length);
+using OnCommandErrorCallback    = void (*)(void * appContext, chip::Protocols::InteractionModel::Status status,
+                                        chip::ClusterStatus clusterStatus, CHIP_ERROR error);
+using OnCommandDoneCallback     = void (*)(void * appContext);
 
 class WebRTCTransportProviderClient : public chip::app::CommandSender::Callback
 {
@@ -49,12 +47,11 @@ public:
     // methods to be called from python
     void Init(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
 
-    PyChipError SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId, const uint8_t * payload,
-                            size_t length);
+    CHIP_ERROR SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId, const uint8_t * payload,
+                           size_t length);
 
-    void InitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
-                       OnCommandSenderErrorCallback onCommandSenderErrorCallback,
-                       OnCommandSenderDoneCallback onCommandSenderDoneCallback);
+    void InitCallbacks(OnCommandResponseCallback onCommandResponseCallback, OnCommandErrorCallback onCommandErrorCallback,
+                       OnCommandDoneCallback onCommandDoneCallback);
 
     /////////// CommandSender Callback Interface /////////
     void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
@@ -89,7 +86,7 @@ private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Type mProvideAnswerData;
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
     StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
-    PyObject mAppContext                = nullptr;
+    void * mAppContext                  = nullptr;
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;
@@ -101,9 +98,9 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
-    OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
-    OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
-    OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
+    OnCommandResponseCallback gOnCommandResponseCallback = nullptr;
+    OnCommandErrorCallback gOnCommandErrorCallback       = nullptr;
+    OnCommandDoneCallback gOnCommandDoneCallback         = nullptr;
 
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                   const chip::SessionHandle & sessionHandle);
