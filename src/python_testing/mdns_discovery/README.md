@@ -247,23 +247,23 @@ assert_valid_dn_key("Kitchen")
 
 ### ✅ Available assert functions
 
-|                        |                                             |
-| ---------------------- | ------------------------------------------- |
-| `assert_valid_d_key`   | `assert_valid_commissionable_instance_name` |
-| `assert_valid_vp_key`  | `assert_valid_operational_instance_name`    |
-| `assert_valid_cm_key`  | `assert_valid_short_discriminator_subtype`  |
-| `assert_valid_dt_key`  | `assert_valid_long_discriminator_subtype`   |
-| `assert_valid_dn_key`  | `assert_is_commissionable_type`             |
-| `assert_valid_ri_key`  | `assert_is_border_router_type`              |
-| `assert_valid_ph_key`  | `assert_valid_devtype_subtype`              |
-| `assert_valid_pi_key`  | `assert_valid_vendor_subtype`               |
-| `assert_valid_jf_key`  | `assert_is_commissioner_type`               |
-| `assert_valid_sii_key` | `assert_valid_ipv6_addresses`               |
-| `assert_valid_sai_key` | `assert_is_operational_type`                |
-| `assert_valid_sat_key` | `assert_valid_product_id`                   |
-| `assert_valid_t_key`   | `assert_valid_vendor_id`                    |
-| `assert_valid_icd_key` | `assert_valid_hostname`                     |
-|                        | `assert_txt_record_present`                 |
+|                                             |                                            |
+| ------------------------------------------- | ------------------------------------------ |
+| `assert_valid_d_key`                        | `assert_valid_operational_instance_name`   |
+| `assert_valid_vp_key`                       | `assert_valid_short_discriminator_subtype` |
+| `assert_valid_cm_key`                       | `assert_valid_long_discriminator_subtype`  |
+| `assert_valid_dt_key`                       | `assert_is_commissionable_type`            |
+| `assert_valid_dn_key`                       | `assert_is_border_router_type`             |
+| `assert_valid_ri_key`                       | `assert_valid_devtype_subtype`             |
+| `assert_valid_ph_key`                       | `assert_valid_vendor_subtype`              |
+| `assert_valid_pi_key`                       | `assert_is_commissioner_type`              |
+| `assert_valid_jf_key`                       | `assert_valid_ipv6_addresses`              |
+| `assert_valid_sii_key`                      | `assert_is_operational_type`               |
+| `assert_valid_sai_key`                      | `assert_valid_product_id`                  |
+| `assert_valid_sat_key`                      | `assert_valid_vendor_id`                   |
+| `assert_valid_t_key`                        | `assert_valid_hostname`                    |
+| `assert_valid_icd_key`                      | `assert_txt_record_present`                |
+| `assert_valid_commissionable_instance_name` |                                            |
 
 ## 🛜 Network Utilities
 
@@ -287,6 +287,42 @@ for addr in addr_list:
 | ------------------------- |
 | `get_host_ipv6_addresses` |
 | `is_dut_tcp_supported`    |
+
+## 🧰 Discovery Test Support Helpers
+
+This module contains higher-level helpers shared across the SC-X.x discovery
+family of tests
+
+You can import them from the following file: `mdns_discovery/utils/support.py`
+
+```python
+from mdns_discovery.utils.support import DiscoverySupport, get_verify_srv_record
+
+
+class TC_SC_4_X(DiscoverySupport, MatterBaseTest):
+    async def test_TC_SC_4_X(self):
+        srv_hostname = await get_verify_srv_record(instance_name, service_type)
+```
+
+### ✅ Available support functions
+
+|                                       |
+| ------------------------------------- |
+| `get_verify_commissioner_service`     |
+| `get_verify_srv_record`               |
+| `verify_commissioner_txt_record_keys` |
+| `get_single_ptr_instance_name`        |
+| `verify_devtype_subtype`              |
+| `verify_aaaa_records`                 |
+
+### ✅ `DiscoverySupport` methods
+
+|                                |
+| ------------------------------ |
+| `get_descriptor_server_list`   |
+| `get_icd_feature_map`          |
+| `get_active_mode_threshold_ms` |
+| `get_dut_instance_name`        |
 
 ## 📌 General Information
 
