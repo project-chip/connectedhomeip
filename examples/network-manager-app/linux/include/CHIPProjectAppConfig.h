@@ -20,6 +20,10 @@
 
 #define CHIP_DEVICE_CONFIG_DEVICE_TYPE 144 // 0x0090 Network Infrastructure Manager
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Network Infrastructure Manager"
+// Advertise the device name and type while commissionable; without
+// them, commissioners fall back to a generic accessory placeholder.
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME 1
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE 1
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8013
 
 // Sufficient space for ArlReviewEvent of several fabrics.
