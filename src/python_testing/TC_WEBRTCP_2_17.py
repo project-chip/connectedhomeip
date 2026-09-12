@@ -153,6 +153,11 @@ class TC_WEBRTCP_2_17(MatterBaseTest, WEBRTCPTestBase):
         # Verify the Answer command contains the same session ID
         asserts.assert_equal(answer_sessionId, session_id,
                              f"Answer session ID {answer_sessionId} does not match expected {session_id}")
+
+        # The DUT can start trickling ICE candidates immediately after it sends
+        # Answer.  Install the remote description before yielding to later test
+        # steps so the requestor callback can apply IPv4 or IPv6 candidates.
+        webrtc_peer.set_remote_answer(answer_sdp)
         log.info("Received Answer command for session %s", session_id)
 
         self.step(4)
