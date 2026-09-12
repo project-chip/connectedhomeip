@@ -52,11 +52,14 @@ log = logging.getLogger(__name__)
 
 
 class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
+    """Implementation of test case TC-AVANALY-2.7."""
 
     def desc_TC_AVANALY_2_7(self) -> str:
+        """Returns the description of TC-AVANALY-2.7."""
         return "[TC-AVANALY-2.7] Validate PerceivedContext event generation and context list handling with Server as DUT"
 
     def steps_TC_AVANALY_2_7(self) -> list[TestStep]:
+        """Returns the list of test steps for TC-AVANALY-2.7."""
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH enables multiple context triggers (e.g., Context A and Context B). Verify success response."),
@@ -82,6 +85,7 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
         ]
 
     def pics_TC_AVANALY_2_7(self) -> list[str]:
+        """Returns the PICS requirements for TC-AVANALY-2.7."""
         return [
             "AVANALY.S",
             "AVANALY.S.E02",
@@ -89,6 +93,7 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
 
     @run_if_endpoint_matches(has_cluster(Clusters.AvAnalysis))
     async def test_TC_AVANALY_2_7(self):
+        """Execute the test steps for TC-AVANALY-2.7."""
         cluster = Clusters.Objects.AvAnalysis
         attributes = cluster.Attributes
         endpoint = self.get_endpoint()

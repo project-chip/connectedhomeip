@@ -24,6 +24,8 @@ from matter.interaction_model import InteractionModelError, Status
 
 
 class AVANALYTestBase:
+    """Base class providing helper methods and constants for AVANALY tests."""
+
     SPEC_MAX_COUNT_SUPPORTEDAMBIENTCONTEXTS = 50
     SPEC_MAX_COUNT_ANALYSIS_STREAMS = 255
 
