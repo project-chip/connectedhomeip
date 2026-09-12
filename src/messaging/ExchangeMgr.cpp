@@ -311,6 +311,19 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             return;
         }
+
+        if (!payloadHeader.IsInitiator() && session->IsUnauthenticatedSession() &&
+            payloadHeader.HasProtocol(Protocols::SecureChannel::Id) &&
+            (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2) ||
+             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume)))
+        {
+            if (packetHeader.GetDestinationNodeId().HasValue() && mSessionManager != nullptr)
+            {
+                TEMPORARY_RETURN_IGNORED mSessionManager->SendUnauthenticatedErrorStatusReport(
+                    packetHeader, payloadHeader, session->AsUnauthenticatedSession()->GetPeerAddress());
+            }
+            return;
+        }
     }
     else
     {
