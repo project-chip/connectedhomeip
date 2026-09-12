@@ -106,6 +106,27 @@ def parse_pics(lines: list[str]) -> dict[str, bool]:
     return pics
 
 
+def apply_pics_overrides(pics: dict[str, bool], overrides: list[str]) -> list[str]:
+    """Overrides the value of items present in a PICS set, or adds them if absent, modifying the given set directly.
+
+    Args:
+        pics: The PICS set to modify.
+        overrides: The override entries to apply, each using the PICS file
+            line format (e.g. "DGGEN.S.E00=0").
+
+    Returns:
+        The keys that were not present in the PICS set, so callers can flag
+        likely typos when the set came from a PICS file.
+
+    Raises:
+        ValueError: An entry is without a 0 or 1 value.
+    """
+    parsed = parse_pics(overrides)
+    added = [key for key in parsed if key not in pics]
+    pics.update(parsed)
+    return added
+
+
 def parse_pics_xml(contents: str) -> dict[str, bool]:
     pics: dict[str, bool] = {}
     mytree = ET.fromstring(contents)
