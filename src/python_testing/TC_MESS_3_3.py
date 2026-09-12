@@ -44,7 +44,8 @@ class TC_MESS_3_3(MatterBaseTest, MESSTestBase):
                      "DUT is in a muted or do-not-disturb state."),
             TestStep(2, "TH sends a PresentMessagesRequest command to the DUT with MessageID="
                      "AABBCCDDEEFF00112233445566778899, Priority=Low (0), MessageControl with the AudioMessage bit "
-                     "(bit 6) set and MessageURI pointing to a valid audio resource.",
+                     "(bit 6) set, StartTime=null, Duration=null, MessageText='' and MessageURI pointing to a valid "
+                     "audio resource.",
                      "Verify that a successful (status 0) response is received."),
             TestStep(3, "TH waits for the DUT to drop the Low priority audio message.",
                      "Verify that a MessageNotPresented event is generated with MessageID="
@@ -54,7 +55,8 @@ class TC_MESS_3_3(MatterBaseTest, MESSTestBase):
                      "in the messages list."),
             TestStep(5, "TH sends a PresentMessagesRequest command to the DUT with MessageID="
                      "BBCCDDEE0011223344556677889900AA, Priority=High (2), MessageControl with the AudioMessage bit "
-                     "(bit 6) set and MessageURI pointing to a valid audio resource.",
+                     "(bit 6) set, StartTime=null, Duration=null, MessageText='' and MessageURI pointing to a valid "
+                     "audio resource.",
                      "Verify that a successful (status 0) response is received."),
             TestStep(6, "TH waits for the DUT to defer the High priority audio message.",
                      "Verify that a MessageNotPresented event is generated with MessageID="
@@ -90,6 +92,10 @@ class TC_MESS_3_3(MatterBaseTest, MESSTestBase):
             prompt_msg="Place the DUT in a muted or do-not-disturb state, per the manufacturer's documentation, "
                        "then press Enter.\n")
 
+        # Both messages are sent with a null Duration, meaning "until changed". Unlike TC-MESS-3.1
+        # and 3.2, nothing here waits for a message to complete: the High priority message has to
+        # still be queued when step 7 reads the Messages attribute, and step 8 removes it.
+        #
         # A Low priority audio message cannot be presented while muted, so the DUT drops it.
         self.step(2)
         await self.send_present_message(
