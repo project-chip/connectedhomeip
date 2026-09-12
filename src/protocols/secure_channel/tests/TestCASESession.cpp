@@ -2417,4 +2417,186 @@ TEST_F(TestCASESession, ParseSigma3TBEData)
     TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEFutureProofTlvElementNoStructEnd);
 }
 
+TEST_F(TestCASESession, StaleSigma2TriggersStatusReportAndUnwedgesServer)
+{
+    TestCASESecurePairingDelegate delegateCommissioner1;
+    auto pairingCommissioner1 = chip::Platform::MakeUnique<CASESession>();
+    pairingCommissioner1->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback                            = GetLoopback();
+    loopback.mSentMessageCount                 = 0;
+    loopback.mNumMessagesToAllowBeforeDropping = 1; // Allow Sigma1
+    loopback.mNumMessagesToDrop                = 1; // Drop initial Sigma2 from responder
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner1 = NewUnauthenticatedExchangeToBob(pairingCommissioner1.get());
+
+    EXPECT_EQ(pairingCommissioner1->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                     ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
+                                                     nullptr, nullptr, &delegateCommissioner1,
+                                                     Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    // Responder sent Sigma2 (which was dropped) and is now waiting in State::kSentSigma2.
+    EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
+
+    // Simulate initiator timing out / closing before Sigma2 arrives.
+    // This closes the initiator ExchangeContext and releases the UnauthenticatedSession from SessionManager.
+    pairingCommissioner1.reset();
+
+    // Advance IO until responder retransmits Sigma2 and receives the failure StatusReport from SessionManager.
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return loopback.mSentMessageCount >= 4; });
+    ServiceEvents();
+
+    // Verify 1-to-1 packet reflection: 1 Sigma1 + 1 dropped Sigma2 + 1 retransmitted Sigma2 + 1 StatusReport = 4 packets.
+    EXPECT_EQ(loopback.mSentMessageCount, 4u);
+
+    // Responder CASEServer should have immediately aborted State::kSentSigma2 and reset to State::kInitialized.
+    EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kInitialized);
+
+    // A subsequent Sigma1 from a second initiator must succeed immediately without Busy.
+    TestCASESecurePairingDelegate delegateCommissioner2;
+    CASESession pairingCommissioner2;
+    pairingCommissioner2.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextCommissioner2 = NewUnauthenticatedExchangeToBob(&pairingCommissioner2);
+
+    EXPECT_EQ(pairingCommissioner2.EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner2,
+                                                    nullptr, nullptr, &delegateCommissioner2,
+                                                    Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateCommissioner2.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner2.mNumPairingErrors, 0u);
+
+    gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, StaleSigma2WithRetainedUnauthSessionTriggersStatusReport)
+{
+    TestCASESecurePairingDelegate delegateCommissioner1;
+    auto pairingCommissioner1 = chip::Platform::MakeUnique<CASESession>();
+    pairingCommissioner1->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback                            = GetLoopback();
+    loopback.mSentMessageCount                 = 0;
+    loopback.mNumMessagesToAllowBeforeDropping = 1; // Allow Sigma1
+    loopback.mNumMessagesToDrop                = 1; // Drop initial Sigma2 from responder
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner1 = NewUnauthenticatedExchangeToBob(pairingCommissioner1.get());
+
+    // Retain a reference to the initiator UnauthenticatedSession so it remains in SessionManager
+    // when the initiator ExchangeContext is closed, exercising the ExchangeManager path.
+    SessionHolder retainedInitiatorSession(contextCommissioner1->GetSessionHandle());
+
+    EXPECT_EQ(pairingCommissioner1->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                     ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner1,
+                                                     nullptr, nullptr, &delegateCommissioner1,
+                                                     Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
+
+    // Close initiator CASESession and ExchangeContext while keeping UnauthenticatedSession alive.
+    pairingCommissioner1.reset();
+
+    // Advance IO until responder retransmits Sigma2 and receives the failure StatusReport via ExchangeManager.
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return loopback.mSentMessageCount >= 4; });
+    ServiceEvents();
+
+    // Verify 1-to-1 packet reflection: only ONE StatusReport with piggybacked MRP ACK is transmitted (no duplicate StandaloneAck).
+    EXPECT_EQ(loopback.mSentMessageCount, 4u);
+
+    EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kInitialized);
+
+    TestCASESecurePairingDelegate delegateCommissioner2;
+    CASESession pairingCommissioner2;
+    pairingCommissioner2.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextCommissioner2 = NewUnauthenticatedExchangeToBob(&pairingCommissioner2);
+
+    EXPECT_EQ(pairingCommissioner2.EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner2,
+                                                    nullptr, nullptr, &delegateCommissioner2,
+                                                    Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateCommissioner2.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner2.mNumPairingErrors, 0u);
+
+    gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, MalformedSigma2WithoutDestinationNodeIdDoesNotCrash)
+{
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    // 1. Direct API guard validation: calling SendUnauthenticatedErrorStatusReport without DestinationNodeId
+    // or with IsInitiator() == true must safely return CHIP_ERROR_INVALID_ARGUMENT without crashing.
+    {
+        PacketHeader badPacketHeader;
+        badPacketHeader.SetSourceNodeId(Node01_02); // S=1, DSIZ=0 (DestinationNodeId missing)
+
+        PayloadHeader sigma2PayloadHeader;
+        sigma2PayloadHeader.SetExchangeID(1234).SetMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2).SetInitiator(false);
+
+        EXPECT_EQ(GetSecureSessionManager().SendUnauthenticatedErrorStatusReport(
+                      badPacketHeader, sigma2PayloadHeader,
+                      Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6))),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+
+        PacketHeader validDestHeader;
+        validDestHeader.SetDestinationNodeId(Node01_01);
+        PayloadHeader initiatorPayloadHeader;
+        initiatorPayloadHeader.SetExchangeID(1234)
+            .SetMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2)
+            .SetInitiator(true); // Invalid: Initiator flag set on Sigma2
+
+        EXPECT_EQ(GetSecureSessionManager().SendUnauthenticatedErrorStatusReport(
+                      validDestHeader, initiatorPayloadHeader,
+                      Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6))),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // 2. End-to-end packet injection: inject a spoofed/malformed unauthenticated CASE_Sigma2 with
+    // S=1, DSIZ=0 (SourceNodeId set, DestinationNodeId unset) and I=0 (!IsInitiator(), NeedsAck=true).
+    // Verify SessionManager::UnauthenticatedMessageDispatch and ExchangeManager::OnMessageReceived
+    // process and drop it safely without calling Optional::Value() (no chipDie crash) and without
+    // transmitting any StatusReport or StandaloneAck packet.
+    System::PacketBufferHandle msg = System::PacketBufferHandle::New(64);
+    ASSERT_FALSE(msg.IsNull());
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(9999)
+        .SetMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2)
+        .SetInitiator(false)
+        .SetNeedsAck(true);
+    EXPECT_EQ(payloadHeader.EncodeBeforeData(msg), CHIP_NO_ERROR);
+
+    PacketHeader packetHeader;
+    packetHeader.SetSessionId(0)
+        .SetSessionType(Header::SessionType::kUnicastSession)
+        .SetMessageCounter(42)
+        .SetSourceNodeId(Node01_02); // S=1, DSIZ=0
+    EXPECT_EQ(packetHeader.EncodeBeforeData(msg), CHIP_NO_ERROR);
+
+    Transport::PeerAddress peerAddr = Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6));
+    GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(msg));
+    ServiceEvents();
+
+    // Zero packets should be transmitted in response to a malformed S=1, DSIZ=0 Sigma2.
+    EXPECT_EQ(loopback.mSentMessageCount, 0u);
+}
+
 } // namespace chip

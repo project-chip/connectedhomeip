@@ -43,6 +43,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/StatusReport.h>
 #include <tracing/macros.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
@@ -598,6 +599,63 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
+CHIP_ERROR SessionManager::SendUnauthenticatedErrorStatusReport(const PacketHeader & incomingPacketHeader,
+                                                                const PayloadHeader & incomingPayloadHeader,
+                                                                const Transport::PeerAddress & peerAddress)
+{
+    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mTransportMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(incomingPacketHeader.GetDestinationNodeId().HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!incomingPayloadHeader.IsInitiator(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Protocols::SecureChannel::StatusReport statusReport(Protocols::SecureChannel::GeneralStatusCode::kFailure,
+                                                        Protocols::SecureChannel::Id,
+                                                        Protocols::SecureChannel::kProtocolCodeInvalidParam);
+
+    auto handle = System::PacketBufferHandle::New(statusReport.Size());
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(handle));
+    statusReport.WriteToBuffer(bbuf);
+
+    System::PacketBufferHandle msg = bbuf.Finalize();
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    PayloadHeader responsePayloadHeader;
+    responsePayloadHeader.SetExchangeID(incomingPayloadHeader.GetExchangeID())
+        .SetMessageType(Protocols::SecureChannel::MsgType::StatusReport)
+        .SetInitiator(true);
+
+    if (incomingPayloadHeader.NeedsAck())
+    {
+        responsePayloadHeader.SetAckMessageCounter(incomingPacketHeader.GetMessageCounter());
+    }
+
+    ReturnErrorOnFailure(responsePayloadHeader.EncodeBeforeData(msg));
+
+    uint32_t messageCounter = 0;
+    ReturnErrorOnFailure(mGlobalUnencryptedMessageCounter.AdvanceAndConsume(messageCounter));
+
+    PacketHeader responsePacketHeader;
+    responsePacketHeader.SetSessionId(0)
+        .SetSessionType(Header::SessionType::kUnicastSession)
+        .SetMessageCounter(messageCounter)
+        .SetSourceNodeId(incomingPacketHeader.GetDestinationNodeId().Value());
+
+    ReturnErrorOnFailure(responsePacketHeader.EncodeBeforeData(msg));
+
+    Transport::PeerAddress mutablePeerAddress = peerAddress;
+    CorrectPeerAddressInterfaceID(mutablePeerAddress);
+
+    ChipLogProgress(Inet,
+                    "Sending failure StatusReport for orphan CASE Sigma2 on exchange " ChipLogFormatExchangeId
+                    " to initiator 0x" ChipLogFormatX64,
+                    ChipLogValueExchangeIdFromReceivedHeader(incomingPayloadHeader),
+                    ChipLogValueX64(incomingPacketHeader.GetDestinationNodeId().Value()));
+
+    return mTransportMgr->SendMessage(mutablePeerAddress, std::move(msg));
+}
+
 void SessionManager::ExpireAllSessions(const ScopedNodeId & node)
 {
     ChipLogDetail(Inet, "Expiring all sessions for node " ChipLogFormatScopedNodeId "!!", ChipLogValueScopedNodeId(node));
@@ -871,6 +929,15 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
         {
             ChipLogProgress(Inet, "Received unknown unsecure packet for initiator 0x" ChipLogFormatX64,
                             ChipLogValueX64(destination.Value()));
+
+            PayloadHeader payloadHeader;
+            if (payloadHeader.DecodeAndConsume(msg) == CHIP_NO_ERROR && !payloadHeader.IsInitiator() &&
+                payloadHeader.HasProtocol(Protocols::SecureChannel::Id) &&
+                (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2) ||
+                 payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume)))
+            {
+                TEMPORARY_RETURN_IGNORED SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader, peerAddress);
+            }
             return;
         }
     }
