@@ -209,6 +209,7 @@ if (chip_build_tests) {
         "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/concentration-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/device-energy-management-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/door-lock-server/tests",
         "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/energy-evse-server/tests:tests-backwards-compatibility",
