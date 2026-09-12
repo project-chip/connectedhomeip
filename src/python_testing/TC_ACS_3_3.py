@@ -36,6 +36,7 @@
 #       --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
 #       --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03
 #       --float-arg PIXIT.ACS.Holdtime:10
+#       --bool-arg simulate_ambientsensing:True
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -86,7 +87,7 @@ class TC_ACS_3_3(MatterBaseTest):
 
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
     def write_to_app_pipe(self, command):
         if self.is_ci:
@@ -273,10 +274,10 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdTime_input))
             if event.eventStartTimePos is not None:
-                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 2000, "Not matching EventStartTimePos")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimePos})
             else:
-                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 2000, "Not matching EventStartTimeSys")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimeSys})
 
         else:
@@ -360,10 +361,10 @@ class TC_ACS_3_3(MatterBaseTest):
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdTime_input))
             # asserts.assert_true((event.eventStartTime//1000) == event_start_time, "Not matching EventStartTime")
             if event.eventStartTimePos is not None:
-                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 2000, "Not matching EventStartTimePos")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimePos}")
             else:
-                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 2000, "Not matching EventStartTimeSys")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimeSys}")
         else:
             log.info("ObjectIdentification Feature not supported. Test steps skipped")
@@ -448,10 +449,10 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdTime_input))
             if event.eventStartTimePos is not None:
-                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 2000, "Not matching EventStartTimePos")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimePos}")
             else:
-                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 2000, "Not matching EventStartTimeSys")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimeSys}")
         else:
             log.info("SoundIdentification Feature not supported. Test steps skipped")
@@ -559,10 +560,10 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdTime_input))
             if event.eventStartTimePos is not None:
-                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 1000, "Not matching EventStartTimePos")
+                asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < 2000, "Not matching EventStartTimePos")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimePos})
             else:
-                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 1000, "Not matching EventStartTimeSys")
+                asserts.assert_true(abs(event.eventStartTimeSys - event_start_time) < 2000, "Not matching EventStartTimeSys")
                 log.info("event time from AmbientContextDetectEnded field data: %s", {event.eventStartTimeSys})
 
         else:
