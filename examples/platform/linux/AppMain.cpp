@@ -763,11 +763,22 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
     {
-        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
-        std::string logfile = "--log-file=thread.log";
-        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
+        std::string nodeid   = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+        const char * logpath = "/dev/stderr";
+        FILE * f             = fopen(logpath, "wt");
+        if (f != nullptr)
+        {
+            fclose(f);
+            std::string logfile = std::string("--log-file=") + logpath;
+            char * args[]       = { argv[0], logfile.data(), nodeid.data() };
+            otSysInit(MATTER_ARRAY_SIZE(args), args);
+        }
+        else
+        {
+            char * args[] = { argv[0], nodeid.data() };
+            otSysInit(MATTER_ARRAY_SIZE(args), args);
+        }
 
-        otSysInit(MATTER_ARRAY_SIZE(args), args);
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
         ChipLogProgress(NotSpecified, "Thread initialized.");
