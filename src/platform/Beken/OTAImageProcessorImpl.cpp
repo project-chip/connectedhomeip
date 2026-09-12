@@ -206,11 +206,21 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     if (!imageProcessor->readHeader) // First block received, process header
     {
+        if (block.size() < sizeof(ota_data_struct_t))
+        {
+            ChipLogError(SoftwareUpdate, "Block of %u bytes is too small to hold the image descriptor (%u bytes)",
+                         static_cast<unsigned>(block.size()), static_cast<unsigned>(sizeof(ota_data_struct_t)));
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_BUFFER_TOO_SMALL);
+            return;
+        }
+
         ota_data_struct_t * tempBuf = (ota_data_struct_t *) chip::Platform::MemoryAlloc(sizeof(ota_data_struct_t));
 
         if (NULL == tempBuf)
         {
             ChipLogError(SoftwareUpdate, "%s [%d] malloc failed  ", __FUNCTION__, __LINE__);
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_NO_MEMORY);
+            return;
         }
         memset((char *) tempBuf, 0, sizeof(ota_data_struct_t));
         memcpy((char *) &(imageProcessor->pOtaTgtHdr), block.data(), sizeof(ota_data_struct_t));
