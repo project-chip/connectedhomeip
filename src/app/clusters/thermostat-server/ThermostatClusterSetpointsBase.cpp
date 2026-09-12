@@ -94,6 +94,24 @@ void ThermostatSetpointsBase::NotifyAttributesChanged(const SetpointAttributes &
     }
 }
 
+Status ThermostatSetpointsBase::ApplyOccupiedSetpoints(chip::Optional<temperature> heat, chip::Optional<temperature> cool)
+{
+    if (!heat.HasValue() && !cool.HasValue())
+    {
+        return Status::Success;
+    }
+
+    Setpoints setpoints = GetSetpoints();
+    SetpointAttributes changedAttributes;
+    DataModel::ActionReturnStatus status =
+        setpoints.ChangeRange(setpoints.occupiedRange, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
+    if (status.IsSuccess())
+    {
+        status = SaveSetpoints(setpoints, changedAttributes);
+    }
+    return status.GetStatusCode().GetStatus();
+}
+
 std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                     TLV::TLVReader & input_arguments,
                                                                                     CommandHandler * handler)
