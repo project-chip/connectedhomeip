@@ -61,7 +61,6 @@ extern "C" {
 extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
 #elif defined(CONFIG_BT_TLX)
 extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
-extern __attribute__((noinline)) void tlx_bt_802154_dual_mode_start(void);
 #elif defined(CONFIG_BT_W91)
 extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
 #endif
@@ -260,8 +259,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // Telink TLX: start a minimal BLE advertisement before dual-mode so Thread's tlx_start_radio() does not block.
     int adv_err = StartMinimalBLEAdvertisement();
     VerifyOrReturnError(adv_err == 0, MapErrorZephyr(adv_err));
-
-    tlx_bt_802154_dual_mode_start();
 #endif
 
     TEMPORARY_RETURN_IGNORED BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));

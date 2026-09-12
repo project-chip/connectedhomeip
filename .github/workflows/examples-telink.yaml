@@ -93,8 +93,9 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            # - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 1f4804a19fe7ba792bfc315948043d5515e74cd2"
+            - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
+              run: 
+                scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py https://github.com/telink-semi/tl_zephyr.git ec302e94cb2886f0c71515efbe7344b32449a9ff --sdk-repo https://github.com/telink-semi/tl_ble_sdk_zephyr.git --sdk-hash de6f125c8ae6d29c4a640ab3526b40ff8c3f0a20"
 
             - name: Download Factory Data tools
               uses: actions/download-artifact@v8
@@ -133,15 +134,15 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92) All Clusters Minimal App with NFC onboarding payload
+            - name: Build example Telink (B92) All Clusters Minimal App with NFC onboarding payload, 4Mb flash
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal-nfc-payload' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal-nfc-payload-4mb' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9528a all-clusters-minimal-app \
-                    out/telink-tlsr9528a-all-clusters-minimal-nfc-payload/zephyr/zephyr.elf \
+                    out/telink-tlsr9528a-all-clusters-minimal-nfc-payload-4mb/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -189,19 +190,12 @@ jobs:
 
             - name: Build example Telink (W91) Lighting App with OTA, Factory Data
               # Run test for master and all PRs
-              #
-              # TODO: full logging is not enabled here; logging is reduced to progress/error
-              #       (via the *-log-progress target) because with full logging this runs
-              #       out of flash. This is generally NOT expected/intentional.
-              #       At the time this was checked:
-              #         - a 4K flash increase occurred due to the group cast cluster
-              #         - flash runs out by about 1.2K
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-light-ota-factory-data-log-progress' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-light-ota-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9118bdk40d lighting-app-ota-factory-data \
-                    out/telink-tlsr9118bdk40d-light-ota-factory-data-log-progress/zephyr/zephyr.elf \
+                    out/telink-tlsr9118bdk40d-light-ota-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -220,8 +214,64 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl721x retention) Light Switch App with OTA (LZMA), Factory Data
+            - name: Build example Telink (tl323x) Lighting App with Factory Data, 4Mb flash
               # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl3238x-light-ota-factory-data-4mb' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl3238x light-app-ota-factory-data-4mb \
+                    out/telink-tl3238x-light-ota-factory-data-4mb/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl323x_retention) Light Switch App with OTA, Factory Data
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl3238x_retention-light-switch-ota-compress-lzma-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl3238x_retention light-switch-app-ota-compress-lzma-factory-data \
+                    out/telink-tl3238x_retention-light-switch-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl521x) Lighting App with Factory Data, 4Mb flash
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl5218x-light-ota-factory-data-4mb' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl5218x light-app-ota-factory-data-4mb \
+                    out/telink-tl5218x-light-ota-factory-data-4mb/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            # TODO: tl521x_retention light switch app can build but may not run normally, need further porting.
+            - name: Build example Telink (tl521x_retention) Light Switch App with OTA, Factory Data
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl5218x_retention-light-switch-ota-compress-lzma-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl5218x_retention light-switch-app-ota-compress-lzma-factory-data \
+                    out/telink-tl5218x_retention-light-switch-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl721x retention) Light Switch App with OTA (LZMA), Factory Data
+              # Run test for master and s07641069 PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data' build"
@@ -247,15 +297,15 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl721x) OTA Requestor App
+            - name: Build example Telink (tl323x) OTA Requestor App
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl7218x-ota-requestor' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl7218x ota-requestor-app \
-                    out/telink-tl7218x-ota-requestor/zephyr/zephyr.elf \
+                    telink tl3218x ota-requestor-app \
+                    out/telink-tl3218x-ota-requestor/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)

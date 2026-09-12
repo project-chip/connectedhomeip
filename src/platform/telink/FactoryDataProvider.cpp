@@ -27,6 +27,8 @@
 #include <assert.h>
 #include <zephyr/logging/log.h>
 
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+
 namespace chip {
 namespace {
 
@@ -98,12 +100,14 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to read factory data partition");
+        free(ptr); // Only free on failure
         return error;
     }
 
     if (!ParseFactoryData(factoryData, factoryDataSize, &mFactoryData))
     {
         ChipLogError(DeviceLayer, "Failed to parse factory data");
+        free(ptr); // Only free on failure
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
@@ -202,6 +206,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
     chip::Crypto::P256PublicKey dacPublicKey;
 
     error = chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey);
+
     free(P_DACCert);
     if (error != CHIP_NO_ERROR)
     {
@@ -220,6 +225,10 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
     }
 
     GetFactoryData(P_DACPrivKey, mFactoryData.dac_priv_key.data, mFactoryData.dac_priv_key.len);
+
+    // LOG_INF("[SignWithDeviceAttestationKey] DAC priv key len=%u", mFactoryData.dac_priv_key.len);
+    // LOG_HEXDUMP_INF(mFactoryData.dac_priv_key.data, mFactoryData.dac_priv_key.len, "mFactoryData.dac_priv_key.data");
+    // LOG_HEXDUMP_INF(P_DACPrivKey, mFactoryData.dac_priv_key.len, "DAC CERT - P_DACPrivKey");
 
     // Load keypair from raw.
     error = LoadKeypairFromRaw(ByteSpan(reinterpret_cast<uint8_t *>(P_DACPrivKey), mFactoryData.dac_priv_key.len),

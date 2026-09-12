@@ -30,6 +30,7 @@
 #if CONFIG_OPENTHREAD_SNTP_CLIENT
 #include "ThreadTimeSync.h"
 #endif
+#include <lib/support/ThreadOperationalDataset.h>
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/Zephyr/InetUtils.h>
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
@@ -99,6 +100,9 @@ bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
+#if defined CONFIG_IEEE802154_TLX_OPTIMIZATION
+bool isThreadCommissioned = false;
+#endif /* CONFIG_IEEE802154_TLX_OPTIMIZATION */
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -208,6 +212,34 @@ void AppTaskCommon::PowerOnFactoryReset(void)
 }
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+static void PowerOnNetworkCheck(void)
+{
+    Thread::OperationalDataset curDataset;
+    CHIP_ERROR err  = DeviceLayer::ThreadStackMgrImpl().GetThreadProvision(curDataset);
+    bool hasDataset = (err == CHIP_NO_ERROR); // Check if stored OpenThread dataset
+
+    uint8_t fabricNum = chip::Server::GetInstance().GetFabricTable().FabricCount();
+
+    if (!hasDataset && fabricNum == 0)
+    { // New device
+        return;
+    }
+    else if (hasDataset && fabricNum > 0)
+    { // Device successfully commissioned
+        return;
+    }
+    else if (hasDataset && fabricNum == 0)
+    {
+        ChipLogProgress(DeviceLayer, "Thread dataset exists, but matter uncommissioned\n");
+    }
+    else
+    {
+        return;
+    }
+}
+#endif
+
 CHIP_ERROR AppTaskCommon::StartApp(void)
 {
     CHIP_ERROR err = GetAppTask().Init();
@@ -266,6 +298,15 @@ void AppTaskCommon::PrintFirmwareInfo(void)
     LOG_DBG("\t branch: %s %.8s%s %s", ZEPHYR_BRANCH, ZEPHYR_COMMIT_HASH, ZEPHYR_LOCAL_STATUS, ZEPHYR_COMMIT_DATE);
     LOG_DBG("\t remote: %s", ZEPHYR_REMOTE_URL);
     LOG_DBG("\t HAL commit: %.8s%s %s", TELINK_HAL_COMMIT_HASH, TELINK_HAL_LOCAL_STATUS, TELINK_HAL_COMMIT_DATE);
+
+    LOG_DBG("OpenThread revision: ");
+    LOG_DBG("\t path: %s", OPENTHREAD_PATH);
+    LOG_DBG("\t remote: %s", OT_REMOTE_URL);
+    if (strlen(OT_TAG) > 0)
+    {
+        LOG_DBG("\t tag: %s", OT_TAG);
+    }
+    LOG_DBG("\t branch: %s %.8s%s %s", OT_BRANCH, OT_COMMIT_HASH, OT_LOCAL_STATUS, OT_COMMIT_DATE);
 #endif
 }
 
@@ -370,6 +411,11 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // between the main and the CHIP threads.
     LogErrorOnFailure(PlatformMgr().AddEventHandler(ChipEventHandler, 0));
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    // TODO: Defer this validation until chip::Server is fully initialized to avoid crashes
+    PowerOnNetworkCheck();
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -431,7 +477,7 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
         break;
 #endif
     case kButtonId_StartBleAdv:
-        StartBleAdvButtonEventHandler();
+        ToggleBleAdvButtonEventHandler();
         break;
     }
 }
@@ -504,7 +550,7 @@ void AppTaskCommon::LinkButtons(ButtonManager & buttonManager)
 #if CONFIG_TELINK_OTA_BUTTON_TEST
     buttonManager.addCallback(TestOTAButtonEventHandler, 2, true);
 #else
-    buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
+    buttonManager.addCallback(ToggleBleAdvButtonEventHandler, 2, true);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     buttonManager.addCallback(StartThreadButtonEventHandler, 3, true);
@@ -567,20 +613,21 @@ void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEn
     }
 }
 
-void AppTaskCommon::StartBleAdvButtonEventHandler(void)
+void AppTaskCommon::ToggleBleAdvButtonEventHandler(void)
 {
     AppEvent event;
 
     event.Type               = AppEvent::kEventType_Button;
     event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = StartBleAdvHandler;
+    event.Handler            = ToggleBleAdvHandler;
     GetAppTask().PostEvent(&event);
 }
 
-void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
+void AppTaskCommon::ToggleBleAdvHandler(AppEvent * aEvent)
 {
-    LOG_INF("StartBleAdvHandler");
+    LOG_INF("ToggleBleAdvHandler");
 
+    // Disable manual Matter service BLE advertising after device provisioning.
     if (sIsNetworkProvisioned)
     {
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -780,6 +827,36 @@ void AppTaskCommon::TriggerMicroSpeechEventHandler(AppEvent * aEvent)
 }
 #endif
 
+void AppTaskCommon::OtaEventsHandler(const ChipDeviceEvent * event)
+{
+    switch (event->OtaStateChanged.newState)
+    {
+    case DeviceLayer::kOtaDownloadInProgress:
+        ChipLogProgress(DeviceLayer, "OTA image download in progress\n");
+        break;
+    case DeviceLayer::kOtaDownloadComplete:
+        ChipLogProgress(DeviceLayer, "OTA image download complete\n");
+        break;
+    case DeviceLayer::kOtaDownloadFailed:
+        ChipLogProgress(DeviceLayer, "OTA image download failed\n");
+        break;
+    case DeviceLayer::kOtaDownloadAborted:
+        ChipLogProgress(DeviceLayer, "OTA image download aborted\n");
+        break;
+    case DeviceLayer::kOtaApplyInProgress:
+        ChipLogProgress(DeviceLayer, "OTA image apply in progress\n");
+        break;
+    case DeviceLayer::kOtaApplyComplete:
+        ChipLogProgress(DeviceLayer, "OTA image apply complete\n");
+        break;
+    case DeviceLayer::kOtaApplyFailed:
+        ChipLogProgress(DeviceLayer, "OTA image apply failed\n");
+        break;
+    default:
+        break;
+    }
+}
+
 void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
     switch (event->Type)
@@ -905,6 +982,14 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             }
         }
 #endif
+#if defined CONFIG_IEEE802154_TLX_OPTIMIZATION
+
+        if (sIsNetworkAttached && curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED)
+        {
+            if (isThreadCommissioned == false)
+                isThreadCommissioned = true;
+        }
+#endif /* CONFIG_IEEE802154_TLX_OPTIMIZATION */
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
@@ -929,6 +1014,9 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
 #endif
+        break;
+    case DeviceEventType::kOtaStateChanged:
+        AppTaskCommon::OtaEventsHandler(event);
         break;
     default:
         break;

@@ -100,7 +100,8 @@ else()
   unset(USB_CONF_OVERLAY_FILE)
 endif()
 
-if(${CONFIG_COMPRESS_LZMA} MATCHES y)
+# Check if there is any lzma conf file in CONF_FILE，or check CONFIG_COMPRESS_LZMA
+if(("${CONF_FILE}" MATCHES "lzma") OR (${CONFIG_COMPRESS_LZMA} MATCHES y))
   set(BOOT_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader_compress_lzma.conf")
   set(FLASH_LAYOUT_SUFFIX "_lzma")
 else()
@@ -128,6 +129,12 @@ if(NOT EXISTS "${LOCAL_DTC_OVERLAY_FILE}")
   unset(LOCAL_DTC_OVERLAY_FILE)
 endif()
 
+set(LOCAL_BOARD_CONF_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf")
+if(NOT EXISTS "${LOCAL_BOARD_CONF_FILE}")
+  message(STATUS "${LOCAL_BOARD_CONF_FILE} doesn't exist")
+  unset(LOCAL_BOARD_CONF_FILE)
+endif()
+
 set(GLOBAL_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}.overlay")
 if(NOT EXISTS "${GLOBAL_BOOT_DTC_OVERLAY_FILE}")
   message(STATUS "${GLOBAL_BOOT_DTC_OVERLAY_FILE} doesn't exist")
@@ -140,6 +147,15 @@ if(NOT EXISTS "${GLOBAL_DTC_OVERLAY_FILE}")
   unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
+# Special check for tl3238x and tl7218x: 2MB flash with OTA requires LZMA compression
+if(${BASE_BOARD} MATCHES "tl3238x" OR ${BASE_BOARD} MATCHES "tl5218x" OR ${BASE_BOARD} MATCHES "tl7218x")
+  if("${CONF_FILE}" MATCHES "_ota" AND "${FLASH_SIZE}" STREQUAL "2m" AND "${FLASH_LAYOUT_SUFFIX}" STREQUAL "")
+    # For 2MB flash with OTA, LZMA compression is required because firmware size may exceed 916KB (0xe5000)
+    message(WARNING "${BASE_BOARD} with 2MB flash and OTA requires LZMA compression. Please use a config with 'lzma' suffix and set CONFIG_COMPRESS_LZMA=y. Continuing compilation anyway...")
+  endif()
+endif()
+
+# Always use overlay with FLASH_LAYOUT_SUFFIX, for all boards and configurations
 set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_${FLASH_SIZE}_flash${FLASH_LAYOUT_SUFFIX}.overlay")
 if(NOT EXISTS "${FLASH_DTC_OVERLAY_FILE}")
   message(STATUS "${FLASH_DTC_OVERLAY_FILE} doesn't exist")
@@ -156,7 +172,7 @@ else()
 endif()
 
 if(NOT CONF_FILE)
-  set(CONF_FILE ${USB_CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} prj.conf ${TFLM_CONF_OVERLAY_FILE} ${ML_CONF_OVERLAY_FILE})
+  set(CONF_FILE ${USB_CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} ${ZEPHYR_VERSION_OVERLAY_FILE} prj.conf ${TFLM_CONF_OVERLAY_FILE} ${ML_CONF_OVERLAY_FILE} ${LOCAL_BOARD_CONF_FILE})
 endif()
 
 # Load NCS/Zephyr build system

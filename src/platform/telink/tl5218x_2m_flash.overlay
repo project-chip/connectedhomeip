@@ -1,0 +1,60 @@
+&flash {
+	reg = <0x20000000 0x200000>;
+
+	/delete-node/ partitions;
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+// reserve 20k for software bootloader , 64k for mcuboot,need to disable log for mcuboot；		
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x15000>; 
+		};
+		slot0_partition: partition@15000 {
+			label = "image-0";
+			reg = <0x15000 0xe7000>; // total slot0 is 924k
+		};
+// Image size (0xe3653) + trailer (0x3030), so modify slot1 size to 924k.
+		slot1_partition: partition@fc000 {
+			label = "image-1";
+			reg = <0xfc000 0xe7000>; // total slot1 is 924k
+		};
+		user_rfu_partition: partition@1e3000 {
+ 			label = "user_rfu";
+			reg = <0x1e3000 0x1000>; // from 16k to 4k
+ 		};
+        storage_partition: partition@1e4000 {
+			label = "matter-nvs";
+			reg = <0x1e4000 0x8000>; // matter nvs part , total is 32k.
+		};
+        zigbee_nvs_partition: partition@1ec000 {
+			label = "zigbee-nvs";
+			reg = <0x1ec000 0xc000>; // zigbee nvs part , total is 48k.
+		};
+		secure_partition: partition@1f8000 {
+ 			label = "secure";
+			reg = <0x1f8000 0x1000>; // secure info ,reserved for secure boot .if not use , can beused by other way .
+ 		};
+		user_config_partition: partition@1f9000 {
+ 			label = "user_config";
+			reg = <0x1f9000 0x1000>; // user_config ,for the secure-boot sign logic changes ,it can release for user .
+ 		};
+		dual_mode_partition: partition@1fa000 {
+ 			label = "dual-mode";
+			reg = <0x1fa000 0x2000>; // user:store the mode info and the key info part.same as public area for dual mode
+ 		};
+		dac_keypair_partition: partition@1fc000 {
+			label = "dac-keypair";
+			reg = <0x1fc000 0x1000>; // store dac and key pair.
+		};
+		factory_partition: partition@1fd000 {
+			label = "factory-data";
+			reg = <0x1fd000 0x1000>; // factory data info 
+		};
+		vendor_partition: partition@1fe000 {
+			label = "vendor-data";
+			reg = <0x1fe000 0x2000>; // mac and rf info.
+		};
+	};
+};

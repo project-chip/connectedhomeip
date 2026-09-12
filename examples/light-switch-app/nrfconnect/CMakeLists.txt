@@ -58,11 +58,6 @@ if(CONFIG_CHIP_OTA_REQUESTOR OR CONFIG_MCUMGR_TRANSPORT_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
 endif()
 
-if(CONFIG_MCUMGR_TRANSPORT_BT)
-    zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
-    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
-endif()
-
 chip_configure_data_model(app
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../light-switch-common/light-switch-app.zap
 )

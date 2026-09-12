@@ -63,11 +63,6 @@ if(CONFIG_CHIP_OTA_REQUESTOR OR CONFIG_MCUMGR_TRANSPORT_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
 endif()
 
-if(CONFIG_MCUMGR_TRANSPORT_BT)
-    zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
-    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
-endif()
-
 if (CONFIG_SHELL AND BOARD STREQUAL "nrf52840dongle_nrf52840")
   target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)
 endif()
