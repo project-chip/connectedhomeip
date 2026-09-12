@@ -197,5 +197,67 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(SessionKeystore & keystore,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin)
+{
+    psa_status_t status                      = PSA_SUCCESS;
+    psa_key_attributes_t attributes          = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_id_t passwordKey                 = PSA_KEY_ID_NULL;
+    psa_key_derivation_operation_t operation = PSA_KEY_DERIVATION_OPERATION_INIT;
+    psa_key_id_t spakeKey                    = PSA_KEY_ID_NULL;
+    uint8_t verifier[kP256_FE_Length + kP256_Point_Length];
+    size_t verifierLen;
+
+    // Prepare password key
+    uint8_t password[sizeof(uint32_t)];
+    Encoding::LittleEndian::Put32(password, setupPin);
+
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
+    psa_set_key_algorithm(&attributes, PSA_ALG_PBKDF2_HMAC(PSA_ALG_SHA_256));
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_PASSWORD);
+
+    status = psa_import_key(&attributes, password, sizeof(password), &passwordKey);
+    psa_reset_key_attributes(&attributes);
+    VerifyOrExit(status == PSA_SUCCESS, );
+
+    // Run PBKDF
+    status = psa_key_derivation_setup(&operation, PSA_ALG_PBKDF2_HMAC(PSA_ALG_SHA_256));
+    VerifyOrExit(status == PSA_SUCCESS, );
+
+    status = psa_key_derivation_input_integer(&operation, PSA_KEY_DERIVATION_INPUT_COST, pbkdf2IterCount);
+    VerifyOrExit(status == PSA_SUCCESS, );
+
+    status = psa_key_derivation_input_bytes(&operation, PSA_KEY_DERIVATION_INPUT_SALT, salt.data(), salt.size());
+    VerifyOrExit(status == PSA_SUCCESS, );
+
+    status = psa_key_derivation_input_key(&operation, PSA_KEY_DERIVATION_INPUT_PASSWORD, passwordKey);
+    VerifyOrExit(status == PSA_SUCCESS, );
+
+    attributes = psa_key_attributes_init();
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE | PSA_KEY_USAGE_EXPORT);
+    psa_set_key_algorithm(&attributes, PSA_ALG_SPAKE2P_MATTER);
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_SPAKE2P_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&attributes, kP256_FE_Length * 8);
+
+    status = psa_key_derivation_output_key(&attributes, &operation, &spakeKey);
+    psa_reset_key_attributes(&attributes);
+    VerifyOrExit(status == PSA_SUCCESS, );
+
+    // Export verifier as raw bytes
+    status = psa_export_public_key(spakeKey, verifier, sizeof(verifier), &verifierLen);
+
+exit:
+    psa_key_derivation_abort(&operation);
+    psa_destroy_key(passwordKey);
+    psa_destroy_key(spakeKey);
+
+    if (status != PSA_SUCCESS)
+    {
+        ChipLogError(Crypto, "PSA error: %d", static_cast<int>(status));
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return Deserialize(ByteSpan(verifier, verifierLen));
+}
+
 } // namespace Crypto
 } // namespace chip
