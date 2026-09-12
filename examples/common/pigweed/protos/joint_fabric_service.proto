@@ -40,6 +40,11 @@ message Response {
   bytes response_bytes = 2;
 }
 
+message GetCatVersionsResponse {
+  optional uint32 admin_cat_version = 1;
+  optional uint32 anchor_cat_version = 2;
+}
+
 service JointFabric {
   /* JFC executes the commissioner role and JFA the administrator steps */
   rpc TransferOwnership(OwnershipContext) returns (pw.protobuf.Empty) {}
@@ -49,4 +54,7 @@ service JointFabric {
 
   // JFA uses the above GetStream stream for 
   rpc ResponseStream(Response) returns (pw.protobuf.Empty);
+
+  // JFC requests Administrator/Anchor CAT versions from JFA JF Datastore GroupList.
+  rpc GetCatVersions(pw.protobuf.Empty) returns (GetCatVersionsResponse);
 }
