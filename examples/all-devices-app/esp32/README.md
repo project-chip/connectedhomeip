@@ -11,6 +11,38 @@ This application supports **WiFi-based ESP32 SoCs only**
 
 > **Note:** Thread devices are not supported by this example.
 
+### M5Stack LCD UI
+
+On M5Stack boards, this example also drives an on-device LCD/touch UI (QR code
+display, status screen, device-type selection, factory reset) instead of relying
+solely on the CLI. Two boards are supported today:
+
+| Board                | Build target                      | Input                                                                                         |
+| -------------------- | --------------------------------- | --------------------------------------------------------------------------------------------- |
+| M5Stack Basic / Gray | `esp32-m5stack-all-devices`       | 3 physical GPIO buttons                                                                       |
+| M5Stack Core2        | `esp32-m5stack-core2-all-devices` | 3 virtual buttons along the bottom of the touchscreen (capacitive touch, no physical buttons) |
+
+The Core2 differs from the Basic/Gray in ways that go beyond a pin remap: its
+LCD backlight/logic rails and RESET line are switched by the onboard AXP192 PMIC
+over I2C (see `examples/common/screen-framework/AXP192.{h,cpp}` and
+`Core2Power.{h,cpp}`), and its touch controller
+(`examples/all-devices-app/esp32/main/display/CapacitiveTouchButtons.{h,cpp}`)
+is FT6336U-family capacitive touch rather than GPIO buttons. Both were validated
+by flashing real M5Stack Core2 hardware.
+
+Known follow-ups for anyone building on this:
+
+-   `sdkconfig_m5stack_core2.defaults` conservatively targets a 4MB flash size
+    (matching the Basic/Gray defaults) even though most Core2 units ship with
+    16MB flash and 8MB PSRAM; bump `CONFIG_ESPTOOLPY_FLASHSIZE_*` via
+    `idf.py menuconfig` if you need the extra space.
+-   The panel's MADCTL orientation byte
+    (`examples/common/screen-framework/Display.cpp`) was determined empirically
+    against one unit, since none of the vendored TFT library's 4 named rotation
+    presets (which all set MV and/or MX/MY) render it right-side up -- the
+    Core2's panel needs none of those bits, only the BGR color-order bit. If
+    text renders reflected or rotated on your unit, that's the value to adjust.
+
 ## Building the Example
 
 Please
