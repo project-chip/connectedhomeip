@@ -27,7 +27,7 @@ import subprocess
 import sys
 import threading
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from xml.dom.minidom import parseString
 from xml.etree.ElementTree import Element, SubElement, tostring
@@ -48,12 +48,31 @@ class TestResult:
 
 
 @dataclass
+class JUnitConfig:
+    file_path: Path
+    suite_name: str = "execute_python_tests script"
+
+    @classmethod
+    def from_args(cls, file_path: Path | None, suite_name: str | None) -> 'JUnitConfig | None':
+        if file_path is None:
+            return None
+        if suite_name is None:
+            return cls(file_path=file_path)
+        return cls(file_path=file_path, suite_name=suite_name)
+
+
 class RunSummary:
-    run_timestamp: datetime.datetime
-    total_runs: int = 0
-    passed: int = 0
-    failed: int = 0
-    results: list[TestResult] = field(default_factory=list)
+
+    def __init__(self, run_timestamp: datetime.datetime, summary_file: Path | None = None, junit_config: JUnitConfig | None = None, keep_going: bool = False):
+        self.run_timestamp = run_timestamp
+        self.summary_file = summary_file
+        self.junit_config = junit_config
+        self.keep_going = keep_going
+        self.total_runs: int = 0
+        self.passed: int = 0
+        self.failed: int = 0
+        self.results: list[TestResult] = []
+        self.failed_scripts: list[str] = []
 
     def record(self, name: str, status: str, duration: float, error_message: str | None = None) -> None:
         self.results.append(TestResult(name=name, status=status, duration_seconds=round(duration, 3), error_message=error_message))
@@ -63,8 +82,13 @@ class RunSummary:
             self.failed += 1
 
     def write_json(self, path: Path) -> None:
-        data = asdict(self)
-        data["run_timestamp"] = self.run_timestamp.isoformat()
+        data = {
+            "run_timestamp": self.run_timestamp.isoformat(),
+            "total_runs": self.total_runs,
+            "passed": self.passed,
+            "failed": self.failed,
+            "results": [asdict(r) for r in self.results]
+        }
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(data, indent=2))
         log.info("Test run summary written to %s", path)
@@ -102,6 +126,61 @@ class RunSummary:
         xml_str = parseString(tostring(suite, encoding="unicode")).toprettyxml(indent="  ")
         path.write_text(xml_str)
         log.info("JUnit XML written to %s", path)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.total_runs = len(self.results)
+        if self.summary_file is not None:
+            self.write_json(self.summary_file)
+        if self.junit_config is not None:
+            self.write_junit_xml(self.junit_config.suite_name, self.junit_config.file_path)
+        return False
+
+    def executed_test(self, script_path: str) -> 'ExecutedTest':
+        """Returns a context manager to track and record a single test execution."""
+        return ExecutedTest(self, script_path)
+
+
+class ExecutedTest:
+    """
+    A context manager that tracks the execution of a single test.
+
+    It measures the duration and records the result to the associated RunSummary.
+    If an exception occurs within the block, it is recorded as a failure.
+    """
+
+    def __init__(self, summary: RunSummary, script_path: str):
+        self.summary = summary
+        self.script_path = script_path
+        self.name = os.path.basename(script_path)
+        self.status = "failed"
+        self.error_message = None
+        self.start_time = None
+
+    def __enter__(self):
+        self.start_time = time.monotonic()
+        return self
+
+    def mark(self, status: str, error_message: str | None = None):
+        """Marks the test status. If not called, default status is 'failed'."""
+        self.status = status
+        self.error_message = error_message
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        duration = time.monotonic() - self.start_time
+        if exc_type is not None:
+            self.status = "failed"
+            self.error_message = str(exc_val)
+
+        if self.status == "failed":
+            self.summary.failed_scripts.append(self.script_path)
+
+        self.summary.record(self.name, self.status, duration, self.error_message)
+        if exc_type is not None and issubclass(exc_type, Exception):
+            return self.summary.keep_going
+        return False
 
 
 def load_env_from_yaml(file_path):
@@ -235,6 +314,15 @@ class VMFreezeWatchdog(threading.Thread):
         """Stops the watchdog thread."""
         self._stop_event.set()
 
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+        self.join()
+        return False
+
 
 @click.group()
 def main():
@@ -344,44 +432,29 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         log.error("No tests to execute")
         sys.exit(1)
 
-    run_summary = RunSummary(run_timestamp=datetime.datetime.now(datetime.UTC))
-
-    watchdog = VMFreezeWatchdog()
-    watchdog.start()
-
-    failed_scripts = []
-    try:
+    with RunSummary(
+        run_timestamp=datetime.datetime.now(datetime.UTC),
+        summary_file=summary_file,
+        junit_config=JUnitConfig.from_args(junit_file, junit_suite_name),
+        keep_going=keep_going
+    ) as run_summary, VMFreezeWatchdog() as watchdog:
         for script in python_files:
-            test_start = time.monotonic()
-            try:
+            with run_summary.executed_test(script) as test:
                 full_command = f"{base_command} --load-from-env {env_file} --script {script}"
                 if dry_run:
                     print(f"DRY-RUN(skip): {full_command}", flush=True)
-                    run_summary.record(os.path.basename(script), "dry_run", time.monotonic() - test_start)
+                    test.mark("dry_run")
                 else:
                     def run_test():
                         print(f"Running command: {full_command}", flush=True)
                         subprocess.run(full_command, shell=True, check=True)
 
                     watchdog.execute_with_retry(run_test)
-                    run_summary.record(os.path.basename(script), "passed", time.monotonic() - test_start)
-            except Exception as e:
-                run_summary.record(os.path.basename(script), "failed", time.monotonic() - test_start, error_message=str(e))
-                if keep_going:
-                    failed_scripts.append(script)
-                else:
-                    raise
-    finally:
-        watchdog.stop()
-        run_summary.total_runs = len(run_summary.results)
-        if summary_file is not None:
-            run_summary.write_json(summary_file)
-        if junit_file is not None:
-            run_summary.write_junit_xml(junit_suite_name, junit_file)
+                    test.mark("passed")
 
-    if failed_scripts:
+    if run_summary.failed_scripts:
         log.error("FAILURES detected:")
-        for s in failed_scripts:
+        for s in run_summary.failed_scripts:
             log.error("   - %s", s)
         sys.exit(1)
 
