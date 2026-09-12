@@ -29,7 +29,6 @@
 #       --passcode 20202021
 #       --endpoint 1
 #       --app-pipe /tmp/acs_fifo
-#       --bool-arg simulate_ambientsensing:true
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
