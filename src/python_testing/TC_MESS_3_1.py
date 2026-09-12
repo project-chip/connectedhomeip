@@ -75,7 +75,8 @@ class TC_MESS_3_1(MatterBaseTest, MESSTestBase):
                      "supportedLangCode."),
             TestStep(2, "TH sends a PresentMessagesRequest command to the DUT with MessageID="
                      "AABBCCDDEEFF00112233445566778899, Priority=Low (0), MessageControl with the SpokenMessage bit "
-                     "(bit 5) set, MessageText='Hello from Matter' and LanguageCode=supportedLangCode.",
+                     "(bit 5) set, StartTime=null, Duration=2000 (2 seconds), MessageText='Hello from Matter' and "
+                     "LanguageCode=supportedLangCode.",
                      "Verify that a successful (status 0) response is received."),
             TestStep(3, "TH waits for the DUT to queue the message.",
                      "Verify that a MessageQueued event is generated with MessageID="
@@ -88,8 +89,8 @@ class TC_MESS_3_1(MatterBaseTest, MESSTestBase):
                      "AABBCCDDEEFF00112233445566778899."),
             TestStep(6, "TH sends a PresentMessagesRequest command to the DUT with MessageID="
                      "BBCCDDEE0011223344556677889900AA, Priority=Low (0), MessageControl with the SpokenMessage bit "
-                     "(bit 5) set, MessageText='Hello from Matter' and LanguageCode set to an unsupported language "
-                     "tag (xx-XX).",
+                     "(bit 5) set, StartTime=null, Duration=2000 (2 seconds), MessageText='Hello from Matter' and "
+                     "LanguageCode set to an unsupported language tag (xx-XX).",
                      "Verify that a successful (status 0) response is received and the DUT presents the message "
                      "using its default locale or a best-match language. Verify that MessagePresented and "
                      "MessageComplete events are generated."),
