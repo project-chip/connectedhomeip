@@ -202,11 +202,9 @@ class TC_ICDB_3_1(ICDBaseTest):
         # *** STEP 4a ***
         # Apply vendor specific mechanism to transition DUT to from LIT operating mode to SIT operating mode
         self.step("4a")
-        if self.is_pics_sdk_ci_only:
-            await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kDSLSForceSitMode)
-        else:
-            self.wait_for_user_input(
-                prompt_msg="Apply the vendor-specific mechanism on the DUT to transition it from LIT to SIT operating mode, then press Enter.")
+        await self.apply_vendor_dsls_transition(
+            event_trigger=ICDTestEventTriggerOperations.kDSLSForceSitMode,
+            prompt_msg="Apply the vendor-specific mechanism on the DUT to transition it from LIT to SIT operating mode, then press Enter.")
 
         # *** STEP 4b ***
         # TH reads from the DUT the OperatingMode attribute
@@ -229,11 +227,9 @@ class TC_ICDB_3_1(ICDBaseTest):
         # *** STEP 5a ***
         # Apply vendor specific mechanism to transition DUT to from SIT operating mode to LIT operating mode
         self.step("5a")
-        if self.is_pics_sdk_ci_only:
-            await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kDSLSWithdrawSitMode)
-        else:
-            self.wait_for_user_input(
-                prompt_msg="Apply the vendor-specific mechanism on the DUT to transition it from SIT to LIT operating mode, then press Enter.")
+        await self.apply_vendor_dsls_transition(
+            event_trigger=ICDTestEventTriggerOperations.kDSLSWithdrawSitMode,
+            prompt_msg="Apply the vendor-specific mechanism on the DUT to transition it from SIT to LIT operating mode, then press Enter.")
 
         # *** STEP 5b ***
         # TH reads from the DUT the OperatingMode attribute
