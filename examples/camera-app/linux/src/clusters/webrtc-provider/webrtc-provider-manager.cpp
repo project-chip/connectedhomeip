@@ -238,7 +238,8 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
             },
-            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); },
+            [](bool gatheringComplete, const uint16_t sessionId) {});
     }
 
     transport->SetRequestArgs(requestArgs);
@@ -464,7 +465,17 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
             },
-            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); },
+            [this](bool gatheringComplete, const uint16_t sessionId) {
+                if (gatheringComplete)
+                {
+                    if (WebrtcTransport * transport = this->GetTransport(sessionId))
+                    {
+                        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+                        this->ScheduleICECandidatesSend(sessionId);
+                    }
+                }
+            });
     }
 
     // Check resource availability before proceeding
