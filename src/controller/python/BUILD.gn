@@ -492,6 +492,22 @@ pw_python_distribution("matter-repl") {
   extra_files = [ "//LICENSE > matter/LICENSE" ]
 }
 
+if (chip_support_commissioning_in_controller) {
+  pw_python_package("matter-controller-tests") {
+    generate_setup = {
+      metadata = {
+        name = "matter-controller-tests"
+        version = chip_python_version
+      }
+    }
+    tests = [ "tests/test_commissioning_flow_blocks.py" ]
+    python_deps = [
+      ":matter-clusters-module",
+      ":matter-core-module",
+    ]
+  }
+}
+
 # Python wheels collection for core Matter controller packages
 pw_python_wheels("matter-controller-wheels") {
   packages = [

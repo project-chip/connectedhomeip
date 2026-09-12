@@ -23,6 +23,8 @@
 #include <controller/python/matter/native/PyChipError.h>
 
 extern "C" {
+uint32_t pychip_GetMaxCertificateChainDocumentSize();
+uint32_t pychip_GetCertificateChainDocumentSizeForProfiles(uint8_t subjectProfile, uint8_t issuerProfile);
 PyChipError pychip_ConvertX509CertToChipCert(const uint8_t * x509Cert, size_t x509CertLen, uint8_t * chipCert,
                                              size_t * chipCertLen);
 PyChipError pychip_ConvertChipCertToX509Cert(const uint8_t * chipCert, size_t chipCertLen, uint8_t * x509Cert,

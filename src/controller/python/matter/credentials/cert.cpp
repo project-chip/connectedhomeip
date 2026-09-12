@@ -18,11 +18,24 @@
 
 #include "cert.h"
 
+#include <controller/CertificateChainRequestTracker.h>
 #include <credentials/CHIPCert.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::Credentials;
+
+uint32_t pychip_GetMaxCertificateChainDocumentSize()
+{
+    return Controller::CertificateChainRequestTracker::kMaxCertificateDocumentSize;
+}
+
+uint32_t pychip_GetCertificateChainDocumentSizeForProfiles(uint8_t subjectProfile, uint8_t issuerProfile)
+{
+    using Tracker = Controller::CertificateChainRequestTracker;
+    return Tracker::MaxCertificateDocumentSize(static_cast<Tracker::CryptoProfile>(subjectProfile),
+                                               static_cast<Tracker::CryptoProfile>(issuerProfile));
+}
 
 PyChipError pychip_ConvertX509CertToChipCert(const uint8_t * x509Cert, size_t x509CertLen, uint8_t * chipCert, size_t * chipCertLen)
 {
