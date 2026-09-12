@@ -88,6 +88,7 @@ ASR
 AssertionError
 AST
 ASYNC
+asyncio
 AsyncZeroconfServiceTypes
 ATL
 ATLs
@@ -285,6 +286,7 @@ CodeGenerator
 CodeLab
 codelabs
 ColorControl
+colspan
 Combinators
 Comcast
 CommandHandlerInterface
@@ -405,6 +407,7 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+denylist
 dep
 Depacketization
 deployable
@@ -1337,6 +1340,7 @@ Robolectric
 rodata
 Rollershade
 rootfs
+rowspan
 RPC
 RPCs
 RPi
