@@ -76,6 +76,7 @@ NSString * const MTRErrorKey = @"error";
 NSString * const MTRTypeKey = @"type";
 NSString * const MTRValueKey = @"value";
 NSString * const MTRContextTagKey = @"contextTag";
+NSString * const MTRLocalReceiptTimeKey = @"localReceiptTime";
 NSString * const MTRSignedIntegerValueType = @"SignedInteger";
 NSString * const MTRUnsignedIntegerValueType = @"UnsignedInteger";
 NSString * const MTRBooleanValueType = @"Boolean";
@@ -1119,17 +1120,26 @@ private:
             auto resultArray = [[NSMutableArray alloc] init];
             auto onAttributeSuccessCb
                 = [resultArray, includeDataVersion](const ConcreteDataAttributePath & aAttributePath, const MTRDataValueDictionaryDecodableType & aData) {
+                      // Capture the receipt time here, as close to the wire as we can get: this runs
+                      // synchronously as the ReadClient decodes the incoming report, before the
+                      // results are handed back to the caller's queue.  Stamping here is what gives
+                      // the key its meaning: a value that carries one arrived from the device at that
+                      // instant, as opposed to coming from a cache or being synthesized locally.
+                      NSDate * localReceiptTime = [NSDate now];
+
                       // TODO: move this logic into MTRDataValueDictionaryDecodableType
                       if (includeDataVersion && aAttributePath.mDataVersion.HasValue()) {
                           NSDictionary * dataValue = aData.GetDecodedObject();
                           [resultArray addObject:@{
                               MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:aAttributePath],
-                              MTRDataKey : _MakeDataValueDictionary(dataValue[MTRTypeKey], dataValue[MTRValueKey], @(aAttributePath.mDataVersion.Value()))
+                              MTRDataKey : _MakeDataValueDictionary(dataValue[MTRTypeKey], dataValue[MTRValueKey], @(aAttributePath.mDataVersion.Value())),
+                              MTRLocalReceiptTimeKey : localReceiptTime,
                           }];
                       } else {
                           [resultArray addObject:@ {
                               MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:aAttributePath],
-                              MTRDataKey : aData.GetDecodedObject()
+                              MTRDataKey : aData.GetDecodedObject(),
+                              MTRLocalReceiptTimeKey : localReceiptTime,
                           }];
                       }
                   };
@@ -3197,6 +3207,17 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
     }
     MTRAttributePath * path = responseValue[MTRAttributePathKey];
 
+    // Optional: present only when this value came from the device.  Assigned before the
+    // branches below so that it survives on every path that returns a report, whether the
+    // report ends up carrying data or an error.
+    if (responseValue[MTRLocalReceiptTimeKey] != nil) {
+        if (!CheckMemberOfType(responseValue, MTRLocalReceiptTimeKey, [NSDate class],
+                @"response-value local receipt time is not an NSDate.", error)) {
+            return nil;
+        }
+        _localReceiptTime = responseValue[MTRLocalReceiptTimeKey];
+    }
+
     id _Nullable value = responseValue[MTRErrorKey];
     if (value != nil) {
         if (!CheckMemberOfType(responseValue, MTRErrorKey, [NSError class], @"response-value error is not an NSError.", error)) {
@@ -3256,7 +3277,11 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    return [[MTRAttributeReport alloc] initWithPath:[self.path _asConcretePath] value:self.value error:self.error];
+    auto * copy = [[MTRAttributeReport alloc] initWithPath:[self.path _asConcretePath] value:self.value error:self.error];
+    // initWithPath:value:error: has no receipt time to work from, so carry it over
+    // explicitly; otherwise copying would silently drop the age of the value.
+    copy->_localReceiptTime = self.localReceiptTime;
+    return copy;
 }
 
 @end

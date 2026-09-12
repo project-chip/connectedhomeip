@@ -6399,6 +6399,276 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertGreaterThan(values.count, 100);
 }
 
+- (void)test051_LocalReceiptTimeOnAttributeReports
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    // Collect everything reported during subscription priming, so we can check the
+    // receipt times against a window we control on both ends.
+    __auto_type * reportedValues = [NSMutableArray array];
+    __auto_type * lock = [[NSObject alloc] init];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        @synchronized(lock) {
+            [reportedValues addObjectsFromArray:data];
+        }
+    };
+
+    NSDate * beforeSubscription = [NSDate now];
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+    NSDate * afterReports = [NSDate now];
+
+    NSArray<NSDictionary<NSString *, id> *> * values;
+    @synchronized(lock) {
+        values = [reportedValues copy];
+    }
+
+    // Priming a subscription to all-clusters-app reports a lot of attributes; if we got
+    // nothing, the per-value assertions below would vacuously pass.
+    XCTAssertGreaterThan(values.count, 100);
+
+    for (NSDictionary<NSString *, id> * value in values) {
+        // This data came from a report the device sent us, so we should know when it arrived.
+        NSDate * receiptTime = value[MTRLocalReceiptTimeKey];
+        XCTAssertNotNil(receiptTime, "No receipt time for reported value %@", value);
+        XCTAssertTrue([receiptTime isKindOfClass:[NSDate class]], "Receipt time is not an NSDate: %@", receiptTime);
+
+        // The report cannot have arrived before we asked for it, nor after we stopped
+        // waiting for it.
+        XCTAssertEqual([receiptTime compare:beforeSubscription], NSOrderedDescending,
+            "Receipt time %@ predates subscription setup at %@", receiptTime, beforeSubscription);
+        XCTAssertEqual([receiptTime compare:afterReports], NSOrderedAscending,
+            "Receipt time %@ postdates last report at %@", receiptTime, afterReports);
+    }
+}
+
+- (void)test051b_NoLocalReceiptTimeForValuesNotReceivedFromDevice
+{
+    // Values that did not arrive in a report from the device must not claim a receipt
+    // time, since we do not know how old they are.  This pins the receipt time to the
+    // point where a report is actually received off the wire; stamping it later (when a
+    // report is handled, or when it is handed to delegates) would wrongly attach a time
+    // to values like these.
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Use a node we never commission, with subscription setup skipped, so this device has
+    // an empty cache and never talks to an accessory: anything we inject counts as a
+    // change and so gets reported, and we do not disturb the shared device's cache.
+    __auto_type * device = [MTRDevice deviceWithNodeID:0x12344399 deviceController:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+
+    XCTestExpectation * gotReport = [self expectationWithDescription:@"Injected report delivered"];
+    __block NSArray<NSDictionary<NSString *, id> *> * reported = nil;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        reported = data;
+        [gotReport fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    __auto_type * injectedReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1)
+                                                                  clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(17),
+        },
+    } ];
+    [device unitTestInjectAttributeReport:injectedReport fromSubscription:YES];
+
+    [self waitForExpectations:@[ gotReport ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(reported.count, 1);
+    XCTAssertNil(reported.firstObject[MTRLocalReceiptTimeKey]);
+}
+
+- (void)test051c_LocalReceiptTimeOnReadResults
+{
+    // Values that arrive in a read response are just as much "received from the device" as
+    // values that arrive in a subscription report, and must be stamped too.  This matters
+    // most for Changes Omitted Quality (C quality) attributes, whose values reach a
+    // consumer via read-through rather than via subscription reports, so the read path is
+    // the only place their age can be established.
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read complete"];
+
+    __auto_type * attributePaths = @[
+        // Basic Information VendorName/VendorID/ProductName, on all endpoints that have it.
+        [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@1],
+        [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@2],
+        [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@3],
+    ];
+
+    NSDate * beforeRead = [NSDate now];
+    [device readAttributePaths:attributePaths
+                    eventPaths:nil
+                        params:nil
+                         queue:queue
+                    completion:^(id _Nullable values, NSError * _Nullable error) {
+                        XCTAssertNil(error);
+                        XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+
+                        NSDate * afterRead = [NSDate now];
+
+                        NSArray * resultArray = values;
+                        // If the read came back empty the per-value assertions below would
+                        // vacuously pass.
+                        XCTAssertGreaterThan(resultArray.count, 0);
+
+                        for (NSDictionary * result in resultArray) {
+                            XCTAssertNotNil(result[MTRAttributePathKey]);
+
+                            NSDate * receiptTime = result[MTRLocalReceiptTimeKey];
+                            XCTAssertNotNil(receiptTime, "No receipt time for read result %@", result);
+                            XCTAssertTrue([receiptTime isKindOfClass:[NSDate class]],
+                                "Receipt time is not an NSDate: %@", receiptTime);
+
+                            // The value cannot have arrived before we asked for it, nor after
+                            // the read completed.
+                            XCTAssertEqual([receiptTime compare:beforeRead], NSOrderedDescending,
+                                "Receipt time %@ predates read start at %@", receiptTime, beforeRead);
+                            XCTAssertEqual([receiptTime compare:afterRead], NSOrderedAscending,
+                                "Receipt time %@ postdates read completion at %@", receiptTime, afterRead);
+                        }
+
+                        [expectation fulfill];
+                    }];
+
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test051d_LocalReceiptTimeOnReadWithDataVersion
+{
+    // The read path has two shapes, depending on whether the caller wants data versions
+    // included, and they build their response-value dictionaries separately.  MTRDevice's
+    // read-through uses the includeDataVersion:YES shape, and read-through is the only way a
+    // Changes Omitted Quality (C quality) attribute's value ever reaches a consumer -- such
+    // an attribute is not reported when it changes -- so this is the shape that matters most
+    // for establishing the age of a C quality value.  test051c covers the other shape.
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read complete"];
+
+    // GeneralDiagnostics UpTime is Changes Omitted Quality (see
+    // AttributeHasChangesOmittedQuality in MTRDevice_Concrete.mm).
+    __auto_type * attributePaths = @[
+        [MTRAttributeRequestPath requestPathWithEndpointID:@(0)
+                                                 clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
+                                               attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID)],
+    ];
+
+    NSDate * beforeRead = [NSDate now];
+    [device readAttributePaths:attributePaths
+                    eventPaths:nil
+                        params:nil
+            includeDataVersion:YES
+                         queue:queue
+                    completion:^(id _Nullable values, NSError * _Nullable error) {
+                        XCTAssertNil(error);
+                        XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+
+                        NSDate * afterRead = [NSDate now];
+
+                        NSArray * resultArray = values;
+                        XCTAssertEqual(resultArray.count, 1);
+
+                        NSDictionary * result = resultArray.firstObject;
+
+                        // Confirm we really took the includeDataVersion:YES branch, and not the
+                        // one test051c exercises.
+                        XCTAssertNotNil(result[MTRDataKey][MTRDataVersionKey]);
+
+                        NSDate * receiptTime = result[MTRLocalReceiptTimeKey];
+                        XCTAssertNotNil(receiptTime, "No receipt time for read result %@", result);
+                        XCTAssertTrue([receiptTime isKindOfClass:[NSDate class]],
+                            "Receipt time is not an NSDate: %@", receiptTime);
+
+                        // The value cannot have arrived before we asked for it, nor after the
+                        // read completed.
+                        XCTAssertEqual([receiptTime compare:beforeRead], NSOrderedDescending,
+                            "Receipt time %@ predates read start at %@", receiptTime, beforeRead);
+                        XCTAssertEqual([receiptTime compare:afterRead], NSOrderedAscending,
+                            "Receipt time %@ postdates read completion at %@", receiptTime, afterRead);
+
+                        [expectation fulfill];
+                    }];
+
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test051e_MTRAttributeReportCarriesLocalReceiptTime
+{
+    // MTRAttributeReport is the conversion every consumer of a response-value dictionary
+    // funnels through, so if it drops the receipt time the value never reaches anything that
+    // could use it.
+    __auto_type * receiptTime = [NSDate dateWithTimeIntervalSince1970:1750000000];
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1)
+                                                             clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)];
+    __auto_type * responseValue = @{
+        MTRAttributePathKey : path,
+        MTRDataKey : @ {
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(17),
+        },
+        MTRLocalReceiptTimeKey : receiptTime,
+    };
+
+    NSError * error;
+    __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:responseValue error:&error];
+    XCTAssertNotNil(report);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(report.localReceiptTime, receiptTime);
+    XCTAssertEqualObjects(report.value, @(17));
+
+    // Copying must not lose the age of the value: copyWithZone: rebuilds via an initializer
+    // that has no receipt time of its own.
+    MTRAttributeReport * copied = [report copy];
+    XCTAssertEqualObjects(copied.localReceiptTime, receiptTime);
+
+    // Absent key means "age unknown", not zero or now.
+    NSMutableDictionary * withoutTime = [responseValue mutableCopy];
+    [withoutTime removeObjectForKey:MTRLocalReceiptTimeKey];
+    __auto_type * unstampedReport = [[MTRAttributeReport alloc] initWithResponseValue:withoutTime error:&error];
+    XCTAssertNotNil(unstampedReport);
+    XCTAssertNil(unstampedReport.localReceiptTime);
+
+    // An error report can carry a receipt time too: we know when the status arrived.
+    __auto_type * errorResponseValue = @{
+        MTRAttributePathKey : path,
+        MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil],
+        MTRLocalReceiptTimeKey : receiptTime,
+    };
+    __auto_type * errorReport = [[MTRAttributeReport alloc] initWithResponseValue:errorResponseValue error:&error];
+    XCTAssertNotNil(errorReport);
+    XCTAssertNotNil(errorReport.error);
+    XCTAssertEqualObjects(errorReport.localReceiptTime, receiptTime);
+
+    // A wrong-typed receipt time is rejected rather than silently ignored, both by the shape
+    // validator that guards report delivery and by the initializer itself.
+    NSMutableDictionary * badTime = [responseValue mutableCopy];
+    badTime[MTRLocalReceiptTimeKey] = @"not a date";
+    XCTAssertFalse(MTRAttributeReportIsWellFormed(@[ badTime ]));
+    XCTAssertTrue(MTRAttributeReportIsWellFormed(@[ responseValue ]));
+
+    error = nil;
+    XCTAssertNil([[MTRAttributeReport alloc] initWithResponseValue:badTime error:&error]);
+    XCTAssertNotNil(error);
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
