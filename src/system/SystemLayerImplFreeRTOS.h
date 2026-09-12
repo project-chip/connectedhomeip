@@ -39,7 +39,7 @@ public:
     CriticalFailure Init() override;
     void Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CriticalFailure StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
+    CriticalFailure StartTimer(Clock::Milliseconds64 delay, TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) override;
     Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) override;

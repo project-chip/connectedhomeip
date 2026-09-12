@@ -117,7 +117,7 @@ public:
      *   @return CHIP_ERROR_NO_MEMORY If a timer cannot be allocated.
      *   @return Other Value indicating timer failed to start.
      */
-    virtual CriticalFailure StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
+    virtual CriticalFailure StartTimer(Clock::Milliseconds64 aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
 
     /**
      * @brief

@@ -27,8 +27,7 @@ namespace app {
 class DefaultTimerDelegate : public TimerDelegate
 {
 public:
-    using Timeout = System::Clock::Timeout;
-    CriticalFailure StartTimer(TimerContext * context, Timeout aTimeout) override;
+    CriticalFailure StartTimer(TimerContext * context, System::Clock::Milliseconds64 aTimeout) override;
     void CancelTimer(TimerContext * context) override;
     bool IsTimerActive(TimerContext * context) override;
     System::Clock::Timestamp GetCurrentMonotonicTimestamp() override;

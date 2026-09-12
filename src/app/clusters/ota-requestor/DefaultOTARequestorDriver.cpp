@@ -245,6 +245,12 @@ void DefaultOTARequestorDriver::UpdateDownloaded()
 void DefaultOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mImageProcessor != nullptr);
+
+    // The spec permits capping ApplyUpdateResponse.DelayedActionTime at 24h (OTAProvider.adoc). This also keeps the
+    // Seconds32->Milliseconds32 conversion in ScheduleDelayedAction from wrapping (86400 s == 86.4e6 ms << 2^32).
+    if (delay > System::Clock::Seconds32(86400))
+        delay = System::Clock::Seconds32(86400);
+
     ScheduleDelayedAction(delay, ApplyTimerHandler, this);
 }
 
@@ -256,6 +262,11 @@ void DefaultOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
     {
         delay = kDefaultDelayedActionTime;
     }
+
+    // The spec permits capping ApplyUpdateResponse.DelayedActionTime at 24h (OTAProvider.adoc). This also keeps the
+    // Seconds32->Milliseconds32 conversion in ScheduleDelayedAction from wrapping (86400 s == 86.4e6 ms << 2^32).
+    if (delay > System::Clock::Seconds32(86400))
+        delay = System::Clock::Seconds32(86400);
 
     ScheduleDelayedAction(delay, ApplyUpdateTimerHandler, this);
 }
@@ -282,7 +293,7 @@ void DefaultOTARequestorDriver::UpdateCancelled()
 void DefaultOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
                                                       void * aAppState)
 {
-    VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState) ==
+    VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Milliseconds64>(delay), action, aAppState) ==
                 CHIP_NO_ERROR);
 }
 

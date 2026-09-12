@@ -19,8 +19,6 @@
 #include <platform/DefaultTimerDelegate.h>
 #include <system/SystemClock.h>
 
-using Timeout = chip::System::Clock::Timeout;
-
 namespace chip {
 namespace app {
 
@@ -29,7 +27,7 @@ static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
     TimerContext * context = static_cast<TimerContext *>(aAppState);
     context->TimerFired();
 }
-CriticalFailure DefaultTimerDelegate::StartTimer(TimerContext * context, Timeout aTimeout)
+CriticalFailure DefaultTimerDelegate::StartTimer(TimerContext * context, System::Clock::Milliseconds64 aTimeout)
 {
     return DeviceLayer::SystemLayer().StartTimer(aTimeout, TimerCallbackInterface, context);
 }
