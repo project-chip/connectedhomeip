@@ -252,7 +252,7 @@ private:
 
     ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
 
-    SessionManager * mSessionManager;
+    SessionManager * mSessionManager = nullptr;
     ReliableMessageMgr mReliableMessageMgr;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
