@@ -62,8 +62,9 @@ class TC_MESS_3_2(MatterBaseTest, MESSTestBase):
                      "supportedMimeTypes."),
             TestStep(2, "TH sends a PresentMessagesRequest command to the DUT with MessageID="
                      "AABBCCDDEEFF00112233445566778899, Priority=Low (0), MessageControl with the AudioMessage bit "
-                     "(bit 6) set, MessageText='' and MessageURI pointing to a valid audio resource in a format "
-                     "from supportedMimeTypes with a duration under 20 seconds.",
+                     "(bit 6) set, StartTime=null, Duration=10000 (10 seconds), MessageText='' and MessageURI "
+                     "pointing to a valid audio resource in a format from supportedMimeTypes with a duration under "
+                     "20 seconds.",
                      "Verify that a successful (status 0) response is received."),
             TestStep(3, "TH waits for the DUT to queue the message.",
                      "Verify that a MessageQueued event is generated with MessageID="
@@ -76,10 +77,11 @@ class TC_MESS_3_2(MatterBaseTest, MESSTestBase):
                      "AABBCCDDEEFF00112233445566778899."),
             TestStep(6, "TH sends a PresentMessagesRequest command to the DUT with MessageID="
                      "BBCCDDEE0011223344556677889900AA, Priority=Low (0), MessageControl with the AudioMessage bit "
-                     "(bit 6) set, MessageText='' and MessageURI pointing to an audio resource longer than 20 "
-                     "seconds.",
+                     "(bit 6) set, StartTime=null, Duration=null, MessageText='' and MessageURI pointing to an "
+                     "audio resource longer than 20 seconds.",
                      "Verify that a successful (status 0) response is received."),
-            TestStep(7, "TH waits for the DUT to truncate audio playback.",
+            TestStep(7, "TH waits for the DUT to truncate audio playback. This step applies only to a DUT that "
+                     "does not support the MultiModalMessages feature.",
                      "Verify that a MessageComplete event is generated with MessageID="
                      "BBCCDDEE0011223344556677889900AA within approximately 20 seconds of the corresponding "
                      "MessagePresented event."),
