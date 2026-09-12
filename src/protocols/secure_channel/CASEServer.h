@@ -21,6 +21,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <system/SystemClock.h>
 
@@ -79,6 +80,9 @@ public:
     }
 
 private:
+    friend class CASEServerAccess;
+    friend class TestCASESession;
+
     Messaging::ExchangeManager * mExchangeManager                       = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
@@ -114,6 +118,33 @@ private:
      *
      */
     void PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer = ScopedNodeId());
+
+    // Temporal grace window (1.5s) to protect in-flight Sigma2 packets from premature preemption
+    static constexpr System::Clock::Milliseconds16 kInFlightGraceWindow = System::Clock::Milliseconds16(1500);
+
+    // Dynamic wait time tracking for busy status reports
+    System::Clock::Timestamp mStateEnteredTimestamp = System::Clock::kZero;
+
+    // Helper to extract initiatorRandom and destinationId from raw Sigma1 TLV payload without consuming the buffer
+    CHIP_ERROR PeekSigma1Params(const System::PacketBufferHandle & payload, MutableByteSpan & outInitiatorRandom,
+                                MutableByteSpan & outDestinationId);
+
+    // Guard 4: Destination ID validation against provisioned fabrics
+    bool ValidateDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom) const;
+
+    // Evaluates Quadruple Guard Preemption:
+    // Guard 1: initiatorRandom inequality
+    // Guard 2: active crypto calculation guard
+    // Guard 3: temporal grace window (1.5s)
+    // Guard 4: destination ID validation against provisioned fabrics
+    bool CanPreemptSession(Messaging::ExchangeContext * ec, const ByteSpan & incomingInitiatorRandom,
+                           const ByteSpan & incomingDestinationId);
+
+    // Handles MRP retransmissions by re-sending cached Sigma2 or Standalone ACK
+    CHIP_ERROR HandleMRPRetry(Messaging::ExchangeContext * ec);
+
+    void PreemptExistingSession();
+    System::Clock::Milliseconds16 ComputeDynamicBusyDelay();
 
     // If we are in the middle of handshake and receive a Sigma1 then respond with Busy status code.
     // @param[in] ec              Exchange Context

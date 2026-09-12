@@ -186,6 +186,14 @@ public:
 
     State GetState() { return mState; }
 
+    ByteSpan GetInitiatorRandom() const { return ByteSpan(mInitiatorRandom); }
+
+    bool IsCryptoOperationInProgress() const
+    {
+        return (mSendSigma3Helper != nullptr) || (mHandleSigma3Helper != nullptr) || (mState == State::kHandleSigma3Pending) ||
+            (mState == State::kSendSigma3Pending);
+    }
+
     // Returns true if the CASE session handshake was stuck due to failing to schedule work on the Matter thread.
     // If this function returns true, the CASE session has been reset and is ready for a new session establishment.
     bool InvokeBackgroundWorkWatchdog();
@@ -466,6 +474,7 @@ protected:
 
 private:
     friend class TestCASESession;
+    friend class CASEServerAccess;
 
     using AutoReleaseSessionKey = Crypto::AutoReleaseSymmetricKey<Crypto::Aes128KeyHandle>;
 
