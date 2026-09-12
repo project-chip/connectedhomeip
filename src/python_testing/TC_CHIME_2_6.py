@@ -35,7 +35,7 @@
 #     quiet: true
 #   run2:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --device chime
+#     app-args: --discriminator 1234 --KVS kvs1 --device chime:1 --device speaker:2,parent=1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -71,12 +71,14 @@ class TC_CHIME_2_6(MatterBaseTest, CHIMETestBase):
     def steps_TC_CHIME_2_6(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Establish a subscription to the ChimeStartedPlaying event"),
-            TestStep(3, "Set the enabled attribute to True"),
-            TestStep(4, "Read and save the value of the SelectedChime attribute in mySelectedChime"),
-            TestStep(5, "Send the PlayChimeSound command"),
-            TestStep(6, "Verify reception of the ChimeStartedPlaying event"),
-            TestStep(7, "Verify that the value of the ChimeID in the event is the same as the value of mySelectedChime"),
+            TestStep(2, "On the child Speaker endpoint, write OnOff attribute of OnOff cluster to True (Unmuted) if Speaker is present"),
+            TestStep(3, "On the child Speaker endpoint, write CurrentLevel attribute to a high level (e.g. 200) if Speaker is present and Level Control is supported"),
+            TestStep(4, "Establish a subscription to all events of the cluster (which by implication includes the ChimeStartedPlaying event)"),
+            TestStep(5, "Set the enabled attribute to True"),
+            TestStep(6, "Read and save the value of the SelectedChime attribute in mySelectedChime"),
+            TestStep(7, "Send the PlayChimeSound command"),
+            TestStep(8, "Verify reception of the ChimeStartedPlaying event within a 5 second window"),
+            TestStep(9, "Verify that the value of the ChimeID in the event is the same as the value of mySelectedChime"),
         ]
 
     def pics_TC_CHIME_2_6(self) -> list[str]:
@@ -100,20 +102,29 @@ class TC_CHIME_2_6(MatterBaseTest, CHIMETestBase):
 
         self.step(1)  # Already done, immediately go to step 2
 
-        # TH establishes a subscription to all of the Events from the Cluster
+        # Step 2: Unmute child Speaker if present
         self.step(2)
+        speaker_endpoint = await self.get_child_speaker_endpoint(endpoint)
+        await self.unmute_speaker_if_present(speaker_endpoint)
+
+        # Step 3: Set Level Control to high if supported on child Speaker
+        self.step(3)
+        await self.set_speaker_volume_high_if_supported(speaker_endpoint)
+
+        # TH establishes a subscription to all of the Events from the Cluster
+        self.step(4)
         event_callback = EventSubscriptionHandler(expected_cluster=Clusters.Chime)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
                                    self.get_endpoint())
 
-        self.step(3)
+        self.step(5)
         await self.write_chime_attribute_expect_success(endpoint, attributes.Enabled, True)
 
-        self.step(4)
+        self.step(6)
         mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)
 
-        self.step(5)
+        self.step(7)
         await self.send_play_chime_sound_command(endpoint)
         if not self.is_ci:
             user_response = self.wait_for_user_input(prompt_msg="A chime sound should have been played, is this correct? Enter 'y' or 'n'",
@@ -125,11 +136,11 @@ class TC_CHIME_2_6(MatterBaseTest, CHIMETestBase):
             else:
                 log.info("TC-CHIME-2.6: No response received for chime sound played user prompt")
 
-        self.step(6)
-        event_data = event_callback.wait_for_event_report(Clusters.Chime.Events.ChimeStartedPlaying, timeout_sec=30)
+        self.step(8)
+        event_data = event_callback.wait_for_event_report(Clusters.Chime.Events.ChimeStartedPlaying, timeout_sec=5)
         log.info("Event data %s", event_data)
 
-        self.step(7)
+        self.step(9)
         asserts.assert_equal(event_data.chimeID, mySelectedChime, "Unexpected value for ChimeID returned")
 
 
