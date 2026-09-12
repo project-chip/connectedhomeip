@@ -187,6 +187,7 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestOperationalSessionSetupBusy.cpp",
     "TestOperationalSessionSetupFallback.cpp",
     "TestOperationalStateClusterObjects.cpp",
     "TestPendingResponseTrackerImpl.cpp",
