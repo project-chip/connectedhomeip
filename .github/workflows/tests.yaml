@@ -511,6 +511,41 @@ jobs:
                      --commissioning-method wifipaf-wifi \
                   "
 
+            - name: Run Commissioning Proxy certification tests over mocked BLE and Wi-Fi PAF
+              timeout-minutes: 25
+              env:
+                # Disable TSAN bug reporting, as it reports false positives as BlueZ
+                # integration uses GIO globals (glib internals) that TSAN does not
+                # understand.
+                TSAN_OPTIONS: report_bugs=0
+              run: |
+                  # These tests need three actors (test harness, commissioning proxy,
+                  # end device), so they have their own runner as run_python_test.py
+                  # cannot accommodate this. The tests are run serially because they
+                  # share /tmp and the mock system bus. The end device uses
+                  # all-clusters rather than all-devices, whose --wifi never starts
+                  # Wi-Fi management.
+                  tests=$(out/venv/bin/python3 -c "import yaml; print(' '.join(t['name'].removesuffix('.py') for t in yaml.safe_load(open('src/python_testing/test_metadata.yaml'))['dedicated_runner'] if t['runner'] == 'scripts/tests/run_compro_test.py'))")
+                  if [ -z "$tests" ]; then
+                      echo "No dedicated_runner tests for run_compro_test.py in test_metadata.yaml"
+                      exit 1
+                  fi
+                  echo "Running: $tests"
+                  fail=0
+                  for test in $tests; do
+                      echo "::group::${test}"
+                      PATH=$PWD/out/venv/bin:$PATH out/venv/bin/python3 \
+                          scripts/tests/run_compro_test.py \
+                          --proxy-app ./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
+                          --ed-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                          --script src/python_testing/${test}.py \
+                          --script-args "--tests test_${test}" \
+                          --proxy-transport both \
+                          || { echo "${test} FAILED"; fail=1; }
+                      echo "::endgroup::"
+                  done
+                  exit $fail
+
             - name: Print test run summaries
               if: always()
               run: |

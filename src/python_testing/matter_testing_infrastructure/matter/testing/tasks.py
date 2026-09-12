@@ -19,7 +19,7 @@ import shlex
 import subprocess
 import sys
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import BinaryIO, Self
@@ -94,17 +94,24 @@ class Subprocess(threading.Thread):
         self.output_cb = output_cb
         self.f_stdout = f_stdout
         self.f_stderr = f_stderr
-        self.output_match: re.Pattern | None = None
+        self.output_match: list[re.Pattern] = []
+        # stdout and stderr are forwarded by separate threads sharing one
+        # callback, so the patterns still outstanding are guarded.
+        self.output_match_lock = threading.Lock()
         self.returncode: int | None = None
         self.p: subprocess.Popen | None = None
 
-    def set_output_match(self, pattern: str | re.Pattern) -> None:
-        if isinstance(pattern, str):
-            self.output_match = re.compile(re.escape(pattern.encode()))
-        else:
-            self.output_match = pattern
+    def set_output_match(self, pattern: str | re.Pattern | Sequence[str | re.Pattern]) -> None:
+        """Set the output to wait for.
 
-    def arm_output_match(self, pattern: str | re.Pattern) -> None:
+        A sequence waits for every pattern in it, in any order, which is what a
+        process that becomes ready in more than one respect needs.
+        """
+        patterns = [pattern] if isinstance(pattern, (str, re.Pattern)) else list(pattern)
+        with self.output_match_lock:
+            self.output_match = [re.compile(re.escape(p.encode())) if isinstance(p, str) else p for p in patterns]
+
+    def arm_output_match(self, pattern: str | re.Pattern | Sequence[str | re.Pattern]) -> None:
         """Watch the output for a pattern, discarding any match seen so far.
 
         Arm before triggering whatever makes the subprocess print the line, so that a
@@ -123,8 +130,11 @@ class Subprocess(threading.Thread):
         return self.event.wait(timeout)
 
     def _check_output(self, line: bytes, is_stderr: bool) -> bytes:
-        if self.output_match is not None and self.output_match.search(line):
-            self.event.set()
+        with self.output_match_lock:
+            if self.output_match:
+                self.output_match = [p for p in self.output_match if not p.search(line)]
+                if not self.output_match:
+                    self.event.set()
         if self.output_cb is not None:
             line = self.output_cb(line, is_stderr)
         return line
@@ -180,7 +190,8 @@ class Subprocess(threading.Thread):
                 if forwarding_stderr_thread.is_alive():
                     LOGGER.warning("Forwarding stderr thread did not finish within timeout")
 
-    def start(self, expected_output: str | re.Pattern | None = None, timeout: float = TestingDefaults.DEFAULT_TIMEOUT_S) -> None:
+    def start(self, expected_output: str | re.Pattern | Sequence[str | re.Pattern] | None = None,
+              timeout: float = TestingDefaults.DEFAULT_TIMEOUT_S) -> None:
         """Start a subprocess and optionally wait for a specific output."""
 
         if expected_output is not None:
@@ -198,7 +209,8 @@ class Subprocess(threading.Thread):
             self.p.terminate()
             raise TimeoutError(f"Expected output {expected_output!r} not found within {timeout} seconds")
 
-    def send(self, message: str, end: str = "\n", expected_output: str | re.Pattern | None = None,
+    def send(self, message: str, end: str = "\n",
+             expected_output: str | re.Pattern | Sequence[str | re.Pattern] | None = None,
              timeout: float = TestingDefaults.DEFAULT_TIMEOUT_S) -> None:
         """Send a message to a process and optionally wait for a response."""
 

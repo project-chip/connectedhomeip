@@ -25,7 +25,8 @@ class AppServerSubprocess(Subprocess):
     log_file = ""
     err_log_file = ""
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = ...) -> None: ...
+                 passcode: int, port: int = 5540, extra_args: list[str] = ...,
+                 wrapper: list[str] = ...) -> None: ...
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
