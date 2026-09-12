@@ -16,45 +16,19 @@ import contextlib
 import dataclasses
 import logging
 import sys
-import tempfile
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import ClassVar
 
 import chiptest
 from chiptest.accessories import AppsRegister
 from chiptest.concurrency.context import StartStopContextMixin
-from chiptest.log_config import LogConfig
 from chiptest.results import TestResult
 from chiptest.runner import Executor
-from chiptest.test_definition import TestDefinition, TestJobConfig
+from chiptest.test_definition import TestDefinition
 
-from .process import ProcessConfig, WrappedProcess
+from .config import WorkerConfig
+from .process import WrappedProcess
 
 log = logging.getLogger(__name__)
-
-
-@dataclasses.dataclass
-class WorkerConfig(ProcessConfig, TestJobConfig):
-    """Configuration for a worker process based on a common test job config."""
-
-    WORKER_START_TIMEOUT: ClassVar[float] = 15
-    WORKER_STOP_TIMEOUT: ClassVar[float] = 10
-
-    tmp_dir_clear: bool = False
-    tmp_dir_default: ClassVar[Path] = Path(tempfile.gettempdir())
-    tmp_dir_worker_base: ClassVar[Path] = Path(tempfile.gettempdir()) / "matter_test_suite"
-
-    @classmethod
-    def from_test_job_config(cls, log_config: LogConfig, config: TestJobConfig, *, tmp_dir_clear: bool):
-        """Create a worker config from a test job config."""
-        # Needs to be a shallow copy, so that we don't accidentally create unpicklable generators in the config.
-        return cls(**{field.name: getattr(config, field.name) for field in dataclasses.fields(config)},
-                   name=f"W{{id:0{len(str(config.concurrency))}}}",
-                   log_config=log_config,
-                   start_timeout_sec=WorkerConfig.WORKER_START_TIMEOUT,
-                   stop_timeout_sec=WorkerConfig.WORKER_STOP_TIMEOUT,
-                   tmp_dir_clear=tmp_dir_clear)
 
 
 @dataclasses.dataclass
@@ -91,16 +65,20 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, TestResult], StartSt
     def _proc_work(self) -> None:
         """Main loop of the worker process."""
         while True:
-            work = self._work_queue.get()
+            work = self.work_queue.get()
 
-            with (self.state.working_context(),
-                  self._config.log_config.fmt_context(task=work.test.name, level=self._config.log_config.level_tests),
-                  TestResult.measure_execution(work.test.name, self._config.id, work.iteration, self._config.dry_run) as result):
-                work.test.Run(self.runner, self.apps_register, self._config, self.thread_ba_host, self.thread_ba_port)
-
-            self._rsp_queue.put(result)
-            if isinstance(result.exception, KeyboardInterrupt):
-                raise result.exception
+            result: TestResult | None = None
+            try:
+                with (self.state.working_context(),
+                      self._config.log_config.fmt_context(task=work.test.name, level=self._config.log_config.level_tests),
+                      TestResult.measure_execution(work.test.name, self._config.process_id, work.iteration,
+                                                   self._config.dry_run) as result):
+                    work.test.Run(self.runner, self.apps_register, self._config, self.thread_ba_host, self.thread_ba_port)
+            finally:
+                if result is not None:
+                    self._rsp_queue.put(result)
+                    if isinstance(result.exception, KeyboardInterrupt):
+                        raise result.exception
 
 
 class GenericWorkerProcess(WorkerProcess):

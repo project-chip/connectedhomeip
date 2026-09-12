@@ -13,6 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from __future__ import annotations
+
 import logging
 import shlex
 import shutil
@@ -29,8 +31,10 @@ from pathlib import Path
 
 from python_path import PythonPath
 
-from .accessories import AppsRegister
 from .runner import LogPipe, Runner, SubprocessInfo, SubprocessKind
+
+if typing.TYPE_CHECKING:
+    from .accessories import AppsRegister
 
 CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
@@ -446,6 +450,13 @@ class TestRunTime(StrEnum):
     DARWIN_FRAMEWORK_TOOL_PYTHON = 'darwin_framework_tool_python'  # use the python yaml test parser with chip-tool
 
 
+class TestConcurrencySchedulerType(StrEnum):
+    """Type of scheduler used for concurrent test execution."""
+
+    FAST = auto()
+    REPRODUCIBLE = auto()
+
+
 @dataclass
 class TestJobConfig:
     """Worker configuration which is a subset of command line options."""
@@ -457,6 +468,7 @@ class TestJobConfig:
     test_timeout_seconds: int | None
     value_wait_extra_duration_ms: int | None
     concurrency: int
+    concurrency_scheduler: TestConcurrencySchedulerType
 
 
 @dataclass
@@ -614,7 +626,9 @@ class TestDefinition:
                     test_cmd,
                     name='TEST', dependencies=[apps_register],
                     timeout_seconds=config.test_timeout_seconds)
-
+        except KeyboardInterrupt:
+            log.warning("Interrupting %s per user request", self.name)
+            raise
         except BaseException:
             log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
             runner.capture_delegate.LogContents()

@@ -23,6 +23,7 @@ from types import TracebackType
 from typing import Self
 
 import coloredlogs
+from chiptest.concurrency.work_queue import wait_for_mp_managed
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +44,12 @@ class LogMessageCounter:
     """Cross-process cancellable counter for printed log messages."""
 
     USER_CANCEL_TIMEOUT_SEC = 1.0
+
+    USER_CANCEL_POLL_INTERVAL_SEC = 0.1
+    """Upper bound on a single proxy call while waiting for the users to deregister.
+
+    Needed to ensure that the whole USER_CANCEL_TIMEOUT_SEC is not spent inside one uninterruptible call.
+    """
 
     def __init__(self, mp_manager: SyncManager) -> None:
         self._cond = mp_manager.Condition()
@@ -82,7 +89,7 @@ class LogMessageCounter:
     def wait_for_count_or_cancel(self, count: int, timeout: float | None = None) -> bool:
         """Wait until the total message count reaches at least the specified count or until cancelled."""
         with self._cond:
-            return self._cond.wait_for(lambda: self._counter.value >= count or self.cancelled, timeout=timeout)
+            return wait_for_mp_managed(self._cond, lambda: self._counter.value >= count or self.cancelled, timeout_sec=timeout)
 
     @contextlib.contextmanager
     def register_user(self) -> Iterator[Self]:
@@ -103,7 +110,9 @@ class LogMessageCounter:
     def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
         self.cancel()
         with self._users_cond:
-            if not self._users_cond.wait_for(lambda: self._users_counter.value == 0, timeout=self.USER_CANCEL_TIMEOUT_SEC):
+            if not wait_for_mp_managed(self._users_cond, lambda: self._users_counter.value == 0,
+                                       timeout_sec=self.USER_CANCEL_TIMEOUT_SEC,
+                                       polling_interval_sec=self.USER_CANCEL_POLL_INTERVAL_SEC):
                 log.warning("Log message counter still has %d users after waiting for cancellation", self._users_counter.value)
 
 

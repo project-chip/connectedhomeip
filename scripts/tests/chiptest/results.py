@@ -20,6 +20,7 @@ import datetime
 import enum
 import json
 import logging
+import sys
 import threading
 import time
 from collections import defaultdict
@@ -29,6 +30,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any, TypeAlias
 
+from chiptest.concurrency.config import WorkerConfig
 from chiptest.concurrency.context import TerminableThread
 from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue
 
@@ -130,6 +132,7 @@ class RunStats:
     cancelled: int = field(default=0, init=False)
     mean_duration: float = field(default=0.0, init=False)
     exception_first: ExceptionInfoT = field(default=None, init=False)
+    runners: list[int] = field(default_factory=list, init=False)
 
     @property
     def pass_rate(self) -> float:
@@ -166,6 +169,9 @@ class RunStats:
         # Save the exception if it's the first one.
         if result.exception is not None and self.exception_first is None:
             self.exception_first = result.exception
+
+        # Record the runner ID.
+        self.runners.append(result.worker_id)
 
 
 @dataclass
@@ -350,8 +356,8 @@ class RunSummary(RunStats):
             failed_results = tuple(r for r in self.results if r.status == TestStatus.FAILED)
             self._print_table(title=f"FAILED TESTS ({len(failed_results)}):",
                               no_content_msg="No failures recorded",
-                              headers_fmt=(("Test name", "<"), ("Iter", ">"), ("Duration", ">")),
-                              rows=((r.name_decorated, str(r.iteration), f"{r.duration_seconds:.2f}s")
+                              headers_fmt=(("Test name", "<"), ("Iter", ">"), ("Duration", ">"), ("Worker ID", ">")),
+                              rows=((r.name_decorated, str(r.iteration), f"{r.duration_seconds:.2f}s", str(r.worker_id))
                                     for r in sorted(failed_results, key=lambda x: x.name)))
 
         if show_flaky and self.iterations > 1:
@@ -371,18 +377,25 @@ class RunSummary(RunStats):
                 slowest = slowest[:top_slowest]
 
             self._print_table(title=f"SLOWEST {len(slowest)} TEST RUNS:", no_content_msg="No tests to show for slowest list",
-                              headers_fmt=(("Test name", "<"), ("Status", "<"), ("Iter", ">"), ("Duration", ">")),
-                              rows=((r.name_decorated, r.status, str(r.iteration), f"{r.duration_seconds:.2f}s")
+                              headers_fmt=(("Test name", "<"), ("Status", "<"), ("Iter", ">"),
+                                           ("Duration", ">"), ("Worker ID", ">")),
+                              rows=((r.name_decorated, r.status, str(r.iteration), f"{r.duration_seconds:.2f}s", str(r.worker_id))
                                     for r in slowest))
 
         if show_all:
             self._print_table(title="STATS OF ALL TESTS:", no_content_msg="No tests to show", last_col_max_width=20,
-                              headers_fmt=(("Test name", "<"), ("Passed", ">"), ("Mean time", ">"), ("Status", "<")),
-                              rows=((name, f"{stats.passed}/{stats.total_runs}", f"{stats.mean_duration:.2f}s", stats.status_msg)
+                              headers_fmt=(("Test name", "<"), ("Passed", ">"),
+                                           ("Mean time", ">"), ("Worker ID", "<"), ("Status", "<")),
+                              rows=((name, f"{stats.passed}/{stats.total_runs}", f"{stats.mean_duration:.2f}s",
+                                     ", ".join(map(str, stats.runners)), stats.status_msg)
                                     for name, stats in self.test_stats.items()))
 
         # Final vertical padding.
         print()
+
+        if sys.platform == "linux":
+            log.info("Note: You can find %s of each runner in %s/{Worker ID}", WorkerConfig.tmp_dir_default,
+                     WorkerConfig.tmp_dir_worker_base)
 
 
 class ResultError(Exception):
@@ -397,7 +410,6 @@ class ResultProcessingThread(TerminableThread):
     expected_failures: int
     keep_going: bool
     result_queue: CancellableQueue[TestResult]
-    exception: BaseException | None = None
 
     def __post_init__(self) -> None:
         super().__init__(name="Results")
@@ -441,11 +453,6 @@ class ResultProcessingThread(TerminableThread):
             # Close the result queue to unblock the thread if it's waiting for results.
             self.result_queue.close()
 
-            if isinstance(self.exception, KeyboardInterrupt):
-                raise self.exception
-            if self.exception is not None:
-                raise ResultError("Result processing thread terminated with an exception") from self.exception
-
             if not self.resource_thread_join():
                 raise RuntimeError("Result processing thread is still alive, it might be stuck on processing results")
         except Exception as e:
@@ -453,6 +460,6 @@ class ResultProcessingThread(TerminableThread):
             self.result_queue.cancel()
 
             # Wait for the thread to finish processing results if it had been started.
-            if not self.resource_thread_join():
+            if not self.resource_thread_join(raise_on_error=False):
                 raise RuntimeError(
                     "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e

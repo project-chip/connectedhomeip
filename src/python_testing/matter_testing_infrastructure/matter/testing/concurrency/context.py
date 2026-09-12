@@ -13,7 +13,10 @@
 # limitations under the License.
 
 import contextlib
+import functools
 import logging
+import multiprocessing
+import multiprocessing.process
 import os
 import signal
 import subprocess
@@ -21,9 +24,42 @@ import threading
 from abc import abstractmethod
 from collections.abc import Callable
 from types import TracebackType
-from typing import Any, Generic, Self, TypeVar
+from typing import Any, Concatenate, Generic, ParamSpec, Protocol, Self, TypeVar, runtime_checkable
 
 log = logging.getLogger(__name__)
+
+
+class WithName(Protocol):
+    @property
+    def name(self) -> str: ...
+
+
+@runtime_checkable
+class HasProcessProperty(Protocol):
+    _proc: multiprocessing.process.BaseProcess
+
+
+S = TypeVar("S", bound="WithName")
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def with_annotated_exception(fn: Callable[Concatenate[S, P], R]) -> Callable[Concatenate[S, P], R]:
+    """Decorator to enrich exceptions from thread and process methods with their names for easier debugging."""
+
+    @functools.wraps(fn)
+    def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R:
+        try:
+            return fn(self, *args, **kwargs)
+        except BaseException as e:
+            kind = ("thread" if isinstance(self, threading.Thread) else
+                    "process" if isinstance(self, (multiprocessing.Process, HasProcessProperty)) else
+                    self.__class__.__name__)
+
+            e.add_note(f"Exception in {kind} {self.name}")
+            raise
+
+    return wrapper
 
 
 InternalResourceT = TypeVar("InternalResourceT")
@@ -112,15 +148,20 @@ class TerminableThread(TerminableResource, threading.Thread):
                  terminate_debug_logging: bool = True) -> None:
         threading.Thread.__init__(self, group, target, name, args, kwargs, daemon=daemon)
         super().__init__(name, terminate_debug_logging)
+        self.exception: BaseException | None = None
 
     def resource_start(self) -> None:
         self.start()
 
-    def resource_thread_join(self) -> bool:
+    def resource_thread_join(self, *, raise_on_error: bool = True) -> bool:
         """Join the thread and return whether it has been successfully joined (i.e. is not alive anymore)."""
         if self.ident is not None:
             log.debug("Joining thread %s", self.name)
             self.join(timeout=self.RESOURCE_TIMEOUT_TERMINATE_S)
+
+        if raise_on_error and self.exception is not None:
+            raise self.exception
+
         return not self.is_alive()
 
     def resource_terminate(self) -> None:
