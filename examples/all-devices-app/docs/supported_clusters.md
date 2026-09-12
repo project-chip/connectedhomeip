@@ -1,4 +1,4 @@
-# Matter Clusters Implementation Status (159 total)
+# Matter Clusters Implementation Status (160 total)
 
 **Updated as of**: 2026-06-25 (Matter Specification SHA:
 `5a31ae2acb487bea09286243ccb5ad4ca9d3ef08`)
@@ -203,4 +203,5 @@ To update or validate this list manually, follow these steps:
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **104**            | **67**              |                                       |
+| 160       | Smoke Concentration Measurement                            | 1076 (0x0434) | Yes                | Yes                 | Instance of Concentration Measurement |
+| **Total** | **160**                                                    |               | **105**            | **68**              |                                       |

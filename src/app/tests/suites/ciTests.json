@@ -247,6 +247,7 @@
         "Test_TC_PMICONC_2_1",
         "Test_TC_PMKCONC_2_1",
         "Test_TC_RNCONC_2_1",
+        "Test_TC_SMOKECONC_2_1",
         "Test_TC_TVOCCONC_2_1"
     ],
     "collection": [
