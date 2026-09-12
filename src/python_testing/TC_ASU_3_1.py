@@ -73,6 +73,7 @@ class TC_ASU_3_1(MatterBaseTest):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientSensingUnion
         attr = Clusters.AmbientSensingUnion.Attributes
+        ci_wait_time = 3.0
 
         self.step("1", "Commissioning, already done", is_commissioning=True)
 
@@ -94,7 +95,7 @@ class TC_ASU_3_1(MatterBaseTest):
         union_name_write = "TestUnionName"
         await self.write_single_attribute(attr.UnionName(union_name_write), endpoint_id=endpoint)
         # Allow time for the subscription report to arrive
-        await asyncio.sleep(1)
+        await asyncio.sleep(ci_wait_time)
 
         self.step("4", "TH awaits a ReportDataMessage containing an attribute report for UnionName attribute. Verify that the value of UnionName attribute reflects the change made in step 3.")
         reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionName)
@@ -123,7 +124,7 @@ class TC_ASU_3_1(MatterBaseTest):
                 "ContributorEndpointId": contend_1,
                 "Status": contstatus_online.value,
             })
-            await asyncio.sleep(1)
+            await asyncio.sleep(ci_wait_time)
         else:
             self.wait_for_user_input(
                 prompt_msg="Change the UnionHealth attribute (e.g. by adding/removing contributors), then type any letter and press ENTER.")
@@ -148,7 +149,7 @@ class TC_ASU_3_1(MatterBaseTest):
                 "ContributorEndpointId": contend_2,
                 "Status": contstatus_2.value,
             })
-            await asyncio.sleep(1)
+            await asyncio.sleep(ci_wait_time)
         else:
             self.wait_for_user_input(
                 prompt_msg="Add a contributor to UnionContributorList, then type any letter and press ENTER.")
@@ -179,7 +180,7 @@ class TC_ASU_3_1(MatterBaseTest):
                 "NodeId": contnode_str_2,
                 "ContributorEndpointId": contend_2,
             })
-            await asyncio.sleep(1)
+            await asyncio.sleep(ci_wait_time)
         else:
             self.wait_for_user_input(
                 prompt_msg="Remove a contributor from UnionContributorList, then type any letter and press ENTER.")
