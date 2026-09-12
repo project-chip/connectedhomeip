@@ -18,6 +18,10 @@
 
 #include "DeviceDisplay.h"
 #include "Button.h"
+#if CONFIG_DEVICE_TYPE_M5STACK_CORE2
+#include "CapacitiveTouchButtons.h"
+#include "Core2Power.h"
+#endif // CONFIG_DEVICE_TYPE_M5STACK_CORE2
 #include "DeviceInfoScreen.h"
 #include "DeviceSelectionScreen.h"
 #include "Display.h"
@@ -74,7 +78,21 @@ void InitDeviceDisplay()
         return;
     }
 
-    esp_err_t err = InitDisplay();
+    esp_err_t err;
+
+#if CONFIG_DEVICE_TYPE_M5STACK_CORE2
+    // Unlike the Basic/Gray, the Core2's LCD is powered and reset through the
+    // AXP192 PMIC, so it must be brought up before InitDisplay() talks to the
+    // panel over SPI.
+    err = Core2Power::Init();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Core2Power::Init() failed: %s", esp_err_to_name(err));
+        return;
+    }
+#endif // CONFIG_DEVICE_TYPE_M5STACK_CORE2
+
+    err = InitDisplay();
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "InitDisplay() failed: %s", esp_err_to_name(err));
@@ -96,6 +114,12 @@ void InitDeviceDisplay()
         {
             ESP_LOGE(TAG, "Failed to initialize button %d: %s", i + 1, esp_err_to_name(btnErr));
         }
+    }
+#elif CONFIG_DEVICE_TYPE_M5STACK_CORE2
+    err = CapacitiveTouchButtons::Init(Core2Power::kInternalI2CPort);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "CapacitiveTouchButtons::Init() failed: %s", esp_err_to_name(err));
     }
 #endif // CONFIG_DEVICE_TYPE_M5STACK
 

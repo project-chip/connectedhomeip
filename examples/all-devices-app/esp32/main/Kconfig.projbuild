@@ -46,6 +46,9 @@ menu "Demo"
         config DEVICE_TYPE_M5STACK
             bool "M5Stack"
             depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_M5STACK_CORE2
+            bool "M5Stack Core2"
+            depends on IDF_TARGET_ESP32
         config DEVICE_TYPE_ESP32_C3_DEVKITM
             bool "ESP32C3-DevKitM"
             depends on IDF_TARGET_ESP32C3
@@ -102,13 +105,30 @@ menu "Demo"
         range 0 5
         default 0 if DEVICE_TYPE_ESP32_DEVKITC || DEVICE_TYPE_ESP32_H2_DEVKITM || DEVICE_TYPE_ESP32_H21_DEVKITM || DEVICE_TYPE_ESP32_H4_DEVKITM || DEVICE_TYPE_ESP32_P4_FUNCTION_EV_BOARD
         default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC || DEVICE_TYPE_ESP32_S31_DEVKITC
+        # Core2 has no predefined slot in the vendored TFT library: it uses
+        # type 0 (custom), configured by the TFT_PIN_NUM_*/TFT_* options below.
+        default 0 if DEVICE_TYPE_M5STACK_CORE2
         default 3 if DEVICE_TYPE_M5STACK
         default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
 
+    # Core2 uses TFT_PREDEFINED_DISPLAY_TYPE 0 (custom), configured by the
+    # TFT_PIN_NUM_*/TFT_* options the vendored tft component itself declares
+    # (examples/common/m5stack-tft/repo/components/tft/Kconfig). Its defaults
+    # already match what Core2 needs (RST/BCKL 0 -- driven by the AXP192, see
+    # Core2Power, not a GPIO; BGR panel; no SPI touch controller; 240x320
+    # portrait-native, rotated to landscape at runtime) except for MISO and
+    # DC, which differ from its generic defaults and are overridden below.
+    config TFT_PIN_NUM_MISO
+        int
+        default 38 if DEVICE_TYPE_M5STACK_CORE2
+    config TFT_PIN_NUM_DC
+        int
+        default 15 if DEVICE_TYPE_M5STACK_CORE2
+
     config HAVE_DISPLAY
         bool
-        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT
-        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT)
+        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_M5STACK_CORE2 || DEVICE_TYPE_ESP32_WROVER_KIT
+        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_M5STACK_CORE2 || DEVICE_TYPE_ESP32_WROVER_KIT)
 
     config RENDEZVOUS_MODE
        int
@@ -123,7 +143,7 @@ menu "Demo"
     config DISPLAY_AUTO_OFF
         bool "Automatically turn off the M5Stack's Display after a few seconds"
         default "y"
-        depends on DEVICE_TYPE_M5STACK
+        depends on DEVICE_TYPE_M5STACK || DEVICE_TYPE_M5STACK_CORE2
         help
             To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
 

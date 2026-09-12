@@ -28,6 +28,7 @@ log = logging.getLogger(__name__)
 class Esp32Board(Enum):
     DevKitC = auto()
     M5Stack = auto()
+    M5StackCore2 = auto()
     C3DevKit = auto()
     P4FunctionEV = auto()
     QEMU = auto()
@@ -129,6 +130,9 @@ class Esp32App(Enum):
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         if board == Esp32Board.P4FunctionEV:
             return self == Esp32App.ALL_CLUSTERS
+        if board == Esp32Board.M5StackCore2:
+            # Only all-devices-app has Core2-specific display/power support so far.
+            return self == Esp32App.ALL_DEVICES
         return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
 
@@ -157,6 +161,10 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         }
         if app in specific_apps:
             return f'sdkconfig_m5stack{rpc}.defaults'
+        return f'sdkconfig{rpc}.defaults'
+    if board == Esp32Board.M5StackCore2:
+        if app == Esp32App.ALL_DEVICES:
+            return f'sdkconfig_m5stack_core2{rpc}.defaults'
         return f'sdkconfig{rpc}.defaults'
     raise Exception('Unknown board type')
 

@@ -1,0 +1,105 @@
+#
+#    Copyright (c) 2026 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#    Description:
+#      CI and local builds use this to select the ESP32 M5Stack Core2 for all-devices-app.
+#
+CONFIG_IDF_TARGET="esp32"
+CONFIG_IDF_TARGET_ESP32=y
+CONFIG_DEVICE_TYPE_M5STACK_CORE2=y
+
+# Default to 921600 baud when flashing and monitoring device
+CONFIG_ESPTOOLPY_BAUD_921600B=y
+CONFIG_ESPTOOLPY_BAUD=921600
+CONFIG_ESPTOOLPY_COMPRESSED=y
+CONFIG_ESPTOOLPY_MONITOR_BAUD_115200B=y
+CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
+
+# Enable BT
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+
+# Disable BT connection reattempt
+CONFIG_BT_NIMBLE_ENABLE_CONN_REATTEMPT=n
+
+# Enable lwip ipv6 autoconfig
+CONFIG_LWIP_IPV6_AUTOCONFIG=y
+
+# Use a custom partition table
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+
+# Vendor and product id
+CONFIG_DEVICE_VENDOR_ID=0xFFF1
+CONFIG_DEVICE_PRODUCT_ID=0x8001
+
+# Main task needs more stack (5k)
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=5120
+
+# Enable debug shell
+CONFIG_ENABLE_CHIP_SHELL=y
+
+# Enable lwIP route hooks
+CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT=y
+CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT=y
+
+# Serial Flasher config
+# Most Core2 units ship with 16MB of flash, but 4MB is kept here to match the
+# M5Stack Basic/Gray defaults and stay safe on any unit with less. Bump this
+# via `idf.py menuconfig` if your board has more and you need the space.
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+
+# Disable softap support by default
+CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# Disable Bluetooth modem sleep
+CONFIG_BTDM_CTRL_MODEM_SLEEP=n
+CONFIG_BTDM_CTRL_MODEM_SLEEP_MODE_ORIG=n
+CONFIG_BTDM_CTRL_LPCLK_SEL_MAIN_XTAL=n
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y
+
+# Move functions from IRAM to flash
+CONFIG_FREERTOS_PLACE_FUNCTIONS_INTO_FLASH=y
+
+# Increase LwIP IPv6 address number
+CONFIG_LWIP_IPV6_NUM_ADDRESSES=6
+
+# Disable Read Client (saves memory)
+CONFIG_DISABLE_READ_CLIENT=y
+
+# Reduce event logging buffer DRAM usage
+CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE=512
+CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE=512
+CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE=512
+
+# Optimize Flash
+CONFIG_NEWLIB_NANO_FORMAT=y
+
+# Proximity Ranging support for BLE post-commissioning
+CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING=n
+
+# Enable SPIRAM / PSRAM support (Core2 has 8MB of PSRAM)
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_BOOT_INIT=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_TYPE_AUTO=y
+CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=0
+CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=y
