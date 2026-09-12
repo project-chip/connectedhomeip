@@ -2,4 +2,9 @@ chip_device_platform = "zephyr"
 
 declare_args() {
   chip_malloc_sys_heap = false
+
+  # Optional GN label for an alternate OTA image processor source_set.
+  # Empty uses the built-in Zephyr MCUboot OTAImageProcessorImpl.
+  # Platform integrations may set this from CMake to supply their own processor.
+  chip_zephyr_ota_image_processor = ""
 }
