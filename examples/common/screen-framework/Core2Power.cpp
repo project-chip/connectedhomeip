@@ -35,15 +35,15 @@ constexpr gpio_num_t kSDA = GPIO_NUM_21;
 constexpr gpio_num_t kSCL = GPIO_NUM_22;
 
 // Runs one step of the power-on sequence, logging and returning on the first failure.
-#define CORE2_POWER_STEP(expr, what)                                                                                             \
-    do                                                                                                                           \
-    {                                                                                                                            \
-        esp_err_t _err = (expr);                                                                                                 \
-        if (_err != ESP_OK)                                                                                                      \
-        {                                                                                                                        \
-            ESP_LOGE(TAG, "%s failed: %s", what, esp_err_to_name(_err));                                                         \
-            return _err;                                                                                                        \
-        }                                                                                                                        \
+#define CORE2_POWER_STEP(expr, what)                                                                                               \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        esp_err_t _err = (expr);                                                                                                   \
+        if (_err != ESP_OK)                                                                                                        \
+        {                                                                                                                          \
+            ESP_LOGE(TAG, "%s failed: %s", what, esp_err_to_name(_err));                                                           \
+            return _err;                                                                                                           \
+        }                                                                                                                          \
     } while (0)
 
 } // namespace

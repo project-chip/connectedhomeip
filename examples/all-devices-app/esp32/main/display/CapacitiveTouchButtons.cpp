@@ -53,15 +53,15 @@ constexpr uint8_t kRegTdStatus  = 0x02;
 // are assumed to be interacting with the list/menu content instead.
 constexpr uint16_t kButtonBarHeightPercent = 20;
 
-constexpr TickType_t kPollInterval  = pdMS_TO_TICKS(50);
+constexpr TickType_t kPollInterval = pdMS_TO_TICKS(50);
 // Minimum time between two accepted presses, to absorb the noisy point-count
 // blips the controller can report for a couple of scans as a finger lands.
 constexpr TickType_t kPressDebounce = pdMS_TO_TICKS(150);
 
-TimerHandle_t gPollTimer  = nullptr;
-i2c_port_t gI2CPort       = I2C_NUM_0;
-bool gWasPressed          = false;
-TickType_t gLastPressed   = 0;
+TimerHandle_t gPollTimer = nullptr;
+i2c_port_t gI2CPort      = I2C_NUM_0;
+bool gWasPressed         = false;
+TickType_t gLastPressed  = 0;
 
 esp_err_t ReadTouchRegs(uint8_t startReg, uint8_t * data, size_t len)
 {
