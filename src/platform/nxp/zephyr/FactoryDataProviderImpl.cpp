@@ -28,14 +28,18 @@
 #else
 #include "mbedtls/aes.h"
 #endif // MBEDTLS_VERSION_NUMBER >= 0x04000000
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#include "mbedtls/private/sha256.h"
+#else
 #include "mbedtls/sha256.h"
+#endif // MBEDTLS_VERSION_NUMBER >= 0x04000000
 
-#if defined(CONFIG_SOC_SERIES_RW6XX)
+#if defined(CONFIG_SOC_SERIES_RW6XX) && defined(CONFIG_CHIP_CRYPTO_HW_ENGINE)
 #include "els_pkc_driver.h"
 #if defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION)
 #include "ELSFactoryData.h"
 #endif /* defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) */
-#endif /* defined(CONFIG_SOC_SERIES_RW6XX) */
+#endif /* defined(CONFIG_SOC_SERIES_RW6XX) && defined(CONFIG_CHIP_CRYPTO_HW_ENGINE) */
 
 /* -------------------------------------------------------------------------- */
 /*                               Private macros                               */
@@ -43,9 +47,10 @@
 
 #define HASH_ID 0xCE47BA5E
 
-#if defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX)
+#if defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) && defined(CONFIG_CHIP_CRYPTO_HW_ENGINE)
 #define DAC_KEY_BLOB_SIZE 48
-#endif /* defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) */
+#endif /* defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) &&                                   \
+          defined(CONFIG_CHIP_CRYPTO_HW_ENGINE) */
 
 /* -------------------------------------------------------------------------- */
 /*                            Class implementation                            */
@@ -112,14 +117,14 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
 
 void FactoryDataProviderImpl::UpdateKeyAttributes(psa_key_attributes_t & attrs)
 {
-#ifdef CONFIG_SOC_SERIES_RW6XX
+#if defined(CONFIG_SOC_SERIES_RW6XX) && defined(CONFIG_CHIP_CRYPTO_HW_ENGINE)
     if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_PERSISTENT)
     {
         psa_set_key_lifetime(&attrs,
                              PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT,
                                                                             PSA_CRYPTO_ELS_PKC_LOCATION_S50_RFC3394_STORAGE));
     }
-#endif /* CONFIG_SOC_SERIES_RW6XX */
+#endif /* CONFIG_SOC_SERIES_RW6XX && CONFIG_CHIP_CRYPTO_HW_ENGINE */
 }
 
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
@@ -205,7 +210,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
         ChipLogProgress(DeviceLayer, "Factory data hash verified successfully");
     }
 
-#if defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX)
+#if defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) && defined(CONFIG_CHIP_CRYPTO_HW_ENGINE)
     uint16_t keySize = 0;
 
     ChipLogProgress(DeviceLayer, "Init: only protect DAC private key");
@@ -225,7 +230,8 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
         els_enable();
         ReturnLogErrorOnFailure(ELS_ConvertDacKey());
     }
-#endif /* defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) */
+#endif /* defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) &&                                   \
+          defined(CONFIG_CHIP_CRYPTO_HW_ENGINE) */
 
     // Import the DAC private key into PSA once at Init time so that
     // SignWithDacKey() does not have to import/destroy the key on every
@@ -272,7 +278,7 @@ CHIP_ERROR FactoryDataProviderImpl::ReadEncryptedData(uint8_t * dest, uint8_t * 
     return CHIP_NO_ERROR;
 }
 
-#if defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX)
+#if defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) && defined(CONFIG_CHIP_CRYPTO_HW_ENGINE)
 
 CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
 {
@@ -394,7 +400,8 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
     return CHIP_NO_ERROR;
 }
 
-#endif /* defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) */
+#endif /* defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) &&                                   \
+          defined(CONFIG_CHIP_CRYPTO_HW_ENGINE) */
 
 #ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
