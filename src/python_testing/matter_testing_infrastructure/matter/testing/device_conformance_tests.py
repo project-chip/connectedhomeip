@@ -294,7 +294,11 @@ class DeviceConformanceTests(BasicCompositionTests):
 
             # This is a manually curated list of cluster revisions that are in-progress in the SDK, but have landed in the spec
             in_progress_revisions = [Clusters.BasicInformation.id, Clusters.PowerSource.id,
+<<<<<<< HEAD
                                      Clusters.NetworkCommissioning.id, Clusters.ScenesManagement.id]
+=======
+                                     Clusters.NetworkCommissioning.id, Clusters.OperationalCredentials.id, Clusters.ScenesManagement.id, Clusters.Groups.id]
+>>>>>>> 3a58f0c (Implemented Groups cluster revision 5, for soft-deprecation (#74101))
             ignore_revisions.extend(in_progress_revisions)
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
