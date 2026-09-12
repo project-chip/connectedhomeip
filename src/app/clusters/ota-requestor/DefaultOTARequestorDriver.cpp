@@ -51,6 +51,10 @@ constexpr uint8_t kMaxInvalidSessionRetries        = 1;  // Max # of query image
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 
+// Delay (seconds) between retries after the provider explicitly aborted the BDX download. Spec
+// 11.20.6 permits a delayed retry; a short delay avoids waiting the full 24h periodic-query interval.
+constexpr uint32_t kAbortedByPeerRetryDelaySec = 120;
+
 #if NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR >= 0
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR);
 #else
@@ -70,6 +74,8 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
     mImageProcessor           = processor;
     mProviderRetryCount       = 0;
     mInvalidSessionRetryCount = 0;
+    // Clear the peer-abort budget so a warm restart does not leak a stale count.
+    mAbortedByPeerRetryCount = 0;
 
     if (mImageProcessor->IsFirstImageRun())
     {
@@ -143,6 +149,13 @@ void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
     {
         mInvalidSessionRetryCount = 0;
     }
+    // Only a clean idle entry resets the peer-abort budget; kInvalidSession / kUnknown do NOT, so a
+    // misbehaving provider cannot defeat the 3-retry cap by interleaving idle reasons. (Also reset in
+    // UpdateDownloaded() and UpdateCancelled().)
+    if (reason == IdleStateReason::kIdle)
+    {
+        mAbortedByPeerRetryCount = 0;
+    }
 
     switch (reason)
     {
@@ -167,6 +180,39 @@ void DefaultOTARequestorDriver::HandleIdleStateEnter(IdleStateReason reason)
         else
         {
             mInvalidSessionRetryCount = 0;
+            StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
+        }
+        break;
+    case IdleStateReason::kAbortedByPeer:
+        // Cancel any armed peer-abort retry timer first so a re-entrant kAbortedByPeer or the
+        // cap-exceeded fallback below cannot leave a stale timer that fires during the idle window.
+        CancelDelayedAction(StartDelayTimerHandler, this);
+        if (mAbortedByPeerRetryCount < kMaxAbortedByPeerRetryCount)
+        {
+            // Provider aborted the in-progress BDX transfer; schedule a short retry instead of
+            // waiting for the 24h periodic-query timer (Matter spec 11.20.6 permits a delayed retry).
+            // Stop the watchdog explicitly since this path bypasses StartSelectedTimer (which would
+            // call StopWatchdogTimer); otherwise it could fire mid-window and cancel a valid retry.
+            StopWatchdogTimer();
+            mAbortedByPeerRetryCount++;
+            ChipLogProgress(SoftwareUpdate, "Peer aborted OTA download; scheduling retry %u/%u in %u seconds",
+                            static_cast<unsigned>(mAbortedByPeerRetryCount), static_cast<unsigned>(kMaxAbortedByPeerRetryCount),
+                            static_cast<unsigned>(kAbortedByPeerRetryDelaySec));
+            // Honor the platform's action-delay floor. std::max (not a ternary) avoids
+            // -Wunreachable-code when the two constants are equal.
+            const System::Clock::Seconds32 effectiveDelay =
+                std::max(kDefaultDelayedActionTime, System::Clock::Seconds32(kAbortedByPeerRetryDelaySec));
+            ScheduleDelayedAction(effectiveDelay, StartDelayTimerHandler, this);
+        }
+        else
+        {
+            // Cap hit: reset the budget and fall back to the periodic-query timer so we do not retry
+            // forever. Capture the count before resetting for the log; [[maybe_unused]] because
+            // ChipLogProgress compiles away in no-logging builds.
+            [[maybe_unused]] uint8_t prevCount = mAbortedByPeerRetryCount;
+            mAbortedByPeerRetryCount           = 0;
+            ChipLogProgress(SoftwareUpdate, "Peer aborted OTA download after %u/%u short retries; falling back to periodic query",
+                            static_cast<unsigned>(prevCount), static_cast<unsigned>(kMaxAbortedByPeerRetryCount));
             StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         }
         break;
@@ -239,6 +285,8 @@ CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason
 void DefaultOTARequestorDriver::UpdateDownloaded()
 {
     VerifyOrDie(mRequestor != nullptr);
+    // A successful download resets the peer-abort budget.
+    mAbortedByPeerRetryCount = 0;
     TEMPORARY_RETURN_IGNORED mRequestor->ApplyUpdate();
 }
 
@@ -277,6 +325,11 @@ void DefaultOTARequestorDriver::UpdateCancelled()
     CancelDelayedAction(StartDelayTimerHandler, this);
     CancelDelayedAction(ApplyTimerHandler, this);
     CancelDelayedAction(ApplyUpdateTimerHandler, this);
+
+    // Reset retry budgets so a freshly-commissioned fabric or externally-cancelled update starts
+    // with a full budget rather than leaking stale counters from the prior session.
+    mAbortedByPeerRetryCount  = 0;
+    mInvalidSessionRetryCount = 0;
 }
 
 void DefaultOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,

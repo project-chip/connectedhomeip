@@ -60,6 +60,10 @@ System::Clock::Timeout BDXDownloader::GetTimeout()
 
 void BDXDownloader::Reset()
 {
+    // NOTE: Do NOT clear mLastFailureCause here. Failure-cleanup callers (CleanupOnError,
+    // OnPreparedForDownload's failure branch, OnDownloadTimeout) write it AFTER Reset() and before
+    // SetState(kIdle, kFailure); successful transitions clear it explicitly at their own callsites.
+    // Clearing it here would silently degrade the short-retry path to the 24h periodic-query path.
     mPrevBlockCounter = 0;
     DeviceLayer::SystemLayer().CancelTimer(TransferTimeoutCheckHandler, this);
 }
@@ -116,6 +120,8 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mPrevBlockCounter = 0;
+    // Clear any stale failure cause from a prior aborted attempt.
+    mLastFailureCause = LastFailureCause::kNone;
 
     // Note that due to the nature of this timer function, the actual time taken to detect a stalled BDX connection might be
     // anywhere in the range of [mTimeout, 2*mTimeout)
@@ -134,6 +140,7 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
 
     if (status == CHIP_NO_ERROR)
     {
+        mLastFailureCause = LastFailureCause::kNone;
         SetState(State::kInProgress, OTAChangeReasonEnum::kSuccess);
 
         // Must call here because StartTransfer() should have prepared a ReceiveInit message, and now we should send it.
@@ -144,6 +151,8 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
         ChipLogError(BDX, "failed to prepare download: %" CHIP_ERROR_FORMAT, status.Format());
         Reset();
         mBdxTransfer.Reset();
+        // Local prepare failure, not a peer abort: keep it off the short-retry budget.
+        mLastFailureCause = LastFailureCause::kLocalPrepareFailed;
         SetState(State::kIdle, OTAChangeReasonEnum::kFailure);
     }
 
@@ -180,6 +189,8 @@ void BDXDownloader::OnDownloadTimeout()
         {
             TEMPORARY_RETURN_IGNORED mImageProcessor->Abort();
         }
+        // Watchdog-detected timeout (distinct from TransferSession::kTransferTimeout); same routing.
+        mLastFailureCause = LastFailureCause::kTimeout;
         SetState(State::kIdle, OTAChangeReasonEnum::kTimeOut);
     }
     else
@@ -190,6 +201,9 @@ void BDXDownloader::OnDownloadTimeout()
 
 void BDXDownloader::EndDownload(CHIP_ERROR reason)
 {
+    // Clear any stale cause before the state read below so a CHIP_NO_ERROR end-of-download does not
+    // leak a previous cause into the idle transition.
+    mLastFailureCause = LastFailureCause::kNone;
     Reset();
 
     if (mState == State::kInProgress)
@@ -236,10 +250,13 @@ void BDXDownloader::PollTransferSession()
     } while (outEvent.EventType != TransferSession::OutputEventType::kNone);
 }
 
-void BDXDownloader::CleanupOnError(OTAChangeReasonEnum reason)
+void BDXDownloader::CleanupOnError(OTAChangeReasonEnum reason, LastFailureCause cause)
 {
+    // Reset() clears mLastFailureCause, so assign the caller-supplied cause after the resets and
+    // before SetState() fires the StateDelegate.
     Reset();
     mBdxTransfer.Reset();
+    mLastFailureCause = cause;
     SetState(State::kIdle, reason);
     if (mImageProcessor)
     {
@@ -266,6 +283,7 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         {
             Reset();
 
+            mLastFailureCause = LastFailureCause::kNone;
             // BDX transfer is not complete until BlockAckEOF has been sent
             SetState(State::kComplete, OTAChangeReasonEnum::kSuccess);
         }
@@ -287,15 +305,17 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "BDX StatusReport %x", static_cast<uint16_t>(outEvent.statusData.statusCode));
-        CleanupOnError(OTAChangeReasonEnum::kFailure);
+        // Peer explicitly aborted via BDX StatusReport: route through the short-retry path.
+        CleanupOnError(OTAChangeReasonEnum::kFailure, LastFailureCause::kPeerStatusReport);
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "TransferSession error");
-        CleanupOnError(OTAChangeReasonEnum::kFailure);
+        // Local error, not a peer abort: keep it off the short-retry budget.
+        CleanupOnError(OTAChangeReasonEnum::kFailure, LastFailureCause::kLocalInternalError);
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
-        CleanupOnError(OTAChangeReasonEnum::kTimeOut);
+        CleanupOnError(OTAChangeReasonEnum::kTimeOut, LastFailureCause::kTimeout);
         break;
     case TransferSession::OutputEventType::kInitReceived:
     case TransferSession::OutputEventType::kAckReceived:
