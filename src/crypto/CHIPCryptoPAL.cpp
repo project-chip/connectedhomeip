@@ -774,6 +774,9 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
     // Read S
     ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, MutableByteSpan{ raw_cursor, fe_length_bytes }));
 
+    // R and S must consume the entire sequence: reject any trailing bytes.
+    VerifyOrReturnError(reader.Remaining() == 0, CHIP_ERROR_INVALID_ARGUMENT);
+
     out_raw_sig = out_raw_sig.SubSpan(0, (2u * fe_length_bytes));
 
     return CHIP_NO_ERROR;
