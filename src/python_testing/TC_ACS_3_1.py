@@ -36,6 +36,7 @@
 #       --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
 #       --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03
 #       --float-arg PIXIT.ACS.Holdtime:30
+#       --bool-arg simulate_ambientsensing:True
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -76,7 +77,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
     # Sends and out-of-band command to the all-clusters-app
     def write_to_app_pipe(self, command):
@@ -294,8 +295,8 @@ class TC_ACS_3_1(MatterBaseTest):
                 await asyncio.sleep(holdTime_input - elapsed_time + 1)
 
             # The last end event
-            # event = event_listener.get_last_event()
-            event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectEnded, timeout_sec=30.0)
+            event = event_listener.get_last_event()
+            # event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectEnded, timeout_sec=30.0)
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
 
@@ -478,7 +479,8 @@ class TC_ACS_3_1(MatterBaseTest):
                 await asyncio.sleep(holdTime_input - elapsed_time + 3)
 
             # The last end event
-            event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectEnded, timeout_sec=30.0)
+            event = event_listener.get_last_event()
+            # event = event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectEnded, timeout_sec=30.0)
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
 
