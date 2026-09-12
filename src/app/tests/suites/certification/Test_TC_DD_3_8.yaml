@@ -103,7 +103,6 @@ tests:
     - label:
           "Step 5: Commissioner SHALL configure regulatory information in the
           Commissionee."
-      PICS: MCORE.COM.WIRELESS
       verification: |
           Verify in DUT as client side
 
@@ -433,7 +432,6 @@ tests:
     - label:
           "Step 15: Commissioner SHALL configure regulatory information in the
           Commissionee."
-      PICS: MCORE.COM.WIRELESS
       verification: |
           Verify in DUT as client side
 
