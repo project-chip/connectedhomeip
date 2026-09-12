@@ -163,7 +163,7 @@ inline void CopyString(char (&dest)[N], CharSpan source)
 inline char * MemoryAllocString(const char * string, size_t length)
 {
     size_t lengthWithNull = length + 1;
-    char * result         = static_cast<char *>(MemoryAlloc(lengthWithNull));
+    char * result         = MemoryAllocTyped<char>(lengthWithNull);
     CopyString(result, lengthWithNull, string);
     return result;
 }

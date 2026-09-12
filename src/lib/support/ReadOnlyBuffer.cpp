@@ -52,7 +52,7 @@ GenericAppendOnlyBuffer & GenericAppendOnlyBuffer::operator=(GenericAppendOnlyBu
 
     if (mBufferIsAllocated && (mBuffer != nullptr))
     {
-        Platform::Impl::PlatformMemoryManagement::MemoryFree(mBuffer);
+        Platform::MemoryFree(mBuffer);
     }
 
     // take over the data
