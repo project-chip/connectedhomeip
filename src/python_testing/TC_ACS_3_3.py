@@ -487,7 +487,6 @@ class TC_ACS_3_3(MatterBaseTest):
             objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
                 countingObject=semantic_tag, objectCountThreshold=objectcountthreshold_input)
             await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
-
             await asyncio.sleep(1)
 
             self.step("6c", "TH awaits a ReportDataMessage containing an attribute report for ObjectCountConfig attribute. Verify that the CountingObject field of ObjectCountConfig attribute contains the namespace ID ant tag ID entered in the step 6b and the ObjectCountThreshold field contains 2")
@@ -510,7 +509,7 @@ class TC_ACS_3_3(MatterBaseTest):
                 await asyncio.sleep(1)
                 self.write_to_app_pipe(
                     f'{{"Name":"SetObjCount","EndpointId":{endpoint},"ObjectCount":2}}')
-                await asyncio.sleep(1)
+                await asyncio.sleep(2)
             else:
                 self.wait_for_user_input(
                     prompt_msg="Type any letter and press ENTER after an object counting ambient sensing event is triggered.")
