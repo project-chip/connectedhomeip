@@ -6001,6 +6001,70 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ updateFabricLabelExpectingWrongValueExpectation ] timeout:(2 * kTimeoutInSeconds)];
 }
 
+- (void)test045b_MTRDeviceInvokeGroupExceedingMaxPathsPerInvoke
+{
+    // all-clusters-app advertises MaxPathsPerInvoke == 5 and only exposes LevelControl/ColorControl on
+    // endpoint 1, so drive a realistic lighting burst: OnOff/LevelControl/ColorControl to the color light
+    // on endpoint 1, plus On to the on/off light on endpoint 2. Six distinct paths split into 5 + 1.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type unsignedField = ^(uint8_t fieldID, NSNumber * value) {
+        return @{
+            MTRContextTagKey : @(fieldID),
+            MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : value },
+        };
+    };
+    __auto_type structure = ^(NSArray * fields) {
+        return @{ MTRTypeKey : MTRStructureValueType, MTRValueKey : fields };
+    };
+
+    // MoveToLevel/MoveToLevelWithOnOff: level, transitionTime, optionsMask, optionsOverride.
+    __auto_type * moveToLevelFields = structure(@[ unsignedField(0, @(128)), unsignedField(1, @(0)), unsignedField(2, @(0)), unsignedField(3, @(0)) ]);
+    __auto_type * moveToLevelWithOnOffFields = structure(@[ unsignedField(0, @(200)), unsignedField(1, @(0)), unsignedField(2, @(0)), unsignedField(3, @(0)) ]);
+    // MoveToColor: colorX, colorY, transitionTime, optionsMask, optionsOverride.
+    __auto_type * moveToColorFields = structure(@[ unsignedField(0, @(0x4000)), unsignedField(1, @(0x4000)), unsignedField(2, @(0)), unsignedField(3, @(0)), unsignedField(4, @(0)) ]);
+    // MoveToColorTemperature: colorTemperatureMireds, transitionTime, optionsMask, optionsOverride.
+    __auto_type * moveToColorTemperatureFields = structure(@[ unsignedField(0, @(250)), unsignedField(1, @(0)), unsignedField(2, @(0)), unsignedField(3, @(0)) ]);
+
+    __auto_type command = ^(NSNumber * endpointID, NSNumber * clusterID, NSNumber * commandID, NSDictionary<NSString *, id> * commandFields) {
+        __auto_type * path = [MTRCommandPath commandPathWithEndpointID:endpointID clusterID:clusterID commandID:commandID];
+        return [[MTRCommandWithRequiredResponse alloc] initWithPath:path commandFields:commandFields requiredResponse:nil];
+    };
+
+    __auto_type * commandGroup = @[
+        command(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOnID), nil),
+        command(@(1), @(MTRClusterIDTypeLevelControlID), @(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID), moveToLevelFields),
+        command(@(1), @(MTRClusterIDTypeColorControlID), @(MTRCommandIDTypeClusterColorControlCommandMoveToColorID), moveToColorFields),
+        command(@(1), @(MTRClusterIDTypeColorControlID), @(MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID), moveToColorTemperatureFields),
+        command(@(1), @(MTRClusterIDTypeLevelControlID), @(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID), moveToLevelWithOnOffFields),
+        command(@(2), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOnID), nil),
+    ];
+
+    __auto_type * expectedPaths = [NSMutableArray array];
+    for (MTRCommandWithRequiredResponse * commandWithResponse in commandGroup) {
+        [expectedPaths addObject:commandWithResponse.path];
+    }
+
+    XCTestExpectation * chunkedInvokeDone = [self expectationWithDescription:@"Invoke of a group exceeding max paths per invoke done"];
+    [device invokeCommands:@[ commandGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, expectedPaths.count);
+                    for (NSUInteger i = 0; i < values.count; i++) {
+                        XCTAssertEqualObjects(values[i], @ { MTRCommandPathKey : expectedPaths[i] });
+                    }
+
+                    [chunkedInvokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ chunkedInvokeDone ] timeout:(6 * kTimeoutInSeconds)];
+}
+
 - (void)test046_MTRCommandWithRequiredResponseEncoding
 {
     // Basic test with no command fields or required response.
