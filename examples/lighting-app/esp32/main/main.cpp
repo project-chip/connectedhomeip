@@ -34,6 +34,7 @@
 #include "shell_extension/launch.h"
 #include "shell_extension/openthread_cli_register.h"
 #include <app/server/Dnssd.h>
+#include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
@@ -75,6 +76,14 @@ using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
 static const char TAG[] = "light-app";
+
+// Endpoint 2 is declared as a secondary network interface by this app's data model. Only the
+// Wi-Fi + Thread build (sdkconfig.wifi_thread.defaults) puts a NetworkCommissioning instance
+// there, by pointing the Thread driver at it.
+#define SECONDARY_NETWORK_INTERFACE_ENDPOINT 2
+#if defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID) && CONFIG_THREAD_NETWORK_ENDPOINT_ID == SECONDARY_NETWORK_INTERFACE_ENDPOINT
+#define SECONDARY_NETWORK_INTERFACE_IN_USE 1
+#endif
 
 static AppDeviceCallbacks EchoCallbacks;
 static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
@@ -142,6 +151,14 @@ static void InitServer(intptr_t context)
 
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
+#ifndef SECONDARY_NETWORK_INTERFACE_IN_USE
+    // Nothing implements NetworkCommissioning on the secondary network interface endpoint in this
+    // configuration, so reads of its attributes would fail. Take the endpoint out of the data model
+    // rather than leave a cluster behind that cannot answer a read of its mandatory attributes.
+    emberAfEndpointEnableDisable(SECONDARY_NETWORK_INTERFACE_ENDPOINT, false);
+#endif
+
     InitInsights();
 }
 
