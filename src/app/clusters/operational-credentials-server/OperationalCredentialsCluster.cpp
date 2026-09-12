@@ -41,8 +41,17 @@ using namespace chip::Protocols::InteractionModel;
 using namespace chip::Transport;
 namespace {
 
+<<<<<<< HEAD
 constexpr auto kDACCertificate                = CertificateChainTypeEnum::kDACCertificate;
 constexpr auto kPAICertificate                = CertificateChainTypeEnum::kPAICertificate;
+=======
+constexpr auto kDACCertificate                    = CertificateChainTypeEnum::kDACCertificate;
+constexpr auto kPAICertificate                    = CertificateChainTypeEnum::kPAICertificate;
+constexpr auto kLegacyAttestationProfile          = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
+constexpr uint16_t kDefaultCertificateSegmentSize = 600;
+// RESP_MAX bounds the requested size even though responses use fixed 600-byte segments.
+constexpr uint16_t kMaxCertificateSegmentSize = 900;
+>>>>>>> 24a3a54 (Pqc phase1 commissioner (#73855))
 constexpr auto kNocResponseMaxDebugTextLength = 128;
 
 // Get the attestation challenge for the current session in progress. Only valid when called
@@ -61,6 +70,35 @@ ByteSpan GetAttestationChallengeFromCurrentSession(app::CommandHandler * command
     return attestationChallenge;
 }
 
+<<<<<<< HEAD
+=======
+BitMask<Credentials::DeviceAttestationCertProfileBitmap>
+ToDeviceAttestationProfileBitmap(Credentials::DeviceAttestationCertProfile profile)
+{
+    return BitMask<Credentials::DeviceAttestationCertProfileBitmap>(static_cast<uint16_t>(1u << to_underlying(profile)));
+}
+
+CHIP_ERROR BuildSegmentedCertificateResponse(const ByteSpan & segment, size_t documentSize, size_t offset, uint16_t segmentId,
+                                             Commands::CertificateChainResponse::Type & response)
+{
+    VerifyOrReturnError(documentSize != 0 && documentSize <= Credentials::kMaxDERCertLengthMlDsa65, CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(offset < documentSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CanCastTo<uint16_t>(documentSize), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(segment.size() == std::min(documentSize - offset, static_cast<size_t>(kDefaultCertificateSegmentSize)),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    response.certificate = segment;
+    response.totalDocumentSize.SetValue(static_cast<uint16_t>(documentSize));
+
+    if (offset + segment.size() < documentSize)
+    {
+        response.nextSegmentID.SetValue(static_cast<uint16_t>(segmentId + 1));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+>>>>>>> 24a3a54 (Pqc phase1 commissioner (#73855))
 const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler, FabricTable & fabricTable)
 {
     FabricIndex index = aCommandHandler->GetAccessingFabricIndex();

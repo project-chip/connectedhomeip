@@ -38,6 +38,7 @@
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPCluster.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <controller/CertificateChainRequestTracker.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/DevicePairingDelegate.h>
@@ -948,8 +949,11 @@ private:
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType,
-                                                  Optional<System::Clock::Timeout> timeout);
+    CHIP_ERROR SendCertificateChainRequestCommand(
+        DeviceProxy * device, Credentials::CertificateType certificateType, Optional<System::Clock::Timeout> timeout,
+        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile = NullOptional,
+        Optional<uint16_t> segmentId                                                                = NullOptional,
+        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> issuerProfile = NullOptional);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
@@ -982,6 +986,7 @@ private:
 
     void ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
                                                Credentials::AttestationVerificationResult result);
+    CHIP_ERROR ContinueCertificateChainRequest(Optional<System::Clock::Timeout> timeout);
     static void OnCertificateChainFailureResponse(void * context, CHIP_ERROR error);
     static void OnCertificateChainResponse(
         void * context, const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response);
@@ -1137,6 +1142,7 @@ private:
     CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType);
+    CHIP_ERROR ParseOperationalCredentialsInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
@@ -1172,7 +1178,69 @@ private:
         mDeviceAttestationInformationVerificationCallback;
 
     chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
+<<<<<<< HEAD
+=======
+
+    struct CertificateChainRequestState
+    {
+        void Reset()
+        {
+            requestTracker.Reset();
+            hasActiveRequest = false;
+            cryptoProfile.ClearValue();
+        }
+
+        bool hasActiveRequest                        = false;
+        uint32_t generation                          = 0;
+        Credentials::CertificateType certificateType = static_cast<Credentials::CertificateType>(0);
+        Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> cryptoProfile;
+        CertificateChainRequestTracker requestTracker;
+    };
+    chip::Callback::Callback<OnNetworkIdentityAvailableFunct> mOnNetworkIdentityRequestCallback;
+    chip::Callback::Callback<OnClientRegisteredFunct> mOnNetworkClientRegistrationCallback;
+
+    // Tracks the Network Client Identity revocation in flight, if any. Its mCall rests at the base
+    // OnClientUnregistered() variant, and a caller that needs to carry on once the revocation lands
+    // swaps in one of the other variants; RollBackNetworkClientIdentity() may only be entered at the
+    // resting state, and cancels (and reports) a revocation still using the callback object when it
+    // needs it for a new one. See those declarations above for the full invariants.
+    chip::Callback::Callback<OnClientUnregisteredFunct> mOnNetworkClientUnregistrationCallback;
+
+    // A Network Client Identity we have registered with a NetworkIdentityRegistrar on behalf of
+    // the commissionee, which we owe a matching UnregisterClient() unless the commissionee ends up
+    // actually using it. Taken on by the kPDCRegisterClientIdentity stage if (and only if)
+    // CommissioningParameters::GetManagePDCClientIdentityRollback() is true, and discharged by
+    // RollBackNetworkClientIdentity(). Note the obligation is taken on before the registrar is
+    // called and survives a registration that fails, unless the registrar reports the failure as
+    // determinate; see OnClientRegistered(). The identifier is recorded with the registration
+    // because the delegate is free to clear or overwrite the PDCClientIdentity parameter it is
+    // derived from at any time. Note we only manage one outstanding registration at a time, since
+    // we expect initial commissioning to provision exactly one operational network connection: the
+    // ConnectNetwork / operational discovery / CommissioningComplete flow only validates one set
+    // of connection parameters.
+    struct NetworkClientRegistration
+    {
+        bool HasValue() const { return registrar != nullptr; }
+        void Clear() { registrar = nullptr; }
+
+        NetworkIdentityRegistrar * registrar = nullptr; // the registrar the identity was registered with
+        Credentials::CertificateKeyIdStorage clientIdentifier{};
+    };
+    NetworkClientRegistration mNetworkClientRegistration;
+
+    // The Network Client Identity of the revocation in flight, or of the last one we gave up on.
+    // Only used for logging, but kept apart from mNetworkClientRegistration because that copy is
+    // overwritten by the next registration, which a revocation left running can outlive.
+    Credentials::CertificateKeyIdStorage mRevokedClientIdentifier{};
+
+    // The node OnClientUnregisteredFromCleanupFinishCommissioning() has to report on.
+    // Captured because CommissioningStageComplete() clears mDeviceBeingCommissioned.
+    NodeId mOnNetworkClientUnregistrationFinishNodeId = kUndefinedNodeId;
+
+>>>>>>> 24a3a54 (Pqc phase1 commissioner (#73855))
     SetUpCodePairer mSetUpCodePairer;
+    CertificateChainRequestState mCertificateChainRequestState;
+    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mPaaAttestationIssuerProfile;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
         &mAutoCommissioner; // Commissioning delegate to call when PairDevice / Commission functions are used

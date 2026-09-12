@@ -157,6 +157,87 @@ TEST_F(AutoCommissionerTest, FeaturesPassedTimeZoneValue)
     ASSERT_TRUE(commissioning_params.GetTimeZone().Value()[0].name.Value().data_equal("ARG"_span));
 }
 
+TEST_F(AutoCommissionerTest, ControllerSupportedAttestationRequestProfilesAlwaysIncludeLegacyFallback)
+{
+    const auto profiles = Internal::GetControllerSupportedAttestationRequestProfiles();
+
+    EXPECT_TRUE(profiles.Has(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy));
+    EXPECT_EQ(profiles.Has(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44),
+              Crypto::IsMlDsa44Supported());
+    EXPECT_EQ(profiles.Has(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65),
+              Crypto::IsMlDsa65Supported());
+}
+
+TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersHighestSharedProfile)
+{
+    if (!Crypto::IsMlDsa65Supported())
+    {
+        GTEST_SKIP() << "Build has no ML-DSA-65 support, so the preference order cannot be exercised";
+    }
+
+    Internal::AttestationProfileBitmap deviceProfiles;
+    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
+    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
+    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65);
+
+    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
+
+    ASSERT_TRUE(selectedProfile.HasValue());
+    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa65);
+}
+
+TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersMlDsa44OverLegacy)
+{
+    if (!Crypto::IsMlDsa44Supported())
+    {
+        GTEST_SKIP() << "Build has no ML-DSA-44 support, so its preference over legacy cannot be exercised";
+    }
+
+    Internal::AttestationProfileBitmap deviceProfiles(
+        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
+        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
+
+    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
+
+    ASSERT_TRUE(selectedProfile.HasValue());
+    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa44);
+}
+
+TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfileReturnsLegacyWhenItIsOnlySharedProfile)
+{
+    Internal::AttestationProfileBitmap deviceProfiles(
+        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
+
+    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
+
+    ASSERT_TRUE(selectedProfile.HasValue());
+    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+}
+
+TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilesIndependently)
+{
+    using app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap;
+    using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+
+    if (!Crypto::IsMlDsa65Supported() || !Crypto::IsMlDsa44Supported())
+    {
+        GTEST_SKIP() << "Build needs both ML-DSA-65 and ML-DSA-44 support to exercise independent PQC profiles";
+    }
+
+    Internal::AttestationProfileBitmap paiProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
+                                                   AttestationCryptoProfileBitmap::kSupportsMlDsa65);
+    Internal::AttestationProfileBitmap dacProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
+                                                   AttestationCryptoProfileBitmap::kSupportsMlDsa44);
+
+    const auto selectedPaiProfile = Internal::SelectControllerSupportedAttestationRequestProfile(paiProfiles);
+    const auto selectedDacProfile = Internal::SelectControllerSupportedAttestationRequestProfile(dacProfiles);
+
+    ASSERT_TRUE(selectedPaiProfile.HasValue());
+    ASSERT_TRUE(selectedDacProfile.HasValue());
+    EXPECT_EQ(selectedPaiProfile.Value(), AttestationCryptoProfileEnum::kMlDsa65);
+    EXPECT_EQ(selectedDacProfile.Value(), AttestationCryptoProfileEnum::kMlDsa44);
+}
+
 TEST_F(AutoCommissionerTest, FeaturesPassedNTPValue)
 {
     constexpr CharSpan defaultNTPBuffer = "default"_span;
@@ -688,4 +769,194 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
         EXPECT_EQ(result, c.isSecondaryNetworkSupported);
     }
 }
+<<<<<<< HEAD
+=======
+
+TEST_F(AutoCommissionerTest, SetCommissioningParametersPreservesAttestationRequestProfiles)
+{
+    using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    mParams.SetPAIAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kMlDsa65)
+        .SetDACAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    ASSERT_EQ(mCommissioner.SetCommissioningParameters(mParams), CHIP_NO_ERROR);
+
+    // Updating a buffer-backed parameter must retain the already selected scalar profiles.
+    CommissioningParameters updated = mCommissioner.GetCommissioningParameters();
+    updated.SetCountryCode("US"_span);
+    ASSERT_EQ(mCommissioner.SetCommissioningParameters(updated), CHIP_NO_ERROR);
+
+    const auto & stored = mCommissioner.GetCommissioningParameters();
+    ASSERT_TRUE(stored.GetPAIAttestationCertificateRequestProfile().HasValue());
+    EXPECT_EQ(stored.GetPAIAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kMlDsa65);
+    ASSERT_TRUE(stored.GetDACAttestationCertificateRequestProfile().HasValue());
+    EXPECT_EQ(stored.GetDACAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    ASSERT_TRUE(stored.GetCountryCode().HasValue());
+    EXPECT_TRUE(stored.GetCountryCode().Value().data_equal("US"_span));
+}
+
+TEST_F(AutoCommissionerTest, SetCommissioningParametersCopiesSpans)
+{
+    uint8_t source[32]{ 0xde, 0xad }; // length 32 is valid for all these except country code
+    ByteSpan sourceSpan32(source);
+    CharSpan sourceCountryCode = "XX"_span;
+
+    CommissioningParameters params{};
+    params.SetAttestationNonce(sourceSpan32);
+    params.SetCSRNonce(sourceSpan32);
+    params.SetPDCPossessionNonce(sourceSpan32);
+    params.SetThreadOperationalDataset(sourceSpan32);
+    params.SetWiFiCredentials(WiFiCredentials(sourceSpan32, sourceSpan32));
+    params.SetCountryCode(sourceCountryCode);
+    EXPECT_EQ(mCommissioner.SetCommissioningParameters(params), CHIP_NO_ERROR);
+
+    CommissioningParameters storedParams = mCommissioner.GetCommissioningParameters();
+    ASSERT_TRUE(storedParams.GetAttestationNonce().HasValue());
+    EXPECT_NE(storedParams.GetAttestationNonce().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetAttestationNonce().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetCSRNonce().HasValue());
+    EXPECT_NE(storedParams.GetCSRNonce().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetCSRNonce().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetPDCPossessionNonce().HasValue());
+    EXPECT_NE(storedParams.GetPDCPossessionNonce().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetPDCPossessionNonce().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetThreadOperationalDataset().HasValue());
+    EXPECT_NE(storedParams.GetThreadOperationalDataset().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetThreadOperationalDataset().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetWiFiCredentials().HasValue());
+    EXPECT_NE(storedParams.GetWiFiCredentials().Value().ssid.data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetWiFiCredentials().Value().ssid.data_equal(sourceSpan32));
+    EXPECT_NE(storedParams.GetWiFiCredentials().Value().credentials.data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetWiFiCredentials().Value().credentials.data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetCountryCode().HasValue());
+    EXPECT_NE(storedParams.GetCountryCode().Value().data(), sourceCountryCode.data());
+    EXPECT_TRUE(storedParams.GetCountryCode().Value().data_equal(sourceCountryCode));
+}
+
+// ---------------------------------------------------------------------------
+// Failing over from the primary to the secondary network interface
+// ---------------------------------------------------------------------------
+
+// Giving up on the primary network only requires removing its configuration from the commissionee
+// if we actually wrote one. Asking a commissionee to remove a network it does not have fails, which
+// would end the commissioning attempt instead of letting us try the other network technology.
+class AutoCommissionerNetworkFailoverTest : public ::testing::Test
+{
+protected:
+    // A commissionee supporting both Wi-Fi and Thread, with credentials for both, which is what
+    // IsSecondaryNetworkSupported() requires. The interface on the root endpoint is the primary one.
+    void ConfigureDualInterface(EndpointId wifiEndpoint, EndpointId threadEndpoint)
+    {
+        const uint8_t ssid[]       = { 's', 's', 'i', 'd' };
+        const uint8_t passphrase[] = { 'p', 'a', 's', 's' };
+        const uint8_t dataset[]    = { 0x00 };
+
+        CommissioningParameters params;
+        params.SetWiFiCredentials(WiFiCredentials(ByteSpan(ssid), ByteSpan(passphrase)));
+        params.SetThreadOperationalDataset(ByteSpan(dataset));
+        params.SetSupportsConcurrentConnection(true);
+        ASSERT_EQ(mCommissioner.SetCommissioningParameters(params), CHIP_NO_ERROR);
+
+        ReadCommissioningInfo & info = mAccess.GetDeviceCommissioningInfo();
+        info.network.wifi.endpoint   = wifiEndpoint;
+        info.network.thread.endpoint = threadEndpoint;
+        ASSERT_TRUE(mAccess.IsSecondaryNetworkSupported());
+        ASSERT_FALSE(mAccess.WroteNetworkConfig());
+    }
+
+    // Reports a stage as having completed successfully. PerformStep() then fails because this
+    // fixture has no device proxy, by which point everything we care about has already happened.
+    void CompleteStage(CommissioningStage stage)
+    {
+        CommissioningDelegate::CommissioningReport report;
+        report.stageCompleted = stage;
+        EXPECT_EQ(mCommissioner.CommissioningStepFinished(CHIP_NO_ERROR, report), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    // The stage the flow moves to once the failover has given up on the primary network. Mirrors
+    // what CommissioningStepFinished() does on a network failure: switch, then report the switch.
+    CommissioningStage StageAfterPrimaryNetworkFailed()
+    {
+        mAccess.TrySecondaryNetwork();
+        CHIP_ERROR err          = CHIP_NO_ERROR;
+        CommissioningStage next = mAccess.AccessGetNextCommissioningStageInternal(kPrimaryOperationalNetworkFailed, err);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        return next;
+    }
+
+    AutoCommissioner mCommissioner{};
+    AutoCommissionerTestAccess mAccess{ &mCommissioner };
+};
+
+// AddOrUpdateWiFiNetwork never succeeded, so there is nothing on the commissionee to remove and we
+// go straight to the secondary network.
+TEST_F(AutoCommissionerNetworkFailoverTest, PrimaryWiFiWithoutConfigSkipsRemoval)
+{
+    ConfigureDualInterface(kRootEndpointId, /* threadEndpoint = */ 1);
+
+    EXPECT_EQ(StageAfterPrimaryNetworkFailed(), kThreadNetworkSetup);
+}
+
+// The Wi-Fi configuration was written, so it has to come off before Thread is configured.
+TEST_F(AutoCommissionerNetworkFailoverTest, PrimaryWiFiWithConfigIsRemovedFirst)
+{
+    ConfigureDualInterface(kRootEndpointId, /* threadEndpoint = */ 1);
+    CompleteStage(kWiFiNetworkSetup);
+    ASSERT_TRUE(mAccess.WroteNetworkConfig());
+
+    EXPECT_EQ(StageAfterPrimaryNetworkFailed(), kRemoveWiFiNetworkConfig);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EXPECT_EQ(mAccess.AccessGetNextCommissioningStageInternal(kRemoveWiFiNetworkConfig, err), kThreadNetworkSetup);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+// The same either way round: Thread on the root endpoint is the primary network.
+TEST_F(AutoCommissionerNetworkFailoverTest, PrimaryThreadWithoutConfigSkipsRemoval)
+{
+    ConfigureDualInterface(/* wifiEndpoint = */ 1, kRootEndpointId);
+
+    EXPECT_EQ(StageAfterPrimaryNetworkFailed(), kWiFiNetworkSetup);
+}
+
+TEST_F(AutoCommissionerNetworkFailoverTest, PrimaryThreadWithConfigIsRemovedFirst)
+{
+    ConfigureDualInterface(/* wifiEndpoint = */ 1, kRootEndpointId);
+    CompleteStage(kThreadNetworkSetup);
+    ASSERT_TRUE(mAccess.WroteNetworkConfig());
+
+    EXPECT_EQ(StageAfterPrimaryNetworkFailed(), kRemoveThreadNetworkConfig);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EXPECT_EQ(mAccess.AccessGetNextCommissioningStageInternal(kRemoveThreadNetworkConfig, err), kWiFiNetworkSetup);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+// What we track is what the commissionee is actually holding, so a successful removal clears it
+// again. Nothing in the current stage graph asks twice, but the record would otherwise be wrong.
+TEST_F(AutoCommissionerNetworkFailoverTest, RemovingTheConfigClearsTheRecord)
+{
+    ConfigureDualInterface(kRootEndpointId, /* threadEndpoint = */ 1);
+    CompleteStage(kWiFiNetworkSetup);
+    ASSERT_TRUE(mAccess.WroteNetworkConfig());
+
+    CompleteStage(kRemoveWiFiNetworkConfig);
+    EXPECT_FALSE(mAccess.WroteNetworkConfig());
+}
+
+// An AutoCommissioner is reused across commissioning attempts, so a configuration written during
+// one attempt must not be remembered into the next.
+TEST_F(AutoCommissionerNetworkFailoverTest, CleanupClearsTheRecord)
+{
+    ConfigureDualInterface(kRootEndpointId, /* threadEndpoint = */ 1);
+    CompleteStage(kWiFiNetworkSetup);
+    ASSERT_TRUE(mAccess.WroteNetworkConfig());
+
+    mAccess.CleanupCommissioning();
+    EXPECT_FALSE(mAccess.WroteNetworkConfig());
+}
+>>>>>>> 24a3a54 (Pqc phase1 commissioner (#73855))
 } // namespace
