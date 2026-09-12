@@ -1043,6 +1043,8 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
 
     ReturnErrorVariantOnFailure(NextStep, ParseSigma1(tlvReader, parsedSigma1));
 
+    std::copy(parsedSigma1.initiatorRandom.begin(), parsedSigma1.initiatorRandom.end(), mInitiatorRandom);
+
     ChipLogDetail(SecureChannel, "Peer (Initiator) assigned session ID %d", parsedSigma1.initiatorSessionId);
     SetPeerSessionId(parsedSigma1.initiatorSessionId);
 

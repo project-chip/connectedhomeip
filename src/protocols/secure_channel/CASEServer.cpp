@@ -17,6 +17,7 @@
 
 #include <protocols/secure_channel/CASEServer.h>
 
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
@@ -86,40 +87,48 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     CHIP_FAULT_INJECT(FaultInjection::kFault_CASEServerBusy, busy = true);
     if (busy)
     {
+        uint8_t incomingRandomBuf[kSigmaParamRandomNumberSize];
+        MutableByteSpan incomingInitiatorRandom(incomingRandomBuf);
+        uint8_t incomingDestIdBuf[Crypto::kSHA256_Hash_Length];
+        MutableByteSpan incomingDestinationId(incomingDestIdBuf);
+        if (PeekSigma1Params(payload, incomingInitiatorRandom, incomingDestinationId) == CHIP_NO_ERROR)
+        {
+            auto activeExchange = GetSession().GetExchangeContext();
+            if (activeExchange.HasValue() &&
+                activeExchange.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress() ==
+                    ec->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress())
+            {
+                // Guard 1: initiatorRandom inequality guard to distinguish MRP retries from new sessions
+                if (incomingInitiatorRandom.data_equal(GetSession().GetInitiatorRandom()))
+                {
+                    // MRP Duplicate/Retransmission!
+                    ChipLogProgress(SecureChannel, "CASE Server detected Sigma1 MRP retry. Resending Sigma2/ACK.");
+                    return HandleMRPRetry(ec);
+                }
+
+                // Different initiatorRandom indicates a new session attempt by the client.
+                // Guard 2 (Active crypto guard), Guard 3 (1.5s temporal grace window),
+                // and Guard 4 (Destination ID validation against provisioned fabrics)
+                if (CanPreemptSession(ec, incomingInitiatorRandom, incomingDestinationId))
+                {
+                    ChipLogProgress(SecureChannel, "CASE Server passed Quadruple Guard Preemption. Preempting stale session.");
+                    PreemptExistingSession();
+                    busy = false;
+                }
+            }
+        }
+    }
+    if (busy)
+    {
         // We are in the middle of CASE handshake
 
         // Invoke watchdog to fix any stuck handshakes
         bool watchdogFired = GetSession().InvokeBackgroundWorkWatchdog();
         if (!watchdogFired)
         {
-            // Handshake wasn't stuck, send the busy status report and let the existing handshake continue.
-
-            // A successful CASE handshake can take several seconds and some may time out (30 seconds or more).
-
-            System::Clock::Milliseconds16 delay = System::Clock::kZero;
-            if (GetSession().GetState() == CASESession::State::kSentSigma2)
-            {
-                // The delay should be however long we think it will take for
-                // that to time out.
-                auto sigma2Timeout = CASESession::ComputeSigma2ResponseTimeout(GetSession().GetRemoteMRPConfig());
-                if (sigma2Timeout < System::Clock::Milliseconds16::max())
-                {
-                    delay = std::chrono::duration_cast<System::Clock::Milliseconds16>(sigma2Timeout);
-                }
-                else
-                {
-                    // Avoid overflow issues, just wait for as long as we can to
-                    // get close to our expected Sigma2 timeout.
-                    delay = System::Clock::Milliseconds16::max();
-                }
-            }
-            else
-            {
-                // For now, setting minimum wait time to 5000 milliseconds if we
-                // have no other information.
-                delay = System::Clock::Milliseconds16(5000);
-            }
-            CHIP_ERROR err = SendBusyStatusReport(ec, delay);
+            // Handshake wasn't stuck, send dynamic busy status report
+            System::Clock::Milliseconds16 delay = ComputeDynamicBusyDelay();
+            CHIP_ERROR err                      = SendBusyStatusReport(ec, delay);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Inet, "Failed to send the busy status report, err:%" CHIP_ERROR_FORMAT, err.Format());
@@ -138,6 +147,8 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
 
     CHIP_ERROR err = InitCASEHandshake(ec);
     SuccessOrExit(err);
+
+    mStateEnteredTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
     // TODO - Enable multiple concurrent CASE session establishment
     // https://github.com/project-chip/connectedhomeip/issues/8342
@@ -232,6 +243,165 @@ CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, Sys
 
     ChipLogProgress(Inet, "Sending status report, exchange " ChipLogFormatExchange, ChipLogValueExchange(ec));
     return ec->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(handle));
+}
+
+CHIP_ERROR CASEServer::PeekSigma1Params(const System::PacketBufferHandle & payload, MutableByteSpan & outInitiatorRandom,
+                                        MutableByteSpan & outDestinationId)
+{
+    VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+    System::PacketBufferTLVReader reader;
+    reader.Init(payload.Retain());
+    TLV::TLVType containerType = TLV::kTLVType_Structure;
+    ReturnErrorOnFailure(reader.Next(containerType, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+
+    // Tag 1: initiatorRandom
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(1)));
+    ByteSpan randomSpan;
+    ReturnErrorOnFailure(reader.GetByteView(randomSpan));
+    VerifyOrReturnError(randomSpan.size() <= outInitiatorRandom.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(outInitiatorRandom.data(), randomSpan.data(), randomSpan.size());
+    outInitiatorRandom.reduce_size(randomSpan.size());
+
+    // Tag 2: initiatorSessionId
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(2)));
+    uint16_t initiatorSessionId = 0;
+    ReturnErrorOnFailure(reader.Get(initiatorSessionId));
+
+    // Tag 3: destinationId
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(3)));
+    ByteSpan destIdSpan;
+    ReturnErrorOnFailure(reader.GetByteView(destIdSpan));
+    VerifyOrReturnError(destIdSpan.size() <= outDestinationId.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(outDestinationId.data(), destIdSpan.data(), destIdSpan.size());
+    outDestinationId.reduce_size(destIdSpan.size());
+
+    return CHIP_NO_ERROR;
+}
+
+bool CASEServer::ValidateDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom) const
+{
+    if (mFabrics == nullptr || mGroupDataProvider == nullptr)
+    {
+        return false;
+    }
+
+    for (const FabricInfo & fabricInfo : *mFabrics)
+    {
+        FabricId fabricId = fabricInfo.GetFabricId();
+        NodeId nodeId     = fabricInfo.GetNodeId();
+        Crypto::P256PublicKey rootPubKey;
+        CHIP_ERROR err = mFabrics->FetchRootPubkey(fabricInfo.GetFabricIndex(), rootPubKey);
+        if (err != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+        Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
+
+        GroupDataProvider::KeySet ipkKeySet;
+        auto ipkKeySetWiperOnScopeExit = ScopeExit([&] { ipkKeySet.ClearKeys(); });
+        err                            = mGroupDataProvider->GetIpkKeySet(fabricInfo.GetFabricIndex(), ipkKeySet);
+        if ((err != CHIP_NO_ERROR) ||
+            ((ipkKeySet.num_keys_used == 0) || (ipkKeySet.num_keys_used > Credentials::GroupDataProvider::KeySet::kEpochKeysMax)))
+        {
+            continue;
+        }
+
+        for (size_t keyIdx = 0; keyIdx < ipkKeySet.num_keys_used; ++keyIdx)
+        {
+            uint8_t candidateDestinationId[Crypto::kSHA256_Hash_Length];
+            MutableByteSpan candidateDestinationIdSpan(candidateDestinationId);
+            ByteSpan candidateIpkSpan(ipkKeySet.epoch_keys[keyIdx].key);
+
+            err = GenerateCaseDestinationId(candidateIpkSpan, initiatorRandom, rootPubKeySpan, fabricId, nodeId,
+                                            candidateDestinationIdSpan);
+            if ((err == CHIP_NO_ERROR) && candidateDestinationIdSpan.data_equal(destinationId))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool CASEServer::CanPreemptSession(Messaging::ExchangeContext * ec, const ByteSpan & incomingInitiatorRandom,
+                                   const ByteSpan & incomingDestinationId)
+{
+    // Guard 2: Active crypto calculation guard
+    if (GetSession().IsCryptoOperationInProgress())
+    {
+        ChipLogProgress(SecureChannel, "Preemption blocked: active crypto operation in progress.");
+        return false;
+    }
+
+    // Guard 3: Temporal grace window (1.5s) for in-flight Sigma2 packets
+    System::Clock::Timestamp now   = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Timeout elapsed = (now >= mStateEnteredTimestamp) ? (now - mStateEnteredTimestamp) : System::Clock::kZero;
+    if (elapsed < kInFlightGraceWindow)
+    {
+        ChipLogProgress(SecureChannel, "Preemption deferred: Sigma2 in transit (grace window %u ms remaining).",
+                        static_cast<unsigned>((kInFlightGraceWindow - elapsed).count()));
+        return false;
+    }
+
+    // Guard 4: Destination ID validation against provisioned fabrics
+    VerifyOrReturnError(ValidateDestinationId(incomingDestinationId, incomingInitiatorRandom), false);
+
+    return true;
+}
+
+CHIP_ERROR CASEServer::HandleMRPRetry(Messaging::ExchangeContext * ec)
+{
+    if (ec != nullptr && ec->GetReliableMessageContext() != nullptr)
+    {
+        return ec->GetReliableMessageContext()->SendStandaloneAckMessage();
+    }
+    return CHIP_NO_ERROR;
+}
+
+void CASEServer::PreemptExistingSession()
+{
+    MATTER_TRACE_SCOPE("PreemptExistingSession", "CASEServer");
+    ChipLogProgress(SecureChannel, "Preempting stale CASE session for superseding retry");
+
+    GetSession().DiscardExchange();
+    GetSession().Clear();
+    mPinnedSecureSession.ClearValue();
+    PrepareForSessionEstablishment();
+}
+
+System::Clock::Milliseconds16 CASEServer::ComputeDynamicBusyDelay()
+{
+    System::Clock::Timeout expectedDuration = System::Clock::kZero;
+    if (GetSession().GetState() == CASESession::State::kSentSigma2)
+    {
+        expectedDuration = CASESession::ComputeSigma2ResponseTimeout(GetSession().GetRemoteMRPConfig());
+    }
+    else if (GetSession().IsCryptoOperationInProgress())
+    {
+        expectedDuration = System::Clock::Milliseconds16(250);
+    }
+    else
+    {
+        expectedDuration = System::Clock::Milliseconds16(2000);
+    }
+
+    System::Clock::Timestamp now   = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Timeout elapsed = (now >= mStateEnteredTimestamp) ? (now - mStateEnteredTimestamp) : System::Clock::kZero;
+    System::Clock::Timeout remaining =
+        (expectedDuration > elapsed) ? (expectedDuration - elapsed) : System::Clock::Timeout(System::Clock::Milliseconds16(250));
+
+    if (remaining < System::Clock::Milliseconds16(250))
+    {
+        remaining = System::Clock::Milliseconds16(250);
+    }
+
+    uint16_t jitterMs = static_cast<uint16_t>(50 + (Crypto::GetRandU16() % 200));
+    remaining += System::Clock::Milliseconds16(jitterMs);
+
+    return std::chrono::duration_cast<System::Clock::Milliseconds16>(
+        std::min<System::Clock::Timeout>(remaining, System::Clock::Milliseconds16::max()));
 }
 
 } // namespace chip
