@@ -34,7 +34,8 @@
 #       --app-pipe /tmp/acs_fifo_3_2
 #       --string-arg PIXIT.ACS.Event1_NSID:0x4B
 #       --string-arg PIXIT.ACS.Event1_TAGID:0x03
-#       --float-arg PIXIT.ACS.Holdtime:30"
+#       --float-arg PIXIT.ACS.Holdtime:30
+#       --bool-arg simulate_ambientsensing:True
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -73,7 +74,7 @@ class TC_ACS_3_2(MatterBaseTest):
 
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
     # Sends and out-of-band command to the all-clusters-app
     def write_to_app_pipe(self, command):
