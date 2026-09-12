@@ -506,10 +506,10 @@ class TC_ACS_3_3(MatterBaseTest):
                 self.write_to_app_pipe(
                     # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":73, "TagId":3}]}')
                     f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID2}, "TagId":{tag2}}}]}}')
-                await asyncio.sleep(1)
+                #await asyncio.sleep(1)
                 self.write_to_app_pipe(
                     f'{{"Name":"SetObjCount","EndpointId":{endpoint},"ObjectCount":2}}')
-                await asyncio.sleep(2)
+                #await asyncio.sleep(1)
             else:
                 self.wait_for_user_input(
                     prompt_msg="Type any letter and press ENTER after an object counting ambient sensing event is triggered.")
