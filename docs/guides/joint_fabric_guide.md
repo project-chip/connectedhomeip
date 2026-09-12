@@ -258,6 +258,31 @@ should be found.
 
 Execute all the initialization steps for Ecosystem A and Ecosystem B above.
 
+### JCM Flow Overview
+
+When the JCM commissioning step (`--jcm true`) is triggered, the following
+sequence is executed automatically by the Ecosystem A jf-admin-app after the
+standard commissioning finalizes ownership transfer:
+
+1. **AnnounceJointFabricAdministrator** — jf-admin-app sends itself to the
+   commissionee (the Ecosystem B jf-admin-app) as an administrator
+2. **ICACCSRRequest** — jf-admin-app requests an ICAC CSR from the commissionee;
+   the commissionee returns the CSR signed by its `TrustedIcacPublicKeyB`
+   keypair
+3. **Cross-signing** — jf-admin-app asks the Ecosystem A jf-control-app (via the
+   `CROSS_SIGNED_ICAC` RPC transaction) to cross-sign the commissionee's ICAC
+   CSR under the Ecosystem A anchor root CA, embedding the anchor fabric ID in
+   the Subject DN
+4. **AddICAC** — jf-admin-app installs the cross-signed ICAC on the commissionee
+   via the `AddICAC` cluster command; the commissionee validates the certificate
+   chain and stores it
+5. **CommissioningComplete** — jf-admin-app finalizes commissioning
+
+The cross-signed ICAC enables the commissionee to later receive NOCs valid on
+the Ecosystem A anchor fabric, establishing the joint fabric relationship.
+
+### Running the JCM Test
+
 On the Ecosystem B Joint Fabric Controller application
 
 -   Open Joint Commissioning Window on JF Admin App of Ecosystem B
@@ -278,6 +303,16 @@ On the Ecosystem A Joint Fabric Controller application
 
 ```
 pairing code 10 [manual pairing code] --jcm true
+```
+
+After successful JCM commissioning, check for the following logs on Ecosystem
+A's jf-admin-app to confirm the cross-signing flow completed:
+
+```
+OnSendICACSRRequestResponse: validated ICAC CSR
+CrossSignICAC: requesting cross-signed ICAC for anchor fabric ...
+OnAddICACResponse: ICAC installed successfully, proceeding to CommissioningComplete
+Joint Commissioning Method (nodeId=...) success
 ```
 
 ## Unit Testing Joint Fabric

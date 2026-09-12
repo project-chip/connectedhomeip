@@ -62,6 +62,11 @@ public:
 
     CHIP_ERROR GenerateIcacCsr(chip::MutableByteSpan & generatedIcacCsr) { return mOpCredsIssuer.ObtainICACSR(generatedIcacCsr); }
 
+    CHIP_ERROR SignICAC(chip::ByteSpan icaCsr, chip::FabricId anchorFabricId, chip::MutableByteSpan & icac)
+    {
+        return mOpCredsIssuer.SignICAC(icaCsr, anchorFabricId, icac);
+    }
+
     CHIP_ERROR AddAdditionalCDVerifyingCerts(const std::vector<std::vector<uint8_t>> & additionalCdCerts) override
     {
         VerifyOrReturnError(mDacVerifier != nullptr, CHIP_ERROR_INCORRECT_STATE);
