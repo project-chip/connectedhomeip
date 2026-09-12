@@ -138,45 +138,43 @@ class BasicClientFragment : Fragment() {
     val attributeName = ATTRIBUTES[itemIndex]
     val attributeId = BasicInformation.Attribute.valueOf(attributeName).id
 
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        ChipClient.getDeviceController(requireContext())
+          .readPath(
+            object : ReportCallback {
+              override fun onError(
+                attributePath: ChipAttributePath?,
+                eventPath: ChipEventPath?,
+                ex: java.lang.Exception
+              ) {
+                showMessage("Read $attributeName failure $ex")
+                Log.e(TAG, "Read $attributeName failure", ex)
+              }
+
+              override fun onReport(nodeState: NodeState?) {
+                val tlv =
+                  nodeState
+                    ?.getEndpointState(endpointId)
+                    ?.getClusterState(clusterId)
+                    ?.getAttributeState(attributeId)
+                    ?.tlv
+                val value = tlv?.let { TlvReader(it).toAny() }
+                Log.i(TAG, "[Read Success] $attributeName: $value")
+                showMessage("[Read Success] $attributeName: $value")
+              }
+            },
+            devicePtr,
+            listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
+            null,
+            false,
+            0 /* imTimeoutMs */
+          )
       }
-
-    ChipClient.getDeviceController(requireContext())
-      .readPath(
-        object : ReportCallback {
-          override fun onError(
-            attributePath: ChipAttributePath?,
-            eventPath: ChipEventPath?,
-            ex: java.lang.Exception
-          ) {
-            showMessage("Read $attributeName failure $ex")
-            Log.e(TAG, "Read $attributeName failure", ex)
-          }
-
-          override fun onReport(nodeState: NodeState?) {
-            val tlv =
-              nodeState
-                ?.getEndpointState(endpointId)
-                ?.getClusterState(clusterId)
-                ?.getAttributeState(attributeId)
-                ?.tlv
-            val value = tlv?.let { TlvReader(it).toAny() }
-            Log.i(TAG, "[Read Success] $attributeName: $value")
-            showMessage("[Read Success] $attributeName: $value")
-          }
-        },
-        devicePtr,
-        listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
-        null,
-        false,
-        0 /* imTimeoutMs */
-      )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun makeAttributeList() {
@@ -187,40 +185,38 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun sendWriteAttribute(attribute: BasicInformation.Attribute, tlv: ByteArray) {
     val clusterId = BasicInformation.ID
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        ChipClient.getDeviceController(requireContext())
+          .write(
+            object : WriteAttributesCallback {
+              override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {
+                showMessage("Write ${attribute.name} failure $ex")
+                Log.e(TAG, "Write ${attribute.name} failure", ex)
+              }
 
-    ChipClient.getDeviceController(requireContext())
-      .write(
-        object : WriteAttributesCallback {
-          override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {
-            showMessage("Write ${attribute.name} failure $ex")
-            Log.e(TAG, "Write ${attribute.name} failure", ex)
-          }
-
-          override fun onResponse(attributePath: ChipAttributePath, status: Status) {
-            showMessage("Write ${attribute.name} response: $status")
-          }
-        },
-        devicePtr,
-        listOf(
-          AttributeWriteRequest.newInstance(
-            addressUpdateFragment.endpointId,
-            clusterId,
-            attribute.id,
-            tlv,
-            Optional.empty()
+              override fun onResponse(attributePath: ChipAttributePath, status: Status) {
+                showMessage("Write ${attribute.name} response: $status")
+              }
+            },
+            devicePtr,
+            listOf(
+              AttributeWriteRequest.newInstance(
+                addressUpdateFragment.endpointId,
+                clusterId,
+                attribute.id,
+                tlv,
+                Optional.empty()
+              )
+            ),
+            0,
+            0
           )
-        ),
-        0,
-        0
-      )
+      }
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun showMessage(msg: String) {
