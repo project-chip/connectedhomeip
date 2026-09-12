@@ -1,5 +1,9 @@
 # Matter OTA
 
+> To update several component firmware images (e.g. a co-processor plus the
+> application) in a single OTA session, see
+> [Multi-Image OTA](multi_image_ota.md).
+
 ## Generate CHIP OTA image
 
 User can generate the Matter OTA image by simply enabling
