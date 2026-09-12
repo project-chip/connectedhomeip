@@ -10789,3 +10789,66 @@ PICS:
 
     - label: "Does the device implement the End command?"
       id: WEBRTCR.S.C03.Rsp
+
+    #
+    # Proximity Ranging Cluster
+    #
+    - label:
+          "Does the device implement the Proximity Ranging cluster as a server?"
+      id: PROXR.S
+
+    # Features
+    - label: "Does the device support the Wi-Fi USD Proximity Ranging feature?"
+      id: PROXR.S.F00
+
+    - label: "Does the device support the Bluetooth Channel Sounding feature?"
+      id: PROXR.S.F01
+
+    - label: "Does the device support the BLE Beacon RSSI feature?"
+      id: PROXR.S.F02
+
+    - label: "Does the device support the UWB Ranging feature?"
+      id: PROXR.S.F03
+
+    # Server attributes
+    - label: "Does the device implement the RangingCapabilities attribute?"
+      id: PROXR.S.A0000
+
+    - label: "Does the device implement the WiFiDevIK attribute?"
+      id: PROXR.S.A0001
+
+    - label: "Does the device implement the BLEDeviceID attribute?"
+      id: PROXR.S.A0002
+
+    - label: "Does the device implement the BLTDevIK attribute?"
+      id: PROXR.S.A0003
+
+    - label: "Does the device implement the BLTCSSecurityLevel attribute?"
+      id: PROXR.S.A0004
+
+    - label: "Does the device implement the BLTCSModeCapability attribute?"
+      id: PROXR.S.A0005
+
+    - label: "Does the device implement the SessionIDList attribute?"
+      id: PROXR.S.A0006
+
+    - label: "Does the device implement the RangingConstraints attribute?"
+      id: PROXR.S.A0007
+
+    # Commands received
+    - label: "Does the device implement the StartRangingRequest command?"
+      id: PROXR.S.C00.Rsp
+
+    - label: "Does the device implement the StopRangingRequest command?"
+      id: PROXR.S.C02.Rsp
+
+    # Commands generated
+    - label: "Does the device implement the StartRangingResponse command?"
+      id: PROXR.S.C01.Tx
+
+    # Events
+    - label: "Does the device implement the RangingResult event?"
+      id: PROXR.S.E00
+
+    - label: "Does the device implement the RangingSessionStatus event?"
+      id: PROXR.S.E01

@@ -3227,3 +3227,34 @@ JFADMIN.C=1
 
 # Attributes
 JFADMIN.S.A0000=1 #AdministratorFabricIndex
+
+# Proximity Ranging Cluster
+# Server
+PROXR.S=1
+
+# Features
+PROXR.S.F00=1  # WFUSDPD - Wi-Fi USD Proximity Ranging
+PROXR.S.F01=1  # BLTCS - Bluetooth Channel Sounding
+PROXR.S.F02=1  # BLERBC - BLE Beacon RSSI
+PROXR.S.F03=0  # UWBR - UWB Ranging
+
+# Attributes
+PROXR.S.A0000=1  # RangingCapabilities
+PROXR.S.A0001=1  # WiFiDevIK
+PROXR.S.A0002=1  # BLEDeviceID
+PROXR.S.A0003=1  # BLTDevIK
+PROXR.S.A0004=1  # BLTCSSecurityLevel
+PROXR.S.A0005=1  # BLTCSModeCapability
+PROXR.S.A0006=1  # SessionIDList
+PROXR.S.A0007=0  # RangingConstraints (not implemented by all-devices-app)
+
+# Commands Received
+PROXR.S.C00.Rsp=1  # StartRangingRequest
+PROXR.S.C02.Rsp=1  # StopRangingRequest
+
+# Commands Generated
+PROXR.S.C01.Tx=1   # StartRangingResponse
+
+# Events
+PROXR.S.E00=1      # RangingResult
+PROXR.S.E01=1      # RangingSessionStatus
