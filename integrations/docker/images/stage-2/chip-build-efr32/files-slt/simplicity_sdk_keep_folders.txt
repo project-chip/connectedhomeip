@@ -53,6 +53,7 @@ bluetooth_le_controller/build/gcc/xg21/release/liblinklayer.a
 bluetooth_le_controller/build/gcc/xg24/release/liblinklayer.a
 bluetooth_le_controller/build/gcc/xg26/release/liblinklayer.a
 bluetooth_le_controller/build/llvm/xg24/release/liblinklayer.a
+bluetooth_le_controller/build/llvm/xg26/release/liblinklayer.a
 bluetooth_le_controller/build/llvm/x301/release/liblinklayer.a
 bluetooth_le_host/build/gcc/cortex-m33/privacy/rpa_resolution/release/libble_host_rpa_resolution_stub.a
 bluetooth_le_host/build/gcc/cortex-m33/privacy/resolving_list/release/libble_host_resolving_list_stub.a
