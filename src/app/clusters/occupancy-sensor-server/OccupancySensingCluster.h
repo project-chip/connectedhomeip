@@ -32,13 +32,25 @@ public:
      * @brief Called when the occupancy state changes.
      * @param occupied The new occupancy state.
      */
-    virtual void OnOccupancyChanged(bool occupied) = 0;
+    virtual void OnOccupancyChanged(bool occupied) {}
 
     /**
      * @brief Called when the hold time changes.
      * @param holdTime The new hold time.
      */
-    virtual void OnHoldTimeChanged(uint16_t holdTime) = 0;
+    virtual void OnHoldTimeChanged(uint16_t holdTime) {}
+
+    /**
+     * @brief Get the predicted occupancy entry at the given index.
+     * @param index The 0-based index of the predicted occupancy entry.
+     * @param[out] prediction The predicted occupancy struct to populate.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if index is out of range, or another error.
+     */
+    virtual CHIP_ERROR GetPredictedOccupancyAtIndex(size_t index,
+                                                    OccupancySensing::Structs::PredictedOccupancyStruct::Type & prediction)
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
 };
 
 class OccupancySensingCluster : public DefaultServerCluster, public TimerContext
@@ -107,6 +119,12 @@ public:
     void SetOccupancy(bool occupied);
     bool IsOccupied() const;
     bool IsHoldTimeEnabled() const;
+    bool IsPredictionEnabled() const;
+
+    void SetDelegate(OccupancySensingDelegate * delegate) { mDelegate = delegate; }
+    OccupancySensingDelegate * GetDelegate() const { return mDelegate; }
+
+    void NotifyPredictedOccupancyChanged();
 
     uint16_t GetHoldTime() const;
     const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & GetHoldTimeLimits() const;
