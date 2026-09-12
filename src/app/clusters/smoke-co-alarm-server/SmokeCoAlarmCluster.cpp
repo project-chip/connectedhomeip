@@ -225,12 +225,14 @@ bool SmokeCoAlarmCluster::SetInterconnectCOAlarm(AlarmStateEnum newInterconnectC
 void SmokeCoAlarmCluster::SetContaminationState(ContaminationStateEnum newContaminationState)
 {
     VerifyOrReturn(SupportsSmokeAlarm());
+    VerifyOrReturn(mConfig.optionalAttribs.IsSet(ContaminationState::Id));
     SetAttributeValue(mContaminationState, newContaminationState, ContaminationState::Id);
 }
 
 void SmokeCoAlarmCluster::SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensitivityLevel)
 {
     VerifyOrReturn(SupportsSmokeAlarm());
+    VerifyOrReturn(mConfig.optionalAttribs.IsSet(SmokeSensitivityLevel::Id));
     SetAttributeValue(mSmokeSensitivityLevel, newSmokeSensitivityLevel, SmokeSensitivityLevel::Id);
     if (mDelegate != nullptr)
     {
@@ -407,8 +409,10 @@ CHIP_ERROR SmokeCoAlarmCluster::Attributes(const ConcreteClusterPath & path,
         { mConfig.optionalAttribs.IsSet(DeviceMuted::Id), DeviceMuted::kMetadataEntry },
         { mConfig.optionalAttribs.IsSet(InterconnectSmokeAlarm::Id), InterconnectSmokeAlarm::kMetadataEntry },
         { mConfig.optionalAttribs.IsSet(InterconnectCOAlarm::Id), InterconnectCOAlarm::kMetadataEntry },
-        { mConfig.featureMap.Has(Feature::kSmokeAlarm), ContaminationState::kMetadataEntry },
-        { mConfig.featureMap.Has(Feature::kSmokeAlarm), SmokeSensitivityLevel::kMetadataEntry },
+        { mConfig.featureMap.Has(Feature::kSmokeAlarm) && mConfig.optionalAttribs.IsSet(ContaminationState::Id),
+          ContaminationState::kMetadataEntry },
+        { mConfig.featureMap.Has(Feature::kSmokeAlarm) && mConfig.optionalAttribs.IsSet(SmokeSensitivityLevel::Id),
+          SmokeSensitivityLevel::kMetadataEntry },
         { mConfig.optionalAttribs.IsSet(ExpiryDate::Id), ExpiryDate::kMetadataEntry },
         { mConfig.optionalAttribs.IsSet(Unmounted::Id), Unmounted::kMetadataEntry },
     };
