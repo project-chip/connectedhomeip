@@ -53,6 +53,10 @@ chip_test_suite("tests") {
     ]
   }
 
+  if (chip_system_config_event_loop == "Dispatch") {
+    test_sources += [ "TestSystemDispatchSocketWatch.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

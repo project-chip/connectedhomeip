@@ -28,6 +28,8 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include <unistd.h>
+
 // Note: CONFIG_BUILD_FOR_HOST_UNIT_TEST
 //
 // Certain unit tests are executed without a main dispatch queue, relying instead on a mock clock
@@ -96,8 +98,21 @@ namespace System {
         VerifyOrDie(nullptr != dispatchQueue);
 #endif
 
-        source = dispatch_source_create(sourceType, static_cast<uintptr_t>(watch->mFD), 0, dispatchQueue);
-        VerifyOrReturnError(nullptr != source, CHIP_ERROR_NO_MEMORY);
+        // Monitor a private duplicate of the socket descriptor rather than the caller's fd.
+        // libdispatch READ/WRITE sources require the monitored descriptor to remain valid until
+        // the source's cancel handler has run; otherwise, if the fd is close()d during socket /
+        // endpoint teardown before the asynchronous source cancellation completes, libdispatch
+        // aborts the process with _dispatch_bug_kevent_vanished (EXC_GUARD). The caller owns and
+        // may close watch->mFD at any time, so we dup() it and close the copy from the cancel
+        // handler, which libdispatch invokes only once it is completely done with the source.
+        int dupFD = ::dup(watch->mFD);
+        VerifyOrReturnError(dupFD >= 0, CHIP_ERROR_POSIX(errno));
+
+        source = dispatch_source_create(sourceType, static_cast<uintptr_t>(dupFD), 0, dispatchQueue);
+        if (nullptr == source) {
+            ::close(dupFD);
+            return CHIP_ERROR_NO_MEMORY;
+        }
 
         dispatch_source_set_event_handler(source, ^{
             if (watch->mPendingIO.Has(flag) && watch->mCallback != nullptr) {
@@ -105,6 +120,11 @@ namespace System {
                 events.Set(flag);
                 watch->mCallback(events, watch->mCallbackData);
             }
+        });
+        // Close our private duplicate of the descriptor only after libdispatch is completely
+        // finished with the source, guaranteeing the monitored fd never vanishes underneath it.
+        dispatch_source_set_cancel_handler(source, ^{
+            ::close(dupFD);
         });
         // only now we are sure the source exists and can become active
         dispatch_activate(source);
