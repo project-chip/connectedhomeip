@@ -24,6 +24,7 @@
 #include <credentials/attestation_verifier/TestPAAStore.h>
 #include <crypto/CHIPCryptoPAL.h>
 
+#include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
@@ -328,25 +329,6 @@ bool SupportsAttestationVerificationProfile(DeviceAttestationCertProfile profile
     return false;
 }
 
-constexpr size_t GetPaaCertificateAllocationSize(DeviceAttestationCertProfile profile)
-{
-    switch (profile)
-    {
-    case DeviceAttestationCertProfile::kMlDsa44:
-    case DeviceAttestationCertProfile::kMlDsa65:
-        return kMaxDERCertLengthMlDsa65;
-    case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
-    case DeviceAttestationCertProfile::kUnknownEnumValue:
-        return kMaxDERCertLength;
-    }
-
-    return kMaxDERCertLength;
-}
-
-static_assert(GetPaaCertificateAllocationSize(DeviceAttestationCertProfile::kEcdsaMatterLegacy) == kMaxDERCertLength);
-static_assert(GetPaaCertificateAllocationSize(DeviceAttestationCertProfile::kMlDsa44) == kMaxDERCertLengthMlDsa65);
-static_assert(GetPaaCertificateAllocationSize(DeviceAttestationCertProfile::kMlDsa65) == kMaxDERCertLengthMlDsa65);
-
 // CertificateType class doesn't work since it doesn't encode PAA.
 enum class AttestationChainElement : uint8_t
 {
@@ -465,6 +447,51 @@ const char * CertificationTypeAsString(CertificationType certificationType)
 
 } // namespace
 
+CHIP_ERROR DefaultDACVerifier::GetPaaCertificateAllocationSize(ByteSpan paiDer, size_t & allocationSize)
+{
+    // The PAI request profile describes its subject key, whereas its signature identifies
+    // the PAA algorithm. A P-256 PAI can therefore require an ML-DSA PAA buffer.
+    using namespace ASN1;
+    ASN1Reader reader;
+    reader.Init(paiDer);
+    ReturnErrorOnFailure(reader.Next());
+    VerifyOrReturnError(reader.GetClass() == kASN1TagClass_Universal && reader.GetTag() == kASN1UniversalTag_Sequence,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(reader.EnterConstructedType());
+    ReturnErrorOnFailure(reader.Next()); // TBSCertificate
+    VerifyOrReturnError(reader.GetClass() == kASN1TagClass_Universal && reader.GetTag() == kASN1UniversalTag_Sequence,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(reader.Next()); // signatureAlgorithm
+    VerifyOrReturnError(reader.GetClass() == kASN1TagClass_Universal && reader.GetTag() == kASN1UniversalTag_Sequence,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(reader.EnterConstructedType());
+    ReturnErrorOnFailure(reader.Next());
+    VerifyOrReturnError(reader.GetClass() == kASN1TagClass_Universal && reader.GetTag() == kASN1UniversalTag_ObjectId,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    // DER OID values for ecdsa-with-SHA256, id-ml-dsa-44, and id-ml-dsa-65.
+    constexpr uint8_t kEcdsaSha256[] = { 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02 };
+    constexpr uint8_t kMlDsa44[]     = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x11 };
+    constexpr uint8_t kMlDsa65[]     = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x12 };
+    const ByteSpan signatureOid(reader.GetValue(), reader.GetValueLen());
+    if (signatureOid.data_equal(ByteSpan(kEcdsaSha256)))
+    {
+        allocationSize = kMaxDERCertLength;
+        return CHIP_NO_ERROR;
+    }
+    if (signatureOid.data_equal(ByteSpan(kMlDsa44)))
+    {
+        allocationSize = kMaxDERCertLengthMlDsa44;
+        return Crypto::IsMlDsa44Supported() ? CHIP_NO_ERROR : CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    if (signatureOid.data_equal(ByteSpan(kMlDsa65)))
+    {
+        allocationSize = kMaxDERCertLengthMlDsa65;
+        return Crypto::IsMlDsa65Supported() ? CHIP_NO_ERROR : CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
+}
+
 void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
@@ -478,6 +505,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     AttestationCertVidPid dacVidPid;
     AttestationCertVidPid paiVidPid;
     AttestationCertVidPid paaVidPid;
+    size_t paaCertAllocatedLen = 0;
 
     VerifyOrExit(!info.attestationElementsBuffer.empty() && !info.attestationChallengeBuffer.empty() &&
                      !info.attestationSignatureBuffer.empty() && !info.dacDerBuffer.empty() && !info.attestationNonceBuffer.empty(),
@@ -496,6 +524,15 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
 
     // Ensure PAI is present
     VerifyOrExit(!info.paiDerBuffer.empty(), attestationError = AttestationVerificationResult::kPaiMissing);
+
+    // This is an allocation/capability hint only; certificate validation below still
+    // checks the PAI signature against the trusted PAA.
+    {
+        const CHIP_ERROR err = GetPaaCertificateAllocationSize(info.paiDerBuffer, paaCertAllocatedLen);
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     attestationError = err == CHIP_ERROR_NOT_IMPLEMENTED ? AttestationVerificationResult::kNotImplemented
+                                                                          : AttestationVerificationResult::kPaiFormatInvalid);
+    }
 
     // Validate Proper Certificate Format
     {
@@ -553,8 +590,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     {
         uint8_t paiAkidBuf[Crypto::kAuthorityKeyIdentifierLength];
         MutableByteSpan paiAkid(paiAkidBuf);
-        const size_t paaCertAllocatedLen = GetPaaCertificateAllocationSize(info.attestationProfile);
-        CHIP_ERROR err                   = CHIP_NO_ERROR;
+        CHIP_ERROR err = CHIP_NO_ERROR;
 
         VerifyOrExit(ExtractAKIDFromX509Cert(info.paiDerBuffer, paiAkid) == CHIP_NO_ERROR,
                      attestationError = AttestationVerificationResult::kPaiFormatInvalid);
