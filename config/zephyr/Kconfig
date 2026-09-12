@@ -66,6 +66,13 @@ config CHIP_LIB_SHELL
 	imply SHELL
 	imply OPENTHREAD_SHELL if OPENTHREAD
 
+config CHIP_DATA_MODEL_CODEDRIVEN
+	bool "Code-driven data model provider"
+	help
+	  Builds the code-driven data model provider into the Matter library. Select
+	  this when the application registers clusters and endpoints at run time
+	  instead of using the ZAP generated data model.
+
 if OPENTHREAD
 
 # See config/common/cmake/Kconfig for full definition

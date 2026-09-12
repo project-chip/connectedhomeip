@@ -44,6 +44,11 @@ if(CONFIG_CHIP)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_kconfig_defaults.cmake)
 
+    # Defines chip_ota_image(), which applications call to package their binary.
+    if(CONFIG_CHIP_OTA_IMAGE_BUILD)
+        include(${CHIP_ROOT}/config/zephyr/ota-image.cmake)
+    endif()
+
     # Prepare compiler flags
 
     # CHIP_CFLAGS can be optionally defined by the application to pass additional
@@ -76,7 +81,7 @@ if(CONFIG_CHIP)
         endif()
     endif()
 
-    
+
     # IMU task has no Kconfig for priority; on RW platforms it is critical infrastructure,
     # so its priority is forced to cooperative to prevent starvation.
     if(CONFIG_SOC_FAMILY_NXP_RW)
@@ -92,7 +97,7 @@ if(CONFIG_CHIP)
     zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
     matter_add_cxxflags("${ZEPHYR_GNU_CPP_STD}")
 
-    # Set up custom OpenThread configuration
+        # Set up custom OpenThread configuration
     if(CONFIG_CHIP_OPENTHREAD_CONFIG)
         get_filename_component(CHIP_OPENTHREAD_CONFIG
             ${CONFIG_CHIP_OPENTHREAD_CONFIG}
@@ -160,8 +165,27 @@ if(CONFIG_CHIP)
         DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
         GN_DEPENDENCIES kernel
     )
-    
+
     set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
+
+    target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
+
+    include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
+    chip_enable_gnu_std(chip)
+
+    # //src/data-model-providers/codedriven is a GN source_set and is not part of
+    # libCHIP.a, so the module compiles the code-driven provider itself.
+    if(CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
+        zephyr_library_named(chip_codedriven_data_model)
+        target_sources(chip_codedriven_data_model PRIVATE
+            ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
+            ${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
+            ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp
+        )
+        target_link_libraries(chip_codedriven_data_model PRIVATE chip)
+    endif()
 
     if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         target_link_options(chip INTERFACE

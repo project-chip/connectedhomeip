@@ -1,0 +1,165 @@
+#
+#    Copyright (c) 2026 Project CHIP Authors
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+cmake_minimum_required(VERSION 3.20)
+
+# You may point this at a header that defines chip::app::AllDevices::AppTask as the
+# final type of a CRTP layer chain rooted at AppTaskBase (see include/AppTask.h).
+if(NOT DEFINED APP_TASK_IMPL_HEADER)
+    set(APP_TASK_IMPL_HEADER "")
+endif()
+
+# Zephyr auto-discovers files directly under boards/. This also discovers
+# board files in the registered vendor subdirectories.
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/board_files.cmake)
+if(DEFINED BOARD)
+    all_devices_board_name(${BOARD} ALL_DEVICES_BOARD_NAME)
+
+    all_devices_find_board_file(${CMAKE_CURRENT_SOURCE_DIR}/boards ${ALL_DEVICES_BOARD_NAME}.overlay
+                                 ALL_DEVICES_NESTED_BOARD_OVERLAY EXCLUDE_FLAT)
+    if(ALL_DEVICES_NESTED_BOARD_OVERLAY)
+        list(APPEND DTC_OVERLAY_FILE ${ALL_DEVICES_NESTED_BOARD_OVERLAY})
+        set(DTC_OVERLAY_FILE "${DTC_OVERLAY_FILE}" CACHE STRING "Application devicetree overlays" FORCE)
+    endif()
+    message(VERBOSE "BOARD=${BOARD} ALL_DEVICES_BOARD_NAME=${ALL_DEVICES_BOARD_NAME} ALL_DEVICES_NESTED_BOARD_OVERLAY=${ALL_DEVICES_NESTED_BOARD_OVERLAY} EXTRA_DTC_OVERLAY_FILE=${EXTRA_DTC_OVERLAY_FILE}")
+
+    all_devices_find_board_file(${CMAKE_CURRENT_SOURCE_DIR}/boards ${ALL_DEVICES_BOARD_NAME}.conf
+                                 ALL_DEVICES_NESTED_BOARD_CONF EXCLUDE_FLAT)
+    if(ALL_DEVICES_NESTED_BOARD_CONF)
+        list(APPEND EXTRA_CONF_FILE ${ALL_DEVICES_NESTED_BOARD_CONF})
+    endif()
+
+endif()
+
+find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
+
+# Matter is the Zephyr module "connectedhomeip"; it must be in the west manifest.
+if(NOT DEFINED ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)
+    message(FATAL_ERROR "Matter is not registered as a Zephyr module. Add it to your west manifest.")
+endif()
+set(CHIP_ROOT ${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR})
+set(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common)
+
+# Device selection comes from Kconfig (CONFIG_ALL_DEVICES_DEVICE_*, see Kconfig.devices).
+# -DALL_DEVICES_ENABLED_DEVICES="on-off-light;..." overrides it; an empty list means all devices.
+if(NOT DEFINED ALL_DEVICES_ENABLED_DEVICES)
+    set(ALL_DEVICES_ENABLED_DEVICES "")
+    get_cmake_property(_all_devices_vars VARIABLES)
+    foreach(_var IN LISTS _all_devices_vars)
+        if(_var MATCHES "^CONFIG_ALL_DEVICES_DEVICE_(.+)$" AND ${_var})
+            string(TOLOWER "${CMAKE_MATCH_1}" _key)
+            string(REPLACE "_" "-" _key "${_key}")
+            list(APPEND ALL_DEVICES_ENABLED_DEVICES "${_key}")
+        endif()
+    endforeach()
+endif()
+include(${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake)
+
+# Count how many are ALL_DEVICES_ENABLE_<NAME>=1 to size AppTask's device array
+get_cmake_property(_all_devices_vars VARIABLES)
+set(ALL_DEVICES_ENABLED_DEVICE_COUNT 0)
+foreach(_var IN LISTS _all_devices_vars)
+    if(_var MATCHES "^ALL_DEVICES_ENABLE_" AND ${_var})
+        math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 1")
+    endif()
+endforeach()
+
+# ot-config re-lists zephyr_interface's INTERFACE_COMPILE_DEFINITIONS, including
+# $<COMPILE_LANGUAGE:CXX> generator expressions. openthread/CMakeLists.txt uses
+# ot-config's defines to build a plain custom target, where COMPILE_LANGUAGE is
+# invalid. Strip it so LLVM/Clang builds configure cleanly.
+if(CONFIG_OPENTHREAD AND TARGET ot-config AND TARGET zephyr_interface)
+    get_target_property(OT_CONFIG_DEFS ot-config INTERFACE_COMPILE_DEFINITIONS)
+    if(OT_CONFIG_DEFS)
+        list(FILTER OT_CONFIG_DEFS EXCLUDE REGEX "TARGET_PROPERTY:zephyr_interface,INTERFACE_COMPILE_DEFINITIONS")
+    else()
+        set(OT_CONFIG_DEFS "")
+    endif()
+    get_target_property(ZEPHYR_INTERFACE_DEFS zephyr_interface INTERFACE_COMPILE_DEFINITIONS)
+    if(ZEPHYR_INTERFACE_DEFS)
+        list(FILTER ZEPHYR_INTERFACE_DEFS EXCLUDE REGEX "COMPILE_LANGUAGE:CXX")
+    else()
+        set(ZEPHYR_INTERFACE_DEFS "")
+    endif()
+    set_target_properties(ot-config PROPERTIES
+        INTERFACE_COMPILE_DEFINITIONS "${OT_CONFIG_DEFS};${ZEPHYR_INTERFACE_DEFS}")
+endif()
+
+project(matter-all-devices-zephyr)
+
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+
+target_compile_options(app PRIVATE -Werror -Wno-error=format)
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
+endif()
+
+target_compile_definitions(app PRIVATE ALL_DEVICES_ENABLED_DEVICE_COUNT=${ALL_DEVICES_ENABLED_DEVICE_COUNT})
+
+if(NOT APP_TASK_IMPL_HEADER STREQUAL "")
+    target_compile_definitions(app PRIVATE APP_TASK_IMPL_HEADER="${APP_TASK_IMPL_HEADER}")
+endif()
+
+target_include_directories(app PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    src
+    include
+    ${ALL_DEVICES_COMMON_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR} # for generated app_config/enabled_devices.h
+)
+
+target_sources(app PRIVATE
+    CHIPProjectConfig.h
+    include/AppTaskBase.h
+    include/AppTaskBase.ipp
+    include/AppTask.h
+    include/Buttons.h
+    src/Buttons.cpp
+    src/main.cpp
+
+    # all-devices-common
+    ${ALL_DEVICES_DEVICE_SOURCES}
+    ${ALL_DEVICES_CLUSTER_SOURCES}
+)
+
+# Included by AppTaskBase.h; listed above only so it shows up in IDEs.
+set_source_files_properties(include/AppTaskBase.ipp PROPERTIES HEADER_FILE_ONLY TRUE)
+
+# Matches CHIP_DEVICE_CONFIG_ENABLE_THREAD, which AppTaskBase.ipp gates on.
+if(CONFIG_OPENTHREAD)
+    target_sources(app PRIVATE
+        ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.h
+        ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.cpp
+    )
+endif()
+
+# TODO: Wi-Fi
+
+if(CONFIG_CHIP_OTA_REQUESTOR)
+    chip_configure_cluster(app ota-requestor)
+
+    if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
+        set(ALL_DEVICES_OTA_BASE_NAME "zephyr")
+    else()
+        set(ALL_DEVICES_OTA_BASE_NAME "zephyr.signed")
+    endif()
+
+    if(CONFIG_CHIP_OTA_IMAGE_BUILD)
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr/${ALL_DEVICES_OTA_BASE_NAME}.bin
+            OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
+        )
+    endif()
+endif()

@@ -1,0 +1,153 @@
+#
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# One option per device type of the all-devices device factory. The CMake build
+# maps each enabled symbol back to its registry key
+# (ALL_DEVICES_DEVICE_ON_OFF_LIGHT -> "on-off-light").
+#
+# Keep in sync with the device list in
+# all-devices-common/device-factory/enabled_devices.cmake.
+
+menu "Matter device types"
+
+config ALL_DEVICES_DEVICE_AGGREGATOR
+	bool "Aggregator"
+
+config ALL_DEVICES_DEVICE_AIR_PURIFIER
+	bool "Air purifier"
+
+config ALL_DEVICES_DEVICE_AIR_QUALITY_SENSOR
+	bool "Air quality sensor"
+
+config ALL_DEVICES_DEVICE_AMBIENT_CONTEXT_SENSOR
+	bool "Ambient context sensor"
+
+config ALL_DEVICES_DEVICE_BRIDGED_NODE
+	bool "Bridged node"
+
+config ALL_DEVICES_DEVICE_CHIME
+	bool "Chime"
+
+config ALL_DEVICES_DEVICE_CONTACT_SENSOR
+	bool "Contact sensor"
+
+config ALL_DEVICES_DEVICE_COOKTOP
+	bool "Cooktop"
+
+config ALL_DEVICES_DEVICE_DEVICE_ENERGY_MANAGEMENT
+	bool "Device energy management"
+
+config ALL_DEVICES_DEVICE_DIMMABLE_LIGHT
+	bool "Dimmable light"
+
+config ALL_DEVICES_DEVICE_DIMMABLE_PLUG_IN_UNIT
+	bool "Dimmable plug-in unit"
+
+config ALL_DEVICES_DEVICE_DISHWASHER
+	bool "Dishwasher"
+
+config ALL_DEVICES_DEVICE_EXTRACTOR_HOOD
+	bool "Extractor hood"
+
+config ALL_DEVICES_DEVICE_FAN
+	bool "Fan"
+
+config ALL_DEVICES_DEVICE_FLOW_SENSOR
+	bool "Flow sensor"
+
+config ALL_DEVICES_DEVICE_GENERIC_SWITCH
+	bool "Generic switch"
+
+config ALL_DEVICES_DEVICE_HUMIDITY_SENSOR
+	bool "Humidity sensor"
+
+config ALL_DEVICES_DEVICE_LAUNDRY_DRYER
+	bool "Laundry dryer"
+
+config ALL_DEVICES_DEVICE_LAUNDRY_WASHER
+	bool "Laundry washer"
+
+config ALL_DEVICES_DEVICE_LIGHT_SENSOR
+	bool "Light sensor"
+
+config ALL_DEVICES_DEVICE_MICROWAVE_OVEN
+	bool "Microwave oven"
+
+config ALL_DEVICES_DEVICE_MOUNTED_DIMMABLE_LOAD_CONTROL
+	bool "Mounted dimmable load control"
+
+config ALL_DEVICES_DEVICE_MOUNTED_ON_OFF_CONTROL
+	bool "Mounted on/off control"
+
+config ALL_DEVICES_DEVICE_NETWORK_INFRASTRUCTURE_MANAGER
+	bool "Network infrastructure manager"
+
+config ALL_DEVICES_DEVICE_OCCUPANCY_SENSOR
+	bool "Occupancy sensor"
+
+config ALL_DEVICES_DEVICE_ON_OFF_LIGHT
+	bool "On/off light"
+	default y
+
+config ALL_DEVICES_DEVICE_ON_OFF_LIGHT_SWITCH
+	bool "On/off light switch"
+
+config ALL_DEVICES_DEVICE_ON_OFF_PLUG_IN_UNIT
+	bool "On/off plug-in unit"
+
+config ALL_DEVICES_DEVICE_OVEN
+	bool "Oven"
+
+config ALL_DEVICES_DEVICE_POWER_SOURCE
+	bool "Power source"
+
+config ALL_DEVICES_DEVICE_PRESSURE_SENSOR
+	bool "Pressure sensor"
+
+config ALL_DEVICES_DEVICE_PROXIMITY_RANGER
+	bool "Proximity ranger"
+
+config ALL_DEVICES_DEVICE_RAIN_SENSOR
+	bool "Rain sensor"
+
+config ALL_DEVICES_DEVICE_REFRIGERATOR
+	bool "Refrigerator"
+
+config ALL_DEVICES_DEVICE_ROBOTIC_VACUUM_CLEANER
+	bool "Robotic vacuum cleaner"
+
+config ALL_DEVICES_DEVICE_SMOKE_CO_ALARM
+	bool "Smoke/CO alarm"
+
+config ALL_DEVICES_DEVICE_SOIL_SENSOR
+	bool "Soil sensor"
+
+config ALL_DEVICES_DEVICE_SPEAKER
+	bool "Speaker"
+
+config ALL_DEVICES_DEVICE_TEMPERATURE_SENSOR
+	bool "Temperature sensor"
+
+config ALL_DEVICES_DEVICE_WATER_FREEZE_DETECTOR
+	bool "Water freeze detector"
+
+config ALL_DEVICES_DEVICE_WATER_LEAK_DETECTOR
+	bool "Water leak detector"
+
+config ALL_DEVICES_DEVICE_WATER_VALVE
+	bool "Water valve"
+
+endmenu
