@@ -171,6 +171,15 @@ public:
      */
     CHIP_ERROR SendPreparedMessage(const SessionHandle & session, const EncryptedPacketBufferHandle & preparedMessage);
 
+    /**
+     * @brief
+     *   Send an unauthenticated failure StatusReport in response to an orphan CASE Sigma2 or Sigma2Resume message
+     *   when no matching initiator session or exchange context exists.
+     */
+    CHIP_ERROR SendUnauthenticatedErrorStatusReport(const PacketHeader & incomingPacketHeader,
+                                                    const PayloadHeader & incomingPayloadHeader,
+                                                    const Transport::PeerAddress & peerAddress);
+
     /// @brief Set the delegate for handling incoming messages. There can be only one message delegate (probably the
     /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
