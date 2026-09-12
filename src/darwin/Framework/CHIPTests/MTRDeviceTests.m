@@ -6196,14 +6196,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         ;
     }];
 
-    // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test
+    // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test.
+    // This has to happen on the delegate queue: _clearSubscriptionPoolWork notifies
+    // delegates asynchronously, so the notification for the initial subscription is
+    // still queued there and would otherwise run the handler we are installing.
     XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"_triggerResubscribeWithReason work completed"];
     __weak __auto_type weakDelegate = delegate;
-    delegate.onSubscriptionPoolWorkComplete = ^{
-        __strong __auto_type strongDelegate = weakDelegate;
-        strongDelegate.onSubscriptionPoolWorkComplete = nil;
-        [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
-    };
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionPoolWorkComplete = nil;
+            [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
+        };
+    });
 
     // Now that subscription is established and live, ReadClient->mIsResubscriptionScheduled should be false, and _handleResubscriptionNeededWithDelayOnDeviceQueue can simulate the code path that leads to ReadClient->TriggerResubscribeIfScheduled() returning false, and exercise the edge case
     [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
