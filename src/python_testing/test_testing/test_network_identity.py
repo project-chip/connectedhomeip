@@ -226,6 +226,15 @@ class TestPossessionSignature(unittest.TestCase):
         with self.assertRaises(ValueError):
             ni.verify_possession_signature(compact, nonce, signature[:32])
 
+    def test_rejects_a_padded_identity(self):
+        # The signed message starts with the identity, so a caller appending bytes and signing
+        # the result would otherwise verify against a malformed identity.
+        private_key, compact = ni.generate_network_client_identity()
+        padded = compact + b"\x00"
+        nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
+        with self.assertRaises(ValueError):
+            ni.verify_possession_signature(padded, nonce, _sign_possession(private_key, padded, nonce))
+
 
 class TestCollidingAndInvalidIdentities(unittest.TestCase):
     """Validates the helpers used to build collision and invalid-identity test inputs."""

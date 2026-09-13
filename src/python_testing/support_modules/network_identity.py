@@ -267,8 +267,8 @@ def derive_ecdsa_network_identity(raw_secret: bytes) -> tuple[ec.EllipticCurvePr
 
 def compact_identity_public_key(compact_identity: bytes) -> bytes:
     """Extracts the 65-byte uncompressed public key from a compact identity."""
-    if len(compact_identity) < 4 + 65:
-        raise ValueError("compact identity is too short")
+    if len(compact_identity) != COMPACT_IDENTITY_LENGTH:
+        raise ValueError(f"compact identity must be {COMPACT_IDENTITY_LENGTH} bytes, got {len(compact_identity)}")
     if compact_identity[1:3] != bytes([0x30, _TLV_TAG_EC_PUBLIC_KEY]) or compact_identity[3] != 65:
         raise ValueError("unexpected compact identity encoding")
     return compact_identity[4:4 + 65]
@@ -316,11 +316,9 @@ def validate_compact_identity(compact_identity: bytes) -> None:
         ValueError: If the encoding is not a well-formed compact identity.
         InvalidSignature: If the self-signature does not verify.
     """
-    if len(compact_identity) != COMPACT_IDENTITY_LENGTH:
-        raise ValueError(f"compact identity must be {COMPACT_IDENTITY_LENGTH} bytes, got {len(compact_identity)}")
-    if compact_identity[0] != 0x15 or compact_identity[-1] != 0x18:
+    if not compact_identity or compact_identity[0] != 0x15 or compact_identity[-1] != 0x18:
         raise ValueError("compact identity must be an anonymous TLV structure")
-    public_key = compact_identity_public_key(compact_identity)
+    public_key = compact_identity_public_key(compact_identity)  # also enforces the overall length
     _verify_p256(public_key, _encode_network_identity_tbs(public_key), compact_identity_signature(compact_identity))
 
 
