@@ -63,9 +63,9 @@ public:
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningCluster : public ::testing::Test
 {
-    // The CHIP stack is needed for the system timer that arming the fail-safe starts.
     static void SetUpTestSuite()
     {
+        // InitChipStack() is needed because arming the fail-safe starts a system timer
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
     }
@@ -214,8 +214,6 @@ TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC && (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
 
-// Generates a self-signed identity in compact-pdc-identity format, as both the Network
-// Identity the client sends and the Client Identity the driver returns must be.
 void GenerateIdentity(MutableByteSpan & identity)
 {
     Crypto::P256Keypair keypair;
@@ -225,8 +223,8 @@ void GenerateIdentity(MutableByteSpan & identity)
 
 // Exercises the cluster half of AddOrUpdateWiFiNetwork with PDC: the request reaches the
 // driver intact and the Client Identity it produces comes back in the response. Making
-// sense of the identities themselves is the driver's job, and is covered by cert tests
-// that drive a real WiFi driver.
+// sense of the identities themselves is the driver's job, and needs to be covered by cert
+// tests that drive a real WiFi driver.
 TEST_F(TestNetworkCommissioningCluster, TestAddOrUpdateWiFiNetworkWithPDC)
 {
     uint8_t networkIdentityBuffer[Credentials::kMaxCHIPCompactNetworkIdentityLength];
