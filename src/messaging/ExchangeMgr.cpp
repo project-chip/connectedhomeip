@@ -312,17 +312,17 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        if (!payloadHeader.IsInitiator() && session->IsUnauthenticatedSession() &&
-            payloadHeader.HasProtocol(Protocols::SecureChannel::Id) &&
-            (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2) ||
-             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume)))
+        if (session->IsUnauthenticatedSession() && IsUnsolicitedCaseSigma2(payloadHeader))
         {
+            // Duplicates are intentionally not filtered, since each Sigma2 retransmission may need its own StatusReport.
             if (packetHeader.GetDestinationNodeId().HasValue() && mSessionManager != nullptr)
             {
-                TEMPORARY_RETURN_IGNORED mSessionManager->SendUnauthenticatedErrorStatusReport(
-                    packetHeader, payloadHeader, session->AsUnauthenticatedSession()->GetPeerAddress());
+                // The StatusReport carries the piggybacked ack so no StandaloneAck is needed.
+                LogErrorOnFailure(mSessionManager->SendUnauthenticatedErrorStatusReport(
+                    packetHeader, payloadHeader, session->AsUnauthenticatedSession()->GetPeerAddress()));
+                return;
             }
-            return;
+            // Otherwise we fall through so MRP still acks as before.
         }
     }
     else

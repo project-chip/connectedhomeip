@@ -144,6 +144,17 @@ private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 };
 
+/**
+ * @brief
+ *   Check if the given payload header indicates an unsolicited CASE Sigma2 or Sigma2Resume message.
+ */
+inline bool IsUnsolicitedCaseSigma2(const PayloadHeader & payloadHeader)
+{
+    return !payloadHeader.IsInitiator() && payloadHeader.HasProtocol(Protocols::SecureChannel::Id) &&
+        (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2) ||
+         payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume));
+}
+
 class DLL_EXPORT SessionManager : public TransportMgrDelegate, public FabricTable::Delegate
 {
 public:
@@ -173,8 +184,28 @@ public:
 
     /**
      * @brief
-     *   Send an unauthenticated failure StatusReport in response to an orphan CASE Sigma2 or Sigma2Resume message
-     *   when no matching initiator session or exchange context exists.
+     *   Send an unauthenticated failure StatusReport in response to an orphan CASE Sigma2 or
+     *   Sigma2Resume message, when no matching initiator session or exchange context exists.
+     *
+     * @details
+     *   This deliberately bypasses the exchange layer and MRP: there is no ExchangeContext to send
+     *   on, and the report is not retransmitted. If the incoming message requested an ack, that ack
+     *   is piggybacked onto this report, so no separate StandaloneAck is required. The report always
+     *   carries {GeneralStatusCode::kFailure, kProtocolCodeInvalidParam}, which drives the peer's
+     *   CASESession::OnFailureStatusReport to abort and release its half-open session.
+     *
+     *   ExchangeManager is the intended caller; it is public only so that unit tests can exercise
+     *   the guard clauses directly.
+     *
+     * @param[in] incomingPacketHeader  Header of the received message. Must carry a destination node
+     *                                  id, which is echoed back as the response's source node id.
+     * @param[in] incomingPayloadHeader Payload header of the received message. Must not be marked as
+     *                                  sent by the initiator.
+     * @param[in] peerAddress           Address to send the report to.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the headers fail the checks
+     *         above, CHIP_ERROR_INCORRECT_STATE if the manager is not initialized, or an error from
+     *         the underlying transport.
      */
     CHIP_ERROR SendUnauthenticatedErrorStatusReport(const PacketHeader & incomingPacketHeader,
                                                     const PayloadHeader & incomingPayloadHeader,

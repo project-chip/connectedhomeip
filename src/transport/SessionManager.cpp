@@ -931,12 +931,9 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
                             ChipLogValueX64(destination.Value()));
 
             PayloadHeader payloadHeader;
-            if (payloadHeader.DecodeAndConsume(msg) == CHIP_NO_ERROR && !payloadHeader.IsInitiator() &&
-                payloadHeader.HasProtocol(Protocols::SecureChannel::Id) &&
-                (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2) ||
-                 payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume)))
+            if (payloadHeader.DecodeAndConsume(msg) == CHIP_NO_ERROR && IsUnsolicitedCaseSigma2(payloadHeader))
             {
-                TEMPORARY_RETURN_IGNORED SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader, peerAddress);
+                LogErrorOnFailure(SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader, peerAddress));
             }
             return;
         }
