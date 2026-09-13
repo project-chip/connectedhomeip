@@ -139,7 +139,7 @@ class TC_CNET_4_25(CNETPDCBaseTest):
         added = self.network_at(networks, pdc_netidx_1)
         asserts.assert_equal(added.networkID, _PDC_SSID_1, f"Networks[{pdc_netidx_1}].NetworkID is not PDC_SSID_1.")
         asserts.assert_false(added.connected, f"Networks[{pdc_netidx_1}].Connected is TRUE for a network the DUT was "
-                                              "never asked to connect to.")
+                             "never asked to connect to.")
         asserts.assert_equal(added.networkIdentifier, ni_1_id,
                              f"Networks[{pdc_netidx_1}].NetworkIdentifier is not the key identifier of NI_1.")
         asserts.assert_equal(added.clientIdentifier, nci_1_id,

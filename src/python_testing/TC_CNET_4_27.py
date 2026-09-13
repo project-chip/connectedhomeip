@@ -202,7 +202,7 @@ class TC_CNET_4_27(CNETPDCBaseTest):
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(ssid=_PDC_SSID_1, credentials=b"", networkIdentity=ni_2),
             endpoint=endpoint)
         self.assert_network_config_success(response, f"AddOrUpdateWiFiNetwork replacing the identity of "
-                                                     f"{_PDC_SSID_1!r}")
+                                           f"{_PDC_SSID_1!r}")
         nci_b = response.clientIdentity
         self.assert_valid_identity(nci_b, "NetworkConfigResponse.ClientIdentity")
         asserts.assert_not_equal(nci_b, nci_a,
@@ -247,7 +247,7 @@ class TC_CNET_4_27(CNETPDCBaseTest):
         response = await self.send_single_cmd(
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(ssid=_PDC_SSID_1, credentials=credentials), endpoint=endpoint)
         self.assert_network_config_success(response, f"AddOrUpdateWiFiNetwork converting {_PDC_SSID_1!r} to a "
-                                                     "credentials based configuration")
+                                           "credentials based configuration")
         networks = await self.read_networks(endpoint)
         entry = self.find_network(networks, _PDC_SSID_1)
         asserts.assert_equal(entry.networkIdentifier, NullValue,

@@ -169,9 +169,8 @@ class TestCompactIdentityAccessors(unittest.TestCase):
         # An empty or truncated input must be reported as a malformed identity rather
         # than escaping as an IndexError from the structural checks.
         for candidate in (b"", b"\x15\x18", ni.generate_network_client_identity()[1][:-1]):
-            with self.subTest(length=len(candidate)):
-                with self.assertRaises(ValueError):
-                    ni.validate_compact_identity(candidate)
+            with self.subTest(length=len(candidate)), self.assertRaises(ValueError):
+                ni.validate_compact_identity(candidate)
 
     def test_validate_rejects_non_structure(self):
         _, compact = ni.generate_network_client_identity()
