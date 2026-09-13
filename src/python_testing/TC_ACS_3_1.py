@@ -295,9 +295,9 @@ class TC_ACS_3_1(MatterBaseTest):
                 await asyncio.sleep(holdTime_input - elapsed_time + 1)
 
             # The last end event
-            #event = event_listener.get_last_event()
+            # event = event_listener.get_last_event()
             event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectEnded, timeout_sec=30.0)
-            #asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
+            # asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
             #                     f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
 
             self.skip_step("6a")
@@ -481,7 +481,7 @@ class TC_ACS_3_1(MatterBaseTest):
             # The last end event
             # event = event_listener.get_last_event()
             event_listener.wait_for_event_report(cluster.Events.AmbientContextDetectEnded, timeout_sec=30.0)
-            #asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
+            # asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectEnded.event_id,
             #                     f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
 
         self.step("7", "TH reads the AmbientContextType attribute. Verify that the AmbientContextType attribute contains an empty list and the Boolean attributes related the step 5a or 6a are False.")
