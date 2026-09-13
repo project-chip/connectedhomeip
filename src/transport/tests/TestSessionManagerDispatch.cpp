@@ -896,6 +896,9 @@ CHIP_ERROR PrepareTestMessage(SessionManager & sessionManager, const SessionHand
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
     payloadHeader.SetInitiator(true);
+    // Reliable, so a duplicate is not dropped at the no-ack fast path and reaches
+    // the peer address update.
+    payloadHeader.SetNeedsAck(true);
 
     const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
     System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
@@ -923,10 +926,12 @@ TEST_F(TestSessionManagerDispatch, TestReplayedMessageDoesNotRebindPeerAddress)
     ASSERT_FALSE(prepared.IsNull());
 
     EncryptedPacketBufferHandle firstDelivery = prepared.CloneData();
+    ASSERT_FALSE(firstDelivery.IsNull());
     sessionManager.OnMessageReceived(establishedAddress, firstDelivery.CastToWritable());
     ASSERT_EQ(receiver->GetPeerAddress(), establishedAddress);
 
     EncryptedPacketBufferHandle replay = prepared.CloneData();
+    ASSERT_FALSE(replay.IsNull());
     sessionManager.OnMessageReceived(replayAddress, replay.CastToWritable());
 
     EXPECT_EQ(receiver->GetPeerAddress(), establishedAddress);
