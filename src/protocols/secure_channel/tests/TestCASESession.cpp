@@ -2417,16 +2417,73 @@ TEST_F(TestCASESession, ParseSigma3TBEData)
     TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEFutureProofTlvElementNoStructEnd);
 }
 
+// Drops the responder's first CASE_Sigma2 and counts the unencrypted SecureChannel messages that
+// follow.
+//
+// The loopback transport's positional drop controls (mNumMessagesToAllowBeforeDropping) are not
+// usable here, because whether Sigma2 is the second packet on the wire depends on how quickly the
+// platform can produce it. When Sigma2 generation is slower than the exchange layer's standalone
+// ack timeout (as on Zephyr native_sim), the responder emits a standalone ack for Sigma1 first and
+// positional dropping would discard that ack instead of Sigma2, letting the handshake complete.
+class Sigma2DropperLoopbackDelegate : public Testing::LoopbackTransportDelegate
+{
+public:
+    explicit Sigma2DropperLoopbackDelegate(Testing::LoopbackTransport & loopback) : mLoopback(loopback) {}
+
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(DecodeUnsecuredPayloadHeader(message, payloadHeader));
+        VerifyOrReturn(payloadHeader.HasProtocol(Protocols::SecureChannel::Id));
+
+        if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2))
+        {
+            ++mSigma2Count;
+            if (mSigma2Count == 1)
+            {
+                // WillSendMessage() runs before LoopbackTransport::SendMessage() consults its drop
+                // counters, so this makes it drop precisely this message.
+                mLoopback.mNumMessagesToAllowBeforeDropping = 0;
+                mLoopback.mNumMessagesToDrop                = 1;
+            }
+        }
+        else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+        {
+            ++mStatusReportCount;
+        }
+    }
+
+    uint32_t mSigma2Count       = 0;
+    uint32_t mStatusReportCount = 0;
+
+private:
+    static bool DecodeUnsecuredPayloadHeader(const System::PacketBufferHandle & message, PayloadHeader & payloadHeader)
+    {
+        System::PacketBufferHandle buf = message.CloneData();
+        VerifyOrReturnValue(!buf.IsNull(), false);
+
+        PacketHeader packetHeader;
+        VerifyOrReturnValue(packetHeader.DecodeAndConsume(buf) == CHIP_NO_ERROR, false);
+        // Only unencrypted messages expose a readable payload header.
+        VerifyOrReturnValue(!packetHeader.IsEncrypted(), false);
+
+        return payloadHeader.DecodeAndConsume(buf) == CHIP_NO_ERROR;
+    }
+
+    Testing::LoopbackTransport & mLoopback;
+};
+
 TEST_F(TestCASESession, StaleSigma2TriggersStatusReportAndUnwedgesServer)
 {
     TestCASESecurePairingDelegate delegateCommissioner1;
     auto pairingCommissioner1 = chip::Platform::MakeUnique<CASESession>();
     pairingCommissioner1->SetGroupDataProvider(&gCommissionerGroupDataProvider);
 
-    auto & loopback                            = GetLoopback();
-    loopback.mSentMessageCount                 = 0;
-    loopback.mNumMessagesToAllowBeforeDropping = 1; // Allow Sigma1
-    loopback.mNumMessagesToDrop                = 1; // Drop initial Sigma2 from responder
+    auto & loopback = GetLoopback();
+
+    // Drop the responder's first Sigma2 regardless of where it lands in the packet sequence.
+    Sigma2DropperLoopbackDelegate loopbackDelegate(loopback);
+    loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
 
     EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
                                                            nullptr, nullptr, &gDeviceGroupDataProvider),
@@ -2442,6 +2499,7 @@ TEST_F(TestCASESession, StaleSigma2TriggersStatusReportAndUnwedgesServer)
     ServiceEvents();
 
     // Responder sent Sigma2 (which was dropped) and is now waiting in State::kSentSigma2.
+    EXPECT_EQ(loopbackDelegate.mSigma2Count, 1u);
     EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
 
     // Simulate initiator timing out / closing before Sigma2 arrives.
@@ -2449,14 +2507,20 @@ TEST_F(TestCASESession, StaleSigma2TriggersStatusReportAndUnwedgesServer)
     pairingCommissioner1.reset();
 
     // Advance IO until responder retransmits Sigma2 and receives the failure StatusReport from SessionManager.
-    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return loopback.mSentMessageCount >= 4; });
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                [&] { return loopbackDelegate.mStatusReportCount >= 1; });
     ServiceEvents();
 
-    // Verify 1-to-1 packet reflection: 1 Sigma1 + 1 dropped Sigma2 + 1 retransmitted Sigma2 + 1 StatusReport = 4 packets.
-    EXPECT_EQ(loopback.mSentMessageCount, 4u);
+    // Verify 1-to-1 packet reflection: every Sigma2 that actually reached the wire (all but the
+    // dropped one) is answered by exactly ONE failure StatusReport.
+    EXPECT_GE(loopbackDelegate.mSigma2Count, 2u);
+    EXPECT_EQ(loopbackDelegate.mStatusReportCount, loopbackDelegate.mSigma2Count - 1);
 
     // Responder CASEServer should have immediately aborted State::kSentSigma2 and reset to State::kInitialized.
     EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kInitialized);
+
+    // The second handshake below must not be observed by the Sigma2 dropper.
+    loopback.SetLoopbackTransportDelegate(nullptr);
 
     // A subsequent Sigma1 from a second initiator must succeed immediately without Busy.
     TestCASESecurePairingDelegate delegateCommissioner2;
@@ -2483,10 +2547,11 @@ TEST_F(TestCASESession, StaleSigma2WithRetainedUnauthSessionTriggersStatusReport
     auto pairingCommissioner1 = chip::Platform::MakeUnique<CASESession>();
     pairingCommissioner1->SetGroupDataProvider(&gCommissionerGroupDataProvider);
 
-    auto & loopback                            = GetLoopback();
-    loopback.mSentMessageCount                 = 0;
-    loopback.mNumMessagesToAllowBeforeDropping = 1; // Allow Sigma1
-    loopback.mNumMessagesToDrop                = 1; // Drop initial Sigma2 from responder
+    auto & loopback = GetLoopback();
+
+    // Drop the responder's first Sigma2 regardless of where it lands in the packet sequence.
+    Sigma2DropperLoopbackDelegate loopbackDelegate(loopback);
+    loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
 
     EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
                                                            nullptr, nullptr, &gDeviceGroupDataProvider),
@@ -2505,19 +2570,27 @@ TEST_F(TestCASESession, StaleSigma2WithRetainedUnauthSessionTriggersStatusReport
               CHIP_NO_ERROR);
     ServiceEvents();
 
+    EXPECT_EQ(loopbackDelegate.mSigma2Count, 1u);
     EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kSentSigma2);
 
     // Close initiator CASESession and ExchangeContext while keeping UnauthenticatedSession alive.
     pairingCommissioner1.reset();
 
     // Advance IO until responder retransmits Sigma2 and receives the failure StatusReport via ExchangeManager.
-    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return loopback.mSentMessageCount >= 4; });
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                [&] { return loopbackDelegate.mStatusReportCount >= 1; });
     ServiceEvents();
 
-    // Verify 1-to-1 packet reflection: only ONE StatusReport with piggybacked MRP ACK is transmitted (no duplicate StandaloneAck).
-    EXPECT_EQ(loopback.mSentMessageCount, 4u);
+    // Verify 1-to-1 packet reflection: every Sigma2 that actually reached the wire (all but the
+    // dropped one) is answered by exactly ONE StatusReport carrying a piggybacked MRP ACK, with no
+    // duplicate StandaloneAck.
+    EXPECT_GE(loopbackDelegate.mSigma2Count, 2u);
+    EXPECT_EQ(loopbackDelegate.mStatusReportCount, loopbackDelegate.mSigma2Count - 1);
 
     EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kInitialized);
+
+    // The second handshake below must not be observed by the Sigma2 dropper.
+    loopback.SetLoopbackTransportDelegate(nullptr);
 
     TestCASESecurePairingDelegate delegateCommissioner2;
     CASESession pairingCommissioner2;
