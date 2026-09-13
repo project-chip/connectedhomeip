@@ -92,7 +92,7 @@ CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
             P256SerializedKeypair serializedKeypair;
             SuccessOrExit(err = kvs.Get(kWifiClientIdentityKeypairKeyName, serializedKeypair.Bytes(), serializedKeypair.Capacity(),
                                         &valueLen));
-            serializedKeypair.SetLength(valueLen);
+            SuccessOrExit(err = serializedKeypair.SetLength(valueLen));
             network.clientIdentityKeypair = Platform::MakeShared<P256Keypair>();
             SuccessOrExit(err = network.clientIdentityKeypair->Deserialize(serializedKeypair));
         }
