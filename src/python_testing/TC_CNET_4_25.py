@@ -94,7 +94,7 @@ class TC_CNET_4_25(CNETPDCBaseTest):
                                   f"The DUT already has a network configuration for {ssid!r}, which this test case "
                                   "requires to be absent.")
 
-        self.step(4, "TH sends ArmFailSafe to the DUT with ExpiryLengthSeconds set to 900.",
+        self.step(4, "TH sends ArmFailSafe to the DUT with ExpiryLengthSeconds set to 60.",
                   expectation="DUT sends an ArmFailSafeResponse.")
         await self.arm_failsafe(FAILSAFE_EXPIRY_SECONDS)
 

@@ -73,7 +73,7 @@ class TC_CNET_4_26(CNETPDCBaseTest):
         asserts.assert_not_in(_PDC_SSID_1, [n.networkID for n in initial_networks],
                               f"The DUT already has a network configuration for {_PDC_SSID_1!r}.")
 
-        self.step(3, "TH sends ArmFailSafe to the DUT with ExpiryLengthSeconds set to 900.",
+        self.step(3, "TH sends ArmFailSafe to the DUT with ExpiryLengthSeconds set to 60.",
                   expectation="DUT sends an ArmFailSafeResponse.")
         await self.arm_failsafe(FAILSAFE_EXPIRY_SECONDS)
 

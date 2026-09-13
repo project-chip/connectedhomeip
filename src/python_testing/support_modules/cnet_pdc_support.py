@@ -38,7 +38,10 @@ log = logging.getLogger(__name__)
 cnet = Clusters.NetworkCommissioning
 cgen = Clusters.GeneralCommissioning
 
-FAILSAFE_EXPIRY_SECONDS = 900
+# Expiry for the fail-safe these test cases arm while they manipulate network configurations.
+# They never invoke ConnectNetwork, so the armed window is a handful of round trips; a short
+# expiry bounds how long a DUT stays modified if the TH dies before it can disarm.
+FAILSAFE_EXPIRY_SECONDS = 60
 MAX_DEBUG_TEXT_LENGTH = 512
 
 # Stands in for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS where the TH has none; see
