@@ -145,6 +145,7 @@ class TC_ACS_3_1(MatterBaseTest):
         # subscription setup
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+        attrib_listener.reset()
 
         # start event listener
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
@@ -203,7 +204,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # Second PIXIT input
             pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", "0x49")
-            pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", "0x03")
+            pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", "0x04")
             log.info("pixit1_nsid: %s", pixit2_nsid)
             log.info("pixit1_tagid: %s", pixit2_tagid)
             # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal

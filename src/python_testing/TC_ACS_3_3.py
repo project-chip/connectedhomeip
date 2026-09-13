@@ -195,6 +195,7 @@ class TC_ACS_3_3(MatterBaseTest):
         # MinIntervalFloor = 0, MaxIntervalCeiling = 30, KeepSubscriptions = false (EventSubscriptionHandler has True hardcoded and can't be changed)
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+        attrib_listener.reset()
 
         # start event listener
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
