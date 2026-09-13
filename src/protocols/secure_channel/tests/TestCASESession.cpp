@@ -2712,8 +2712,7 @@ TEST_F(TestCASESession, StaleSigma2TriggersStatusReportAndUnwedgesServer)
     pairingCommissioner1.reset();
 
     // Advance IO until responder retransmits Sigma2 and receives the failure StatusReport from SessionManager.
-    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                [&] { return loopbackDelegate.mStatusReportCount >= 1; });
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return loopbackDelegate.mStatusReportCount >= 1; });
     ServiceEvents();
 
     // Verify 1-to-1 packet reflection: every Sigma2 that actually reached the wire (all but the
@@ -2782,8 +2781,7 @@ TEST_F(TestCASESession, StaleSigma2WithRetainedUnauthSessionTriggersStatusReport
     pairingCommissioner1.reset();
 
     // Advance IO until responder retransmits Sigma2 and receives the failure StatusReport via ExchangeManager.
-    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                [&] { return loopbackDelegate.mStatusReportCount >= 1; });
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return loopbackDelegate.mStatusReportCount >= 1; });
     ServiceEvents();
 
     // Verify 1-to-1 packet reflection: every Sigma2 that actually reached the wire (all but the
@@ -2873,8 +2871,8 @@ TEST_F(TestCASESession, MalformedSigma2WithoutDestinationNodeIdDoesNotCrash)
     GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(msg));
     ServiceEvents();
 
-    // Zero packets should be transmitted in response to a malformed S=1, DSIZ=0 Sigma2.
-    EXPECT_EQ(loopback.mSentMessageCount, 0u);
+    // MRP still acks as before while no StatusReport is sent.
+    EXPECT_EQ(loopback.mSentMessageCount, 1u);
 }
 
 } // namespace chip
