@@ -280,89 +280,89 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
             }
             break;
         }
-        }
     }
+}
 
-    status = Status::Success;
-    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+status = Status::Success;
+for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+{
+    // If we've gotten this far, then the client has manage permission to call AtomicRequest,
+    // which is also the privilege necessary to write to the atomic attributes, so no need to do
+    // the "If the client does not have sufficient privilege to write to the attribute" check
+    // from the spec.
+    auto & attributeStatus = attributeStatuses[i];
+    auto statusCode        = Status::Success;
+    switch (attributeStatus.attributeID)
     {
-        // If we've gotten this far, then the client has manage permission to call AtomicRequest,
-        // which is also the privilege necessary to write to the atomic attributes, so no need to do
-        // the "If the client does not have sufficient privilege to write to the attribute" check
-        // from the spec.
-        auto & attributeStatus = attributeStatuses[i];
-        auto statusCode        = Status::Success;
-        switch (attributeStatus.attributeID)
-        {
-        case Presets::Id:
-        case Schedules::Id:
+    case Presets::Id:
+    case Schedules::Id:
 <<<<<<< HEAD
-            statusCode = InAtomicWrite(MakeOptional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
+        statusCode = InAtomicWrite(MakeOptional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
 =======
         case SensorSchedule::Id:
             statusCode = InAtomicWrite(std::make_optional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
 >>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
-            break;
-        default:
-            statusCode = Status::InvalidCommand;
-            break;
-        }
-        if (statusCode != Status::Success)
-        {
-            status = Status::Failure;
-        }
-        attributeStatus.statusCode = to_underlying(statusCode);
+        break;
+    default:
+        statusCode = Status::InvalidCommand;
+        break;
     }
-
-    auto timeout = std::min(System::Clock::Milliseconds16(commandData.timeout.Value()), maximumTimeout);
-
-    if (status == Status::Success)
+    if (statusCode != Status::Success)
     {
-        if (!SetAtomicWrite(GetSourceScopedNodeId(commandObj), State::Open, attributeStatuses))
+        status = Status::Failure;
+    }
+    attributeStatus.statusCode = to_underlying(statusCode);
+}
+
+auto timeout = std::min(System::Clock::Milliseconds16(commandData.timeout.Value()), maximumTimeout);
+
+if (status == Status::Success)
+{
+    if (!SetAtomicWrite(GetSourceScopedNodeId(commandObj), State::Open, attributeStatuses))
+    {
+        for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
         {
-            for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+            attributeStatuses[i].statusCode = to_underlying(Status::ResourceExhausted);
+        }
+        status = Status::Failure;
+    }
+    else
+    {
+        // This is a valid request to open an atomic write. Tell the delegate it
+        // needs to keep track of a pending preset list now.
+        for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+        {
+            auto & attributeStatus     = attributeStatuses[i];
+            auto beginStatus           = mDelegate->OnAtomicWriteBegin(attributeStatus.attributeID);
+            attributeStatus.statusCode = to_underlying(beginStatus);
+            if (beginStatus != Status::Success)
             {
-                attributeStatuses[i].statusCode = to_underlying(Status::ResourceExhausted);
+                status = Status::Failure;
             }
-            status = Status::Failure;
+        }
+        if (status == Status::Success)
+        {
+            if (ScheduleTimer(this, timeout) != CHIP_NO_ERROR)
+            {
+                for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+                {
+                    auto & attributeStatus = attributeStatuses[i];
+                    mDelegate->OnAtomicWriteRollback(attributeStatus.attributeID);
+                    attributeStatus.statusCode = to_underlying(Status::Failure);
+                }
+                ResetAtomicWrite();
+                status = Status::Failure;
+            }
         }
         else
         {
-            // This is a valid request to open an atomic write. Tell the delegate it
-            // needs to keep track of a pending preset list now.
-            for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
-            {
-                auto & attributeStatus     = attributeStatuses[i];
-                auto beginStatus           = mDelegate->OnAtomicWriteBegin(attributeStatus.attributeID);
-                attributeStatus.statusCode = to_underlying(beginStatus);
-                if (beginStatus != Status::Success)
-                {
-                    status = Status::Failure;
-                }
-            }
-            if (status == Status::Success)
-            {
-                if (ScheduleTimer(this, timeout) != CHIP_NO_ERROR)
-                {
-                    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
-                    {
-                        auto & attributeStatus = attributeStatuses[i];
-                        mDelegate->OnAtomicWriteRollback(attributeStatus.attributeID);
-                        attributeStatus.statusCode = to_underlying(Status::Failure);
-                    }
-                    ResetAtomicWrite();
-                    status = Status::Failure;
-                }
-            }
-            else
-            {
-                ResetAtomicWrite();
-            }
+            ResetAtomicWrite();
         }
     }
+}
 
-    SendAtomicResponse(commandObj, commandPath, status, attributeStatuses, MakeOptional(timeout.count()));
-    return std::nullopt;
+SendAtomicResponse(commandObj, commandPath, status, attributeStatuses, MakeOptional(timeout.count()));
+return std::nullopt;
 }
 
 std::optional<DataModel::ActionReturnStatus>

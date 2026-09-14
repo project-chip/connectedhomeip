@@ -33,9 +33,9 @@
 #include "thermostat-sensors-delegate-impl.h"
 #include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
->>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
+    >>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
 
-using namespace chip;
+    using namespace chip;
 using namespace chip::app;
 // using namespace chip::app::Clusters;
 

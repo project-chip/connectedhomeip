@@ -46,7 +46,7 @@
 #include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
 
->>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
+    >>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
 #include "tls-client-management-instance.h"
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
 
@@ -81,7 +81,7 @@
 
 #include <string>
 
-using namespace chip;
+    using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
 
@@ -196,7 +196,7 @@ LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
 
 <<<<<<< HEAD
 =======
-constexpr EndpointId gThermostatEndpoint(1);
+    constexpr EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEndpoint);
