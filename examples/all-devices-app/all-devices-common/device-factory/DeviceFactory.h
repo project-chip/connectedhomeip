@@ -356,8 +356,15 @@ private:
         {
             RegisterCreator("doorbell", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<Doorbell>(mContext->timerDelegate, mContext->platformManager, mContext->bindingTable,
-                                                  mContext->bindingManager);
+                return std::make_unique<Doorbell>(Doorbell::Config{
+                    .timerDelegate     = mContext->timerDelegate,
+                    .platformManager   = mContext->platformManager,
+                    .bindingTable      = mContext->bindingTable,
+                    .bindingManager    = mContext->bindingManager,
+                    .identifyDelegate  = mContext->identifyDelegate,
+                    .numberOfSwitchPositions = 2,
+                    .features          = Clusters::Switch::Feature::kMomentarySwitch,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)

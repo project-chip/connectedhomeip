@@ -33,8 +33,20 @@ namespace app {
 class Doorbell : public SingleEndpoint
 {
 public:
-    Doorbell(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager, Clusters::Binding::Table & bindingTable,
-             Clusters::Binding::Manager & bindingManager);
+
+    struct Config
+    {
+        TimerDelegate & timerDelegate;
+        DeviceLayer::PlatformManager & platformManager;
+        Clusters::Binding::Table & bindingTable;
+        Clusters::Binding::Manager & bindingManager;
+        Clusters::IdentifyDelegate & identifyDelegate;
+        // Switch cluster configuration
+        uint8_t numberOfSwitchPositions = 2;
+        BitFlags<Clusters::Switch::Feature> features = Clusters::Switch::Feature::kMomentarySwitch;
+    };
+
+    Doorbell(const Config & config);
     ~Doorbell() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -48,10 +60,7 @@ public:
     Clusters::BindingCluster & BindingCluster();
 
 protected:
-    TimerDelegate & mTimerDelegate;
-    DeviceLayer::PlatformManager & mPlatformManager;
-    Clusters::Binding::Table & mBindingTable;
-    Clusters::Binding::Manager & mBindingManager;
+    Config mConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::SwitchCluster> mSwitchCluster;
     LazyRegisteredServerCluster<Clusters::BindingCluster> mBindingCluster;

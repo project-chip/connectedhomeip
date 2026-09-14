@@ -26,15 +26,15 @@ namespace app {
 
 namespace {
 const ClusterId kClientClusters[] = { Chime::Id };
-// Assuming a simple doorbell with two switch positions.
-const uint8_t kSwitchNumberOfPositions = 2;
 } // namespace
 
-Doorbell::Doorbell(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
-                   Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager) :
+Doorbell::Doorbell(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1)),
-    mTimerDelegate(timerDelegate), mPlatformManager(platformManager), mBindingTable(bindingTable), mBindingManager(bindingManager)
-{}
+    mConfig(config)
+{
+    // The Feature MomentarySwitch is required for a doorbell.
+    VerifyOrDie(mConfig.features.Has(Clusters::Switch::Feature::kMomentarySwitch));
+}
 
 CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
@@ -43,18 +43,18 @@ CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProv
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mConfig.timerDelegate).WithDelegate(&mConfig.identifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kMomentarySwitch),
-                          SwitchCluster::StartupConfiguration{ .numberOfPositions = kSwitchNumberOfPositions });
+    mSwitchCluster.Create(endpoint, mConfig.features,
+                          SwitchCluster::StartupConfiguration{ .numberOfPositions = mConfig.numberOfSwitchPositions });
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 
     mBindingCluster.Create(
         BindingCluster::Context{
-            .bindingTable    = mBindingTable,
-            .bindingManager  = mBindingManager,
-            .platformManager = mPlatformManager,
+            .bindingTable    = mConfig.bindingTable,
+            .bindingManager  = mConfig.bindingManager,
+            .platformManager = mConfig.platformManager,
         },
         endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));
