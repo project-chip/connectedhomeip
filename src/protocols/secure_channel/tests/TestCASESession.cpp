@@ -2643,8 +2643,9 @@ TEST_F(TestCASESession, MalformedSigma2WithoutDestinationNodeIdDoesNotCrash)
     // 2. End-to-end packet injection: inject a spoofed/malformed unauthenticated CASE_Sigma2 with
     // S=1, DSIZ=0 (SourceNodeId set, DestinationNodeId unset) and I=0 (!IsInitiator(), NeedsAck=true).
     // Verify SessionManager::UnauthenticatedMessageDispatch and ExchangeManager::OnMessageReceived
-    // process and drop it safely without calling Optional::Value() (no chipDie crash) and without
-    // transmitting any StatusReport or StandaloneAck packet.
+    // process it safely without calling Optional::Value() (no chipDie crash)
+    // and without transmitting any StatusReport. The message still gets the
+    // usual MRP StandaloneAck.
     System::PacketBufferHandle msg = System::PacketBufferHandle::New(64);
     ASSERT_FALSE(msg.IsNull());
 
