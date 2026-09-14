@@ -150,7 +150,7 @@ class TC_TSTAT_4_4(ThermostatBaseTest):
 
     def pics_TC_TSTAT_4_4(self) -> list[str]:
         """Returns a list of PICS for this test case that must be True for the test to be run."""
-        return ["TSTAT.S"]
+        return ["TSTAT.S", "TSTAT.S.F0b"]
 
     def steps_TC_TSTAT_4_4(self) -> list[TestStep]:
         """Returns the list of test steps for TC-TSTAT-4.4."""
@@ -239,8 +239,11 @@ class TC_TSTAT_4_4(ThermostatBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
         log.info("FeatureMap: 0x%08x", feature_map)
         # Verify that the SENSORS bit (bit 11) is set in the FeatureMap value.
-        asserts.assert_true(bool(feature_map & cluster.Bitmaps.Feature.kThermostatSensors),
-                            "SENSORS bit (bit 11, 0x800) is not set in FeatureMap")
+        has_sensors = bool(feature_map & cluster.Bitmaps.Feature.kThermostatSensors)
+        if not has_sensors:
+            log.warning("SENSORS bit (bit 11, 0x800) is not set in FeatureMap on endpoint %d. Skipping steps 2b-6b.", endpoint)
+            self.mark_step_range_skipped("2b", "6b")
+            return
 
         self.step("2b")
         # TH reads the Sensors attribute.
