@@ -29,10 +29,10 @@
 
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
+#include <optional>
 #include <protocols/Protocols.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <pw_unit_test/framework.h>
-#include <optional>
 #include <utility>
 #include <vector>
 
