@@ -200,6 +200,7 @@ config CHIP_DEVICE_TYPE
 
 config CHIP_DEVICE_DISCRIMINATOR
 	hex "Device pairing discriminator"
+	range 0x0 0xFFF
 	default 0xF00
 	help
 	  Provides a 12-bit identifier that is used to discover the device during
@@ -696,6 +697,13 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 		Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
 		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 		within a range of +/- the value of this option.
+
+config CHIP_WIFI_PAF
+	bool "Enable Wi-Fi with PAFTP support"
+	depends on CHIP_WIFI
+	help
+	  Enable PAFTP (Public Action Frame Transport Protocol) support for Matter-over-Wi-Fi devices.
+	  This allows the device to use Wi-Fi Aware (NAN) for commissioning and service discovery.
 
 # Platform additions and configuration
 

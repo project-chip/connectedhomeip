@@ -541,8 +541,16 @@ class MatterBaseTest(base_test.BaseTestClass):
     * When a wildcard subscription is active, read_single_attribute_check_success compares
       each read to the subscription cache unless verify_wildcard_subscription=False is passed,
       or the class sets default_verify_wildcard_subscription = False.
+
+    * Set class attribute enable_server_interactions = False for tests where the TH must
+      publish no DNS-SD records at all (neither its commissioner service nor its
+      operational identities). Needed by tests that browse a service type the TH itself
+      advertises and whose records carry nothing to tell the TH's apart from the DUT's
+      (e.g. TC-SC-4.6: both advertise '_matterd._udp', and commissioner records have no
+      mandatory DUT-identifying key to filter on). Default is True.
     """
     requires_dut: bool = True
+    enable_server_interactions: bool = True
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)

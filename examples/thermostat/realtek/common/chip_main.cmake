@@ -8,6 +8,7 @@ set(chip_main chip_main)
 set(list_chip_main_sources chip_main_sources)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/includepath.cmake)
+include(${chip_dir}/examples/thermostat/thermostat-common/thermostat-common.cmake)
 
 if (matter_enable_shell)
 list(
@@ -41,7 +42,6 @@ list(
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
     ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp
-    ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp
 )
 
 add_library(
@@ -54,6 +54,8 @@ chip_configure_data_model(chip_main
     INCLUDE_SERVER
     ZAP_FILE ${matter_example_path}/../../thermostat-common/thermostat.zap
 )
+
+chip_add_thermostat_common(${chip_main})
 
 target_include_directories(
     ${chip_main}

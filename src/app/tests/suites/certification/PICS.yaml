@@ -3843,9 +3843,6 @@ PICS:
     - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
       id: GRPKEY.S.A0003
 
-    - label: "Does the device implement the GroupcastAdoption attribute?"
-      id: GRPKEY.S.A0004
-
     #
     # server commandsGenerated
     #
@@ -3994,6 +3991,10 @@ PICS:
           "Does the DUT(client) implement invoking/generating
           AddGroupIfIdentifying Command?"
       id: G.C.C05.Tx
+
+    # Groupcast Cluster Test Plan
+    - label: "Does the device implement the Groupcast cluster as a server?"
+      id: GC.S
 
     # HEPA Filter Monitoring Cluster Test Plan
     - label:
@@ -6582,6 +6583,13 @@ PICS:
           "Does the device implement the ThermostatSuggestionNotFollowingReason
           attribute?"
       id: TSTAT.S.A0056
+
+    - label: "Does the device implement the CriticalFreezeProtection attribute?"
+      id: TSTAT.S.A0057
+
+    - label:
+          "Does the device implement the CriticalOverheatProtection attribute?"
+      id: TSTAT.S.A0058
 
     #
     # server / commandsReceived
@@ -10319,6 +10327,62 @@ PICS:
 
     - label: "Can the mode change be manually controlled?"
       id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+
+    #
+    # Thermostat Mode Cluster
+    #
+
+    - label: "Does the device implement the TSTATM cluster as a server?"
+      id: TSTATM.S
+
+    # server / features
+    - label: "Does the device support the CoreModes feature?"
+      id: TSTATM.S.F01
+
+    # server / attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: TSTATM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: TSTATM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: TSTATM.S.A0002
+
+    - label: "Does the device implement the CoreModeTags attribute?"
+      id: TSTATM.S.A0004
+
+    # server / Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: TSTATM.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the ChangeToModeByCoreTag
+          command?"
+      id: TSTATM.S.C02.Rsp
+
+    # server / Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: TSTATM.S.C01.Tx
+
+    # Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: TSTATM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: TSTATM.S.M.CAN_MANUALLY_CONTROLLED
+
+    # PIXIT
+    - label:
+          "ID of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.TSTATM.MODE_CHANGE_FAIL
+
+    - label:
+          "ID of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.TSTATM.MODE_CHANGE_OK
 
     #
     # Power Topology Cluster

@@ -175,6 +175,14 @@ groups:
             teams: [reviewers-lg]
         reviews:
             request: 0 # Do not auto-add
+    shared-reviewers-morsemicro:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-morsemicro]
+        reviews:
+            request: 0 # Do not auto-add
     shared-reviewers-nordic:
         type: optional
         conditions:
