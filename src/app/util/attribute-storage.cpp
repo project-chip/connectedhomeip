@@ -1639,7 +1639,8 @@ Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
             uint8_t value[AttributeDefaultValue::kMaxOwnedValueSize] = {};
             if (emberAfExternalAttributeReadCallback(endpoint, clusterId, &am, value, am.size) == Status::Success)
             {
-                VerifyOrReturnError(outDefault.SetOwnedValue(ByteSpan(value, am.size), am.attributeType), Status::Failure);
+                // Guaranteed by the am.size check above, which is the only way SetOwnedValue fails.
+                VerifyOrDie(outDefault.SetOwnedValue(ByteSpan(value, am.size), am.attributeType));
                 return Status::Success;
             }
             // The application does not serve this attribute; fall back to the declaration.
