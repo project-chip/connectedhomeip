@@ -80,14 +80,17 @@ TEST(TestAppOptionsPortNumber, RejectsInputThatIsNotEntirelyNumeric)
     EXPECT_EQ(port, static_cast<uint16_t>(1));
 }
 
-TEST(TestAppOptionsRpcServerPort, DefaultsToTheLinuxExamplePort)
+TEST(TestAppOptionsRpcServerPort, IsUnsetUntilTheOptionIsGiven)
 {
-    // Keep in sync with LinuxDeviceOptions::rpcServerPort so that tooling which does not
-    // pass --rpc-server-port keeps reaching the app.
-    EXPECT_EQ(AppOptions::kDefaultRpcServerPort, static_cast<uint16_t>(33000));
-
+    // Left unset so that a non-PW_RPC build can tell "--rpc-server-port 33000" apart from the
+    // option not being passed at all, and warn in the former case.
     const AppOptions::AppConfig defaults;
-    EXPECT_EQ(defaults.rpcServerPort, AppOptions::kDefaultRpcServerPort);
+    EXPECT_FALSE(defaults.rpcServerPort.has_value());
+
+    // Keep in sync with LinuxDeviceOptions::rpcServerPort so that tooling which does not pass
+    // --rpc-server-port keeps reaching the app.
+    EXPECT_EQ(AppOptions::kDefaultRpcServerPort, static_cast<uint16_t>(33000));
+    EXPECT_EQ(defaults.rpcServerPort.value_or(AppOptions::kDefaultRpcServerPort), AppOptions::kDefaultRpcServerPort);
 }
 
 } // namespace

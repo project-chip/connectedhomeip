@@ -398,11 +398,11 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::app::PigweedAttributeAccessor sPwOobAccessor;
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
 
-    const uint16_t rpcServerPort = AppOptions::GetConfig().rpcServerPort;
+    const uint16_t rpcServerPort = AppOptions::GetConfig().rpcServerPort.value_or(AppOptions::kDefaultRpcServerPort);
     chip::rpc::Init(rpcServerPort);
     ChipLogProgress(AppServer, "PW_RPC initialized on port %u.", rpcServerPort);
 #else
-    if (AppOptions::GetConfig().rpcServerPort != AppOptions::kDefaultRpcServerPort)
+    if (AppOptions::GetConfig().rpcServerPort.has_value())
     {
         ChipLogError(AppServer,
                      "--rpc-server-port was specified, but this binary was built without Pigweed RPC support. Ignoring it.");

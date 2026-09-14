@@ -235,6 +235,14 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
             ChipLogError(Support, "Invalid RPC server port: %s", value);
             return false;
         }
+        // Port 0 would make the OS pick an ephemeral port. Unlike the Matter operational port,
+        // which is advertised over DNS-SD, the pw_rpc port is not discoverable and the app does
+        // not report the port it actually bound, so no client could ever reach the server.
+        if (port == 0)
+        {
+            ChipLogError(Support, "Invalid RPC server port: 0 is not a usable listen port");
+            return false;
+        }
         mConfig.rpcServerPort = port;
         ChipLogProgress(AppServer, "RPC server port option set to %u", port);
         return true;
@@ -378,9 +386,9 @@ OptionSet * AppOptions::GetOptions()
         result += "       A 16-byte, hex-encoded key, used to validate TestEventTrigger command of General Diagnostics cluster\n\n";
 
         result += "  --rpc-server-port <number>\n";
-        result += "       Listen port for the Pigweed RPC server (default: 33000). This is separate from\n";
-        result += "       --port, which sets the Matter operational port. Only has an effect in builds\n";
-        result += "       compiled with Pigweed RPC support (chip_enable_pw_rpc).\n\n";
+        result += "       Listen port for the Pigweed RPC server, 1-65535 (default: 33000). This is\n";
+        result += "       separate from --port, which sets the Matter operational port. Only has an\n";
+        result += "       effect in builds compiled with Pigweed RPC support (chip_enable_pw_rpc).\n\n";
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         result += "  --wifipaf freq_list=<freq_1>,<freq_2>...\n";

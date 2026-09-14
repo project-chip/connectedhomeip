@@ -52,10 +52,12 @@ public:
         uint8_t testEventTriggerEnableKey[16] = { 0 };
         bool enableWiFi                       = false;
         uint32_t bleController                = 0;
-        /// Listen port for the Pigweed RPC server. This is unconditionally parsed, but only
-        /// consumed by builds compiled with Pigweed RPC support (chip_enable_pw_rpc), so that
-        /// the option stays unit-testable and the struct layout does not vary per build flavor.
-        uint16_t rpcServerPort = kDefaultRpcServerPort;
+        /// Listen port for the Pigweed RPC server, unset when --rpc-server-port was not given.
+        /// This is unconditionally parsed, but only consumed by builds compiled with Pigweed RPC
+        /// support (chip_enable_pw_rpc), so that the option stays unit-testable and the struct
+        /// layout does not vary per build flavor. Callers should fall back to
+        /// kDefaultRpcServerPort.
+        std::optional<uint16_t> rpcServerPort;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         std::string wifipafExtCmds;
         // Frequencies in MHz parsed out of "--wifipaf freq_list=", in the order given.
