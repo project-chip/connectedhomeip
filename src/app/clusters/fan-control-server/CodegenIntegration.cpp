@@ -168,17 +168,17 @@ public:
         }
         if (features.Has(FanControl::Feature::kRocking))
         {
+            // RockSupport is mandatory with RCK and the spec requires at least one bit to be set, so the
+            // value has to come from the endpoint configuration: there is no capability to fall back to.
             BitMask<RockBitmap> rockSupport;
-            RockSupport::GetDefaultOr(
-                endpointId, rockSupport,
-                BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound));
+            VerifyOrDie(RockSupport::GetDefault(endpointId, rockSupport) == Status::Success && rockSupport.HasAny());
             config.WithRockSupport(rockSupport);
         }
         if (features.Has(FanControl::Feature::kWind))
         {
+            // WindSupport is mandatory with WND and the spec requires at least one bit to be set.
             BitMask<WindBitmap> windSupport;
-            WindSupport::GetDefaultOr(endpointId, windSupport,
-                                      BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind));
+            VerifyOrDie(WindSupport::GetDefault(endpointId, windSupport) == Status::Success && windSupport.HasAny());
             config.WithWindSupport(windSupport);
         }
         if (features.Has(FanControl::Feature::kAirflowDirection))
