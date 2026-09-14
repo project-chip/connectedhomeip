@@ -30,9 +30,18 @@ RUN set -x \
     && echo "${OPENSSL_SHA256}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c - \
     && tar xzf openssl-${OPENSSL_VERSION}.tar.gz \
     && cd openssl-${OPENSSL_VERSION} \
-    && ./Configure --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib \
+    && ./Configure --prefix=/opt/matter/openssl --openssldir=/etc/ssl --libdir=lib \
     && make -j$(nproc) \
     && make install_sw \
-    && ldconfig \
     && cd / && rm -rf /tmp/openssl-${OPENSSL_VERSION}* \
     && : # last line
+
+# Unset uses host OpenSSL. Explicit true/false selects private OpenSSL with
+# static/dynamic linkage. Only the SDK's OpenSSL GN configuration consumes these.
+ARG OPENSSL_STATIC=
+RUN case "$OPENSSL_STATIC" in \
+        ''|true|false) ;; \
+        *) echo "OPENSSL_STATIC must be empty (host), true (static), or false (dynamic)" >&2; exit 1 ;; \
+    esac
+ENV CHIP_OPENSSL_ROOT=${OPENSSL_STATIC:+/opt/matter/openssl}
+ENV CHIP_OPENSSL_STATIC=${OPENSSL_STATIC}
