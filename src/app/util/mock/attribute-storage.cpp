@@ -590,6 +590,11 @@ namespace app {
 Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
                                                                     AttributeId attributeId, AttributeDefaultValue & outDefault)
 {
+    // Status selection must match the ember implementation in app/util/attribute-storage.cpp:
+    // a missing cluster is UnsupportedCluster, a missing attribute is UnsupportedAttribute.
+    VerifyOrReturnError(emberAfFindServerCluster(endpoint, clusterId) != nullptr,
+                        Protocols::InteractionModel::Status::UnsupportedCluster);
+
     const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId);
     VerifyOrReturnError(metadata != nullptr, Protocols::InteractionModel::Status::UnsupportedAttribute);
     return emberAfGetAttributeDefaultValue(*metadata, outDefault);

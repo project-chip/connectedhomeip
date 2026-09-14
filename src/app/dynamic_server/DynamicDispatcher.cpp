@@ -302,7 +302,9 @@ EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
 Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
                                                                     AttributeId attributeId, AttributeDefaultValue & outDefault)
 {
-    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    // Dynamically dispatched endpoints have no ZAP-configured defaults. NotFound (rather than an
+    // error) is what GetDefaultOr treats as "use the caller-supplied fallback".
+    return Protocols::InteractionModel::Status::NotFound;
 }
 
 } // namespace app

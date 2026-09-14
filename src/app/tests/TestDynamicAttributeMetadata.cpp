@@ -250,8 +250,9 @@ TEST(TestDynamicAttributeMetadata, EndpointLevelLookup)
     EXPECT_EQ(emberAfGetAttributeDefaultValue(kTestEndpointId, kTestClusterId, 0x9999, val),
               Protocols::InteractionModel::Status::UnsupportedAttribute);
 
+    // Endpoint 99 does not exist, so the cluster cannot be found.
     EXPECT_EQ(emberAfGetAttributeDefaultValue(99, kTestClusterId, 0x0002, val),
-              Protocols::InteractionModel::Status::UnsupportedAttribute);
+              Protocols::InteractionModel::Status::UnsupportedCluster);
 
     Testing::ResetMockNodeConfig();
 }
