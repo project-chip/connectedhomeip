@@ -466,6 +466,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             attrib_listener.reset()
+
             # Drain any DetectStarted events already queued before waiting for DetectEnded
 +            event_listener.flush_events()   # if such API exists, or:
 
