@@ -30,13 +30,15 @@ scripts/run_in_python_env.sh out/python_env \
     --app out/linux-x64-all-devices-ipv6only-no-ble-no-wifi-rpc-asan-clang-test/all-devices-app \
     --app-args "\
         --device contact-sensor:1 \
-        --device water-leak-detector:2" \
+        --device water-leak-detector:2 \
+        --rpc-server-port 33000" \
     --factory-reset \
     --script examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor/test.py \
     --script-args "\
         --commissioning-method on-network \
         --discriminator 3840 \
-        --passcode 20202021\
+        --passcode 20202021 \
+        --int-arg rpc_server_port:33000\
         " \
     --app-stdin-pipe /tmp/app_stdin.txt'
 
