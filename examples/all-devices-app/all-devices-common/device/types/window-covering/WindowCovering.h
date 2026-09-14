@@ -46,6 +46,8 @@ public:
     {
         BitFlags<Clusters::WindowCovering::Feature> features;
         Clusters::WindowCovering::OptionalAttributeSet optionalAttributes = {};
+        Clusters::WindowCovering::Type type                               = Clusters::WindowCovering::Type::kUnknown;
+        Clusters::WindowCovering::EndProductType endProductType = Clusters::WindowCovering::EndProductType::kUnknown;
     };
 
     WindowCovering(const Context & context, const Delegates & delegates, const Config & config);
