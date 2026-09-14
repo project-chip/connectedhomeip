@@ -215,5 +215,70 @@ class TestNetworkAdministratorSecret(unittest.TestCase):
             ni.encode_network_administrator_secret(0, b"\x00" * 16)
 
 
+class TestNetworkAdministratorSecretDecoding(unittest.TestCase):
+    def test_round_trips_encoded_secret(self):
+        raw_secret = bytes(range(ni.NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
+        created = 0x01020304
+        decoded = ni.decode_network_administrator_secret(
+            ni.encode_network_administrator_secret(created, raw_secret))
+        self.assertEqual(decoded.version, 0)
+        self.assertEqual(decoded.created, created)
+        self.assertEqual(decoded.raw_secret, raw_secret)
+
+    def test_accepts_narrow_created_encodings(self):
+        # The C++ TLV writer emits the smallest unsigned encoding that fits, so a small
+        # timestamp comes back as a 1- or 2-byte element rather than the 4 bytes the
+        # Python encoder always writes.
+        raw_secret = bytes(range(ni.NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
+        for control, value_bytes, expected in ((0x24, b"\x07", 7), (0x25, b"\x34\x12", 0x1234)):
+            encoded = (bytes([0x15, 0x24, 0x01, 0x00, control, 0x02]) + value_bytes
+                       + bytes([0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]))
+            self.assertEqual(ni.decode_network_administrator_secret(encoded).created, expected)
+
+    def test_rejects_malformed_secrets(self):
+        raw_secret = bytes(ni.NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH)
+        valid = ni.encode_network_administrator_secret(0x01020304, raw_secret)
+        # Each case names the rejection it must produce. Matching the message keeps two cases
+        # from silently landing in the same branch and leaving another one unreached: dropping
+        # bytes off the end of a valid NASS, for instance, takes the closing 0x18 with them and
+        # is rejected as a bad structure long before any truncation check runs.
+        cases = {
+            "not a structure": (valid[1:], "anonymous TLV structure"),
+            "no closing tag": (valid[:-1], "anonymous TLV structure"),
+            # Ends between two fields, with less than a control-and-tag pair left.
+            "ends after the version": (bytes([0x15, 0x24, 0x01, 0x00, 0x18]), "truncated before field 2"),
+            # Ends right after the octet string's tag, so its length prefix is off the end.
+            "ends after the raw secret tag": (bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                     0x30, 0x03, 0x18]),
+                                              "truncated before the length of field 3"),
+            # Declares 32 bytes of raw secret but carries 28, so the field runs off the end.
+            "raw secret shorter than its length prefix": (valid[:-5] + bytes([0x18]), "truncated inside field 3"),
+            "trailing field": (valid[:-1] + bytes([0x24, 0x04, 0x00, 0x18]), "unexpected trailing fields"),
+            "nonzero version": (bytes([0x15, 0x24, 0x01, 0x01]) + valid[4:], "version must be 0"),
+            "short raw secret": (bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                        0x30, 0x03, 0x10]) + raw_secret[:16] + bytes([0x18]),
+                                 "raw secret must be 32 bytes"),
+            "out of tag order": (bytes([0x15, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01, 0x24, 0x01, 0x00,
+                                        0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]),
+                                 "out of tag order"),
+            # Each field's TLV type is enforced, so callers can rely on `created` being an
+            # integer they can do arithmetic on rather than getting bytes back.
+            "version as an octet string": (bytes([0x15, 0x30, 0x01, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]),
+                                           "field 1 must be an unsigned integer"),
+            "created as an octet string": (bytes([0x15, 0x24, 0x01, 0x00, 0x30, 0x02, 0x04, 0x04, 0x03, 0x02, 0x01,
+                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]),
+                                           "field 2 must be an unsigned integer"),
+            "raw secret as an integer": (bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                0x26, 0x03, 0x04, 0x03, 0x02, 0x01, 0x18]),
+                                         "field 3 must be an octet string"),
+        }
+        for name, (encoded, expected_message) in cases.items():
+            with self.subTest(name=name):
+                with self.assertRaises(ValueError) as caught:
+                    ni.decode_network_administrator_secret(encoded)
+                self.assertIn(expected_message, str(caught.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

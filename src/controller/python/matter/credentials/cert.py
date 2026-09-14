@@ -28,6 +28,11 @@ def _handle():
             ctypes.c_uint8), ctypes.c_size_t, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t)])
         setter.Set("pychip_ConvertChipCertToX509Cert", PyChipError, [ctypes.POINTER(
             ctypes.c_uint8), ctypes.c_size_t, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t)])
+    if handle.pychip_GetMaxCertificateChainDocumentSize.argtypes is None:
+        NativeLibraryHandleMethodArguments(handle).Set("pychip_GetMaxCertificateChainDocumentSize", ctypes.c_uint32, [])
+    if handle.pychip_GetCertificateChainDocumentSizeForProfiles.argtypes is None:
+        NativeLibraryHandleMethodArguments(handle).Set(
+            "pychip_GetCertificateChainDocumentSizeForProfiles", ctypes.c_uint32, [ctypes.c_uint8, ctypes.c_uint8])
     return handle
 
 
@@ -53,3 +58,11 @@ def convert_chip_cert_to_x509_cert(chipCert: bytes) -> bytes:
                                                ctypes.cast(output_buffer, ptr_type), ctypes.byref(output_size)).raise_on_error()
 
     return bytes(output_buffer)[:output_size.value]
+
+
+def get_max_certificate_chain_document_size(subject_profile: int | None = None, issuer_profile: int | None = None) -> int:
+    """Return a native SDK bound for both certificate algorithms, or the global bound if either is unknown."""
+    # Preserve the parameterless API and native symbol for existing callers.
+    if subject_profile is None or issuer_profile is None:
+        return _handle().pychip_GetMaxCertificateChainDocumentSize()
+    return _handle().pychip_GetCertificateChainDocumentSizeForProfiles(subject_profile, issuer_profile)

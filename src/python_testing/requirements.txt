@@ -9,3 +9,10 @@ pycountry
 validators
 nest-asyncio
 pyserial
+
+# support_modules/pqc_support.py verifies ML-DSA attestation signatures in Python rather than
+# through the SDK's C++ crypto, so the harness stays an independent check on the stack. That needs
+# hazmat.primitives.asymmetric.mldsa, added in cryptography 46.0.0; the wheel bundles an OpenSSL
+# new enough to provide it. Without this floor the ML-DSA cases in
+# test_testing/test_pqc_support.py silently skip instead of running.
+cryptography>=46

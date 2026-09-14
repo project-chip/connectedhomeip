@@ -21,8 +21,18 @@
 
 #include <iostream>
 #include <list>
+#include <memory>
 #include <string>
 #include <vector>
+
+// Completion always coincides with removal from mCachedMessages (see
+// MessagesManager::CompleteMessage), so there's no separate "complete" state to observe --
+// only these two are ever set.
+enum class MessageState : uint8_t
+{
+    kQueued,
+    kPresented,
+};
 
 struct CachedMessageOption
 {
@@ -51,7 +61,7 @@ struct CachedMessage
     CachedMessage(const CachedMessage & message) :
         mPriority(message.mPriority), mMessageControl(message.mMessageControl), mStartTime(message.mStartTime),
         mDuration(message.mDuration), mMessageText(message.mMessageText), mLanguageCode(message.mLanguageCode),
-        mMessageUri(message.mMessageUri), mOptions(message.mOptions)
+        mMessageUri(message.mMessageUri), mOptions(message.mOptions), mState(message.mState), mFabricIndex(message.mFabricIndex)
     {
         memcpy(mMessageIdBuffer, message.mMessageIdBuffer, sizeof(mMessageIdBuffer));
 
@@ -67,15 +77,15 @@ struct CachedMessage
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
                   const chip::app::DataModel::Nullable<uint32_t> & startTime,
                   const chip::app::DataModel::Nullable<uint64_t> & duration, std::string messageText, std::string languageCode,
-                  std::string messageUri) :
+                  std::string messageUri, chip::FabricIndex fabricIndex) :
         mPriority(priority),
         mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText),
-        mLanguageCode(languageCode), mMessageUri(messageUri)
+        mLanguageCode(languageCode), mMessageUri(messageUri), mFabricIndex(fabricIndex)
     {
         memcpy(mMessageIdBuffer, messageId.data(), sizeof(mMessageIdBuffer));
     }
 
-    bool MessageIdMatches(const chip::ByteSpan & id) { return chip::ByteSpan(mMessageIdBuffer).data_equal(id); }
+    bool MessageIdMatches(const chip::ByteSpan & id) const { return chip::ByteSpan(mMessageIdBuffer).data_equal(id); }
 
     void AddOption(CachedMessageOption option)
     {
@@ -83,7 +93,15 @@ struct CachedMessage
         mResponseOptions.push_back(option.GetMessageOption());
     }
 
-    chip::app::Clusters::Messages::Structs::MessageStruct::Type GetMessage()
+    chip::ByteSpan GetMessageId() const { return chip::ByteSpan(mMessageIdBuffer); }
+    const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & GetMessageControl() const { return mMessageControl; }
+    const chip::app::DataModel::Nullable<uint32_t> & GetStartTime() const { return mStartTime; }
+    const chip::app::DataModel::Nullable<uint64_t> & GetDuration() const { return mDuration; }
+    MessageState GetState() const { return mState; }
+    void SetState(MessageState state) { mState = state; }
+    chip::FabricIndex GetFabricIndex() const { return mFabricIndex; }
+
+    chip::app::Clusters::Messages::Structs::MessageStruct::Type GetMessage() const
     {
         chip::app::Clusters::Messages::Structs::MessageStruct::Type message{ chip::ByteSpan(mMessageIdBuffer),
                                                                              mPriority,
@@ -93,7 +111,7 @@ struct CachedMessage
                                                                              chip::CharSpan::fromCharString(mMessageText.c_str()) };
         if (mResponseOptions.size() > 0)
         {
-            chip::app::DataModel::List<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type> options(
+            chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type> options(
                 mResponseOptions.data(), mResponseOptions.size());
             message.responses = chip::MakeOptional(options);
         }
@@ -123,21 +141,26 @@ protected:
 
     std::vector<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type> mResponseOptions;
     std::list<CachedMessageOption> mOptions;
+    MessageState mState = MessageState::kQueued;
+    chip::FabricIndex mFabricIndex;
 };
 
 class MessagesManager : public chip::app::Clusters::Messages::Delegate
 {
 public:
+    ~MessagesManager() override;
+
     // Commands
-    CHIP_ERROR HandlePresentMessagesRequest(
-        const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
-        const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
-        const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint64_t> & duration,
-        const chip::CharSpan & messageText,
-        const chip::Optional<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
-            responses,
-        const chip::Optional<chip::CharSpan> & languageCode, const chip::Optional<chip::CharSpan> & messageUri) override;
+    CHIP_ERROR
+    HandlePresentMessagesRequest(const chip::ByteSpan & messageId,
+                                 const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
+                                 const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
+                                 const chip::app::DataModel::Nullable<uint32_t> & startTime,
+                                 const chip::app::DataModel::Nullable<uint64_t> & duration, const chip::CharSpan & messageText,
+                                 const chip::Optional<chip::app::DataModel::DecodableList<
+                                     chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> & responses,
+                                 const chip::Optional<chip::CharSpan> & languageCode,
+                                 const chip::Optional<chip::CharSpan> & messageUri, chip::FabricIndex fabricIndex) override;
     CHIP_ERROR HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes
@@ -149,6 +172,54 @@ public:
     // Global Attributes
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
-protected:
+    // Not part of the Delegate contract. ZCLCallbacks.cpp calls this once, right
+    // after SetDefaultDelegate(), so events can be logged against the right endpoint.
+    void SetEndpointId(chip::EndpointId endpoint) { mEndpointId = endpoint; }
+
+    // Not part of the Delegate contract. Read-only introspection for the `messages
+    // list` shell command.
+    void LogCachedMessages() const;
+
+    // Not part of the Delegate contract. Backs the `messages do-not-disturb` shell command.
+    bool GetDoNotDisturb() const { return mDoNotDisturb; }
+    void SetDoNotDisturb(bool enabled) { mDoNotDisturb = enabled; }
+
+private:
+    enum class MessageTimerType : uint8_t
+    {
+        kPresent,
+        kComplete,
+    };
+
+    struct MessageTimerContext
+    {
+        MessagesManager * manager;
+        uint8_t messageId[chip::app::Clusters::Messages::kMessageIdLength];
+        MessageTimerType type;
+    };
+
+    static constexpr uint32_t kClockRecheckIntervalSeconds = 30;
+
+    std::list<CachedMessage>::iterator FindCachedMessage(chip::ByteSpan messageId);
+
+    // Computes the delay until `messageId`'s StartTime and (re-)schedules the
+    // present-timer for it, or presents it immediately if StartTime has already
+    // passed (or is null). Also used to recheck once the real time becomes synced.
+    void ScheduleOrPresentMessage(chip::ByteSpan messageId);
+    void PresentMessage(CachedMessage & message);
+    void PresentOrSuppressMessage(std::list<CachedMessage>::iterator it);
+    void CompleteMessage(chip::ByteSpan messageId);
+
+    void StartMessageTimer(chip::ByteSpan messageId, MessageTimerType type, uint32_t delayMs);
+    void CancelMessageTimers(chip::ByteSpan messageId);
+    static void OnMessageTimerExpired(chip::System::Layer * systemLayer, void * context);
+
+    chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
+    bool mDoNotDisturb           = false;
     std::list<CachedMessage> mCachedMessages;
+    std::vector<std::shared_ptr<MessageTimerContext>> mTimerContexts;
 };
+
+// Defined in ZCLCallbacks.cpp; returns the live Messages delegate instance for
+// use by the `messages` shell command.
+MessagesManager * GetMessagesManager();
