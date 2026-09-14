@@ -123,6 +123,10 @@ if(CONFIG_CHIP)
         DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
     )
 
+    if(CONFIG_CHIP_OTA_REQUESTOR)
+        matter_add_gn_arg_bool("chip_enable_ota_requestor" TRUE)
+    endif()
+
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})
     matter_add_gn_arg_string("zephyr_cxx" ${CMAKE_CXX_COMPILER})
@@ -178,6 +182,7 @@ if(CONFIG_CHIP)
     if(CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
         zephyr_library_named(chip_codedriven_data_model)
         target_sources(chip_codedriven_data_model PRIVATE
+            ${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp
             ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
             ${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
             ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp

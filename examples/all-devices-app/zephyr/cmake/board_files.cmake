@@ -53,13 +53,30 @@ function(all_devices_find_board_file boards_dir filename out_var)
     set(${out_var} "${_match}" PARENT_SCOPE)
 endfunction()
 
-# Appends to a sysbuild image variable for this CMake run without changing
-# caller-provided cache entries.
+# Appends to a sysbuild image variable while preserving caller-provided values
+# and cache metadata.
 function(all_devices_append_image_files var)
+    set(_owned_var "_ALL_DEVICES_OWNED_${var}")
     set(_value ${${var}})
+
+    if(DEFINED CACHE{${var}})
+        get_property(_cache_type CACHE ${var} PROPERTY TYPE)
+        get_property(_cache_help CACHE ${var} PROPERTY HELPSTRING)
+    else()
+        set(_cache_type INTERNAL)
+        set(_cache_help "All-devices sysbuild image files")
+    endif()
+
+    foreach(_owned_file IN LISTS ${_owned_var})
+        list(REMOVE_ITEM _value "${_owned_file}")
+    endforeach()
+
     list(APPEND _value ${ARGN})
     if(_value)
         list(REMOVE_DUPLICATES _value)
     endif()
+
+    set(${_owned_var} "${ARGN}" CACHE INTERNAL "All-devices sysbuild image files" FORCE)
+    set(${var} "${_value}" CACHE ${_cache_type} "${_cache_help}" FORCE)
     set(${var} "${_value}" PARENT_SCOPE)
 endfunction()
