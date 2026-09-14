@@ -120,17 +120,11 @@ public:
 
         // Read Description from attribute metadata (points directly to flash).
         chip::CharSpan descSpan;
-        if (Attributes::Description::GetDefault(endpointId, descSpan) != Status::Success)
-        {
-            descSpan = chip::CharSpan();
-        }
+        Attributes::Description::GetDefaultOr(endpointId, descSpan, chip::CharSpan());
 
         // Read StandardNamespace from Ember RAM storage (ZAP default = null).
         DataModel::Nullable<uint16_t> standardNamespace;
-        if (Attributes::StandardNamespace::GetDefault(endpointId, standardNamespace) != Status::Success)
-        {
-            standardNamespace.SetNull();
-        }
+        Attributes::StandardNamespace::GetDefaultOr(endpointId, standardNamespace, DataModel::NullNullable);
 
         ModeSelectCluster::Config config{
             .featureMap             = BitMask<Feature>(featureMap),

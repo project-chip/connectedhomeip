@@ -150,11 +150,8 @@ public:
         FanModeSequenceEnum defaultFanModeSequence =
             features.Has(FanControl::Feature::kAuto) ? FanModeSequenceEnum::kOffLowHighAuto : FanModeSequenceEnum::kOffLowHigh;
 
-        FanModeSequenceEnum fanModeSequence = defaultFanModeSequence;
-        if (FanModeSequence::GetDefault(endpointId, fanModeSequence) != Status::Success)
-        {
-            fanModeSequence = defaultFanModeSequence;
-        }
+        FanModeSequenceEnum fanModeSequence{};
+        FanModeSequence::GetDefaultOr(endpointId, fanModeSequence, defaultFanModeSequence);
 
         if (EnsureKnownEnumValue(fanModeSequence) == FanModeSequenceEnum::kUnknownEnumValue)
         {
@@ -165,29 +162,23 @@ public:
 
         if (features.Has(FanControl::Feature::kMultiSpeed))
         {
-            uint8_t speedMax = 100;
-            if (SpeedMax::GetDefault(endpointId, speedMax) != Status::Success)
-            {
-                speedMax = 100;
-            }
+            uint8_t speedMax{};
+            SpeedMax::GetDefaultOr(endpointId, speedMax, 100);
             config.WithSpeedMax(speedMax);
         }
         if (features.Has(FanControl::Feature::kRocking))
         {
             BitMask<RockBitmap> rockSupport;
-            if (RockSupport::GetDefault(endpointId, rockSupport) != Status::Success)
-            {
-                rockSupport = BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound);
-            }
+            RockSupport::GetDefaultOr(
+                endpointId, rockSupport,
+                BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound));
             config.WithRockSupport(rockSupport);
         }
         if (features.Has(FanControl::Feature::kWind))
         {
             BitMask<WindBitmap> windSupport;
-            if (WindSupport::GetDefault(endpointId, windSupport) != Status::Success)
-            {
-                windSupport = BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind);
-            }
+            WindSupport::GetDefaultOr(endpointId, windSupport,
+                                      BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind));
             config.WithWindSupport(windSupport);
         }
         if (features.Has(FanControl::Feature::kAirflowDirection))

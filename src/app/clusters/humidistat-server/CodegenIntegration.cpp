@@ -96,10 +96,7 @@ public:
 
         if (optionalAttributes.IsSet(Sleep::Id))
         {
-            if (Sleep::GetDefault(endpointId, config.sleep) != Status::Success)
-            {
-                config.sleep = false;
-            }
+            Sleep::GetDefaultOr(endpointId, config.sleep, false);
         }
 
         if (features.Has(Feature::kOptimal))

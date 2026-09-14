@@ -47,11 +47,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         CharSpan activeLocale;
-        Status status = ActiveLocale::GetDefault(endpointId, activeLocale);
-        if (status != Status::Success)
-        {
-            ChipLogError(AppServer, "Failed to get active locale on endpoint %u: 0x%02x", endpointId, to_underlying(status));
-        }
+        ActiveLocale::GetDefaultOr(endpointId, activeLocale, CharSpan());
 
         DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
         VerifyOrDie(provider != nullptr);
