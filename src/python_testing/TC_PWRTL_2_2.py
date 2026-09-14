@@ -40,6 +40,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import queue
 import random
 
 from mobly import asserts
@@ -206,8 +207,9 @@ class TC_PWRTL_2_2(MatterBaseTest):
 
         self.step(12, "As TH2, TH writes ElectricalCircuitNodes with a new valid list of 2 entries",
                   expectation="Write returns SUCCESS; TH awaits a subscription report on TH2's subscription "
-                  "reflecting the updated list. TH1 is also reported to, since dirtiness is per attribute path "
-                  "and not per fabric, but its report still carries only its own entries.")
+                  "reflecting the updated list. TH1's subscription may also report, since an attribute is "
+                  "marked dirty per path and not per fabric, but any report it carries MUST contain only "
+                  "TH1's own entries.")
         try:
             entries_final = [
                 CircuitNodeStruct(node=0x000000000000B010),
@@ -217,13 +219,17 @@ class TC_PWRTL_2_2(MatterBaseTest):
             asserts.assert_equal(result[0].Status, Status.Success, 'The TH2 write must succeed on its own fabric')
             report = th2_reports.wait_for_attribute_report()
             self._assert_nodes_equal(report.value, entries_final, "TH2's report after its own write")
-            # TH1 is reported to as well: the IM marks an attribute dirty per path, and
-            # AttributePathParams carries no fabric, so there is no way to dirty an attribute for one
-            # fabric only. What must not happen is TH2's entries reaching TH1, so the content is what
-            # is checked rather than the absence of a report.
-            th1_report = th1_reports.wait_for_attribute_report()
-            self._assert_nodes_equal(th1_report.value, entries_label_max,
-                                     "TH1's report must still carry only TH1's own entries")
+            # TH1 may also be reported to: the IM marks an attribute dirty per path, and
+            # AttributePathParams carries no fabric, so a server has no way to dirty an attribute for
+            # one fabric only. A server that does filter per fabric is equally conformant, so the
+            # report is not required. What must not happen is TH2's entries reaching TH1, so any
+            # report that does arrive is checked for content.
+            try:
+                th1_report = th1_reports.attribute_queue.get(block=True, timeout=5)
+                self._assert_nodes_equal(th1_report.value, entries_label_max,
+                                         "TH1's report must still carry only TH1's own entries")
+            except queue.Empty:
+                log.info("TH1 received no report, which the test plan permits")
         finally:
             th1_reports.cancel()
             th2_reports.cancel()
