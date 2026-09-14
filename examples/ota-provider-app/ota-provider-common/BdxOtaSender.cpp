@@ -66,20 +66,17 @@ CHIP_ERROR BdxOtaSender::OnMessageReceived(chip::Messaging::ExchangeContext * ec
                                            chip::System::PacketBufferHandle && payload)
 {
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mInitialized && mFabricIndex.HasValue() && mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
-    // Only screen exchanges other than the one already driving the transfer: an early return here skips the base handler's
-    // WillSendMessage(), so the messaging layer would free the exchange context we still hold.
-    if (ec != mExchangeCtx)
-    {
-        VerifyOrReturnError(mInitialized && mFabricIndex.HasValue() && mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    // Only a unicast CASE/PASE session carries an authenticated peer identity. Reject group and
+    // unauthenticated sessions, whose GetPeer() is the unauthenticated packet-header source node id.
+    const auto & session = ec->GetSessionHandle();
+    VerifyOrReturnError(session->IsSecureSession(), CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
 
-        // A transfer is armed from a QueryImage over CASE, so mFabricIndex/mNodeId are operational values. Comparing both against
-        // the incoming session's peer rejects any other requester; a PASE session (undefined fabric index) cannot match.
-        const auto & session = ec->GetSessionHandle();
-        VerifyOrReturnError(session->IsSecureSession(), CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
-        VerifyOrReturnError(session->GetFabricIndex() == mFabricIndex.Value() && session->GetPeer().GetNodeId() == mNodeId.Value(),
-                            CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
-    }
+    // Serve only the requester the transfer was armed for by its QueryImage. The exchange already
+    // driving the transfer passes this by construction, so it is never rejected here.
+    VerifyOrReturnError(session->GetFabricIndex() == mFabricIndex.Value() && session->GetPeer().GetNodeId() == mNodeId.Value(),
+                        CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
 
     return chip::bdx::TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
 }
