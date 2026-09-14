@@ -87,7 +87,7 @@ class TC_ACS_3_3(MatterBaseTest):
 
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
 
     def write_to_app_pipe(self, command):
         if self.is_ci:
@@ -509,7 +509,7 @@ class TC_ACS_3_3(MatterBaseTest):
                     f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID2}, "TagId":{tag2}}}]}}')
                 # await asyncio.sleep(1)
                 self.write_to_app_pipe(
-                    f'{{"Name":"SetObjCount","EndpointId":{endpoint},"ObjectCount":2}}')
+                    f'{{"Name":"SetObjectCount","EndpointId":{endpoint},"ObjectCount":2}}')
                 # await asyncio.sleep(1)
             else:
                 self.wait_for_user_input(
