@@ -141,9 +141,9 @@ public:
         }
 
         EndpointId mEndpointId;
-        CharSpan mUnionName                                  = CharSpan();
-        AmbientSensingUnionDelegate * mDelegate              = nullptr;
-        AmbientSensingUnion::UnionHealthEnum mUnionHealth    = AmbientSensingUnion::UnionHealthEnum::kNonFunctional;
+        CharSpan mUnionName                               = CharSpan();
+        AmbientSensingUnionDelegate * mDelegate           = nullptr;
+        AmbientSensingUnion::UnionHealthEnum mUnionHealth = AmbientSensingUnion::UnionHealthEnum::kNonFunctional;
     };
 
     ~AmbientSensingUnionCluster() override = default;

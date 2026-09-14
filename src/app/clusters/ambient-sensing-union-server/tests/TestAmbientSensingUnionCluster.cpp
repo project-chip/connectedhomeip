@@ -358,7 +358,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatus)
     EXPECT_EQ(
         cluster->UpdateMatterContributorStatus(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline),
         CHIP_NO_ERROR);
-
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatusSameValue)
@@ -481,7 +480,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateNonMatterContributorStatus)
     EXPECT_EQ(cluster->UpdateNonMatterContributorStatus(CharSpan::fromCharString(kContributorName),
                                                         UnionContributorStatusEnum::kUnionContributorOffline),
               CHIP_NO_ERROR);
-
 }
 
 // =============================================================================
@@ -1107,8 +1105,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestSetUnionHealthSameValueIsNoOp)
     mDelegate.Reset();
     EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kNonFunctional), CHIP_NO_ERROR);
     EXPECT_FALSE(mDelegate.mUnionHealthChangedCalled);
-    EXPECT_FALSE(
-        mContext->ChangeListener().IsDirty({ kTestEndpointId, AmbientSensingUnion::Id, Attributes::UnionHealth::Id }));
+    EXPECT_FALSE(mContext->ChangeListener().IsDirty({ kTestEndpointId, AmbientSensingUnion::Id, Attributes::UnionHealth::Id }));
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestSetUnionHealthNotifiesAttributeChanged)
@@ -1119,8 +1116,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestSetUnionHealthNotifiesAttributeChange
 
     mContext->ChangeListener().DirtyList().clear();
     EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kFullyFunctional), CHIP_NO_ERROR);
-    EXPECT_TRUE(
-        mContext->ChangeListener().IsDirty({ kTestEndpointId, AmbientSensingUnion::Id, Attributes::UnionHealth::Id }));
+    EXPECT_TRUE(mContext->ChangeListener().IsDirty({ kTestEndpointId, AmbientSensingUnion::Id, Attributes::UnionHealth::Id }));
 }
 
 } // namespace
