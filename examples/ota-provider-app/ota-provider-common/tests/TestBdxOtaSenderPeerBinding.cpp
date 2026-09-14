@@ -156,10 +156,7 @@ protected:
         return mSender->OnMessageReceived(exchange, payloadHeader, MakeReceiveInit());
     }
 
-    CHIP_ERROR DeliverReceiveInitFrom(const SessionHandle & session)
-    {
-        return DeliverReceiveInitOn(NewExchangeFor(session));
-    }
+    CHIP_ERROR DeliverReceiveInitFrom(const SessionHandle & session) { return DeliverReceiveInitOn(NewExchangeFor(session)); }
 
     std::optional<TestableBdxOtaSender> mSender;
     std::vector<Messaging::ExchangeContext *> mExchanges;
