@@ -148,7 +148,16 @@ endif()
 # TODO: Wi-Fi
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
-    chip_configure_cluster(app ota-requestor)
+    target_sources(app PRIVATE
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/ExtendedOTARequestorDriver.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTATestEventTriggerHandler.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestorAttributes.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestorCluster.cpp
+    )
 
     if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
         set(ALL_DEVICES_OTA_BASE_NAME "zephyr")

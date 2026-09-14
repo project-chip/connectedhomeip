@@ -53,13 +53,13 @@ function(all_devices_find_board_file boards_dir filename out_var)
     set(${out_var} "${_match}" PARENT_SCOPE)
 endfunction()
 
-# Appends to a sysbuild image variable. Read-modify-write because writing a
-# CACHE INTERNAL entry implies FORCE, which would drop values passed with -D.
-# Appended paths persist in the cache, so changing boards requires a pristine build.
+# Appends to a sysbuild image variable for this CMake run without changing
+# caller-provided cache entries.
 function(all_devices_append_image_files var)
-    set(_value ${${var}} ${ARGN})
+    set(_value ${${var}})
+    list(APPEND _value ${ARGN})
     if(_value)
         list(REMOVE_DUPLICATES _value)
-        set(${var} "${_value}" CACHE INTERNAL "all-devices-app: ${var}")
     endif()
+    set(${var} "${_value}" PARENT_SCOPE)
 endfunction()
