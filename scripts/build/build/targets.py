@@ -252,6 +252,9 @@ def BuildHostTarget():
         "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-(mbedtls|psa)')
     target.AppendModifier(
         "psa", crypto_library=HostCryptoLibrary.PSA).ExceptIfRe('-(boringssl|mbedtls)')
+    target.AppendModifier(
+        "openssl-static", crypto_library=HostCryptoLibrary.OPENSSL_STATIC).OnlyIfRe('^linux-').ExceptIfRe(
+            '-(boringssl|mbedtls|psa|nodeps)')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
