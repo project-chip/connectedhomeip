@@ -33,26 +33,26 @@ matter_app_map_file = sys.argv[2]
 matter_image_without_factory_data_hex = sys.argv[3]
 device_family = sys.argv[4]
 
-# extract factory data length from map file
+# Retrieve Factory Data base address and length from Map file
 with open(matter_app_map_file, "r") as map_file:
-    pattern = ".factory_data   0x000fe800"
+    pattern = ".*\.factory_data.*(0x.*)\s*(0x.*)"
+
     for line in map_file:
-        if re.search(pattern, line):
-            factory_data_num_bytes = line
+        factoryDataResult = re.search(pattern, line)
+        if factoryDataResult:
+            factory_data_base_address = int(factoryDataResult.group(1), 16)
+            factory_data_length = int(factoryDataResult.group(2), 16)
             break
 
-# this is the length of the factory data in hexadecmial form
-factory_data_num_bytes = factory_data_num_bytes[32:]
+value_address = factory_data_base_address + factory_data_length
 
 # convert hex image to dictionary
 matter_image = intelhex.IntelHex()
 matter_image.fromfile(matter_app_file, format='hex')
 matter_image_dict = matter_image.todict()
 
-# 1042432 is 0xFE800 - start of factory data
-start_index = list(matter_image_dict.keys()).index(1042432)
-# convert length of factory data into a decimal value
-end_index = start_index + int(factory_data_num_bytes, 16)
+start_index = list(matter_image_dict.keys()).index(factory_data_base_address)
+end_index = start_index + factory_data_length
 
 # slice dictionary to remove factory data elements
 matter_image_dict_first_half = dict(itertools.islice(matter_image_dict.items(), 0, start_index))
