@@ -28,9 +28,9 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 <<<<<<< HEAD
 #include <lib/core/CHIPSafeCasts.h>
-=======
+    =======
 #include <lib/support/BitFlags.h>
->>>>>>> d40e5f5 (Pdc test plans (#73884))
+    >>>>>>> d40e5f5 (Pdc test plans (#73884))
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -44,7 +44,7 @@
 
 #include <optional>
 
-using namespace chip;
+    using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
