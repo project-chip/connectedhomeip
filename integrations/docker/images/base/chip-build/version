@@ -1,1 +1,1 @@
-211 : [nrfconnect] Update nRF Connect SDK version in Docker to 3.4.0
+212 : [NXP] Remove pre-installed NXP ZSDK from Zephyr docker image
