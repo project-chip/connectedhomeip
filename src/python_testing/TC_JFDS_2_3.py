@@ -33,6 +33,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import base64
 import logging
 import os
@@ -261,43 +262,42 @@ class TC_JFDS_2_3(MatterBaseTest):
         asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
 
         self.step("1")
-        # Read GroupList attribute from DUT
-        response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.GroupList)],
-            returnClusterObject=True)
-        groupList = response[jfds_endpoint][Clusters.JointFabricDatastore].groupList
-
-        # Note the number of entries returned
-        num_entries = len(groupList)
-        log.info("GroupList contains %s entries", num_entries)
-
-        # Variables to track found entries
+        # Poll GroupList until HandleCommissioningCompleteEvent on the JFA has
+        # populated both the Admin CAT (0xFFFF) and Anchor CAT (0xFFFE) entries.
+        # The JFC's commissioning-complete log is NOT a reliable barrier: the JFA
+        # processes kCommissioningComplete via PostEvent, which may be queued and
+        # dispatched after the JFC has already printed its success message.
+        kPollIntervalSec = 0.5
+        kPollTimeoutSec = 15.0
+        deadline = asyncio.get_event_loop().time() + kPollTimeoutSec
         admin_cat_group_id = None
         anchor_cat_group_id = None
-
-        # Look for entries matching Admin CAT and Anchor CAT
-        for entry in groupList:
-            log.info("GroupList entry: GroupID=%s, CAT=%s", entry.groupID, entry.groupCAT)
-
-            # Check if this entry's CAT matches our controller's CAT tags
-            # Admin CAT should be present (commissioned with --anchor true)
-            # We need to check both Admin and Anchor CAT presence
-            if entry.groupCAT is not None:
-                # If CAT matches and we haven't found admin yet, consider it admin
-                if admin_cat_group_id is None and entry.groupCAT == 0xFFFF:
+        groupList = []
+        while True:
+            response = await self.devCtrlEcoA.ReadAttribute(
+                nodeId=self.jfadmin_fabric_a_node_id,
+                attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.GroupList)],
+                returnClusterObject=True)
+            groupList = response[jfds_endpoint][Clusters.JointFabricDatastore].groupList
+            admin_cat_group_id = None
+            anchor_cat_group_id = None
+            for entry in groupList:
+                if entry.groupCAT == 0xFFFF and admin_cat_group_id is None:
                     admin_cat_group_id = entry.groupID
-                    log.info("Found Admin CAT entry with GroupID: %s", admin_cat_group_id)
-                # If CAT matches and admin already found, consider it anchor
-                elif anchor_cat_group_id is None and entry.groupCAT == 0xFFFE:
+                elif entry.groupCAT == 0xFFFE and anchor_cat_group_id is None:
                     anchor_cat_group_id = entry.groupID
-                    log.info("Found Anchor CAT entry with GroupID: %s", anchor_cat_group_id)
+            if admin_cat_group_id is not None and anchor_cat_group_id is not None:
+                break
+            if asyncio.get_event_loop().time() >= deadline:
+                asserts.fail(
+                    f"Timeout after {kPollTimeoutSec}s waiting for Admin/Anchor CAT entries in GroupList "
+                    f"(admin={'found' if admin_cat_group_id else 'missing'}, "
+                    f"anchor={'found' if anchor_cat_group_id else 'missing'})")
+            await asyncio.sleep(kPollIntervalSec)
 
-        # Verify that both Admin CAT and Anchor CAT entries were found
-        asserts.assert_is_not_none(admin_cat_group_id, "Admin CAT entry must exist in GroupList")
-        asserts.assert_is_not_none(anchor_cat_group_id, "Anchor CAT entry must exist in GroupList")
-
-        log.info("Admin CAT GroupID: %s", admin_cat_group_id)
-        log.info("Anchor CAT GroupID: %s", anchor_cat_group_id)
+        num_entries = len(groupList)
+        log.info("GroupList contains %s entries; Admin CAT GroupID=%s, Anchor CAT GroupID=%s",
+                 num_entries, admin_cat_group_id, anchor_cat_group_id)
 
         # Store these for potential use in future steps
         self.admin_cat_group_id = admin_cat_group_id
