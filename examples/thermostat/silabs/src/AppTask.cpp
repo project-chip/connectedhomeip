@@ -37,7 +37,7 @@
 =======
 #include <app/clusters/thermostat-server/AttributeAccessorShim.h>
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
->>>>>>> 67c8272 ([HVAC] Split thermostat cluster delegates (#73355))
+    >>>>>>> 67c8272 ([HVAC] Split thermostat cluster delegates (#73355))
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -65,7 +65,7 @@
 
 #define APP_FUNCTION_BUTTON 0
 
-using namespace chip;
+    using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace ::chip::DeviceLayer;
@@ -120,8 +120,7 @@ CHIP_ERROR AppTask::AppInit()
     GetLCD().SetCustomUI(ThermostatUI::DrawUI);
 #endif
 
-<<<<<<< HEAD
-    using namespace chip::app::Clusters::Thermostat;
+    <<<<<<< HEAD using namespace chip::app::Clusters::Thermostat;
     auto & delegate = ThermostatDelegate::GetInstance();
     SetDefaultDelegate(kThermostatEndpoint, &delegate);
 =======
