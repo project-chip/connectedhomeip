@@ -196,8 +196,8 @@ class TC_CNET_4_27(CNETPDCBaseTest):
                       "set to an empty octet string, the NetworkIdentity field set to NI_2, and the ClientIdentifier "
                       "and PossessionNonce fields absent.",
                   expectation="DUT sends a NetworkConfigResponse with NetworkingStatus Success and a ClientIdentity "
-                              "that is not equal to NCI_A, saved as NCI_B with the associated key identifier saved as "
-                              "NCI_B_ID.")
+                              "saved as NCI_B, with the associated key identifier saved as NCI_B_ID. NCI_B_ID is not "
+                              "equal to NCI_A_ID, i.e. a new key was generated.")
         response = await self.send_single_cmd(
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(ssid=_PDC_SSID_1, credentials=b"", networkIdentity=ni_2),
             endpoint=endpoint)
@@ -205,10 +205,10 @@ class TC_CNET_4_27(CNETPDCBaseTest):
                                            f"{_PDC_SSID_1!r}")
         nci_b = response.clientIdentity
         self.assert_valid_identity(nci_b, "NetworkConfigResponse.ClientIdentity")
-        asserts.assert_not_equal(nci_b, nci_a,
-                                 "The DUT reused the existing Network Client Identity even though the "
-                                 "ClientIdentifier field was absent.")
         nci_b_id = network_identity_identifier(nci_b)
+        asserts.assert_not_equal(nci_b_id, nci_a_id,
+                                 "The DUT reused the key of the existing Network Client Identity even though the "
+                                 "ClientIdentifier field was absent.")
 
         self.step(14, "TH sends QueryIdentity with the KeyIdentifier field set to NCI_A_ID and the PossessionNonce "
                       "field absent.",

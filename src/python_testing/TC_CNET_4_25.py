@@ -162,18 +162,18 @@ class TC_CNET_4_25(CNETPDCBaseTest):
                       "set to an empty octet string, the NetworkIdentity field set to NI_1, and the ClientIdentifier "
                       "and PossessionNonce fields absent.",
                   expectation="DUT sends a NetworkConfigResponse with NetworkingStatus Success and a ClientIdentity "
-                              "that is a valid self-signed PDC identity of length 137 (saved as NCI_2). NCI_2 differs "
-                              "from NCI_1, since a new unique Network Client Identity is created when the "
-                              "ClientIdentifier field is absent. PossessionSignature is absent.")
+                              "that is a valid self-signed PDC identity of length 137 (saved as NCI_2). The key "
+                              "identifier of NCI_2 differs from NCI_1_ID, since a new unique Network Client Identity "
+                              "is created when the ClientIdentifier field is absent. PossessionSignature is absent.")
         response = await self.send_single_cmd(
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(ssid=_PDC_SSID_2, credentials=b"", networkIdentity=ni_1),
             endpoint=endpoint)
         self.assert_network_config_success(response, f"AddOrUpdateWiFiNetwork for {_PDC_SSID_2!r}")
         nci_2 = response.clientIdentity
         self.assert_valid_identity(nci_2, "NetworkConfigResponse.ClientIdentity")
-        asserts.assert_not_equal(nci_2, nci_1,
-                                 "The DUT reused the Network Client Identity of another network configuration even "
-                                 "though the ClientIdentifier field was absent.")
+        asserts.assert_not_equal(network_identity_identifier(nci_2), nci_1_id,
+                                 "The DUT reused the key of the Network Client Identity of another network "
+                                 "configuration even though the ClientIdentifier field was absent.")
         asserts.assert_is_none(response.possessionSignature,
                                "NetworkConfigResponse carries a PossessionSignature even though the "
                                "AddOrUpdateWiFiNetwork command had no PossessionNonce field.")
