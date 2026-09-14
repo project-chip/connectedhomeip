@@ -32,9 +32,9 @@
 #include "thermostat-presets-delegate-impl.h"
 #include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
->>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
+    >>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
 
-using namespace chip;
+    using namespace chip;
 using namespace chip::app;
 // using namespace chip::app::Clusters;
 

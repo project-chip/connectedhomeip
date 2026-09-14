@@ -45,7 +45,7 @@
 #include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
 
->>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
+    >>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
 #include "tls-client-management-instance.h"
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
 
@@ -80,7 +80,7 @@
 
 #include <string>
 
-using namespace chip;
+    using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
 
