@@ -99,7 +99,7 @@ class TC_JFDS_2_3(MatterBaseTest):
         self.fabric_a_admin = None
         # If test is executed in CI environment, start JFA app for Fabric B
         if self.is_pics_sdk_ci_only:
-            self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
             self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
             self.dut_rpc_server_ip = "127.0.0.1"
             self.dut_rpc_server_port = str(self.get_random_port())

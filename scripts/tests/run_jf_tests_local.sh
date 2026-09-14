@@ -34,7 +34,7 @@
 #        scripts/run_in_build_env.sh \
 #          "./scripts/build/build_examples.py --target linux-arm64-jf-admin-app-clang build"
 #        scripts/run_in_build_env.sh \
-#          "./scripts/build/build_examples.py --target linux-arm64-jf-control-app build"
+#          "./scripts/build/build_examples.py --target linux-arm64-jf-control-app-clang build"
 
 set -e
 
@@ -42,7 +42,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHIP_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 VENV="${CHIP_ROOT}/out/venv"
 JFA_APP="${CHIP_ROOT}/out/linux-arm64-jf-admin-app-clang/jfa-app"
-JFC_APP="${CHIP_ROOT}/out/linux-arm64-jf-control-app/jfc-app"
+JFC_APP="${CHIP_ROOT}/out/linux-arm64-jf-control-app-clang/jfc-app"
 
 if [[ ! -f "${VENV}/bin/activate" ]]; then
     echo "ERROR: Python venv not found at ${VENV}"
