@@ -320,10 +320,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                 // The StatusReport carries the piggybacked ack so no
                 // StandaloneAck is needed on success.
                 auto * unauthSession = session->AsUnauthenticatedSession();
-                CHIP_ERROR err =
-                    mSessionManager->SendUnauthenticatedErrorStatusReport(
-                        packetHeader, payloadHeader,
-                        unauthSession->GetPeerAddress());
+                CHIP_ERROR err       = mSessionManager->SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader,
+                                                                                             unauthSession->GetPeerAddress());
                 if (err == CHIP_NO_ERROR)
                 {
                     return;
