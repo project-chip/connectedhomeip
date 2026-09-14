@@ -118,4 +118,33 @@ static const uint32_t kPasscode = 20202021; // Matches kOnboardingPayload
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 }
 
+- (void)test003_PairDeviceWithBadManualPairingCode_SurfacesIntegrityCheckFailed
+{
+    // Integration regression pin: pairing through MTRDeviceController with a
+    // manual pairing code whose Verhoeff check digit is wrong must surface
+    // MTRErrorCodeIntegrityCheckFailed end-to-end, not the pre-fix generic
+    // MTRErrorCodeInvalidArgument.
+    //
+    // Deliberately does NOT call -startServerApp (unlike test001/test002): the
+    // bad check digit is rejected synchronously in
+    // -[MTRDeviceController pairDevice:onboardingPayload:error:] when it parses
+    // the payload via -[MTRSetupPayload initWithPayload:error:], which fails
+    // before any commissionable-node discovery or PASE handshake is attempted.
+    // The call returns NO inline, so no server, network, or paired device is
+    // needed and there is no asynchronous delegate callback to await. Adding a
+    // server app here would be incorrect -- it would never be contacted.
+    __auto_type * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    NSError * error;
+    BOOL ok = [controller pairDevice:sDeviceId
+                   onboardingPayload:@"02684354589"
+                               error:&error];
+    XCTAssertFalse(ok);
+    XCTAssertNotNil(error);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+    XCTAssertNotEqual(error.code, MTRErrorCodeInvalidArgument);
+}
+
 @end

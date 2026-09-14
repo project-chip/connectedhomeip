@@ -562,4 +562,278 @@
     XCTAssertTrue([MTRSetupPayload isValidSetupPasscode:[MTRSetupPayload generateRandomSetupPasscode]]);
 }
 
+- (void)testManualPairingCode_LastDigitCorruption_ReturnsIntegrityCheckFailed
+{
+    // Regression pin (1/2): malformed setup code with last-digit corruption.
+    // Take a known-good 21-digit manual pairing code, flip ONLY its last digit
+    // (the Verhoeff check digit), and confirm the parser rejects the corrupted
+    // form with MTRErrorCodeIntegrityCheckFailed while still accepting the
+    // canonical form. Pins the bug where typo-on-the-last-digit was silently
+    // flattened to MTRErrorCodeInvalidArgument and indistinguishable from any
+    // other parse failure.
+    NSString * const validCode = @"641286075300001000016";
+    NSString * const corruptedCode = @"641286075300001000017"; // last digit 6 -> 7
+
+    NSError * validError = nil;
+    MTRSetupPayload * validPayload = [[MTRSetupPayload alloc] initWithManualPairingCode:validCode error:&validError];
+    XCTAssertNotNil(validPayload);
+    XCTAssertNil(validError);
+
+    NSError * corruptedError = nil;
+    MTRSetupPayload * corruptedPayload = [[MTRSetupPayload alloc] initWithManualPairingCode:corruptedCode error:&corruptedError];
+    XCTAssertNil(corruptedPayload);
+    XCTAssertNotNil(corruptedError);
+    XCTAssertEqualObjects(corruptedError.domain, MTRErrorDomain);
+    XCTAssertEqual(corruptedError.code, MTRErrorCodeIntegrityCheckFailed);
+}
+
+- (void)testManualPairingCode_BadCheckDigit_SurfacesIntegrityCheckFailedAcrossAPIs
+{
+    // Regression pin (2/2): integrity-check error surfaces correctly on the
+    // FINE-GRAINED parse surfaces, and the DEPRECATED surfaces keep their
+    // historical flattening contract. A manual pairing code with a wrong
+    // Verhoeff check digit must surface as:
+    //   - MTRErrorCodeIntegrityCheckFailed on the modern, error-bearing inits
+    //     (-initWithManualPairingCode:error: and -initWithPayload:error:),
+    //     which are what the commissioning controller now uses; and
+    //   - MTRErrorCodeInvalidArgument on the deprecated surfaces
+    //     (+setupPayloadWithOnboardingPayload:error: and
+    //     -[MTRManualSetupPayloadParser populatePayload:]), which deliberately
+    //     flatten every parse failure for source-compatibility with callers
+    //     that switch on == MTRErrorCodeInvalidArgument.
+    // This pins BOTH halves of the intended contract so neither side can drift
+    // silently.
+    NSString * const badCode = @"02684354589";
+
+    // Fine-grained: -initWithManualPairingCode:error:
+    {
+        NSError * error = nil;
+        MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithManualPairingCode:badCode error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+        XCTAssertNotEqual(error.code, MTRErrorCodeInvalidArgument);
+    }
+    // Fine-grained: -initWithPayload:error: (no "MT:" prefix -> manual path).
+    // This is the path -[MTRDeviceController pairDevice:onboardingPayload:error:]
+    // uses, so the integrity-check failure reaches the commissioning UI.
+    {
+        NSError * error = nil;
+        MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:badCode error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+        XCTAssertNotEqual(error.code, MTRErrorCodeInvalidArgument);
+    }
+    // Deprecated (flattens): +setupPayloadWithOnboardingPayload:error:
+    {
+        NSError * error = nil;
+        MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:badCode error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
+        XCTAssertNotEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+    }
+    // Deprecated (flattens): -[MTRManualSetupPayloadParser populatePayload:]
+    {
+        MTRManualSetupPayloadParser * parser =
+            [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:badCode];
+        NSError * error = nil;
+        MTRSetupPayload * payload = [parser populatePayload:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
+        XCTAssertNotEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+    }
+}
+
+- (void)testParseFailures_NullErrorOutParamDoesNotCrash
+{
+    // Edge case: the new error-bearing inits wrap their *error writes in
+    // `if (error) { *error = ... }` blocks; pass NULL on every failing surface
+    // to confirm nothing dereferences a null out-param. Each call must still
+    // return nil for the failing input. Covers all four `if (error)` write
+    // sites added in the fix:
+    //   - initWithQRCode:error: (initializeFromQRCode parse failure)
+    //   - initWithManualPairingCode:error: (parser.populatePayload failure)
+    //   - initWithManualPairingCode:error: (isValidManualCode rejection)
+    //   - +setupPayloadWithOnboardingPayload:error: (both branches)
+    NSString * const badManual = @"02684354589"; // bad Verhoeff
+    NSString * const badQR = @"MT:M5L90MP500K64J0000?"; // bad Base38 char
+    NSString * const truncatedQR = @"MT:M5L90MP500K64J00000AB"; // bad chunk length
+
+    XCTAssertNil([[MTRSetupPayload alloc] initWithManualPairingCode:badManual error:NULL]);
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:badManual error:NULL]);
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:badQR error:NULL]);
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:truncatedQR error:NULL]);
+
+    // Parser surfaces with NULL error out-param.
+    MTRManualSetupPayloadParser * manualParser =
+        [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:badManual];
+    XCTAssertNil([manualParser populatePayload:NULL]);
+
+    MTRQRCodeSetupPayloadParser * qrParser =
+        [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:[badQR substringFromIndex:3]];
+    XCTAssertNil([qrParser populatePayload:NULL]);
+}
+
+- (void)testSetupPayloadWithOnboardingPayload_DispatchesByMTPrefix
+{
+    // The "MT:"-prefix dispatch lives in -initWithPayload:error: (prefix
+    // present -> QR / Base38 path, prefix absent -> manual decimal path), and
+    // +setupPayloadWithOnboardingPayload:error: delegates to it. Because the
+    // routing is only OBSERVABLE on the fine-grained surface (the deprecated
+    // dispatcher flattens every failure to MTRErrorCodeInvalidArgument), the
+    // routing assertions below use -initWithPayload:error:; a final block pins
+    // that the deprecated dispatcher still flattens regardless of the route.
+    //
+    // (1) "MT:" + invalid Base38 char -> QR path, must NOT report
+    //     MTRErrorCodeIntegrityCheckFailed (that error is unique to the
+    //     manual-code Verhoeff check).
+    {
+        NSError * error;
+        MTRSetupPayload * payload =
+            [[MTRSetupPayload alloc] initWithPayload:@"MT:M5L90MP500K64J0000?" error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertNotEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+    }
+
+    // (2) Decimal-only digits with no "MT:" prefix and a bad Verhoeff digit
+    //     -> manual path, must report MTRErrorCodeIntegrityCheckFailed (would
+    //     have surfaced MTRErrorCodeInvalidStringLength or similar if it had
+    //     been wrongly routed through the Base38 decoder).
+    {
+        NSError * error;
+        MTRSetupPayload * payload =
+            [[MTRSetupPayload alloc] initWithPayload:@"02684354589" error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+        XCTAssertNotEqual(error.code, MTRErrorCodeInvalidStringLength);
+        XCTAssertNotEqual(error.code, MTRErrorCodeInvalidIntegerValue);
+    }
+
+    // (2b) The deprecated dispatcher takes the SAME manual route for the same
+    //      input but flattens the result: it must report
+    //      MTRErrorCodeInvalidArgument, NOT the fine-grained integrity-check
+    //      code surfaced above. This is the back-compat contract for callers
+    //      switching on == MTRErrorCodeInvalidArgument.
+    {
+        NSError * error;
+        MTRSetupPayload * payload =
+            [MTRSetupPayload setupPayloadWithOnboardingPayload:@"02684354589" error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
+        XCTAssertNotEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+    }
+
+    // (3) Empty string has no "MT:" prefix -> manual path; must fail without
+    //     crashing and surface a non-nil error in MTRErrorDomain.
+    {
+        NSError * error;
+        MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:@"" error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    }
+
+    // (4) Bare "MT:" with no Base38 body -> QR path; must not crash and must
+    //     return a non-nil error in MTRErrorDomain.
+    {
+        NSError * error;
+        MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:@"MT:" error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    }
+}
+
+- (void)testParseFailures_NilAndEmptyInputDoNotCrash
+{
+    // Edge case: production code in -initWithManualPairingCode:error: and
+    // -initWithQRCode:error: both use `(input ?: @"")` to handle nil
+    // gracefully before reaching the C++ parser. Pin that nil/empty inputs
+    // return nil (not crash, not throw) on every parse surface, and that
+    // when an error out-param IS provided it gets populated with an
+    // MTRErrorDomain error rather than left untouched.
+    //
+    // Adversarially picked because a regression that drops the `?: @""`
+    // guard would crash inside std::string(NULL) construction, not in any
+    // place the existing typo-tests would catch.
+
+    // Manual code: nil input, error out-param provided.
+    {
+        NSError * error;
+        MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithManualPairingCode:(NSString * _Nonnull) nil error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    }
+    // Manual code: nil input, NULL error out-param (must not crash on the
+    // `if (error)` write-through path with a nil input).
+    XCTAssertNil([[MTRSetupPayload alloc] initWithManualPairingCode:(NSString * _Nonnull) nil error:NULL]);
+
+    // Manual code: empty string -- the parser sees a zero-length decimal
+    // representation. Must return nil + populate error, not crash.
+    {
+        NSError * error;
+        MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithManualPairingCode:@"" error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    }
+
+    // +setupPayloadWithOnboardingPayload: dispatches by "MT:" prefix; nil
+    // input has no prefix and therefore lands on the manual-code path.
+    // Pin that nil/empty input on this surface also returns nil cleanly.
+    {
+        NSError * error;
+        MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:(NSString * _Nonnull) nil error:&error];
+        XCTAssertNil(payload);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    }
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:(NSString * _Nonnull) nil error:NULL]);
+
+    // -initWithPayload: is the public no-error wrapper for the dispatcher;
+    // pin that it tolerates nil and empty too.
+    XCTAssertNil([[MTRSetupPayload alloc] initWithPayload:(NSString * _Nonnull) nil]);
+    XCTAssertNil([[MTRSetupPayload alloc] initWithPayload:@""]);
+}
+
+- (void)testManualPairingCode_StructurallyValidButSemanticallyInvalid_PinsInvalidArgument
+{
+    // Regression pin for the !isValidManualCode(kConsume) branch in
+    // -initWithManualPairingCode:error:. A manual code can survive both
+    // ManualSetupPayloadParser::populatePayload AND the Verhoeff check digit
+    // (so it is NOT MTRErrorCodeIntegrityCheckFailed) and still be rejected
+    // because the decoded payload fails semantic validation -- e.g. an
+    // explicitly-blocklisted setup passcode like 11111111
+    // (see PayloadContents::IsValidSetupPIN). The current behavior surfaces
+    // this as MTRErrorCodeInvalidArgument; this test pins that contract so
+    // any future move to a more-specific code is an intentional, reviewed
+    // change rather than a silent drift.
+    //
+    // The string "35191106788" is the documented "passcode 11111111" manual
+    // code from test23357 above; its 11th character is the Verhoeff check
+    // digit and is correct, so the failure is from isValidManualCode, not
+    // from the check-digit path.
+    NSError * error;
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithManualPairingCode:@"35191106788" error:&error];
+    XCTAssertNil(payload);
+    XCTAssertNotNil(error);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
+    XCTAssertNotEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+}
+
 @end
