@@ -23,6 +23,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/bdx/BdxTransferSession.h>
+#include <transport/Session.h>
 
 #include <fstream>
 
@@ -59,6 +60,28 @@ CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip:
     mNodeId.SetValue(nodeId);
     mInitialized = true;
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BdxOtaSender::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                           chip::System::PacketBufferHandle && payload)
+{
+    VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Only screen exchanges other than the one already driving the transfer: an early return here skips the base handler's
+    // WillSendMessage(), so the messaging layer would free the exchange context we still hold.
+    if (ec != mExchangeCtx)
+    {
+        VerifyOrReturnError(mInitialized && mFabricIndex.HasValue() && mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+        // A transfer is armed from a QueryImage over CASE, so mFabricIndex/mNodeId are operational values. Comparing both against
+        // the incoming session's peer rejects any other requester; a PASE session (undefined fabric index) cannot match.
+        const auto & session = ec->GetSessionHandle();
+        VerifyOrReturnError(session->IsSecureSession(), CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+        VerifyOrReturnError(session->GetFabricIndex() == mFabricIndex.Value() && session->GetPeer().GetNodeId() == mNodeId.Value(),
+                            CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+    }
+
+    return chip::bdx::TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
 }
 
 void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
