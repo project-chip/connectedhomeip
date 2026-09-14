@@ -140,6 +140,28 @@ void AttributeDefaultValue::CopyScalar(void * outBuffer, size_t bufferSize) cons
     }
 }
 
+namespace {
+
+/// Decodes the Pascal-style length prefix at the start of `ptr` and reports the number of bytes the
+/// value occupies, prefix included. `declaredSize` is the attribute size from the metadata, which
+/// covers both the prefix and the payload.
+///
+/// Returns false when the prefix claims more bytes than the attribute declares: such a declaration is
+/// inconsistent and the resulting span would reach past the underlying buffer.
+bool PascalStringSize(const uint8_t * ptr, uint16_t declaredSize, bool isLongString, size_t & outSize)
+{
+    const size_t prefixSize = isLongString ? 2u : 1u;
+    VerifyOrReturnValue(declaredSize >= prefixSize, false);
+
+    const uint16_t length = isLongString ? Encoding::LittleEndian::Get16(ptr) : ptr[0];
+    const bool isNull     = isLongString ? (length == 0xFFFF) : (length == 0xFF);
+
+    outSize = isNull ? prefixSize : (prefixSize + length);
+    return outSize <= declaredSize;
+}
+
+} // namespace
+
 Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata & am, AttributeDefaultValue & outDefault)
 {
     outDefault.type = am.attributeType;
@@ -211,16 +233,14 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata & am, Attr
         return Status::NotFound;
     }
 
-    if (isLongString)
+    if (isStringType)
     {
-        uint16_t len       = Encoding::LittleEndian::Get16(ptr);
-        size_t totalSize   = (len == 0xFFFF) ? 2 : static_cast<size_t>(2 + len);
-        outDefault.rawData = ByteSpan(ptr, totalSize);
-    }
-    else if (isShortString)
-    {
-        uint8_t len        = ptr[0];
-        size_t totalSize   = (len == 0xFF) ? 1 : static_cast<size_t>(1 + len);
+        size_t totalSize = 0;
+        if (!PascalStringSize(ptr, am.size, isLongString, totalSize))
+        {
+            outDefault.rawData = ByteSpan();
+            return Status::NotFound;
+        }
         outDefault.rawData = ByteSpan(ptr, totalSize);
     }
     else
