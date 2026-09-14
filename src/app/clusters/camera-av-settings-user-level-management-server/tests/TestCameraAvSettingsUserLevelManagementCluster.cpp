@@ -19,6 +19,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CodegenCameraAvSettingsUserLevelManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -117,7 +118,7 @@ struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
     void TearDown() override { mServer.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     MockCameraAvSettingsUserLevelManagementDelegate mMockDelegate;
-    CodegenCameraAvSettingsUserLevelManagementCluster mServer;
+    CameraAvSettingsUserLevelManagementCluster mServer;
     ClusterTester mClusterTester;
 };
 
