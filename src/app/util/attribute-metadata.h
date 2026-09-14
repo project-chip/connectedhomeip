@@ -292,6 +292,10 @@ struct AttributeDefaultValue
     DataModel::Nullable<ByteSpan> ToNullableByteSpan() const;
 
     /// Decodes a non-nullable scalar default (uint8_t..uint64_t, int8_t..int64_t, bool, float, enum, BitMask, OddSizedInteger).
+    ///
+    /// The configured value is returned verbatim: a non-nullable attribute whose configuration happens to hold the type's
+    /// null sentinel (0xFF for uint8, INT16_MIN for int16, ...) yields that sentinel rather than an error. Validating a
+    /// static configuration at runtime costs flash on every device, so the configuration is trusted to be sane.
     template <typename T>
     typename NumericAttributeTraits<T>::WorkingType As() const
     {

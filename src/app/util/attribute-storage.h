@@ -119,11 +119,16 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
     }
 
 /**
- * @brief Declares a dynamic attribute with a string default value stored in flash/ROM as Pascal-format length-prefixed bytes.
+ * @brief Declares a dynamic attribute with a string default value held as Pascal-format length-prefixed bytes.
+ *
+ * The metadata stores the pointer, not a copy, and readers hand out zero-copy views of it: the bytes must outlive the
+ * endpoint and must not change while it is registered. A string literal in flash satisfies that, and so does an
+ * application-owned buffer filled before emberAfSetDynamicEndpoint - which is how a bridge gives an endpoint a
+ * per-device string (a serial number or a URL, for instance).
  *
  * @param attId Identifier of the attribute.
  * @param attType ZCL attribute type (CHAR_STRING, LONG_CHAR_STRING, OCTET_STRING, LONG_OCTET_STRING).
- * @param attSizeBytes Maximum buffer size of the attribute in bytes.
+ * @param attSizeBytes Maximum buffer size of the attribute in bytes, length prefix included.
  * @param attrMask Attribute flags.
  * @param defaultBytesPtr Pointer to Pascal-format length-prefixed bytes (e.g. "\x05Hello" or "\xFF" for null).
  */

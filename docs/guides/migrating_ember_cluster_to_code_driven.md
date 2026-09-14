@@ -118,6 +118,18 @@ project's Slack channel.
             -   `Attributes::<Name>::GetDefaultOr(endpoint, value, fallback)`
                 substitutes `fallback` whenever no value can be read. Use it
                 when the cluster can operate without a configured default.
+            -   Dynamic endpoints (bridges) carry no ZAP configuration, so the
+                application is the only source: scalars come from
+                `emberAfExternalAttributeReadCallback`, and if the application
+                does not serve the attribute the value falls back to the
+                `DECLARE_DYNAMIC_ATTRIBUTE*` declaration. Strings are never read
+                from the callback and need
+                `DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT`. Weigh this
+                before choosing `VerifyOrDie`: it turns a bridge that omits the
+                attribute into a boot failure. Fan Control does exactly that for
+                `RockSupport` and `WindSupport`, which the specification
+                requires to have at least one bit set whenever `RCK` or `WND` is
+                advertised.
 
 -   [ ] **1.2: Choose an Implementation Pattern:**
 
