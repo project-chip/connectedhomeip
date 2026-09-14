@@ -44,7 +44,6 @@ ActionsCluster::OptionalAttributesSet BuildOptionalAttributes(EndpointId endpoin
 // An empty return value means the attribute is absent or unreadable.
 std::string ReadSetupURL(EndpointId endpointId)
 {
-    VerifyOrReturnValue(emberAfContainsAttribute(endpointId, Actions::Id, Attributes::SetupURL::Id), std::string());
     CharSpan urlSpan;
     VerifyOrReturnValue(Attributes::SetupURL::GetDefault(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
                         std::string());
