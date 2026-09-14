@@ -316,7 +316,8 @@ class TC_TSTAT_4_4(ThermostatBaseTest):
         await self.write_available_sensor_handles(endpoint=endpoint, available_sensor_handles=available_sensor_handles)
         read_available_sensor_handles = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AvailableSensorHandles)
-        asserts.assert_equal(read_available_sensor_handles, available_sensor_handles, "AvailableSensorHandles does not match written list")
+        asserts.assert_equal(read_available_sensor_handles, available_sensor_handles,
+                             "AvailableSensorHandles does not match written list")
 
         self.step("3b")
         # If EnabledSensorHandles contains at least one sensor handle, TH writes to AvailableSensorHandles with a list that omits one.
@@ -339,7 +340,8 @@ class TC_TSTAT_4_4(ThermostatBaseTest):
                 log.info("AvailableSensorHandles after omitting: %s", available_sensor_handles)
                 log.info("EnabledSensorHandles after omitting: %s", enabled_sensor_handles)
 
-                asserts.assert_equal(available_sensor_handles, new_available_sensor_handles, "AvailableSensorHandles does not match written list")
+                asserts.assert_equal(available_sensor_handles, new_available_sensor_handles,
+                                     "AvailableSensorHandles does not match written list")
                 # Verify that removing the sensor handle from AvailableSensorHandles overrides and removes that handle from EnabledSensorHandles
                 asserts.assert_not_in(omitted_handle, enabled_sensor_handles,
                                       f"Omitted handle {omitted_handle} was not removed from EnabledSensorHandles as required by spec")
