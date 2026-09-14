@@ -66,6 +66,10 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodabl
 } // namespace {{asUpperCamelCase label}}
 
 {{/if_is_struct}}
+{{else}}
+{{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
+#error Attribute "{{name}}" in cluster "{{../name}}" is list-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
+{{/unless}}
 {{/unless}}
 {{#last}}
 } // namespace Attributes
