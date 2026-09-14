@@ -111,6 +111,10 @@ void MatterActivatedCarbonFilterMonitoringClusterInitCallback(EndpointId) {}
 
 void MatterHepaFilterMonitoringClusterInitCallback(EndpointId) {}
 
+void MatterWaterTankLevelMonitoringClusterInitCallback(EndpointId) {}
+
 void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
 
 void MatterHepaFilterMonitoringClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
+
+void MatterWaterTankLevelMonitoringClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}

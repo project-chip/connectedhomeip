@@ -25,6 +25,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::HepaFilterMonitoring;
+using namespace chip::app::Clusters::WaterTankLevelMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
@@ -33,12 +34,18 @@ constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(ResourceMo
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
+constexpr std::bitset<4> gWaterTankLevelFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
+                                                    static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
+                                                    static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
 
 static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
 static ResourceMonitoring::Instance * gActivatedCarbonFilterInstance            = nullptr;
 
 static HepaFilterMonitoringDelegate * gHepaFilterDelegate = nullptr;
 static ResourceMonitoring::Instance * gHepaFilterInstance = nullptr;
+
+static WaterTankLevelMonitoringDelegate * gWaterTankLevelDelegate = nullptr;
+static ResourceMonitoring::Instance * gWaterTankLevelInstance     = nullptr;
 
 static ImmutableReplacementProductListManager sReplacementProductListManager;
 
@@ -110,6 +117,40 @@ void HepaFilterMonitoring::Shutdown()
     }
 }
 
+//-- Water Tank Level Monitoring delegate methods
+CHIP_ERROR WaterTankLevelMonitoringDelegate::Init()
+{
+    ChipLogDetail(Zcl, "WaterTankLevelMonitoringDelegate::Init()");
+    GetInstance()->SetReplacementProductListManagerInstance(&sReplacementProductListManager);
+    return CHIP_NO_ERROR;
+}
+
+Status WaterTankLevelMonitoringDelegate::PreResetCondition()
+{
+    ChipLogDetail(Zcl, "WaterTankLevelMonitoringDelegate::PreResetCondition()");
+    return Status::Success;
+}
+
+Status WaterTankLevelMonitoringDelegate::PostResetCondition()
+{
+    ChipLogDetail(Zcl, "WaterTankLevelMonitoringDelegate::PostResetCondition()");
+    return Status::Success;
+}
+
+void WaterTankLevelMonitoring::Shutdown()
+{
+    if (gWaterTankLevelInstance != nullptr)
+    {
+        delete gWaterTankLevelInstance;
+        gWaterTankLevelInstance = nullptr;
+    }
+    if (gWaterTankLevelDelegate != nullptr)
+    {
+        delete gWaterTankLevelDelegate;
+        gWaterTankLevelDelegate = nullptr;
+    }
+}
+
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
     VerifyOrDie(gActivatedCarbonFilterInstance == nullptr && gActivatedCarbonFilterDelegate == nullptr);
@@ -131,6 +172,17 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     TEMPORARY_RETURN_IGNORED gHepaFilterInstance->Init();
 }
 
+void emberAfWaterTankLevelMonitoringClusterInitCallback(chip::EndpointId endpoint)
+{
+    VerifyOrDie(gWaterTankLevelInstance == nullptr && gWaterTankLevelDelegate == nullptr);
+
+    gWaterTankLevelDelegate = new WaterTankLevelMonitoringDelegate;
+    gWaterTankLevelInstance = new ResourceMonitoring::Instance(gWaterTankLevelDelegate, endpoint, WaterTankLevelMonitoring::Id,
+                                                               static_cast<uint32_t>(gWaterTankLevelFeatureMap.to_ulong()),
+                                                               ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+    TEMPORARY_RETURN_IGNORED gWaterTankLevelInstance->Init();
+}
+
 void emberAfActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint)
 {
     ActivatedCarbonFilterMonitoring::Shutdown();
@@ -139,6 +191,11 @@ void emberAfActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::Endpoin
 void emberAfHepaFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint)
 {
     HepaFilterMonitoring::Shutdown();
+}
+
+void emberAfWaterTankLevelMonitoringClusterShutdownCallback(chip::EndpointId endpoint)
+{
+    WaterTankLevelMonitoring::Shutdown();
 }
 
 CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct & item)
