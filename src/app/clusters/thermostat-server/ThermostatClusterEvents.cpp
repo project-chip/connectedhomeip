@@ -17,20 +17,41 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include "ThermostatCluster.h"
+#include "ThermostatClusterEvents.h"
 #include <app/EventLogging.h>
 
 #include <limits>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
+
+void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp)
+{
+    switch (attributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, OccupancyBitmap::kOccupied, MakeOptional(oldTemp),
+                                    newTemp);
+        break;
+    case UnoccupiedHeatingSetpoint::Id:
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp),
+                                    newTemp);
+        break;
+    case OccupiedCoolingSetpoint::Id:
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, OccupancyBitmap::kOccupied, MakeOptional(oldTemp),
+                                    newTemp);
+        break;
+    case UnoccupiedCoolingSetpoint::Id:
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp),
+                                    newTemp);
+        break;
+    }
+}
 
 void GenerateSystemModeChangeEvent(EndpointId endpoint, Optional<SystemModeEnum> previousSystemMode,
                                    SystemModeEnum currentSystemMode)
@@ -78,14 +99,14 @@ void GenerateOccupancyChangeEvent(EndpointId endpoint, Optional<BitMask<Occupanc
     }
 }
 
-void GenerateSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, Optional<BitMask<OccupancyBitmap>> occupancy,
-                                 Optional<int16_t> previousSetpoint, int16_t currentSetpoint)
+void GenerateSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, BitMask<OccupancyBitmap> occupancy,
+                                 Optional<temperature> previousSetpoint, temperature currentSetpoint)
 {
     Events::SetpointChange::Type event;
     EventNumber eventNumber;
 
     event.systemMode       = systemMode;
-    event.occupancy        = occupancy;
+    event.occupancy        = MakeOptional(occupancy);
     event.previousSetpoint = previousSetpoint;
     event.currentSetpoint  = currentSetpoint;
 
