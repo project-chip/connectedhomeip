@@ -67,11 +67,11 @@ network-manager, all-clusters, chip-tool, and chip-cert:
 ./scripts/build/build_examples.py --target linux-x64-network-manager-openssl-static build
 ```
 
-For direct GN builds, set `chip_crypto="openssl" chip_openssl_static=true`.
-The default is `false` unless `CHIP_OPENSSL_STATIC=true` is set by a build image.
+For direct GN builds, set `chip_crypto="openssl" chip_openssl_static=true`. The
+default is `false` unless `CHIP_OPENSSL_STATIC=true` is set by a build image.
 Other system libraries keep their normal linkage. Set `chip_openssl_root` to a
-private installation prefix to select its matching headers and libraries for
-SDK targets only. Both `lib/pkgconfig` and `lib64/pkgconfig` layouts are accepted.
+private installation prefix to select its matching headers and libraries for SDK
+targets only. Both `lib/pkgconfig` and `lib64/pkgconfig` layouts are accepted.
 Dynamic SDK consumers get a RUNPATH to that library directory. The static option
 requires `libssl.a` and `libcrypto.a`; it does not download or upgrade OpenSSL.
 When deploying dynamic binaries outside the build image, also deploy the private
@@ -79,15 +79,16 @@ shared libraries at the configured path.
 
 The `chip-build`, `chip-build-minimal`, and `chip-cert-bins` Dockerfiles also
 accept `--build-arg OPENSSL_STATIC=true` for static OpenSSL 3.5 or
-`--build-arg OPENSSL_STATIC=false` for dynamic OpenSSL 3.5. Omitting the argument
-(or passing an empty value) selects host OpenSSL, which is 3.0 on Ubuntu 24.04.
-The images install OpenSSL 3.5 under `/opt/matter/openssl`; explicit selections
-set SDK-only `CHIP_OPENSSL_ROOT` and `CHIP_OPENSSL_STATIC` defaults. The target
-suffix is optional inside those images. Ordinary pkg-config queries, compiler include paths, the OpenSSL CLI,
-and the loader cache continue to use system OpenSSL, including in derived
-images such as Cirque. The private image installation is ignored for cross
-sysroots and other target architectures; those builds select their own OpenSSL.
-Use a fresh output directory or rerun GN generation when switching an existing build to a different image or OpenSSL
+`--build-arg OPENSSL_STATIC=false` for dynamic OpenSSL 3.5. Omitting the
+argument (or passing an empty value) selects host OpenSSL, which is 3.0 on
+Ubuntu 24.04. The images install OpenSSL 3.5 under `/opt/matter/openssl`;
+explicit selections set SDK-only `CHIP_OPENSSL_ROOT` and `CHIP_OPENSSL_STATIC`
+defaults. The target suffix is optional inside those images. Ordinary pkg-config
+queries, compiler include paths, the OpenSSL CLI, and the loader cache continue
+to use system OpenSSL, including in derived images such as Cirque. The private
+image installation is ignored for cross sysroots and other target architectures;
+those builds select their own OpenSSL. Use a fresh output directory or rerun GN
+generation when switching an existing build to a different image or OpenSSL
 installation.
 
 To override an image's default for an individual SDK build, set both variables
@@ -110,12 +111,13 @@ GitHub's Linux Standalone workflow builds examples with both explicit OpenSSL
 The Linux test suite selects dynamic linkage; REPL and nightly test-app builds
 select static linkage because their binaries are transferred to other runners.
 The `setup-sdk-openssl` action provides the private installation when an older
-build image lacks it and exports only the SDK-specific selection variables.
-The published standalone tools come from the static job.
+build image lacks it and exports only the SDK-specific selection variables. The
+published standalone tools come from the static job.
 
 Static linking preserves the selected OpenSSL version; it does not add missing
-algorithms. For example, network-manager's Network Identity Management operations
-require deterministic ECDSA, which the OpenSSL backend implements for OpenSSL
-3.2 and newer. Building with the static suffix against OpenSSL 3.0 still leaves
-those operations unsupported. The Dockerfiles above provide a private OpenSSL
-3.5 installation, which must be explicitly selected to use its newer algorithms.
+algorithms. For example, network-manager's Network Identity Management
+operations require deterministic ECDSA, which the OpenSSL backend implements for
+OpenSSL 3.2 and newer. Building with the static suffix against OpenSSL 3.0 still
+leaves those operations unsupported. The Dockerfiles above provide a private
+OpenSSL 3.5 installation, which must be explicitly selected to use its newer
+algorithms.
