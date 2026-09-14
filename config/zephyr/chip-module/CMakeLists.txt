@@ -182,7 +182,6 @@ if(CONFIG_CHIP)
     if(CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
         zephyr_library_named(chip_codedriven_data_model)
         target_sources(chip_codedriven_data_model PRIVATE
-            ${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp
             ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
             ${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
             ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
