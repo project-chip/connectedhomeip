@@ -63,7 +63,6 @@ class TC_ASU_3_1(MatterBaseTest):
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
     @pics('ASU.S')
-    @async_test_body
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientSensingUnion))
     async def test_TC_ASU_3_1(self):
         """[TC-ASU-3.1] Cluster endpoint"""
