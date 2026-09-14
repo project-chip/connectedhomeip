@@ -317,10 +317,18 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             // Duplicates are intentionally not filtered, since each Sigma2 retransmission may need its own StatusReport.
             if (packetHeader.GetDestinationNodeId().HasValue() && mSessionManager != nullptr)
             {
-                // The StatusReport carries the piggybacked ack so no StandaloneAck is needed.
-                LogErrorOnFailure(mSessionManager->SendUnauthenticatedErrorStatusReport(
-                    packetHeader, payloadHeader, session->AsUnauthenticatedSession()->GetPeerAddress()));
-                return;
+                // The StatusReport carries the piggybacked ack so no
+                // StandaloneAck is needed on success.
+                auto * unauthSession = session->AsUnauthenticatedSession();
+                CHIP_ERROR err =
+                    mSessionManager->SendUnauthenticatedErrorStatusReport(
+                        packetHeader, payloadHeader,
+                        unauthSession->GetPeerAddress());
+                if (err == CHIP_NO_ERROR)
+                {
+                    return;
+                }
+                LogErrorOnFailure(err);
             }
             // Otherwise we fall through so MRP still acks as before.
         }
