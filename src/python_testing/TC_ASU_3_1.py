@@ -130,11 +130,11 @@ class TC_ASU_3_1(MatterBaseTest):
                 prompt_msg="Change the UnionHealth attribute (e.g. by adding/removing contributors), then type any letter and press ENTER.")
 
         self.step("6", "TH awaits a ReportDataMessage containing an attribute report for UnionHealth attribute. Verify that the value of UnionHealth attribute reflects the change made in step 5.")
-        #reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionHealth)
-        #asserts.assert_true(reports is not None and len(reports) > 0,
+        # reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionHealth)
+        # asserts.assert_true(reports is not None and len(reports) > 0,
         #                    "No subscription report received for UnionHealth after the change.")
-        #union_health_sub = reports[-1].value
-        #log.info("UnionHealth subscription report after contributor add: %s", union_health_sub)
+        # union_health_sub = reports[-1].value
+        # log.info("UnionHealth subscription report after contributor add: %s", union_health_sub)
         # Temporary bypass the above test step until an api-pipe command to change UnionHealth attribute is available.
         union_health_sub = expected_union_health
         asserts.assert_equal(union_health_sub, expected_union_health,
