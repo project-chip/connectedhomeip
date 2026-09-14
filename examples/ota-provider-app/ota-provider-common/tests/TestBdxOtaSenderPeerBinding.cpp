@@ -139,18 +139,26 @@ protected:
         return writer.Finalize();
     }
 
-    // Delivers a ReceiveInit to the sender over an exchange bound to `session` and
-    // returns the sender's verdict for that message.
-    CHIP_ERROR DeliverReceiveInitFrom(const SessionHandle & session)
+    // Opens an exchange bound to `session`, tracked so teardown can abort it.
+    Messaging::ExchangeContext * NewExchangeFor(const SessionHandle & session)
     {
         Messaging::ExchangeContext * exchange = GetExchangeManager().NewContext(session, &*mSender);
         VerifyOrDie(exchange != nullptr);
         mExchanges.push_back(exchange);
+        return exchange;
+    }
 
+    // Delivers a ReceiveInit to the sender over `exchange` and returns its verdict.
+    CHIP_ERROR DeliverReceiveInitOn(Messaging::ExchangeContext * exchange)
+    {
         PayloadHeader payloadHeader;
         payloadHeader.SetMessageType(Protocols::BDX::Id, to_underlying(MessageType::ReceiveInit));
-
         return mSender->OnMessageReceived(exchange, payloadHeader, MakeReceiveInit());
+    }
+
+    CHIP_ERROR DeliverReceiveInitFrom(const SessionHandle & session)
+    {
+        return DeliverReceiveInitOn(NewExchangeFor(session));
     }
 
     std::optional<TestableBdxOtaSender> mSender;
@@ -184,6 +192,20 @@ TEST_F(TestBdxOtaSenderPeerBinding, RejectsTheSameNodeIdOnADifferentFabric)
     ArmForArmedRequester();
 
     EXPECT_EQ(DeliverReceiveInitFrom(mCrossFabricSession.Get().Value()), CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+}
+
+// The override must not reject a later message on the exchange already driving the transfer:
+// an early return there would skip the base's WillSendMessage() and free that exchange. Guards
+// against a future gate reintroducing that use-after-free (ASan flags it at teardown).
+TEST_F(TestBdxOtaSenderPeerBinding, DoesNotRejectALaterMessageOnTheDrivingExchange)
+{
+    ArmForArmedRequester();
+
+    Messaging::ExchangeContext * driving = NewExchangeFor(mArmedSession.Get().Value());
+    ASSERT_SUCCESS(DeliverReceiveInitOn(driving));
+
+    // A second init is a base state-machine error, not the override's rejection code.
+    EXPECT_NE(DeliverReceiveInitOn(driving), CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
 }
 
 } // namespace
