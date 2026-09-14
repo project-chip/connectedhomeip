@@ -266,9 +266,6 @@ struct AttributeDefaultValue
     /// Nullable zero-copy ByteSpan view (returns Null if length prefix is 0xFF / 0xFFFF)
     DataModel::Nullable<ByteSpan> ToNullableByteSpan() const;
 
-    /// Copies raw native-endian scalar storage bytes into destination buffer (zero-fills if rawData is empty)
-    void CopyScalar(void * outBuffer, size_t bufferSize) const;
-
     /// Decodes a non-nullable scalar default (uint8_t..uint64_t, int8_t..int64_t, bool, float, enum, BitMask, OddSizedInteger).
     template <typename T>
     typename NumericAttributeTraits<T>::WorkingType As() const
@@ -303,6 +300,12 @@ struct AttributeDefaultValue
     }
 
 private:
+    /// Copies raw native-endian scalar storage bytes into destination buffer (zero-fills if rawData is empty).
+    ///
+    /// The buffer is untyped because the caller supplies a NumericAttributeTraits<T>::StorageType;
+    /// As<T>() / AsNullable<T>() are the typed entry points.
+    void CopyScalar(void * outBuffer, size_t bufferSize) const;
+
     /// Decodes the Pascal length-prefixed string payload held in rawData.
     ///
     /// Returns false (and clears outPayload) when the value is the Null sentinel, the type is not
@@ -311,7 +314,7 @@ private:
 };
 
 /// Extract default value given attribute metadata
-Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * metadata,
+Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata & metadata,
                                                                     AttributeDefaultValue & outDefault);
 
 } // namespace app

@@ -592,7 +592,7 @@ Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId e
 {
     const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId);
     VerifyOrReturnError(metadata != nullptr, Protocols::InteractionModel::Status::UnsupportedAttribute);
-    return emberAfGetAttributeDefaultValue(metadata, outDefault);
+    return emberAfGetAttributeDefaultValue(*metadata, outDefault);
 }
 
 } // namespace app

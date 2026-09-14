@@ -130,20 +130,18 @@ void AttributeDefaultValue::CopyScalar(void * outBuffer, size_t bufferSize) cons
     }
 }
 
-Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, AttributeDefaultValue & outDefault)
+Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata & am, AttributeDefaultValue & outDefault)
 {
-    VerifyOrReturnError(am != nullptr, Status::UnsupportedAttribute);
+    outDefault.type = am.attributeType;
 
-    outDefault.type = am->attributeType;
-
-    if (am->HasEmptyDefault())
+    if (am.HasEmptyDefault())
     {
         outDefault.rawData = ByteSpan();
         return Status::NotFound;
     }
 
-    const bool isLongString  = emberAfIsLongStringAttributeType(am->attributeType);
-    const bool isShortString = emberAfIsStringAttributeType(am->attributeType);
+    const bool isLongString  = emberAfIsLongStringAttributeType(am.attributeType);
+    const bool isShortString = emberAfIsStringAttributeType(am.attributeType);
     const bool isStringType  = isLongString || isShortString;
 
     const uint8_t * ptr = nullptr;
@@ -153,22 +151,22 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
     size_t inlineStorageSize = 0;
     (void) inlineStorageSize;
 
-    if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
+    if ((am.mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
     {
-        if (am->defaultValue.ptrToMinMaxValue != nullptr)
+        if (am.defaultValue.ptrToMinMaxValue != nullptr)
         {
             // This is intentionally 2 and not 4 bytes since defaultValue in min/max attributes is
             // still uint16_t.
-            static_assert(sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue) == 2,
+            static_assert(sizeof(am.defaultValue.ptrToMinMaxValue->defaultValue.defaultValue) == 2,
                           "if statement relies on size of max/min defaultValue being 2");
-            if (am->size <= 2)
+            if (am.size <= 2)
             {
-                ptr = reinterpret_cast<const uint8_t *>(&(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue));
-                inlineStorageSize = sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
+                ptr = reinterpret_cast<const uint8_t *>(&(am.defaultValue.ptrToMinMaxValue->defaultValue.defaultValue));
+                inlineStorageSize = sizeof(am.defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
             }
             else
             {
-                ptr = am->defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
+                ptr = am.defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
             }
         }
     }
@@ -177,23 +175,23 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
         // Non-string scalars <= 4 bytes are stored inline in defaultValue.defaultValue.
         // Strings and long strings always store a pointer in defaultValue.ptrToDefaultValue,
         // even if their size is <= 4 bytes.
-        if ((am->size <= 4) && !isStringType)
+        if ((am.size <= 4) && !isStringType)
         {
-            ptr               = reinterpret_cast<const uint8_t *>(&(am->defaultValue.defaultValue));
-            inlineStorageSize = sizeof(am->defaultValue.defaultValue);
+            ptr               = reinterpret_cast<const uint8_t *>(&(am.defaultValue.defaultValue));
+            inlineStorageSize = sizeof(am.defaultValue.defaultValue);
         }
         else
         {
-            ptr = am->defaultValue.ptrToDefaultValue;
+            ptr = am.defaultValue.ptrToDefaultValue;
         }
     }
 
 #if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
     // Inline defaults occupy the full union member regardless of the attribute size. On big-endian
     // targets the significant bytes sit at the end of that member, so nudge the pointer forward.
-    if (am->size < inlineStorageSize && ptr != nullptr)
+    if (am.size < inlineStorageSize && ptr != nullptr)
     {
-        ptr += (inlineStorageSize - am->size);
+        ptr += (inlineStorageSize - am.size);
     }
 #endif
 
@@ -217,7 +215,7 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
     }
     else
     {
-        outDefault.rawData = ByteSpan(ptr, am->size);
+        outDefault.rawData = ByteSpan(ptr, am.size);
     }
 
     return Status::Success;

@@ -67,19 +67,19 @@ TEST(TestDynamicAttributeMetadata, EmptyDefault)
 {
     AttributeDefaultValue val;
     EXPECT_TRUE(sTestDynamicAttrs[0].HasEmptyDefault());
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[0], val), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[0], val), Protocols::InteractionModel::Status::NotFound);
     EXPECT_TRUE(val.rawData.empty());
     EXPECT_EQ(val.As<uint8_t>(), 0);
 
     // Nullable attribute with empty default -> Null
     EXPECT_TRUE(sTestDynamicAttrs[14].HasEmptyDefault());
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[14], val), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[14], val), Protocols::InteractionModel::Status::NotFound);
     EXPECT_TRUE(val.rawData.empty());
     EXPECT_TRUE(val.AsNullable<int16_t>().IsNull());
 
     // Min/max attribute with no default flag -> HasEmptyDefault is true, rawData is empty
     EXPECT_TRUE(sTestDynamicAttrs[15].HasEmptyDefault());
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[15], val), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[15], val), Protocols::InteractionModel::Status::NotFound);
     EXPECT_TRUE(val.rawData.empty());
 }
 
@@ -88,23 +88,23 @@ TEST(TestDynamicAttributeMetadata, ScalarDefaults)
     AttributeDefaultValue val;
 
     // INT8U: 42
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[1], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[1], val), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(val.As<uint8_t>(), 42);
 
     // INT16U: 0x1234
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[2], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[2], val), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(val.As<uint16_t>(), 0x1234);
 
     // INT32U: 0x12345678
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[3], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[3], val), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(val.As<uint32_t>(), 0x12345678u);
 
     // BOOLEAN: true
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[4], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[4], val), Protocols::InteractionModel::Status::Success);
     EXPECT_TRUE(val.As<bool>());
 
     // INT16S: -100
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[5], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[5], val), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(val.As<int16_t>(), -100);
 }
 
@@ -113,15 +113,15 @@ TEST(TestDynamicAttributeMetadata, StringDefaults)
     AttributeDefaultValue val;
 
     // Short string
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[6], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[6], val), Protocols::InteractionModel::Status::Success);
     EXPECT_TRUE(val.ToCharSpan().data_equal("Hello"_span));
 
     // Long string
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[7], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[7], val), Protocols::InteractionModel::Status::Success);
     EXPECT_TRUE(val.ToCharSpan().data_equal("Hello World"_span));
 
     // Octet string
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[8], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[8], val), Protocols::InteractionModel::Status::Success);
     const uint8_t expectedBytes[] = { 1, 2, 3, 4 };
     EXPECT_TRUE(val.ToByteSpan().data_equal(ByteSpan(expectedBytes, sizeof(expectedBytes))));
 }
@@ -129,7 +129,7 @@ TEST(TestDynamicAttributeMetadata, StringDefaults)
 TEST(TestDynamicAttributeMetadata, MinMaxDefault)
 {
     AttributeDefaultValue val;
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[9], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[9], val), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(val.As<uint16_t>(), 50);
     EXPECT_FALSE(sTestDynamicAttrs[9].HasEmptyDefault());
 
@@ -137,7 +137,7 @@ TEST(TestDynamicAttributeMetadata, MinMaxDefault)
     EmberAfAttributeMetadata nullMinMaxAttr = DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(
         0x000A, INT16U, 2, 0, static_cast<const EmberAfAttributeMinMaxValue *>(nullptr));
     EXPECT_FALSE(nullMinMaxAttr.HasEmptyDefault());
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&nullMinMaxAttr, val), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(nullMinMaxAttr, val), Protocols::InteractionModel::Status::NotFound);
     EXPECT_TRUE(val.rawData.empty());
 }
 
@@ -146,22 +146,22 @@ TEST(TestDynamicAttributeMetadata, NullableDefaults)
     AttributeDefaultValue val;
 
     // Null short string
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[10], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[10], val), Protocols::InteractionModel::Status::Success);
     auto nullableShort = val.ToNullableCharSpan();
     EXPECT_TRUE(nullableShort.IsNull());
 
     // Null long string
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[11], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[11], val), Protocols::InteractionModel::Status::Success);
     auto nullableLong = val.ToNullableCharSpan();
     EXPECT_TRUE(nullableLong.IsNull());
 
     // Null scalar
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[12], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[12], val), Protocols::InteractionModel::Status::Success);
     auto nullableU8Null = val.AsNullable<uint8_t>();
     EXPECT_TRUE(nullableU8Null.IsNull());
 
     // Non-null nullable scalar
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[13], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[13], val), Protocols::InteractionModel::Status::Success);
     auto nullableU8Val = val.AsNullable<uint8_t>();
     EXPECT_FALSE(nullableU8Val.IsNull());
     EXPECT_EQ(nullableU8Val.Value(), 10);
@@ -210,7 +210,7 @@ TEST(TestDynamicAttributeMetadata, EmptyRawDataSemantics)
 TEST(TestDynamicAttributeMetadata, ClusterRevision)
 {
     AttributeDefaultValue val;
-    EXPECT_EQ(emberAfGetAttributeDefaultValue(&sTestDynamicAttrs[16], val), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(emberAfGetAttributeDefaultValue(sTestDynamicAttrs[16], val), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(sTestDynamicAttrs[16].attributeId, 0xFFFDu);
     EXPECT_EQ(val.As<uint16_t>(), 3);
 }

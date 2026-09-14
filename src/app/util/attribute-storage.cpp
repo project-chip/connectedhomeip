@@ -99,12 +99,18 @@ unsigned emberMetadataStructureGeneration = 0;
 // we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
-#define ZAP_LONG_DEFAULTS_INDEX(index) { &generatedDefaults[index] }
+#define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
+    {                                                                                                                              \
+        &generatedDefaults[index]                                                                                                  \
+    }
 #endif // GENERATED_DEFAULTS
 
 #if (defined(GENERATED_MIN_MAX_DEFAULTS) && GENERATED_MIN_MAX_DEFAULT_COUNT)
 constexpr const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
-#define ZAP_MIN_MAX_DEFAULTS_INDEX(index) { &minMaxDefaults[index] }
+#define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
+    {                                                                                                                              \
+        &minMaxDefaults[index]                                                                                                     \
+    }
 #endif // GENERATED_MIN_MAX_DEFAULTS
 
 #ifdef GENERATED_FUNCTION_ARRAYS
@@ -1341,7 +1347,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
                         // A missing default (or one that cannot be resolved) leaves ptr null, which
                         // emAfReadOrWriteAttribute treats as an array of all zeroes.
                         AttributeDefaultValue defaultValue;
-                        if (emberAfGetAttributeDefaultValue(am, defaultValue) == Protocols::InteractionModel::Status::Success)
+                        if (emberAfGetAttributeDefaultValue(*am, defaultValue) == Protocols::InteractionModel::Status::Success)
                         {
                             // Defaults live in flash and are only read from here; emAfReadOrWriteAttribute
                             // takes a non-const pointer because the same parameter is an output on reads.
@@ -1603,7 +1609,7 @@ Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
     {
         if (cluster->attributes[i].attributeId == attributeId)
         {
-            return emberAfGetAttributeDefaultValue(&cluster->attributes[i], outDefault);
+            return emberAfGetAttributeDefaultValue(cluster->attributes[i], outDefault);
         }
     }
 
