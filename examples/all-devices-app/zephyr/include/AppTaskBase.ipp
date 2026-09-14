@@ -274,7 +274,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitOTARequestor()
     ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,
                                                 mOTARequestorAttributes, mOTARequestorCluster.Cluster()));
 
-    auto & imageProcessor = DeviceLayer::OTAImageProcessorImpl::GetDefaultInstance();
+    auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
     mOTARequestorDriver.Init(&mOTARequestorCore, &imageProcessor);
     ReturnErrorOnFailure(imageProcessor.Init(&mOTADownloader));
     mOTADownloader.SetImageProcessorDelegate(&imageProcessor);
