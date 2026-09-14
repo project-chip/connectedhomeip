@@ -164,6 +164,7 @@ foreach(_key
         ambient-context-sensor
         bridged-node
         chime
+        closure-panel
         color-temperature-light
         commissioning-proxy
         contact-sensor
