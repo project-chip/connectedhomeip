@@ -31,7 +31,7 @@ from support_modules.network_identity import (COMPACT_IDENTITY_LENGTH, NETWORK_I
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ MAX_DEBUG_TEXT_LENGTH = 512
 _FALLBACK_CREDENTIALS = "placeholder-credentials"
 
 
-class CNETPDCBaseTest(MatterBaseTest):
+class CNETPDCBaseTest(MatterTestCommissionedDevice):
     """Base class for the Wi-Fi Per-Device Credentials test cases of the Network Commissioning cluster."""
 
     # These test cases rewrite the Networks attribute repeatedly and read it back wherever they
