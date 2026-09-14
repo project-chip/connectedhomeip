@@ -17,7 +17,7 @@
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/groups-server/GroupsCluster.h>
+#include <app/clusters/groups-server/GroupsClusterImpl.h>
 #include <app/clusters/identify-server/IdentifyIntegrationDelegate.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -98,12 +98,12 @@ public:
 
     void SetUp() override
     {
-        mCluster       = std::make_unique<GroupsCluster>(kTestEndpointId,
-                                                   GroupsCluster::Context{
-                                                             .groupDataProvider   = mGroupDataProvider,
-                                                             .scenesIntegration   = &mScenesDelegate,
-                                                             .identifyIntegration = &mIdentifyDelegate,
-                                                   });
+        mCluster       = std::make_unique<GroupsClusterImpl>(kTestEndpointId,
+                                                       GroupsClusterImpl::Context{
+                                                                 .groupDataProvider   = mGroupDataProvider,
+                                                                 .scenesIntegration   = &mScenesDelegate,
+                                                                 .identifyIntegration = &mIdentifyDelegate,
+                                                       });
         mClusterTester = std::make_unique<ClusterTester>(*mCluster);
 
         mGroupDataProvider.SetStorageDelegate(&mClusterTester->GetServerClusterContext().storage);
@@ -171,7 +171,7 @@ protected:
     Crypto::DefaultSessionKeystore mSessionKeystore;
     MockIdentifyIntegrationDelegate mIdentifyDelegate;
     MockScenesIntegrationDelegate mScenesDelegate;
-    std::unique_ptr<GroupsCluster> mCluster;
+    std::unique_ptr<GroupsClusterImpl> mCluster;
     std::unique_ptr<ClusterTester> mClusterTester;
 };
 
@@ -745,12 +745,12 @@ TEST_F(TestGroupsCluster, TestGroupNameNodeWide)
     MapGroupToKeyset(kTestFabricIndex, kGroupId, kKeysetId);
 
     // Endpoint 1
-    GroupsCluster cluster1(kEndpoint1, { mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate });
+    GroupsClusterImpl cluster1(kEndpoint1, { mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate });
     ClusterTester tester1(cluster1);
     tester1.SetFabricIndex(kTestFabricIndex);
 
     // Endpoint 2
-    GroupsCluster cluster2(kEndpoint2, { mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate });
+    GroupsClusterImpl cluster2(kEndpoint2, { mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate });
     ClusterTester tester2(cluster2);
     tester2.SetFabricIndex(kTestFabricIndex);
 
