@@ -312,9 +312,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        if (session->IsUnauthenticatedSession() && IsUnsolicitedCaseSigma2(payloadHeader))
+        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && session->IsUnauthenticatedSession() &&
+            IsUnsolicitedCaseSigma2(payloadHeader))
         {
-            // Duplicates are intentionally not filtered, since each Sigma2 retransmission may need its own StatusReport.
+            // Filter duplicates so legitimate retransmissions of a previously processed Sigma2
+            // fall through to SendStandaloneAckIfNeeded without triggering an unauthenticated failure StatusReport.
             if (packetHeader.GetDestinationNodeId().HasValue() && mSessionManager != nullptr)
             {
                 // The StatusReport carries the piggybacked ack so no
