@@ -1,0 +1,45 @@
+name: Set up SDK OpenSSL
+description: Select private OpenSSL for SDK targets without changing system library discovery
+inputs:
+  static:
+    description: 'true for static OpenSSL 3.5, false for dynamic OpenSSL 3.5'
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Prepare private OpenSSL installation
+      shell: bash
+      env:
+        OPENSSL_STATIC: ${{ inputs.static }}
+      run: |
+        case "$OPENSSL_STATIC" in
+          true|false) ;;
+          *) echo "static must be true or false" >&2; exit 1 ;;
+        esac
+        # Read the same pinned source version and checksum used by the images.
+        dockerfile=integrations/docker/images/base/chip-build/Dockerfile
+        version=$(sed -n 's/^ARG OPENSSL_VERSION=//p' "$dockerfile")
+        checksum=$(sed -n 's/^ARG OPENSSL_SHA256=//p' "$dockerfile")
+        test -n "$version" && test -n "$checksum"
+        root=/opt/matter/openssl
+        if [[ ! -f "$root/lib/pkgconfig/openssl.pc" ]]; then
+          build_dir=$(mktemp -d)
+          trap 'rm -rf "$build_dir"' EXIT
+          curl --fail --location --retry 3 \
+            "https://github.com/openssl/openssl/releases/download/openssl-${version}/openssl-${version}.tar.gz" \
+            -o "$build_dir/openssl.tar.gz"
+          echo "$checksum  $build_dir/openssl.tar.gz" | sha256sum -c -
+          tar -xzf "$build_dir/openssl.tar.gz" -C "$build_dir"
+          (
+            cd "$build_dir/openssl-$version"
+            ./Configure --prefix="$root" --openssldir=/etc/ssl --libdir=lib
+            make -j"$(nproc)"
+            make install_sw
+          )
+        fi
+        test "$(PKG_CONFIG_PATH="$root/lib/pkgconfig" pkg-config --modversion openssl)" = "$version"
+        test -f "$root/lib/libssl.a" && test -f "$root/lib/libcrypto.a"
+        test -f "$root/lib/libssl.so" && test -f "$root/lib/libcrypto.so"
+        # Only the SDK GN configuration consumes these variables.
+        echo "CHIP_OPENSSL_ROOT=$root" >> "$GITHUB_ENV"
+        echo "CHIP_OPENSSL_STATIC=$OPENSSL_STATIC" >> "$GITHUB_ENV"

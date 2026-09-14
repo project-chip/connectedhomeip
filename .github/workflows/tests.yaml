@@ -82,6 +82,11 @@ jobs:
             - uses: actions/checkout@v7
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
+            - name: Select SDK OpenSSL
+              uses: ./.github/actions/setup-sdk-openssl
+              with:
+                  static: 'false'
+
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -817,6 +822,11 @@ jobs:
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v7
+            - name: Select SDK OpenSSL
+              uses: ./.github/actions/setup-sdk-openssl
+              with:
+                  static: 'true'
+
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

@@ -81,8 +81,53 @@ source_set("public_headers") {
 if (chip_crypto == "openssl") {
   import("${build_root}/config/linux/pkg_config.gni")
 
+  openssl_root = chip_openssl_root
+  if (openssl_root == "" && current_os == "linux" && current_cpu == host_cpu &&
+      sysroot == "") {
+    # The image's private host installation must not override a cross sysroot.
+    openssl_root = getenv("CHIP_OPENSSL_ROOT")
+  }
+
   pkg_config("openssl_config") {
     packages = [ "openssl" ]
+    if (openssl_root != "") {
+      assert(current_os == "linux",
+             "chip_openssl_root currently requires a Linux linker")
+      openssl_libdir = "$openssl_root/lib"
+      if (!path_exists("$openssl_libdir/pkgconfig/openssl.pc")) {
+        openssl_libdir = "$openssl_root/lib64"
+      }
+      assert(path_exists("$openssl_libdir/pkgconfig/openssl.pc"),
+             "No OpenSSL pkg-config metadata under $openssl_root")
+      pkg_config_path = "$openssl_libdir/pkgconfig"
+      foreach(library,
+              [
+                "ssl",
+                "crypto",
+              ]) {
+        if (chip_openssl_static) {
+          assert(path_exists("$openssl_libdir/lib${library}.a"),
+                 "Missing static OpenSSL archive in $openssl_libdir")
+        } else {
+          assert(path_exists("$openssl_libdir/lib${library}.so"),
+                 "Missing shared OpenSSL library in $openssl_libdir")
+        }
+      }
+      if (!chip_openssl_static) {
+        # Only SDK consumers get this search path. Do not expose this directory
+        # through the image's loader cache or a global LD_LIBRARY_PATH.
+        ldflags = [ "-Wl,-rpath,$openssl_libdir" ]
+      }
+    }
+    if (chip_openssl_static) {
+      assert(current_os == "linux",
+             "chip_openssl_static currently requires a Linux linker")
+      extra_args = [ "--static" ]
+      static_libs = [
+        "ssl",
+        "crypto",
+      ]
+    }
   }
 
   source_set("cryptopal_openssl") {
