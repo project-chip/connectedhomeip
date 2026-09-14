@@ -466,6 +466,8 @@ class TC_ACS_3_1(MatterBaseTest):
                 asserts.assert_true(audioContextDetected, "Failed to get audioContextDetected being True.")
 
             attrib_listener.reset()
+            # Drain any DetectStarted events already queued before waiting for DetectEnded
++            event_listener.flush_events()   # if such API exists, or:
 
             self.step("6c", "An operator waits until the HoldTime duration expires since the step 6a execution. Check if AmbientContextDetectEnded is received for the last ambient sensing event.")
 
