@@ -116,7 +116,7 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
             TestStep("14a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("14b", "TH reads from the DUT the OptOutState",
-                     "Value has to be 0x02 (LocalOptOut)"),
+                     "Value has to be 0x01 (LocalOptOut)"),
             TestStep("15", "TH sends command RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep("16", "TH sends command RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=GridOptimization",

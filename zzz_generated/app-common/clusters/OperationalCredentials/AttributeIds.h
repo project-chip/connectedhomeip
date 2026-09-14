@@ -14,7 +14,7 @@ namespace OperationalCredentials {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 11;
+inline constexpr uint32_t kAttributesCount = 12;
 
 namespace NOCs {
 inline constexpr AttributeId Id = 0x00000000;
@@ -39,6 +39,10 @@ inline constexpr AttributeId Id = 0x00000004;
 namespace CurrentFabricIndex {
 inline constexpr AttributeId Id = 0x00000005;
 } // namespace CurrentFabricIndex
+
+namespace PQCDeviceAttestationProfile {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace PQCDeviceAttestationProfile
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

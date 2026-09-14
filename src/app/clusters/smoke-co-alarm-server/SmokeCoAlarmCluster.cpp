@@ -389,6 +389,9 @@ DataModel::ActionReturnStatus SmokeCoAlarmCluster::WriteAttribute(const DataMode
 
     SensitivityEnum value;
     ReturnErrorOnFailure(decoder.Decode(value));
+    // The spec requires CONSTRAINT_ERROR when a client writes an enumeration value the server
+    // does not support.
+    VerifyOrReturnValue(value != SensitivityEnum::kUnknownEnumValue, Status::ConstraintError);
     SetSmokeSensitivityLevel(value);
     return Status::Success;
 }

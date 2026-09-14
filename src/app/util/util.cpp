@@ -119,6 +119,7 @@ void MatterPm10ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
+void MatterSmokeConcentrationMeasurementPluginServerInitCallback() {}
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRvcRunModePluginServerInitCallback() {}
 void MatterRvcCleanModePluginServerInitCallback() {}
@@ -140,7 +141,7 @@ void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
 void MatterServiceAreaPluginServerInitCallback() {}
 void MatterWaterHeaterManagementPluginServerInitCallback() {}
 void MatterWaterHeaterModePluginServerInitCallback() {}
-void MatterCommodityPricePluginServerInitCallback() {}
+void MatterThermostatModePluginServerInitCallback() {}
 void MatterCommodityTariffPluginServerInitCallback() {}
 void MatterElectricalGridConditionsPluginServerInitCallback() {}
 void MatterElectricalProtectionAlarmPluginServerInitCallback() {}

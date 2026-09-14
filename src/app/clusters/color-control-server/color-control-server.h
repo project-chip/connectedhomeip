@@ -15,4 +15,7 @@
  *    limitations under the License.
  */
 #pragma once
+
+// This header is for backwards compatibility only with codegen cluster
+// implementations. We just include the codegen version
 #include "codegen/color-control-server.h" // nogncheck
