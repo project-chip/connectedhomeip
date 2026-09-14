@@ -39,9 +39,8 @@ namespace {{asUpperCamelCase label}} {
 
 {{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
 {{#*inline "sizingBytes"}}{{#if (isShortString type)}}1{{else}}2{{/if}}{{/inline}}
-{{#*inline "accessorDefaultType"}}{{#if (isString type)}}{{#if isNullable}}DataModel::Nullable<chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span> &{{else}}chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span &{{/if}}{{else}}{{#if isNullable}}{{accessorGetterType this}}{{else}}{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} &{{/if}}{{/if}}{{/inline}}
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{>accessorDefaultType}} value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{>accessor_default_type}} value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =

@@ -99,18 +99,12 @@ unsigned emberMetadataStructureGeneration = 0;
 // we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
-#define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
-    {                                                                                                                              \
-        &generatedDefaults[index]                                                                                                  \
-    }
+#define ZAP_LONG_DEFAULTS_INDEX(index) { &generatedDefaults[index] }
 #endif // GENERATED_DEFAULTS
 
 #if (defined(GENERATED_MIN_MAX_DEFAULTS) && GENERATED_MIN_MAX_DEFAULT_COUNT)
 constexpr const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
-#define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
-    {                                                                                                                              \
-        &minMaxDefaults[index]                                                                                                     \
-    }
+#define ZAP_MIN_MAX_DEFAULTS_INDEX(index) { &minMaxDefaults[index] }
 #endif // GENERATED_MIN_MAX_DEFAULTS
 
 #ifdef GENERATED_FUNCTION_ARRAYS
@@ -1344,57 +1338,15 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
 
                     if (ptr == nullptr)
                     {
-                        size_t defaultValueSizeForBigEndianNudger = 0;
-                        // Bypasses compiler warning about unused variable for little endian platforms.
-                        (void) defaultValueSizeForBigEndianNudger;
-                        if (am->HasEmptyDefault())
+                        // A missing default (or one that cannot be resolved) leaves ptr null, which
+                        // emAfReadOrWriteAttribute treats as an array of all zeroes.
+                        AttributeDefaultValue defaultValue;
+                        if (emberAfGetAttributeDefaultValue(am, defaultValue) == Protocols::InteractionModel::Status::Success)
                         {
-                            ptr = nullptr;
+                            // Defaults live in flash and are only read from here; emAfReadOrWriteAttribute
+                            // takes a non-const pointer because the same parameter is an output on reads.
+                            ptr = const_cast<uint8_t *>(defaultValue.rawData.data());
                         }
-                        else if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
-                        {
-                            // This is intentionally 2 and not 4 bytes since defaultValue in min/max
-                            // attributes is still uint16_t.
-                            if (emberAfAttributeSize(am) <= 2)
-                            {
-                                static_assert(sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue) == 2,
-                                              "if statement relies on size of max/min defaultValue being 2");
-                                ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
-                                defaultValueSizeForBigEndianNudger =
-                                    sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
-                            }
-                            else
-                            {
-                                ptr = (uint8_t *) am->defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
-                            }
-                        }
-                        else
-                        {
-                            if ((emberAfAttributeSize(am) <= 4) && !emberAfIsStringAttributeType(am->attributeType))
-                            {
-                                ptr                                = (uint8_t *) &(am->defaultValue.defaultValue);
-                                defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.defaultValue);
-                            }
-                            else
-                            {
-                                ptr = (uint8_t *) am->defaultValue.ptrToDefaultValue;
-                            }
-                        }
-                        // At this point, ptr either points to a default value, or is NULL, in which case
-                        // it should be treated as if it is pointing to an array of all zeroes.
-
-#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
-                        // The default values for attributes that are less than or equal to
-                        // defaultValueSizeForBigEndianNudger in bytes are stored in an
-                        // uint32_t.  On big-endian platforms, a pointer to the default value
-                        // of size less than defaultValueSizeForBigEndianNudger will point to the wrong
-                        // byte.  So, for those cases, nudge the pointer forward so it points
-                        // to the correct byte.
-                        if (emberAfAttributeSize(am) < defaultValueSizeForBigEndianNudger && ptr != NULL)
-                        {
-                            ptr += (defaultValueSizeForBigEndianNudger - emberAfAttributeSize(am));
-                        }
-#endif // BIGENDIAN
                     }
 
                     emAfReadOrWriteAttribute(&record,

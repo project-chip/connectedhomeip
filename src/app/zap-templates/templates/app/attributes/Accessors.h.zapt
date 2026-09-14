@@ -34,9 +34,8 @@ namespace Attributes {
 {{/unless}}
 {{else}}
 namespace {{asUpperCamelCase label}} {
-{{#*inline "accessorDefaultType"}}{{#if (isString type)}}{{#if isNullable}}DataModel::Nullable<chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span> &{{else}}chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span &{{/if}}{{else}}{{#if isNullable}}{{accessorGetterType this}}{{else}}{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} &{{/if}}{{/if}}{{/inline}}
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{>accessorDefaultType}} value);
-inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, {{>accessorDefaultType}} value, {{#if (isString type)}}{{#if isNullable}}const DataModel::Nullable<chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span> & fallback = {}{{else}}chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span fallback = {}{{/if}}{{else}}{{#if isNullable}}{{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} fallback = {}{{else}}{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} fallback = {}{{/if}}{{/if}})
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, {{>accessor_default_type}} value);
+inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, {{>accessor_default_type}} value, {{#if (isString type)}}{{#if isNullable}}const DataModel::Nullable<chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span> & fallback = {}{{else}}chip::{{#if (isOctetString type)}}Byte{{else}}Char{{/if}}Span fallback = {}{{/if}}{{else}}{{#if isNullable}}{{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} fallback = {}{{else}}{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} fallback = {}{{/if}}{{/if}})
 {
     Protocols::InteractionModel::Status status = GetDefault(endpoint, value);
     if (status == Protocols::InteractionModel::Status::NotFound)

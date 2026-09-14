@@ -41,7 +41,6 @@ namespace Identify {
 namespace Attributes {
 
 namespace IdentifyTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -56,7 +55,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace IdentifyTime
 
 namespace IdentifyType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::Identify::IdentifyTypeEnum & value,
@@ -73,7 +71,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace IdentifyType
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -88,7 +85,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -109,7 +105,6 @@ namespace Groups {
 namespace Attributes {
 
 namespace NameSupport {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -127,7 +122,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace NameSupport
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -142,7 +136,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -163,7 +156,6 @@ namespace OnOff {
 namespace Attributes {
 
 namespace OnOff {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -181,7 +173,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace OnOff
 
 namespace GlobalSceneControl {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -199,7 +190,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace GlobalSceneControl
 
 namespace OnTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -217,7 +207,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace OnTime
 
 namespace OffWaitTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -235,7 +224,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace OffWaitTime
 
 namespace StartUpOnOff {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -265,7 +253,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace StartUpOnOff
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -283,7 +270,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -307,7 +293,6 @@ namespace LevelControl {
 namespace Attributes {
 
 namespace CurrentLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -331,7 +316,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace CurrentLevel
 
 namespace RemainingTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -349,7 +333,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace RemainingTime
 
 namespace MinLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -367,7 +350,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MinLevel
 
 namespace MaxLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -385,7 +367,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MaxLevel
 
 namespace CurrentFrequency {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -403,7 +384,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace CurrentFrequency
 
 namespace MinFrequency {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -421,7 +401,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace MinFrequency
 
 namespace MaxFrequency {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -439,7 +418,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace MaxFrequency
 
 namespace Options {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -462,7 +440,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 } // namespace Options
 
 namespace OnOffTransitionTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -480,7 +457,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace OnOffTransitionTime
 
 namespace OnLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -504,7 +480,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace OnLevel
 
 namespace OnTransitionTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -528,7 +503,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace OnTransitionTime
 
 namespace OffTransitionTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -552,7 +526,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace OffTransitionTime
 
 namespace DefaultMoveRate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -576,7 +549,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace DefaultMoveRate
 
 namespace StartUpCurrentLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -600,7 +572,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace StartUpCurrentLevel
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -618,7 +589,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -642,7 +612,6 @@ namespace PulseWidthModulation {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -660,7 +629,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -684,7 +652,6 @@ namespace Descriptor {
 namespace Attributes {
 
 namespace EndpointUniqueID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -699,7 +666,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace EndpointUniqueID
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -714,7 +680,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -735,7 +700,6 @@ namespace Binding {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -750,7 +714,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -771,7 +734,6 @@ namespace AccessControl {
 namespace Attributes {
 
 namespace SubjectsPerAccessControlEntry {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -786,7 +748,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SubjectsPerAccessControlEntry
 
 namespace TargetsPerAccessControlEntry {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -801,7 +762,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TargetsPerAccessControlEntry
 
 namespace AccessControlEntriesPerFabric {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -816,7 +776,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AccessControlEntriesPerFabric
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -831,7 +790,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -852,7 +810,6 @@ namespace Actions {
 namespace Attributes {
 
 namespace SetupURL {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -867,7 +824,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace SetupURL
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -882,7 +838,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -903,7 +858,6 @@ namespace BasicInformation {
 namespace Attributes {
 
 namespace DataModelRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -918,7 +872,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace DataModelRevision
 
 namespace VendorName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -933,7 +886,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace VendorName
 
 namespace VendorID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::VendorId & value, chip::VendorId fallback = {})
 {
@@ -948,7 +900,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace VendorID
 
 namespace ProductName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -963,7 +914,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ProductName
 
 namespace ProductID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -978,7 +928,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ProductID
 
 namespace NodeLabel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -993,7 +942,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace NodeLabel
 
 namespace Location {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1008,7 +956,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace Location
 
 namespace HardwareVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -1023,7 +970,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace HardwareVersion
 
 namespace HardwareVersionString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1038,7 +984,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace HardwareVersionString
 
 namespace SoftwareVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1053,7 +998,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SoftwareVersion
 
 namespace SoftwareVersionString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1068,7 +1012,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace SoftwareVersionString
 
 namespace ManufacturingDate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1083,7 +1026,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ManufacturingDate
 
 namespace PartNumber {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1098,7 +1040,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace PartNumber
 
 namespace ProductURL {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1113,7 +1054,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ProductURL
 
 namespace ProductLabel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1128,7 +1068,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ProductLabel
 
 namespace SerialNumber {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1143,7 +1082,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace SerialNumber
 
 namespace LocalConfigDisabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -1158,7 +1096,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace LocalConfigDisabled
 
 namespace Reachable {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -1173,7 +1110,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace Reachable
 
 namespace UniqueID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1188,7 +1124,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace UniqueID
 
 namespace SpecificationVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1203,7 +1138,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SpecificationVersion
 
 namespace MaxPathsPerInvoke {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -1218,7 +1152,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxPathsPerInvoke
 
 namespace ConfigurationVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1233,7 +1166,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ConfigurationVersion
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1248,7 +1180,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -1269,7 +1200,6 @@ namespace OtaSoftwareUpdateProvider {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1284,7 +1214,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -1305,7 +1234,6 @@ namespace OtaSoftwareUpdateRequestor {
 namespace Attributes {
 
 namespace UpdatePossible {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -1320,7 +1248,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace UpdatePossible
 
 namespace UpdateState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum & value);
 inline Protocols::InteractionModel::Status
@@ -1338,7 +1265,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequesto
 } // namespace UpdateState
 
 namespace UpdateStateProgress {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -1354,7 +1280,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace UpdateStateProgress
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1369,7 +1294,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -1390,7 +1314,6 @@ namespace LocalizationConfiguration {
 namespace Attributes {
 
 namespace ActiveLocale {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1405,7 +1328,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ActiveLocale
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1420,7 +1342,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -1441,7 +1362,6 @@ namespace TimeFormatLocalization {
 namespace Attributes {
 
 namespace HourFormat {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::TimeFormatLocalization::HourFormatEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -1459,7 +1379,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace HourFormat
 
 namespace ActiveCalendarType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -1477,7 +1396,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ActiveCalendarType
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1492,7 +1410,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -1513,7 +1430,6 @@ namespace UnitLocalization {
 namespace Attributes {
 
 namespace TemperatureUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::UnitLocalization::TempUnitEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::UnitLocalization::TempUnitEnum & value,
@@ -1530,7 +1446,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace TemperatureUnit
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1545,7 +1460,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -1566,7 +1480,6 @@ namespace PowerSourceConfiguration {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1584,7 +1497,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -1608,7 +1520,6 @@ namespace PowerSource {
 namespace Attributes {
 
 namespace Status {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::PowerSource::PowerSourceStatusEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -1630,7 +1541,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace Status
 
 namespace Order {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -1648,7 +1558,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace Order
 
 namespace Description {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1666,7 +1575,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace Description
 
 namespace WiredAssessedInputVoltage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -1690,7 +1598,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace WiredAssessedInputVoltage
 
 namespace WiredAssessedInputFrequency {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -1714,7 +1621,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace WiredAssessedInputFrequency
 
 namespace WiredCurrentType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::PowerSource::WiredCurrentTypeEnum & value,
@@ -1735,7 +1641,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace WiredCurrentType
 
 namespace WiredAssessedCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -1759,7 +1664,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace WiredAssessedCurrent
 
 namespace WiredNominalVoltage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1777,7 +1681,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace WiredNominalVoltage
 
 namespace WiredMaximumCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -1795,7 +1698,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace WiredMaximumCurrent
 
 namespace WiredPresent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -1813,7 +1715,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace WiredPresent
 
 namespace BatVoltage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -1837,7 +1738,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace BatVoltage
 
 namespace BatPercentRemaining {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -1861,7 +1761,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace BatPercentRemaining
 
 namespace BatTimeRemaining {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -1885,7 +1784,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace BatTimeRemaining
 
 namespace BatChargeLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::PowerSource::BatChargeLevelEnum & value,
@@ -1906,7 +1804,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace BatChargeLevel
 
 namespace BatReplacementNeeded {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -1924,7 +1821,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace BatReplacementNeeded
 
 namespace BatReplaceability {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::PowerSource::BatReplaceabilityEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -1946,7 +1842,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace BatReplaceability
 
 namespace BatPresent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -1964,7 +1859,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace BatPresent
 
 namespace BatReplacementDescription {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -1982,7 +1876,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace BatReplacementDescription
 
 namespace BatCommonDesignation {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::PowerSource::BatCommonDesignationEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -2004,7 +1897,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace BatCommonDesignation
 
 namespace BatANSIDesignation {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -2022,7 +1914,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace BatANSIDesignation
 
 namespace BatIECDesignation {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -2040,7 +1931,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace BatIECDesignation
 
 namespace BatApprovedChemistry {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::PowerSource::BatApprovedChemistryEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -2062,7 +1952,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace BatApprovedChemistry
 
 namespace BatCapacity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -2080,7 +1969,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace BatCapacity
 
 namespace BatQuantity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -2098,7 +1986,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace BatQuantity
 
 namespace BatChargeState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::PowerSource::BatChargeStateEnum & value,
@@ -2119,7 +2006,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace BatChargeState
 
 namespace BatTimeToFullCharge {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -2143,7 +2029,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace BatTimeToFullCharge
 
 namespace BatFunctionalWhileCharging {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -2161,7 +2046,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace BatFunctionalWhileCharging
 
 namespace BatChargingCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -2185,7 +2069,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace BatChargingCurrent
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -2203,7 +2086,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2224,7 +2106,6 @@ namespace GeneralCommissioning {
 namespace Attributes {
 
 namespace Breadcrumb {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -2239,7 +2120,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace Breadcrumb
 
 namespace RegulatoryConfig {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -2257,7 +2137,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::GeneralCommissioning::Reg
 } // namespace RegulatoryConfig
 
 namespace LocationCapability {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -2275,7 +2154,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::GeneralCommissioning::Reg
 } // namespace LocationCapability
 
 namespace SupportsConcurrentConnection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -2290,7 +2168,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace SupportsConcurrentConnection
 
 namespace TCAcceptedVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2305,7 +2182,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TCAcceptedVersion
 
 namespace TCMinRequiredVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2320,7 +2196,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TCMinRequiredVersion
 
 namespace TCAcknowledgements {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2335,7 +2210,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TCAcknowledgements
 
 namespace TCAcknowledgementsRequired {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -2350,7 +2224,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace TCAcknowledgementsRequired
 
 namespace TCUpdateDeadline {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -2366,7 +2239,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace TCUpdateDeadline
 
 namespace RecoveryIdentifier {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::ByteSpan & value, chip::ByteSpan fallback = {})
 {
@@ -2381,7 +2253,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace RecoveryIdentifier
 
 namespace NetworkRecoveryReason {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::NetworkRecoveryReasonEnum> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(
@@ -2399,7 +2270,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(
 } // namespace NetworkRecoveryReason
 
 namespace IsCommissioningWithoutPower {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -2414,7 +2284,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace IsCommissioningWithoutPower
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -2429,7 +2298,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2450,7 +2318,6 @@ namespace NetworkCommissioning {
 namespace Attributes {
 
 namespace MaxNetworks {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -2465,7 +2332,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxNetworks
 
 namespace ScanMaxTimeSeconds {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -2480,7 +2346,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ScanMaxTimeSeconds
 
 namespace ConnectMaxTimeSeconds {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -2495,7 +2360,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ConnectMaxTimeSeconds
 
 namespace InterfaceEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -2510,7 +2374,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace InterfaceEnabled
 
 namespace LastNetworkingStatus {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint,
            DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value);
@@ -2529,7 +2392,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(
 } // namespace LastNetworkingStatus
 
 namespace LastNetworkID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -2545,7 +2407,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace LastNetworkID
 
 namespace LastConnectErrorValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int32_t> & value,
                                                         const chip::app::DataModel::Nullable<int32_t> & fallback = {})
@@ -2561,7 +2422,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace LastConnectErrorValue
 
 namespace SupportedThreadFeatures {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -2579,7 +2439,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::NetworkComm
 } // namespace SupportedThreadFeatures
 
 namespace ThreadVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2594,7 +2453,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ThreadVersion
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -2609,7 +2467,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2630,7 +2487,6 @@ namespace DiagnosticLogs {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -2645,7 +2501,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2666,7 +2521,6 @@ namespace GeneralDiagnostics {
 namespace Attributes {
 
 namespace RebootCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2681,7 +2535,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RebootCount
 
 namespace UpTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -2696,7 +2549,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace UpTime
 
 namespace TotalOperationalHours {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -2711,7 +2563,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TotalOperationalHours
 
 namespace BootReason {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -2729,7 +2580,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace BootReason
 
 namespace TestEventTriggersEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -2744,7 +2594,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace TestEventTriggersEnabled
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -2759,7 +2608,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2780,7 +2628,6 @@ namespace SoftwareDiagnostics {
 namespace Attributes {
 
 namespace CurrentHeapFree {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -2795,7 +2642,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentHeapFree
 
 namespace CurrentHeapUsed {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -2810,7 +2656,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentHeapUsed
 
 namespace CurrentHeapHighWatermark {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -2825,7 +2670,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentHeapHighWatermark
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -2840,7 +2684,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -2861,7 +2704,6 @@ namespace ThreadNetworkDiagnostics {
 namespace Attributes {
 
 namespace Channel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -2877,7 +2719,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace Channel
 
 namespace RoutingRole {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -2895,7 +2736,6 @@ GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Threa
 } // namespace RoutingRole
 
 namespace NetworkName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value,
                                                         const DataModel::Nullable<chip::CharSpan> & fallback = {})
@@ -2911,7 +2751,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace NetworkName
 
 namespace PanId {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -2927,7 +2766,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PanId
 
 namespace ExtendedPanId {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -2943,7 +2781,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ExtendedPanId
 
 namespace MeshLocalPrefix {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -2959,7 +2796,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeshLocalPrefix
 
 namespace OverrunCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -2974,7 +2810,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace OverrunCount
 
 namespace PartitionId {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -2990,7 +2825,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PartitionId
 
 namespace Weighting {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -3006,7 +2840,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace Weighting
 
 namespace DataVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -3022,7 +2855,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace DataVersion
 
 namespace StableDataVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -3038,7 +2870,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace StableDataVersion
 
 namespace LeaderRouterId {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -3054,7 +2885,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace LeaderRouterId
 
 namespace DetachedRoleCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -3069,7 +2899,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace DetachedRoleCount
 
 namespace ChildRoleCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -3084,7 +2913,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ChildRoleCount
 
 namespace RouterRoleCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -3099,7 +2927,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RouterRoleCount
 
 namespace LeaderRoleCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -3114,7 +2941,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace LeaderRoleCount
 
 namespace AttachAttemptCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -3129,7 +2955,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AttachAttemptCount
 
 namespace PartitionIdChangeCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -3144,7 +2969,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PartitionIdChangeCount
 
 namespace BetterPartitionAttachAttemptCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -3159,7 +2983,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace BetterPartitionAttachAttemptCount
 
 namespace ParentChangeCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -3174,7 +2997,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ParentChangeCount
 
 namespace TxTotalCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3189,7 +3011,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxTotalCount
 
 namespace TxUnicastCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3204,7 +3025,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxUnicastCount
 
 namespace TxBroadcastCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3219,7 +3039,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxBroadcastCount
 
 namespace TxAckRequestedCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3234,7 +3053,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxAckRequestedCount
 
 namespace TxAckedCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3249,7 +3067,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxAckedCount
 
 namespace TxNoAckRequestedCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3264,7 +3081,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxNoAckRequestedCount
 
 namespace TxDataCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3279,7 +3095,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxDataCount
 
 namespace TxDataPollCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3294,7 +3109,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxDataPollCount
 
 namespace TxBeaconCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3309,7 +3123,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxBeaconCount
 
 namespace TxBeaconRequestCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3324,7 +3137,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxBeaconRequestCount
 
 namespace TxOtherCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3339,7 +3151,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxOtherCount
 
 namespace TxRetryCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3354,7 +3165,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxRetryCount
 
 namespace TxDirectMaxRetryExpiryCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3369,7 +3179,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxDirectMaxRetryExpiryCount
 
 namespace TxIndirectMaxRetryExpiryCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3384,7 +3193,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxIndirectMaxRetryExpiryCount
 
 namespace TxErrCcaCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3399,7 +3207,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxErrCcaCount
 
 namespace TxErrAbortCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3414,7 +3221,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxErrAbortCount
 
 namespace TxErrBusyChannelCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3429,7 +3235,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxErrBusyChannelCount
 
 namespace RxTotalCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3444,7 +3249,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxTotalCount
 
 namespace RxUnicastCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3459,7 +3263,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxUnicastCount
 
 namespace RxBroadcastCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3474,7 +3277,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxBroadcastCount
 
 namespace RxDataCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3489,7 +3291,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxDataCount
 
 namespace RxDataPollCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3504,7 +3305,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxDataPollCount
 
 namespace RxBeaconCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3519,7 +3319,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxBeaconCount
 
 namespace RxBeaconRequestCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3534,7 +3333,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxBeaconRequestCount
 
 namespace RxOtherCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3549,7 +3347,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxOtherCount
 
 namespace RxAddressFilteredCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3564,7 +3361,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxAddressFilteredCount
 
 namespace RxDestAddrFilteredCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3579,7 +3375,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxDestAddrFilteredCount
 
 namespace RxDuplicatedCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3594,7 +3389,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxDuplicatedCount
 
 namespace RxErrNoFrameCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3609,7 +3403,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxErrNoFrameCount
 
 namespace RxErrUnknownNeighborCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3624,7 +3417,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxErrUnknownNeighborCount
 
 namespace RxErrInvalidSrcAddrCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3639,7 +3431,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxErrInvalidSrcAddrCount
 
 namespace RxErrSecCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3654,7 +3445,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxErrSecCount
 
 namespace RxErrFcsCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3669,7 +3459,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxErrFcsCount
 
 namespace RxErrOtherCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3684,7 +3473,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RxErrOtherCount
 
 namespace ActiveTimestamp {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -3700,7 +3488,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ActiveTimestamp
 
 namespace PendingTimestamp {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -3716,7 +3503,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PendingTimestamp
 
 namespace Delay {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -3732,7 +3518,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace Delay
 
 namespace ChannelPage0Mask {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -3748,7 +3533,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ChannelPage0Mask
 
 namespace ExtAddress {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -3764,7 +3548,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ExtAddress
 
 namespace Rloc16 {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -3780,7 +3563,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace Rloc16
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -3795,7 +3577,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -3816,7 +3597,6 @@ namespace WiFiNetworkDiagnostics {
 namespace Attributes {
 
 namespace Bssid {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -3832,7 +3612,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace Bssid
 
 namespace SecurityType {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -3850,7 +3629,6 @@ GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::WiFiN
 } // namespace SecurityType
 
 namespace WiFiVersion {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -3868,7 +3646,6 @@ GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::WiFiN
 } // namespace WiFiVersion
 
 namespace ChannelNumber {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -3884,7 +3661,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ChannelNumber
 
 namespace Rssi {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int8_t> & value,
                                                         const chip::app::DataModel::Nullable<int8_t> & fallback = {})
@@ -3900,7 +3676,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace Rssi
 
 namespace BeaconLostCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -3916,7 +3691,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace BeaconLostCount
 
 namespace BeaconRxCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -3932,7 +3706,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace BeaconRxCount
 
 namespace PacketMulticastRxCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -3948,7 +3721,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PacketMulticastRxCount
 
 namespace PacketMulticastTxCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -3964,7 +3736,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PacketMulticastTxCount
 
 namespace PacketUnicastRxCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -3980,7 +3751,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PacketUnicastRxCount
 
 namespace PacketUnicastTxCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -3996,7 +3766,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PacketUnicastTxCount
 
 namespace CurrentMaxRate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -4012,7 +3781,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentMaxRate
 
 namespace OverrunCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -4028,7 +3796,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace OverrunCount
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -4043,7 +3810,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4064,7 +3830,6 @@ namespace EthernetNetworkDiagnostics {
 namespace Attributes {
 
 namespace PHYRate {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -4082,7 +3847,6 @@ GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Ether
 } // namespace PHYRate
 
 namespace FullDuplex {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<bool> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<bool> & value,
                                                         const chip::app::DataModel::Nullable<bool> & fallback = {})
@@ -4098,7 +3862,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace FullDuplex
 
 namespace PacketRxCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -4113,7 +3876,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PacketRxCount
 
 namespace PacketTxCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -4128,7 +3890,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PacketTxCount
 
 namespace TxErrCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -4143,7 +3904,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TxErrCount
 
 namespace CollisionCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -4158,7 +3918,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CollisionCount
 
 namespace OverrunCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -4173,7 +3932,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace OverrunCount
 
 namespace CarrierDetect {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<bool> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<bool> & value,
                                                         const chip::app::DataModel::Nullable<bool> & fallback = {})
@@ -4189,7 +3947,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CarrierDetect
 
 namespace TimeSinceReset {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -4204,7 +3961,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TimeSinceReset
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -4219,7 +3975,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4240,7 +3995,6 @@ namespace TimeSynchronization {
 namespace Attributes {
 
 namespace UTCTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -4256,7 +4010,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace UTCTime
 
 namespace Granularity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::TimeSynchronization::GranularityEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -4274,7 +4027,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace Granularity
 
 namespace TimeSource {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::TimeSynchronization::TimeSourceEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -4292,7 +4044,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace TimeSource
 
 namespace DefaultNTP {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value,
                                                         const DataModel::Nullable<chip::CharSpan> & fallback = {})
@@ -4308,7 +4059,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace DefaultNTP
 
 namespace LocalTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -4324,7 +4074,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace LocalTime
 
 namespace TimeZoneDatabase {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum & value);
 inline Protocols::InteractionModel::Status
@@ -4342,7 +4091,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::TimeSynchronization::Time
 } // namespace TimeZoneDatabase
 
 namespace NTPServerAvailable {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -4357,7 +4105,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace NTPServerAvailable
 
 namespace TimeZoneListMaxSize {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -4372,7 +4119,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TimeZoneListMaxSize
 
 namespace DSTOffsetListMaxSize {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -4387,7 +4133,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace DSTOffsetListMaxSize
 
 namespace SupportsDNSResolve {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -4402,7 +4147,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace SupportsDNSResolve
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -4417,7 +4161,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4438,7 +4181,6 @@ namespace BridgedDeviceBasicInformation {
 namespace Attributes {
 
 namespace VendorName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4453,7 +4195,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace VendorName
 
 namespace VendorID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::VendorId & value, chip::VendorId fallback = {})
 {
@@ -4468,7 +4209,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace VendorID
 
 namespace ProductName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4483,7 +4223,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ProductName
 
 namespace ProductID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4498,7 +4237,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ProductID
 
 namespace NodeLabel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4513,7 +4251,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace NodeLabel
 
 namespace HardwareVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4528,7 +4265,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace HardwareVersion
 
 namespace HardwareVersionString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4543,7 +4279,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace HardwareVersionString
 
 namespace SoftwareVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -4558,7 +4293,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SoftwareVersion
 
 namespace SoftwareVersionString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4573,7 +4307,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace SoftwareVersionString
 
 namespace ManufacturingDate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4588,7 +4321,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ManufacturingDate
 
 namespace PartNumber {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4603,7 +4335,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace PartNumber
 
 namespace ProductURL {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4618,7 +4349,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ProductURL
 
 namespace ProductLabel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4633,7 +4363,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ProductLabel
 
 namespace SerialNumber {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4648,7 +4377,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace SerialNumber
 
 namespace Reachable {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -4663,7 +4391,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace Reachable
 
 namespace UniqueID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -4678,7 +4405,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace UniqueID
 
 namespace ConfigurationVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -4693,7 +4419,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ConfigurationVersion
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -4708,7 +4433,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4729,7 +4453,6 @@ namespace Switch {
 namespace Attributes {
 
 namespace NumberOfPositions {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -4744,7 +4467,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfPositions
 
 namespace CurrentPosition {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -4759,7 +4481,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentPosition
 
 namespace MultiPressMax {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -4774,7 +4495,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MultiPressMax
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -4789,7 +4509,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4810,7 +4529,6 @@ namespace AdministratorCommissioning {
 namespace Attributes {
 
 namespace WindowStatus {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum & value);
 inline Protocols::InteractionModel::Status
@@ -4828,7 +4546,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::AdministratorCommissionin
 } // namespace WindowStatus
 
 namespace AdminFabricIndex {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::FabricIndex> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::FabricIndex> & value,
                                                         const chip::app::DataModel::Nullable<chip::FabricIndex> & fallback = {})
@@ -4844,7 +4561,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AdminFabricIndex
 
 namespace AdminVendorId {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::VendorId> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::VendorId> & value,
                                                         const chip::app::DataModel::Nullable<chip::VendorId> & fallback = {})
@@ -4860,7 +4576,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AdminVendorId
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -4875,7 +4590,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4896,7 +4610,6 @@ namespace OperationalCredentials {
 namespace Attributes {
 
 namespace SupportedFabrics {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -4911,7 +4624,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SupportedFabrics
 
 namespace CommissionedFabrics {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -4926,7 +4638,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CommissionedFabrics
 
 namespace CurrentFabricIndex {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -4941,7 +4652,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentFabricIndex
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -4956,7 +4666,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4977,7 +4686,6 @@ namespace GroupKeyManagement {
 namespace Attributes {
 
 namespace MaxGroupsPerFabric {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -4992,7 +4700,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxGroupsPerFabric
 
 namespace MaxGroupKeysPerFabric {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5007,7 +4714,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxGroupKeysPerFabric
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5022,7 +4728,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5043,7 +4748,6 @@ namespace FixedLabel {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5058,7 +4762,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5079,7 +4782,6 @@ namespace UserLabel {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5094,7 +4796,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5115,7 +4816,6 @@ namespace ProxyConfiguration {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5133,7 +4833,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5157,7 +4856,6 @@ namespace ProxyDiscovery {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5175,7 +4873,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5199,7 +4896,6 @@ namespace ProxyValid {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5217,7 +4913,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5241,7 +4936,6 @@ namespace BooleanState {
 namespace Attributes {
 
 namespace StateValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -5256,7 +4950,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace StateValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5271,7 +4964,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5292,7 +4984,6 @@ namespace IcdManagement {
 namespace Attributes {
 
 namespace IdleModeDuration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5307,7 +4998,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace IdleModeDuration
 
 namespace ActiveModeDuration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5322,7 +5012,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ActiveModeDuration
 
 namespace ActiveModeThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5337,7 +5026,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ActiveModeThreshold
 
 namespace ICDCounter {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5352,7 +5040,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ICDCounter
 
 namespace ClientsSupportedPerFabric {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5367,7 +5054,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ClientsSupportedPerFabric
 
 namespace UserActiveModeTriggerHint {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -5385,7 +5071,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::IcdManageme
 } // namespace UserActiveModeTriggerHint
 
 namespace UserActiveModeTriggerInstruction {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -5400,7 +5085,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace UserActiveModeTriggerInstruction
 
 namespace OperatingMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::IcdManagement::OperatingModeEnum & value,
@@ -5417,7 +5101,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace OperatingMode
 
 namespace MaximumCheckInBackOff {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5432,7 +5115,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaximumCheckInBackOff
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5447,7 +5129,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5468,7 +5149,6 @@ namespace OvenCavityOperationalState {
 namespace Attributes {
 
 namespace CurrentPhase {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -5484,7 +5164,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentPhase
 
 namespace CountdownTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -5500,7 +5179,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CountdownTime
 
 namespace OperationalState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::OvenCavityOperationalState::OperationalStateEnum & value);
 inline Protocols::InteractionModel::Status
@@ -5518,7 +5196,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::OvenCavityOperationalStat
 } // namespace OperationalState
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5533,7 +5210,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5554,7 +5230,6 @@ namespace OvenMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -5569,7 +5244,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5584,7 +5258,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5605,7 +5278,6 @@ namespace LaundryDryerControls {
 namespace Attributes {
 
 namespace SelectedDrynessLevel {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -5623,7 +5295,6 @@ GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Laund
 } // namespace SelectedDrynessLevel
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5638,7 +5309,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5659,7 +5329,6 @@ namespace TemperatureControlledCabinetTopology {
 namespace Attributes {
 
 namespace Topology {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum & value);
 inline Protocols::InteractionModel::Status
@@ -5684,7 +5353,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace Topology
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5702,7 +5370,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5726,7 +5393,6 @@ namespace ModeSelect {
 namespace Attributes {
 
 namespace Description {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -5741,7 +5407,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace Description
 
 namespace StandardNamespace {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -5757,7 +5422,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace StandardNamespace
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -5772,7 +5436,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace StartUpMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -5788,7 +5451,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace StartUpMode
 
 namespace OnMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -5804,7 +5466,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace OnMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5819,7 +5480,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5840,7 +5500,6 @@ namespace LaundryWasherMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -5855,7 +5514,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5870,7 +5528,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5891,7 +5548,6 @@ namespace RefrigeratorAndTemperatureControlledCabinetMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -5906,7 +5562,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5921,7 +5576,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -5942,7 +5596,6 @@ namespace LaundryWasherControls {
 namespace Attributes {
 
 namespace SpinSpeedCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -5958,7 +5611,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace SpinSpeedCurrent
 
 namespace NumberOfRinses {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum & value);
 inline Protocols::InteractionModel::Status
@@ -5976,7 +5628,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::LaundryWasherControls::Nu
 } // namespace NumberOfRinses
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -5991,7 +5642,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6012,7 +5662,6 @@ namespace RvcRunMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6027,7 +5676,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6042,7 +5690,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6063,7 +5710,6 @@ namespace RvcCleanMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6078,7 +5724,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6093,7 +5738,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6114,7 +5758,6 @@ namespace TemperatureControl {
 namespace Attributes {
 
 namespace TemperatureSetpoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -6129,7 +5772,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace TemperatureSetpoint
 
 namespace MinTemperature {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -6144,7 +5786,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MinTemperature
 
 namespace MaxTemperature {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -6159,7 +5800,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MaxTemperature
 
 namespace Step {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -6174,7 +5814,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace Step
 
 namespace SelectedTemperatureLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6189,7 +5828,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SelectedTemperatureLevel
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6204,7 +5842,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6225,7 +5862,6 @@ namespace RefrigeratorAlarm {
 namespace Attributes {
 
 namespace Mask {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -6243,7 +5879,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Refrigerato
 } // namespace Mask
 
 namespace State {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -6261,7 +5896,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Refrigerato
 } // namespace State
 
 namespace Supported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -6279,7 +5913,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Refrigerato
 } // namespace Supported
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6294,7 +5927,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6315,7 +5947,6 @@ namespace DishwasherMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6330,7 +5961,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6345,7 +5975,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6366,7 +5995,6 @@ namespace AirQuality {
 namespace Attributes {
 
 namespace AirQuality {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::AirQuality::AirQualityEnum & value,
@@ -6383,7 +6011,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace AirQuality
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6398,7 +6025,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6419,7 +6045,6 @@ namespace SmokeCoAlarm {
 namespace Attributes {
 
 namespace ExpressedState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum & value,
@@ -6436,7 +6061,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ExpressedState
 
 namespace SmokeState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value,
@@ -6453,7 +6077,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace SmokeState
 
 namespace COState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value,
@@ -6470,7 +6093,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace COState
 
 namespace BatteryAlert {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value,
@@ -6487,7 +6109,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace BatteryAlert
 
 namespace DeviceMuted {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::SmokeCoAlarm::MuteStateEnum & value,
@@ -6504,7 +6125,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace DeviceMuted
 
 namespace TestInProgress {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -6519,7 +6139,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace TestInProgress
 
 namespace HardwareFaultAlert {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -6534,7 +6153,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace HardwareFaultAlert
 
 namespace EndOfServiceAlert {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum & value,
@@ -6551,7 +6169,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace EndOfServiceAlert
 
 namespace InterconnectSmokeAlarm {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value,
@@ -6568,7 +6185,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace InterconnectSmokeAlarm
 
 namespace InterconnectCOAlarm {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum & value,
@@ -6585,7 +6201,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace InterconnectCOAlarm
 
 namespace ContaminationState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -6603,7 +6218,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ContaminationState
 
 namespace SmokeSensitivityLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::SmokeCoAlarm::SensitivityEnum & value,
@@ -6620,7 +6234,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace SmokeSensitivityLevel
 
 namespace ExpiryDate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6635,7 +6248,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ExpiryDate
 
 namespace Unmounted {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -6650,7 +6262,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace Unmounted
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6665,7 +6276,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6686,7 +6296,6 @@ namespace DishwasherAlarm {
 namespace Attributes {
 
 namespace Mask {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -6704,7 +6313,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherA
 } // namespace Mask
 
 namespace Latch {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -6722,7 +6330,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherA
 } // namespace Latch
 
 namespace State {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -6740,7 +6347,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherA
 } // namespace State
 
 namespace Supported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -6758,7 +6364,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherA
 } // namespace Supported
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6773,7 +6378,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6794,7 +6398,6 @@ namespace MicrowaveOvenMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6809,7 +6412,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6824,7 +6426,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6845,7 +6446,6 @@ namespace MicrowaveOvenControl {
 namespace Attributes {
 
 namespace CookTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6860,7 +6460,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CookTime
 
 namespace MaxCookTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6875,7 +6474,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxCookTime
 
 namespace PowerSetting {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6890,7 +6488,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PowerSetting
 
 namespace MinPower {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6905,7 +6502,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MinPower
 
 namespace MaxPower {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6920,7 +6516,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxPower
 
 namespace PowerStep {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6935,7 +6530,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PowerStep
 
 namespace SelectedWattIndex {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -6950,7 +6544,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SelectedWattIndex
 
 namespace WattRating {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -6965,7 +6558,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace WattRating
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -6980,7 +6572,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7001,7 +6592,6 @@ namespace OperationalState {
 namespace Attributes {
 
 namespace CurrentPhase {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -7017,7 +6607,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentPhase
 
 namespace CountdownTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -7033,7 +6622,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CountdownTime
 
 namespace OperationalState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::OperationalState::OperationalStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -7051,7 +6639,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace OperationalState
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -7066,7 +6653,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7087,7 +6673,6 @@ namespace RvcOperationalState {
 namespace Attributes {
 
 namespace CurrentPhase {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -7103,7 +6688,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentPhase
 
 namespace CountdownTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -7119,7 +6703,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CountdownTime
 
 namespace OperationalState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -7134,7 +6717,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace OperationalState
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -7149,7 +6731,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7170,7 +6751,6 @@ namespace ScenesManagement {
 namespace Attributes {
 
 namespace SceneTableSize {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7185,7 +6765,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SceneTableSize
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -7200,7 +6779,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7221,7 +6799,6 @@ namespace ThermostatMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -7236,7 +6813,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace StartUpMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -7252,7 +6828,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace StartUpMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -7267,7 +6842,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7288,7 +6862,6 @@ namespace Groupcast {
 namespace Attributes {
 
 namespace MaxMembershipCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7303,7 +6876,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxMembershipCount
 
 namespace MaxMcastAddrCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7318,7 +6890,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxMcastAddrCount
 
 namespace UsedMcastAddrCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7333,7 +6904,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace UsedMcastAddrCount
 
 namespace FabricUnderTest {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::FabricIndex & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::FabricIndex & value,
                                                         chip::FabricIndex fallback = {})
@@ -7349,7 +6919,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace FabricUnderTest
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -7364,7 +6933,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7385,7 +6953,6 @@ namespace HepaFilterMonitoring {
 namespace Attributes {
 
 namespace Condition {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -7400,7 +6967,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace Condition
 
 namespace DegradationDirection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum & value);
 inline Protocols::InteractionModel::Status
@@ -7418,7 +6984,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::HepaFilterMonitoring::Deg
 } // namespace DegradationDirection
 
 namespace ChangeIndication {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum & value);
 inline Protocols::InteractionModel::Status
@@ -7436,7 +7001,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::HepaFilterMonitoring::Cha
 } // namespace ChangeIndication
 
 namespace InPlaceIndicator {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -7451,7 +7015,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace InPlaceIndicator
 
 namespace LastChangedTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -7467,7 +7030,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace LastChangedTime
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -7482,7 +7044,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7503,7 +7064,6 @@ namespace ActivatedCarbonFilterMonitoring {
 namespace Attributes {
 
 namespace Condition {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -7518,7 +7078,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace Condition
 
 namespace DegradationDirection {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum & value);
 inline Protocols::InteractionModel::Status
@@ -7536,7 +7095,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMoni
 } // namespace DegradationDirection
 
 namespace ChangeIndication {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum & value);
 inline Protocols::InteractionModel::Status
@@ -7554,7 +7112,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::ActivatedCarbonFilterMoni
 } // namespace ChangeIndication
 
 namespace InPlaceIndicator {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -7569,7 +7126,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace InPlaceIndicator
 
 namespace LastChangedTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -7585,7 +7141,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace LastChangedTime
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -7600,7 +7155,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7621,7 +7175,6 @@ namespace WaterTankLevelMonitoring {
 namespace Attributes {
 
 namespace Condition {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -7639,7 +7192,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value
 } // namespace Condition
 
 namespace DegradationDirection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum & value);
 inline Protocols::InteractionModel::Status
@@ -7664,7 +7216,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace DegradationDirection
 
 namespace ChangeIndication {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum & value);
 inline Protocols::InteractionModel::Status
@@ -7688,7 +7239,6 @@ Set(EndpointId endpoint, chip::app::Clusters::WaterTankLevelMonitoring::ChangeIn
 } // namespace ChangeIndication
 
 namespace InPlaceIndicator {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -7706,7 +7256,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace InPlaceIndicator
 
 namespace LastChangedTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -7730,7 +7279,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace LastChangedTime
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -7748,7 +7296,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7772,7 +7319,6 @@ namespace BooleanStateConfiguration {
 namespace Attributes {
 
 namespace CurrentSensitivityLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -7787,7 +7333,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentSensitivityLevel
 
 namespace SupportedSensitivityLevels {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -7802,7 +7347,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SupportedSensitivityLevels
 
 namespace DefaultSensitivityLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -7817,7 +7361,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace DefaultSensitivityLevel
 
 namespace AlarmsActive {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -7835,7 +7378,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStat
 } // namespace AlarmsActive
 
 namespace AlarmsSuppressed {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -7853,7 +7395,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStat
 } // namespace AlarmsSuppressed
 
 namespace AlarmsEnabled {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -7871,7 +7412,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStat
 } // namespace AlarmsEnabled
 
 namespace AlarmsSupported {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -7889,7 +7429,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStat
 } // namespace AlarmsSupported
 
 namespace SensorFault {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -7907,7 +7446,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStat
 } // namespace SensorFault
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -7922,7 +7460,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -7943,7 +7480,6 @@ namespace ValveConfigurationAndControl {
 namespace Attributes {
 
 namespace OpenDuration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -7959,7 +7495,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace OpenDuration
 
 namespace DefaultOpenDuration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -7975,7 +7510,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace DefaultOpenDuration
 
 namespace AutoCloseTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -7991,7 +7525,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AutoCloseTime
 
 namespace RemainingDuration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -8007,7 +7540,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace RemainingDuration
 
 namespace CurrentState {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(
@@ -8025,7 +7557,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(
 } // namespace CurrentState
 
 namespace TargetState {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(
@@ -8043,7 +7574,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(
 } // namespace TargetState
 
 namespace CurrentLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent> & fallback = {})
@@ -8059,7 +7589,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentLevel
 
 namespace TargetLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent> & fallback = {})
@@ -8075,7 +7604,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace TargetLevel
 
 namespace DefaultOpenLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -8090,7 +7618,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace DefaultOpenLevel
 
 namespace ValveFault {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -8108,7 +7635,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ValveConfig
 } // namespace ValveFault
 
 namespace LevelStep {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -8123,7 +7649,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace LevelStep
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -8138,7 +7663,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -8159,7 +7683,6 @@ namespace ElectricalPowerMeasurement {
 namespace Attributes {
 
 namespace PowerMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -8177,7 +7700,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::ElectricalPowerMeasuremen
 } // namespace PowerMode
 
 namespace NumberOfMeasurementTypes {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -8192,7 +7714,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfMeasurementTypes
 
 namespace Voltage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8208,7 +7729,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace Voltage
 
 namespace ActiveCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8224,7 +7744,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ActiveCurrent
 
 namespace ReactiveCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8240,7 +7759,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ReactiveCurrent
 
 namespace ApparentCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8256,7 +7774,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ApparentCurrent
 
 namespace ActivePower {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8272,7 +7789,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ActivePower
 
 namespace ReactivePower {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8288,7 +7804,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ReactivePower
 
 namespace ApparentPower {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8304,7 +7819,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ApparentPower
 
 namespace RMSVoltage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8320,7 +7834,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace RMSVoltage
 
 namespace RMSCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8336,7 +7849,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace RMSCurrent
 
 namespace RMSPower {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8352,7 +7864,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace RMSPower
 
 namespace Frequency {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8368,7 +7879,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace Frequency
 
 namespace PowerFactor {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8384,7 +7894,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PowerFactor
 
 namespace NeutralCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -8400,7 +7909,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace NeutralCurrent
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -8415,7 +7923,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -8436,7 +7943,6 @@ namespace ElectricalEnergyMeasurement {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -8451,7 +7957,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -8475,7 +7980,6 @@ namespace WaterHeaterManagement {
 namespace Attributes {
 
 namespace HeaterTypes {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -8493,7 +7997,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeater
 } // namespace HeaterTypes
 
 namespace HeatDemand {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -8511,7 +8014,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WaterHeater
 } // namespace HeatDemand
 
 namespace TankVolume {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -8526,7 +8028,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TankVolume
 
 namespace EstimatedHeatRequired {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -8541,7 +8042,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace EstimatedHeatRequired
 
 namespace TankPercentage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -8556,7 +8056,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace TankPercentage
 
 namespace BoostState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::WaterHeaterManagement::BoostStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -8574,7 +8073,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace BoostState
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -8589,7 +8087,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -8610,7 +8107,6 @@ namespace CommodityPrice {
 namespace Attributes {
 
 namespace TariffUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Globals::TariffUnitEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Globals::TariffUnitEnum & value,
                                                         chip::app::Clusters::Globals::TariffUnitEnum fallback = {})
@@ -8626,7 +8122,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace TariffUnit
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -8641,7 +8136,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -8662,7 +8156,6 @@ namespace Messages {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -8680,7 +8173,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -8704,7 +8196,6 @@ namespace DeviceEnergyManagement {
 namespace Attributes {
 
 namespace ESAType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::DeviceEnergyManagement::ESATypeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -8722,7 +8213,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ESAType
 
 namespace ESACanGenerate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -8737,7 +8227,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace ESACanGenerate
 
 namespace ESAState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::DeviceEnergyManagement::ESAStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -8755,7 +8244,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ESAState
 
 namespace AbsMinPower {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -8770,7 +8258,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace AbsMinPower
 
 namespace AbsMaxPower {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -8785,7 +8272,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace AbsMaxPower
 
 namespace OptOutState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -8803,7 +8289,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace OptOutState
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -8818,7 +8303,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -8839,7 +8323,6 @@ namespace EnergyEvse {
 namespace Attributes {
 
 namespace State {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                DataModel::Nullable<chip::app::Clusters::EnergyEvse::StateEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -8857,7 +8340,6 @@ GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Energ
 } // namespace State
 
 namespace SupplyState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::EnergyEvse::SupplyStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::EnergyEvse::SupplyStateEnum & value,
@@ -8874,7 +8356,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace SupplyState
 
 namespace FaultState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::EnergyEvse::FaultStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::EnergyEvse::FaultStateEnum & value,
@@ -8891,7 +8372,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace FaultState
 
 namespace ChargingEnabledUntil {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -8907,7 +8387,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ChargingEnabledUntil
 
 namespace DischargingEnabledUntil {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -8923,7 +8402,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace DischargingEnabledUntil
 
 namespace CircuitCapacity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -8938,7 +8416,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace CircuitCapacity
 
 namespace MinimumChargeCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -8953,7 +8430,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MinimumChargeCurrent
 
 namespace MaximumChargeCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -8968,7 +8444,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MaximumChargeCurrent
 
 namespace MaximumDischargeCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -8983,7 +8458,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MaximumDischargeCurrent
 
 namespace UserMaximumChargeCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -8998,7 +8472,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace UserMaximumChargeCurrent
 
 namespace RandomizationDelayWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9013,7 +8486,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace RandomizationDelayWindow
 
 namespace NextChargeStartTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -9029,7 +8501,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace NextChargeStartTime
 
 namespace NextChargeTargetTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -9045,7 +8516,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace NextChargeTargetTime
 
 namespace NextChargeRequiredEnergy {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -9061,7 +8531,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace NextChargeRequiredEnergy
 
 namespace NextChargeTargetSoC {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent> & fallback = {})
@@ -9077,7 +8546,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace NextChargeTargetSoC
 
 namespace ApproximateEVEfficiency {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -9093,7 +8561,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ApproximateEVEfficiency
 
 namespace StateOfCharge {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent> & fallback = {})
@@ -9109,7 +8576,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace StateOfCharge
 
 namespace BatteryCapacity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -9125,7 +8591,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace BatteryCapacity
 
 namespace VehicleID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value,
                                                         const DataModel::Nullable<chip::CharSpan> & fallback = {})
@@ -9141,7 +8606,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace VehicleID
 
 namespace SessionID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -9157,7 +8621,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace SessionID
 
 namespace SessionDuration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -9173,7 +8636,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace SessionDuration
 
 namespace SessionEnergyCharged {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -9189,7 +8651,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace SessionEnergyCharged
 
 namespace SessionEnergyDischarged {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -9205,7 +8666,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace SessionEnergyDischarged
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9220,7 +8680,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -9241,7 +8700,6 @@ namespace EnergyPreference {
 namespace Attributes {
 
 namespace CurrentEnergyBalance {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -9256,7 +8714,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentEnergyBalance
 
 namespace CurrentLowPowerModeSensitivity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -9271,7 +8728,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentLowPowerModeSensitivity
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9286,7 +8742,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -9307,7 +8762,6 @@ namespace PowerTopology {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9322,7 +8776,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -9343,7 +8796,6 @@ namespace EnergyEvseMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -9358,7 +8810,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9373,7 +8824,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -9394,7 +8844,6 @@ namespace WaterHeaterMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -9409,7 +8858,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9424,7 +8872,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -9445,7 +8892,6 @@ namespace DeviceEnergyManagementMode {
 namespace Attributes {
 
 namespace CurrentMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -9460,7 +8906,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9475,7 +8920,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -9496,7 +8940,6 @@ namespace ElectricalGridConditions {
 namespace Attributes {
 
 namespace LocalGenerationAvailable {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<bool> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<bool> & value,
                                                         const chip::app::DataModel::Nullable<bool> & fallback = {})
@@ -9512,7 +8955,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace LocalGenerationAvailable
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9527,7 +8969,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -9551,7 +8992,6 @@ namespace ElectricalAlarm {
 namespace Attributes {
 
 namespace Mask {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -9569,7 +9009,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalA
 } // namespace Mask
 
 namespace Latch {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -9587,7 +9026,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalA
 } // namespace Latch
 
 namespace State {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -9605,7 +9043,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalA
 } // namespace State
 
 namespace Supported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -9623,7 +9060,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalA
 } // namespace Supported
 
 namespace OverVoltageThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9638,7 +9074,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace OverVoltageThreshold
 
 namespace UnderVoltageThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9653,7 +9088,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace UnderVoltageThreshold
 
 namespace OverFrequencyThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9668,7 +9102,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace OverFrequencyThreshold
 
 namespace UnderFrequencyThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9683,7 +9116,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace UnderFrequencyThreshold
 
 namespace OverPowerThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9698,7 +9130,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace OverPowerThreshold
 
 namespace UnderPowerThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9713,7 +9144,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace UnderPowerThreshold
 
 namespace OverCurrentThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9728,7 +9158,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace OverCurrentThreshold
 
 namespace UnderCurrentThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9743,7 +9172,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace UnderCurrentThreshold
 
 namespace PowerImportThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9758,7 +9186,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace PowerImportThreshold
 
 namespace PowerExportThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -9773,7 +9200,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace PowerExportThreshold
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9788,7 +9214,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -9809,7 +9234,6 @@ namespace ElectricalDistribution {
 namespace Attributes {
 
 namespace MaxContinuousCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -9833,7 +9257,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxContinuousCurrent
 
 namespace MaxVoltage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -9857,7 +9280,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxVoltage
 
 namespace NumberOfPoles {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -9881,7 +9303,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NumberOfPoles
 
 namespace EndOfLife {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::ElectricalDistribution::EndOfLifeEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -9911,7 +9332,6 @@ Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Cluster
 } // namespace EndOfLife
 
 namespace ServiceEntranceRated {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<bool> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<bool> & value,
                                                         const chip::app::DataModel::Nullable<bool> & fallback = {})
@@ -9935,7 +9355,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace ServiceEntranceRated
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -9953,7 +9372,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -9977,7 +9395,6 @@ namespace ElectricalProtectionAlarm {
 namespace Attributes {
 
 namespace Mask {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -9995,7 +9412,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalP
 } // namespace Mask
 
 namespace State {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -10013,7 +9429,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalP
 } // namespace State
 
 namespace Supported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::AlarmBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -10031,7 +9446,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalP
 } // namespace Supported
 
 namespace ArcCause {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint,
            DataModel::Nullable<chip::BitMask<chip::app::Clusters::ElectricalProtectionAlarm::ArcCauseBitmap>> & value);
@@ -10052,7 +9466,6 @@ GetDefaultOr(EndpointId endpoint,
 } // namespace ArcCause
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -10067,7 +9480,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10088,7 +9500,6 @@ namespace DoorLock {
 namespace Attributes {
 
 namespace LockState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value);
 inline Protocols::InteractionModel::Status
@@ -10118,7 +9529,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace LockState
 
 namespace LockType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType & value,
                                                         chip::app::Clusters::DoorLock::DlLockType fallback = {})
@@ -10138,7 +9548,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace LockType
 
 namespace ActuatorEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -10156,7 +9565,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace ActuatorEnabled
 
 namespace DoorState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -10186,7 +9594,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace DoorState
 
 namespace DoorOpenEvents {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -10204,7 +9611,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace DoorOpenEvents
 
 namespace DoorClosedEvents {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -10222,7 +9628,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace DoorClosedEvents
 
 namespace OpenPeriod {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10240,7 +9645,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace OpenPeriod
 
 namespace NumberOfTotalUsersSupported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10258,7 +9662,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace NumberOfTotalUsersSupported
 
 namespace NumberOfPINUsersSupported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10276,7 +9679,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace NumberOfPINUsersSupported
 
 namespace NumberOfRFIDUsersSupported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10294,7 +9696,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace NumberOfRFIDUsersSupported
 
 namespace NumberOfWeekDaySchedulesSupportedPerUser {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10312,7 +9713,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace NumberOfWeekDaySchedulesSupportedPerUser
 
 namespace NumberOfYearDaySchedulesSupportedPerUser {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10330,7 +9730,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace NumberOfYearDaySchedulesSupportedPerUser
 
 namespace NumberOfHolidaySchedulesSupported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10348,7 +9747,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace NumberOfHolidaySchedulesSupported
 
 namespace MaxPINCodeLength {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10366,7 +9764,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MaxPINCodeLength
 
 namespace MinPINCodeLength {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10384,7 +9781,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MinPINCodeLength
 
 namespace MaxRFIDCodeLength {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10402,7 +9798,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MaxRFIDCodeLength
 
 namespace MinRFIDCodeLength {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10420,7 +9815,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MinRFIDCodeLength
 
 namespace CredentialRulesSupport {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> & value);
 inline Protocols::InteractionModel::Status
@@ -10444,7 +9838,6 @@ Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DoorLock::DlCredenti
 } // namespace CredentialRulesSupport
 
 namespace NumberOfCredentialsSupportedPerUser {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10462,7 +9855,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace NumberOfCredentialsSupportedPerUser
 
 namespace Language {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -10480,7 +9872,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace Language
 
 namespace LEDSettings {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10498,7 +9889,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace LEDSettings
 
 namespace AutoRelockTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -10516,7 +9906,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace AutoRelockTime
 
 namespace SoundVolume {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10534,7 +9923,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace SoundVolume
 
 namespace OperatingMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::DoorLock::OperatingModeEnum & value,
@@ -10555,7 +9943,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace OperatingMode
 
 namespace SupportedOperatingModes {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> & value);
 inline Protocols::InteractionModel::Status
@@ -10580,7 +9967,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace SupportedOperatingModes
 
 namespace DefaultConfigurationRegister {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> & value);
 inline Protocols::InteractionModel::Status
@@ -10605,7 +9991,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace DefaultConfigurationRegister
 
 namespace EnableLocalProgramming {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -10623,7 +10008,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace EnableLocalProgramming
 
 namespace EnableOneTouchLocking {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -10641,7 +10025,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace EnableOneTouchLocking
 
 namespace EnableInsideStatusLED {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -10659,7 +10042,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace EnableInsideStatusLED
 
 namespace EnablePrivacyModeButton {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -10677,7 +10059,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace EnablePrivacyModeButton
 
 namespace LocalProgrammingFeatures {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> & value);
 inline Protocols::InteractionModel::Status
@@ -10702,7 +10083,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace LocalProgrammingFeatures
 
 namespace WrongCodeEntryLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10720,7 +10100,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace WrongCodeEntryLimit
 
 namespace UserCodeTemporaryDisableTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10738,7 +10117,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace UserCodeTemporaryDisableTime
 
 namespace SendPINOverTheAir {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -10756,7 +10134,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace SendPINOverTheAir
 
 namespace RequirePINforRemoteOperation {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -10774,7 +10151,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace RequirePINforRemoteOperation
 
 namespace ExpiringUserTimeout {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10792,7 +10168,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ExpiringUserTimeout
 
 namespace AliroReaderVerificationKey {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -10808,7 +10183,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AliroReaderVerificationKey
 
 namespace AliroReaderGroupIdentifier {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -10824,7 +10198,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AliroReaderGroupIdentifier
 
 namespace AliroReaderGroupSubIdentifier {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::ByteSpan & value, chip::ByteSpan fallback = {})
 {
@@ -10839,7 +10212,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace AliroReaderGroupSubIdentifier
 
 namespace AliroGroupResolvingKey {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -10855,7 +10227,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AliroGroupResolvingKey
 
 namespace AliroBLEAdvertisingVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -10870,7 +10241,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AliroBLEAdvertisingVersion
 
 namespace NumberOfAliroCredentialIssuerKeysSupported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10885,7 +10255,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfAliroCredentialIssuerKeysSupported
 
 namespace NumberOfAliroEndpointKeysSupported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10900,7 +10269,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfAliroEndpointKeysSupported
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -10918,7 +10286,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10942,7 +10309,6 @@ namespace WindowCovering {
 namespace Attributes {
 
 namespace Type {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::WindowCovering::Type & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::app::Clusters::WindowCovering::Type & value,
                                                         chip::app::Clusters::WindowCovering::Type fallback = {})
@@ -10958,7 +10324,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace Type
 
 namespace PhysicalClosedLimitLift {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10973,7 +10338,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PhysicalClosedLimitLift
 
 namespace PhysicalClosedLimitTilt {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -10988,7 +10352,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PhysicalClosedLimitTilt
 
 namespace CurrentPositionLift {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -11004,7 +10367,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentPositionLift
 
 namespace CurrentPositionTilt {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -11020,7 +10382,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentPositionTilt
 
 namespace NumberOfActuationsLift {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11035,7 +10396,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfActuationsLift
 
 namespace NumberOfActuationsTilt {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11050,7 +10410,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfActuationsTilt
 
 namespace ConfigStatus {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> & value);
 inline Protocols::InteractionModel::Status
@@ -11068,7 +10427,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCover
 } // namespace ConfigStatus
 
 namespace CurrentPositionLiftPercentage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent> & fallback = {})
@@ -11084,7 +10442,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentPositionLiftPercentage
 
 namespace CurrentPositionTiltPercentage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent> & fallback = {})
@@ -11100,7 +10457,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentPositionTiltPercentage
 
 namespace OperationalStatus {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> & value);
 inline Protocols::InteractionModel::Status
@@ -11118,7 +10474,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCover
 } // namespace OperationalStatus
 
 namespace TargetPositionLiftPercent100ths {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & fallback = {})
@@ -11134,7 +10489,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace TargetPositionLiftPercent100ths
 
 namespace TargetPositionTiltPercent100ths {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & fallback = {})
@@ -11150,7 +10504,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace TargetPositionTiltPercent100ths
 
 namespace EndProductType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::WindowCovering::EndProductType & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::WindowCovering::EndProductType & value,
@@ -11167,7 +10520,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace EndProductType
 
 namespace CurrentPositionLiftPercent100ths {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & fallback = {})
@@ -11183,7 +10535,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentPositionLiftPercent100ths
 
 namespace CurrentPositionTiltPercent100ths {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & fallback = {})
@@ -11199,7 +10550,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentPositionTiltPercent100ths
 
 namespace InstalledOpenLimitLift {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11214,7 +10564,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace InstalledOpenLimitLift
 
 namespace InstalledClosedLimitLift {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11229,7 +10578,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace InstalledClosedLimitLift
 
 namespace InstalledOpenLimitTilt {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11244,7 +10592,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace InstalledOpenLimitTilt
 
 namespace InstalledClosedLimitTilt {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11259,7 +10606,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace InstalledClosedLimitTilt
 
 namespace Mode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::WindowCovering::Mode> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -11277,7 +10623,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace Mode
 
 namespace SafetyStatus {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> & value);
 inline Protocols::InteractionModel::Status
@@ -11295,7 +10640,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCover
 } // namespace SafetyStatus
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -11310,7 +10654,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11331,7 +10674,6 @@ namespace ClosureControl {
 namespace Attributes {
 
 namespace CountdownTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -11347,7 +10689,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CountdownTime
 
 namespace MainState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureControl::MainStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::ClosureControl::MainStateEnum & value,
@@ -11364,7 +10705,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace MainState
 
 namespace LatchControlModes {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -11382,7 +10722,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ClosureCont
 } // namespace LatchControlModes
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -11397,7 +10736,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11418,7 +10756,6 @@ namespace ClosureDimension {
 namespace Attributes {
 
 namespace Resolution {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent100ths & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent100ths & value,
                                                         chip::Percent100ths fallback = {})
@@ -11434,7 +10771,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace Resolution
 
 namespace StepValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent100ths & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent100ths & value,
                                                         chip::Percent100ths fallback = {})
@@ -11450,7 +10786,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace StepValue
 
 namespace Unit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureDimension::ClosureUnitEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::ClosureDimension::ClosureUnitEnum & value,
@@ -11467,7 +10802,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace Unit
 
 namespace TranslationDirection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::ClosureDimension::TranslationDirectionEnum & value);
 inline Protocols::InteractionModel::Status
@@ -11485,7 +10819,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::ClosureDimension::Transla
 } // namespace TranslationDirection
 
 namespace RotationAxis {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::ClosureDimension::RotationAxisEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -11503,7 +10836,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace RotationAxis
 
 namespace Overflow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ClosureDimension::OverflowEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::ClosureDimension::OverflowEnum & value,
@@ -11520,7 +10852,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace Overflow
 
 namespace ModulationType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::ClosureDimension::ModulationTypeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -11538,7 +10869,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ModulationType
 
 namespace LatchControlModes {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -11556,7 +10886,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ClosureDime
 } // namespace LatchControlModes
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -11571,7 +10900,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11592,7 +10920,6 @@ namespace ServiceArea {
 namespace Attributes {
 
 namespace CurrentArea {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -11608,7 +10935,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentArea
 
 namespace EstimatedEndTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -11624,7 +10950,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace EstimatedEndTime
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -11639,7 +10964,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -11660,7 +10984,6 @@ namespace PumpConfigurationAndControl {
 namespace Attributes {
 
 namespace MaxPressure {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -11684,7 +11007,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxPressure
 
 namespace MaxSpeed {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -11708,7 +11030,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxSpeed
 
 namespace MaxFlow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -11732,7 +11053,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxFlow
 
 namespace MinConstPressure {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -11756,7 +11076,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MinConstPressure
 
 namespace MaxConstPressure {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -11780,7 +11099,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxConstPressure
 
 namespace MinCompPressure {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -11804,7 +11122,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MinCompPressure
 
 namespace MaxCompPressure {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -11828,7 +11145,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxCompPressure
 
 namespace MinConstSpeed {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -11852,7 +11168,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MinConstSpeed
 
 namespace MaxConstSpeed {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -11876,7 +11191,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxConstSpeed
 
 namespace MinConstFlow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -11900,7 +11214,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MinConstFlow
 
 namespace MaxConstFlow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -11924,7 +11237,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxConstFlow
 
 namespace MinConstTemp {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -11948,7 +11260,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MinConstTemp
 
 namespace MaxConstTemp {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -11972,7 +11283,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxConstTemp
 
 namespace PumpStatus {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -11997,7 +11307,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace PumpStatus
 
 namespace EffectiveOperationMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -12021,7 +11330,6 @@ Set(EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::Opera
 } // namespace EffectiveOperationMode
 
 namespace EffectiveControlMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -12045,7 +11353,6 @@ Set(EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::Contr
 } // namespace EffectiveControlMode
 
 namespace Capacity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -12069,7 +11376,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Capacity
 
 namespace Speed {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -12093,7 +11399,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Speed
 
 namespace LifetimeRunningHours {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -12117,7 +11422,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace LifetimeRunningHours
 
 namespace Power {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -12141,7 +11445,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Power
 
 namespace LifetimeEnergyConsumed {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -12165,7 +11468,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace LifetimeEnergyConsumed
 
 namespace OperationMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -12189,7 +11491,6 @@ Set(EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::Opera
 } // namespace OperationMode
 
 namespace ControlMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -12213,7 +11514,6 @@ Set(EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::Contr
 } // namespace ControlMode
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -12231,7 +11531,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -12255,7 +11554,6 @@ namespace Thermostat {
 namespace Attributes {
 
 namespace LocalTemperature {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -12271,7 +11569,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace LocalTemperature
 
 namespace OutdoorTemperature {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -12287,7 +11584,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace OutdoorTemperature
 
 namespace Occupancy {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -12305,7 +11601,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat:
 } // namespace Occupancy
 
 namespace AbsMinHeatSetpointLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12320,7 +11615,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace AbsMinHeatSetpointLimit
 
 namespace AbsMaxHeatSetpointLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12335,7 +11629,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace AbsMaxHeatSetpointLimit
 
 namespace AbsMinCoolSetpointLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12350,7 +11643,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace AbsMinCoolSetpointLimit
 
 namespace AbsMaxCoolSetpointLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12365,7 +11657,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace AbsMaxCoolSetpointLimit
 
 namespace PICoolingDemand {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -12380,7 +11671,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PICoolingDemand
 
 namespace PIHeatingDemand {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -12395,7 +11685,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PIHeatingDemand
 
 namespace HVACSystemTypeConfiguration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -12413,7 +11702,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat:
 } // namespace HVACSystemTypeConfiguration
 
 namespace LocalTemperatureCalibration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int8_t & value, int8_t fallback = {})
 {
@@ -12428,7 +11716,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace LocalTemperatureCalibration
 
 namespace OccupiedCoolingSetpoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12443,7 +11730,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace OccupiedCoolingSetpoint
 
 namespace OccupiedHeatingSetpoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12458,7 +11744,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace OccupiedHeatingSetpoint
 
 namespace UnoccupiedCoolingSetpoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12473,7 +11758,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace UnoccupiedCoolingSetpoint
 
 namespace UnoccupiedHeatingSetpoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12488,7 +11772,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace UnoccupiedHeatingSetpoint
 
 namespace MinHeatSetpointLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12503,7 +11786,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MinHeatSetpointLimit
 
 namespace MaxHeatSetpointLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12518,7 +11800,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MaxHeatSetpointLimit
 
 namespace MinCoolSetpointLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12533,7 +11814,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MinCoolSetpointLimit
 
 namespace MaxCoolSetpointLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -12548,7 +11828,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MaxCoolSetpointLimit
 
 namespace MinSetpointDeadBand {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int8_t & value, int8_t fallback = {})
 {
@@ -12563,7 +11842,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MinSetpointDeadBand
 
 namespace RemoteSensing {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -12581,7 +11859,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat:
 } // namespace RemoteSensing
 
 namespace ControlSequenceOfOperation {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum & value);
 inline Protocols::InteractionModel::Status
@@ -12599,7 +11876,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequen
 } // namespace ControlSequenceOfOperation
 
 namespace SystemMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::Thermostat::SystemModeEnum & value,
@@ -12616,7 +11892,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace SystemMode
 
 namespace ThermostatRunningMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Thermostat::ThermostatRunningModeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -12634,7 +11909,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ThermostatRunningMode
 
 namespace StartOfWeek {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::StartOfWeekEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::Thermostat::StartOfWeekEnum & value,
@@ -12651,7 +11925,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace StartOfWeek
 
 namespace NumberOfWeeklyTransitions {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -12666,7 +11939,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfWeeklyTransitions
 
 namespace NumberOfDailyTransitions {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -12681,7 +11953,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfDailyTransitions
 
 namespace TemperatureSetpointHold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -12699,7 +11970,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace TemperatureSetpointHold
 
 namespace TemperatureSetpointHoldDuration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -12715,7 +11985,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace TemperatureSetpointHoldDuration
 
 namespace ThermostatProgrammingOperationMode {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -12733,7 +12002,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat:
 } // namespace ThermostatProgrammingOperationMode
 
 namespace ThermostatRunningState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -12751,7 +12019,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat:
 } // namespace ThermostatRunningState
 
 namespace SetpointChangeSource {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Thermostat::SetpointChangeSourceEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -12769,7 +12036,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace SetpointChangeSource
 
 namespace SetpointChangeAmount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -12785,7 +12051,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace SetpointChangeAmount
 
 namespace SetpointChangeSourceTimestamp {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -12800,7 +12065,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SetpointChangeSourceTimestamp
 
 namespace OccupiedSetback {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -12816,7 +12080,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace OccupiedSetback
 
 namespace OccupiedSetbackMin {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -12832,7 +12095,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace OccupiedSetbackMin
 
 namespace OccupiedSetbackMax {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -12848,7 +12110,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace OccupiedSetbackMax
 
 namespace UnoccupiedSetback {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -12864,7 +12125,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace UnoccupiedSetback
 
 namespace UnoccupiedSetbackMin {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -12880,7 +12140,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace UnoccupiedSetbackMin
 
 namespace UnoccupiedSetbackMax {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -12896,7 +12155,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace UnoccupiedSetbackMax
 
 namespace EmergencyHeatDelta {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -12911,7 +12169,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace EmergencyHeatDelta
 
 namespace ACType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum & value,
                                                         chip::app::Clusters::Thermostat::ACTypeEnum fallback = {})
@@ -12927,7 +12184,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace ACType
 
 namespace ACCapacity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -12942,7 +12198,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ACCapacity
 
 namespace ACRefrigerantType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum & value,
@@ -12959,7 +12214,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ACRefrigerantType
 
 namespace ACCompressorType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCompressorTypeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::Thermostat::ACCompressorTypeEnum & value,
@@ -12976,7 +12230,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ACCompressorType
 
 namespace ACErrorCode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -12994,7 +12247,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat:
 } // namespace ACErrorCode
 
 namespace ACLouverPosition {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACLouverPositionEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::Thermostat::ACLouverPositionEnum & value,
@@ -13011,7 +12263,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ACLouverPosition
 
 namespace ACCoilTemperature {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -13027,7 +12278,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ACCoilTemperature
 
 namespace ACCapacityformat {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::Thermostat::ACCapacityFormatEnum & value,
@@ -13044,7 +12294,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace ACCapacityformat
 
 namespace NumberOfPresets {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -13059,7 +12308,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfPresets
 
 namespace NumberOfSchedules {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -13074,7 +12322,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfSchedules
 
 namespace NumberOfScheduleTransitions {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -13089,7 +12336,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfScheduleTransitions
 
 namespace NumberOfScheduleTransitionPerDay {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -13105,7 +12351,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace NumberOfScheduleTransitionPerDay
 
 namespace ActivePresetHandle {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -13121,7 +12366,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ActivePresetHandle
 
 namespace ActiveScheduleHandle {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -13137,7 +12381,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ActiveScheduleHandle
 
 namespace SetpointHoldExpiryTimestamp {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -13153,7 +12396,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace SetpointHoldExpiryTimestamp
 
 namespace MaxThermostatSuggestions {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -13168,7 +12410,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxThermostatSuggestions
 
 namespace ThermostatSuggestionNotFollowingReason {
-
 Protocols::InteractionModel::Status GetDefault(
     EndpointId endpoint,
     DataModel::Nullable<chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>> & value);
@@ -13189,7 +12430,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(
 } // namespace ThermostatSuggestionNotFollowingReason
 
 namespace CriticalFreezeProtection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -13204,7 +12444,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace CriticalFreezeProtection
 
 namespace CriticalOverheatProtection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -13219,7 +12458,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace CriticalOverheatProtection
 
 namespace NumberOfSensorScheduleTransitions {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -13234,7 +12472,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumberOfSensorScheduleTransitions
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -13249,7 +12486,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -13270,7 +12506,6 @@ namespace FanControl {
 namespace Attributes {
 
 namespace FanMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum & value,
                                                         chip::app::Clusters::FanControl::FanModeEnum fallback = {})
@@ -13286,7 +12521,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace FanMode
 
 namespace FanModeSequence {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::FanControl::FanModeSequenceEnum & value,
@@ -13303,7 +12537,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace FanModeSequence
 
 namespace PercentSetting {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent> & fallback = {})
@@ -13319,7 +12552,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PercentSetting
 
 namespace PercentCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -13334,7 +12566,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace PercentCurrent
 
 namespace SpeedMax {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -13349,7 +12580,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SpeedMax
 
 namespace SpeedSetting {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -13365,7 +12595,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace SpeedSetting
 
 namespace SpeedCurrent {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -13380,7 +12609,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SpeedCurrent
 
 namespace RockSupport {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -13398,7 +12626,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace RockSupport
 
 namespace RockSetting {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -13416,7 +12643,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace RockSetting
 
 namespace WindSupport {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -13434,7 +12660,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace WindSupport
 
 namespace WindSetting {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -13452,7 +12677,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace WindSetting
 
 namespace AirflowDirection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::FanControl::AirflowDirectionEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::FanControl::AirflowDirectionEnum & value,
@@ -13469,7 +12693,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace AirflowDirection
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -13484,7 +12707,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -13505,7 +12727,6 @@ namespace ThermostatUserInterfaceConfiguration {
 namespace Attributes {
 
 namespace TemperatureDisplayMode {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -13530,7 +12751,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace TemperatureDisplayMode
 
 namespace KeypadLockout {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum & value);
 inline Protocols::InteractionModel::Status
@@ -13555,7 +12775,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace KeypadLockout
 
 namespace ScheduleProgrammingVisibility {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint,
            chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum & value);
@@ -13582,7 +12801,6 @@ Set(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfigurati
 } // namespace ScheduleProgrammingVisibility
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -13600,7 +12818,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -13624,7 +12841,6 @@ namespace Humidistat {
 namespace Attributes {
 
 namespace Mode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum & value,
                                                         chip::app::Clusters::Humidistat::ModeEnum fallback = {})
@@ -13640,7 +12856,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace Mode
 
 namespace SystemState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::Humidistat::SystemStateEnum & value,
@@ -13657,7 +12872,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace SystemState
 
 namespace UserSetpoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -13672,7 +12886,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace UserSetpoint
 
 namespace MinSetpoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -13687,7 +12900,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace MinSetpoint
 
 namespace MaxSetpoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -13702,7 +12914,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace MaxSetpoint
 
 namespace Step {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -13717,7 +12928,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace Step
 
 namespace TargetSetpoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback = {})
 {
@@ -13732,7 +12942,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace TargetSetpoint
 
 namespace MistType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -13750,7 +12959,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Humidistat:
 } // namespace MistType
 
 namespace Continuous {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -13765,7 +12973,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace Continuous
 
 namespace Sleep {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -13780,7 +12987,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace Sleep
 
 namespace Optimal {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -13795,7 +13001,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace Optimal
 
 namespace CondPumpEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -13810,7 +13015,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace CondPumpEnabled
 
 namespace CondRunCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -13825,7 +13029,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CondRunCount
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -13840,7 +13043,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -13861,7 +13063,6 @@ namespace ColorControl {
 namespace Attributes {
 
 namespace CurrentHue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -13879,7 +13080,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace CurrentHue
 
 namespace CurrentSaturation {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -13897,7 +13097,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace CurrentSaturation
 
 namespace RemainingTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -13915,7 +13114,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace RemainingTime
 
 namespace CurrentX {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -13933,7 +13131,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace CurrentX
 
 namespace CurrentY {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -13951,7 +13148,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace CurrentY
 
 namespace DriftCompensation {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::ColorControl::DriftCompensationEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -13973,7 +13169,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace DriftCompensation
 
 namespace CompensationText {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -13991,7 +13186,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace CompensationText
 
 namespace ColorTemperatureMireds {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14009,7 +13203,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorTemperatureMireds
 
 namespace ColorMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ColorControl::ColorModeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::ColorControl::ColorModeEnum & value,
@@ -14030,7 +13223,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace ColorMode
 
 namespace Options {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ColorControl::OptionsBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -14053,7 +13245,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 } // namespace Options
 
 namespace NumberOfPrimaries {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14077,7 +13268,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NumberOfPrimaries
 
 namespace Primary1X {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14095,7 +13285,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary1X
 
 namespace Primary1Y {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14113,7 +13302,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary1Y
 
 namespace Primary1Intensity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14137,7 +13325,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Primary1Intensity
 
 namespace Primary2X {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14155,7 +13342,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary2X
 
 namespace Primary2Y {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14173,7 +13359,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary2Y
 
 namespace Primary2Intensity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14197,7 +13382,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Primary2Intensity
 
 namespace Primary3X {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14215,7 +13399,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary3X
 
 namespace Primary3Y {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14233,7 +13416,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary3Y
 
 namespace Primary3Intensity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14257,7 +13439,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Primary3Intensity
 
 namespace Primary4X {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14275,7 +13456,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary4X
 
 namespace Primary4Y {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14293,7 +13473,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary4Y
 
 namespace Primary4Intensity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14317,7 +13496,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Primary4Intensity
 
 namespace Primary5X {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14335,7 +13513,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary5X
 
 namespace Primary5Y {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14353,7 +13530,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary5Y
 
 namespace Primary5Intensity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14377,7 +13553,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Primary5Intensity
 
 namespace Primary6X {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14395,7 +13570,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary6X
 
 namespace Primary6Y {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14413,7 +13587,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Primary6Y
 
 namespace Primary6Intensity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14437,7 +13610,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Primary6Intensity
 
 namespace WhitePointX {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14455,7 +13627,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace WhitePointX
 
 namespace WhitePointY {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14473,7 +13644,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace WhitePointY
 
 namespace ColorPointRX {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14491,7 +13661,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorPointRX
 
 namespace ColorPointRY {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14509,7 +13678,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorPointRY
 
 namespace ColorPointRIntensity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14533,7 +13701,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace ColorPointRIntensity
 
 namespace ColorPointGX {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14551,7 +13718,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorPointGX
 
 namespace ColorPointGY {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14569,7 +13735,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorPointGY
 
 namespace ColorPointGIntensity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14593,7 +13758,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace ColorPointGIntensity
 
 namespace ColorPointBX {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14611,7 +13775,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorPointBX
 
 namespace ColorPointBY {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14629,7 +13792,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorPointBY
 
 namespace ColorPointBIntensity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -14653,7 +13815,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace ColorPointBIntensity
 
 namespace EnhancedCurrentHue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14671,7 +13832,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace EnhancedCurrentHue
 
 namespace EnhancedColorMode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::ColorControl::EnhancedColorModeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -14693,7 +13853,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace EnhancedColorMode
 
 namespace ColorLoopActive {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -14711,7 +13870,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace ColorLoopActive
 
 namespace ColorLoopDirection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -14729,7 +13887,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace ColorLoopDirection
 
 namespace ColorLoopTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14747,7 +13904,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorLoopTime
 
 namespace ColorLoopStartEnhancedHue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14765,7 +13921,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorLoopStartEnhancedHue
 
 namespace ColorLoopStoredEnhancedHue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14783,7 +13938,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorLoopStoredEnhancedHue
 
 namespace ColorCapabilities {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::ColorControl::ColorCapabilitiesBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -14808,7 +13962,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace ColorCapabilities
 
 namespace ColorTempPhysicalMinMireds {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14826,7 +13979,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorTempPhysicalMinMireds
 
 namespace ColorTempPhysicalMaxMireds {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14844,7 +13996,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ColorTempPhysicalMaxMireds
 
 namespace CoupleColorTempToLevelMinMireds {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14862,7 +14013,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace CoupleColorTempToLevelMinMireds
 
 namespace StartUpColorTemperatureMireds {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -14886,7 +14036,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace StartUpColorTemperatureMireds
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -14904,7 +14053,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -14928,7 +14076,6 @@ namespace BallastConfiguration {
 namespace Attributes {
 
 namespace PhysicalMinLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -14946,7 +14093,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace PhysicalMinLevel
 
 namespace PhysicalMaxLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -14964,7 +14110,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace PhysicalMaxLevel
 
 namespace BallastStatus {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -14989,7 +14134,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace BallastStatus
 
 namespace MinLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -15007,7 +14151,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MinLevel
 
 namespace MaxLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -15025,7 +14168,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MaxLevel
 
 namespace IntrinsicBallastFactor {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -15049,7 +14191,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace IntrinsicBallastFactor
 
 namespace BallastFactorAdjustment {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -15073,7 +14214,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace BallastFactorAdjustment
 
 namespace LampQuantity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -15091,7 +14231,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace LampQuantity
 
 namespace LampType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -15109,7 +14248,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace LampType
 
 namespace LampManufacturer {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -15127,7 +14265,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace LampManufacturer
 
 namespace LampRatedHours {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -15151,7 +14288,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace LampRatedHours
 
 namespace LampBurnHours {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -15175,7 +14311,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace LampBurnHours
 
 namespace LampAlarmMode {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -15200,7 +14335,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace LampAlarmMode
 
 namespace LampBurnHoursTripPoint {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -15224,7 +14358,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace LampBurnHoursTripPoint
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -15242,7 +14375,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15266,7 +14398,6 @@ namespace DynamicLighting {
 namespace Attributes {
 
 namespace CurrentEffectID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15282,7 +14413,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentEffectID
 
 namespace CurrentSpeed {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15298,7 +14428,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace CurrentSpeed
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -15313,7 +14442,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15334,7 +14462,6 @@ namespace IlluminanceMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15350,7 +14477,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15366,7 +14492,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15382,7 +14507,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15397,7 +14521,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace Tolerance
 
 namespace LightSensorType {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -15415,7 +14538,6 @@ GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Illum
 } // namespace LightSensorType
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -15430,7 +14552,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15451,7 +14572,6 @@ namespace TemperatureMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -15467,7 +14587,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -15483,7 +14602,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -15499,7 +14617,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15514,7 +14631,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace Tolerance
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -15529,7 +14645,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15550,7 +14665,6 @@ namespace PressureMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -15566,7 +14680,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -15582,7 +14695,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -15598,7 +14710,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15613,7 +14724,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace Tolerance
 
 namespace ScaledValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -15629,7 +14739,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ScaledValue
 
 namespace MinScaledValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -15645,7 +14754,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinScaledValue
 
 namespace MaxScaledValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -15661,7 +14769,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxScaledValue
 
 namespace ScaledTolerance {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15676,7 +14783,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ScaledTolerance
 
 namespace Scale {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int8_t & value, int8_t fallback = {})
 {
@@ -15691,7 +14797,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace Scale
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -15706,7 +14811,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15727,7 +14831,6 @@ namespace FlowMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15743,7 +14846,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15759,7 +14861,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15775,7 +14876,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15790,7 +14890,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace Tolerance
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -15805,7 +14904,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15826,7 +14924,6 @@ namespace RelativeHumidityMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15842,7 +14939,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15858,7 +14954,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -15874,7 +14969,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15889,7 +14983,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace Tolerance
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -15904,7 +14997,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15925,7 +15017,6 @@ namespace OccupancySensing {
 namespace Attributes {
 
 namespace Occupancy {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -15943,7 +15034,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::OccupancySe
 } // namespace Occupancy
 
 namespace OccupancySensorType {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -15961,7 +15051,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::OccupancySensing::Occupan
 } // namespace OccupancySensorType
 
 namespace OccupancySensorTypeBitmap {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -15979,7 +15068,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::OccupancySe
 } // namespace OccupancySensorTypeBitmap
 
 namespace HoldTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -15994,7 +15082,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace HoldTime
 
 namespace PIROccupiedToUnoccupiedDelay {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16009,7 +15096,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PIROccupiedToUnoccupiedDelay
 
 namespace PIRUnoccupiedToOccupiedDelay {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16024,7 +15110,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PIRUnoccupiedToOccupiedDelay
 
 namespace PIRUnoccupiedToOccupiedThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -16039,7 +15124,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PIRUnoccupiedToOccupiedThreshold
 
 namespace UltrasonicOccupiedToUnoccupiedDelay {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16054,7 +15138,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace UltrasonicOccupiedToUnoccupiedDelay
 
 namespace UltrasonicUnoccupiedToOccupiedDelay {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16069,7 +15152,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace UltrasonicUnoccupiedToOccupiedDelay
 
 namespace UltrasonicUnoccupiedToOccupiedThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -16084,7 +15166,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace UltrasonicUnoccupiedToOccupiedThreshold
 
 namespace PhysicalContactOccupiedToUnoccupiedDelay {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16099,7 +15180,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PhysicalContactOccupiedToUnoccupiedDelay
 
 namespace PhysicalContactUnoccupiedToOccupiedDelay {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16114,7 +15194,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PhysicalContactUnoccupiedToOccupiedDelay
 
 namespace PhysicalContactUnoccupiedToOccupiedThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -16129,7 +15208,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16144,7 +15222,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16165,7 +15242,6 @@ namespace CarbonMonoxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16181,7 +15257,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16197,7 +15272,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16213,7 +15287,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16229,7 +15302,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16244,7 +15316,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16260,7 +15331,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16275,7 +15345,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -16290,7 +15359,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16308,7 +15376,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrati
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16326,7 +15393,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrati
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16344,7 +15410,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrati
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16359,7 +15424,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16383,7 +15447,6 @@ namespace CarbonDioxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16399,7 +15462,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16415,7 +15477,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16431,7 +15492,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16447,7 +15507,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16462,7 +15521,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16478,7 +15536,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16493,7 +15550,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -16508,7 +15564,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16526,7 +15581,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentratio
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16544,7 +15598,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentratio
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16562,7 +15615,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentratio
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16577,7 +15629,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16601,7 +15652,6 @@ namespace NitrogenDioxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16617,7 +15667,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16633,7 +15682,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16649,7 +15697,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16665,7 +15712,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16680,7 +15726,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16696,7 +15741,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16711,7 +15755,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -16726,7 +15769,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16744,7 +15786,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrat
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16762,7 +15803,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrat
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16780,7 +15820,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrat
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16795,7 +15834,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -16819,7 +15857,6 @@ namespace OzoneConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16835,7 +15872,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16851,7 +15887,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16867,7 +15902,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16883,7 +15917,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16898,7 +15931,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -16914,7 +15946,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -16929,7 +15960,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -16944,7 +15974,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16962,7 +15991,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::OzoneConcentrationMeasure
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16980,7 +16008,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::OzoneConcentrationMeasure
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -16998,7 +16025,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::OzoneConcentrationMeasure
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17013,7 +16039,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -17037,7 +16062,6 @@ namespace Pm25ConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17053,7 +16077,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17069,7 +16092,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17085,7 +16107,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17101,7 +16122,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17116,7 +16136,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17132,7 +16151,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17147,7 +16165,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -17162,7 +16179,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17180,7 +16196,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Pm25ConcentrationMeasurem
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17198,7 +16213,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Pm25ConcentrationMeasurem
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17216,7 +16230,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Pm25ConcentrationMeasurem
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17231,7 +16244,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -17255,7 +16267,6 @@ namespace FormaldehydeConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17271,7 +16282,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17287,7 +16297,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17303,7 +16312,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17319,7 +16327,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17334,7 +16341,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17350,7 +16356,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17365,7 +16370,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -17380,7 +16384,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17398,7 +16401,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentration
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17416,7 +16418,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentration
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17434,7 +16435,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentration
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17449,7 +16449,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -17473,7 +16472,6 @@ namespace Pm1ConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17489,7 +16487,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17505,7 +16502,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17521,7 +16517,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17537,7 +16532,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17552,7 +16546,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17568,7 +16561,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17583,7 +16575,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -17598,7 +16589,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17616,7 +16606,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Pm1ConcentrationMeasureme
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17634,7 +16623,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Pm1ConcentrationMeasureme
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17652,7 +16640,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Pm1ConcentrationMeasureme
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17667,7 +16654,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -17691,7 +16677,6 @@ namespace Pm10ConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17707,7 +16692,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17723,7 +16707,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17739,7 +16722,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17755,7 +16737,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17770,7 +16751,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17786,7 +16766,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17801,7 +16780,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -17816,7 +16794,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17834,7 +16811,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Pm10ConcentrationMeasurem
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17852,7 +16828,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Pm10ConcentrationMeasurem
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -17870,7 +16845,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Pm10ConcentrationMeasurem
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17885,7 +16859,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -17909,7 +16882,6 @@ namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17925,7 +16897,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17941,7 +16912,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17957,7 +16927,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -17973,7 +16942,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -17988,7 +16956,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18004,7 +16971,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18019,7 +16985,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -18034,7 +16999,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint,
            chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum & value);
@@ -18054,7 +17018,6 @@ GetDefaultOr(EndpointId endpoint,
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint,
            chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum & value);
@@ -18074,7 +17037,6 @@ GetDefaultOr(EndpointId endpoint,
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -18093,7 +17055,6 @@ GetDefaultOr(EndpointId endpoint,
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18108,7 +17069,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -18132,7 +17092,6 @@ namespace RadonConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18148,7 +17107,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18164,7 +17122,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18180,7 +17137,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18196,7 +17152,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18211,7 +17166,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18227,7 +17181,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18242,7 +17195,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -18257,7 +17209,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, flo
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -18275,7 +17226,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::RadonConcentrationMeasure
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -18293,7 +17243,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::RadonConcentrationMeasure
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -18311,7 +17260,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::RadonConcentrationMeasure
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18326,7 +17274,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -18350,7 +17297,6 @@ namespace SoilMeasurement {
 namespace Attributes {
 
 namespace SoilMoistureMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value,
                                                         const chip::app::DataModel::Nullable<chip::Percent> & fallback = {})
@@ -18366,7 +17312,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace SoilMoistureMeasuredValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18381,7 +17326,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -18402,7 +17346,6 @@ namespace AmbientContextSensing {
 namespace Attributes {
 
 namespace HumanActivityDetected {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -18417,7 +17360,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace HumanActivityDetected
 
 namespace ObjectIdentified {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -18432,7 +17374,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace ObjectIdentified
 
 namespace AudioContextDetected {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -18447,7 +17388,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace AudioContextDetected
 
 namespace ObjectCountThresholdReached {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -18462,7 +17402,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace ObjectCountThresholdReached
 
 namespace ObjectCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -18477,7 +17416,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ObjectCount
 
 namespace SimultaneousDetectionLimit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -18492,7 +17430,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SimultaneousDetectionLimit
 
 namespace HoldTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -18507,7 +17444,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace HoldTime
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18522,7 +17458,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -18543,7 +17478,6 @@ namespace AmbientSensingUnion {
 namespace Attributes {
 
 namespace UnionName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -18558,7 +17492,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace UnionName
 
 namespace UnionHealth {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -18576,7 +17509,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace UnionHealth
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18591,7 +17523,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -18612,7 +17543,6 @@ namespace ProximityRanging {
 namespace Attributes {
 
 namespace WiFiDevIK {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::ByteSpan & value, chip::ByteSpan fallback = {})
 {
@@ -18627,7 +17557,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace WiFiDevIK
 
 namespace BLEDeviceID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -18642,7 +17571,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace BLEDeviceID
 
 namespace BLTDevIK {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::ByteSpan & value, chip::ByteSpan fallback = {})
 {
@@ -18657,7 +17585,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace BLTDevIK
 
 namespace BLTCSSecurityLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -18675,7 +17602,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace BLTCSSecurityLevel
 
 namespace BLTCSModeCapability {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::ProximityRanging::BLTCSModeEnum & value,
@@ -18692,7 +17618,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace BLTCSModeCapability
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18707,7 +17632,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -18728,7 +17652,6 @@ namespace SmokeConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18752,7 +17675,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18776,7 +17698,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18800,7 +17721,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18824,7 +17744,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18842,7 +17761,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -18866,7 +17784,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18884,7 +17801,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -18902,7 +17818,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, float value, MarkAt
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementUnitEnum & value);
 inline Protocols::InteractionModel::Status
@@ -18927,7 +17842,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementMediumEnum & value);
 inline Protocols::InteractionModel::Status
@@ -18952,7 +17866,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::SmokeConcentrationMeasurement::LevelValueEnum & value);
 inline Protocols::InteractionModel::Status
@@ -18976,7 +17889,6 @@ Set(EndpointId endpoint, chip::app::Clusters::SmokeConcentrationMeasurement::Lev
 } // namespace LevelValue
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -18994,7 +17906,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19018,7 +17929,6 @@ namespace NetworkIdentityManagement {
 namespace Attributes {
 
 namespace ClientTableSize {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19033,7 +17943,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ClientTableSize
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19048,7 +17957,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19069,7 +17977,6 @@ namespace WiFiNetworkManagement {
 namespace Attributes {
 
 namespace Ssid {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -19085,7 +17992,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace Ssid
 
 namespace PassphraseSurrogate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -19101,7 +18007,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PassphraseSurrogate
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19116,7 +18021,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19137,7 +18041,6 @@ namespace ThreadBorderRouterManagement {
 namespace Attributes {
 
 namespace BorderRouterName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -19152,7 +18055,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace BorderRouterName
 
 namespace BorderAgentID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::ByteSpan & value, chip::ByteSpan fallback = {})
 {
@@ -19167,7 +18069,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chi
 } // namespace BorderAgentID
 
 namespace ThreadVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19182,7 +18083,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ThreadVersion
 
 namespace InterfaceEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -19197,7 +18097,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace InterfaceEnabled
 
 namespace ActiveDatasetTimestamp {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -19213,7 +18112,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ActiveDatasetTimestamp
 
 namespace PendingDatasetTimestamp {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -19229,7 +18127,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PendingDatasetTimestamp
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19244,7 +18141,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19265,7 +18161,6 @@ namespace ThreadNetworkDirectory {
 namespace Attributes {
 
 namespace PreferredExtendedPanID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -19281,7 +18176,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PreferredExtendedPanID
 
 namespace ThreadNetworkTableSize {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -19296,7 +18190,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ThreadNetworkTableSize
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19314,7 +18207,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19338,7 +18230,6 @@ namespace CommissioningProxy {
 namespace Attributes {
 
 namespace Transport {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -19356,7 +18247,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Commissioni
 } // namespace Transport
 
 namespace ScanMaxTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -19371,7 +18261,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ScanMaxTime
 
 namespace MaxSessions {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -19386,7 +18275,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxSessions
 
 namespace MaxCachedResults {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -19401,7 +18289,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxCachedResults
 
 namespace NumCachedResults {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -19416,7 +18303,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace NumCachedResults
 
 namespace CacheTimeout {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19431,7 +18317,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CacheTimeout
 
 namespace WiFiBand {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -19449,7 +18334,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Commissioni
 } // namespace WiFiBand
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19464,7 +18348,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19485,7 +18368,6 @@ namespace WakeOnLan {
 namespace Attributes {
 
 namespace MACAddress {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -19503,7 +18385,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace MACAddress
 
 namespace LinkLocalAddress {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::ByteSpan & value, chip::ByteSpan fallback = {})
 {
@@ -19521,7 +18402,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
 } // namespace LinkLocalAddress
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19539,7 +18419,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19563,7 +18442,6 @@ namespace Channel {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19581,7 +18459,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19605,7 +18482,6 @@ namespace TargetNavigator {
 namespace Attributes {
 
 namespace CurrentTarget {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -19623,7 +18499,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace CurrentTarget
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19641,7 +18516,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19665,7 +18539,6 @@ namespace MediaPlayback {
 namespace Attributes {
 
 namespace CurrentState {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::MediaPlayback::PlaybackStateEnum & value,
@@ -19686,7 +18559,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace CurrentState
 
 namespace StartTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -19710,7 +18582,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace StartTime
 
 namespace Duration {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -19734,7 +18605,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace Duration
 
 namespace PlaybackSpeed {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -19752,7 +18622,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, float value, MarkAt
 } // namespace PlaybackSpeed
 
 namespace SeekRangeEnd {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -19776,7 +18645,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace SeekRangeEnd
 
 namespace SeekRangeStart {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -19800,7 +18668,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace SeekRangeStart
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19818,7 +18685,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19842,7 +18708,6 @@ namespace MediaInput {
 namespace Attributes {
 
 namespace CurrentInput {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -19860,7 +18725,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace CurrentInput
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19878,7 +18742,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19902,7 +18765,6 @@ namespace LowPower {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19920,7 +18782,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19944,7 +18805,6 @@ namespace KeypadInput {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -19962,7 +18822,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -19986,7 +18845,6 @@ namespace ContentLauncher {
 namespace Attributes {
 
 namespace SupportedStreamingProtocols {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -20011,7 +18869,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace SupportedStreamingProtocols
 
 namespace Movable {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -20029,7 +18886,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace Movable
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20047,7 +18903,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20071,7 +18926,6 @@ namespace AudioOutput {
 namespace Attributes {
 
 namespace CurrentOutput {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -20089,7 +18943,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace CurrentOutput
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20107,7 +18960,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20131,7 +18983,6 @@ namespace ApplicationLauncher {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20149,7 +19000,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20173,7 +19023,6 @@ namespace ApplicationBasic {
 namespace Attributes {
 
 namespace VendorName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -20191,7 +19040,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace VendorName
 
 namespace VendorID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::VendorId & value, chip::VendorId fallback = {})
 {
@@ -20209,7 +19057,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::VendorId valu
 } // namespace VendorID
 
 namespace ApplicationName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -20227,7 +19074,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace ApplicationName
 
 namespace ProductID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20245,7 +19091,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ProductID
 
 namespace Status {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
@@ -20267,7 +19112,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace Status
 
 namespace ApplicationVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -20285,7 +19129,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace ApplicationVersion
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20303,7 +19146,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20327,7 +19169,6 @@ namespace AccountLogin {
 namespace Attributes {
 
 namespace OAuthLoggedIn {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -20345,7 +19186,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace OAuthLoggedIn
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20363,7 +19203,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20387,7 +19226,6 @@ namespace ContentControl {
 namespace Attributes {
 
 namespace Enabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -20405,7 +19243,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace Enabled
 
 namespace OnDemandRatingThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -20423,7 +19260,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace OnDemandRatingThreshold
 
 namespace ScheduledContentRatingThreshold {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -20441,7 +19277,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace ScheduledContentRatingThreshold
 
 namespace ScreenDailyTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20459,7 +19294,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace ScreenDailyTime
 
 namespace RemainingScreenTime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20477,7 +19311,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace RemainingScreenTime
 
 namespace BlockUnrated {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -20495,7 +19328,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace BlockUnrated
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20513,7 +19345,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20537,7 +19368,6 @@ namespace ContentAppObserver {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20555,7 +19385,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20579,7 +19408,6 @@ namespace MediaFileManagement {
 namespace Attributes {
 
 namespace TotalStorage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -20594,7 +19422,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace TotalStorage
 
 namespace AvailableStorage {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -20609,7 +19436,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace AvailableStorage
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20624,7 +19450,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20645,7 +19470,6 @@ namespace AudioControl {
 namespace Attributes {
 
 namespace SoftMuted {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -20660,7 +19484,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace SoftMuted
 
 namespace PhysicallyMuted {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -20675,7 +19498,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace PhysicallyMuted
 
 namespace Volume {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20690,7 +19512,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace Volume
 
 namespace MinDeviceVolume {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20705,7 +19526,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MinDeviceVolume
 
 namespace MaxDeviceVolume {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20720,7 +19540,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxDeviceVolume
 
 namespace MaxDeviceVolumeDB {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20735,7 +19554,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxDeviceVolumeDB
 
 namespace MaxUserVolume {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20750,7 +19568,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxUserVolume
 
 namespace DefaultStepSize {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20765,7 +19582,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace DefaultStepSize
 
 namespace SetVolumeUnmutePolicy {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::AudioControl::UnmutePolicyEnum & value,
@@ -20782,7 +19598,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace SetVolumeUnmutePolicy
 
 namespace IncreaseVolumeUnmutePolicy {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::AudioControl::UnmutePolicyEnum & value,
@@ -20799,7 +19614,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace IncreaseVolumeUnmutePolicy
 
 namespace IncreaseVolumeUnmuteVolume {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmuteVolumeEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::AudioControl::UnmuteVolumeEnum & value,
@@ -20816,7 +19630,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace IncreaseVolumeUnmuteVolume
 
 namespace DecreaseVolumeUnmutePolicy {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::AudioControl::UnmutePolicyEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::AudioControl::UnmutePolicyEnum & value,
@@ -20833,7 +19646,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace DecreaseVolumeUnmutePolicy
 
 namespace StartUpMuted {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<bool> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<bool> & value,
                                                         const chip::app::DataModel::Nullable<bool> & fallback = {})
@@ -20849,7 +19661,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace StartUpMuted
 
 namespace StartUpVolume {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -20865,7 +19676,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace StartUpVolume
 
 namespace Bass {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -20880,7 +19690,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace Bass
 
 namespace Mid {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -20895,7 +19704,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace Mid
 
 namespace Treble {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -20910,7 +19718,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace Treble
 
 namespace MinCorrection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -20925,7 +19732,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MinCorrection
 
 namespace MaxCorrection {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -20940,7 +19746,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace MaxCorrection
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -20955,7 +19760,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -20976,7 +19780,6 @@ namespace ZoneManagement {
 namespace Attributes {
 
 namespace MaxUserDefinedZones {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -20991,7 +19794,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxUserDefinedZones
 
 namespace MaxZones {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21006,7 +19808,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxZones
 
 namespace SensitivityMax {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21021,7 +19822,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SensitivityMax
 
 namespace Sensitivity {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21036,7 +19836,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace Sensitivity
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21051,7 +19850,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21072,7 +19870,6 @@ namespace CameraAvStreamManagement {
 namespace Attributes {
 
 namespace MaxConcurrentEncoders {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21087,7 +19884,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxConcurrentEncoders
 
 namespace MaxEncodedPixelRate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21102,7 +19898,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxEncodedPixelRate
 
 namespace NightVisionUsesInfrared {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21117,7 +19912,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace NightVisionUsesInfrared
 
 namespace MaxContentBufferSize {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21132,7 +19926,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxContentBufferSize
 
 namespace TwoWayTalkSupport {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::CameraAvStreamManagement::TwoWayTalkSupportTypeEnum & value);
 inline Protocols::InteractionModel::Status
@@ -21150,7 +19943,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement:
 } // namespace TwoWayTalkSupport
 
 namespace MaxNetworkBandwidth {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21165,7 +19957,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxNetworkBandwidth
 
 namespace CurrentFrameRate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21180,7 +19971,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace CurrentFrameRate
 
 namespace HDRModeEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21195,7 +19985,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace HDRModeEnabled
 
 namespace SoftRecordingPrivacyModeEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21210,7 +19999,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace SoftRecordingPrivacyModeEnabled
 
 namespace SoftLivestreamPrivacyModeEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21225,7 +20013,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace SoftLivestreamPrivacyModeEnabled
 
 namespace HardPrivacyModeOn {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21240,7 +20027,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace HardPrivacyModeOn
 
 namespace NightVision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum & value);
 inline Protocols::InteractionModel::Status
@@ -21258,7 +20044,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement:
 } // namespace NightVision
 
 namespace NightVisionIllum {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum & value);
 inline Protocols::InteractionModel::Status
@@ -21276,7 +20061,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CameraAvStreamManagement:
 } // namespace NightVisionIllum
 
 namespace SpeakerMuted {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21291,7 +20075,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace SpeakerMuted
 
 namespace SpeakerVolumeLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21306,7 +20089,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SpeakerVolumeLevel
 
 namespace SpeakerMaxLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21321,7 +20103,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SpeakerMaxLevel
 
 namespace SpeakerMinLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21336,7 +20117,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SpeakerMinLevel
 
 namespace MicrophoneMuted {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21351,7 +20131,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace MicrophoneMuted
 
 namespace MicrophoneVolumeLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21366,7 +20145,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MicrophoneVolumeLevel
 
 namespace MicrophoneMaxLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21381,7 +20159,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MicrophoneMaxLevel
 
 namespace MicrophoneMinLevel {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21396,7 +20173,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MicrophoneMinLevel
 
 namespace MicrophoneAGCEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21411,7 +20187,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace MicrophoneAGCEnabled
 
 namespace ImageRotation {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21426,7 +20201,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ImageRotation
 
 namespace ImageFlipHorizontal {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21441,7 +20215,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace ImageFlipHorizontal
 
 namespace ImageFlipVertical {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21456,7 +20229,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace ImageFlipVertical
 
 namespace LocalVideoRecordingEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21471,7 +20243,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace LocalVideoRecordingEnabled
 
 namespace LocalSnapshotRecordingEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21486,7 +20257,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace LocalSnapshotRecordingEnabled
 
 namespace StatusLightEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21501,7 +20271,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace StatusLightEnabled
 
 namespace StatusLightBrightness {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Globals::ThreeLevelAutoEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
                                                         chip::app::Clusters::Globals::ThreeLevelAutoEnum & value,
@@ -21518,7 +20287,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint,
 } // namespace StatusLightBrightness
 
 namespace ImageRotationDiscreteAngles {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21533,7 +20301,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ImageRotationDiscreteAngles
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21548,7 +20315,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21569,7 +20335,6 @@ namespace CameraAvSettingsUserLevelManagement {
 namespace Attributes {
 
 namespace MaxPresets {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21584,7 +20349,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxPresets
 
 namespace ZoomMax {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21599,7 +20363,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace ZoomMax
 
 namespace TiltMin {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -21614,7 +20377,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace TiltMin
 
 namespace TiltMax {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -21629,7 +20391,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace TiltMax
 
 namespace PanMin {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -21644,7 +20405,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace PanMin
 
 namespace PanMax {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -21659,7 +20419,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int
 } // namespace PanMax
 
 namespace MovementState {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum & value);
 inline Protocols::InteractionModel::Status
@@ -21677,7 +20436,6 @@ GetDefaultOr(EndpointId endpoint, chip::app::Clusters::CameraAvSettingsUserLevel
 } // namespace MovementState
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21692,7 +20450,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21716,7 +20473,6 @@ namespace WebRTCTransportProvider {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21734,7 +20490,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21758,7 +20513,6 @@ namespace WebRTCTransportRequestor {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21776,7 +20530,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21800,7 +20553,6 @@ namespace PushAvStreamTransport {
 namespace Attributes {
 
 namespace MaxZones {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -21816,7 +20568,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaxZones
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21831,7 +20582,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21852,7 +20602,6 @@ namespace Chime {
 namespace Attributes {
 
 namespace SelectedChime {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21867,7 +20616,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace SelectedChime
 
 namespace Enabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21882,7 +20630,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace Enabled
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21897,7 +20644,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -21918,7 +20664,6 @@ namespace AvAnalysis {
 namespace Attributes {
 
 namespace MaxAnalysisStreamCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21936,7 +20681,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MaxAnalysisStreamCount
 
 namespace CurrentAnalysisStreamCount {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -21954,7 +20698,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace CurrentAnalysisStreamCount
 
 namespace TrackingEnabled {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -21972,7 +20715,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace TrackingEnabled
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -21990,7 +20732,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22014,7 +20755,6 @@ namespace CommodityTariff {
 namespace Attributes {
 
 namespace TariffUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -22044,7 +20784,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace TariffUnit
 
 namespace StartDate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -22068,7 +20807,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace StartDate
 
 namespace CurrentDayEntryDate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -22092,7 +20830,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace CurrentDayEntryDate
 
 namespace NextDayEntryDate {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -22116,7 +20853,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NextDayEntryDate
 
 namespace DefaultRandomizationOffset {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -22140,7 +20876,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace DefaultRandomizationOffset
 
 namespace DefaultRandomizationType {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::CommodityTariff::DayEntryRandomizationTypeEnum> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(
@@ -22173,7 +20908,6 @@ Set(EndpointId endpoint,
 } // namespace DefaultRandomizationType
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22191,7 +20925,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22215,7 +20948,6 @@ namespace EcosystemInformation {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22233,7 +20965,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22257,7 +20988,6 @@ namespace CommissionerControl {
 namespace Attributes {
 
 namespace SupportedDeviceCategories {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> & value);
 inline Protocols::InteractionModel::Status
@@ -22275,7 +21005,6 @@ GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Commissione
 } // namespace SupportedDeviceCategories
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22290,7 +21019,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22311,7 +21039,6 @@ namespace JointFabricDatastore {
 namespace Attributes {
 
 namespace AnchorRootCA {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::ByteSpan & value, chip::ByteSpan fallback = {})
 {
@@ -22329,7 +21056,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
 } // namespace AnchorRootCA
 
 namespace AnchorNodeID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::NodeId & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::NodeId & value, chip::NodeId fallback = {})
 {
@@ -22347,7 +21073,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::NodeId value,
 } // namespace AnchorNodeID
 
 namespace AnchorVendorID {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::VendorId & value, chip::VendorId fallback = {})
 {
@@ -22365,7 +21090,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::VendorId valu
 } // namespace AnchorVendorID
 
 namespace FriendlyName {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -22383,7 +21107,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace FriendlyName
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22401,7 +21124,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22425,7 +21147,6 @@ namespace JointFabricAdministrator {
 namespace Attributes {
 
 namespace AdministratorFabricIndex {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::FabricIndex> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::FabricIndex> & value,
                                                         const chip::app::DataModel::Nullable<chip::FabricIndex> & fallback = {})
@@ -22449,7 +21170,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace AdministratorFabricIndex
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22467,7 +21187,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22491,7 +21210,6 @@ namespace TlsCertificateManagement {
 namespace Attributes {
 
 namespace MaxRootCertificates {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -22506,7 +21224,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxRootCertificates
 
 namespace MaxClientCertificates {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -22521,7 +21238,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxClientCertificates
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22536,7 +21252,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22557,7 +21272,6 @@ namespace TlsClientManagement {
 namespace Attributes {
 
 namespace MaxProvisioned {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -22572,7 +21286,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace MaxProvisioned
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22587,7 +21300,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22608,7 +21320,6 @@ namespace MeterIdentification {
 namespace Attributes {
 
 namespace MeterType {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::MeterIdentification::MeterTypeEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -22626,7 +21337,6 @@ GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Meter
 } // namespace MeterType
 
 namespace PointOfDelivery {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value,
                                                         const DataModel::Nullable<chip::CharSpan> & fallback = {})
@@ -22642,7 +21352,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace PointOfDelivery
 
 namespace MeterSerialNumber {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value,
                                                         const DataModel::Nullable<chip::CharSpan> & fallback = {})
@@ -22658,7 +21367,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeterSerialNumber
 
 namespace ProtocolVersion {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value,
                                                         const DataModel::Nullable<chip::CharSpan> & fallback = {})
@@ -22674,7 +21382,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace ProtocolVersion
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22689,7 +21396,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uin
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22713,7 +21419,6 @@ namespace CommodityMetering {
 namespace Attributes {
 
 namespace MeteredQuantityTimestamp {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -22729,7 +21434,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MeteredQuantityTimestamp
 
 namespace TariffUnit {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -22747,7 +21451,6 @@ GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Globa
 } // namespace TariffUnit
 
 namespace MaximumMeteredQuantities {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -22763,7 +21466,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, Dat
 } // namespace MaximumMeteredQuantities
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22781,7 +21483,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22805,7 +21506,6 @@ namespace UnitTesting {
 namespace Attributes {
 
 namespace Boolean {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -22823,7 +21523,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace Boolean
 
 namespace Bitmap8 {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> & value);
 inline Protocols::InteractionModel::Status
@@ -22846,7 +21545,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 } // namespace Bitmap8
 
 namespace Bitmap16 {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> & value);
 inline Protocols::InteractionModel::Status
@@ -22870,7 +21568,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 } // namespace Bitmap16
 
 namespace Bitmap32 {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> & value);
 inline Protocols::InteractionModel::Status
@@ -22894,7 +21591,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 } // namespace Bitmap32
 
 namespace Bitmap64 {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> & value);
 inline Protocols::InteractionModel::Status
@@ -22918,7 +21614,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip:
 } // namespace Bitmap64
 
 namespace Int8u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -22936,7 +21631,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace Int8u
 
 namespace Int16u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -22954,7 +21648,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Int16u
 
 namespace Int24u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22972,7 +21665,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace Int24u
 
 namespace Int32u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -22990,7 +21682,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace Int32u
 
 namespace Int40u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -23008,7 +21699,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value, Mar
 } // namespace Int40u
 
 namespace Int48u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -23026,7 +21716,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value, Mar
 } // namespace Int48u
 
 namespace Int56u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -23044,7 +21733,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value, Mar
 } // namespace Int56u
 
 namespace Int64u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -23062,7 +21750,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value, Mar
 } // namespace Int64u
 
 namespace Int8s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int8_t & value, int8_t fallback = {})
 {
@@ -23080,7 +21767,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value, MarkA
 } // namespace Int8s
 
 namespace Int16s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -23098,7 +21784,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, Mark
 } // namespace Int16s
 
 namespace Int24s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int32_t & value, int32_t fallback = {})
 {
@@ -23116,7 +21801,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int32_t value, Mark
 } // namespace Int24s
 
 namespace Int32s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int32_t & value, int32_t fallback = {})
 {
@@ -23134,7 +21818,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int32_t value, Mark
 } // namespace Int32s
 
 namespace Int40s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -23152,7 +21835,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, Mark
 } // namespace Int40s
 
 namespace Int48s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -23170,7 +21852,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, Mark
 } // namespace Int48s
 
 namespace Int56s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -23188,7 +21869,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, Mark
 } // namespace Int56s
 
 namespace Int64s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int64_t & value, int64_t fallback = {})
 {
@@ -23206,7 +21886,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, Mark
 } // namespace Int64s
 
 namespace Enum8 {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -23224,7 +21903,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace Enum8
 
 namespace Enum16 {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -23242,7 +21920,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Enum16
 
 namespace FloatSingle {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, float & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, float & value, float fallback = {})
 {
@@ -23260,7 +21937,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, float value, MarkAt
 } // namespace FloatSingle
 
 namespace FloatDouble {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, double & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, double & value, double fallback = {})
 {
@@ -23278,7 +21954,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, double value, MarkA
 } // namespace FloatDouble
 
 namespace OctetString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::ByteSpan & value, chip::ByteSpan fallback = {})
 {
@@ -23296,7 +21971,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
 } // namespace OctetString
 
 namespace LongOctetString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::ByteSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::ByteSpan & value, chip::ByteSpan fallback = {})
 {
@@ -23314,7 +21988,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
 } // namespace LongOctetString
 
 namespace CharString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -23332,7 +22005,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace CharString
 
 namespace LongCharString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::CharSpan & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::CharSpan fallback = {})
 {
@@ -23350,7 +22022,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan valu
 } // namespace LongCharString
 
 namespace EpochUs {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint64_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint64_t & value, uint64_t fallback = {})
 {
@@ -23368,7 +22039,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value, Mar
 } // namespace EpochUs
 
 namespace EpochS {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -23386,7 +22056,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace EpochS
 
 namespace VendorId {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::VendorId & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::VendorId & value, chip::VendorId fallback = {})
 {
@@ -23404,7 +22073,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::VendorId valu
 } // namespace VendorId
 
 namespace EnumAttr {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum & value,
                                                         chip::app::Clusters::UnitTesting::SimpleEnum fallback = {})
@@ -23424,7 +22092,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace EnumAttr
 
 namespace RangeRestrictedInt8u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -23442,7 +22109,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace RangeRestrictedInt8u
 
 namespace RangeRestrictedInt8s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int8_t & value, int8_t fallback = {})
 {
@@ -23460,7 +22126,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value, MarkA
 } // namespace RangeRestrictedInt8s
 
 namespace RangeRestrictedInt16u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -23478,7 +22143,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace RangeRestrictedInt16u
 
 namespace RangeRestrictedInt16s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, int16_t & value, int16_t fallback = {})
 {
@@ -23496,7 +22160,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, Mark
 } // namespace RangeRestrictedInt16s
 
 namespace TimedWriteBoolean {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -23514,7 +22177,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace TimedWriteBoolean
 
 namespace GeneralErrorBoolean {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -23529,7 +22191,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace GeneralErrorBoolean
 
 namespace ClusterErrorBoolean {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -23544,7 +22205,6 @@ inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, boo
 } // namespace ClusterErrorBoolean
 
 namespace GlobalEnum {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Globals::TestGlobalEnum & value,
                                                         chip::app::Clusters::Globals::TestGlobalEnum fallback = {})
@@ -23564,7 +22224,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 } // namespace GlobalEnum
 
 namespace UnsupportedAttributeRequiringAdminPrivilege {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -23582,7 +22241,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace UnsupportedAttributeRequiringAdminPrivilege
 
 namespace Unsupported {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -23600,7 +22258,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace Unsupported
 
 namespace ReadFailureCode {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -23618,7 +22275,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace ReadFailureCode
 
 namespace FailureInt32U {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -23636,7 +22292,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FailureInt32U
 
 namespace NullableBoolean {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<bool> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<bool> & value,
                                                         const chip::app::DataModel::Nullable<bool> & fallback = {})
@@ -23660,7 +22315,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableBoolean
 
 namespace NullableBitmap8 {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value);
 inline Protocols::InteractionModel::Status
@@ -23692,7 +22346,6 @@ Set(EndpointId endpoint,
 } // namespace NullableBitmap8
 
 namespace NullableBitmap16 {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value);
 inline Protocols::InteractionModel::Status
@@ -23725,7 +22378,6 @@ Set(EndpointId endpoint,
 } // namespace NullableBitmap16
 
 namespace NullableBitmap32 {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value);
 inline Protocols::InteractionModel::Status
@@ -23758,7 +22410,6 @@ Set(EndpointId endpoint,
 } // namespace NullableBitmap32
 
 namespace NullableBitmap64 {
-
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value);
 inline Protocols::InteractionModel::Status
@@ -23791,7 +22442,6 @@ Set(EndpointId endpoint,
 } // namespace NullableBitmap64
 
 namespace NullableInt8u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -23815,7 +22465,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt8u
 
 namespace NullableInt16u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -23839,7 +22488,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt16u
 
 namespace NullableInt24u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -23863,7 +22511,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt24u
 
 namespace NullableInt32u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
                                                         const chip::app::DataModel::Nullable<uint32_t> & fallback = {})
@@ -23887,7 +22534,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt32u
 
 namespace NullableInt40u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -23911,7 +22557,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt40u
 
 namespace NullableInt48u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -23935,7 +22580,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt48u
 
 namespace NullableInt56u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -23959,7 +22603,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt56u
 
 namespace NullableInt64u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint64_t> & value,
                                                         const chip::app::DataModel::Nullable<uint64_t> & fallback = {})
@@ -23983,7 +22626,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt64u
 
 namespace NullableInt8s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int8_t> & value,
                                                         const chip::app::DataModel::Nullable<int8_t> & fallback = {})
@@ -24007,7 +22649,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt8s
 
 namespace NullableInt16s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -24031,7 +22672,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt16s
 
 namespace NullableInt24s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int32_t> & value,
                                                         const chip::app::DataModel::Nullable<int32_t> & fallback = {})
@@ -24055,7 +22695,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt24s
 
 namespace NullableInt32s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int32_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int32_t> & value,
                                                         const chip::app::DataModel::Nullable<int32_t> & fallback = {})
@@ -24079,7 +22718,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt32s
 
 namespace NullableInt40s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -24103,7 +22741,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt40s
 
 namespace NullableInt48s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -24127,7 +22764,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt48s
 
 namespace NullableInt56s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -24151,7 +22787,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt56s
 
 namespace NullableInt64s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int64_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int64_t> & value,
                                                         const chip::app::DataModel::Nullable<int64_t> & fallback = {})
@@ -24175,7 +22810,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableInt64s
 
 namespace NullableEnum8 {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -24199,7 +22833,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableEnum8
 
 namespace NullableEnum16 {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -24223,7 +22856,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableEnum16
 
 namespace NullableFloatSingle {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<float> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value,
                                                         const chip::app::DataModel::Nullable<float> & fallback = {})
@@ -24247,7 +22879,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableFloatSingle
 
 namespace NullableFloatDouble {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<double> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<double> & value,
                                                         const chip::app::DataModel::Nullable<double> & fallback = {})
@@ -24271,7 +22902,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableFloatDouble
 
 namespace NullableOctetString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::ByteSpan> & value,
                                                         const DataModel::Nullable<chip::ByteSpan> & fallback = {})
@@ -24295,7 +22925,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableOctetString
 
 namespace NullableCharString {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::CharSpan> & value,
                                                         const DataModel::Nullable<chip::CharSpan> & fallback = {})
@@ -24319,7 +22948,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableCharString
 
 namespace NullableEnumAttr {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -24349,7 +22977,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace NullableEnumAttr
 
 namespace NullableRangeRestrictedInt8u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint8_t> & value,
                                                         const chip::app::DataModel::Nullable<uint8_t> & fallback = {})
@@ -24373,7 +23000,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableRangeRestrictedInt8u
 
 namespace NullableRangeRestrictedInt8s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int8_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int8_t> & value,
                                                         const chip::app::DataModel::Nullable<int8_t> & fallback = {})
@@ -24397,7 +23023,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableRangeRestrictedInt8s
 
 namespace NullableRangeRestrictedInt16u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint16_t> & value,
                                                         const chip::app::DataModel::Nullable<uint16_t> & fallback = {})
@@ -24421,7 +23046,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableRangeRestrictedInt16u
 
 namespace NullableRangeRestrictedInt16s {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, DataModel::Nullable<int16_t> & value,
                                                         const chip::app::DataModel::Nullable<int16_t> & fallback = {})
@@ -24445,7 +23069,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 } // namespace NullableRangeRestrictedInt16s
 
 namespace WriteOnlyInt8u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -24463,7 +23086,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace WriteOnlyInt8u
 
 namespace NullableGlobalEnum {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                DataModel::Nullable<chip::app::Clusters::Globals::TestGlobalEnum> & value);
 inline Protocols::InteractionModel::Status
@@ -24493,7 +23115,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
 } // namespace NullableGlobalEnum
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -24511,7 +23132,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -24529,7 +23149,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace ClusterRevision
 
 namespace MeiInt8u {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback = {})
 {
@@ -24553,7 +23172,6 @@ namespace FaultInjection {
 namespace Attributes {
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -24571,7 +23189,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -24595,7 +23212,6 @@ namespace SampleMei {
 namespace Attributes {
 
 namespace FlipFlop {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -24613,7 +23229,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace FlipFlop
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -24631,7 +23246,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {
@@ -24655,7 +23269,6 @@ namespace TestHiddenManufacturerSpecific {
 namespace Attributes {
 
 namespace TestAttribute {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, bool & value, bool fallback = {})
 {
@@ -24673,7 +23286,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAtt
 } // namespace TestAttribute
 
 namespace FeatureMap {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback = {})
 {
@@ -24691,7 +23303,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 } // namespace FeatureMap
 
 namespace ClusterRevision {
-
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
 inline Protocols::InteractionModel::Status GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback = {})
 {

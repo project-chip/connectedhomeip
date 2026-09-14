@@ -21,6 +21,7 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 
 bool EmberAfAttributeMetadata::IsBoolean() const
@@ -48,116 +49,66 @@ namespace app {
 
 using Protocols::InteractionModel::Status;
 
-CharSpan AttributeDefaultValue::ToCharSpan() const
+bool AttributeDefaultValue::DecodeStringPayload(ByteSpan & outPayload) const
 {
-    VerifyOrReturnValue(!rawData.empty(), CharSpan());
+    outPayload = ByteSpan();
+
+    VerifyOrReturnValue(!rawData.empty(), false);
+
+    size_t prefixSize;
+    size_t length;
+
     if (emberAfIsLongStringAttributeType(type))
     {
-        VerifyOrReturnValue(rawData.size() >= 2, CharSpan());
+        VerifyOrReturnValue(rawData.size() >= 2, false);
         uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
-        if (len == 0xFFFF)
-        {
-            return CharSpan();
-        }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), CharSpan());
-        return CharSpan(reinterpret_cast<const char *>(rawData.data() + 2), len);
+        VerifyOrReturnValue(len != 0xFFFF, false); // Null sentinel
+        prefixSize = 2;
+        length     = len;
     }
-    if (emberAfIsStringAttributeType(type))
+    else if (emberAfIsStringAttributeType(type))
     {
-        VerifyOrReturnValue(rawData.size() >= 1, CharSpan());
         uint8_t len = rawData[0];
-        if (len == 0xFF)
-        {
-            return CharSpan();
-        }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), CharSpan());
-        return CharSpan(reinterpret_cast<const char *>(rawData.data() + 1), len);
+        VerifyOrReturnValue(len != 0xFF, false); // Null sentinel
+        prefixSize = 1;
+        length     = len;
     }
-    return CharSpan();
+    else
+    {
+        return false;
+    }
+
+    VerifyOrReturnValue(rawData.size() >= prefixSize + length, false);
+    outPayload = rawData.SubSpan(prefixSize, length);
+    return true;
+}
+
+CharSpan AttributeDefaultValue::ToCharSpan() const
+{
+    ByteSpan payload;
+    VerifyOrReturnValue(DecodeStringPayload(payload), CharSpan());
+    return CharSpan(Uint8::to_const_char(payload.data()), payload.size());
 }
 
 ByteSpan AttributeDefaultValue::ToByteSpan() const
 {
-    VerifyOrReturnValue(!rawData.empty(), ByteSpan());
-    if (emberAfIsLongStringAttributeType(type))
-    {
-        VerifyOrReturnValue(rawData.size() >= 2, ByteSpan());
-        uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
-        if (len == 0xFFFF)
-        {
-            return ByteSpan();
-        }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), ByteSpan());
-        return ByteSpan(rawData.data() + 2, len);
-    }
-    if (emberAfIsStringAttributeType(type))
-    {
-        VerifyOrReturnValue(rawData.size() >= 1, ByteSpan());
-        uint8_t len = rawData[0];
-        if (len == 0xFF)
-        {
-            return ByteSpan();
-        }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), ByteSpan());
-        return ByteSpan(rawData.data() + 1, len);
-    }
-    return ByteSpan();
+    ByteSpan payload;
+    VerifyOrReturnValue(DecodeStringPayload(payload), ByteSpan());
+    return payload;
 }
 
 DataModel::Nullable<CharSpan> AttributeDefaultValue::ToNullableCharSpan() const
 {
-    VerifyOrReturnValue(!rawData.empty(), DataModel::Nullable<CharSpan>());
-    if (emberAfIsLongStringAttributeType(type))
-    {
-        VerifyOrReturnValue(rawData.size() >= 2, DataModel::Nullable<CharSpan>());
-        uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
-        if (len == 0xFFFF)
-        {
-            return DataModel::Nullable<CharSpan>();
-        }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), DataModel::Nullable<CharSpan>());
-        return DataModel::Nullable<CharSpan>(CharSpan(reinterpret_cast<const char *>(rawData.data() + 2), len));
-    }
-    if (emberAfIsStringAttributeType(type))
-    {
-        VerifyOrReturnValue(rawData.size() >= 1, DataModel::Nullable<CharSpan>());
-        uint8_t len = rawData[0];
-        if (len == 0xFF)
-        {
-            return DataModel::Nullable<CharSpan>();
-        }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), DataModel::Nullable<CharSpan>());
-        return DataModel::Nullable<CharSpan>(CharSpan(reinterpret_cast<const char *>(rawData.data() + 1), len));
-    }
-    return DataModel::Nullable<CharSpan>();
+    ByteSpan payload;
+    VerifyOrReturnValue(DecodeStringPayload(payload), DataModel::Nullable<CharSpan>());
+    return DataModel::Nullable<CharSpan>(CharSpan(Uint8::to_const_char(payload.data()), payload.size()));
 }
 
 DataModel::Nullable<ByteSpan> AttributeDefaultValue::ToNullableByteSpan() const
 {
-    VerifyOrReturnValue(!rawData.empty(), DataModel::Nullable<ByteSpan>());
-    if (emberAfIsLongStringAttributeType(type))
-    {
-        VerifyOrReturnValue(rawData.size() >= 2, DataModel::Nullable<ByteSpan>());
-        uint16_t len = Encoding::LittleEndian::Get16(rawData.data());
-        if (len == 0xFFFF)
-        {
-            return DataModel::Nullable<ByteSpan>();
-        }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(2 + len), DataModel::Nullable<ByteSpan>());
-        return DataModel::Nullable<ByteSpan>(ByteSpan(rawData.data() + 2, len));
-    }
-    if (emberAfIsStringAttributeType(type))
-    {
-        VerifyOrReturnValue(rawData.size() >= 1, DataModel::Nullable<ByteSpan>());
-        uint8_t len = rawData[0];
-        if (len == 0xFF)
-        {
-            return DataModel::Nullable<ByteSpan>();
-        }
-        VerifyOrReturnValue(rawData.size() >= static_cast<size_t>(1 + len), DataModel::Nullable<ByteSpan>());
-        return DataModel::Nullable<ByteSpan>(ByteSpan(rawData.data() + 1, len));
-    }
-    return DataModel::Nullable<ByteSpan>();
+    ByteSpan payload;
+    VerifyOrReturnValue(DecodeStringPayload(payload), DataModel::Nullable<ByteSpan>());
+    return DataModel::Nullable<ByteSpan>(payload);
 }
 
 void AttributeDefaultValue::CopyScalar(void * outBuffer, size_t bufferSize) const
@@ -195,18 +146,25 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
     const bool isShortString = emberAfIsStringAttributeType(am->attributeType);
     const bool isStringType  = isLongString || isShortString;
 
-    const uint8_t * ptr                       = nullptr;
-    size_t defaultValueSizeForBigEndianNudger = 0;
-    (void) defaultValueSizeForBigEndianNudger;
+    const uint8_t * ptr = nullptr;
+
+    // Size of the union member that `ptr` points into when the value is stored inline. Only
+    // relevant on big-endian targets; see the adjustment below.
+    size_t inlineStorageSize = 0;
+    (void) inlineStorageSize;
 
     if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
     {
         if (am->defaultValue.ptrToMinMaxValue != nullptr)
         {
+            // This is intentionally 2 and not 4 bytes since defaultValue in min/max attributes is
+            // still uint16_t.
+            static_assert(sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue) == 2,
+                          "if statement relies on size of max/min defaultValue being 2");
             if (am->size <= 2)
             {
                 ptr = reinterpret_cast<const uint8_t *>(&(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue));
-                defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
+                inlineStorageSize = sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
             }
             else
             {
@@ -221,8 +179,8 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
         // even if their size is <= 4 bytes.
         if ((am->size <= 4) && !isStringType)
         {
-            ptr                                = reinterpret_cast<const uint8_t *>(&(am->defaultValue.defaultValue));
-            defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.defaultValue);
+            ptr               = reinterpret_cast<const uint8_t *>(&(am->defaultValue.defaultValue));
+            inlineStorageSize = sizeof(am->defaultValue.defaultValue);
         }
         else
         {
@@ -231,9 +189,11 @@ Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata * am, Attr
     }
 
 #if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
-    if (am->size < defaultValueSizeForBigEndianNudger && ptr != nullptr)
+    // Inline defaults occupy the full union member regardless of the attribute size. On big-endian
+    // targets the significant bytes sit at the end of that member, so nudge the pointer forward.
+    if (am->size < inlineStorageSize && ptr != nullptr)
     {
-        ptr += (defaultValueSizeForBigEndianNudger - am->size);
+        ptr += (inlineStorageSize - am->size);
     }
 #endif
 

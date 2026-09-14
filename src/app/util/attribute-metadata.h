@@ -301,6 +301,13 @@ struct AttributeDefaultValue
         }
         return value;
     }
+
+private:
+    /// Decodes the Pascal length-prefixed string payload held in rawData.
+    ///
+    /// Returns false (and clears outPayload) when the value is the Null sentinel, the type is not
+    /// a string type, or the prefix does not agree with the size of rawData.
+    bool DecodeStringPayload(ByteSpan & outPayload) const;
 };
 
 /// Extract default value given attribute metadata
