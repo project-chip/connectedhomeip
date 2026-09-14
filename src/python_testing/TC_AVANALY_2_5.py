@@ -242,21 +242,26 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
         # Find an endpoint that does not host WebRTC or PushAV transport clusters
         invalid_endpoint = endpoints_without_transport[0] if endpoints_without_transport else 0xFFFF
 
+        # Select exactly one discovered transport for activation (prefer WebRTC if available, else PushAV)
+        selected_transport = "webrtc" if webrtc_endpoint is not None else "pushav"
+        selected_webrtc_ep = webrtc_endpoint if selected_transport == "webrtc" else None
+        selected_pushav_ep = pushav_endpoint if selected_transport == "pushav" else None
+
         self.step(10)
         # Activate with invalid endpoint ID -> expect NOT_FOUND per test plan
         if not self.is_ci:
             await self.send_activate_analysis_stream_cmd(
                 endpoint,
                 analysis_stream_id=stream_id,
-                webrtc_endpoint_id=invalid_endpoint if webrtc_endpoint is not None else None,
-                pushav_endpoint_id=invalid_endpoint if webrtc_endpoint is None else None,
+                webrtc_endpoint_id=invalid_endpoint if selected_transport == "webrtc" else None,
+                pushav_endpoint_id=invalid_endpoint if selected_transport == "pushav" else None,
                 expected_status=Status.NotFound,
             )
         else:
             cmd = Clusters.Objects.AvAnalysis.Commands.ActivateAnalysisStream(
                 analysisStreamID=stream_id,
-                webRTCEndpointID=invalid_endpoint if webrtc_endpoint is not None else None,
-                pushAVEndpointID=invalid_endpoint if webrtc_endpoint is None else None,
+                webRTCEndpointID=invalid_endpoint if selected_transport == "webrtc" else None,
+                pushAVEndpointID=invalid_endpoint if selected_transport == "pushav" else None,
             )
             try:
                 await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
@@ -279,8 +284,8 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
         await self.send_activate_analysis_stream_cmd(
             endpoint,
             analysis_stream_id=stream_id,
-            webrtc_endpoint_id=webrtc_endpoint,
-            pushav_endpoint_id=pushav_endpoint,
+            webrtc_endpoint_id=selected_webrtc_ep,
+            pushav_endpoint_id=selected_pushav_ep,
             expected_status=Status.Success,
         )
 
@@ -288,27 +293,40 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
         analysis_streams = await self.read_avanaly_attribute_expect_success(endpoint, attributes.AnalysisStreams)
         matching_streams = [s for s in analysis_streams if s.analysisStreamID == stream_id]
         asserts.assert_equal(len(matching_streams), 1, f"AnalysisStream with ID {stream_id} not found in AnalysisStreams")
-        valid_active_states = [enums.AnalysisStreamStateEnum.kWebRTCActive, enums.AnalysisStreamStateEnum.kPushAVActive]
-        asserts.assert_in(matching_streams[0].analysisStreamState, valid_active_states,
-                          f"Expected stream state to be WebRTCActive or PushAVActive, got {matching_streams[0].analysisStreamState}")
-        if not self.is_ci:
-            if webrtc_endpoint is not None:
+        if selected_transport == "webrtc":
+            asserts.assert_equal(
+                matching_streams[0].analysisStreamState,
+                enums.AnalysisStreamStateEnum.kWebRTCActive,
+                f"Expected stream state to be WebRTCActive, got {matching_streams[0].analysisStreamState}",
+            )
+            if not self.is_ci:
                 asserts.assert_equal(
                     matching_streams[0].webRTCEndpointID,
-                    webrtc_endpoint,
-                    f"Expected webRTCEndpointID {webrtc_endpoint}, got {matching_streams[0].webRTCEndpointID}",
+                    selected_webrtc_ep,
+                    f"Expected webRTCEndpointID {selected_webrtc_ep}, got {matching_streams[0].webRTCEndpointID}",
                 )
-            elif pushav_endpoint is not None:
+            else:
+                if matching_streams[0].webRTCEndpointID not in [NullValue, None]:
+                    log.info("Transport endpoint ID is populated: %s", matching_streams[0].webRTCEndpointID)
+                else:
+                    log.warning("Transport endpoint ID was not populated by DUT in AnalysisStreams")
+        else:
+            asserts.assert_equal(
+                matching_streams[0].analysisStreamState,
+                enums.AnalysisStreamStateEnum.kPushAVActive,
+                f"Expected stream state to be PushAVActive, got {matching_streams[0].analysisStreamState}",
+            )
+            if not self.is_ci:
                 asserts.assert_equal(
                     matching_streams[0].pushAVEndpointID,
-                    pushav_endpoint,
-                    f"Expected pushAVEndpointID {pushav_endpoint}, got {matching_streams[0].pushAVEndpointID}",
+                    selected_pushav_ep,
+                    f"Expected pushAVEndpointID {selected_pushav_ep}, got {matching_streams[0].pushAVEndpointID}",
                 )
-        else:
-            if matching_streams[0].webRTCEndpointID not in [NullValue, None]:
-                log.info("Transport endpoint ID is populated: %s", matching_streams[0].webRTCEndpointID)
             else:
-                log.warning("Transport endpoint ID was not populated by DUT in AnalysisStreams")
+                if matching_streams[0].pushAVEndpointID not in [NullValue, None]:
+                    log.info("Transport endpoint ID is populated: %s", matching_streams[0].pushAVEndpointID)
+                else:
+                    log.warning("Transport endpoint ID was not populated by DUT in AnalysisStreams")
 
         self.step(13)
         # TH sends ActivateAnalysisStream command again for the already active analysis_stream_id.
@@ -317,15 +335,15 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
             await self.send_activate_analysis_stream_cmd(
                 endpoint,
                 analysis_stream_id=stream_id,
-                webrtc_endpoint_id=webrtc_endpoint,
-                pushav_endpoint_id=pushav_endpoint,
+                webrtc_endpoint_id=selected_webrtc_ep,
+                pushav_endpoint_id=selected_pushav_ep,
                 expected_status=Status.Success,
             )
         else:
             cmd = Clusters.Objects.AvAnalysis.Commands.ActivateAnalysisStream(
                 analysisStreamID=stream_id,
-                webRTCEndpointID=webrtc_endpoint,
-                pushAVEndpointID=pushav_endpoint,
+                webRTCEndpointID=selected_webrtc_ep,
+                pushAVEndpointID=selected_pushav_ep,
             )
             try:
                 await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
