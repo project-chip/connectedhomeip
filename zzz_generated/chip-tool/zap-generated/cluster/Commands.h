@@ -10227,6 +10227,8 @@ private:
 | * ThermostatSuggestions                                             | 0x0054 |
 | * CurrentThermostatSuggestion                                       | 0x0055 |
 | * ThermostatSuggestionNotFollowingReason                            | 0x0056 |
+| * CriticalFreezeProtection                                          | 0x0057 |
+| * CriticalOverheatProtection                                        | 0x0058 |
 | * Sensors                                                           | 0x0059 |
 | * AvailableSensors                                                  | 0x005A |
 | * EnabledSensors                                                    | 0x005B |
@@ -29492,7 +29494,11 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "thermostat-suggestion-not-following-reason",
-                                   Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),    //
+                                   Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
+                                   credsIssuerConfig),                                                            //
         make_unique<ReadAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "available-sensors", Attributes::AvailableSensors::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "enabled-sensors", Attributes::EnabledSensors::Id, credsIssuerConfig),     //
@@ -29680,6 +29686,10 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
             chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>>>>(
             Id, "thermostat-suggestion-not-following-reason", 0, UINT16_MAX, Attributes::ThermostatSuggestionNotFollowingReason::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "critical-freeze-protection", 0, 1, Attributes::CriticalFreezeProtection::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "critical-overheat-protection", 0, 1, Attributes::CriticalOverheatProtection::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::Type>>>(
             Id, "sensors", Attributes::Sensors::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -29792,7 +29802,11 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "thermostat-suggestion-not-following-reason",
-                                        Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),    //
+                                        Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
+                                        credsIssuerConfig),                                                            //
         make_unique<SubscribeAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "available-sensors", Attributes::AvailableSensors::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "enabled-sensors", Attributes::EnabledSensors::Id, credsIssuerConfig),     //
