@@ -63,6 +63,7 @@ class TC_JFDS_2_3(MatterBaseTest):
         super().setup_class()
 
         self.fabric_a_ctrl = None
+        self.fabric_a_admin = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.fabric_a_server_app = None
         self.devCtrlEcoA = None
