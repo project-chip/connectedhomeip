@@ -13,9 +13,9 @@ Contents of this directory:
 
 OpenSSL is downloaded, checksum-verified, compiled, and installed when the image
 is built. The build checks the pinned version and the presence of both static
-and shared libraries. CI jobs reuse this installation; they must not download
-or compile OpenSSL during job setup. Publish the updated image and update CI
-image references before enabling jobs that require `/opt/matter/openssl`.
+and shared libraries. CI jobs reuse this installation; they must not download or
+compile OpenSSL during job setup. Publish the updated image and update CI image
+references before enabling jobs that require `/opt/matter/openssl`.
 
 Select SDK OpenSSL linkage with a `docker build` argument. The same choices
 apply to `chip-build-minimal` and `chip-cert-bins`:
