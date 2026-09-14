@@ -48,11 +48,6 @@ constexpr CASEAuthTag CASEAuthTagFromNodeId(NodeId aNodeId)
     return aNodeId & kMaskCASEAuthTag;
 }
 
-constexpr bool IsValidCASEAuthTag(CASEAuthTag aCAT)
-{
-    return (aCAT & kTagVersionMask) > 0;
-}
-
 constexpr uint16_t GetCASEAuthTagIdentifier(CASEAuthTag aCAT)
 {
     return static_cast<uint16_t>((aCAT & kTagIdentifierMask) >> kTagIdentifierShift);
@@ -67,7 +62,7 @@ constexpr uint16_t GetCASEAuthTagVersion(CASEAuthTag aCAT)
  * @brief Check whether a CAT identifier value is allowed.
  *
  * Reserved CAT identifiers (0xFFFF Admin CAT, 0xFFFE Anchor CAT) are permitted identifier values.
- * Version validity (non-zero) is validated separately via IsValidCASEAuthTag().
+ * Identifier 0x0000 is always invalid. Version validity is checked separately by IsValidCASEAuthTag().
  *
  * @param identifier The CAT identifier to validate
  * @return true if the identifier is valid, false otherwise
@@ -81,6 +76,21 @@ constexpr bool IsValidCATIdentifier(uint16_t identifier)
     }
     // Other identifiers: 0x0000 is invalid (undefined), 0xFFFE and 0xFFFF already handled above
     return identifier != 0x0000;
+}
+
+/**
+ * @brief Check whether a full CASE Authenticated Tag value is valid.
+ *
+ * A tag is valid when both its identifier and its version are valid:
+ *   - identifier != 0x0000 (see IsValidCATIdentifier)
+ *   - version > 0
+ *
+ * @param aCAT The full 32-bit CAT value to validate
+ * @return true if the tag is valid, false otherwise
+ */
+constexpr bool IsValidCASEAuthTag(CASEAuthTag aCAT)
+{
+    return (aCAT & kTagVersionMask) > 0 && IsValidCATIdentifier(GetCASEAuthTagIdentifier(aCAT));
 }
 
 constexpr CASEAuthTag GetAdminCATWithVersion(uint16_t version)
