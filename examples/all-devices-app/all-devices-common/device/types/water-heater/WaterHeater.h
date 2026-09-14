@@ -16,10 +16,9 @@
  */
 #pragma once
 
-#include "ThermostatDelegate.h"
-#include "ThermostatSetpointsDelegate.h"
-
+#include <devices/Types.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <device/api/SingleEndpoint.h>
@@ -27,54 +26,125 @@
 
 namespace chip::app {
 
-class WaterHeater : public SingleEndpoint, public Clusters::WaterHeaterManagement::Delegate, public TimerContext
+template <typename... ThermostatDelegates>
+class WaterHeater : public SingleEndpoint
 {
 public:
+    using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<ThermostatDelegates...>;
 
-using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
-    Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate>;
+    struct Config
+    {
+        TimerDelegate & timerDelegate;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+        // WaterHeaterManagement cluster
+        BitMask<Clusters::WaterHeaterManagement::Feature> whmFeatures;
+        // Thermostat cluster
+        BitMask<Clusters::Thermostat::Feature> thermostatFeatures;
 
-    explicit WaterHeater(TimerDelegate & timerDelegate);
-    ~WaterHeater() override;
+    };
 
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
+    explicit WaterHeater(const Config & config, Clusters::WaterHeaterManagement::Delegate & whmDelegate, Clusters::ModeBase::AppDelegate & waterHeaterModeDelegate) :
+        SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)),  
+        mConfig(config), mWhmDelegate(whmDelegate), mWaterHeaterModeDelegate(waterHeaterModeDelegate) {}
+    ~WaterHeater() = default;
 
-    Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeaterManagementCluster();
+    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, 
+                        EndpointComposition composition = {}) override
+    {
+        VerifyOrReturnError(SingleEndpoint::mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+        DeviceRegistrationTransaction transaction(*this, provider);
+    
+        mProvider = &provider;
+        ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+    
+        mWaterHeaterManagementCluster.Create(endpoint, mWhmDelegate, mConfig.whmFeatures);
+        ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterManagementCluster.Registration()));
 
-    // TimerContext
-    void TimerFired() override;
+        mThermostatDelegates = std::make_tuple(std::make_unique<ThermostatDelegates>(endpoint)...);
+    
+        std::apply([&](auto &... delegates) {
+            mThermostatCluster.Create(
+                endpoint, 
+                mConfig.thermostatFeatures, 
+                Clusters::Thermostat::ThermostatClusterBase::Config(Clusters::Thermostat::OptionalAttributes(), mConfig.timerDelegate),
+                *delegates... 
+            );
+        }, mThermostatDelegates);
+    
+        ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
-    // Clusters::WaterHeaterManagement::Delegate
-    Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
-                                                    Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
-                                                    Optional<Percent> targetReheat) override;
-    Protocols::InteractionModel::Status HandleCancelBoost() override;
-    BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> GetHeaterTypes() override;
-    BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> GetHeatDemand() override;
-    uint16_t GetTankVolume() override;
-    Energy_mWh GetEstimatedHeatRequired() override;
-    Percent GetTankPercentage() override;
-    Clusters::WaterHeaterManagement::BoostStateEnum GetBoostState() override;
+        mWaterHeaterModeCluster.Create(endpoint, Clusters::ModeBase::kWaterHeaterMode,
+            Clusters::ModeBaseCluster::Config{
+                .feature                = BitMask<Clusters::ModeBase::Feature>(),
+                .optionalAttributeSet   = {},
+                .appDelegate            = mWaterHeaterModeDelegate,
+                .onOffValueForStartUp   = false,
+                .diagnosticDataProvider = mConfig.diagnosticDataProvider,
+            });
+        ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterModeCluster.Registration()));
+
+        ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
+    
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+        transaction.Commit();
+        return CHIP_NO_ERROR;
+    }
+    void Unregister(CodeDrivenDataModelProvider & provider) override
+    {
+        mProvider = nullptr;
+        UnregisterDescriptor(provider);
+        UnregisterOptionalClusters(provider);
+        if (mWaterHeaterManagementCluster.IsConstructed())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mWaterHeaterManagementCluster.Cluster()));
+            mWaterHeaterManagementCluster.Destroy();
+        }
+        if (mThermostatCluster.IsConstructed())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mThermostatCluster.Cluster()));
+            mThermostatCluster.Destroy();
+        }
+        if (mWaterHeaterModeCluster.IsConstructed())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mWaterHeaterModeCluster.Cluster()));
+            mWaterHeaterModeCluster.Destroy();
+        }
+    }
+
+    Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeaterManagementCluster()
+    {
+        VerifyOrDie(mWaterHeaterManagementCluster.IsConstructed());
+        return mWaterHeaterManagementCluster.Cluster();
+    }
+
+    Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & ThermostatCluster()
+    {
+        VerifyOrDie(mThermostatCluster.IsConstructed());
+        return mThermostatCluster.Cluster();
+    }
+
+
+protected:
+
+    virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
+
+    Config mConfig;
+    CodeDrivenDataModelProvider * mProvider = nullptr;
 
 private:
-    void EndBoost();
-    void NotifyHeatDemandAndBoostStateChanged();
-
-    TimerDelegate & mTimerDelegate;
-    CodeDrivenDataModelProvider * mProvider = nullptr;
-    std::unique_ptr<Clusters::Thermostat::ThermostatDelegate> mThermostatDelegate;
-    std::unique_ptr<Clusters::Thermostat::ThermostatSetpointsDelegate> mThermostatSetpointsDelegate;
-
-    BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeaterTypes{
-        Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap::kImmersionElement1
-    };
-    BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeatDemand;
-    Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
-
+    // Delegates
+    std::tuple<std::unique_ptr<ThermostatDelegates>...> mThermostatDelegates;
+    Clusters::WaterHeaterManagement::Delegate & mWhmDelegate;
+    Clusters::ModeBase::AppDelegate & mWaterHeaterModeDelegate;
+    // Clusters
     LazyRegisteredServerCluster<Clusters::WaterHeaterManagement::WaterHeaterManagementCluster> mWaterHeaterManagementCluster;
     LazyRegisteredServerCluster<ThermostatClusterType> mThermostatCluster;
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mWaterHeaterModeCluster;
 };
 
 } // namespace chip::app

@@ -23,6 +23,8 @@ source_set("water-heater") {
     "ThermostatDelegate.cpp",
     "ThermostatSetpointsDelegate.cpp",
     "ThermostatSetpointsDelegate.h",
+    "impl/SimulatedWaterHeater.cpp",
+    "impl/SimulatedWaterHeater.h"
   ]
 
   public_deps = [

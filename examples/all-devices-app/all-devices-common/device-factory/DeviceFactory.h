@@ -63,7 +63,7 @@
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
-#include <device/types/water-heater/WaterHeater.h>
+#include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <device/types/water-valve/WaterValve.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -534,7 +534,12 @@ private:
         {
             RegisterCreator("water-heater", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<WaterHeater>(mContext->timerDelegate);
+                return std::make_unique<SimulatedWaterHeater>(SimulatedWaterHeater::Config{
+                    .timerDelegate = mContext->timerDelegate,
+                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                    .whmFeatures = BitMask<Clusters::WaterHeaterManagement::Feature>(),
+                    .thermostatFeatures = BitMask<Clusters::Thermostat::Feature>(),
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)
