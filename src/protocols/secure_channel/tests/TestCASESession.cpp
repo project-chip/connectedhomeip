@@ -2671,4 +2671,107 @@ TEST_F(TestCASESession, MalformedSigma2WithoutDestinationNodeIdDoesNotCrash)
     EXPECT_EQ(loopback.mSentMessageCount, 1u);
 }
 
+class DuplicateSigma2LoopbackDelegate : public Testing::LoopbackTransportDelegate
+{
+public:
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(DecodeUnsecuredPayloadHeader(message, payloadHeader));
+        VerifyOrReturn(payloadHeader.HasProtocol(Protocols::SecureChannel::Id));
+
+        if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2))
+        {
+            if (mCapturedSigma2.IsNull())
+            {
+                mCapturedSigma2 = message.CloneData();
+                mPeerAddress    = Testing::LoopbackTransport::LoopbackPeer(peer);
+            }
+        }
+        else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+        {
+            ++mStatusReportCount;
+        }
+        else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+        {
+            ++mStandaloneAckCount;
+        }
+    }
+
+    void ResetCounts()
+    {
+        mStatusReportCount  = 0;
+        mStandaloneAckCount = 0;
+    }
+
+    System::PacketBufferHandle mCapturedSigma2;
+    Transport::PeerAddress mPeerAddress;
+    uint32_t mStatusReportCount  = 0;
+    uint32_t mStandaloneAckCount = 0;
+
+private:
+    static bool DecodeUnsecuredPayloadHeader(const System::PacketBufferHandle & message, PayloadHeader & payloadHeader)
+    {
+        System::PacketBufferHandle buf = message.CloneData();
+        VerifyOrReturnValue(!buf.IsNull(), false);
+
+        PacketHeader packetHeader;
+        VerifyOrReturnValue(packetHeader.DecodeAndConsume(buf) == CHIP_NO_ERROR, false);
+        VerifyOrReturnValue(!packetHeader.IsEncrypted(), false);
+
+        return payloadHeader.DecodeAndConsume(buf) == CHIP_NO_ERROR;
+    }
+};
+
+TEST_F(TestCASESession, DuplicateSigma2DoesNotTriggerStatusReport)
+{
+    TestCASESecurePairingDelegate delegateCommissioner;
+    auto pairingCommissioner = chip::Platform::MakeUnique<CASESession>();
+    pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback = GetLoopback();
+
+    DuplicateSigma2LoopbackDelegate loopbackDelegate;
+    loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner.get());
+    ASSERT_NE(contextCommissioner, nullptr);
+
+    // Retain a reference to the initiator UnauthenticatedSession so it remains in SessionManager
+    // when the exchange is closed.
+    SessionHolder retainedInitiatorSession(contextCommissioner->GetSessionHandle());
+
+    EXPECT_EQ(pairingCommissioner->EstablishSession(
+                  GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+                  contextCommissioner, nullptr, nullptr, &delegateCommissioner, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
+    ASSERT_FALSE(loopbackDelegate.mCapturedSigma2.IsNull());
+
+    // Reset counters after handshake completes.
+    loopbackDelegate.ResetCounts();
+
+    // Inject the duplicate CASE_Sigma2 packet buffer into SessionManager after the exchange has closed.
+    System::PacketBufferHandle duplicateSigma2 = loopbackDelegate.mCapturedSigma2.CloneData();
+    ASSERT_FALSE(duplicateSigma2.IsNull());
+
+    GetSecureSessionManager().OnMessageReceived(loopbackDelegate.mPeerAddress, std::move(duplicateSigma2));
+    ServiceEvents();
+
+    // Verify that duplicate Sigma2 does not trigger an unauthenticated failure StatusReport,
+    // and instead falls through to SendStandaloneAckIfNeeded which transmits a StandaloneAck.
+    EXPECT_EQ(loopbackDelegate.mStatusReportCount, 0u);
+    EXPECT_EQ(loopbackDelegate.mStandaloneAckCount, 1u);
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
+    gPairingServer.Shutdown();
+}
+
 } // namespace chip
