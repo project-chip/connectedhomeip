@@ -171,7 +171,7 @@ string(APPEND script_args "-s \"${schema_path}\"\n")
 # Add optional offset and size arguments to generate .hex file as well as .json.
 if(SB_CONFIG_PARTITION_MANAGER OR CONFIG_PARTITION_MANAGER_ENABLED)
     string(APPEND script_args "--offset $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_ADDRESS>\n")
-    string(APPEND script_args "--size $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_OFFSET>\n")
+    string(APPEND script_args "--size $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_SIZE>\n")
 else()
     dt_nodelabel(factory_data_partition_path TARGET ${DEFAULT_IMAGE} NODELABEL "factory_data_partition" REQUIRED)
     dt_reg_addr(factory_data_addr TARGET ${DEFAULT_IMAGE} PATH ${factory_data_partition_path})

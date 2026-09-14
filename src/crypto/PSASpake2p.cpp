@@ -249,6 +249,7 @@ exit:
     psa_key_derivation_abort(&operation);
     psa_destroy_key(passwordKey);
     psa_destroy_key(spakeKey);
+    ClearSecretData(password, sizeof(password));
 
     if (status != PSA_SUCCESS)
     {
