@@ -1634,7 +1634,9 @@ Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
         {
             // The callback writes exactly am.size bytes in storage order, so unlike an inline flash
             // default this needs no endianness adjustment.
-            uint8_t value[AttributeDefaultValue::kMaxOwnedValueSize];
+            // Zero-initialized: an application that returns Success without filling the buffer must
+            // not leak stack contents into the reported default.
+            uint8_t value[AttributeDefaultValue::kMaxOwnedValueSize] = {};
             if (emberAfExternalAttributeReadCallback(endpoint, clusterId, &am, value, am.size) == Status::Success)
             {
                 VerifyOrReturnError(outDefault.SetOwnedValue(ByteSpan(value, am.size), am.attributeType), Status::Failure);
