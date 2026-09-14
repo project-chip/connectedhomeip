@@ -233,7 +233,11 @@ namespace chip {
 namespace app {
 
 /**
- * @brief Represents an attribute default value referenced directly from flash metadata.
+ * @brief Represents an attribute default value, normally referenced directly from flash metadata.
+ *
+ * Lifetime: rawData usually points into flash and outlives this object. The exception is a value
+ * supplied at runtime by a dynamic endpoint (see the endpoint-level emberAfGetAttributeDefaultValue
+ * in attribute-storage.h), which is held inside this object. Copying is therefore disallowed.
  *
  * String Storage in Flash:
  * - Non-empty strings are stored in flash with a Pascal length prefix (1 byte for short
@@ -251,8 +255,29 @@ namespace app {
  */
 struct AttributeDefaultValue
 {
+    /// Largest value SetOwnedValue accepts: the widest ember scalar.
+    static constexpr size_t kMaxOwnedValueSize = sizeof(uint64_t);
+
+    AttributeDefaultValue() = default;
+
+    // rawData may alias the owned value, so copying or moving would leave the destination span
+    // pointing into the source. Fixing up the span is possible but nothing needs it, and a
+    // relocatable value would obscure whether the bytes live in flash or in the object.
+    AttributeDefaultValue(const AttributeDefaultValue &)             = delete;
+    AttributeDefaultValue & operator=(const AttributeDefaultValue &) = delete;
+    AttributeDefaultValue(AttributeDefaultValue &&)                  = delete;
+    AttributeDefaultValue & operator=(AttributeDefaultValue &&)      = delete;
+
     ByteSpan rawData;              // Flash pointer and size in bytes (empty span if zero-filled / omitted in flash)
     EmberAfAttributeType type = 0; // ZCL attribute type (used to distinguish short vs long string prefixes)
+
+    /// Takes a copy of a value that does not live in flash, and points rawData at it.
+    ///
+    /// Dynamic endpoints have no ZAP configuration, so their values are supplied at runtime by
+    /// emberAfExternalAttributeReadCallback. Returns false, leaving the object unchanged, if the
+    /// value does not fit: only scalars are served this way, since copying a string default would
+    /// defeat the zero-copy views above.
+    bool SetOwnedValue(ByteSpan data, EmberAfAttributeType attributeType);
 
     /// Direct zero-copy CharSpan view (returns empty CharSpan() if rawData is empty or length is 0)
     CharSpan ToCharSpan() const;
@@ -311,9 +336,19 @@ private:
     /// Returns false (and clears outPayload) when the value is the Null sentinel, the type is not
     /// a string type, or the prefix does not agree with the size of rawData.
     bool DecodeStringPayload(ByteSpan & outPayload) const;
+
+    uint8_t mOwnedValue[kMaxOwnedValueSize];
 };
 
 /// Extract default value given attribute metadata
+///
+/// Returns Success when outDefault holds the configured default, or NotFound when the attribute
+/// exists but no default was configured. The endpoint-level overload in attribute-storage.h shares
+/// this contract and adds UnsupportedCluster / UnsupportedAttribute; all of its implementations
+/// (ember, mock, dynamic_server) must agree on those meanings.
+///
+/// This overload reads flash only. It never consults the application, so for an attribute belonging
+/// to a dynamic endpoint it reports what the declaration holds rather than the live value.
 Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata & metadata,
                                                                     AttributeDefaultValue & outDefault);
 

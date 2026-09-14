@@ -1599,6 +1599,17 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
 namespace chip {
 namespace app {
 
+namespace {
+
+/// Dynamic endpoints are registered at runtime and carry no ZAP configuration.
+bool IsDynamicEndpoint(EndpointId endpoint)
+{
+    uint16_t index = findIndexFromEndpoint(endpoint, true /* ignoreDisabledEndpoints */);
+    return (index != kEmberInvalidEndpointIndex) && (index >= emberAfFixedEndpointCount());
+}
+
+} // namespace
+
 Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
                                        AttributeDefaultValue & outDefault)
 {
@@ -1607,10 +1618,32 @@ Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
 
     for (uint16_t i = 0; i < cluster->attributeCount; ++i)
     {
-        if (cluster->attributes[i].attributeId == attributeId)
+        const EmberAfAttributeMetadata & am = cluster->attributes[i];
+        if (am.attributeId != attributeId)
         {
-            return emberAfGetAttributeDefaultValue(cluster->attributes[i], outDefault);
+            continue;
         }
+
+        // Without a ZAP configuration, the only thing a dynamic endpoint can offer is what the
+        // application reports through the external read callback, so ask for that first. Strings are
+        // excluded because rawData is a view and the callback can only fill a buffer; they resolve
+        // from metadata, which for DECLARE_DYNAMIC_ATTRIBUTE means NotFound.
+        if (am.IsExternal() && !emberAfIsStringAttributeType(am.attributeType) &&
+            !emberAfIsLongStringAttributeType(am.attributeType) && am.size <= AttributeDefaultValue::kMaxOwnedValueSize &&
+            IsDynamicEndpoint(endpoint))
+        {
+            // The callback writes exactly am.size bytes in storage order, so unlike an inline flash
+            // default this needs no endianness adjustment.
+            uint8_t value[AttributeDefaultValue::kMaxOwnedValueSize];
+            if (emberAfExternalAttributeReadCallback(endpoint, clusterId, &am, value, am.size) == Status::Success)
+            {
+                VerifyOrReturnError(outDefault.SetOwnedValue(ByteSpan(value, am.size), am.attributeType), Status::Failure);
+                return Status::Success;
+            }
+            // The application does not serve this attribute; fall back to the declaration.
+        }
+
+        return emberAfGetAttributeDefaultValue(am, outDefault);
     }
 
     return Status::UnsupportedAttribute;

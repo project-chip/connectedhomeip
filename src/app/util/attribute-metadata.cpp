@@ -111,6 +111,16 @@ DataModel::Nullable<ByteSpan> AttributeDefaultValue::ToNullableByteSpan() const
     return DataModel::Nullable<ByteSpan>(payload);
 }
 
+bool AttributeDefaultValue::SetOwnedValue(ByteSpan data, EmberAfAttributeType attributeType)
+{
+    VerifyOrReturnValue(data.size() <= kMaxOwnedValueSize, false);
+
+    memcpy(mOwnedValue, data.data(), data.size());
+    rawData = ByteSpan(mOwnedValue, data.size());
+    type    = attributeType;
+    return true;
+}
+
 void AttributeDefaultValue::CopyScalar(void * outBuffer, size_t bufferSize) const
 {
     if (outBuffer == nullptr || bufferSize == 0)

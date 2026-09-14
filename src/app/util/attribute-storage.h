@@ -91,6 +91,11 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
 /**
  * @brief Declares a dynamic attribute with an empty/zero default value.
+ *
+ * The value itself is served by emberAfExternalAttributeReadCallback. That also covers scalar reads
+ * through emberAfGetAttributeDefaultValue, so a scalar declared here needs no default. Strings are
+ * the exception: they are never read from the callback by that path, so use
+ * DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT when a string value has to be visible to it.
  */
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
@@ -509,7 +514,27 @@ enum class EndpointComposition : uint8_t
  */
 EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
 
-/// Lookup default value for an attribute on an endpoint
+/// Lookup the value an endpoint's configuration provides for an attribute
+///
+/// Status meanings, which the mock and dynamic_server implementations must match:
+///   - Success              outDefault holds the value
+///   - NotFound             the attribute exists but the configuration provides no value
+///   - UnsupportedCluster   the cluster is not on this endpoint
+///   - UnsupportedAttribute the attribute is not in this cluster
+///
+/// Where the value comes from depends on the endpoint:
+///
+///   - Fixed endpoints: the ZAP-configured default in flash. This is a static value and does not
+///     change over the lifetime of the device.
+///
+///   - Dynamic endpoints: these have no ZAP configuration, so the application is the only source.
+///     Scalars are read from emberAfExternalAttributeReadCallback and outDefault owns a copy of the
+///     result; that is a snapshot of the current value, not a static default. If the application
+///     does not serve the attribute, the DECLARE_DYNAMIC_ATTRIBUTE* declaration is used instead.
+///
+///     Strings are NOT supported on that path: outDefault exposes zero-copy views, and the callback
+///     can only fill a buffer. A string therefore resolves from the declaration alone, which means
+///     NotFound unless DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT was used.
 Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
                                                                     AttributeId attributeId, AttributeDefaultValue & outDefault);
 

@@ -592,6 +592,8 @@ Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId e
 {
     // Status selection must match the ember implementation in app/util/attribute-storage.cpp:
     // a missing cluster is UnsupportedCluster, a missing attribute is UnsupportedAttribute.
+    //
+    // The mock has no dynamic endpoints, so it deliberately omits the external read callback path.
     VerifyOrReturnError(emberAfFindServerCluster(endpoint, clusterId) != nullptr,
                         Protocols::InteractionModel::Status::UnsupportedCluster);
 
