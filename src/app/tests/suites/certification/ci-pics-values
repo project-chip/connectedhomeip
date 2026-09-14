@@ -631,6 +631,11 @@ G.C.C03.Tx=0
 G.C.C04.Tx=0
 G.C.C05.Tx=0
 
+# Groupcast Cluster
+# CI applications are built with groupcast enabled, so group membership is
+# managed through the Groupcast cluster instead of the Groups cluster.
+GC.S=1
+
 GRPKEY.S=1
 # No support for the CacheAndSync feature so far
 GRPKEY.S.F00=0
