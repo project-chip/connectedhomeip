@@ -125,6 +125,12 @@ jobs:
                 --target linux-x64-all-clusters-${BUILD_VARIANT}-clang-test
                 --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                 && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test"
+            - name: Build linux-x64-all-devices
+              run: >-
+                ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                --target linux-x64-all-devices-${BUILD_VARIANT}-clang-test
+                --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                && rm -rf out/linux-x64-all-devices-${BUILD_VARIANT}-clang-test"
             - name: Build linux-x64-fabric-admin-rpc
               run: >-
                 ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
@@ -288,6 +294,7 @@ jobs:
                   
                   # Slow Test Apps
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
