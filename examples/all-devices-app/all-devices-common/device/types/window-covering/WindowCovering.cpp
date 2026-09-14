@@ -46,7 +46,10 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     mDelegates.windowCovering.SetEndpoint(endpoint);
 
     Clusters::WindowCovering::WindowCoveringCluster::Config config(mDelegates.windowCovering);
-    config.WithFeatures(mConfig.features).WithOptionalAttributes(mConfig.optionalAttributes);
+    config.WithFeatures(mConfig.features)
+        .WithOptionalAttributes(mConfig.optionalAttributes)
+        .WithType(mConfig.type)
+        .WithEndProductType(mConfig.endProductType);
     mWindowCoveringCluster.Create(endpoint, config);
 
     ReturnErrorOnFailure(provider.AddCluster(mWindowCoveringCluster.Registration()));

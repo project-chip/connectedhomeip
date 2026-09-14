@@ -91,8 +91,9 @@ public:
         WindowCoveringDelegate & mDelegate;
         BitFlags<Feature> mFeatures;
         OptionalAttributeSet mOptionalAttributes;
-        Type mType                     = Type::kRollerShade;
-        EndProductType mEndProductType = EndProductType::kRollerShade;
+        // kUnknown is valid regardless of which of LF/TL are enabled (spec 9.3.6.2, 9.3.6.13);
+        Type mType                     = Type::kUnknown;
+        EndProductType mEndProductType = EndProductType::kUnknown;
     };
 
     WindowCoveringCluster(EndpointId endpointId, const Config & config);

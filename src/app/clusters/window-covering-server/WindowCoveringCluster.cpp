@@ -61,6 +61,26 @@ WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config
         VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kTilt), AppServer,
                            "Validation failed: PositionAwareTilt requires Tilt feature.");
     }
+
+    // Type is constrained by which of LF/TL are enabled (spec 9.3.6.2).
+    if (mFeatureMap.Has(Feature::kLift) && mFeatureMap.Has(Feature::kTilt))
+    {
+        VerifyOrDieWithMsg(mType == Type::kTiltBlindLiftAndTilt || mType == Type::kUnknown, AppServer,
+                           "Validation failed: Type is not valid when both Lift and Tilt are enabled.");
+    }
+    else if (mFeatureMap.Has(Feature::kLift))
+    {
+        VerifyOrDieWithMsg(mType == Type::kRollerShade || mType == Type::kRollerShade2Motor ||
+                               mType == Type::kRollerShadeExterior || mType == Type::kRollerShadeExterior2Motor ||
+                               mType == Type::kDrapery || mType == Type::kAwning || mType == Type::kShutter ||
+                               mType == Type::kProjectorScreen || mType == Type::kUnknown,
+                           AppServer, "Validation failed: Type is not valid when only Lift is enabled.");
+    }
+    else
+    {
+        VerifyOrDieWithMsg(mType == Type::kShutter || mType == Type::kTiltBlindTiltOnly || mType == Type::kUnknown, AppServer,
+                           "Validation failed: Type is not valid when only Tilt is enabled.");
+    }
 }
 
 CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)

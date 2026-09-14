@@ -59,7 +59,9 @@ SimulatedWindowCovering::SimulatedWindowCovering(const Context & context) :
                                    .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
                                    .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
                                return optionals;
-                           }() })
+                           }(),
+                           .type           = Clusters::WindowCovering::Type::kTiltBlindLiftAndTilt,
+                           .endProductType = Clusters::WindowCovering::EndProductType::kSheerShade })
 {}
 
 SimulatedWindowCovering::~SimulatedWindowCovering()
