@@ -143,10 +143,6 @@ class TC_SC_5_1(MatterBaseTest):
     async def run_test_against_endpoint(self, groups_endpoint: int):
         dev_ctrl = self.default_controller
         groupcast_enabled = await is_groupcast_on_root_node(self)
-        groups_cluster_rev = await self.read_single_attribute_check_success(
-            cluster=Clusters.Groups,
-            attribute=Clusters.Groups.Attributes.ClusterRevision,
-            endpoint=groups_endpoint)
 
         group_names_supported = False
         if not groupcast_enabled:
