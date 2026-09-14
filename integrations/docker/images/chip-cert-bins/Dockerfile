@@ -124,6 +124,7 @@ RUN set -x \
     && : # last line
 
 # Build and install OpenSSL 3.5 LTS (post-quantum ML-DSA / ML-KEM support)
+# Build once per image; CI jobs reuse these static and shared libraries.
 ARG OPENSSL_VERSION=3.5.0
 ARG OPENSSL_SHA256=344d0a79f1a9b08029b0744e2cc401a43f9c90acd1044d09a530b4885a8e9fc0
 RUN set -x \
@@ -135,6 +136,11 @@ RUN set -x \
     && ./Configure --prefix=/opt/matter/openssl --openssldir=/etc/ssl --libdir=lib \
     && make -j$(nproc) \
     && make install_sw \
+    && test "$(PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR=/opt/matter/openssl/lib/pkgconfig pkg-config --modversion openssl)" = "$OPENSSL_VERSION" \
+    && test -f /opt/matter/openssl/lib/libssl.a \
+    && test -f /opt/matter/openssl/lib/libcrypto.a \
+    && test -f /opt/matter/openssl/lib/libssl.so \
+    && test -f /opt/matter/openssl/lib/libcrypto.so \
     && cd / && rm -rf /tmp/openssl-${OPENSSL_VERSION}* \
     && : # last line
 
