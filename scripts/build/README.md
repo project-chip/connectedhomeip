@@ -110,9 +110,12 @@ GitHub's Linux Standalone workflow builds examples with both explicit OpenSSL
 3.5 linkage modes and checks the dependencies of chip-cert and network-manager.
 The Linux test suite selects dynamic linkage; REPL and nightly test-app builds
 select static linkage because their binaries are transferred to other runners.
-The `setup-sdk-openssl` action provides the private installation when an older
-build image lacks it and exports only the SDK-specific selection variables. The
-published standalone tools come from the static job.
+The `setup-sdk-openssl` action validates the private installation already built
+into the image and exports only the SDK-specific selection variables. It fails
+if the installation is missing or has the wrong version; it never downloads or
+compiles OpenSSL. Publish the updated Docker image and update workflow image
+references before enabling this action. The published standalone tools come
+from the static job.
 
 Static linking preserves the selected OpenSSL version; it does not add missing
 algorithms. For example, network-manager's Network Identity Management
