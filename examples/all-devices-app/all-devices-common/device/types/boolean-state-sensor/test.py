@@ -103,12 +103,15 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
         self.step(3, "Toggle and assert state values on Endpoint 1 and Endpoint 2 independently via PwRPC")
 
         # Establish PwRPC connection
-        logger.info("Establishing Pigweed RPC connection...")
+        # Defaults to the app's own default port; override with
+        # "--int-arg rpc_server_port:<port>" when the app is started with --rpc-server-port.
+        rpc_server_port = self.user_params.get("rpc_server_port", 33000)
+        logger.info("Establishing Pigweed RPC connection on port %d...", rpc_server_port)
         device_connection = create_device_serial_or_socket_connection(
             device="",
             baudrate=115200,
             token_databases=[],
-            socket_addr="127.0.0.1:33000",
+            socket_addr=f"127.0.0.1:{rpc_server_port}",
             compiled_protos=[attributes_service_pb2],
             rpc_logging=True,
             channel_id=rpc.DEFAULT_CHANNEL_ID,
