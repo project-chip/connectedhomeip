@@ -52,23 +52,6 @@ RetrieveLogsResponse command with correct field values.
 
 Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/logs_diagnostics.adoc
-
-Pre-condition values (TransferFileDesignator)
-- TH_LOG_ERROR_EMPTY: ""                                          (zero length)
-- TH_LOG_OK_NORMAL: "Length_1234567.txt"                          (within 32 characters)
-- TH_LOG_OK_FULL_LENGTH: "Length_123456789123456789123.txt"       (exactly 32 characters)
-- TH_LOG_BAD_LENGTH: "Length_1234567891234567891234567891212345.txt" (more than 32 characters)
-
-Notes
-- The BDX steps apply when the DUT can initiate BDX (MCORE.BDX.Initiator); the request to a DUT that does
-  not support BDX applies when it cannot. The invalid-argument checks always apply.
-- The reference app serves the log files named on its command line. When the matching string args are
-  given, the test prepares them so every status of the test plan is exercised: an end user support log
-  larger than 1024 bytes (sent via BDX), no network diagnostics log (NoLogs) and a crash log of at most
-  1024 bytes (sent inline, Exhausted). Omit the args against a real DUT.
-- TH rejects a transfer with the failure StatusReport the controller emits (TRANSFER_FAILED_UNKNOWN_ERROR).
-  The test plan names TRANSFER_METHOD_NOT_SUPPORTED; the DUT must answer Denied to any failure StatusReport
-  received in response to SendInit, so the verification is the same.
 """
 
 import asyncio
@@ -366,19 +349,16 @@ class TC_DLOG_2_1(MatterBaseTest):
         # Verify DUT does not initiate BDX and responds Status=Success with at most 1024 bytes, or Status=NoLogs
         # with empty LogContent.
         self.step(8)
-        if self.pics_guard(supports_bdx):
-            for intent in (IntentEnum.kEndUserSupport, IntentEnum.kNetworkDiag, IntentEnum.kCrashLogs):
-                bdx_transfer, response_task = await self._request_logs(intent, TransferProtocolEnum.kResponsePayload)
-                asserts.assert_is_none(bdx_transfer, f"DUT initiated BDX for a ResponsePayload request ({intent.name})")
-                self._verify_inline_response(await response_task, RESPONSE_PAYLOAD_STATUSES)
+        for intent in (IntentEnum.kEndUserSupport, IntentEnum.kNetworkDiag, IntentEnum.kCrashLogs):
+            bdx_transfer, response_task = await self._request_logs(intent, TransferProtocolEnum.kResponsePayload)
+            asserts.assert_is_none(bdx_transfer, f"DUT initiated BDX for a ResponsePayload request ({intent.name})")
+            self._verify_inline_response(await response_task, RESPONSE_PAYLOAD_STATUSES)
 
         # *** STEP 9 ***
         # TH sends RetrieveLogsRequest(Intent=EndUserSupport, RequestedProtocol=BDX) without
         # TransferFileDesignator to DUT. Verify DUT responds INVALID_COMMAND.
         self.step(9)
-        if self.pics_guard(supports_bdx):
-            await self._request_logs_expect_error(Status.InvalidCommand, IntentEnum.kEndUserSupport,
-                                                  TransferProtocolEnum.kBdx)
+        await self._request_logs_expect_error(Status.InvalidCommand, IntentEnum.kEndUserSupport, TransferProtocolEnum.kBdx)
 
         # *** STEP 10 ***
         # TH sends RetrieveLogsRequest(Intent=EndUserSupport, RequestedProtocol=BDX,
