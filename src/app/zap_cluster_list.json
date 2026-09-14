@@ -138,6 +138,7 @@
         "TEMPERATURE_CONTROL_CLUSTER": [],
         "TEMPERATURE_MEASUREMENT_CLUSTER": [],
         "THERMOSTAT_CLUSTER": [],
+        "THERMOSTAT_MODE_CLUSTER": [],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [],
         "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -181,10 +182,10 @@
         "AIR_QUALITY_CLUSTER": ["air-quality-server"],
         "ALARM_CLUSTER": [],
         "AMBIENT_CONTEXT_SENSING_CLUSTER": ["ambient-context-sensing-server"],
-        "AMBIENT_SENSING_UNION_CLUSTER": [],
+        "AMBIENT_SENSING_UNION_CLUSTER": ["ambient-sensing-union-server"],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
-        "AUDIO_CONTROL_CLUSTER": [],
+        "AUDIO_CONTROL_CLUSTER": ["audio-control-server"],
         "AUDIO_OUTPUT_CLUSTER": ["audio-output-server"],
         "AV_ANALYSIS_CLUSTER": [],
         "BALLAST_CONFIGURATION_CLUSTER": [],
@@ -231,7 +232,7 @@
         "DISHWASHER_ALARM_CLUSTER": ["dishwasher-alarm-server"],
         "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
         "DYNAMIC_LIGHTING_CLUSTER": ["dynamic-lighting-server"],
-        "ELECTRICAL_ALARM_CLUSTER": [],
+        "ELECTRICAL_ALARM_CLUSTER": ["electrical-alarm-server"],
         "ELECTRICAL_DISTRIBUTION_CLUSTER": ["electrical-distribution-server"],
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
             "electrical-grid-conditions-server"
@@ -360,6 +361,7 @@
         "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
         "TEMPERATURE_MEASUREMENT_CLUSTER": ["temperature-measurement-server"],
         "THERMOSTAT_CLUSTER": ["thermostat-server"],
+        "THERMOSTAT_MODE_CLUSTER": ["mode-base-server"],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"
         ],

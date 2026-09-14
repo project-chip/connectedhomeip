@@ -1553,9 +1553,13 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     }
 
     // Sign the new certificate.
-    if (!X509_sign(newCert, caKey, certConfig.GetSignatureAlgorithmDER()))
+    // ML-DSA keys use a built-in hash; pass nullptr as the digest algorithm.
     {
-        ReportOpenSSLErrorAndExit("X509_sign", res = false);
+        const EVP_MD * md = IsMLDSAKey(caKey) ? nullptr : certConfig.GetSignatureAlgorithmDER();
+        if (!X509_sign(newCert, caKey, md))
+        {
+            ReportOpenSSLErrorAndExit("X509_sign", res = false);
+        }
     }
 
 exit:

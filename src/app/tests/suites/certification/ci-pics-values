@@ -631,6 +631,11 @@ G.C.C03.Tx=0
 G.C.C04.Tx=0
 G.C.C05.Tx=0
 
+# Groupcast Cluster
+# CI applications are built with groupcast enabled, so group membership is
+# managed through the Groupcast cluster instead of the Groups cluster.
+GC.S=1
+
 GRPKEY.S=1
 # No support for the CacheAndSync feature so far
 GRPKEY.S.F00=0
@@ -639,7 +644,6 @@ GRPKEY.S.A0000=1
 GRPKEY.S.A0001=1
 GRPKEY.S.A0002=1
 GRPKEY.S.A0003=1
-GRPKEY.S.A0004=1
 
 GRPKEY.S.C00.Rsp=1
 GRPKEY.S.C01.Rsp=1
@@ -1994,6 +1998,8 @@ TSTAT.S.A0053=1
 TSTAT.S.A0054=1
 TSTAT.S.A0055=1
 TSTAT.S.A0056=1
+TSTAT.S.A0057=1
+TSTAT.S.A0058=1
 
 TSTAT.S.M.MinSetpointDeadBandWritable=1
 TSTAT.S.M.HVACSystemTypeConfigurationWritable=0
@@ -2029,6 +2035,30 @@ TSTAT.C.Cfe.Tx=1
 # Client Commands
 TSTAT.C.C00.Tx=1
 TSTAT.C.C04.Tx=1
+
+# THERMOSTAT MODE CLUSTER
+
+TSTATM.S=1
+TSTATM.S.F01=1
+
+#Server
+TSTATM.S.A0000=1
+TSTATM.S.A0001=1
+TSTATM.S.A0002=1
+TSTATM.S.A0004=1
+
+#Command
+TSTATM.S.C00.Rsp=1
+TSTATM.S.C01.Tx=1
+TSTATM.S.C02.Rsp=1
+
+#Manual controllable
+TSTATM.S.M.CAN_TEST_MODE_FAILURE=0
+TSTATM.S.M.CAN_MANUALLY_CONTROLLED=0
+
+#PIXIT
+PIXIT.TSTATM.MODE_CHANGE_FAIL=1
+PIXIT.TSTATM.MODE_CHANGE_OK=1
 
 # Access Control cluster
 ACL.S=1
