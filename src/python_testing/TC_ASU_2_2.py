@@ -40,7 +40,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import async_test_body, has_cluster, pics, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -63,10 +63,9 @@ class TC_ASU_2_2(MatterBaseTest):
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
     @pics('ASU.S')
-    @async_test_body
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientSensingUnion))
     async def test_TC_ASU_2_2(self):
-        """[TC-ASU-2.2] Cluster endpoint"""
+        """[TC-ASU-2.2] Event Reporting with DUT as a server"""
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
         endpoint = self.get_endpoint()
@@ -158,28 +157,11 @@ class TC_ASU_2_2(MatterBaseTest):
         attrib_listener.reset()
 
         self.step("5", "TH receives UnionContributorAdded event and reads the AddedContributor field. Verify that the AddedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the added contributor(s) from step 3. For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string.")
-        # Collect all UnionContributorAdded events and index them by contributor NodeID.
-        # In CI, two contributors were added, so both NodeIDs must be present.
-        # Drain all queued events by polling until the queue is empty.
-        all_added_events = []
-        while True:
-            try:
-                ev = event_listener.get_event_from_queue(block=False, timeout=0)
-                all_added_events.append(ev)
-            except Exception:
-                break
-        if not all_added_events:
-            last = event_listener.get_last_event()
-            if last is not None:
-                all_added_events.append(last)
-
+        # In CI, two contributors were added; collect both events indexed by contributorNodeID.
         added_by_node = {}
-        for event in all_added_events:
-            if event is None:
-                continue
-            asserts.assert_equal(event.Header.EventId, cluster.Events.UnionContributorAdded.event_id,
-                                 f"Wrong event ID: got {event.Header.EventId}, expected UnionContributorAdded.")
-            added_list = list(event.Data.addedContributor)
+        for _ in range(2 if self.is_ci else 1):
+            added_data = event_listener.wait_for_event_report(cluster.Events.UnionContributorAdded, timeout_sec=10.0)
+            added_list = list(added_data.addedContributor)
             asserts.assert_true(len(added_list) > 0, "addedContributor field is empty in UnionContributorAdded event.")
             added = added_list[0]
             asserts.assert_false(added.contributorNodeID == Clusters.Types.NullValue,
@@ -244,12 +226,8 @@ class TC_ASU_2_2(MatterBaseTest):
         attrib_listener.reset()
 
         self.step("8", "TH receives UnionContributorRemoved event and reads the RemovedContributor field. Verify that the RemovedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the removed contributor(s) from step 6. For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string.")
-        event = event_listener.get_last_event()
-        asserts.assert_is_not_none(event, "No UnionContributorRemoved event received.")
-        asserts.assert_equal(event.Header.EventId, cluster.Events.UnionContributorRemoved.event_id,
-                             f"Wrong event ID: got {event.Header.EventId}, expected UnionContributorRemoved.")
-
-        removed_list = list(event.Data.removedContributor)
+        removed_data = event_listener.wait_for_event_report(cluster.Events.UnionContributorRemoved, timeout_sec=10.0)
+        removed_list = list(removed_data.removedContributor)
         asserts.assert_true(len(removed_list) > 0, "removedContributor field is empty in UnionContributorRemoved event.")
         removed = removed_list[0]
         asserts.assert_equal(removed.contributorNodeID, contnode, "Wrong ContributorNodeID in UnionContributorRemoved event.")
@@ -308,12 +286,8 @@ class TC_ASU_2_2(MatterBaseTest):
         attrib_listener.reset()
 
         self.step("11", "TH receives UnionContributorStatusChanged event and reads the ContributorStatusChange field. Verify that the ContributorStatusChange field contains ContributorNodeID, ContributorEndpointID, ContributorName, PreviousContributorStatus, and CurrentContributorStatus and the field values match to the field value changes occurred in step 9.")
-        event = event_listener.get_last_event()
-        asserts.assert_is_not_none(event, "No UnionContributorStatusChanged event received.")
-        asserts.assert_equal(event.Header.EventId, cluster.Events.UnionContributorStatusChanged.event_id,
-                             f"Wrong event ID: got {event.Header.EventId}, expected UnionContributorStatusChanged.")
-
-        changed_list = list(event.Data.contributorStatusChange)
+        changed_data = event_listener.wait_for_event_report(cluster.Events.UnionContributorStatusChanged, timeout_sec=10.0)
+        changed_list = list(changed_data.contributorStatusChange)
         asserts.assert_true(len(changed_list) > 0, "contributorStatusChange field is empty in UnionContributorStatusChanged event.")
         changed = changed_list[0]
         # ContributorNodeID and ContributorEndpointID identify the contributor that changed status.
