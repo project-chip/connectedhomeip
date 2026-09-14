@@ -271,6 +271,17 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/* \
     && : # last line
 
+# The apps below are linked against the OpenSSL 3.5 built from source in
+# Stage 1 (for ML-DSA / ML-KEM support), not the system 3.0.x that libcurl4
+# etc. pull in above. /usr/local/lib is scanned by ldconfig ahead of the
+# multiarch system library dirs (see /etc/ld.so.conf.d/libc.conf), so
+# dropping the 3.5 build there and refreshing the cache makes the dynamic
+# linker prefer it for libssl.so.3/libcrypto.so.3 without needing to remove
+# the apt-installed libssl3.
+COPY --from=chip-build-cert-bins /usr/local/lib/libssl.so* /usr/local/lib/
+COPY --from=chip-build-cert-bins /usr/local/lib/libcrypto.so* /usr/local/lib/
+RUN ldconfig
+
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out apps

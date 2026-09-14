@@ -119,6 +119,7 @@ void MatterPm10ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
+void MatterSmokeConcentrationMeasurementPluginServerInitCallback() {}
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRvcRunModePluginServerInitCallback() {}
 void MatterRvcCleanModePluginServerInitCallback() {}

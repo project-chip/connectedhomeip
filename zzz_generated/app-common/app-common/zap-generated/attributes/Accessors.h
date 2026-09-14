@@ -10296,13 +10296,6 @@ inline void GetDefaultOr(EndpointId endpoint,
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum * value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value,
-                                        MarkAttributeDirty markDirty);
 } // namespace TemperatureDisplayMode
 
 namespace KeypadLockout {
@@ -10316,13 +10309,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::ThermostatUse
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value,
-                                        MarkAttributeDirty markDirty);
 } // namespace KeypadLockout
 
 namespace ScheduleProgrammingVisibility {
@@ -10338,13 +10324,6 @@ inline void GetDefaultOr(EndpointId endpoint,
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum * value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value,
-    MarkAttributeDirty markDirty);
 } // namespace ScheduleProgrammingVisibility
 
 namespace FeatureMap {
@@ -10356,9 +10335,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace FeatureMap
 
 namespace ClusterRevision {
@@ -10370,9 +10346,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
