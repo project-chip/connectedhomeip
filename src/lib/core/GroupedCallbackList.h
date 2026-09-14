@@ -237,9 +237,9 @@ inline void DequeueGroup(Cancelable * cancelable)
 template <size_t Index>
 void TaggedDequeueGroup(Cancelable * cancelable)
 {
-    // Access a unique static volatile variable for each Index to ensure distinct
-    // machine instructions and relocations, preventing the linker from merging
-    // these functions under Identical Code Folding (--icf=all).
+    // Access a unique static volatile variable for each Index to ensure
+    // distinct relocations, preventing the linker from merging these functions
+    // under Identical Code Folding (--icf=all).
     static volatile const size_t sTag = Index;
     (void) sTag;
     DequeueGroup(cancelable);
