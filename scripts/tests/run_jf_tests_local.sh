@@ -50,13 +50,13 @@ if [[ ! -f "${VENV}/bin/activate" ]]; then
     exit 1
 fi
 
-if [[ ! -f "${JFA_APP}" ]]; then
+if [[ ! -f "$JFA_APP" ]]; then
     echo "ERROR: JFA app not found at ${JFA_APP}"
     echo "       Build: scripts/run_in_build_env.sh \"./scripts/build/build_examples.py --target linux-arm64-jf-admin-app-clang build\""
     exit 1
 fi
 
-if [[ ! -f "${JFC_APP}" ]]; then
+if [[ ! -f "$JFC_APP" ]]; then
     echo "ERROR: JFC app not found at ${JFC_APP}"
     echo "       Build: scripts/run_in_build_env.sh \"./scripts/build/build_examples.py --target linux-arm64-jf-control-app build\""
     exit 1
@@ -66,14 +66,14 @@ fi
 # run_python_test.py picks up any API additions not yet rebuilt into the venv.
 MATTER_TESTING_SRC="${CHIP_ROOT}/src/python_testing/matter_testing_infrastructure/matter/testing"
 MATTER_TESTING_VENV="${VENV}/lib/python3.12/site-packages/matter/testing"
-if [[ -d "${MATTER_TESTING_SRC}" && -d "${MATTER_TESTING_VENV}" ]]; then
+if [[ -d "$MATTER_TESTING_SRC" && -d "$MATTER_TESTING_VENV" ]]; then
     cp -r "${MATTER_TESTING_SRC}/." "${MATTER_TESTING_VENV}/"
 fi
 
 source "${VENV}/bin/activate"
 
-cd "${CHIP_ROOT}"
+cd "$CHIP_ROOT"
 exec scripts/tests/local.py python-tests \
-    --override-binary-path JF_ADMIN_APP "${JFA_APP}" \
-    --override-binary-path JF_CONTROL_APP "${JFC_APP}" \
+    --override-binary-path JF_ADMIN_APP "$JFA_APP" \
+    --override-binary-path JF_CONTROL_APP "$JFC_APP" \
     "$@"
