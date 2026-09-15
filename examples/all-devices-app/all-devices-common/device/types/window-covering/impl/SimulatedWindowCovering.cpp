@@ -51,15 +51,16 @@ SimulatedWindowCovering::SimulatedWindowCovering(const Context & context) :
                    Config{ .features = BitFlags<Clusters::WindowCovering::Feature>(
                                Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
                                Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt),
-                           .optionalAttributes = []() {
-                               Clusters::WindowCovering::OptionalAttributeSet optionals;
-                               optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
-                                   .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
-                                   .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
-                                   .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
-                                   .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
-                               return optionals;
-                           }(),
+                           .optionalAttributes =
+                               []() {
+                                   Clusters::WindowCovering::OptionalAttributeSet optionals;
+                                   optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
+                                       .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
+                                       .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
+                                       .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
+                                       .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
+                                   return optionals;
+                               }(),
                            .type           = Clusters::WindowCovering::Type::kTiltBlindLiftAndTilt,
                            .endProductType = Clusters::WindowCovering::EndProductType::kSheerShade })
 {}
@@ -200,7 +201,7 @@ void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
     }
 
     ChipLogProgress(DeviceLayer, "WindowCovering: Starting fake calibration (%u ms)", kCalibrationDuration.count());
-    mCalibrating = true;
+    mCalibrating   = true;
     auto & cluster = WindowCoveringCluster();
     cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
     cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>());
