@@ -266,6 +266,7 @@ class WpaSupplicantMock(TerminableThread):
 
             await self.Scan({})
 
+            await self.network.Enabled.set_async(True)
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
 
@@ -508,7 +509,8 @@ class WpaSupplicantMock(TerminableThread):
 
         @sdbus.dbus_property_async("a{sv}")
         def Properties(self) -> DictVariantT:
-            return {"ssid": ("s", self.ssid)}
+            # wpa_supplicant exposes text SSIDs quoted in the network Properties map.
+            return {"ssid": ("s", f'"{self.ssid}"')}
 
         @sdbus.dbus_property_async("b")
         def Enabled(self) -> bool:
