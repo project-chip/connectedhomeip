@@ -24,6 +24,7 @@ namespace {
 
 using namespace chip;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 const QNamePart kName1[] = { "some", "local" };
 const QNamePart kName2[] = { "something", "else" };

@@ -219,7 +219,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
-    ifp->name                      = CharSpan(threadNetworkName, strlen(threadNetworkName));
+    ifp->name                      = CharSpan::fromCharString(threadNetworkName);
     ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
@@ -230,7 +230,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     struct netif * netif = nullptr;
     netif                = static_cast<struct netif *>(net_get_mlan_handle());
     chip::Platform::CopyString(ifp->Name, "wlan0");
-    ifp->name          = CharSpan(ifp->Name, strlen(ifp->Name));
+    ifp->name          = CharSpan::fromCharString(ifp->Name);
     ifp->isOperational = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
@@ -269,6 +269,12 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+bool DiagnosticDataProviderImpl::IsWiFiStaConnected()
+{
+    enum wlan_connection_state state = WLAN_DISCONNECTED;
+    return (wlan_get_connection_state(&state) == WM_SUCCESS && state == WLAN_CONNECTED);
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
     constexpr size_t bssIdSize = 6;
@@ -336,6 +342,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
+    VerifyOrReturnError(IsWiFiStaConnected(), CHIP_ERROR_INCORRECT_STATE);
     channelNumber = wlan_get_current_channel();
     return CHIP_NO_ERROR;
 }
@@ -474,6 +481,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
 {
 #if CONFIG_WIFI_GET_LOG
+    VerifyOrReturnError(IsWiFiStaConnected(), CHIP_ERROR_INCORRECT_STATE);
     wlan_ds_rate ds_rate;
     mlan_bss_type bss_type = MLAN_BSS_TYPE_STA;
 

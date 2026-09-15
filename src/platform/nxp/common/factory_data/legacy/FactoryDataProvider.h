@@ -142,6 +142,16 @@ public:
     virtual CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer);
     virtual CHIP_ERROR Validate();
 
+    /**
+     * @brief Import the DAC private key into PSA once, at init time.
+     *
+     * Reads the DAC private key stored in factory data, imports it into PSA
+     * with the attributes required for ECDSA signing, and caches the resulting
+     * key id in @ref mDacKeyId. Subsequent calls to SignWithDacKey will reuse
+     * this key id instead of importing the blob for every signing operation.
+     */
+    virtual CHIP_ERROR ImportDacPrivateKey();
+
     virtual CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                                    uint32_t * offset = nullptr);
     virtual CHIP_ERROR SetAesKey(const uint8_t * keyAes, AESKeySize keySize);
@@ -213,6 +223,9 @@ protected:
 
     Header mHeader;
     FactoryDataConfig mConfig;
+    // PSA key id for the DAC private key. Populated by ImportDacPrivateKey() at init;
+    // 0 means "not imported yet" and SignWithDacKey falls back to a per-call import.
+    psa_key_id_t mDacKeyId = 0;
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
     std::vector<RestoreMechanism> mRestoreMechanisms;
     FactoryDataDriver * mFactoryDataDriver = nullptr;

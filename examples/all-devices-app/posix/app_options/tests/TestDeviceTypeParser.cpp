@@ -16,7 +16,9 @@
  *    limitations under the License.
  */
 
+#include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
@@ -448,4 +450,13 @@ TEST_F(TestDeviceTypeParser, ValidateConfig_CycleDetected)
     std::vector<DeviceTypeParser::Entry> entries = { { .type = "chime", .endpoint = 2, .parentId = 3 },
                                                      { .type = "speaker", .endpoint = 3, .parentId = 2 } };
     EXPECT_NE(DeviceTypeParser::ValidateConfig(entries), CHIP_NO_ERROR);
+}
+
+TEST(TestAppOptions, Parse_DacProvider)
+{
+    const char * argv[]              = { "all-devices-app", "--dac_provider", "path/to/dac.json", nullptr };
+    ArgParser::OptionSet * options[] = { AppOptions::GetOptions(), nullptr };
+    EXPECT_TRUE(ArgParser::ParseArgs("all-devices-app", 3, const_cast<char * const *>(argv), options));
+    EXPECT_EQ(AppOptions::ValidateConfig(), CHIP_NO_ERROR);
+    EXPECT_EQ(AppOptions::GetConfig().dacProvider.value_or(""), "path/to/dac.json");
 }

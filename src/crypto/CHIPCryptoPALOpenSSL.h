@@ -32,6 +32,29 @@ namespace Crypto {
 using boringssl_size_t_openssl_int = size_t;
 #else
 using boringssl_size_t_openssl_int = int;
+
+namespace detail {
+// Aborts unless we're running against an appropriate version of OpenSSL.
+// All OpenSSL 3.x versions share the same soname, and there are no explicit ABI versioning symbols
+// that would prevent a binary compiled against a newer version from running against an older
+// library version. Especially when OSSL_PARAMs are used, where the library silently ignores
+// unknown parameters, this can result in code silently misbehaving at runtime, even when it was
+// guarded by appropriate OPENSSL_VERSION_NUMBER guards at build time.
+// For example, OpenSSL 3.2 adds support for the OSSL_SIGNATURE_PARAM_NONCE_TYPE parameter to
+// create deterministic ECDSA signatures, but when linked against an OpenSSL 3.0 shared library at
+// runtime that parameter is silently ignored and non-deterministic signatures are produced instead.
+// To prevent such issues, ensure that the runtime version is not older than the version we compiled
+// against (masked to major/minor version only).
+void AssertOpenSSLVersion();
+
+// CHIPCryptoPAL.h has no initialization API that we could hook into. Force a call to
+// AssertOpenSSLVersion() via a static initializer with inline linkage.
+// This ensures the check runs as long as any TU that includes this header is linked.
+inline struct AssertOpenSSLVersionCaller
+{
+    AssertOpenSSLVersionCaller() { AssertOpenSSLVersion(); }
+} gAssertOpenSSLVersion;
+} // namespace detail
 #endif
 
 enum class ECName

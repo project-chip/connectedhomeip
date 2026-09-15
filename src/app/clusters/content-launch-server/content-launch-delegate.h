@@ -49,14 +49,12 @@ public:
     virtual void HandleContentReplicationRequest(CommandResponseHelper<Commands::ContentReplicationResponse::Type> & helper)
     {
         Commands::ContentReplicationResponse::Type response;
-        (void) helper.Success(response);
+        LogErrorOnFailure(helper.Success(response));
     }
 
-    virtual void HandlePlayPreset(CommandResponseHelper<Commands::LauncherResponse::Type> & helper, uint16_t presetID)
+    virtual void HandlePlayPreset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, uint16_t presetID)
     {
-        Commands::LauncherResponse::Type response;
-        response.status = StatusEnum::kURLNotAvailable;
-        (void) helper.Success(response);
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     }
 
     virtual CHIP_ERROR HandleGetAcceptHeaderList(app::AttributeValueEncoder & aEncoder) = 0;

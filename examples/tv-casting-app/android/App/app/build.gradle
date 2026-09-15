@@ -95,7 +95,9 @@ dependencies {
         implementation fileTree(dir: "libs", include: ["*.jar"], exclude: ["TvCastingApp.jar"])
         compileOnly files("libs/TvCastingApp.jar")
     } else {
-        implementation fileTree(dir: "libs", include: ["*.jar","*.so"])
+        implementation fileTree(dir: "libs", include: ["*.so"])
+        implementation fileTree(dir: "libs", include: ["*.jar"], exclude: ["TvCastingApp.jar"])
+        compileOnly files("libs/TvCastingApp.jar")
     }
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'

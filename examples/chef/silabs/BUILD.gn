@@ -111,8 +111,8 @@ silabs_executable("chef_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_common_plat_dir}/PigweedLogger.cpp",
-      "${examples_common_plat_dir}/Rpc.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/Rpc.cpp",
     ]
 
     deps += [

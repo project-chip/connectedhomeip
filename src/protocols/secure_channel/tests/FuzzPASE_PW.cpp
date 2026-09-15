@@ -295,7 +295,9 @@ FUZZ_TEST(FuzzPASE_PW, PASESession_Unbounded)
 void FuzzSpake2pVerifier(const vector<uint8_t> & aW0, const vector<uint8_t> & aL, const vector<uint8_t> & aSalt,
                          const uint32_t fuzzedPBKDF2Iter, const uint32_t fuzzedSetupPasscode)
 {
-    Spake2pVerifier fuzzedSpake2pVerifier;
+    // Zero-initialize: aW0/aL may be shorter than mW0/mL, so the copy_n calls below leave the tail unset and
+    // BeginVerifier()/FELoad() would read uninitialized bytes. Production verifiers come from Generate()/Deserialize().
+    Spake2pVerifier fuzzedSpake2pVerifier{};
 
     copy_n(aW0.data(), aW0.size(), fuzzedSpake2pVerifier.mW0);
     copy_n(aL.data(), aL.size(), fuzzedSpake2pVerifier.mL);
@@ -494,6 +496,10 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
     // inject it here to be able to pass that check
     memcpy(&pairingCommissioner.mPBKDFLocalRandomData[0], fuzzPBKDFLocalRandomDataInitiator.data(),
            fuzzPBKDFLocalRandomDataInitiator.size());
+
+    // This harness skips Init()/Pair(), which normally set mSetupPINCode; HandlePBKDFParamResponse() -> ComputeWS()
+    // reads it. Set a fixed valid passcode (production always initializes it via Init()/Pair()).
+    pairingCommissioner.mSetupPINCode = 20202021;
 
     // In order to cover the Code path where the Commissioner has PBKDF Parameters before Starting PASE, as such, the Accessory will
     // not send the PBKDF Parameters in the Response message

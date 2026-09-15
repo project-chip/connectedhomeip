@@ -87,7 +87,25 @@
  */
 #define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
 
-// Enable some test-only interaction model APIs.
+// CONFIG_BUILD_FOR_HOST_UNIT_TEST gates *data members* in core types such as
+// CASESession (mStopHandshakeAtState) and, transitively, the layout of the
+// Server singleton (which embeds CASESession via CASEServer/CASESessionManager
+// ahead of its FabricTable). This header is the global project-config include
+// (chip_project_config_include in args.gni), so it is seen by EVERY translation
+// unit in the tv-casting-app build, both the app sources and the core src/*
+// library. It MUST therefore resolve to a single value across the whole link.
+//
+// It is also a functional switch: the non-size-optimized build pulls in the
+// legacy chip-tool InteractionModel.cpp, whose SendCommand/SendSubscribeRequest
+// paths call the test-only CommandSender/ReadClient hooks that are compiled only
+// when this is 1. So it must be 1, matching chip-tool's own CHIPProjectAppConfig.h
+// (which shares that code).
+//
+// Set it here in the shared project-config header ONLY. Do NOT add a per-target
+// `-DCONFIG_BUILD_FOR_HOST_UNIT_TEST=...` override in any BUILD.gn: that reaches
+// only some TUs while the rest pick up the value below, and the resulting ODR
+// mismatch changes the offset of Server::mFabrics between TUs, crashing at
+// startup in FabricTable::AddFabricDelegate (garbage mDelegateListRoot).
 #ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
 #endif

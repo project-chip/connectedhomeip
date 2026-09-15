@@ -99,6 +99,46 @@ file.
 The structured comments above the class definition are used to set up the CI for
 the tests. Please see [Running tests in CI](#running-tests-in-ci).
 
+### Declaring a test's device requirement
+
+`MatterBaseTest` is device-requirement neutral: on its own it does not say
+whether a test needs a commissioned device, an uncommissioned one, performs
+commissioning itself, or needs no device at all. Instead of deriving from
+`MatterBaseTest` directly, a test should derive from the marker base class that
+matches what it requires. These markers are currently **declarative only** —
+they add no runtime behavior and do not change method resolution order, setup,
+teardown, or test discovery. They give tooling (the Test Harness, CI selection,
+the structural check below) a single static signal for what each test needs.
+
+| Base class                       | The test...                                                                   |
+| -------------------------------- | ----------------------------------------------------------------------------- |
+| `MatterTestCommissionedDevice`   | requires a DUT already commissioned before it runs (the common case).         |
+| `MatterTestUncommissionedDevice` | requires an uncommissioned / commissionable DUT (not yet on a fabric).        |
+| `MatterTestCommissioner`         | commissions the DUT itself, or exercises commissioner-role flows (e.g. PASE). |
+| `CertificationUnitTestNoDevice`  | is a parser / validation / framework unit test that never talks to a DUT.     |
+| `BasicCompositionTests`          | intentionally supports either a commissioned **or** an uncommissioned device. |
+
+A test that commissions a _second_ fabric or a helper device while its own DUT
+is already commissioned is still `MatterTestCommissionedDevice`: classification
+follows the DUT's required starting state, not incidental commissioning actions.
+
+> **Wildcard subscription is a separate concern.** Whether the background
+> wildcard subscription runs is controlled by `requires_dut` /
+> `disable_wildcard_subscription` / `--no-wildcard-subscription` (see
+> [Wildcard subscription read verification](#wildcard-subscription-read-verification)).
+> For the three device-STATE markers (`MatterTestCommissionedDevice`,
+> `MatterTestUncommissionedDevice`, `MatterTestCommissioner`) this is
+> independent of classification — e.g. a `MatterTestCommissionedDevice` test may
+> still set `requires_dut = False` to skip the subscription. The one exception
+> is `CertificationUnitTestNoDevice`, which sets `requires_dut = False` on the
+> base: a test that never talks to a DUT can never use the subscription, so
+> no-device tests inherit that automatically and should not set it themselves.
+
+`TestDeviceRequirementMarkers.py` (under `test_testing/`) enforces the hierarchy
+invariants (the device-state markers are empty and subscription-independent,
+`CertificationUnitTestNoDevice` disables the subscription, markers are mutually
+exclusive) and checks that the reclassified tests declare the expected marker.
+
 ## Cluster Codegen
 
 -   [Objects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/Objects.py)
@@ -471,6 +511,10 @@ See
     -   use --int-arg, --bool-arg etc on the command line to specify PIXITs
     -   Warn users if they don’t set required values, add instructions in the
         comments
+    -   for a declarative alternative, declare required/optional PIXITs and
+        harness parameters up front with the `@pixit` / `@harness_params`
+        decorators — see
+        [Declarative PIXITs and harness parameters](./pics_and_pixit.md#declarative-pixits-and-harness-parameters)
 -   pixit_value = self.user_params.get("pixit_name", default)
 
 ## Support functionality

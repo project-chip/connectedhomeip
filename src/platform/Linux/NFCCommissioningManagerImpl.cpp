@@ -745,7 +745,7 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
 
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();
-    ChipLogProgress(DeviceLayer, "CanSendToPeer? nfcShortId = %d", nfcShortId);
+    ChipLogProgressNfcDebug(DeviceLayer, "CanSendToPeer? nfcShortId = %d", nfcShortId);
 
     {
         std::lock_guard<std::mutex> lock(mStateMutex);

@@ -1946,7 +1946,7 @@ int BLEManagerImpl::gatt_svr_chr_access_additional_data(uint16_t conn_handle, ui
         break;
     }
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 
     return err;
 }

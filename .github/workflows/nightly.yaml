@@ -59,7 +59,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -115,7 +115,7 @@ jobs:
 
             - name: Build Software Update ota images with new version.
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 3
                   && mv out/su_ota_images_min-v*/*.ota objdir-clone
                   && rm -rf out/su_ota_images_min-v*"
 
@@ -125,6 +125,12 @@ jobs:
                 --target linux-x64-all-clusters-${BUILD_VARIANT}-clang-test
                 --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                 && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test"
+            - name: Build linux-x64-all-devices
+              run: >-
+                ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                --target linux-x64-all-devices-${BUILD_VARIANT}-clang-test
+                --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                && rm -rf out/linux-x64-all-devices-${BUILD_VARIANT}-clang-test"
             - name: Build linux-x64-fabric-admin-rpc
               run: >-
                 ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
@@ -221,7 +227,7 @@ jobs:
                 # Regex filter by TC SU we think 45 minutes is more than engough for this task
                 # Each on one run to avoid all the jobs fail if one fails
                 # Add slow tests here as needed using the filter, individually or by group.
-                filter: ["", "TC_SU_2_5", "TC_SU_2_7", "!TC_SU"]
+                filter: ["", "TC_SU_2_2", "TC_SU_2_4", "TC_SU_2_5", "TC_SU_2_7", "!TC_SU"]
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
@@ -231,7 +237,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -284,9 +290,11 @@ jobs:
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   # SU OTA Images
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
+                  echo "SU_OTA_REQUESTOR_V3: objdir-clone/chip-ota-requestor-app_v3.min.ota" >> /tmp/test_env.yaml
                   
                   # Slow Test Apps
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
@@ -365,7 +373,7 @@ jobs:
                   path: gh-pages
 
             - name: Generate Allure Report
-              uses: simple-elf/allure-report-action@v1.14
+              uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
               with:
                   allure_results: junit-results
                   allure_report: allure-report
@@ -410,7 +418,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:

@@ -55,7 +55,7 @@ class ProcessingPath:
         return '::'.join(self.paths)
 
     def __repr__(self):
-        return 'ProcessingPath(%r)' % self.paths
+        return f'ProcessingPath({self.paths!r})'
 
 
 class Context:
@@ -118,7 +118,7 @@ class Context:
     def MarkTagNotHandled(self):
         path = str(self.path)
         if path not in self._not_handled:
-            msg = "TAG %s was not handled/recognized" % path
+            msg = f"TAG {path} was not handled/recognized"
 
             where = self.ParseLogLocation()
             if where:
