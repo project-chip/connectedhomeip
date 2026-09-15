@@ -5351,12 +5351,26 @@ void SubscriptionCallback::OnAttributeData(
     }
 
     MTRAttributePath * attributePath = [[MTRAttributePath alloc] initWithPath:aPath];
+
+    // Capture the receipt time here, as close to the wire as we can get: this
+    // runs synchronously as the ReadClient processes the incoming report, before
+    // the report is queued over to the MTRDevice's queue for handling.  Stamping
+    // here is what gives the key its meaning: a value that carries one arrived
+    // from the device at that instant.  A stamp applied further out could not tell
+    // that apart from a value served from the cache or synthesized locally.
+    NSDate * localReceiptTime = [NSDate now];
+
     if (aStatus.mStatus != Status::Success) {
-        [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForIMStatus:aStatus] }];
+        [mAttributeReports addObject:@ {
+            MTRAttributePathKey : attributePath,
+            MTRErrorKey : [MTRError errorForIMStatus:aStatus],
+            MTRLocalReceiptTimeKey : localReceiptTime,
+        }];
     } else if (apData == nullptr) {
         [mAttributeReports addObject:@ {
             MTRAttributePathKey : attributePath,
-            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
+            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT],
+            MTRLocalReceiptTimeKey : localReceiptTime,
         }];
     } else {
         NSNumber * dataVersionNumber = aPath.mDataVersion.HasValue() ? @(aPath.mDataVersion.Value()) : nil;
@@ -5366,9 +5380,14 @@ void SubscriptionCallback::OnAttributeData(
             [mAttributeReports addObject:@ {
                 MTRAttributePathKey : attributePath,
                 MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED],
+                MTRLocalReceiptTimeKey : localReceiptTime,
             }];
         } else {
-            [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRDataKey : value }];
+            [mAttributeReports addObject:@ {
+                MTRAttributePathKey : attributePath,
+                MTRDataKey : value,
+                MTRLocalReceiptTimeKey : localReceiptTime,
+            }];
         }
     }
 

@@ -416,9 +416,18 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_AVAILABLE(ios(17.6), macos(14.
  *
  * @param attributeReport  An array of response-value objects as described in MTRDeviceResponseHandler
  *
- *                In addition to MTRDataKey, each response-value dictionary in the array may also have this key:
+ *                In addition to MTRDataKey, each response-value dictionary in the array may also have these keys:
  *
  *                MTRPreviousDataKey : Same data-value dictionary format as the object for MTRDataKey. This is included when the previous value is known for an attribute.
+ *
+ *                MTRLocalReceiptTimeKey : NSDate object, as described in MTRDeviceResponseHandler.  The local time at which
+ *                                         this value was received from the device.
+ *
+ *                                         Present only for values that were in fact received from the device, whether via
+ *                                         a subscription report or via a read.  Absent for locally synthesized expected
+ *                                         values, and for values served from the local cache (for example, when an
+ *                                         expected value expires and the cached value is reported in its place), whose age
+ *                                         is not tracked.  Absent means "age unknown", not "just now".
  *
  *                The data-value dictionary also contains this key:
  *
