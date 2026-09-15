@@ -78,7 +78,11 @@ CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenData
     // The device boots without a known position; enter calibration mode itself immediately
     // rather than waiting for a client to request it, so it resolves to a known position
     // shortly after startup on its own (see OnModeChanged()/TimerFired()).
-    WindowCoveringCluster().SetMode(chip::BitMask<Mode>(Mode::kCalibrationMode));
+    if (WindowCoveringCluster().GetCurrentPositionLiftPercent100ths().IsNull() ||
+        WindowCoveringCluster().GetCurrentPositionTiltPercent100ths().IsNull())
+    {
+        WindowCoveringCluster().SetMode(chip::BitMask<Mode>(Mode::kCalibrationMode));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -200,7 +204,7 @@ void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
         return;
     }
 
-    ChipLogProgress(DeviceLayer, "WindowCovering: Starting fake calibration (%u ms)", kCalibrationDuration.count());
+    ChipLogProgress(DeviceLayer, "WindowCovering: Starting fake calibration (%" PRIu32 " ms)", kCalibrationDuration.count());
     mCalibrating   = true;
     auto & cluster = WindowCoveringCluster();
     cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
