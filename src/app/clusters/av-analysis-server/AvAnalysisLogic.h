@@ -144,6 +144,10 @@ public:
     HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
 
+    // Attribute interactions
+    bool IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext,
+                                   Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds);
+
     // Active context tracking and events
     CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, Optional<NodeId> aSourceNodeId = NullOptional,
                                    bool aUseSpecificSessionId = false);
@@ -206,6 +210,7 @@ private:
      * Command and event handler helper methods
      */
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
+    bool AreAllZoneIdsFound(const std::vector<uint16_t> & subset, const std::vector<uint16_t> & target);
     bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext);
 
     /**

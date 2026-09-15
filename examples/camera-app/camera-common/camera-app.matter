@@ -3124,7 +3124,7 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    ram      attribute activeLocale default = "en-US";
+    callback attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -3551,6 +3551,7 @@ endpoint 1 {
     handle command SetTransportStatus;
     handle command ManuallyTriggerTransport;
     handle command FindTransport;
+    handle command UpdateMotionZoneOptions;
   }
 
   server cluster Chime {

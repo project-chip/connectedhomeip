@@ -17,6 +17,7 @@
  */
 
 #include "CameraAppCommandDelegate.h"
+#include <cstdint>
 #include <lib/support/SafeInt.h>
 #include <platform/PlatformManager.h>
 
@@ -84,6 +85,36 @@ void CameraAppCommandHandler::HandleCommand(intptr_t context)
         bool value = self->mJsonValue["Value"].asBool();
         self->OnSetHardPrivacyModeOnHandler(value);
     }
+    else if (name == "AmbientContextTriggered")
+    {
+        const Json::Value & namespaceValue        = self->mJsonValue["NamespaceId"];
+        const Json::Value & tagValue              = self->mJsonValue["TagId"];
+        const Json::Value & zoneIdValues          = self->mJsonValue["ZoneIds"];
+        const Json::Value & identifedContextValue = self->mJsonValue["IdentifiedContextId"];
+
+        VerifyOrExit(namespaceValue.isUInt() && namespaceValue.asUInt() <= UINT8_MAX,
+                     ChipLogError(NotSpecified, "Camera App: NamespaceId is missing, invalid or out of unsigned 8-bit range"));
+        VerifyOrExit(tagValue.isUInt() && tagValue.asUInt() <= UINT8_MAX,
+                     ChipLogError(NotSpecified, "Camera App: TagId is missing, invalid or out of unsigned 8-bit range"));
+        VerifyOrExit(
+            identifedContextValue.isUInt() && identifedContextValue.asUInt() <= UINT16_MAX,
+            ChipLogError(NotSpecified, "Camera App: IdentifiedContextId is missing, invalid or out of unsigned 16-bit range"));
+
+        // ZoneIds is always an array, it may be empty
+        VerifyOrExit(zoneIdValues.isArray(), ChipLogError(NotSpecified, "Camera App: ZoneIds must be an array"));
+
+        std::vector<uint16_t> zoneIds;
+        for (const auto & zoneId : zoneIdValues)
+        {
+            VerifyOrExit(zoneId.isUInt() && zoneId.asUInt() <= UINT16_MAX,
+                         ChipLogError(NotSpecified, "Camera App: ZoneIds entry is invalid or out of unsigned 16-bit range"));
+            zoneIds.push_back(static_cast<uint16_t>(zoneId.asUInt()));
+        }
+
+        self->OnAmbientContextTriggeredHandler(static_cast<uint8_t>(namespaceValue.asUInt()),
+                                               static_cast<uint8_t>(tagValue.asUInt()), zoneIds,
+                                               static_cast<uint16_t>(identifedContextValue.asUInt()));
+    }
     else if (name == "AvAnalysisSessionStart")
     {
         self->OnAvAnalysisSessionStartHandler();
@@ -118,6 +149,12 @@ void CameraAppCommandHandler::OnZoneTriggeredHandler(const std::vector<uint16_t>
 void CameraAppCommandHandler::OnSetHardPrivacyModeOnHandler(bool value)
 {
     TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().SetHardPrivacyModeOn(value);
+}
+
+void CameraAppCommandHandler::OnAmbientContextTriggeredHandler(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
+                                                               uint16_t identifiedContextId)
+{
+    mCameraDevice->HandleSimulatedAmbientContextTriggeredEvent(namespaceId, tagId, zoneIds, identifiedContextId);
 }
 
 static AvAnalysis::Structs::TrackedContext::Type ParseTrackedContext(const Json::Value & ctxVal)

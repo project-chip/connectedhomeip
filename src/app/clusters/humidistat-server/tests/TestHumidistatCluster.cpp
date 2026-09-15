@@ -496,6 +496,26 @@ TEST_F(TestHumidistatCluster, SetSettingsUserSetpoint)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestHumidistatCluster, SnapToNearestStepBelowMin)
+{
+    // Regression: value < mMinSetpoint caused unsigned wrap-around in offset calculation.
+    // The constructor calls SnapToNearestStep on config.userSetpoint without a prior range check.
+    HumidistatCluster::StartupConfiguration config;
+    config.minSetpoint  = 20;
+    config.maxSetpoint  = 80;
+    config.step         = 5;
+    config.userSetpoint = 10; // below minSetpoint — triggers wrap-around without the fix
+
+    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kSensor, Feature::kColdMist };
+    HumidistatCluster cluster(kTestEndpointId, features, {}, config);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    // Without the fix, wrap-around produces a garbage snapped value far above maxSetpoint.
+    EXPECT_EQ(cluster.GetUserSetpoint(), 20);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestHumidistatCluster, SetSettingsUnsupportedFieldsIgnored)
 {
     // Cluster with only mode support and NO optional features — optional fields must be silently ignored.
@@ -628,6 +648,14 @@ TEST_F(TestHumidistatCluster, SetMistTypeAllowsEmptyValueInHumidifierMode)
     tester.GetDirtyList().clear();
 
     EXPECT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>()), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
+    EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
+
+    ASSERT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold)), CHIP_NO_ERROR);
+    tester.GetDirtyList().clear();
+
+    // Exercise the WriteAttribute path as well, not just the direct setter.
+    EXPECT_EQ(tester.WriteAttribute(MistType::Id, chip::BitMask<MistTypeBitmap>()), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
     EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
 
