@@ -1205,6 +1205,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_pqc_support.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_10.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_12.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_matter_base_test_teardown.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestAttributeSubscriptionLiveness.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDeviceRequirementMarkers.py'
