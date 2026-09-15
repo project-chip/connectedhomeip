@@ -275,7 +275,8 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
          app_filter, pre_existing_fabric: bool, linux_commissioning_method: str | None,
-         internal_inside_unshare: bool):
+         internal_inside_unshare: bool) -> None:
+    """Run the configured Matter Python test."""
     if linux_commissioning_method:
         if sys.platform != "linux":
             raise click.ClickException("--linux-commissioning-method is only supported on Linux")
