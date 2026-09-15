@@ -2450,7 +2450,7 @@ endpoint 1 {
     ram      attribute speedMax default = 100;
     callback attribute speedSetting;
     callback attribute speedCurrent;
-    ram      attribute rockSupport default = 0x00;
+    ram      attribute rockSupport default = 0x01;
     callback attribute rockSetting;
     callback attribute airflowDirection;
     callback attribute generatedCommandList;

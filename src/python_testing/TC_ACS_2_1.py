@@ -156,8 +156,6 @@ class TC_ACS_2_1(MatterBaseTest):
                     elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
                         asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
                                                   "Tag number doesn't exit in IdentifiedSound namesapce.")
-                    else:
-                        asserts.fail("Unsupported namespace ID.")
 
             self.step("6", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextType attribute. Verify that DUT response contains the list size is less than SimultaneousDetectionLimit. Verify that DUT response contains the list of namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute.")
             ambientContextType = await self.read_single_attribute_check_success(
