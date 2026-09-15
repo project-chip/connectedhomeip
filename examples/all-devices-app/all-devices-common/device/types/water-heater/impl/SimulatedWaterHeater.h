@@ -24,6 +24,9 @@
 
  namespace chip::app {
 
+ constexpr uint32_t kInitialTemperature = 20;
+ constexpr uint32_t kFinalTemperature = 30;
+
  class SimulatedWaterHeater : public WaterHeater<Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate>,
         public Clusters::WaterHeaterManagement::Delegate, public TimerContext, public Clusters::ModeBase::AppDelegate
  {
@@ -32,11 +35,14 @@
     explicit SimulatedWaterHeater(const Config & config);
     ~SimulatedWaterHeater();
 
+    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, 
+        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 
     // TimerContext
     void TimerFired() override;
+
 
     // Clusters::WaterHeaterManagement::Delegate
     Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
@@ -59,16 +65,24 @@
 
 
 private:
+
     void EndBoost();
     void NotifyHeatDemandAndBoostStateChanged();
-
-
+    
+    template <typename DelegateType>
+    DelegateType * GetDelegate()
+    {
+        return std::get<std::unique_ptr<DelegateType>>(mThermostatDelegates).get();
+    }
 
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeaterTypes{
         Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap::kImmersionElement1
     };
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeatDemand;
     Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
+    uint32_t mBoostRemainingTime = 0;
+    uint32_t mTemperature = kInitialTemperature;
+    bool mHeatingEnabled = false;
  };
 
 

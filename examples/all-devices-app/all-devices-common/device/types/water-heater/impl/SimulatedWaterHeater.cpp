@@ -21,11 +21,15 @@
  using namespace chip::app::Clusters;
  using namespace chip::app::Clusters::WaterHeaterManagement;
  using namespace chip::app::Clusters::WaterHeaterManagement::Attributes;
+ using namespace chip::app::Clusters::Thermostat;
 
 
 namespace chip::app {
 
 namespace {
+
+    constexpr uint32_t kStepDurationSeconds = 3;
+    ;
     using ModeTagStructType = Clusters::detail::Structs::ModeTagStruct::Type;
 
     constexpr uint8_t kWaterHeaterModeOff = 0;
@@ -49,10 +53,32 @@ namespace {
     };
 }
 
- SimulatedWaterHeater::SimulatedWaterHeater(const Config & config) : WaterHeater(config, *this, *this) {}
+ SimulatedWaterHeater::SimulatedWaterHeater(const Config & config) : WaterHeater(config, *this, *this) 
+ { }
 
  SimulatedWaterHeater::~SimulatedWaterHeater() {
     mConfig.timerDelegate.CancelTimer(this);
+ }
+
+ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, 
+    EndpointComposition composition)
+ {
+    ReturnErrorOnFailure(WaterHeater::Register(endpoint, provider, composition)); 
+    // Setup initial values
+    mTemperature = kInitialTemperature;
+    mHeatingEnabled = true;
+    mBoostState = BoostStateEnum::kInactive;
+    mBoostRemainingTime = 0;
+    mHeatDemand.ClearAll();
+
+    bool changed = false;
+    GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100), changed);
+    GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetSystemMode(SystemModeEnum::kHeat, changed);
+    GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly, changed);
+    GetDelegate<Clusters::Thermostat::ThermostatSetpointsDelegate>()->SetOccupiedHeatingSetpoint(kFinalTemperature * 100, changed);
+
+    SuccessOrDie(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
+    return CHIP_NO_ERROR;
  }
 
  void SimulatedWaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
@@ -63,8 +89,38 @@ namespace {
 
  void SimulatedWaterHeater::TimerFired()
 {
-    ChipLogProgress(AppServer, "WaterHeater: Boost duration elapsed");
-    EndBoost();
+    SuccessOrDie(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
+    // Handle boost
+    if (mBoostState == BoostStateEnum::kActive) {
+        mBoostRemainingTime -= kStepDurationSeconds;
+        if (mBoostRemainingTime <= 0) {
+            ChipLogProgress(AppServer, "WaterHeater: Boost duration elapsed");
+            EndBoost();
+        }
+    }
+
+    // Handle heating
+    bool changed = false;
+    if (mHeatingEnabled) {
+        uint8_t temperatureStep = mBoostState == BoostStateEnum::kActive ? 2 : 1;
+        mTemperature += temperatureStep;
+        ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRIu8 "°C", mTemperature);
+        GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100), changed);
+        if (mTemperature >= kFinalTemperature) {
+            GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetSystemMode(SystemModeEnum::kOff, changed);
+
+            mHeatingEnabled = false;
+        }
+    }
+    else {
+        mTemperature -= 1;
+        ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRIu8 "°C", mTemperature);
+        GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100), changed);
+        if (mTemperature <= kInitialTemperature) {
+            GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetSystemMode(SystemModeEnum::kHeat, changed);
+            mHeatingEnabled = true;
+        }
+    }
 }
 
 Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
@@ -72,8 +128,6 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
                                 Optional<Percent> targetReheat)
 {
     ChipLogProgress(AppServer, "WaterHeater: Boost duration=%" PRIu32 "s", duration);
-
-    mConfig.timerDelegate.CancelTimer(this);
 
     mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kActive;
     mHeatDemand = mHeaterTypes;
@@ -85,7 +139,6 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
         ChipLogError(AppServer, "WaterHeater: Failed to generate BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    SuccessOrDie(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(duration)));
     NotifyHeatDemandAndBoostStateChanged();
     return Status::Success;
 }
@@ -135,7 +188,6 @@ BoostStateEnum SimulatedWaterHeater::GetBoostState()
 
 void SimulatedWaterHeater::EndBoost()
 {
-    mConfig.timerDelegate.CancelTimer(this);
     mBoostState = BoostStateEnum::kInactive;
     mHeatDemand.ClearAll();
 
@@ -151,9 +203,9 @@ void SimulatedWaterHeater::EndBoost()
 void SimulatedWaterHeater::NotifyHeatDemandAndBoostStateChanged()
 {
     VerifyOrReturn(mProvider != nullptr);
-    mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), Id, HeatDemand::Id },
+    mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), WaterHeaterManagement::Id, HeatDemand::Id },
                                       DataModel::AttributeChangeType::kReportable);
-    mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), Id, BoostState::Id },
+    mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), WaterHeaterManagement::Id, BoostState::Id },
                                       DataModel::AttributeChangeType::kReportable);
 }
 
@@ -188,6 +240,6 @@ CHIP_ERROR SimulatedWaterHeater::GetModeTagsByIndex(uint8_t modeIndex, DataModel
 
 void SimulatedWaterHeater::HandleChangeToMode(uint8_t NewMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    
+    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
  } // namespace chip::app

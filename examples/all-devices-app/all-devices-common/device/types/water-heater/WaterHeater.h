@@ -117,10 +117,16 @@ public:
         return mWaterHeaterManagementCluster.Cluster();
     }
 
-    Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & ThermostatCluster()
+    ThermostatClusterType & ThermostatCluster()
     {
         VerifyOrDie(mThermostatCluster.IsConstructed());
         return mThermostatCluster.Cluster();
+    }
+
+    Clusters::ModeBaseCluster & WaterHeaterModeCluster()
+    {
+        VerifyOrDie(mWaterHeaterModeCluster.IsConstructed());
+        return mWaterHeaterModeCluster.Cluster();
     }
 
 
@@ -136,11 +142,12 @@ protected:
     Config mConfig;
     CodeDrivenDataModelProvider * mProvider = nullptr;
 
-private:
     // Delegates
     std::tuple<std::unique_ptr<ThermostatDelegates>...> mThermostatDelegates;
     Clusters::WaterHeaterManagement::Delegate & mWhmDelegate;
     Clusters::ModeBase::AppDelegate & mWaterHeaterModeDelegate;
+
+private:
     // Clusters
     LazyRegisteredServerCluster<Clusters::WaterHeaterManagement::WaterHeaterManagementCluster> mWaterHeaterManagementCluster;
     LazyRegisteredServerCluster<ThermostatClusterType> mThermostatCluster;
