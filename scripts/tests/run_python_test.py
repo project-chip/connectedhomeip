@@ -577,9 +577,11 @@ def factory_reset_config_removal(app_args: str, script_args: str, reset_type: Fa
     """Handles app factory reset requests by removing configuration and storage files."""
     for path in reset_type.config_files(app_args, script_args):
         log.info("Removing config/storage file, path: '%s'...", path)
-<<<<<<< HEAD
+
+
+<< << << < HEAD
         pathlib.Path(path).unlink(missing_ok=True)
-=======
+== == == =
 
         # Targets the specific tv-app media directory if found, which
         # unlink can't remove, so using shutil.rmtree instead.
@@ -588,7 +590,7 @@ def factory_reset_config_removal(app_args: str, script_args: str, reset_type: Fa
                 shutil.rmtree(path)
         else:
             pathlib.Path(path).unlink(missing_ok=True)
->>>>>>> 1e35375 (TC-SC-4.7 - Add python automation for Commissioner Discovery (#73567))
+>>>>>> > 1e35375 (TC-SC-4.7 - Add python automation for Commissioner Discovery(  # 73567))
 
 
 if __name__ == '__main__':
