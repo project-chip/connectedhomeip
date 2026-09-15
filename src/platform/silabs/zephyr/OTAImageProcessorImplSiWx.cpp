@@ -85,11 +85,8 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     }
 
     CHIP_ERROR err = SetBlock(block);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format()));
 
     TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
@@ -118,13 +115,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     uint32_t currentVersion;
     uint32_t targetVersion = requestor->GetTargetVersion();
     ReturnErrorOnFailure(ConfigurationMgr().GetSoftwareVersion(currentVersion));
-    if (currentVersion != targetVersion)
-    {
-        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion,
-                     targetVersion);
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
+    VerifyOrReturnError(currentVersion == targetVersion, CHIP_ERROR_INCORRECT_STATE, ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion, targetVersion));
     return CHIP_NO_ERROR;
 }
 
@@ -132,16 +123,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
-    if (imageProcessor == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
-        return;
-    }
-    if (imageProcessor->mDownloader == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "mDownloader is null");
-        return;
-    }
+    VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
+    VerifyOrReturn(imageProcessor->mDownloader != nullptr, ChipLogError(SoftwareUpdate, "mDownloader is null"));
 
     ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload");
 
@@ -160,10 +143,8 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
     sl_status_t status    = SL_STATUS_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        return;
-    }
+    
+    VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
     if (writeBufOffset != 0)
     {
@@ -195,11 +176,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     (void) context;
     ChipLogProgress(SoftwareUpdate, "OTAImageProcessorImpl::HandleApply()");
 
-    if (!mReset)
-    {
-        ChipLogError(SoftwareUpdate, "Apply called but firmware update was not marked complete");
-        return;
-    }
+    VerifyOrReturn(mReset, ChipLogError(SoftwareUpdate, "Apply called but firmware update was not marked complete"));
 
     ChipLogProgress(SoftwareUpdate, "M4 firmware update complete; rebooting for Security Bootloader install");
 
@@ -212,16 +189,10 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        return;
-    }
+    VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
     sl_status_t status = sl_si91x_fwup_abort();
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(SoftwareUpdate, "sl_si91x_fwup_abort() error 0x%lx", static_cast<unsigned long>(status));
-    }
+    VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(SoftwareUpdate, "sl_si91x_fwup_abort() error 0x%lx", static_cast<unsigned long>(status)));
 
     mFwChunkType   = kRpsHeader;
     writeBufOffset = 0;
@@ -234,16 +205,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
     sl_status_t status    = SL_STATUS_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
-        return;
-    }
-    if (imageProcessor->mDownloader == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "mDownloader is null");
-        return;
-    }
+    VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
+    VerifyOrReturn(imageProcessor->mDownloader != nullptr, ChipLogError(SoftwareUpdate, "mDownloader is null"));
 
     ByteSpan block        = imageProcessor->mBlock;
     CHIP_ERROR chip_error = imageProcessor->ProcessHeader(block);
@@ -333,19 +296,11 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
         TEMPORARY_RETURN_IGNORED ReleaseBlock();
 
         mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
-        if (mBlock.data() == nullptr)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        VerifyOrReturnError(mBlock.data() != nullptr, CHIP_ERROR_NO_MEMORY);
     }
 
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format()));
     return CHIP_NO_ERROR;
 }
 
