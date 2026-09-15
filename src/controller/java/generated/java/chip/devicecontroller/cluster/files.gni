@@ -197,6 +197,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ProximityRangingClusterBLERangingDeviceRoleConfigStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ProximityRangingClusterRangingCapabilitiesStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ProximityRangingClusterRangingConstraintStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ProximityRangingClusterRangingMeasurementDataStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ProximityRangingClusterRangingTriggerConditionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ProximityRangingClusterRDRStruct.kt",
