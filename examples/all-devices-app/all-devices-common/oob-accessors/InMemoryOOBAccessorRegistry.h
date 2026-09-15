@@ -62,6 +62,8 @@ public:
     size_t Size() const { return mAccessors.size(); }
 
 private:
+    static CHIP_ERROR WriteAttributeToDataModel(ByteSpan tlvData);
+
     std::vector<std::unique_ptr<OOBAccessor>> mAccessors;
 };
 

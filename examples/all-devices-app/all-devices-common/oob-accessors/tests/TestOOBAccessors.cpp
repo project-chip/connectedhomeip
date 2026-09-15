@@ -164,7 +164,7 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
     EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
     EXPECT_FALSE(cluster.IsOccupied());
 
-    // SetAttribute for HoldTime = 60
+    // SetAttribute for HoldTime = 60 (declined by OccupancyOOBAccessor so it falls through to DataModel)
     writer.Init(buffer);
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
@@ -174,7 +174,7 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
 
     // SetAttribute for unknown attribute (should return NOT_FOUND)
     writer.Init(buffer);

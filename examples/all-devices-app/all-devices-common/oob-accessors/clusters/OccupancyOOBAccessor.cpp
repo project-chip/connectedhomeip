@@ -63,19 +63,8 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetAttribute(ByteSpan tlvD
         mCluster.SetOccupancy(occupancy.Has(Clusters::OccupancySensing::OccupancyBitmap::kOccupied));
         return CHIP_NO_ERROR;
     }
-    case Clusters::OccupancySensing::Attributes::HoldTime::Id: {
-        Access::SubjectDescriptor subjectDescriptor{ .authMode = Access::AuthMode::kInternalDeviceAccess };
-        AttributeValueDecoder decoder(request.value, subjectDescriptor);
-        uint16_t holdTime = 0;
-        ReturnErrorOnFailure(decoder.Decode(holdTime));
-        auto status = mCluster.SetHoldTime(holdTime);
-        if (!status.IsSuccess())
-        {
-            return status.GetUnderlyingError();
-        }
-        return CHIP_NO_ERROR;
-    }
     default:
+        // Writable attributes (such as HoldTime) fall through to the regular Matter DataModel write.
         return std::nullopt;
     }
 }

@@ -65,6 +65,8 @@ source_set("oob-accessors") {
     "${chip_root}/src/app/clusters/mode-select-server",
     "${chip_root}/src/app/clusters/occupancy-sensor-server",
     "${chip_root}/src/app/clusters/on-off-server",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
