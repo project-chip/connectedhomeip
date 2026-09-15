@@ -36,6 +36,11 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+<<<<<<< HEAD
+=======
+#include <lib/support/tests/ExtraPwTestMacros.h>
+#include <protocols/interaction_model/Constants.h>
+>>>>>>> 06e1ff5 (Update secure session peer address only after the message authenticates (#73747))
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -642,4 +647,341 @@ TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
     sessionManager.Shutdown();
 }
 
+<<<<<<< HEAD
+=======
+#if !CHIP_CONFIG_SECURITY_TEST_MODE
+class TestGroupPrivacyMessageDelegate : public SessionMessageDelegate
+{
+public:
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const SessionHandle & session,
+                           DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override
+    {
+        mMessageReceived = true;
+        mHeader          = header;
+    }
+
+    bool mMessageReceived = false;
+    PacketHeader mHeader;
+};
+
+static void SetupGroupKeys(SessionManager & sessionManager, FabricIndex & fabricIndex, GroupId groupId, const char * epochKey)
+{
+    using namespace chip::TestCerts;
+
+    // Injects a test fabric
+    FabricTable * fabricTable = sessionManager.GetFabricTable();
+    ASSERT_NE(nullptr, fabricTable);
+    CHIP_ERROR err = fabricTable->AddNewFabricForTestIgnoringCollisions(
+        GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &fabricIndex);
+    EXPECT_EQ(CHIP_NO_ERROR, err);
+
+    // Extracts assigned 64-bit compressed fabric ID span.
+    uint8_t compressedFabricBuf[sizeof(uint64_t)];
+    MutableByteSpan compressedFabricSpan(compressedFabricBuf);
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTable->FindFabricWithIndex(fabricIndex)->GetCompressedFabricIdBytes(compressedFabricSpan));
+
+    // Get pointer to active group data provider
+    GroupDataProvider * provider = GetGroupDataProvider();
+    ASSERT_NE(nullptr, provider);
+
+    // registers symmetric keys under non-zero KeySetID 0x0123.
+    constexpr uint16_t kTestKeysetId = 0x0123;
+    KeySet keySet(kTestKeysetId, GroupDataProvider::SecurityPolicy::kTrustFirst, 1);
+    memcpy(keySet.epoch_keys[0].key, epochKey, 16);
+    keySet.epoch_keys[0].start_time = 0;
+    GroupKey groupKey(groupId, kTestKeysetId);
+    GroupInfo groupInfo(groupId, "Privacy Group");
+
+    // Setup Group key sets, group key maps, and group info
+    EXPECT_EQ(CHIP_NO_ERROR, provider->SetKeySet(fabricIndex, compressedFabricSpan, keySet));
+    EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupKeyAt(fabricIndex, 0, groupKey));
+    EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupInfoAt(fabricIndex, 0, groupInfo));
+}
+
+TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
+{
+    using namespace chip::TestCerts;
+
+    SessionManager sessionManager;
+    TestGroupPrivacyMessageDelegate delegate;
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
+    sessionManager.SetMessageDelegate(&delegate);
+
+    // Loads test parameters for GroupId 2
+    const MessageTestEntry & testEntry = theMessageTestVector[7];
+
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
+
+    // Instantiates outgoing (for PrepareMessage) session.
+    Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
+    SessionHandle outgoingHandle(outgoingSession);
+    SessionHolder outgoingHolder(outgoingHandle);
+
+    // Create the test payload header, data, and buffer
+    PayloadHeader payloadHeader;
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+    const char testPayload[] = "PrivacyTest";
+    System::PacketBufferHandle payloadBuf =
+        MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
+    ASSERT_FALSE(payloadBuf.IsNull());
+
+    // Prepare the group message
+    EncryptedPacketBufferHandle preparedMessage;
+    CHIP_ERROR err =
+        sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
+    EXPECT_EQ(CHIP_NO_ERROR, err);
+
+    // Unwraps the buffer and verifies PrepareMessage set the privacy flag bit high and set the group session type.
+    PacketHeader decodedHeader;
+    uint16_t headerSize                    = 0;
+    System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
+    ASSERT_FALSE(writableMsg.IsNull());
+    EXPECT_EQ(CHIP_NO_ERROR, decodedHeader.Decode(writableMsg->Start(), writableMsg->DataLength(), &headerSize));
+    EXPECT_TRUE(decodedHeader.IsGroupSession());
+    EXPECT_TRUE(decodedHeader.HasPrivacyFlag());
+
+    // Feeds ciphertext back into transport dispatch to verify PrivacyDecrypt and MIC authentication.
+    IPAddress loopbackAddress;
+    IPAddress::FromString("::1", loopbackAddress);
+    const PeerAddress peerAddress = PeerAddress::UDP(loopbackAddress, CHIP_PORT);
+    sessionManager.OnMessageReceived(peerAddress, std::move(writableMsg));
+    EXPECT_TRUE(delegate.mMessageReceived);
+
+    // Verify decrypted fields match expectations
+    EXPECT_EQ(delegate.mHeader.GetSessionId(), decodedHeader.GetSessionId());
+    EXPECT_EQ(delegate.mHeader.GetDestinationGroupId().Value(), testEntry.groupId);
+
+    FabricTable * fabricTable = sessionManager.GetFabricTable();
+    ASSERT_NE(nullptr, fabricTable);
+    NodeId expectedSourceNodeId = fabricTable->FindFabricWithIndex(fabricIndex)->GetNodeId();
+    EXPECT_TRUE(delegate.mHeader.GetSourceNodeId().HasValue());
+    EXPECT_EQ(delegate.mHeader.GetSourceNodeId().Value(), expectedSourceNodeId);
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManagerDispatch, TestGroupIncomingPrivacyBoundsCheck)
+{
+    using namespace chip::TestCerts;
+
+    SessionManager sessionManager;
+    TestGroupPrivacyMessageDelegate delegate;
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
+    sessionManager.SetMessageDelegate(&delegate);
+
+    // Loads test parameters for GroupId 2
+    const MessageTestEntry & testEntry = theMessageTestVector[7];
+
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
+
+    // Instantiates outgoing (for PrepareMessage) session.
+    Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
+    SessionHandle outgoingHandle(outgoingSession);
+    SessionHolder outgoingHolder(outgoingHandle);
+
+    // Create the test payload header, data, and buffer
+    PayloadHeader payloadHeader;
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+    const char testPayload[] = "PrivacyTest";
+    System::PacketBufferHandle payloadBuf =
+        MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
+    ASSERT_FALSE(payloadBuf.IsNull());
+
+    // Prepare the group message
+    EncryptedPacketBufferHandle preparedMessage;
+    CHIP_ERROR err =
+        sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
+    EXPECT_EQ(CHIP_NO_ERROR, err);
+
+    System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
+    ASSERT_FALSE(writableMsg.IsNull());
+
+    // Shrink the buffer to trigger the bounds check failure in GroupKeyDecryptAttempt.
+    writableMsg->SetDataLength(1);
+
+    IPAddress loopbackAddress;
+    IPAddress::FromString("::1", loopbackAddress);
+    const PeerAddress peerAddress = PeerAddress::UDP(loopbackAddress, CHIP_PORT);
+    sessionManager.OnMessageReceived(peerAddress, std::move(writableMsg));
+
+    // The message should be discarded and NOT received by the delegate.
+    EXPECT_FALSE(delegate.mMessageReceived);
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessageChainedBufferFailure)
+{
+    using namespace chip::TestCerts;
+
+    SessionManager sessionManager;
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
+
+    // Loads test parameters for GroupId 2
+    const MessageTestEntry & testEntry = theMessageTestVector[7];
+
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
+
+    // Instantiates outgoing (for PrepareMessage) session.
+    Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
+    SessionHandle outgoingHandle(outgoingSession);
+    SessionHolder outgoingHolder(outgoingHandle);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+
+    // Create a chained buffer
+    System::PacketBufferHandle buf1 = MessagePacketBuffer::New(0);
+    System::PacketBufferHandle buf2 = MessagePacketBuffer::New(0);
+    ASSERT_FALSE(buf1.IsNull());
+    ASSERT_FALSE(buf2.IsNull());
+    buf1.AddToEnd(std::move(buf2));
+
+    EXPECT_TRUE(buf1->HasChainedBuffer());
+
+    EncryptedPacketBufferHandle preparedMessage;
+    CHIP_ERROR err = sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(buf1), preparedMessage);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    sessionManager.Shutdown();
+}
+#endif // !CHIP_CONFIG_SECURITY_TEST_MODE
+
+// A message that fails to decrypt must not update the cached peer address of the
+// session it names.
+TEST_F(TestSessionManagerDispatch, TestUndecryptableMessageDoesNotRebindPeerAddress)
+{
+    SessionManager sessionManager;
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
+
+    constexpr uint16_t kLocalSessionId   = 0x1234;
+    constexpr NodeId kSessionPeerNodeId  = 0x0000000000000002ULL;
+    const PeerAddress establishedAddress = AddressFromString("fe80::1");
+    const PeerAddress spoofedAddress     = AddressFromString("fe80::2");
+
+    SessionHolder sessionHolder;
+    ASSERT_SUCCESS(sessionManager.InjectPaseSessionWithTestKey(sessionHolder, kLocalSessionId, kSessionPeerNodeId, kLocalSessionId,
+                                                               kFabricIndex, establishedAddress,
+                                                               CryptoContext::SessionRole::kResponder));
+
+    SecureSession * secureSession = sessionHolder.Get().Value()->AsSecureSession();
+    ASSERT_EQ(secureSession->GetPeerAddress(), establishedAddress);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+
+    const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
+    System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
+    ASSERT_FALSE(payload.IsNull());
+
+    EncryptedPacketBufferHandle preparedMessage;
+    ASSERT_SUCCESS(sessionManager.PrepareMessage(sessionHolder.Get().Value(), payloadHeader, std::move(payload), preparedMessage));
+
+    // Corrupt the trailing integrity check so the message parses but cannot be
+    // authenticated.
+    System::PacketBufferHandle msg = preparedMessage.CastToWritable();
+    ASSERT_FALSE(msg.IsNull());
+    ASSERT_GT(msg->DataLength(), 0u);
+    msg->Start()[msg->DataLength() - 1] = static_cast<uint8_t>(msg->Start()[msg->DataLength() - 1] ^ 0xff);
+
+    sessionManager.OnMessageReceived(spoofedAddress, std::move(msg));
+
+    EXPECT_EQ(secureSession->GetPeerAddress(), establishedAddress);
+
+    sessionManager.Shutdown();
+}
+
+// Injects the two halves of a PASE session pair so that a message prepared on
+// `initiator` decrypts on `responder`.
+CHIP_ERROR InjectSessionPair(SessionManager & sessionManager, SessionHolder & initiator, SessionHolder & responder,
+                             const PeerAddress & peerAddress)
+{
+    ReturnErrorOnFailure(sessionManager.InjectPaseSessionWithTestKey(initiator, 2, 0x0000000000000002ULL, 1, kFabricIndex,
+                                                                     peerAddress, CryptoContext::SessionRole::kInitiator));
+    return sessionManager.InjectPaseSessionWithTestKey(responder, 1, 0x0000000000000001ULL, 2, kFabricIndex, peerAddress,
+                                                       CryptoContext::SessionRole::kResponder);
+}
+
+// Prepares an encrypted message on `session` carrying a fixed payload.
+CHIP_ERROR PrepareTestMessage(SessionManager & sessionManager, const SessionHandle & session,
+                              EncryptedPacketBufferHandle & prepared)
+{
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+    payloadHeader.SetInitiator(true);
+    // Reliable, so a duplicate is not dropped at the no-ack fast path and reaches
+    // the peer address update.
+    payloadHeader.SetNeedsAck(true);
+
+    const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
+    System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
+    VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_NO_MEMORY);
+    return sessionManager.PrepareMessage(session, payloadHeader, std::move(payload), prepared);
+}
+
+// A replay of an already accepted message is authentic, so it must not be able to
+// update the session's cached peer address.
+TEST_F(TestSessionManagerDispatch, TestReplayedMessageDoesNotRebindPeerAddress)
+{
+    SessionManager sessionManager;
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
+
+    const PeerAddress establishedAddress = AddressFromString("fe80::1");
+    const PeerAddress replayAddress      = AddressFromString("fe80::2");
+
+    SessionHolder initiator;
+    SessionHolder responder;
+    ASSERT_SUCCESS(InjectSessionPair(sessionManager, initiator, responder, establishedAddress));
+    SecureSession * receiver = responder.Get().Value()->AsSecureSession();
+
+    EncryptedPacketBufferHandle prepared;
+    ASSERT_SUCCESS(PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared));
+    ASSERT_FALSE(prepared.IsNull());
+
+    EncryptedPacketBufferHandle firstDelivery = prepared.CloneData();
+    ASSERT_FALSE(firstDelivery.IsNull());
+    sessionManager.OnMessageReceived(establishedAddress, firstDelivery.CastToWritable());
+    ASSERT_EQ(receiver->GetPeerAddress(), establishedAddress);
+
+    EncryptedPacketBufferHandle replay = prepared.CloneData();
+    ASSERT_FALSE(replay.IsNull());
+    sessionManager.OnMessageReceived(replayAddress, replay.CastToWritable());
+
+    EXPECT_EQ(receiver->GetPeerAddress(), establishedAddress);
+
+    sessionManager.Shutdown();
+}
+
+// A peer that moves to a new address is still tracked: the first message that is
+// authentic and not a replay updates the cached address.
+TEST_F(TestSessionManagerDispatch, TestAcceptedMessageFromNewAddressRebindsPeerAddress)
+{
+    SessionManager sessionManager;
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
+
+    const PeerAddress establishedAddress = AddressFromString("fe80::1");
+    const PeerAddress newAddress         = AddressFromString("fe80::2");
+
+    SessionHolder initiator;
+    SessionHolder responder;
+    ASSERT_SUCCESS(InjectSessionPair(sessionManager, initiator, responder, establishedAddress));
+    SecureSession * receiver = responder.Get().Value()->AsSecureSession();
+
+    EncryptedPacketBufferHandle prepared;
+    ASSERT_SUCCESS(PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared));
+    ASSERT_FALSE(prepared.IsNull());
+
+    sessionManager.OnMessageReceived(newAddress, prepared.CastToWritable());
+
+    EXPECT_EQ(receiver->GetPeerAddress(), newAddress);
+
+    sessionManager.Shutdown();
+}
+
+>>>>>>> 06e1ff5 (Update secure session peer address only after the message authenticates (#73747))
 } // namespace
