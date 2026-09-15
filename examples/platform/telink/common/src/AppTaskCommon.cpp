@@ -70,6 +70,12 @@ bool AppTaskCommon::sIsCommissioningFailed = false;
 #include <zephyr/pm/policy.h>
 #endif
 
+#if defined(CONFIG_IEEE802154_TLX_OPTIMIZATION)
+extern "C" {
+bool isThreadCommissioned = false;
+}
+#endif // CONFIG_IEEE802154_TLX_OPTIMIZATION
+
 using namespace chip::app;
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -979,6 +985,17 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             }
         }
 #endif
+#if defined CONFIG_IEEE802154_TLX_OPTIMIZATION
+        otDeviceRole curRole;
+        ThreadStackMgr().LockThreadStack();
+        curRole = otThreadGetDeviceRole(openthread_get_default_instance());
+        ThreadStackMgr().UnlockThreadStack();
+        if (sIsNetworkAttached && curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED)
+        {
+            if (isThreadCommissioned == false)
+                isThreadCommissioned = true;
+        }
+#endif /* CONFIG_IEEE802154_TLX_OPTIMIZATION */
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
