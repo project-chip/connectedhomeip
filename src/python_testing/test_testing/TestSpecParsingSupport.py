@@ -490,6 +490,7 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
             (0x042F, 'Radon Concentration Measurement', 'RNCONC'),
             (0x0071, 'HEPA Filter Monitoring', 'HEPAFREMON'),
             (0x0072, 'Activated Carbon Filter Monitoring', 'ACFREMON'),
+            (0x0079, 'Water Tank Level Monitoring', 'WTLREPMON'),
             (0x0405, 'Relative Humidity Measurement', 'RH'),
         }
 
