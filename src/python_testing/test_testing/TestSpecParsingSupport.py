@@ -279,7 +279,10 @@ _SPEC_PARSING_NAME = "src/python_testing/matter_testing_infrastructure/matter/te
 def _spec_version_from_dirname(dirname: str) -> int:
     # SpecificationVersion is 1 byte major, 1 byte minor, 1 byte dot and 1 reserved byte, so it is
     # derivable from the data model directory name.
-    parts = [int(part) for part in dirname.split(".")]
+    try:
+        parts = [int(part) for part in dirname.split(".")]
+    except ValueError:
+        asserts.fail(f"data_model/{dirname}/ is not a numeric version - SpecificationVersion has no encoding for it")
     # Reject anything that does not encode exactly rather than truncating or aliasing it. There is
     # no field for a fourth component, and each component has to fit its own byte: 1.6.1.1 would
     # truncate to 1.6.1 and 1.6.256 would alias 1.7, either of which would make a wrong mapping key
