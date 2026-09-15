@@ -25,7 +25,7 @@ namespace app {
 namespace Clusters {
 
 /**
- * Codegen integration subclass for CameraAvSettingsUserLevelManagementCluster.
+ * Migrate subclass for CameraAvSettingsUserLevelManagementCluster.
  *
  * Performs one-time migration of TLV-encoded persistent attributes from
  * SafeAttributePersistenceProvider to AttributePersistenceProvider during Startup().
