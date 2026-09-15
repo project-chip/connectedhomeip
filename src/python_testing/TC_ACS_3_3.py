@@ -508,7 +508,7 @@ class TC_ACS_3_3(MatterBaseTest):
                     f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID2}, "TagId":{tag2}}}]}}')
                 await asyncio.sleep(1)
                 self.write_to_app_pipe(
-                    f'{{"Name":"SetObjectCount","EndpointId":{endpoint},"ObjectCount":2}}')
+                    f'{{"Name":"SetObjCount","EndpointId":{endpoint},"ObjectCount":2}}')
                 await asyncio.sleep(5)
             else:
                 self.wait_for_user_input(
