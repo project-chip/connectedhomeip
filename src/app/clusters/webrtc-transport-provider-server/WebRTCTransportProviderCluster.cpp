@@ -855,15 +855,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     Delegate::ProvideOfferRequestArgs args;
 
     // ===== Validate all conformance and constraint checks (data model validation) =====
-
-    // At least one of Video Stream ID, Audio Stream ID, AudioStreamID or VideoStreams has to be present
-    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue() && !req.videoStreams.HasValue() &&
-        !req.audioStreams.HasValue())
-    {
-        ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID, AudioStreamID, VideoStreams, AudioStreams must be present");
-        return Status::InvalidCommand;
-    }
-
+    
     if (req.SFrameConfig.HasValue())
     {
         if (!SFrameFollowsSpecConstraints(req.SFrameConfig.Value()))
@@ -932,49 +924,33 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 
         // For re-offers, populate videoStreams/audioStreams from the deprecated fields if provided.
         // This allows the re-offer to keep or change the stream assignments.
-        if (req.videoStreamID.HasValue())
+        // Validate deprecated VideoStreamID field
+        Status status = ValidateStreamID("HandleSolicitOffer", req.videoStreamID, videoStreams, StreamType::kVideo);
+        if (status != Status::Success)
         {
-            std::vector<uint16_t> streams;
-            if (!req.videoStreamID.Value().IsNull())
-            {
-                streams.push_back(req.videoStreamID.Value().Value());
-            }
-            videoStreams.SetValue(std::move(streams));
+            return status;
         }
 
-        if (req.audioStreamID.HasValue())
+        // Validate deprecated AudioStreamID field
+        status = ValidateStreamID("HandleSolicitOffer", req.audioStreamID, audioStreams, StreamType::kAudio);
+        if (status != Status::Success)
         {
-            std::vector<uint16_t> streams;
-            if (!req.audioStreamID.Value().IsNull())
-            {
-                streams.push_back(req.audioStreamID.Value().Value());
-            }
-            audioStreams.SetValue(std::move(streams));
+            return status;
         }
 
         // For re-offers, if we have stream lists, use these
-        if (req.videoStreams.HasValue())
+        // Validate VideoStreams array if present
+        status = ValidateStreams("HandleProvideOffer", req.videoStreams, videoStreams, StreamType::kVideo);
+        if (status != Status::Success)
         {
-            // Our request is a DecodableList, convert to a vector
-            std::vector<uint16_t> streams;
-            auto it = req.videoStreams.Value().begin();
-            while (it.Next())
-            {
-                streams.push_back(it.GetValue());
-            }
-            videoStreams.SetValue(std::move(streams));
+            return status;
         }
 
-        if (req.audioStreams.HasValue())
+        // Validate AudioStreams array if present
+        status = ValidateStreams("HandleProvideOffer", req.audioStreams, audioStreams, StreamType::kAudio);
+        if (status != Status::Success)
         {
-            // Our request is a DecodableList, convert to a vector
-            std::vector<uint16_t> streams;
-            auto it = req.audioStreams.Value().begin();
-            while (it.Next())
-            {
-                streams.push_back(it.GetValue());
-            }
-            audioStreams.SetValue(std::move(streams));
+            return status;
         }
     }
     else
@@ -1108,7 +1084,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     args.peerNodeId            = peerNodeId;
     args.fabricIndex           = peerFabricIndex;
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
-    args.originatingEndpointId = req.originatingEndpointID.ValueOr(chip::kInvalidEndpointId);
+    args.originatingEndpointId = req.originatingEndpointID.ValueOr(outSession.peerEndpointID);
 
     if (req.SFrameConfig.HasValue())
     {
