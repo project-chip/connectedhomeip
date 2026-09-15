@@ -156,6 +156,7 @@ public:
                                   Optional<NodeId> aSourceNodeId = NullOptional);
 
 >>>>>>> 35b9631 ([AVanalysis] Integrate analysis triggers with pushav clip recording (#74020))
+
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;

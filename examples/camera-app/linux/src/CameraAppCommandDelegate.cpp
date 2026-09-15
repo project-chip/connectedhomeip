@@ -21,10 +21,11 @@
 =======
 #include <cstdint>
 #include <lib/support/SafeInt.h>
->>>>>>> 35b9631 ([AVanalysis] Integrate analysis triggers with pushav clip recording (#74020))
+    >>>>>>> 35b9631 ([AVanalysis] Integrate analysis triggers with pushav clip recording (#74020))
 #include <platform/PlatformManager.h>
 
-CameraAppCommandHandler * CameraAppCommandHandler::FromJSON(const char * json)
+    CameraAppCommandHandler *
+    CameraAppCommandHandler::FromJSON(const char * json)
 {
     Json::Reader reader;
     Json::Value value;

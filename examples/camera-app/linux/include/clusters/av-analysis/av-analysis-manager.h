@@ -103,6 +103,7 @@ public:
     bool HasActiveSession() const { return mHasActiveSession; }
 
 >>>>>>> 35b9631 ([AVanalysis] Integrate analysis triggers with pushav clip recording (#74020))
+
 private:
 };
 
