@@ -48,9 +48,8 @@ constexpr auto kPAICertificate                    = CertificateChainTypeEnum::kP
 constexpr auto kLegacyAttestationProfile          = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
 constexpr uint16_t kDefaultCertificateSegmentSize = 600;
 // RESP_MAX bounds the requested size even though responses use fixed 600-byte segments.
-constexpr uint16_t kMaxCertificateSegmentSize        = 900;
-constexpr size_t kMaxPqcCertificateChainDocumentSize = 10240;
-constexpr auto kNocResponseMaxDebugTextLength        = 128;
+constexpr uint16_t kMaxCertificateSegmentSize = 900;
+constexpr auto kNocResponseMaxDebugTextLength = 128;
 
 // Get the attestation challenge for the current session in progress. Only valid when called
 // synchronously from inside a CommandHandler. If not called in CASE/PASE session context,
@@ -77,7 +76,7 @@ ToDeviceAttestationProfileBitmap(Credentials::DeviceAttestationCertProfile profi
 CHIP_ERROR BuildSegmentedCertificateResponse(const ByteSpan & segment, size_t documentSize, size_t offset, uint16_t segmentId,
                                              Commands::CertificateChainResponse::Type & response)
 {
-    VerifyOrReturnError(documentSize != 0 && documentSize <= kMaxPqcCertificateChainDocumentSize, CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(documentSize != 0 && documentSize <= Credentials::kMaxDERCertLengthMlDsa65, CHIP_ERROR_MESSAGE_TOO_LONG);
     VerifyOrReturnError(offset < documentSize, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(CanCastTo<uint16_t>(documentSize), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(segment.size() == std::min(documentSize - offset, static_cast<size_t>(kDefaultCertificateSegmentSize)),

@@ -29,8 +29,17 @@ public:
     static Span<const CharSpan> GetActionNames()
     {
         static constexpr CharSpan kNames[] = {
-            "SetAmbientContextSupport"_span, "AddAmbientContextDetect"_span, "SetPredictedActivity"_span,
-            "SetSensorFusionSupported"_span, "SetObjectCount"_span,
+            "SetAmbientContextSupport"_span,
+            "AddAmbientContextDetect"_span,
+            "SetPredictedActivity"_span,
+            "SetSensorFusionSupported"_span,
+            "SetObjectCount"_span,
+            "AddAmbientSensingContributor"_span,
+            "RemoveAmbientSensingContributor"_span,
+            "AddAmbientSensingNonMatterContributor"_span,
+            "RemoveAmbientSensingNonMatterContributor"_span,
+            "UpdateAmbientSensingContributorStatus"_span,
+            "SetAmbientSensingUnionName"_span,
         };
         return Span<const CharSpan>(kNames);
     }
@@ -46,6 +55,19 @@ private:
     CHIP_ERROR TranslateSetSensorFusionSupported(EndpointId endpointId, const Json::Value & json,
                                                  OOBAccessorRegistry & registry) const;
     CHIP_ERROR TranslateSetObjectCount(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const;
+
+    CHIP_ERROR TranslateAddAmbientSensingContributor(EndpointId endpointId, const Json::Value & json,
+                                                     OOBAccessorRegistry & registry) const;
+    CHIP_ERROR TranslateRemoveAmbientSensingContributor(EndpointId endpointId, const Json::Value & json,
+                                                        OOBAccessorRegistry & registry) const;
+    CHIP_ERROR TranslateAddAmbientSensingNonMatterContributor(EndpointId endpointId, const Json::Value & json,
+                                                              OOBAccessorRegistry & registry) const;
+    CHIP_ERROR TranslateRemoveAmbientSensingNonMatterContributor(EndpointId endpointId, const Json::Value & json,
+                                                                 OOBAccessorRegistry & registry) const;
+    CHIP_ERROR TranslateUpdateAmbientSensingContributorStatus(EndpointId endpointId, const Json::Value & json,
+                                                              OOBAccessorRegistry & registry) const;
+    CHIP_ERROR TranslateSetAmbientSensingUnionName(EndpointId endpointId, const Json::Value & json,
+                                                   OOBAccessorRegistry & registry) const;
 };
 
 } // namespace chip::app::NamedPipe

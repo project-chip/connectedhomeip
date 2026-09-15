@@ -1212,6 +1212,19 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatModeClusterModeTagStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatModeClusterModeOptionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull label MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRGroupcastClusterMembershipStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nullable endpoints MTR_PROVISIONALLY_AVAILABLE;

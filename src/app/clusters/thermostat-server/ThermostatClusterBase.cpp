@@ -368,6 +368,10 @@ bool ThermostatClusterBase::HasAttribute(AttributeId attributeId)
         return mConfig.mOptionalAttributes.SetpointChangeSourceTimestamp;
     case SetpointHoldExpiryTimestamp::Id:
         return mConfig.mOptionalAttributes.SetpointHoldExpiryTimestamp;
+    case CriticalFreezeProtection::Id:
+        return mConfig.mOptionalAttributes.CriticalFreezeProtection;
+    case CriticalOverheatProtection::Id:
+        return mConfig.mOptionalAttributes.CriticalOverheatProtection;
     case PresetTypes::Id:
     case NumberOfPresets::Id:
     case ActivePresetHandle::Id:
@@ -385,6 +389,12 @@ bool ThermostatClusterBase::HasAttribute(AttributeId attributeId)
     case CurrentThermostatSuggestion::Id:
     case ThermostatSuggestionNotFollowingReason::Id:
         return mFeatures.Has(Feature::kThermostatSuggestions);
+    case Sensors::Id:
+    case AvailableSensors::Id:
+    case EnabledSensors::Id:
+    case NumberOfSensorScheduleTransitions::Id:
+    case SensorSchedule::Id:
+        return mFeatures.Has(Feature::kThermostatSensors);
     default:
         return false;
     }
