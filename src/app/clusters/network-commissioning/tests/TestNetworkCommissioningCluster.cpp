@@ -35,6 +35,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Defer.h>
 #include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
 #include <system/SystemClock.h>
@@ -239,6 +240,9 @@ TEST_F(TestNetworkCommissioningCluster, TestAddOrUpdateWiFiNetworkWithPDC)
     driver.SetClientIdentity(clientIdentity);
 
     app::FailSafeContext failSafeContext;
+    // FailSafeContext has no destructor, so an armed context going out of scope would leave
+    // timers behind pointing at it. Disarm on every exit path, including a failed ASSERT_*.
+    auto deferDisarm = MakeDefer([&failSafeContext] { failSafeContext.DisarmFailSafe(); });
     NetworkCommissioningCluster::Context context{
         .breadcrumbTracker   = tracker,
         .failSafeContext     = failSafeContext,
@@ -279,7 +283,6 @@ TEST_F(TestNetworkCommissioningCluster, TestAddOrUpdateWiFiNetworkWithPDC)
                         app::ConcreteAttributePath(kRootEndpointId, NetworkCommissioning::Id, Networks::Id)),
               tester.GetDirtyList().end());
 
-    failSafeContext.DisarmFailSafe();
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -295,6 +298,7 @@ TEST_F(TestNetworkCommissioningCluster, TestAddOrUpdateWiFiNetworkWithPDCRejects
     Testing::FakePDCWiFiDriver driver;
 
     app::FailSafeContext failSafeContext;
+    auto deferDisarm = MakeDefer([&failSafeContext] { failSafeContext.DisarmFailSafe(); });
     NetworkCommissioningCluster::Context context{
         .breadcrumbTracker   = tracker,
         .failSafeContext     = failSafeContext,
@@ -319,7 +323,6 @@ TEST_F(TestNetworkCommissioningCluster, TestAddOrUpdateWiFiNetworkWithPDCRejects
               Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
     EXPECT_TRUE(driver.GetLastSsid().empty());
 
-    failSafeContext.DisarmFailSafe();
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
