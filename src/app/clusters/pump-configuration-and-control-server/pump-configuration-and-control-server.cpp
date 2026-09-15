@@ -306,6 +306,9 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         case ControlModeEnum::kUnknownEnumValue:
             status = Protocols::InteractionModel::Status::ConstraintError;
             break;
+        default:
+            status = Protocols::InteractionModel::Status::ConstraintError;
+            break;
         }
     }
     break;
