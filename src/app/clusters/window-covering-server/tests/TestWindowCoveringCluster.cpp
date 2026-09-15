@@ -270,11 +270,11 @@ TEST_F(TestWindowCoveringCluster, ReadMandatoryDefaults)
 
     Type type{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::Type::Id, type), CHIP_NO_ERROR);
-    EXPECT_EQ(type, Type()); // default-constructed enum == kRollerShade (0)
+    EXPECT_EQ(type, Type::kUnknown); // kUnknown is valid regardless of which of LF/TL are enabled
 
     EndProductType productType{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::EndProductType::Id, productType), CHIP_NO_ERROR);
-    EXPECT_EQ(productType, EndProductType());
+    EXPECT_EQ(productType, EndProductType::kUnknown);
 
     chip::BitMask<ConfigStatus> configStatus{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::ConfigStatus::Id, configStatus), CHIP_NO_ERROR);
@@ -700,7 +700,7 @@ TEST_F(TestWindowCoveringCluster, PersistenceRoundTrip)
         ASSERT_FALSE(cluster.GetCurrentPositionLiftPercent100ths().IsNull());
         EXPECT_EQ(cluster.GetCurrentPositionLiftPercent100ths().Value(), 2500);
 
-        EXPECT_EQ(cluster.GetType(), Type()); // not persisted -> reset to default
+        EXPECT_EQ(cluster.GetType(), Type::kUnknown); // not persisted -> resets to Config's default
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
