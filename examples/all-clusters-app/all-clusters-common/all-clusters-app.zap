@@ -14142,8 +14142,6 @@
               "reportableChange": 0
             },
             {
-<<<<<<< HEAD
-=======
               "name": "CriticalFreezeProtection",
               "code": 87,
               "mfgCode": null,
@@ -14256,7 +14254,6 @@
               "reportableChange": 0
             },
             {
->>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,

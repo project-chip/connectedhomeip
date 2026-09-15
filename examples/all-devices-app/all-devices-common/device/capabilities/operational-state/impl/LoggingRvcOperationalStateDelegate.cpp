@@ -18,25 +18,16 @@
 #include "LoggingRvcOperationalStateDelegate.h"
 #include <lib/support/logging/CHIPLogging.h>
 
-<<<<<<< HEAD:examples/all-devices-app/all-devices-common/device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.cpp namespace chip::app::Clusters::OperationalState
+namespace chip::app::Clusters::OperationalState {
+
+void LoggingRvcOperationalStateDelegate::HandleGoHomeCommandCallback(GenericOperationalError & err)
 {
-=======
-#include <lib/support/CodeUtils.h>
-
-    namespace chip {
-    namespace app {
-    namespace Clusters {
-    namespace Thermostat {
->>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484)):src/app/clusters/thermostat-server/ThermostatClusterAttributes.cpp
-
-    void LoggingRvcOperationalStateDelegate::HandleGoHomeCommandCallback(GenericOperationalError & err)
+    ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Go Home command received.");
+    if (mCluster)
     {
-        ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Go Home command received.");
-        if (mCluster)
-        {
-            LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
-        }
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
     }
+    err.Set(to_underlying(ErrorStateEnum::kNoError));
+}
 
-    } // namespace chip::app::Clusters::OperationalState
+} // namespace chip::app::Clusters::OperationalState
