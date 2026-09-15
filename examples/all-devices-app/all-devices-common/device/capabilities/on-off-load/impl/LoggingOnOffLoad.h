@@ -40,10 +40,7 @@ namespace app {
  * It is intended as a base class for logging leaf simulator devices like
  * LoggingOnOffLight, OnOffPlugInUnit, and MountedOnOffControl.
  */
-class LoggingOnOffLoad : public OnOffLoad,
-                         public Clusters::OnOffDelegate,
-                         public Clusters::OnOffEffectDelegate,
-                         public Clusters::IdentifyDelegate
+class LoggingOnOffLoad : public OnOffLoad, public Clusters::OnOffDelegate, public Clusters::OnOffEffectDelegate
 {
 public:
     LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
@@ -59,12 +56,6 @@ protected:
     // OnOffEffectDelegate
     DataModel::ActionReturnStatus TriggerDelayedAllOff(Clusters::OnOff::DelayedAllOffEffectVariantEnum e) override;
     DataModel::ActionReturnStatus TriggerDyingLight(Clusters::OnOff::DyingLightEffectVariantEnum e) override;
-
-    // IdentifyDelegate
-    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
-    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
-    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
-    bool IsTriggerEffectEnabled() const override;
 };
 
 } // namespace app

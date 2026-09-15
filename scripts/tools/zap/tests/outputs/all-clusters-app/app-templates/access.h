@@ -322,7 +322,6 @@
     0x00000062, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     0x00000062, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
     0x00000062, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
-    0x00000201, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
@@ -382,7 +381,6 @@
     0x00000003, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     0x00000004, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
     0x00000040, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
-    0x000000FE, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000000, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     0x00000006, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
     0x00000007, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
@@ -442,7 +440,6 @@
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \

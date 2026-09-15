@@ -17,8 +17,13 @@
 
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
+#include <app/util/endpoint-config-defines.h>
 #include <cstdint>
+#include <lib/support/Span.h>
+#include <lib/support/attribute-storage-null-handling.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /**
  * @brief Type for referring to ZCL attribute type
@@ -122,6 +127,8 @@ union EmberAfDefaultOrMinMaxAttributeValue
 #define MATTER_ATTRIBUTE_FLAG_READABLE (0x20)
 // Attribute is nullable
 #define MATTER_ATTRIBUTE_FLAG_NULLABLE (0x40)
+// Attribute has no default value configured
+#define MATTER_ATTRIBUTE_FLAG_NO_DEFAULT_VALUE (0x80)
 
 /**
  * @brief Each attribute has it's metadata stored in such struct.
@@ -156,6 +163,11 @@ struct EmberAfAttributeMetadata
      * functionality.
      */
     EmberAfAttributeMask mask;
+
+    /**
+     * Check whether this attribute was declared with no default value.
+     */
+    bool HasEmptyDefault() const { return (mask & MATTER_ATTRIBUTE_FLAG_NO_DEFAULT_VALUE) != 0; }
 
     /**
      * Check wether this attribute is a boolean based on its type according to the spec.
@@ -216,3 +228,133 @@ bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
 
 /** @brief Returns true if the given attribute type is a long string. */
 bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
+
+namespace chip {
+namespace app {
+
+/**
+ * @brief Represents an attribute default value, normally referenced directly from flash metadata.
+ *
+ * Lifetime: rawData usually points into flash and outlives this object. The exception is a value
+ * supplied at runtime by a dynamic endpoint (see the endpoint-level emberAfGetAttributeDefaultValue
+ * in attribute-storage.h), which is held inside this object. Copying is therefore disallowed.
+ *
+ * String Storage in Flash:
+ * - Non-empty strings are stored in flash with a Pascal length prefix (1 byte for short
+ *   strings, 2 bytes in little-endian for long strings).
+ * - Empty string defaults (from ZAP_EMPTY_DEFAULT() / nullptr flash pointer) have an empty
+ *   rawData ByteSpan (size == 0).
+ * - Explicit Null string defaults for nullable strings are stored in flash with the length
+ *   sentinel: { 0xFF } for short strings, or { 0xFF, 0xFF } for long strings.
+ *
+ * Scalar Storage in Flash:
+ * - Flash storage for scalars (GENERATED_DEFAULTS and inline union defaultValue) is pre-compiled
+ *   in target native-endian format.
+ * - CopyScalar copies raw native-endian storage bytes into the destination buffer (or zeroes
+ *   the buffer if rawData is empty), which directly maps to NumericAttributeTraits<T>::StorageType.
+ */
+struct AttributeDefaultValue
+{
+    /// Largest value SetOwnedValue accepts: the widest ember scalar.
+    static constexpr size_t kMaxOwnedValueSize = sizeof(uint64_t);
+
+    AttributeDefaultValue() = default;
+
+    // rawData may alias the owned value, so copying or moving would leave the destination span
+    // pointing into the source. Fixing up the span is possible but nothing needs it, and a
+    // relocatable value would obscure whether the bytes live in flash or in the object.
+    AttributeDefaultValue(const AttributeDefaultValue &)             = delete;
+    AttributeDefaultValue & operator=(const AttributeDefaultValue &) = delete;
+    AttributeDefaultValue(AttributeDefaultValue &&)                  = delete;
+    AttributeDefaultValue & operator=(AttributeDefaultValue &&)      = delete;
+
+    ByteSpan rawData;              // Flash pointer and size in bytes (empty span if zero-filled / omitted in flash)
+    EmberAfAttributeType type = 0; // ZCL attribute type (used to distinguish short vs long string prefixes)
+
+    /// Takes a copy of a value that does not live in flash, and points rawData at it.
+    ///
+    /// Dynamic endpoints have no ZAP configuration, so their values are supplied at runtime by
+    /// emberAfExternalAttributeReadCallback. Returns false, leaving the object unchanged, if the
+    /// value does not fit: only scalars are served this way, since copying a string default would
+    /// defeat the zero-copy views above.
+    bool SetOwnedValue(ByteSpan data, EmberAfAttributeType attributeType);
+
+    /// Direct zero-copy CharSpan view (returns empty CharSpan() if rawData is empty or length is 0)
+    CharSpan ToCharSpan() const;
+
+    /// Direct zero-copy ByteSpan view (returns empty ByteSpan() if rawData is empty or length is 0)
+    ByteSpan ToByteSpan() const;
+
+    /// Nullable zero-copy CharSpan view (returns Null if length prefix is 0xFF / 0xFFFF)
+    DataModel::Nullable<CharSpan> ToNullableCharSpan() const;
+
+    /// Nullable zero-copy ByteSpan view (returns Null if length prefix is 0xFF / 0xFFFF)
+    DataModel::Nullable<ByteSpan> ToNullableByteSpan() const;
+
+    /// Decodes a non-nullable scalar default (uint8_t..uint64_t, int8_t..int64_t, bool, float, enum, BitMask, OddSizedInteger).
+    ///
+    /// The configured value is returned verbatim: a non-nullable attribute whose configuration happens to hold the type's
+    /// null sentinel (0xFF for uint8, INT16_MIN for int16, ...) yields that sentinel rather than an error. Validating a
+    /// static configuration at runtime costs flash on every device, so the configuration is trusted to be sane.
+    template <typename T>
+    typename NumericAttributeTraits<T>::WorkingType As() const
+    {
+        using Traits = NumericAttributeTraits<T>;
+        typename Traits::StorageType temp;
+        CopyScalar(&temp, sizeof(temp));
+        return Traits::StorageToWorking(temp);
+    }
+
+    /// Decodes a nullable scalar default into DataModel::Nullable<WorkingType> (returns Null if rawData is empty).
+    template <typename T>
+    DataModel::Nullable<typename NumericAttributeTraits<T>::WorkingType> AsNullable() const
+    {
+        if (rawData.empty())
+        {
+            return DataModel::Nullable<typename NumericAttributeTraits<T>::WorkingType>();
+        }
+        using Traits = NumericAttributeTraits<T>;
+        typename Traits::StorageType temp;
+        CopyScalar(&temp, sizeof(temp));
+        DataModel::Nullable<typename Traits::WorkingType> value;
+        if (Traits::IsNullValue(temp))
+        {
+            value.SetNull();
+        }
+        else
+        {
+            value.SetNonNull(Traits::StorageToWorking(temp));
+        }
+        return value;
+    }
+
+private:
+    /// Copies raw native-endian scalar storage bytes into destination buffer (zero-fills if rawData is empty).
+    ///
+    /// The buffer is untyped because the caller supplies a NumericAttributeTraits<T>::StorageType;
+    /// As<T>() / AsNullable<T>() are the typed entry points.
+    void CopyScalar(void * outBuffer, size_t bufferSize) const;
+
+    /// Decodes the Pascal length-prefixed string payload held in rawData.
+    ///
+    /// Returns false (and clears outPayload) when the value is the Null sentinel, the type is not
+    /// a string type, or the prefix does not agree with the size of rawData.
+    bool DecodeStringPayload(ByteSpan & outPayload) const;
+
+    uint8_t mOwnedValue[kMaxOwnedValueSize];
+};
+
+/// Extract default value given attribute metadata
+///
+/// Returns Success when outDefault holds the configured default, or NotFound when the attribute
+/// exists but no default was configured. The endpoint-level overload in attribute-storage.h shares
+/// this contract and adds UnsupportedCluster / UnsupportedAttribute; all of its implementations
+/// (ember, mock, dynamic_server) must agree on those meanings.
+///
+/// This overload reads flash only. It never consults the application, so for an attribute belonging
+/// to a dynamic endpoint it reports what the declaration holds rather than the live value.
+Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(const EmberAfAttributeMetadata & metadata,
+                                                                    AttributeDefaultValue & outDefault);
+
+} // namespace app
+} // namespace chip

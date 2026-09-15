@@ -37,6 +37,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kZone), zone));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kReason), reason));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kNodeID), nodeID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEndpointID), endpointID));
     return aWriter.EndContainer(outer);
 }
 
@@ -57,6 +59,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kReason))
         {
             err = DataModel::Decode(reader, reason);
+        }
+        else if (__context_tag == to_underlying(Fields::kNodeID))
+        {
+            err = DataModel::Decode(reader, nodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpointID))
+        {
+            err = DataModel::Decode(reader, endpointID);
         }
         else
         {
@@ -73,6 +83,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kZone), zone));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kReason), reason));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kNodeID), nodeID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEndpointID), endpointID));
     return aWriter.EndContainer(outer);
 }
 
@@ -93,6 +105,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kReason))
         {
             err = DataModel::Decode(reader, reason);
+        }
+        else if (__context_tag == to_underlying(Fields::kNodeID))
+        {
+            err = DataModel::Decode(reader, nodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpointID))
+        {
+            err = DataModel::Decode(reader, endpointID);
         }
         else
         {

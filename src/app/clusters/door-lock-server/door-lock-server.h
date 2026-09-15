@@ -309,6 +309,7 @@ private:
                               uint16_t & maxNumberOfCredentials);
     DlStatus credentialLengthWithinRange(chip::EndpointId endpointId, CredentialTypeEnum type,
                                          const chip::ByteSpan & credentialData);
+    DlStatus aliroCredentialDataValid(CredentialTypeEnum type, const chip::ByteSpan & credentialData);
     bool getMaxNumberOfCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
                                    uint16_t & maxNumberOfCredentials);
 

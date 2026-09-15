@@ -142,6 +142,9 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                      "Verify that DUT sends success response."),
             TestStep("27", ",TH sends SetAliroReaderConfig Command to DUT with GroupResolvingKey.",
                      "Verify that DUT sends success response."),
+            TestStep("27a", "TH sends SetCredential Command with CredentialType as AliroEvictableEndpointKey and "
+                     "CredentialData that is not an uncompressed EC P-256 public key (first byte != 0x04).",
+                     "Verify that the DUT responds with SetCredentialResponse command with Status INVALID_COMMAND."),
             TestStep("28", "TH sends SetCredential Command CredentialType as AliroEvictableEndpointKey.",
                      "Verify that the DUT responds with SetCredentialResponse commad with status success "),
             TestStep("29", "TH sends SetCredential Command to DUT with CredentialType.PIN.",
@@ -737,6 +740,17 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=False, expected_status=Status.Success)
         self.step("27")
         await self.send_set_aliro_reader_config_cmd(use_group_resolving_key=True, expected_status=Status.Success)
+
+        self.step("27a")
+        if self.pics_guard(self.check_pics("DRLK.S.F0d")
+                           and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
+            # Same length as a valid Aliro key, but compressed-point prefix (0x02) instead of uncompressed (0x04).
+            invalid_aliro_endpoint_key = bytes([0x02]) + aliroevictableendpointkey1[1:]
+            await self.set_credential_cmd(credentialData=invalid_aliro_endpoint_key,
+                                          operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=drlkcluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
+                                          credentialIndex=credentialIndex_1, userIndex=userIndex_1, userStatus=NullValue,
+                                          userType=NullValue, statuscode=Status.InvalidCommand)
 
         self.step("28")
         if self.pics_guard(self.check_pics("DRLK.S.F0d")
