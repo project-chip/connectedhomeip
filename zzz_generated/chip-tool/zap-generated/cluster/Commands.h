@@ -10126,8 +10126,6 @@ private:
 | * ThermostatSuggestions                                             | 0x0054 |
 | * CurrentThermostatSuggestion                                       | 0x0055 |
 | * ThermostatSuggestionNotFollowingReason                            | 0x0056 |
-<<<<<<< HEAD
-=======
 | * CriticalFreezeProtection                                          | 0x0057 |
 | * CriticalOverheatProtection                                        | 0x0058 |
 | * Sensors                                                           | 0x0059 |
@@ -10135,7 +10133,6 @@ private:
 | * EnabledSensors                                                    | 0x005B |
 | * NumberOfSensorScheduleTransitions                                 | 0x005C |
 | * SensorSchedule                                                    | 0x005D |
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -29277,9 +29274,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "thermostat-suggestion-not-following-reason",
-<<<<<<< HEAD
-                                   Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),             //
-=======
                                    Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
                                    credsIssuerConfig), //
@@ -29291,7 +29285,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "number-of-sensor-schedule-transitions", Attributes::NumberOfSensorScheduleTransitions::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "sensor-schedule", Attributes::SensorSchedule::Id, credsIssuerConfig),              //
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29473,8 +29466,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
             chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>>>>(
             Id, "thermostat-suggestion-not-following-reason", 0, UINT16_MAX, Attributes::ThermostatSuggestionNotFollowingReason::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
-<<<<<<< HEAD
-=======
         make_unique<WriteAttribute<bool>>(Id, "critical-freeze-protection", 0, 1, Attributes::CriticalFreezeProtection::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "critical-overheat-protection", 0, 1, Attributes::CriticalOverheatProtection::Id,
@@ -29492,7 +29483,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::SensorScheduleTransitionStruct::Type>>>(
             Id, "sensor-schedule", Attributes::SensorSchedule::Id, WriteCommandType::kWrite, credsIssuerConfig), //
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29592,9 +29582,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "current-thermostat-suggestion", Attributes::CurrentThermostatSuggestion::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "thermostat-suggestion-not-following-reason",
-<<<<<<< HEAD
-                                        Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig),             //
-=======
                                         Attributes::ThermostatSuggestionNotFollowingReason::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
                                         credsIssuerConfig), //
@@ -29606,7 +29593,6 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "number-of-sensor-schedule-transitions",
                                         Attributes::NumberOfSensorScheduleTransitions::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "sensor-schedule", Attributes::SensorSchedule::Id, credsIssuerConfig),              //
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

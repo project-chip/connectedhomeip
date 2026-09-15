@@ -105540,8 +105540,6 @@ public:
 | * ThermostatSuggestions                                             | 0x0054 |
 | * CurrentThermostatSuggestion                                       | 0x0055 |
 | * ThermostatSuggestionNotFollowingReason                            | 0x0056 |
-<<<<<<< HEAD
-=======
 | * CriticalFreezeProtection                                          | 0x0057 |
 | * CriticalOverheatProtection                                        | 0x0058 |
 | * Sensors                                                           | 0x0059 |
@@ -105549,7 +105547,6 @@ public:
 | * EnabledSensors                                                    | 0x005B |
 | * NumberOfSensorScheduleTransitions                                 | 0x005C |
 | * SensorSchedule                                                    | 0x005D |
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -112648,8 +112645,6 @@ public:
 };
 
 #endif // MTR_ENABLE_PROVISIONAL
-<<<<<<< HEAD
-=======
 #if MTR_ENABLE_PROVISIONAL
 
 /*
@@ -113412,7 +113407,6 @@ public:
 };
 
 #endif // MTR_ENABLE_PROVISIONAL
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 
 /*
  * Attribute GeneratedCommandList
@@ -221236,8 +221230,6 @@ void registerClusterThermostat(Commands & commands)
         make_unique<ReadThermostatThermostatSuggestionNotFollowingReason>(), //
         make_unique<SubscribeAttributeThermostatThermostatSuggestionNotFollowingReason>(), //
 #endif // MTR_ENABLE_PROVISIONAL
-<<<<<<< HEAD
-=======
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadThermostatCriticalFreezeProtection>(), //
         make_unique<SubscribeAttributeThermostatCriticalFreezeProtection>(), //
@@ -221269,7 +221261,6 @@ void registerClusterThermostat(Commands & commands)
         make_unique<WriteThermostatSensorSchedule>(), //
         make_unique<SubscribeAttributeThermostatSensorSchedule>(), //
 #endif // MTR_ENABLE_PROVISIONAL
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         make_unique<ReadThermostatGeneratedCommandList>(), //
         make_unique<SubscribeAttributeThermostatGeneratedCommandList>(), //
         make_unique<ReadThermostatAcceptedCommandList>(), //

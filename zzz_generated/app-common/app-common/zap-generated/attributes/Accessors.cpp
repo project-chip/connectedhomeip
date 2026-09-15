@@ -14993,8 +14993,6 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
 
 } // namespace SetpointHoldExpiryTimestamp
 
-<<<<<<< HEAD
-=======
 namespace CriticalFreezeProtection {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value)
@@ -15055,7 +15053,6 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 
 } // namespace NumberOfSensorScheduleTransitions
 
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 namespace FeatureMap {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)

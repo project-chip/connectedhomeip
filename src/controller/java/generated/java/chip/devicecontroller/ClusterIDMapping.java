@@ -12754,8 +12754,6 @@ public class ClusterIDMapping {
             ThermostatSuggestions(84L),
             CurrentThermostatSuggestion(85L),
             ThermostatSuggestionNotFollowingReason(86L),
-<<<<<<< HEAD
-=======
             CriticalFreezeProtection(87L),
             CriticalOverheatProtection(88L),
             Sensors(89L),
@@ -12763,7 +12761,6 @@ public class ClusterIDMapping {
             EnabledSensors(91L),
             NumberOfSensorScheduleTransitions(92L),
             SensorSchedule(93L),
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

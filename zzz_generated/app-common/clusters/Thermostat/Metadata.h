@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-inline constexpr uint32_t kRevision = 11;
+inline constexpr uint32_t kRevision = 12;
 
 namespace Attributes {
 
@@ -299,8 +299,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
-<<<<<<< HEAD
-=======
 namespace CriticalFreezeProtection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CriticalFreezeProtection::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
@@ -337,7 +335,6 @@ inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SensorSchedule::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace SensorSchedule
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     LocalTemperature::kMetadataEntry,
     ControlSequenceOfOperation::kMetadataEntry,
@@ -383,7 +380,7 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RemoveThermostatSuggestion
 namespace AtomicRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AtomicRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+                                                                Access::Privilege::kOperate);
 } // namespace AtomicRequest
 
 } // namespace Commands

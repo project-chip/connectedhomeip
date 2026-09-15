@@ -69328,8 +69328,6 @@ public:
                                      completion:completion];
 }
 
-<<<<<<< HEAD
-=======
 - (void)readAttributeCriticalFreezeProtectionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = Thermostat::Attributes::CriticalFreezeProtection::TypeInfo;
@@ -69756,7 +69754,6 @@ public:
                                      completion:completion];
 }
 
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = Thermostat::Attributes::GeneratedCommandList::TypeInfo;

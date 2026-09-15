@@ -12639,8 +12639,6 @@ public class ClusterReadMapping {
           readThermostatThermostatSuggestionNotFollowingReasonCommandParams
         );
         result.put("readThermostatSuggestionNotFollowingReasonAttribute", readThermostatThermostatSuggestionNotFollowingReasonAttributeInteractionInfo);
-<<<<<<< HEAD
-=======
      Map<String, CommandParameterInfo> readThermostatCriticalFreezeProtectionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatCriticalFreezeProtectionAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -12718,7 +12716,6 @@ public class ClusterReadMapping {
           readThermostatSensorScheduleCommandParams
         );
         result.put("readSensorScheduleAttribute", readThermostatSensorScheduleAttributeInteractionInfo);
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
      Map<String, CommandParameterInfo> readThermostatGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

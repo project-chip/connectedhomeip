@@ -6068,8 +6068,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ThermostatSuggestionNotFollowingReason";
             break;
 
-<<<<<<< HEAD
-=======
         case MTRAttributeIDTypeClusterThermostatAttributeCriticalFreezeProtectionID:
             result = @"CriticalFreezeProtection";
             break;
@@ -6098,7 +6096,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SensorSchedule";
             break;
 
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

@@ -33983,8 +33983,6 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="thermostatSuggestions", Tag=0x00000054, Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]]),
                 ClusterObjectFieldDescriptor(Label="currentThermostatSuggestion", Tag=0x00000055, Type=typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct]),
                 ClusterObjectFieldDescriptor(Label="thermostatSuggestionNotFollowingReason", Tag=0x00000056, Type=typing.Union[None, Nullable, uint]),
-<<<<<<< HEAD
-=======
                 ClusterObjectFieldDescriptor(Label="criticalFreezeProtection", Tag=0x00000057, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="criticalOverheatProtection", Tag=0x00000058, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="sensors", Tag=0x00000059, Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]]),
@@ -33992,7 +33990,6 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="enabledSensors", Tag=0x0000005B, Type=typing.Optional[typing.List[bytes]]),
                 ClusterObjectFieldDescriptor(Label="numberOfSensorScheduleTransitions", Tag=0x0000005C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="sensorSchedule", Tag=0x0000005D, Type=typing.Optional[typing.List[Thermostat.Structs.SensorScheduleTransitionStruct]]),
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -34064,8 +34061,6 @@ class Thermostat(Cluster):
     thermostatSuggestions: typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]] = None
     currentThermostatSuggestion: typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct] = None
     thermostatSuggestionNotFollowingReason: typing.Union[None, Nullable, uint] = None
-<<<<<<< HEAD
-=======
     criticalFreezeProtection: typing.Optional[bool] = None
     criticalOverheatProtection: typing.Optional[bool] = None
     sensors: typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]] = None
@@ -34073,7 +34068,6 @@ class Thermostat(Cluster):
     enabledSensors: typing.Optional[typing.List[bytes]] = None
     numberOfSensorScheduleTransitions: typing.Optional[uint] = None
     sensorSchedule: typing.Optional[typing.List[Thermostat.Structs.SensorScheduleTransitionStruct]] = None
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -34251,6 +34245,7 @@ class Thermostat(Cluster):
             kPresets = 0x100
             kEvents = 0x200
             kThermostatSuggestions = 0x400
+            kThermostatSensors = 0x800
 
         class HVACSystemTypeBitmap(IntFlag):
             kCoolingStage = 0x3
@@ -34407,6 +34402,42 @@ class Thermostat(Cluster):
             systemMode: 'Thermostat.Enums.SystemModeEnum' = 0
             numberOfSchedules: 'uint' = 0
             scheduleTypeFeatures: 'uint' = 0
+
+        @dataclass
+        class SensorScheduleTransitionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="enabledSensors", Tag=2, Type=typing.List[bytes]),
+                    ])
+
+            dayOfWeek: 'uint' = 0
+            transitionTime: 'uint' = 0
+            enabledSensors: 'typing.List[bytes]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class ThermostatSensorStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="sensorHandle", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="cluster", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="endpoint", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="node", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=5, Type=typing.Optional[uint]),
+                    ])
+
+            name: 'str' = ""
+            sensorHandle: 'bytes' = b""
+            cluster: 'uint' = 0
+            endpoint: 'typing.Optional[uint]' = None
+            node: 'typing.Optional[uint]' = None
+            fabricIndex: 'typing.Optional[uint]' = None
 
         @dataclass
         class ThermostatSuggestionStruct(ClusterObject):
@@ -35684,8 +35715,6 @@ class Thermostat(Cluster):
             value: typing.Union[None, Nullable, uint] = None
 
         @dataclass
-<<<<<<< HEAD
-=======
         class CriticalFreezeProtection(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -35798,7 +35827,6 @@ class Thermostat(Cluster):
             value: typing.Optional[typing.List[Thermostat.Structs.SensorScheduleTransitionStruct]] = None
 
         @dataclass
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:

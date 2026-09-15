@@ -3266,8 +3266,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentThermostatSuggestion";
         case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestionNotFollowingReason::Id:
             return "ThermostatSuggestionNotFollowingReason";
-<<<<<<< HEAD
-=======
         case chip::app::Clusters::Thermostat::Attributes::CriticalFreezeProtection::Id:
             return "CriticalFreezeProtection";
         case chip::app::Clusters::Thermostat::Attributes::CriticalOverheatProtection::Id:
@@ -3282,7 +3280,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "NumberOfSensorScheduleTransitions";
         case chip::app::Clusters::Thermostat::Attributes::SensorSchedule::Id:
             return "SensorSchedule";
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         case chip::app::Clusters::Thermostat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Thermostat::Attributes::AcceptedCommandList::Id:

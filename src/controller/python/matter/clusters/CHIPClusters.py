@@ -9354,8 +9354,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
-<<<<<<< HEAD
-=======
             0x00000057: {
                 "attributeName": "CriticalFreezeProtection",
                 "attributeId": 0x00000057,
@@ -9401,7 +9399,6 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

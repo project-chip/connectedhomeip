@@ -25,10 +25,13 @@
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 #include "thermostat-delegate-impl.h"
+#include "thermostat-hold-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-setpoints-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
 
 using namespace chip;
 using namespace chip::app;
-// using namespace chip::app::Clusters;
 
 void OnIdentifyStart(Identify *)
 {
@@ -72,17 +75,31 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
+constexpr EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
+
+using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
+    Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate,
+    Clusters::Thermostat::ThermostatHoldDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
+    Clusters::Thermostat::ThermostatSuggestionsDelegate>;
+
 void ApplicationInit()
 {
-    if (auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
-            chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
-        status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
-    }
+    ChipLogProgress(Zcl, "Thermostat application init");
+
+    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
+                                                            gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate);
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint,
+                                                                           MatterClusterShutdownType::kClusterShutdown);
+}
 
 int main(int argc, char * argv[])
 {

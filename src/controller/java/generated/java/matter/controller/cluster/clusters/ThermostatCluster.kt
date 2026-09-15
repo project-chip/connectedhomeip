@@ -301,6 +301,48 @@ class ThermostatCluster(private val controller: MatterController, private val en
       ThermostatSuggestionNotFollowingReasonAttributeSubscriptionState()
   }
 
+  class SensorsAttribute(val value: List<ThermostatClusterThermostatSensorStruct>?)
+
+  sealed class SensorsAttributeSubscriptionState {
+    data class Success(val value: List<ThermostatClusterThermostatSensorStruct>?) :
+      SensorsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SensorsAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SensorsAttributeSubscriptionState()
+  }
+
+  class AvailableSensorsAttribute(val value: List<ByteArray>?)
+
+  sealed class AvailableSensorsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) : AvailableSensorsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : AvailableSensorsAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AvailableSensorsAttributeSubscriptionState()
+  }
+
+  class EnabledSensorsAttribute(val value: List<ByteArray>?)
+
+  sealed class EnabledSensorsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) : EnabledSensorsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : EnabledSensorsAttributeSubscriptionState()
+
+    object SubscriptionEstablished : EnabledSensorsAttributeSubscriptionState()
+  }
+
+  class SensorScheduleAttribute(val value: List<ThermostatClusterSensorScheduleTransitionStruct>?)
+
+  sealed class SensorScheduleAttributeSubscriptionState {
+    data class Success(val value: List<ThermostatClusterSensorScheduleTransitionStruct>?) :
+      SensorScheduleAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SensorScheduleAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SensorScheduleAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -8093,8 +8135,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-<<<<<<< HEAD
-=======
   suspend fun readCriticalFreezeProtectionAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 87u
 
@@ -8937,7 +8977,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65528u
 

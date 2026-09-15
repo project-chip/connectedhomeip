@@ -828,8 +828,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ThermostatSuggestionNotFollowingReason
-<<<<<<< HEAD
-=======
 namespace CriticalFreezeProtection {
 struct TypeInfo
 {
@@ -918,7 +916,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SensorSchedule
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -1038,8 +1035,6 @@ struct TypeInfo
         Attributes::ThermostatSuggestions::TypeInfo::DecodableType thermostatSuggestions;
         Attributes::CurrentThermostatSuggestion::TypeInfo::DecodableType currentThermostatSuggestion;
         Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo::DecodableType thermostatSuggestionNotFollowingReason;
-<<<<<<< HEAD
-=======
         Attributes::CriticalFreezeProtection::TypeInfo::DecodableType criticalFreezeProtection     = static_cast<bool>(0);
         Attributes::CriticalOverheatProtection::TypeInfo::DecodableType criticalOverheatProtection = static_cast<bool>(0);
         Attributes::Sensors::TypeInfo::DecodableType sensors;
@@ -1048,7 +1043,6 @@ struct TypeInfo
         Attributes::NumberOfSensorScheduleTransitions::TypeInfo::DecodableType numberOfSensorScheduleTransitions =
             static_cast<uint8_t>(0);
         Attributes::SensorSchedule::TypeInfo::DecodableType sensorSchedule;
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

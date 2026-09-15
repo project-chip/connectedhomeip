@@ -160,8 +160,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, currentThermostatSuggestion);
     case Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, thermostatSuggestionNotFollowingReason);
-<<<<<<< HEAD
-=======
     case Attributes::CriticalFreezeProtection::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, criticalFreezeProtection);
     case Attributes::CriticalOverheatProtection::TypeInfo::GetAttributeId():
@@ -176,7 +174,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, numberOfSensorScheduleTransitions);
     case Attributes::SensorSchedule::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, sensorSchedule);
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

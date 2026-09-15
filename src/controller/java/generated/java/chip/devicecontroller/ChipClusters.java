@@ -40192,8 +40192,6 @@ public class ChipClusters {
     private static final long THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID = 84L;
     private static final long CURRENT_THERMOSTAT_SUGGESTION_ATTRIBUTE_ID = 85L;
     private static final long THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID = 86L;
-<<<<<<< HEAD
-=======
     private static final long CRITICAL_FREEZE_PROTECTION_ATTRIBUTE_ID = 87L;
     private static final long CRITICAL_OVERHEAT_PROTECTION_ATTRIBUTE_ID = 88L;
     private static final long SENSORS_ATTRIBUTE_ID = 89L;
@@ -40201,7 +40199,6 @@ public class ChipClusters {
     private static final long ENABLED_SENSORS_ATTRIBUTE_ID = 91L;
     private static final long NUMBER_OF_SENSOR_SCHEDULE_TRANSITIONS_ATTRIBUTE_ID = 92L;
     private static final long SENSOR_SCHEDULE_ATTRIBUTE_ID = 93L;
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -40593,6 +40590,22 @@ public class ChipClusters {
 
     public interface ThermostatSuggestionNotFollowingReasonAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
+    }
+
+    public interface SensorsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ThermostatClusterThermostatSensorStruct> value);
+    }
+
+    public interface AvailableSensorsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<byte[]> value);
+    }
+
+    public interface EnabledSensorsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<byte[]> value);
+    }
+
+    public interface SensorScheduleAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ThermostatClusterSensorScheduleTransitionStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -42532,8 +42545,6 @@ public class ChipClusters {
         }, THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-<<<<<<< HEAD
-=======
     public void readCriticalFreezeProtectionAttribute(
         BooleanAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CRITICAL_FREEZE_PROTECTION_ATTRIBUTE_ID);
@@ -42743,7 +42754,6 @@ public class ChipClusters {
         }, SENSOR_SCHEDULE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
     public void readGeneratedCommandListAttribute(
         GeneratedCommandListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);

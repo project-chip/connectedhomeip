@@ -13913,8 +13913,6 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-<<<<<<< HEAD
-=======
     case Attributes::CriticalFreezeProtection::Id: {
         using TypeInfo = Attributes::CriticalFreezeProtection::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -14093,7 +14091,6 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
     default: {
         // Not a known Thermostat attribute.
         break;

@@ -32868,8 +32868,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-<<<<<<< HEAD
-=======
         case Attributes::CriticalFreezeProtection::Id: {
             using TypeInfo = Attributes::CriticalFreezeProtection::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -33156,7 +33154,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
->>>>>>> a8329a7 ([HVAC]Initial implementation of Thermostat critical protection (#73972))
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
