@@ -81,7 +81,6 @@ ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
     - Pump Configuration and Control
-    - Thermostat User Interface Configuration
     # keep-sorted end
     # Code Driven clusters are clusters that implement the ServerClusterInterface.
     # The clusters in this list require Init() and/or Shutdown() callbacks, defined
@@ -173,6 +172,7 @@ CodeDrivenClusters:
     - Temperature Measurement
     - Thermostat
     - Thermostat Mode
+    - Thermostat User Interface Configuration
     - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization

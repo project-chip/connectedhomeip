@@ -398,8 +398,15 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::app::PigweedAttributeAccessor sPwOobAccessor;
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
 
-    chip::rpc::Init(33000); // TODO: Add an arg for Pw port.
-    ChipLogProgress(AppServer, "PW_RPC initialized.");
+    const uint16_t rpcServerPort = AppOptions::GetConfig().rpcServerPort.value_or(AppOptions::kDefaultRpcServerPort);
+    chip::rpc::Init(rpcServerPort);
+    ChipLogProgress(AppServer, "PW_RPC initialized on port %u.", rpcServerPort);
+#else
+    if (AppOptions::GetConfig().rpcServerPort.has_value())
+    {
+        ChipLogError(AppServer,
+                     "--rpc-server-port was specified, but this binary was built without Pigweed RPC support. Ignoring it.");
+    }
 #endif // PW_RPC_ENABLED
 
     // Init ZCL Data Model and CHIP App Server
