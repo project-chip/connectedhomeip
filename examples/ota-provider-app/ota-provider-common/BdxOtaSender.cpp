@@ -114,6 +114,10 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
                        ChipLogError(BDX, "AcceptTransfer failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
+        // Set the last receive init start offset and bit set
+        mLastReceiveInitStartOffset       = static_cast<uint32_t>(mTransfer.GetStartOffset());
+        mLastReceiveInitStartOffsetBitSet = (mLastReceiveInitStartOffset != 0);
+
         // Store the file designator used during block query
         uint16_t fdl       = 0;
         const uint8_t * fd = mTransfer.GetFileDesignator(fdl);
@@ -251,6 +255,9 @@ void BdxOtaSender::Reset()
     mInitialized  = false;
     mNumBytesSent = 0;
     memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
+
+    mLastReceiveInitStartOffset       = 0;
+    mLastReceiveInitStartOffsetBitSet = false;
 }
 
 void BdxOtaSender::AbortTransfer()
