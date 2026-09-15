@@ -33,6 +33,7 @@ public:
     explicit SimulatedWindowCovering(const Context & context);
     ~SimulatedWindowCovering() override;
 
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // IdentifyDelegate implementation
@@ -46,6 +47,7 @@ public:
     CHIP_ERROR HandleStopMotion() override;
     void OnTargetPositionLiftChanged(DataModel::Nullable<Percent100ths> newTargetLift) override;
     void OnTargetPositionTiltChanged(DataModel::Nullable<Percent100ths> newTargetTilt) override;
+    void OnModeChanged(chip::BitMask<Clusters::WindowCovering::Mode> newMode) override;
 
     // TimerContext
     void TimerFired() override;
