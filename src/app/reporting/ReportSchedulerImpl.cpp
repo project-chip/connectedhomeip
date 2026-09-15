@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
+
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/ReportSchedulerImpl.h>
@@ -53,6 +55,39 @@ void ReportSchedulerImpl::OnEnterActiveMode()
         return Loop::Continue;
     });
 #endif
+}
+
+void ReportSchedulerImpl::DeferReports(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints)
+{
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    mNodesPool.ForEachActiveObject([now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
+        VerifyOrReturnValue(node->PathListsContainAnyEndpoint(targetedEndpoints), Loop::Continue);
+
+        Timestamp target = now + aDelay;
+        if (node->GetDeferralEndTimestamp() > now)
+        {
+            target = std::min(target, node->GetDeferralEndTimestamp());
+        }
+        Timestamp maxAllowed = std::max(now, node->GetMaxTimestamp());
+        node->SetDeferralEndTimestamp(std::min(target, maxAllowed));
+        return Loop::Continue;
+    });
+    RescheduleAllReports();
+}
+
+void ReportSchedulerImpl::RescheduleAllReports()
+{
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    mNodesPool.ForEachActiveObject([this, now](ReadHandlerNode * node) {
+        Milliseconds32 newTimeout;
+        CHIP_ERROR err = this->CalculateNextReportTimeout(newTimeout, node, now);
+        LogErrorOnFailure(err);
+        if (err == CHIP_NO_ERROR)
+        {
+            LogErrorOnFailure(this->ScheduleReport(newTimeout, node, now));
+        }
+        return Loop::Continue;
+    });
 }
 
 void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)

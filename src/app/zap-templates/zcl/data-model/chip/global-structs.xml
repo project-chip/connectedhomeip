@@ -69,8 +69,8 @@ Alchemy: v1.7.10
   </struct>
 
   <struct name="PriceStruct" apiMaturity="provisional">
-    <item fieldId="0" name="Amount" type="money"/>
-    <item fieldId="1" name="Currency" type="CurrencyStruct"/>
+    <item fieldId="0" name="Amount" type="money" apiMaturity="provisional"/>
+    <item fieldId="1" name="Currency" type="CurrencyStruct" apiMaturity="provisional"/>
   </struct>
 
   <struct name="SemanticTagStruct">

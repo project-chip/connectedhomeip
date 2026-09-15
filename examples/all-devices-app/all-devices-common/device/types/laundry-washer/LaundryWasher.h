@@ -17,26 +17,47 @@
 
 #pragma once
 
+#include <app/clusters/laundry-washer-controls-server/LaundryWasherControlsCluster.h>
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/operational-state-server/OperationalStateDelegate.h>
+#include <clusters/LaundryWasherMode/Enums.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
 
 class LaundryWasher : public SingleEndpoint
 {
 public:
-    LaundryWasher();
+    struct Config
+    {
+        Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
+        Clusters::LaundryWasherControls::Delegate & controlsDelegate;
+        Clusters::ModeBase::AppDelegate & modeDelegate;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+    };
+
+    explicit LaundryWasher(const Config & config);
     ~LaundryWasher() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::OperationalState::OperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
+    Clusters::LaundryWasherControlsCluster & LaundryWasherControls() { return mLaundryWasherControlsCluster.Cluster(); }
+    Clusters::ModeBaseCluster & LaundryWasherMode() { return mLaundryWasherModeCluster.Cluster(); }
 
 private:
-    Clusters::OperationalState::LoggingOperationalStateDelegate mDelegate;
+    DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
+    Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
+
+    Clusters::LaundryWasherControls::Delegate & mLaundryWasherControlsDelegate;
+    LazyRegisteredServerCluster<Clusters::LaundryWasherControlsCluster> mLaundryWasherControlsCluster;
+
+    Clusters::ModeBase::AppDelegate & mLaundryWasherModeDelegate;
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mLaundryWasherModeCluster;
 };
 
 } // namespace chip::app

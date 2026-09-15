@@ -22,10 +22,13 @@
 #include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <controller/NetworkIdentityRegistrar.h>
+#include <credentials/CHIPCert.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/jcm/TrustVerification.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/CharSpanToStdString.h>
 #include <lib/support/Span.h>
 #include <lib/support/Variant.h>
@@ -69,6 +72,7 @@ enum CommissioningStage : uint8_t
     // whether the logic in AutoCommissioner::CommissioningStepFinished that checks for "network
     // failure" conditions still makes sense.
     kWiFiNetworkSetup,             ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
+    kPDCRegisterClientIdentity,    ///< Register PDC Client Identity via the NetworkIdentityRegistrar
     kThreadNetworkSetup,           ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
     kFailsafeBeforeWiFiEnable,     ///< Extend the fail-safe before doing kWiFiNetworkEnable
     kFailsafeBeforeThreadEnable,   ///< Extend the fail-safe before doing kThreadNetworkEnable
@@ -99,6 +103,7 @@ enum CommissioningStage : uint8_t
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
     kRequestWiFiCredentials,          ///< Wi-Fi credentials are needed; ask for those.
     kRequestThreadCredentials,        ///< Thread credentials are needed; ask for those.
+    kPDCGetNetworkIdentity,           ///< Retrieve PDC Network Identity from the NetworkIdentityRegistrar
     kCleanup,                         ///< Call delegates with status, free memory, clear timers and state.
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
@@ -121,8 +126,42 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage);
 struct WiFiCredentials
 {
     ByteSpan ssid;
+
+    /// WPA-Personal passphrase, or empty for an open network. Only meaningful if `hasCredentials`.
     ByteSpan credentials;
-    WiFiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
+
+    /// Whether a passphrase was supplied.
+    /// Only false if the PDC-only constructor was used, which implies registrar != nullptr.
+    /// Note: Not folded into `credentials` (by making it a std::optional) to preserve source compat.
+    bool hasCredentials = true;
+
+    /// Grants access to a network that uses Per-Device Credentials (PDC). If this is set and the
+    /// commissionee's Network Commissioning cluster advertises the PDC feature, the commissioner
+    /// will configure the commissionee for PDC instead of using `credentials`.
+    ///
+    /// The registrar must outlive the commissioning attempt; see NetworkIdentityRegistrar.
+    ///
+    /// Note that a registrar is not itself tied to Wi-Fi, even though this is currently the only
+    /// place to supply one: PDC over another link layer would need its own way to reach one.
+    NetworkIdentityRegistrar * registrar = nullptr;
+
+    /// WPA-Personal, or an open network if `aCredentials` is empty.
+    WiFiCredentials(ByteSpan aSsid, ByteSpan aCredentials) : ssid(aSsid), credentials(aCredentials) {}
+
+    /// Per-Device Credentials only: commissioning fails if the commissionee does not support PDC.
+    /// NetworkIdentityRegistrar must be non-null.
+    WiFiCredentials(ByteSpan aSsid, NetworkIdentityRegistrar * aRegistrar) :
+        ssid(aSsid), hasCredentials(false), registrar(aRegistrar)
+    {
+        VerifyOrDie(aRegistrar != nullptr);
+    }
+
+    /// Prefer Per-Device Credentials, falling back to WPA-Personal / open network `credentials`
+    /// for commissionees that do not support PDC. The NetworkIdentityRegistrar may be null, in
+    /// which case this constructor is equivalent to `WiFiCredentials(aSsid, aCredentials)`.
+    WiFiCredentials(ByteSpan aSsid, NetworkIdentityRegistrar * aRegistrar, ByteSpan aCredentials) :
+        ssid(aSsid), credentials(aCredentials), registrar(aRegistrar)
+    {}
 };
 
 struct TermsAndConditionsAcknowledgement
@@ -179,6 +218,12 @@ public:
     static constexpr size_t kMaxSsidLen          = 32;
     static constexpr size_t kMaxCredentialsLen   = 64;
     static constexpr size_t kMaxCountryCodeLen   = 2;
+
+    static constexpr size_t kMaxNetworkIdentityLen = Credentials::kMaxCHIPCompactNetworkIdentityLength;
+    // Duplicates the server-side NetworkCommissioning::kPossessionNonceSize, which lives in a cluster
+    // implementation header the controller cannot depend on. TestPDCCommissioning.cpp asserts they agree.
+    static constexpr size_t kPossessionNonceLen     = 32;
+    static constexpr size_t kPossessionSignatureLen = Crypto::kP256_ECDSA_Signature_Length_Raw;
 
     // Value to use when setting the commissioning failsafe timer on the node being commissioned.
     // If the failsafe timer value is passed in as part of the commissioning parameters, that value will be used. If not supplied,
@@ -260,9 +305,60 @@ public:
     // kSendAttestationRequest step.
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
 
-    // WiFi SSID and credentials to use when adding/updating and enabling WiFi on the node.
-    // This value must be set before calling PerformCommissioningStep for the kWiFiNetworkSetup or kWiFiNetworkEnable steps.
+    // Wi-Fi SSID, credentials and/or PDC NetworkIdentityRegistrar to use when adding/updating and
+    // enabling Wi-Fi on the node. This value must be set before calling PerformCommissioningStep
+    // for the kWiFiNetworkSetup or kWiFiNetworkEnable steps.
     const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
+
+    // Returns GetWiFiCredentials().registrar, or nullptr.
+    NetworkIdentityRegistrar * GetWiFiNetworkIdentityRegistrar() const
+    {
+        return mWiFiCreds.HasValue() ? mWiFiCreds.Value().registrar : nullptr;
+    }
+
+    // The Network Identity of the operational network, in compact-pdc-identity TLV format.
+    // If present, kWiFiNetworkSetup will configure the commissionee for PDC using this identity.
+    // The AutoCommissioner populates this from the PDCNetworkIdentityInfo report returned
+    // by kPDCGetNetworkIdentity, but a CommissioningDelegate is free to obtain the Network Identity
+    // in some other way and bypass that step entirely.
+    // Note: Whoever supplies the identity is responsible for first checking that the commissionee
+    // supports PDC (generally via the network.wifi.supportsPerDeviceCredentials flag of the
+    // ReadCommissioningInfo report returned by kReadCommissioningInfo), since a commissionee that
+    // does not support PDC could otherwise misinterpret a PDC AddOrUpdateWiFiNetwork command as
+    // configuring a connection to an open network. The AutoCommissioner performs that check itself
+    // before scheduling kPDCGetNetworkIdentity, so the obligation only falls to a delegate that sets
+    // this parameter up front.
+    const Optional<ByteSpan> GetPDCNetworkIdentity() const { return mPDCNetworkIdentity; }
+
+    // The nonce sent to the commissionee during kWiFiNetworkSetup, and signed by it to prove
+    // that it has possession of the private key for the Network Client Identity it returns.
+    // Must be exactly kPossessionNonceLen bytes long.
+    // When using the AutoCommissioner, a random nonce will be generated if not supplied, and a
+    // supplied nonce will be cleared after the commissioning attempt ends, or when retrying
+    // commissioning with another Wi-Fi network.
+    // Used during kPDCRegisterClientIdentity to validate that possession proof.
+    const Optional<ByteSpan> GetPDCPossessionNonce() const { return mPDCPossessionNonce; }
+
+    // The Network Client Identity to register with the NetworkIdentityRegistrar during
+    // kPDCRegisterClientIdentity, in compact-pdc-identity TLV format.
+    // The AutoCommissioner populates this from the PDCClientIdentityInfo report returned by kWiFiNetworkSetup.
+    // This must be set before calling PerformCommissioningStep for the kPDCRegisterClientIdentity step.
+    const Optional<ByteSpan> GetPDCClientIdentity() const { return mPDCClientIdentity; }
+
+    // The commissionee's proof-of-possession signature over the Client Identity and the Possession Nonce.
+    // Verified during kPDCRegisterClientIdentity prior to registering the client identity.
+    // The AutoCommissioner populates this from the PDCClientIdentityInfo report returned by kWiFiNetworkSetup.
+    // This must be set before calling PerformCommissioningStep for the kPDCRegisterClientIdentity step.
+    const Optional<ByteSpan> GetPDCPossessionSignature() const { return mPDCPossessionSignature; }
+
+    // Whether the DeviceCommissioner is responsible for rolling back registration of the Network
+    // Client Identity registered in kPDCRegisterClientIdentity if commissioning does not succeed.
+    // Defaults to true. Setting this to false means the delegate assumes the obligation to revoke
+    // the registration if necessary. It must do so if it needs to keep multiple Network Client
+    // Identities alive during a commissioning attempt, because the commissioner only tracks one
+    // registration at a time. The value is read during kPDCRegisterClientIdentity, so changing
+    // it afterwards has no effect on the rollback of a registration that has already been made.
+    bool GetManagePDCClientIdentityRollback() const { return mManagePDCClientIdentityRollback; }
 
     // Thread operational dataset to use when adding/updating and enabling the thread network on the node.
     // This value must be set before calling PerformCommissioningStep for the kThreadNetworkSetup or kThreadNetworkEnable steps.
@@ -324,6 +420,19 @@ public:
     // stage.
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
+
+    // Attestation profiles to use for the PAI and DAC CertificateChainRequest commands.
+    // When unset, legacy Matter behavior is used for the corresponding certificate.
+    const Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
+    GetPAIAttestationCertificateRequestProfile() const
+    {
+        return mPAIAttestationCertificateRequestProfile;
+    }
+    const Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
+    GetDACAttestationCertificateRequestProfile() const
+    {
+        return mDACAttestationCertificateRequestProfile;
+    }
 
     // Node ID when a matching fabric is found in the Node Operational Credentials cluster.
     // In the AutoCommissioner, this is set from kReadCommissioningInfo stage.
@@ -451,6 +560,44 @@ public:
         return *this;
     }
 
+    CommissioningParameters & SetPDCNetworkIdentity(ByteSpan networkIdentity)
+    {
+        mPDCNetworkIdentity.SetValue(networkIdentity);
+        return *this;
+    }
+
+    void ClearPDCNetworkIdentity() { mPDCNetworkIdentity.ClearValue(); }
+
+    CommissioningParameters & SetPDCPossessionNonce(ByteSpan possessionNonce)
+    {
+        mPDCPossessionNonce.SetValue(possessionNonce);
+        return *this;
+    }
+
+    void ClearPDCPossessionNonce() { mPDCPossessionNonce.ClearValue(); }
+
+    CommissioningParameters & SetPDCClientIdentity(ByteSpan clientIdentity)
+    {
+        mPDCClientIdentity.SetValue(clientIdentity);
+        return *this;
+    }
+
+    void ClearPDCClientIdentity() { mPDCClientIdentity.ClearValue(); }
+
+    CommissioningParameters & SetPDCPossessionSignature(ByteSpan possessionSignature)
+    {
+        mPDCPossessionSignature.SetValue(possessionSignature);
+        return *this;
+    }
+
+    void ClearPDCPossessionSignature() { mPDCPossessionSignature.ClearValue(); }
+
+    CommissioningParameters & SetManagePDCClientIdentityRollback(bool manageRollback)
+    {
+        mManagePDCClientIdentityRollback = manageRollback;
+        return *this;
+    }
+
     // If a ThreadOperationalDataset is provided, then the ThreadNetworkScan will not be attempted
     CommissioningParameters & SetThreadOperationalDataset(ByteSpan threadOperationalDataset)
     {
@@ -512,6 +659,18 @@ public:
     CommissioningParameters & SetDAC(const ByteSpan & dac)
     {
         mDAC = MakeOptional(dac);
+        return *this;
+    }
+    CommissioningParameters &
+    SetPAIAttestationCertificateRequestProfile(app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum profile)
+    {
+        mPAIAttestationCertificateRequestProfile.SetValue(profile);
+        return *this;
+    }
+    CommissioningParameters &
+    SetDACAttestationCertificateRequestProfile(app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum profile)
+    {
+        mDACAttestationCertificateRequestProfile.SetValue(profile);
         return *this;
     }
     CommissioningParameters & SetRemoteNodeId(NodeId id)
@@ -642,6 +801,11 @@ public:
         return *this;
     }
     void ClearICDStayActiveDurationMsec() { mICDStayActiveDurationMsec.ClearValue(); }
+    void ClearAttestationCertificateRequestProfiles()
+    {
+        mPAIAttestationCertificateRequestProfile.ClearValue();
+        mDACAttestationCertificateRequestProfile.ClearValue();
+    }
 
     Span<const app::AttributePathParams> GetExtraReadPaths() const { return mExtraReadPaths; }
 
@@ -662,6 +826,10 @@ public:
         mCSRNonce.ClearValue();
         mAttestationNonce.ClearValue();
         mWiFiCreds.ClearValue();
+        mPDCNetworkIdentity.ClearValue();
+        mPDCPossessionNonce.ClearValue();
+        mPDCClientIdentity.ClearValue();
+        mPDCPossessionSignature.ClearValue();
         mCountryCode.ClearValue();
         mThreadOperationalDataset.ClearValue();
         mNOCChainGenerationParameters.ClearValue();
@@ -693,6 +861,11 @@ private:
     Optional<ByteSpan> mCSRNonce;
     Optional<ByteSpan> mAttestationNonce;
     Optional<WiFiCredentials> mWiFiCreds;
+    Optional<ByteSpan> mPDCNetworkIdentity;
+    Optional<ByteSpan> mPDCPossessionNonce;
+    Optional<ByteSpan> mPDCClientIdentity;
+    Optional<ByteSpan> mPDCPossessionSignature;
+    bool mManagePDCClientIdentityRollback = true;
     Optional<CharSpan> mCountryCode;
     Optional<TermsAndConditionsAcknowledgement> mTermsAndConditionsAcknowledgement;
     Optional<ByteSpan> mThreadOperationalDataset;
@@ -707,6 +880,8 @@ private:
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
+    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mPAIAttestationCertificateRequestProfile;
+    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mDACAttestationCertificateRequestProfile;
     Optional<NodeId> mRemoteNodeId;
     Optional<VendorId> mRemoteVendorId;
     Optional<uint16_t> mRemoteProductId;
@@ -774,6 +949,24 @@ struct OperationalNodeFoundData
     OperationalDeviceProxy operationalProxy;
 };
 
+/// Reported by kPDCGetNetworkIdentity: the Network Identity obtained from the NetworkIdentityRegistrar.
+struct PDCNetworkIdentityInfo
+{
+    PDCNetworkIdentityInfo(ByteSpan aNetworkIdentity) : networkIdentity(aNetworkIdentity) {}
+    ByteSpan networkIdentity;
+};
+
+/// Reported by kWiFiNetworkSetup when the commissionee was configured for PDC: the Network Client
+/// Identity it generated, and its signature over (clientIdentity || possessionNonce).
+struct PDCClientIdentityInfo
+{
+    PDCClientIdentityInfo(ByteSpan aClientIdentity, ByteSpan aPossessionSignature) :
+        clientIdentity(aClientIdentity), possessionSignature(aPossessionSignature)
+    {}
+    ByteSpan clientIdentity;
+    ByteSpan possessionSignature;
+};
+
 struct NetworkClusterInfo
 {
     EndpointId endpoint = kInvalidEndpointId;
@@ -781,6 +974,8 @@ struct NetworkClusterInfo
     // maxScanTime == 0 means we don't know; normal commissioning step timeouts
     // will apply in that case.
     app::Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableType maxScanTime = 0;
+    // Whether the cluster advertises the Per-Device Credentials feature.
+    bool supportsPerDeviceCredentials = false;
 };
 struct NetworkClusters
 {
@@ -847,6 +1042,9 @@ struct ReadCommissioningInfo
     uint8_t maxDSTSize                = 1;
     NodeId remoteNodeId               = kUndefinedNodeId;
     bool supportsConcurrentConnection = true;
+    bool supportsPqcDeviceAttestation = false;
+    BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> paiSupportedAttestationProfiles;
+    BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> dacSupportedAttestationProfiles;
     ICDManagementClusterInfo icd;
 };
 
@@ -929,7 +1127,11 @@ public:
      * kSendTrustedRootCert: None
      * kSendNOC: OperationalCertErrorInfo if AddNOC returned a non-success NodeOperationalCertStatusEnum
      * kConfigureTrustedTimeSource: None
-     * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
+     * kPDCGetNetworkIdentity: PDCNetworkIdentityInfo
+     * kWiFiNetworkSetup: PDCClientIdentityInfo if the commissionee was configured for PDC; its shape
+     *                    has been validated, so a success for such a commissionee always carries one.
+     *                    NetworkCommissioningStatusInfo if there is an error
+     * kPDCRegisterClientIdentity: None
      * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkEnable: NetworkCommissioningStatusInfo if there is an error
@@ -943,7 +1145,7 @@ public:
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
                   AttestationErrorInfo, CommissioningErrorInfo, OperationalCertErrorInfo, NetworkCommissioningStatusInfo,
-                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError>
+                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError, PDCNetworkIdentityInfo, PDCClientIdentityInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

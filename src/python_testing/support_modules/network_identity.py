@@ -1,0 +1,442 @@
+#
+#    Copyright (c) 2026 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+"""Generation and verification of Per-Device Credentials (PDC) material.
+
+Two artifacts are produced here for the Network Identity Management cluster (0x0450):
+
+* A **Network (Client) Identity** in the ``compact-pdc-identity`` TLV format
+  accepted by the ``AddClient`` command and validated by the DUT via
+  ``Credentials::ValidateChipNetworkIdentity`` (which recomputes the fixed
+  X.509 TBSCertificate template from the embedded public key and verifies the
+  self-signature). The Python encoder mirrors
+  ``Credentials::EncodeNetworkIdentityTBSCert`` in
+  ``src/credentials/GenerateChipX509Cert.cpp`` byte-for-byte so that the
+  signature we compute verifies against the template the DUT reconstructs.
+
+* A **Network Administrator Shared Secret (NASS)** in the TLV format accepted by
+  the ``ImportAdminSecret`` command (see
+  ``src/app/clusters/network-identity-management-server/NetworkAdministratorSecret.cpp``).
+
+The same compact identity format appears in the Network Commissioning cluster
+(0x0031) when the PDC feature is supported, so :func:`validate_compact_identity`
+and :func:`verify_possession_signature` are here as well: they check the
+``ClientIdentity`` and ``PossessionSignature`` a DUT returns from
+``AddOrUpdateWiFiNetwork`` and ``QueryIdentity``.
+
+The encoders are exercised against the C++ known-answer vectors in
+``src/python_testing/test_testing/test_network_identity.py``.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import os
+import time
+from typing import NamedTuple
+
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature, encode_dss_signature
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+# Length of the raw key material in a Network Administrator Shared Secret.
+NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH = 32
+# Length of the 20-byte identifier (truncated SHA-256 of the public key) reported
+# in the ActiveNetworkIdentities/Clients attributes.
+NETWORK_IDENTITY_IDENTIFIER_LENGTH = 20
+# Length of a compact-pdc-identity: anonymous TLV struct { pubkey[65], signature[64] }.
+COMPACT_IDENTITY_LENGTH = 137
+# Length of the PossessionNonce carried by AddOrUpdateWiFiNetwork and QueryIdentity.
+POSSESSION_NONCE_LENGTH = 32
+# Length of a raw (r || s) P-256 ECDSA signature, as used for PossessionSignature.
+POSSESSION_SIGNATURE_LENGTH = 64
+# Unix time of the Matter/CHIP epoch (2000-01-01T00:00:00 UTC).
+MATTER_EPOCH_OFFSET_SECONDS = 946684800
+
+# Order of the NIST P-256 (secp256r1) curve.
+_P256_ORDER = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551
+# Length of a P-256 field element / private key, in bytes.
+_P256_FIELD_ELEMENT_LENGTH = 32
+# HKDF info string and round count for "Network Identity Derivation for ECDSA".
+_NETWORK_IDENTITY_HKDF_INFO = b"NASS-ECDSA-secp256r1"
+_NETWORK_IDENTITY_DERIVATION_MAX_ROUNDS = 8
+
+# TLV tags of the compact-pdc-identity structure (Matter cert TLV tags).
+_TLV_TAG_EC_PUBLIC_KEY = 0x09
+_TLV_TAG_ECDSA_SIGNATURE = 0x0B
+
+# ---------------------------------------------------------------------------
+# Minimal DER encoding helpers for the Network Identity TBSCertificate.
+# ---------------------------------------------------------------------------
+
+
+def _der_len(length: int) -> bytes:
+    if length < 0x80:
+        return bytes([length])
+    encoded = b""
+    while length:
+        encoded = bytes([length & 0xFF]) + encoded
+        length >>= 8
+    return bytes([0x80 | len(encoded)]) + encoded
+
+
+def _der(tag: int, content: bytes) -> bytes:
+    return bytes([tag]) + _der_len(len(content)) + content
+
+
+# Pre-encoded DER OBJECT IDENTIFIERs.
+_OID_ECDSA_WITH_SHA256 = _der(0x06, bytes([0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02]))
+_OID_EC_PUBLIC_KEY = _der(0x06, bytes([0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01]))
+_OID_PRIME256V1 = _der(0x06, bytes([0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07]))
+_OID_COMMON_NAME = _der(0x06, bytes([0x55, 0x04, 0x03]))
+_OID_BASIC_CONSTRAINTS = _der(0x06, bytes([0x55, 0x1D, 0x13]))
+_OID_KEY_USAGE = _der(0x06, bytes([0x55, 0x1D, 0x0F]))
+_OID_EXT_KEY_USAGE = _der(0x06, bytes([0x55, 0x1D, 0x25]))
+_OID_KEY_PURPOSE_CLIENT_AUTH = _der(0x06, bytes([0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x02]))
+_OID_KEY_PURPOSE_SERVER_AUTH = _der(0x06, bytes([0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x01]))
+
+# DER BOOLEAN TRUE.
+_DER_TRUE = _der(0x01, b"\xff")
+
+
+def _network_identity_name() -> bytes:
+    # RDNSequence with a single CN="*" attribute, encoded as a UTF8String (as
+    # done by InitNetworkIdentitySubject; "*" is not a valid PrintableString).
+    common_name = _der(0x0C, b"*")
+    attribute = _der(0x30, _OID_COMMON_NAME + common_name)
+    return _der(0x30, _der(0x31, attribute))  # SEQUENCE { SET { ... } }
+
+
+def _subject_public_key_info(public_key: bytes) -> bytes:
+    algorithm = _der(0x30, _OID_EC_PUBLIC_KEY + _OID_PRIME256V1)
+    subject_public_key = _der(0x03, b"\x00" + public_key)  # BIT STRING, 0 unused bits
+    return _der(0x30, algorithm + subject_public_key)
+
+
+def _network_identity_extensions() -> bytes:
+    # basicConstraints (critical): cA absent -> empty SEQUENCE.
+    basic_constraints = _der(0x30, _OID_BASIC_CONSTRAINTS + _DER_TRUE + _der(0x04, _der(0x30, b"")))
+    # keyUsage (critical): digitalSignature only -> BIT STRING with 7 unused bits, 0x80.
+    key_usage = _der(0x30, _OID_KEY_USAGE + _DER_TRUE + _der(0x04, _der(0x03, b"\x07\x80")))
+    # extKeyUsage (critical): id-kp-clientAuth, id-kp-serverAuth.
+    ext_key_usage = _der(
+        0x30, _OID_EXT_KEY_USAGE + _DER_TRUE + _der(0x04, _der(0x30, _OID_KEY_PURPOSE_CLIENT_AUTH + _OID_KEY_PURPOSE_SERVER_AUTH)))
+    return _der(0xA3, _der(0x30, basic_constraints + key_usage + ext_key_usage))  # [3] EXPLICIT
+
+
+def _encode_network_identity_tbs(public_key: bytes) -> bytes:
+    """Encodes the X.509 TBSCertificate for a Network Identity with the given
+    65-byte uncompressed P-256 public key. Mirrors EncodeNetworkIdentityTBSCert."""
+    version = _der(0xA0, _der(0x02, b"\x02"))  # [0] EXPLICIT Version v3
+    serial_number = _der(0x02, b"\x01")
+    signature_algorithm = _der(0x30, _OID_ECDSA_WITH_SHA256)
+    issuer = subject = _network_identity_name()
+    # notBefore = CHIP epoch 1 (UTCTime); notAfter = 99991231235959Z (GeneralizedTime).
+    validity = _der(0x30, _der(0x17, b"000101000001Z") + _der(0x18, b"99991231235959Z"))
+    return _der(
+        0x30,
+        version + serial_number + signature_algorithm + issuer + validity + subject
+        + _subject_public_key_info(public_key) + _network_identity_extensions())
+
+
+# ---------------------------------------------------------------------------
+# Compact TLV encoding of the identity.
+# ---------------------------------------------------------------------------
+
+
+def _encode_compact_identity(public_key: bytes, signature: bytes) -> bytes:
+    if len(public_key) != 65:
+        raise ValueError(f"public key must be 65 bytes, got {len(public_key)}")
+    if len(signature) != 64:
+        raise ValueError(f"signature must be 64 bytes, got {len(signature)}")
+    # Anonymous TLV structure { [9] pubkey (octstr), [11] signature (octstr) }.
+    return (bytes([0x15])
+            + bytes([0x30, _TLV_TAG_EC_PUBLIC_KEY, len(public_key)]) + public_key
+            + bytes([0x30, _TLV_TAG_ECDSA_SIGNATURE, len(signature)]) + signature
+            + bytes([0x18]))
+
+
+def _raw_public_key(private_key: ec.EllipticCurvePrivateKey) -> bytes:
+    return private_key.public_key().public_bytes(
+        encoding=serialization.Encoding.X962,
+        format=serialization.PublicFormat.UncompressedPoint)
+
+
+def _compact_identity_from_private_key(private_key: ec.EllipticCurvePrivateKey, *, deterministic: bool) -> bytes:
+    """Self-signs a Network Identity for the given keypair and returns the compact
+    identity. ``deterministic`` selects RFC 6979 signing, matching
+    ``DeriveChipNetworkIdentity`` (vs ``NewChipNetworkIdentity`` for random)."""
+    public_key = _raw_public_key(private_key)
+    tbs = _encode_network_identity_tbs(public_key)
+    der_signature = private_key.sign(tbs, ec.ECDSA(hashes.SHA256(), deterministic_signing=deterministic))
+    r, s = decode_dss_signature(der_signature)
+    raw_signature = r.to_bytes(32, "big") + s.to_bytes(32, "big")
+    return _encode_compact_identity(public_key, raw_signature)
+
+
+def generate_network_client_identity() -> tuple[ec.EllipticCurvePrivateKey, bytes]:
+    """Generates a fresh Network (Client) Identity.
+
+    Returns a tuple of (private_key, compact_identity) where compact_identity is
+    the 137-byte compact-pdc-identity accepted by the AddClient command.
+    """
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    return private_key, _compact_identity_from_private_key(private_key, deterministic=False)
+
+
+def regenerate_network_client_identity(private_key: ec.EllipticCurvePrivateKey) -> bytes:
+    """Re-signs an existing keypair to produce a colliding Network (Client) Identity.
+
+    The result shares the public key (and therefore the 20-byte identifier) of the
+    original identity but carries a fresh random signature, so its bytes differ. The
+    DUT must treat this as a collision (AlreadyExists), not as an idempotent re-add.
+    """
+    return _compact_identity_from_private_key(private_key, deterministic=False)
+
+
+def corrupt_network_client_identity(compact_identity: bytes) -> bytes:
+    """Returns a copy of a compact identity with an invalidated signature.
+
+    A single byte inside the ECDSA signature is flipped, leaving the TLV structure
+    and public key intact so the DUT reaches (and fails) signature verification,
+    which it reports as DynamicConstraintError.
+    """
+    corrupted = bytearray(compact_identity)
+    # The last byte is the TLV end-of-container marker; the byte before it is the
+    # final signature octet. Flipping it invalidates the signature without disturbing
+    # the container structure or the public key.
+    corrupted[-2] ^= 0xFF
+    return bytes(corrupted)
+
+
+def derive_ecdsa_network_identity_private_key(raw_secret: bytes) -> ec.EllipticCurvePrivateKey:
+    """Derives the ECDSA Network Identity private key from a NASS raw secret.
+
+    Implements "Network Identity Derivation for ECDSA" from the Matter
+    specification, mirroring ``RawKeyNetworkIdentityKeystore::DeriveECDSANetworkIdentity``:
+    HKDF-SHA256 expands the raw secret (empty salt, info "NASS-ECDSA-secp256r1")
+    into candidate 32-byte blocks; each block ``x`` yields the candidate private
+    key ``d = x + 1`` and is rejected (retrying the next block) when ``d`` is not
+    below the curve order.
+    """
+    if len(raw_secret) != NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH:
+        raise ValueError(f"raw secret must be {NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH} bytes, got {len(raw_secret)}")
+
+    key_material = HKDF(
+        algorithm=hashes.SHA256(),
+        length=_P256_FIELD_ELEMENT_LENGTH * _NETWORK_IDENTITY_DERIVATION_MAX_ROUNDS,
+        salt=None,  # RFC 5869 treats an absent salt as HashLen zero bytes, matching the SDK.
+        info=_NETWORK_IDENTITY_HKDF_INFO).derive(raw_secret)
+
+    for round_index in range(_NETWORK_IDENTITY_DERIVATION_MAX_ROUNDS):
+        block = key_material[round_index * _P256_FIELD_ELEMENT_LENGTH:(round_index + 1) * _P256_FIELD_ELEMENT_LENGTH]
+        candidate = int.from_bytes(block, "big") + 1
+        if candidate < _P256_ORDER:
+            return ec.derive_private_key(candidate, ec.SECP256R1())
+
+    raise ValueError("ECDSA Network Identity derivation failed after the maximum number of rounds")
+
+
+def derive_ecdsa_network_identity(raw_secret: bytes) -> tuple[ec.EllipticCurvePrivateKey, bytes]:
+    """Derives the ECDSA Network Identity for a NASS raw secret.
+
+    Returns a tuple of (private_key, compact_identity). The compact_identity is
+    byte-for-byte identical to what the DUT activates after ImportAdminSecret, so
+    its 20-byte identifier (see :func:`network_identity_identifier`) can be
+    compared against the ActiveNetworkIdentities attribute to confirm the DUT
+    performed the correct HKDF and key-derivation crypto.
+    """
+    private_key = derive_ecdsa_network_identity_private_key(raw_secret)
+    return private_key, _compact_identity_from_private_key(private_key, deterministic=True)
+
+
+def compact_identity_public_key(compact_identity: bytes) -> bytes:
+    """Extracts the 65-byte uncompressed public key from a compact identity."""
+    if len(compact_identity) != COMPACT_IDENTITY_LENGTH:
+        raise ValueError(f"compact identity must be {COMPACT_IDENTITY_LENGTH} bytes, got {len(compact_identity)}")
+    if compact_identity[1:3] != bytes([0x30, _TLV_TAG_EC_PUBLIC_KEY]) or compact_identity[3] != 65:
+        raise ValueError("unexpected compact identity encoding")
+    return compact_identity[4:4 + 65]
+
+
+def network_identity_identifier(public_key_or_compact: bytes) -> bytes:
+    """Computes the 20-byte identifier for a Network (Client) Identity.
+
+    Accepts either a 65-byte uncompressed public key or a full compact identity.
+    The identifier is the first 20 bytes of SHA-256 over the public key, matching
+    ``CalculateKeyIdentifierSha256`` in the SDK.
+    """
+    if len(public_key_or_compact) == 65:
+        public_key = public_key_or_compact
+    else:
+        public_key = compact_identity_public_key(public_key_or_compact)
+    return hashlib.sha256(public_key).digest()[:NETWORK_IDENTITY_IDENTIFIER_LENGTH]
+
+
+def compact_identity_signature(compact_identity: bytes) -> bytes:
+    """Extracts the 64-byte raw ECDSA self-signature from a compact identity."""
+    offset = 4 + 65
+    if len(compact_identity) != COMPACT_IDENTITY_LENGTH:
+        raise ValueError(f"compact identity must be {COMPACT_IDENTITY_LENGTH} bytes, got {len(compact_identity)}")
+    if compact_identity[offset:offset + 3] != bytes([0x30, _TLV_TAG_ECDSA_SIGNATURE, 64]):
+        raise ValueError("unexpected compact identity signature encoding")
+    return compact_identity[offset + 3:offset + 3 + 64]
+
+
+def _verify_p256(public_key: bytes, message: bytes, raw_signature: bytes) -> None:
+    """Verifies a 64-byte raw (r || s) ECDSA-SHA256 signature over ``message``."""
+    r = int.from_bytes(raw_signature[:32], "big")
+    s = int.from_bytes(raw_signature[32:], "big")
+    loaded = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), public_key)
+    loaded.verify(encode_dss_signature(r, s), message, ec.ECDSA(hashes.SHA256()))
+
+
+def validate_compact_identity(compact_identity: bytes) -> None:
+    """Validates a compact-pdc-identity the way a DUT does.
+
+    Mirrors ``Credentials::ValidateChipNetworkIdentity``: the TBSCertificate template is
+    recomputed from the embedded public key and the self-signature is verified against it.
+
+    Raises:
+        ValueError: If the encoding is not a well-formed compact identity.
+        InvalidSignature: If the self-signature does not verify.
+    """
+    if not compact_identity or compact_identity[0] != 0x15 or compact_identity[-1] != 0x18:
+        raise ValueError("compact identity must be an anonymous TLV structure")
+    public_key = compact_identity_public_key(compact_identity)  # also enforces the overall length
+    _verify_p256(public_key, _encode_network_identity_tbs(public_key), compact_identity_signature(compact_identity))
+
+
+def verify_possession_signature(compact_identity: bytes, nonce: bytes, possession_signature: bytes) -> None:
+    """Verifies a PossessionSignature produced for a Network Client Identity.
+
+    The signature proves the DUT holds the private key associated with
+    ``compact_identity``. Its TBS message is (NetworkClientIdentity || PossessionNonce),
+    matching the DUT side in ``NetworkCommissioningCluster``.
+
+    Raises:
+        ValueError: If the compact identity is malformed or the nonce/signature lengths are wrong.
+        InvalidSignature: If the signature does not verify.
+    """
+    if len(nonce) != POSSESSION_NONCE_LENGTH:
+        raise ValueError(f"possession nonce must be {POSSESSION_NONCE_LENGTH} bytes, got {len(nonce)}")
+    if len(possession_signature) != POSSESSION_SIGNATURE_LENGTH:
+        raise ValueError(f"possession signature must be {POSSESSION_SIGNATURE_LENGTH} bytes, "
+                         f"got {len(possession_signature)}")
+    _verify_p256(compact_identity_public_key(compact_identity), compact_identity + nonce, possession_signature)
+
+
+# ---------------------------------------------------------------------------
+# Network Administrator Shared Secret (NASS) encoding.
+# ---------------------------------------------------------------------------
+
+
+def matter_epoch_now() -> int:
+    """Current time expressed in Matter epoch seconds (seconds since 2000-01-01)."""
+    return int(time.time()) - MATTER_EPOCH_OFFSET_SECONDS
+
+
+def encode_network_administrator_secret(created: int, raw_secret: bytes | None = None) -> bytes:
+    """Encodes a NASS in the TLV format accepted by ImportAdminSecret.
+
+    Args:
+        created: Creation timestamp in Matter epoch seconds. The DUT reports this
+            as the ActiveNetworkIdentities CreatedTimestamp and enforces that it
+            increases monotonically across imports.
+        raw_secret: 32 bytes of raw key material. A random value is generated when
+            omitted.
+    """
+    if raw_secret is None:
+        raw_secret = os.urandom(NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH)
+    if len(raw_secret) != NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH:
+        raise ValueError(f"raw secret must be {NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH} bytes, got {len(raw_secret)}")
+    if not 0 <= created <= 0xFFFFFFFF:
+        raise ValueError("created must fit in a uint32")
+
+    # Anonymous TLV struct { [1] version=0 (u8), [2] created (u32), [3] raw-secret (octstr[32]) }.
+    return (bytes([0x15])
+            + bytes([0x24, 0x01, 0x00])
+            + bytes([0x26, 0x02]) + created.to_bytes(4, "little")
+            + bytes([0x30, 0x03, NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH]) + raw_secret
+            + bytes([0x18]))
+
+
+class NetworkAdministratorSecret(NamedTuple):
+    """The decoded fields of a Network Administrator Shared Secret."""
+
+    version: int
+    created: int
+    raw_secret: bytes
+
+
+def decode_network_administrator_secret(encoded: bytes) -> NetworkAdministratorSecret:
+    """Decodes a NASS as returned by ExportAdminSecret.
+
+    Mirrors ``chip::Crypto::DecodeNetworkAdministratorSecret``: an anonymous TLV struct
+    holding version [1], created [2] and raw-secret [3] in tag order, with no trailing
+    fields. ``created`` is accepted in any unsigned width because the TLV writer emits
+    the smallest encoding that fits the value, but each field's TLV type is enforced, so
+    the returned ``version`` and ``created`` are always ints and ``raw_secret`` bytes.
+
+    Raises:
+        ValueError: If the encoding is not a well-formed NASS.
+    """
+    if not encoded.startswith(bytes([0x15])) or not encoded.endswith(bytes([0x18])):
+        raise ValueError("NASS must be an anonymous TLV structure")
+
+    body = encoded[1:-1]
+    offset = 0
+    fields: dict[int, int | bytes] = {}
+    for expected_tag in (1, 2, 3):
+        if offset + 2 > len(body):
+            raise ValueError(f"NASS is truncated before field {expected_tag}")
+        control, tag = body[offset], body[offset + 1]
+        if tag != expected_tag:
+            raise ValueError(f"NASS field {expected_tag} is missing or out of tag order (found tag {tag})")
+        offset += 2
+        if expected_tag in (1, 2):
+            # Context-tagged unsigned integer, 1/2/4/8 bytes of little-endian value.
+            if control not in (0x24, 0x25, 0x26, 0x27):
+                raise ValueError(f"NASS field {expected_tag} must be an unsigned integer, but carries TLV control "
+                                 f"byte 0x{control:02x}")
+            width = 1 << (control - 0x24)
+            value: int | bytes = int.from_bytes(body[offset:offset + width], "little")
+        else:
+            # Context-tagged octet string with a single-byte length prefix.
+            if control != 0x30:
+                raise ValueError(f"NASS field {expected_tag} must be an octet string, but carries TLV control "
+                                 f"byte 0x{control:02x}")
+            if offset >= len(body):
+                raise ValueError(f"NASS is truncated before the length of field {expected_tag}")
+            width = body[offset]
+            offset += 1
+            value = body[offset:offset + width]
+        if offset + width > len(body):
+            raise ValueError(f"NASS is truncated inside field {expected_tag}")
+        offset += width
+        fields[expected_tag] = value
+
+    if offset != len(body):
+        raise ValueError("NASS carries unexpected trailing fields")
+
+    version, created, raw_secret = fields[1], fields[2], fields[3]
+    if version != 0:
+        raise ValueError(f"NASS version must be 0, got {version}")
+    if len(raw_secret) != NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH:
+        raise ValueError(f"NASS raw secret must be {NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH} bytes, got {len(raw_secret)}")
+    return NetworkAdministratorSecret(version=version, created=created, raw_secret=raw_secret)

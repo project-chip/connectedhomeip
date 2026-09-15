@@ -34,6 +34,12 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="RollbackWrite" value="0x02"/>
   </enum>
 
+  <enum name="CertificationTypeEnum" type="enum8" apiMaturity="provisional">
+    <item name="DeviceAttestationPKI" value="0x00"/>
+    <item name="OperationalPKI" value="0x01"/>
+    <item name="VIDSignerPKI" value="0x02"/>
+  </enum>
+
   <enum name="MeasurementTypeEnum" type="enum16">
     <item name="Unspecified" value="0x0000"/>
     <item name="Voltage" value="0x0001"/>
@@ -53,6 +59,11 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="ReactiveEnergy" value="0x000F"/>
     <item name="ApparentEnergy" value="0x0010"/>
     <item name="SoilMoisture" value="0x0011"/>
+  </enum>
+
+  <enum name="MediumType" type="enum8" apiMaturity="provisional">
+    <item name="Air" value="0x00"/>
+    <item name="Water" value="0x01"/>
   </enum>
 
   <enum name="PowerThresholdSourceEnum" type="enum8">

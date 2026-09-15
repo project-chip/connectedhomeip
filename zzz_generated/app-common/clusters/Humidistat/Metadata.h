@@ -21,9 +21,14 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
+namespace SupportedModes {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SupportedModes
 namespace Mode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Mode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Mode
 namespace SystemState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SystemState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -31,7 +36,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SystemState::Id, BitFl
 } // namespace SystemState
 namespace UserSetpoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UserSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace UserSetpoint
 namespace MinSetpoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MinSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -51,21 +56,30 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetSetpoint::Id, Bi
 } // namespace TargetSetpoint
 namespace MistType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MistType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace MistType
 namespace Continuous {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Continuous::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Continuous
 namespace Sleep {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Sleep::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Sleep
 namespace Optimal {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Optimal::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Optimal
-constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+namespace CondPumpEnabled {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CondPumpEnabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
+} // namespace CondPumpEnabled
+namespace CondRunCount {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CondRunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace CondRunCount
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    SupportedModes::kMetadataEntry,
     Mode::kMetadataEntry,
     SystemState::kMetadataEntry,
 

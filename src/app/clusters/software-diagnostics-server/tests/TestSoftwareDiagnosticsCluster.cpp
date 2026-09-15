@@ -267,7 +267,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
     Events::SoftwareFault::Type fault{
         .id             = 1234,
         .name           = Optional{ "test"_span },
-        .faultRecording = Optional{ ByteSpan(Uint8::from_const_char(faultData), strlen(faultData)) },
+        .faultRecording = Optional{ ByteSpan::fromCharString(faultData) },
     };
 
     SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);

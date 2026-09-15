@@ -1,1 +1,1 @@
-206 : [Silabs] Prevent removal of libble_bgapi_gatt_client.a
+213 : [OpenSSL] Prebuild private OpenSSL for SDK static and dynamic linkage

@@ -244,7 +244,7 @@ class FactoryDataGenerator:
             try:
                 self._user_data = json.loads(self._args.user)
             except json.decoder.JSONDecodeError as e:
-                raise AssertionError("Provided wrong user data, this is not a JSON format! {}".format(e))
+                raise AssertionError(f"Provided wrong user data, this is not a JSON format! {e}")
         assert self._args.spake2_verifier or self._args.passcode, \
             "Cannot find Spake2+ verifier, to generate a new one please provide passcode (--passcode)"
         assert ((self._args.gen_certs and self._args.chip_cert_path) or (self._args.dac_cert and self._args.pai_cert and self._args.dac_key)), \

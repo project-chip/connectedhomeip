@@ -40,7 +40,7 @@ constexpr char kMacB[] = "ffffffffffffffffffffffffffff";
 TEST(TestTargetVideoPlayerInfoCopy, CopyAssignReBindsMacSpanToOwnBuffer)
 {
     TargetVideoPlayerInfo source;
-    source.SetMACAddress(CharSpan(kMacA, strlen(kMacA)));
+    source.SetMACAddress(CharSpan::fromCharString(kMacA));
 
     TargetVideoPlayerInfo copy;
     copy = source;
@@ -50,21 +50,21 @@ TEST(TestTargetVideoPlayerInfoCopy, CopyAssignReBindsMacSpanToOwnBuffer)
 
     // ...and it must keep its own bytes after the source's buffer is overwritten.
     const size_t macLen = copy.GetMACAddress()->size();
-    source.SetMACAddress(CharSpan(kMacB, strlen(kMacB)));
+    source.SetMACAddress(CharSpan::fromCharString(kMacB));
     EXPECT_EQ(0, memcmp(copy.GetMACAddress()->data(), kMacA, macLen));
 }
 
 TEST(TestTargetVideoPlayerInfoCopy, CopyConstructReBindsMacSpanToOwnBuffer)
 {
     TargetVideoPlayerInfo source;
-    source.SetMACAddress(CharSpan(kMacA, strlen(kMacA)));
+    source.SetMACAddress(CharSpan::fromCharString(kMacA));
 
     TargetVideoPlayerInfo copy(source);
 
     EXPECT_NE(copy.GetMACAddress()->data(), source.GetMACAddress()->data());
 
     const size_t macLen = copy.GetMACAddress()->size();
-    source.SetMACAddress(CharSpan(kMacB, strlen(kMacB)));
+    source.SetMACAddress(CharSpan::fromCharString(kMacB));
     EXPECT_EQ(0, memcmp(copy.GetMACAddress()->data(), kMacA, macLen));
 }
 

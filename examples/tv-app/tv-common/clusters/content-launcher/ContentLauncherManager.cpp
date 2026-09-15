@@ -19,6 +19,7 @@
 #include "ContentLauncherManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <clusters/ContentLauncher/Metadata.h>
 #include <lib/support/Span.h>
 
 #include <list>
@@ -179,6 +180,21 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
+void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper)
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleContentReplicationRequest");
+    ContentReplicationResponseType response;
+    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
+    LogErrorOnFailure(helper.Success(response));
+}
+
+void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath, uint16_t presetID)
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandlePlayPreset presetID=%u", presetID);
+    commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
+}
+
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
@@ -198,6 +214,31 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
     return mSupportedStreamingProtocols;
 }
 
+bool ContentLauncherManager::HandleGetMovable()
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetMovable");
+    return true;
+}
+
+CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
+{
+    using namespace chip::literals;
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetPresets");
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        ContentPresetStructType preset1;
+        preset1.presetID   = 1;
+        preset1.presetName = "Morning News"_span;
+        ReturnErrorOnFailure(encoder.Encode(preset1));
+
+        ContentPresetStructType preset2;
+        preset2.presetID   = 2;
+        preset2.presetName = "Evening Playlist"_span;
+        ReturnErrorOnFailure(encoder.Encode(preset2));
+
+        return CHIP_NO_ERROR;
+    });
+}
+
 uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
@@ -214,7 +255,7 @@ uint16_t ContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return kClusterRevision;
+        return chip::app::Clusters::ContentLauncher::kRevision;
     }
 
     uint16_t clusterRevision = 0;

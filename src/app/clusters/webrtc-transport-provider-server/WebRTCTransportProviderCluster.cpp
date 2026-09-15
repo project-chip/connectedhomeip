@@ -855,7 +855,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     Delegate::ProvideOfferRequestArgs args;
 
     // ===== Validate all conformance and constraint checks (data model validation) =====
-    
+
     if (req.SFrameConfig.HasValue())
     {
         if (!SFrameFollowsSpecConstraints(req.SFrameConfig.Value()))

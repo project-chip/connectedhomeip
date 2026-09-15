@@ -119,8 +119,7 @@ class uint(int):
 
     def __init__(self, val: int):
         if (val < 0):
-            raise TypeError(
-                'expecting positive value, got negative value of %d instead' % val)
+            raise TypeError(f'expecting positive value, got negative value of {val} instead')
 
 
 class float32(float):
@@ -645,7 +644,7 @@ class TLVReader:
             self._bytesRead += 8
         elif "UTF-8 String" in decoding["type"]:
             (val,) = struct.unpack(
-                "<%ds" % decoding["strDataLen"],
+                f"<{decoding['strDataLen']}s",
                 tlv[self._bytesRead: self._bytesRead + decoding["strDataLen"]],
             )
             try:
@@ -655,7 +654,7 @@ class TLVReader:
             self._bytesRead += decoding["strDataLen"]
         elif "Byte String" in decoding["type"]:
             (val,) = struct.unpack(
-                "<%ds" % decoding["strDataLen"],
+                f"<{decoding['strDataLen']}s",
                 tlv[self._bytesRead: self._bytesRead + decoding["strDataLen"]],
             )
 

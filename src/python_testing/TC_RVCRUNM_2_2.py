@@ -37,6 +37,23 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcrunm_2_2_fifo
+#     script-args: >
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --app-pipe /tmp/rvcrunm_2_2_fifo
+#       --int-arg PIXIT.RVCRUNM.MODE_A:1
+#       --int-arg PIXIT.RVCRUNM.MODE_B:2
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import enum
@@ -102,8 +119,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         run_mode = await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.CurrentMode)
-        asserts.assert_true(run_mode == expected_mode,
-                            "Expected the current mode to be %i, got %i" % (expected_mode, run_mode))
+        asserts.assert_true(run_mode == expected_mode, f"Expected the current mode to be {expected_mode}, got {run_mode}")
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
@@ -112,8 +128,8 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)
         asserts.assert_true(response.status == expected_error,
-                            "Expected a ChangeToMode response status of %s, got %s" %
-                            (error_enum_to_text(expected_error), error_enum_to_text(response.status)))
+                            f"Expected a ChangeToMode response status of {error_enum_to_text(expected_error)}, "
+                            f"got {error_enum_to_text(response.status)}")
 
     async def read_op_state_operational_state(self) -> Clusters.Objects.RvcOperationalState.Attributes.OperationalState:
         return await self.read_mod_attribute_expect_success(
@@ -153,10 +169,10 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
         test_step = ("Manually put the device in a RVC Run Mode cluster mode with "
                      "the Idle(0x4000) mode tag and in a device state that allows changing to either "
-                     "of these modes: %i, %i" % (self.mode_a, self.mode_b))
+                     f"of these modes: {self.mode_a}, {self.mode_b}")
         self.print_step(2, test_step)
         if not self.is_ci:
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
@@ -232,7 +248,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         if op_state not in valid_op_states:
             self.print_step(9, "Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "ChargerFound"})
+                self.write_to_app_pipe({"Name": "ChargerFound", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(
                     prompt_msg="Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42), and press Enter when ready.\n")

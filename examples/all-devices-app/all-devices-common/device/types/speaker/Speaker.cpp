@@ -37,10 +37,6 @@ CHIP_ERROR Speaker::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvi
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    // Identify
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
-    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
-
     // OnOff (Mute)
     OnOffCluster::Context onOffContext{ mTimerDelegate };
     onOffContext.defaults.onOff = true;
@@ -89,11 +85,6 @@ void Speaker::Unregister(CodeDrivenDataModelProvider & provider)
         mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
         LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
         mOnOffCluster.Destroy();
-    }
-    if (mIdentifyCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
-        mIdentifyCluster.Destroy();
     }
 }
 
