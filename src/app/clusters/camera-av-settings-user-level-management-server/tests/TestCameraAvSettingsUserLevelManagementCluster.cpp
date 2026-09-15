@@ -21,7 +21,7 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/CodegenCameraAvSettingsUserLevelManagementCluster.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/MigrateCameraAvSettingsUserLevelManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -879,15 +879,15 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZStreamsPersist
 }
 
 // ---------------------------------------------------------------------------
-// Migration tests for CodegenCameraAvSettingsUserLevelManagementCluster
+// Migration tests for MigrateCameraAvSettingsUserLevelManagementCluster
 // ---------------------------------------------------------------------------
 
-struct TestCodegenCameraAvSettingsUserLevelManagementMigration : public ::testing::Test
+struct TestMigrateCameraAvSettingsUserLevelManagementMigration : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    TestCodegenCameraAvSettingsUserLevelManagementMigration() :
+    TestMigrateCameraAvSettingsUserLevelManagementMigration() :
         mServer(kTestEndpointId,
                 chip::BitFlags<Feature>(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
                                         Feature::kMechanicalZoom, Feature::kMechanicalPresets),
@@ -926,14 +926,14 @@ struct TestCodegenCameraAvSettingsUserLevelManagementMigration : public ::testin
     }
 
     MockCameraAvSettingsUserLevelManagementDelegate mMockDelegate;
-    CodegenCameraAvSettingsUserLevelManagementCluster mServer;
+    MigrateCameraAvSettingsUserLevelManagementCluster mServer;
     ClusterTester mClusterTester;
     app::DefaultSafeAttributePersistenceProvider mSafePersistence;
     app::SafeAttributePersistenceProvider * mOldSafePersistence = nullptr;
     bool mServerStarted                                         = false;
 };
 
-TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPositionTlv)
+TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPositionTlv)
 {
     Structs::MPTZStruct::Type position;
     position.pan.SetValue(10);
@@ -954,7 +954,7 @@ TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPosi
     EXPECT_EQ(readPosition.zoom.Value(), 30);
 }
 
-TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPresetsTlv)
+TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPresetsTlv)
 {
     Structs::MPTZStruct::Type settings;
     settings.pan.SetValue(5);
@@ -986,7 +986,7 @@ TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPres
     EXPECT_FALSE(it.Next());
 }
 
-TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesDPTZStreamsTlv)
+TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesDPTZStreamsTlv)
 {
     Globals::Structs::ViewportStruct::Type viewPort{ 1, 2, 100, 200 };
     Structs::DPTZStruct::Type stream;
@@ -1012,7 +1012,7 @@ TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, MigratesDPTZStre
     EXPECT_FALSE(it.Next());
 }
 
-TEST_F(TestCodegenCameraAvSettingsUserLevelManagementMigration, OldDataDeletedAfterMigration)
+TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, OldDataDeletedAfterMigration)
 {
     Structs::MPTZStruct::Type position;
     position.pan.SetValue(1);

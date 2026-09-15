@@ -30,7 +30,7 @@ namespace Clusters {
  * Performs one-time migration of TLV-encoded persistent attributes from
  * SafeAttributePersistenceProvider to AttributePersistenceProvider during Startup().
  */
-class CodegenCameraAvSettingsUserLevelManagementCluster : public CameraAvSettingsUserLevelManagementCluster
+class MigrateCameraAvSettingsUserLevelManagementCluster : public CameraAvSettingsUserLevelManagementCluster
 {
 public:
     using CameraAvSettingsUserLevelManagementCluster::CameraAvSettingsUserLevelManagementCluster;

@@ -17,7 +17,7 @@
  */
 
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/CodegenCameraAvSettingsUserLevelManagementCluster.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/MigrateCameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/MigrateCameraAvSettingsUserLevelManagementServerStorage.h>
 #include <lib/support/CodeUtils.h>
 
@@ -25,7 +25,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-CHIP_ERROR CodegenCameraAvSettingsUserLevelManagementCluster::Startup(ServerClusterContext & context)
+CHIP_ERROR MigrateCameraAvSettingsUserLevelManagementCluster::Startup(ServerClusterContext & context)
 {
     SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
     if (srcProvider != nullptr)

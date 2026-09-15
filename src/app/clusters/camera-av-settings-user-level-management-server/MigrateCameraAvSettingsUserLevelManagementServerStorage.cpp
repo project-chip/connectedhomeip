@@ -22,6 +22,7 @@
 #include <app/persistence/AttributePersistenceMigration.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Attributes.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Ids.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -44,9 +45,12 @@ CHIP_ERROR MigrateCameraAvSettingsUserLevelManagementServerStorage(EndpointId en
     static constexpr size_t kBufferSize = MaxAttrMigrationValueSize(kAttributesToMigrate);
     static_assert(kBufferSize > 0, "All migration attributes have zero valueSize");
 
-    // Static storage avoids a large stack allocation for MPTZPresets migration.
-    static uint8_t attributeBuffer[kBufferSize];
-    MutableByteSpan buffer(attributeBuffer);
+    Platform::ScopedMemoryBuffer<uint8_t> attributeBuffer;
+    if (!attributeBuffer.Alloc(kBufferSize))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    MutableByteSpan buffer(attributeBuffer.Get(), kBufferSize);
 
     return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider,
                                                          ConcreteClusterPath(endpointId, CameraAvSettingsUserLevelManagement::Id),

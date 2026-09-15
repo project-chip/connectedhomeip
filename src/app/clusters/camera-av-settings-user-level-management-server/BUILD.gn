@@ -20,8 +20,8 @@ source_set("camera-av-settings-user-level-management-server") {
     "CameraAvSettingsUserLevelManagementCluster.h",
     "CameraAvSettingsUserLevelManagementLogic.cpp",
     "CameraAvSettingsUserLevelManagementLogic.h",
-    "CodegenCameraAvSettingsUserLevelManagementCluster.cpp",
-    "CodegenCameraAvSettingsUserLevelManagementCluster.h",
+    "MigrateCameraAvSettingsUserLevelManagementCluster.cpp",
+    "MigrateCameraAvSettingsUserLevelManagementCluster.h",
     "MigrateCameraAvSettingsUserLevelManagementServerStorage.cpp",
     "MigrateCameraAvSettingsUserLevelManagementServerStorage.h",
   ]
