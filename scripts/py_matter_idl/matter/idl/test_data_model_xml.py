@@ -806,6 +806,70 @@ endpoint 2 {
 
         self.assertIdlEqual(xml_idl, expected_idl)
 
+    def testObsoleteElements(self):
+        xml_idl = XmlToIdl('''
+            <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="123" name="Test" revision="1">
+              <features>
+                <feature bit="0" code="OO" name="OnOff" summary="OnOff feature">
+                  <optionalConform/>
+                </feature>
+                <feature bit="1" code="FQ" name="Frequency" summary="Frequency feature">
+                  <obsoleteConform/>
+                </feature>
+              </features>
+              <attributes>
+                <attribute id="0" name="ValidAttr" type="int8u">
+                  <access read="true" readPrivilege="view"/>
+                  <mandatoryConform/>
+                </attribute>
+                <attribute id="1" name="ObsoleteAttr" type="int8u">
+                  <access read="true" readPrivilege="view"/>
+                  <obsoleteConform/>
+                </attribute>
+              </attributes>
+              <commands>
+                <command id="10" name="ValidCommand" source="client">
+                  <mandatoryConform/>
+                </command>
+                <command id="11" name="ObsoleteCommand" source="client">
+                  <obsoleteConform/>
+                </command>
+              </commands>
+              <events>
+                <event id="1" name="ValidEvent" priority="info">
+                  <mandatoryConform/>
+                </event>
+                <event id="2" name="ObsoleteEvent" priority="info">
+                  <obsoleteConform/>
+                </event>
+              </events>
+            </cluster>
+        ''')
+
+        expected_idl = IdlTextToIdl('''
+            client cluster Test = 123 {
+               bitmap Feature : bitmap32 {
+                 kOnOff = 0x1;
+                 kFrequency = 0x2;
+               }
+
+               info event ValidEvent = 1 {}
+               info event ObsoleteEvent = 2 {}
+               readonly attribute int8u validAttr = 0;
+               command ValidCommand(): DefaultSuccess = 10;
+               command ObsoleteCommand(): DefaultSuccess = 11;
+
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
+
+        self.assertIdlEqual(xml_idl, expected_idl)
+
 
 if __name__ == '__main__':
     unittest.main()
