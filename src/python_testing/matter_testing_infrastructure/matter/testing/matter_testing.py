@@ -3414,7 +3414,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             "Please set 'disable_wildcard_subscription = True' on the test class."
         )
 
-    async def request_device_reboot(self):
+    async def request_device_reboot(self) -> None:
         """Request a reboot of the Device Under Test (DUT).
 
         This method handles device reboots in both CI and development environments (via run_python_test.py test runner script)
