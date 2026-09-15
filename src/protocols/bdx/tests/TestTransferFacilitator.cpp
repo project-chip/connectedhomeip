@@ -33,7 +33,7 @@ public:
     }
     bool IsInitialized() const override { return true; }
 
-    CriticalFailure StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
+    CriticalFailure StartTimer(Clock::Milliseconds64 aDelay, TimerCompleteCallback aComplete, void * aAppState) override
     {
         Clock::Timestamp awakenTime = GetMonotonicMilliseconds64() + std::chrono::duration_cast<Clock::Milliseconds64>(aDelay);
         TimerList::Node * node      = mTimerNodes.Create(*this, awakenTime, aComplete, aAppState);
