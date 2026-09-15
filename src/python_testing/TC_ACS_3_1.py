@@ -77,7 +77,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
 
     # Sends and out-of-band command to the all-clusters-app
     def write_to_app_pipe(self, command):
