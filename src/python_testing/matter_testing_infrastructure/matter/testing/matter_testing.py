@@ -3467,7 +3467,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         testing scenarios (via user input). It expires existing sessions to allow for controllers
         to reconnect to the DUT after the factory reset.
 
-        The test class must set disable_wildcard_subscription = True; a reboot with the
+        The test class must set disable_wildcard_subscription = True; a factory reset with the
         background wildcard subscription running fails the test.
 
         Args:

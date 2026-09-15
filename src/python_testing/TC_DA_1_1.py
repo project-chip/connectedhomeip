@@ -105,7 +105,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/deviceatt
 
 
 class TC_DA_1_1(MatterBaseTest):
-    # Steps 3 factory resets the DUT in CI, which the background wildcard subscription does not survive.
+    # Steps 3 factory resets the DUT, which the background wildcard subscription does not survive.
     disable_wildcard_subscription = True
 
     def desc_TC_DA_1_1(self) -> str:
