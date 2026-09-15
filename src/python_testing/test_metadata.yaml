@@ -329,7 +329,7 @@ not_automated:
       reason: Shared helper methods for AV Analysis tests, not a standalone test
     - name: TC_SC_5_1.py
       reason:
-          CI has been temporarily removed as it was blocking the roll to 1.7. 
+          CI has been temporarily removed as it was blocking the roll to 1.7.
           https://github.com/project-chip/connectedhomeip/issues/74154
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
