@@ -9,6 +9,7 @@ in the SDK.
 :hidden:
 
 *
+common_test_failures/index
 ```
 
 ## Integration and Certification tests
@@ -26,6 +27,7 @@ product as a black box.
 -   [Python testing framework](./python.md)
 -   [Enabling tests in the CI](./ci_testing.md)
 -   [Integration test utilities](./integration_test_utilities.md)
+-   [Common certification test failures](./common_test_failures/index.md)
 
 ## Unit testing
 
