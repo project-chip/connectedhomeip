@@ -18,6 +18,7 @@
 
 #include "AllClustersCommandDelegate.h"
 #include "AppOptions.h"
+#include "PQCDeviceAttestationProfileReadOverride.h"
 #include "ValveControlDelegate.h"
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
@@ -43,6 +44,7 @@
 #include "thermostat-sensors-delegate-impl.h"
 #include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
+#include <app/AttributeAccessInterfaceRegistry.h>
 
 #include "tls-client-management-instance.h"
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
@@ -212,6 +214,9 @@ extern void MatterDishwasherAlarmServerInit();
 
 void ApplicationInit()
 {
+    auto & profileReadOverride = GetPQCDeviceAttestationProfileReadOverride();
+    VerifyOrDie(profileReadOverride.SetReadMode("Normal"_span) == CHIP_NO_ERROR);
+    VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(&profileReadOverride));
     std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR))
     {
@@ -274,6 +279,7 @@ void ApplicationInit()
 
 void ApplicationShutdown()
 {
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&GetPQCDeviceAttestationProfileReadOverride());
     // These may have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
     Clusters::DishwasherMode::Shutdown();
     Clusters::LaundryWasherMode::Shutdown();
