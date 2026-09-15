@@ -56,6 +56,7 @@ source_set("oob-accessors") {
 
   public_deps = [
     ":all_devices_config_buildconfig",
+    "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/clusters/ambient-context-sensing-server",
     "${chip_root}/src/app/clusters/ambient-sensing-union-server",
@@ -66,7 +67,6 @@ source_set("oob-accessors") {
     "${chip_root}/src/app/clusters/occupancy-sensor-server",
     "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
