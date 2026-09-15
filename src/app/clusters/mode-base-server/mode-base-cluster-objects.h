@@ -63,7 +63,10 @@ static constexpr ClusterRevisionEntry kAliasedClusters[] = {
 };
 
 // All aliased clusters share features, mandatory attributes, and commands (except MicrowaveOvenMode).
-using Feature      = DeviceEnergyManagementMode::Feature;
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
 namespace Commands = DeviceEnergyManagementMode::Commands;
 
 namespace Attributes {
