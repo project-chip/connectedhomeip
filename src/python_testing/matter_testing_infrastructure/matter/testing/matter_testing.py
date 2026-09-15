@@ -538,8 +538,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     * Set class attribute disable_wildcard_subscription = True to skip the background
       wildcard subscription and its ACL side effects — same effect as --no-wildcard-subscription.
-      Required for tests that call request_device_reboot() or request_device_factory_reset(), 
-      which fails while the subscription is active (the subscription does not survive a DUT reboot or factory reset).
+      Required for tests that call request_device_reboot() or request_device_factory_reset(),
+      which fail while the subscription is active (the subscription does not survive a DUT reboot or factory reset).
+
     * When a wildcard subscription is active, read_single_attribute_check_success compares
       each read to the subscription cache unless verify_wildcard_subscription=False is passed,
       or the class sets default_verify_wildcard_subscription = False.
