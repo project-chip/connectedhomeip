@@ -81,15 +81,15 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-<<<<<<< HEAD
     - Energy Preference
     - Laundry Dryer Controls
-    - Mode Select
-=======
     - Level Control
->>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
+    - Mode Select
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
+<<<<<<< HEAD
+=======
+>>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
     # keep-sorted end
     # Code Driven clusters are clusters that implement the ServerClusterInterface.
     # The clusters in this list require Init() and/or Shutdown() callbacks, defined

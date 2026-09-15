@@ -42,18 +42,19 @@ from mobly import asserts
 from support_modules.idm_support import IDMBaseTest, WritableAttributeInfo
 
 import matter.clusters as Clusters
-<<<<<<< HEAD
-from matter.interaction_model import InteractionModelError, Status
-=======
 from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.conformance import is_disallowed
->>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
+
+<< << << < HEAD
+== == == =
+>>>>>> > bd73b51(Introduce Data Model Files at 0.9 ballot v1.7 (  # 73842))
 from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import is_standard_cluster_id
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
 
-log = logging.getLogger(__name__)
+log=logging.getLogger(__name__)
 
 
 class TC_IDM_9_1(IDMBaseTest):
@@ -72,14 +73,14 @@ class TC_IDM_9_1(IDMBaseTest):
                      "Verify on the TH that the DUT sends a Status Response Action with a CONSTRAINT_ERROR Status Code."),
         ]
 
-    @async_test_body
+    @ async_test_body
     async def test_TC_IDM_9_1(self):
         self.step(0)
         await self.setup_class_helper(allow_pase=False)
         self.build_spec_xmls()
-        self.endpoint = MatterBaseTest.get_endpoint(self)
+        self.endpoint=MatterBaseTest.get_endpoint(self)
 
-        test_event_triggers_enabled = await self.read_single_attribute_check_success(
+        test_event_triggers_enabled=await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralDiagnostics,
             attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled,
             endpoint=0,
@@ -95,7 +96,7 @@ class TC_IDM_9_1(IDMBaseTest):
             # TestEventTrigger lives on the root node (endpoint 0).
             if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
                 try:
-                    cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                    cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
                         enableKey=b'\x00' * 17,
                         eventTrigger=0,
                     )
@@ -111,7 +112,7 @@ class TC_IDM_9_1(IDMBaseTest):
             self.step("1b")
             if await MatterBaseTest.command_guard(self, endpoint=0, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger):
                 try:
-                    cmd = Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                    cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
                         enableKey=b'\x00' * 15,
                         eventTrigger=0,
                     )
@@ -125,7 +126,7 @@ class TC_IDM_9_1(IDMBaseTest):
         self.step("1c")
         try:
             # CountryCode field is string with constraint length=2
-            cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
+            cmd=Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
                 newRegulatoryConfig=Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kIndoor,
                 countryCode="USA"  # Out of range (must be 2 chars)
             )
@@ -139,7 +140,7 @@ class TC_IDM_9_1(IDMBaseTest):
         self.step("1d")
         try:
             # CountryCode field is string with constraint length=2
-            cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
+            cmd=Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
                 newRegulatoryConfig=Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kIndoor,
                 countryCode="U"  # Out of range (must be 2 chars)
             )
@@ -154,7 +155,7 @@ class TC_IDM_9_1(IDMBaseTest):
         log.info("Testing writable attributes for constraint errors")
 
         # Collect writable attributes from DUT
-        writable_attributes = []
+        writable_attributes=[]
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, device_cluster_data in endpoint.items():
                 if not is_standard_cluster_id(cluster_id):
@@ -162,17 +163,17 @@ class TC_IDM_9_1(IDMBaseTest):
                 if cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
                     continue
 
-                xml_cluster = self.xml_clusters[cluster_id]
-                cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+                xml_cluster=self.xml_clusters[cluster_id]
+                cluster_class=Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
 
                 for attribute_id in self.checkable_attributes(cluster_id, device_cluster_data, xml_cluster):
-                    xml_attr = xml_cluster.attributes[attribute_id]
+                    xml_attr=xml_cluster.attributes[attribute_id]
 
                     # Skip obsolete/disallowed attributes (e.g. obsolete in spec)
                     if is_disallowed(xml_attr.conformance):
                         continue
 
-                    write_access = xml_attr.write_access
+                    write_access=xml_attr.write_access
                     if write_access is not None and write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
                         writable_attributes.append(WritableAttributeInfo(
                             endpoint_id=endpoint_id,
@@ -189,19 +190,19 @@ class TC_IDM_9_1(IDMBaseTest):
         log.info("Found %s writable attributes on DUT", len(writable_attributes))
 
         # Test attributes with constraints
-        tested_count = 0
-        skipped_count = 0
-        failed_attributes = []
+        tested_count=0
+        skipped_count=0
+        failed_attributes=[]
 
         for attr_info in writable_attributes:
-            constraints = attr_info.constraints
+            constraints=attr_info.constraints
 
             if not constraints or not constraints.has_constraints():
                 skipped_count += 1
                 continue
 
             try:
-                result = await self.check_attribute_constraint(attr_info, constraints)
+                result=await self.check_attribute_constraint(attr_info, constraints)
                 if result is None:
                     skipped_count += 1
                 elif result is False:
@@ -216,7 +217,7 @@ class TC_IDM_9_1(IDMBaseTest):
         log.info("Step 2 complete: Tested %s attributes, skipped %s", tested_count, skipped_count)
 
         if failed_attributes:
-            failed_list = ', '.join(failed_attributes)
+            failed_list=', '.join(failed_attributes)
             log.error("Failed attributes constraints not enforced: %s", failed_list)
             asserts.fail(f"Failed attributes constraints not enforced: {failed_list}")
 

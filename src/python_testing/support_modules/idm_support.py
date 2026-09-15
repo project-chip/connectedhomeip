@@ -449,13 +449,14 @@ class IDMBaseTest(BasicCompositionTests):
                 count = max(0, constraints.min_count - 1)
                 return [{}] * count if count > 0 else []
 
+
         # Numeric-like constraints (int, uint, percent, elapsed-s, temperature, etc.)
-<<<<<<< HEAD
+<< << << < HEAD
         if constraints.max_value is not None:
             return constraints.max_value + 1
         if constraints.min_value is not None:
             return max(0, constraints.min_value - 1)
-=======
+== == == =
         type_range = _encodable_numeric_range(datatype, self._is_nullable_attribute(attr_info.attribute))
         if type_range is None:
             # Enum/bitmap/struct-typed attributes are out of scope for automated
@@ -477,7 +478,7 @@ class IDMBaseTest(BasicCompositionTests):
                 val -= 1
             if val not in allowed_values and val >= type_min:
                 return val
->>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
+>>>>>> > bd73b51(Introduce Data Model Files at 0.9 ballot v1.7 (  # 73842))
 
         return None
 
@@ -485,51 +486,51 @@ class IDMBaseTest(BasicCompositionTests):
         """Test a single attribute's constraint. Returns True if test passed, False otherwise."""
         # Resolve dynamic constraints if present
         if constraints.min_value_ref or constraints.max_value_ref or constraints.min_count_ref or constraints.max_count_ref:
-            cluster_class = attr_info.cluster_class
+            cluster_class=attr_info.cluster_class
 
             if constraints.min_value_ref:
-                constraints.min_value = await self.resolve_dynamic_constraint(
+                constraints.min_value=await self.resolve_dynamic_constraint(
                     cluster_class, attr_info.endpoint_id, constraints.min_value_ref
                 )
 
             if constraints.max_value_ref:
-                constraints.max_value = await self.resolve_dynamic_constraint(
+                constraints.max_value=await self.resolve_dynamic_constraint(
                     cluster_class, attr_info.endpoint_id, constraints.max_value_ref
                 )
 
             if constraints.min_count_ref:
-                constraints.min_count = await self.resolve_dynamic_constraint(
+                constraints.min_count=await self.resolve_dynamic_constraint(
                     cluster_class, attr_info.endpoint_id, constraints.min_count_ref
                 )
 
             if constraints.max_count_ref:
-                constraints.max_count = await self.resolve_dynamic_constraint(
+                constraints.max_count=await self.resolve_dynamic_constraint(
                     cluster_class, attr_info.endpoint_id, constraints.max_count_ref
                 )
 
         # Generate constraint violation
-        test_value = self.generate_constraint_violation(attr_info, constraints)
+        test_value=self.generate_constraint_violation(attr_info, constraints)
         if test_value is None:
             return None  # Unsupported constraint type
 
         # Read original value
-        original_value = await self.read_single_attribute_check_success(
+        original_value=await self.read_single_attribute_check_success(
             endpoint=attr_info.endpoint_id,
             cluster=attr_info.cluster_class,
             attribute=attr_info.attribute
         )
 
         # Attempt to write violating value
-        attr_obj = attr_info.attribute(test_value)
-        write_result = await self.default_controller.WriteAttribute(
+        attr_obj=attr_info.attribute(test_value)
+        write_result=await self.default_controller.WriteAttribute(
             nodeId=self.dut_node_id,
             attributes=[(attr_info.endpoint_id, attr_obj)]
         )
-        result_status = write_result[0].Status
+        result_status=write_result[0].Status
 
         if result_status == Status.ConstraintError:
             # Verify value wasn't set to the violating value
-            new_value = await self.read_single_attribute_check_success(
+            new_value=await self.read_single_attribute_check_success(
                 endpoint=attr_info.endpoint_id,
                 cluster=attr_info.cluster_class,
                 attribute=attr_info.attribute
@@ -544,11 +545,11 @@ class IDMBaseTest(BasicCompositionTests):
                      attr_info.attribute_name, original_value, test_value)
             return True
 
-<<<<<<< HEAD
+<< << << < HEAD
         log.error("FAIL: %s.%s got %s instead of CONSTRAINT_ERROR for value %s", attr_info.cluster_name, attr_info.attribute_name,
                   result_status, test_value)
         return False
-=======
+== == ===
         if result_status != Status.Success:
             # Rejected, but not with CONSTRAINT_ERROR. The write never took effect, so the
             # attribute's constraint is neither proven nor disproven by this probe.
@@ -578,7 +579,7 @@ class IDMBaseTest(BasicCompositionTests):
         constrained field. Clusters/commands on the constraint-fuzzing deny
         lists are excluded.
         """
-        infos: list[CommandFieldInfo] = []
+        infos: list[CommandFieldInfo]=[]
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster_data in endpoint.items():
                 if not is_standard_cluster_id(cluster_id):
@@ -590,8 +591,8 @@ class IDMBaseTest(BasicCompositionTests):
                              cluster_id, endpoint_id)
                     continue
 
-                xml_cluster = self.xml_clusters[cluster_id]
-                accepted_command_ids = cluster_data.get(GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, [])
+                xml_cluster=self.xml_clusters[cluster_id]
+                accepted_command_ids=cluster_data.get(GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, [])
                 for command_id in accepted_command_ids:
                     if not is_standard_command_id(command_id):
                         continue
@@ -599,8 +600,8 @@ class IDMBaseTest(BasicCompositionTests):
                         log.info("Skipping command 0x%04X:0x%02X on EP%s: deny-listed for command constraint fuzzing",
                                  cluster_id, command_id, endpoint_id)
                         continue
-                    xml_command = xml_cluster.accepted_commands.get(command_id)
-                    command_class = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id].get(command_id)
+                    xml_command=xml_cluster.accepted_commands.get(command_id)
+                    command_class=Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id].get(command_id)
                     if xml_command is None or command_class is None:
                         continue
 
@@ -620,7 +621,7 @@ class IDMBaseTest(BasicCompositionTests):
                         ))
         return infos
 
-    @staticmethod
+    @ staticmethod
     def _command_field_label(command_class: type[ClusterObjects.ClusterCommand], field_id: int) -> str | None:
         """Map a spec field ID to the generated Python dataclass attribute name via the descriptor tags."""
         for descriptor_field in command_class.descriptor.Fields:
@@ -628,7 +629,7 @@ class IDMBaseTest(BasicCompositionTests):
                 return descriptor_field.Label
         return None
 
-    @staticmethod
+    @ staticmethod
     def _allowed_lengths(constraints: Constraints) -> list[int] | None:
         """Interpret an 'allowed' constraint as exact length(s) for string/octstr fields.
 
@@ -642,12 +643,12 @@ class IDMBaseTest(BasicCompositionTests):
         except ValueError:
             return None
 
-    @staticmethod
+    @ staticmethod
     def _allowed_numeric_values(constraints: Constraints) -> set[int | float]:
         """Parse 'allowed' constraint entries into numeric values, if any."""
         if not constraints.allowed:
             return set()
-        values: set[int | float] = set()
+        values: set[int | float]=set()
         for v in constraints.allowed:
             with contextlib.suppress(ValueError):
                 values.add(int(v, 0))
@@ -658,18 +659,18 @@ class IDMBaseTest(BasicCompositionTests):
 
     async def _resolved_command_field_constraints(self, info: CommandFieldInfo) -> Constraints:
         """Return a copy of the field's constraints with dynamic references resolved against the DUT."""
-        constraints = copy.copy(info.field.constraints)
+        constraints=copy.copy(info.field.constraints)
         if constraints.min_value_ref:
-            constraints.min_value = await self.resolve_dynamic_constraint(
+            constraints.min_value=await self.resolve_dynamic_constraint(
                 info.cluster_class, info.endpoint_id, constraints.min_value_ref)
         if constraints.max_value_ref:
-            constraints.max_value = await self.resolve_dynamic_constraint(
+            constraints.max_value=await self.resolve_dynamic_constraint(
                 info.cluster_class, info.endpoint_id, constraints.max_value_ref)
         if constraints.min_count_ref:
-            constraints.min_count = await self.resolve_dynamic_constraint(
+            constraints.min_count=await self.resolve_dynamic_constraint(
                 info.cluster_class, info.endpoint_id, constraints.min_count_ref)
         if constraints.max_count_ref:
-            constraints.max_count = await self.resolve_dynamic_constraint(
+            constraints.max_count=await self.resolve_dynamic_constraint(
                 info.cluster_class, info.endpoint_id, constraints.max_count_ref)
         return constraints
 
@@ -681,14 +682,14 @@ class IDMBaseTest(BasicCompositionTests):
         under-min of an unsigned field with min 0, or over-max of a bound equal to
         the type's maximum), since such violations cannot be encoded on the wire.
         """
-        violations: list[tuple[str, Any]] = []
-        datatype = (field.type_info or '').lower()
+        violations: list[tuple[str, Any]]=[]
+        datatype=(field.type_info or '').lower()
 
         if datatype in ('string', 'octstr'):
             def make(length: int) -> str | bytes:
                 return 'x' * length if datatype == 'string' else b'\x00' * length
 
-            allowed_lengths = self._allowed_lengths(constraints)
+            allowed_lengths=self._allowed_lengths(constraints)
             if allowed_lengths:
                 # 'allowed' on a string/octstr field is an exact-length constraint.
                 violations.append((f"length {allowed_lengths[-1] + 1} > allowed {allowed_lengths}",
@@ -712,23 +713,23 @@ class IDMBaseTest(BasicCompositionTests):
             # not safely possible for arbitrary element types.
             return violations
 
-        type_range = _encodable_numeric_range(datatype, field.is_nullable)
+        type_range=_encodable_numeric_range(datatype, field.is_nullable)
         if type_range is None:
             # Enum/bitmap/struct-typed fields and 'allowed' *value* constraints on
             # numeric types are out of scope for automated violation generation.
             return violations
-        type_min, type_max = type_range
-        allowed_values = self._allowed_numeric_values(constraints)
+        type_min, type_max=type_range
+        allowed_values=self._allowed_numeric_values(constraints)
 
         if constraints.max_value is not None:
-            val = constraints.max_value + 1
+            val=constraints.max_value + 1
             while val in allowed_values and val <= type_max:
                 val += 1
             if val not in allowed_values and val <= type_max:
                 violations.append((f"value {val} > max {constraints.max_value}", val))
 
         if constraints.min_value is not None:
-            val = constraints.min_value - 1
+            val=constraints.min_value - 1
             while val in allowed_values and val >= type_min:
                 val -= 1
             if val not in allowed_values and val >= type_min:
@@ -746,19 +747,19 @@ class IDMBaseTest(BasicCompositionTests):
         constrained field it means the default may itself be out of range, so callers
         must not attribute a CONSTRAINT_ERROR to the field under test.
         """
-        constraints = field.constraints
+        constraints=field.constraints
         if constraints is None or not constraints.has_constraints():
             return None
-        datatype = (field.type_info or '').lower()
+        datatype=(field.type_info or '').lower()
 
         if datatype in ('string', 'octstr'):
-            allowed_lengths = self._allowed_lengths(constraints)
+            allowed_lengths=self._allowed_lengths(constraints)
             if allowed_lengths:
-                length = allowed_lengths[0]
+                length=allowed_lengths[0]
             elif constraints.min_length is not None:
-                length = constraints.min_length
+                length=constraints.min_length
             else:
-                length = 0
+                length=0
             return 'a' * length if datatype == 'string' else b'\x00' * length
 
         if datatype in _NUMERIC_TYPE_RANGES:
@@ -766,7 +767,7 @@ class IDMBaseTest(BasicCompositionTests):
                 return constraints.min_value
             if constraints.max_value is not None and constraints.max_value < 0:
                 return constraints.max_value
-            allowed_nums = self._allowed_numeric_values(constraints)
+            allowed_nums=self._allowed_numeric_values(constraints)
             if allowed_nums:
                 return next(iter(allowed_nums))
         return None
@@ -784,27 +785,27 @@ class IDMBaseTest(BasicCompositionTests):
         required sibling could not be given a valid value (which would make a
         CONSTRAINT_ERROR ambiguous).
         """
-        target_label = self._command_field_label(info.command_class, info.field.value)
+        target_label=self._command_field_label(info.command_class, info.field.value)
         if target_label is None:
             log.warning("Skipping %s: field id %s not present in generated command class",
                         info.path_str, info.field.value)
             return ConstraintProbeResult()
 
-        constraints = await self._resolved_command_field_constraints(info)
-        violations = self.generate_command_field_violations(info.field, constraints)
+        constraints=await self._resolved_command_field_constraints(info)
+        violations=self.generate_command_field_violations(info.field, constraints)
         if not violations:
             return ConstraintProbeResult()
 
         # Build valid values for the other fields so a CONSTRAINT_ERROR can only be
         # attributed to the field under test. Optional siblings are left unset.
-        base_kwargs: dict[str, Any] = {}
+        base_kwargs: dict[str, Any]={}
         for field_id, sibling in info.all_fields.items():
             if field_id == info.field.value or sibling.is_optional:
                 continue
-            sibling_label = self._command_field_label(info.command_class, field_id)
+            sibling_label=self._command_field_label(info.command_class, field_id)
             if sibling_label is None:
                 continue
-            valid_value = self._generate_valid_command_field_value(sibling)
+            valid_value=self._generate_valid_command_field_value(sibling)
             if valid_value is None:
                 # A required sibling that is itself constrained keeps its generated
                 # class default, which may violate the sibling's own bounds. The DUT
@@ -816,16 +817,16 @@ class IDMBaseTest(BasicCompositionTests):
                                 "required field %s", info.path_str, sibling_label)
                     return ConstraintProbeResult()
                 continue
-            base_kwargs[sibling_label] = valid_value
+            base_kwargs[sibling_label]=valid_value
 
-        timed_request_timeout_ms = 65535 if info.command_class.must_use_timed_invoke else None
-        location = CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
+        timed_request_timeout_ms=65535 if info.command_class.must_use_timed_invoke else None
+        location=CommandPathLocation(endpoint_id=info.endpoint_id, cluster_id=info.cluster_id,
                                        command_id=info.command_id)
-        result = ConstraintProbeResult()
+        result=ConstraintProbeResult()
         for description, bad_value in violations:
-            command = info.command_class(**base_kwargs, **{target_label: bad_value})
+            command=info.command_class(**base_kwargs, **{target_label: bad_value})
             try:
-                response = await self.default_controller.SendCommand(
+                response=await self.default_controller.SendCommand(
                     nodeId=self.dut_node_id, endpoint=info.endpoint_id, payload=command,
                     timedRequestTimeoutMs=timed_request_timeout_ms)
             except InteractionModelError as e:
@@ -848,7 +849,7 @@ class IDMBaseTest(BasicCompositionTests):
             # command (e.g. AddGroupResponse.Status, AddSceneResponse.Status) rather
             # than as an IM status; their cluster specs mandate CONSTRAINT_ERROR be
             # reported there. Accept that as proper enforcement.
-            embedded_status = getattr(response, 'status', None)
+            embedded_status=getattr(response, 'status', None)
             if embedded_status == Status.ConstraintError:
                 log.info("PASS: %s properly rejected %s (via response command status)",
                          info.path_str, description)
@@ -865,13 +866,13 @@ class IDMBaseTest(BasicCompositionTests):
                 location=location,
                 problem=f"{info.path_str} accepted violating payload ({description})")
         return result
->>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
+>> >>>> > bd73b51(Introduce Data Model Files at 0.9 ballot v1.7 (  # 73842))
 
     def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
         """Get list of attributes that exist on the DUT and have spec/codegen data available."""
-        all_attrs = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
+        all_attrs=cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
 
-        checkable_attrs = []
+        checkable_attrs=[]
         for attr_id in all_attrs:
             if not is_standard_attribute_id(attr_id):
                 continue
@@ -899,7 +900,7 @@ class IDMBaseTest(BasicCompositionTests):
         Returns:
             Dictionary containing the read results
         """
-        read_response = await self.default_controller.Read(
+        read_response=await self.default_controller.Read(
             self.dut_node_id,
             attribute_path)
         self.verify_attribute_path(read_response, attribute_path[0])
@@ -914,7 +915,7 @@ class IDMBaseTest(BasicCompositionTests):
         Returns:
             Read response dictionary
         """
-        attribute_path = AttributePath(
+        attribute_path=AttributePath(
             EndpointId=None,
             ClusterId=None,
             AttributeId=attribute_id)
@@ -929,11 +930,11 @@ class IDMBaseTest(BasicCompositionTests):
         Returns:
             Read response dictionary
         """
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [cluster])
+        read_request=await self.default_controller.ReadAttribute(self.dut_node_id, [cluster])
 
         # Verify all expected endpoints are returned
-        expected_endpoints = list(self.endpoints.keys())
-        returned_endpoints = list(read_request.keys())
+        expected_endpoints=list(self.endpoints.keys())
+        returned_endpoints=list(read_request.keys())
         asserts.assert_equal(sorted(returned_endpoints), sorted(expected_endpoints),
                              f"Expected endpoints {expected_endpoints} but got {returned_endpoints}")
 
@@ -946,9 +947,9 @@ class IDMBaseTest(BasicCompositionTests):
             # Verify that returned attributes match the AttributeList
             # DataVersion is excluded as it is metadata and not a real attribute
             if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard:
-                returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster]
+                returned_attrs=sorted([x.attribute_id for x in read_request[endpoint][cluster]
                                          if x != Clusters.Attribute.DataVersion])
-                attr_list = sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList])
+                attr_list=sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList])
                 asserts.assert_equal(
                     returned_attrs,
                     attr_list,
@@ -964,21 +965,21 @@ class IDMBaseTest(BasicCompositionTests):
         Returns:
             Read response dictionary
         """
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [endpoint])
+        read_request=await self.default_controller.ReadAttribute(self.dut_node_id, [endpoint])
         asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
         asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
                           read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
 
         # Verify that returned clusters match the ServerList
-        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint]])
-        server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+        returned_cluster_ids=sorted([cluster.id for cluster in read_request[endpoint]])
+        server_list=sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
         asserts.assert_equal(
             returned_cluster_ids,
             server_list,
             f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
 
         for cluster in read_request[endpoint]:
-            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster]
+            attribute_ids=[a.attribute_id for a in read_request[endpoint][cluster]
                              if a != Clusters.Attribute.DataVersion]
             asserts.assert_equal(
                 sorted(attribute_ids),
@@ -992,9 +993,9 @@ class IDMBaseTest(BasicCompositionTests):
 
         Expects an UnsupportedEndpoint error.
         """
-        supported_endpoints = set(self.endpoints.keys())
-        all_endpoints = set(range(max(supported_endpoints) + 2))
-        unsupported = list(all_endpoints - supported_endpoints)
+        supported_endpoints=set(self.endpoints.keys())
+        all_endpoints=set(range(max(supported_endpoints) + 2))
+        unsupported=list(all_endpoints - supported_endpoints)
         await self.read_single_attribute_expect_error(
             endpoint=unsupported[0],
             cluster=Clusters.Descriptor,
@@ -1007,17 +1008,17 @@ class IDMBaseTest(BasicCompositionTests):
         Expects an UnsupportedCluster error.
         """
         # Get all standard clusters supported on all endpoints
-        supported_cluster_ids = set()
+        supported_cluster_ids=set()
         for endpoint_clusters in self.endpoints.values():
             supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters
                                           if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
 
         # Get all possible standard clusters
-        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
+        all_standard_cluster_ids={cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
                                     if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
 
         # Find unsupported clusters
-        unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
+        unsupported_cluster_ids=all_standard_cluster_ids - supported_cluster_ids
 
         # If no unsupported clusters are found, skip this test step
         if not unsupported_cluster_ids:
@@ -1025,17 +1026,17 @@ class IDMBaseTest(BasicCompositionTests):
             return
 
         # Use the first unsupported cluster
-        unsupported_cluster_id = next(iter(unsupported_cluster_ids))
-        unsupported_cluster = ClusterObjects.ALL_CLUSTERS[unsupported_cluster_id]
+        unsupported_cluster_id=next(iter(unsupported_cluster_ids))
+        unsupported_cluster=ClusterObjects.ALL_CLUSTERS[unsupported_cluster_id]
 
         # Get any attribute from this cluster
-        cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
-        test_attribute = next(iter(cluster_attributes.values()))
+        cluster_attributes=ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
+        test_attribute=next(iter(cluster_attributes.values()))
 
         # Test the unsupported cluster on all available endpoints
         # It should return UnsupportedCluster error from all endpoints
         for endpoint_id in self.endpoints:
-            result = await self.read_single_attribute_expect_error(
+            result=await self.read_single_attribute_expect_error(
                 endpoint=endpoint_id,
                 cluster=unsupported_cluster,
                 attribute=test_attribute,
@@ -1054,19 +1055,19 @@ class IDMBaseTest(BasicCompositionTests):
                 if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
                     continue
 
-                all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
-                dut_attrs = set(cluster[cluster_type.Attributes.AttributeList])
+                all_attrs=set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
+                dut_attrs=set(cluster[cluster_type.Attributes.AttributeList])
 
-                unsupported = [
+                unsupported=[
                     attr_id for attr_id in (all_attrs - dut_attrs)
                     if global_attribute_ids.attribute_id_type(attr_id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal
                 ]
                 if unsupported:
-                    unsupported_attr = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
+                    unsupported_attr=ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
                     log.info(
                         "Testing unsupported attribute: endpoint=%s, cluster=%s, attribute=%s", endpoint_id, cluster_type, unsupported_attr)
                     # Only request this single attribute
-                    result = await self.read_single_attribute_expect_error(
+                    result=await self.read_single_attribute_expect_error(
                         endpoint=endpoint_id,
                         cluster=cluster_type,
                         attribute=unsupported_attr,
@@ -1115,7 +1116,7 @@ class IDMBaseTest(BasicCompositionTests):
     # Shapes we still can't encode with these dummies (lists, structs,
     # enums without a zero member, etc.) raise ValueError/TypeError and
     # are skipped; the caller moves on to the next candidate.
-    _WRITE_FALLBACK_VALUES = (NullValue, 0, "", b"")
+    _WRITE_FALLBACK_VALUES=(NullValue, 0, "", b"")
 
     async def _try_write_with_fallback_values(
         self,
@@ -1141,7 +1142,7 @@ class IDMBaseTest(BasicCompositionTests):
                 )
         return None
 
-    async def write_unsupported_cluster(self, endpoint_id: int = ROOT_NODE_ENDPOINT_ID):
+    async def write_unsupported_cluster(self, endpoint_id: int=ROOT_NODE_ENDPOINT_ID):
         """Find a standard cluster the DUT does not host on any endpoint and
         attempt a write to one of its attributes on `endpoint_id`.
 
@@ -1149,19 +1150,19 @@ class IDMBaseTest(BasicCompositionTests):
         step if no unsupported standard cluster exists, or if no attribute
         on the chosen cluster can be encoded with the fallback value set.
         """
-        supported_cluster_ids = set()
+        supported_cluster_ids=set()
         for endpoint_clusters in self.endpoints.values():
             supported_cluster_ids.update({
                 cluster.id for cluster in endpoint_clusters
                 if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard
             })
 
-        all_standard_cluster_ids = {
+        all_standard_cluster_ids={
             cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
             if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard
         }
 
-        unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
+        unsupported_cluster_ids=all_standard_cluster_ids - supported_cluster_ids
         if not unsupported_cluster_ids:
             self.skip_step("No unsupported standard clusters found to test")
             return
@@ -1172,10 +1173,10 @@ class IDMBaseTest(BasicCompositionTests):
         # when the first cluster happens to expose only complex types
         # (lists, structs, etc.) that the fallback values can't encode.
         for unsupported_cluster_id in sorted(unsupported_cluster_ids):
-            cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
+            cluster_attributes=ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
             for attr_id in sorted(cluster_attributes.keys()):
-                attr_class = cluster_attributes[attr_id]
-                write_status = await self._try_write_with_fallback_values(
+                attr_class=cluster_attributes[attr_id]
+                write_status=await self._try_write_with_fallback_values(
                     endpoint_id=endpoint_id, attr_class=attr_class,
                 )
                 if write_status is None:
@@ -1200,18 +1201,18 @@ class IDMBaseTest(BasicCompositionTests):
 
         Skips the calling step if no candidate attribute can be encoded.
         """
-        candidates: list[tuple[int, int, type[ClusterObjects.ClusterAttributeDescriptor]]] = []
+        candidates: list[tuple[int, int, type[ClusterObjects.ClusterAttributeDescriptor]]]=[]
         for endpoint_id, endpoint in self.endpoints.items():
             for cluster_type, cluster_data in endpoint.items():
                 if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
                     continue
 
-                all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
+                all_attrs=set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
                 # AttributeList (0xFFFB) is a mandatory global attribute. If
                 # it's missing from the wildcard read, that's a DUT defect we
                 # want to surface as a KeyError rather than silently treat as
                 # "this cluster has no attributes".
-                dut_attrs = set(cluster_data[cluster_type.Attributes.AttributeList])
+                dut_attrs=set(cluster_data[cluster_type.Attributes.AttributeList])
 
                 # Sort by attribute id so the candidate order is reproducible
                 # across runs (set difference iteration is hash-based).
@@ -1222,7 +1223,7 @@ class IDMBaseTest(BasicCompositionTests):
                         )
 
         for endpoint_id, cluster_id, candidate_attr in candidates:
-            write_status = await self._try_write_with_fallback_values(
+            write_status=await self._try_write_with_fallback_values(
                 endpoint_id=endpoint_id, attr_class=candidate_attr,
             )
             if write_status is None:
@@ -1251,19 +1252,19 @@ class IDMBaseTest(BasicCompositionTests):
         Returns:
             List of read results
         """
-        results = []
+        results=[]
         for i in range(repeat_count):
-            path = AttributePath(EndpointId=endpoint, ClusterId=cluster.id, AttributeId=attribute.attribute_id)
-            result = await self.verify_attribute_read([path])
+            path=AttributePath(EndpointId=endpoint, ClusterId=cluster.id, AttributeId=attribute.attribute_id)
+            result=await self.verify_attribute_read([path])
             results.append(result)
 
         # Verify all reads returned consistent values
         if len(results) > 1:
-            first_result = results[0]
+            first_result=results[0]
             for i, result in enumerate(results[1:], 2):
                 # Compare the attribute values from each read
-                first_attr_value = first_result.tlvAttributes[endpoint][cluster.id][attribute.attribute_id]
-                current_attr_value = result.tlvAttributes[endpoint][cluster.id][attribute.attribute_id]
+                first_attr_value=first_result.tlvAttributes[endpoint][cluster.id][attribute.attribute_id]
+                current_attr_value=result.tlvAttributes[endpoint][cluster.id][attribute.attribute_id]
                 asserts.assert_equal(first_attr_value, current_attr_value,
                                      f"Read {i} returned different value than first read")
 
@@ -1282,15 +1283,15 @@ class IDMBaseTest(BasicCompositionTests):
         Returns:
             Tuple of (initial_read_response, filtered_read_response)
         """
-        read_request = await self.default_controller.ReadAttribute(
+        read_request=await self.default_controller.ReadAttribute(
             self.dut_node_id, [(endpoint, cluster, attribute)])
-        data_version = read_request[0][cluster][Clusters.Attribute.DataVersion]
+        data_version=read_request[0][cluster][Clusters.Attribute.DataVersion]
         if test_value is not None:
             await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, attribute(value=test_value))])
-        data_version_filter = [(endpoint, cluster, data_version)]
-        filtered_read = await self.default_controller.ReadAttribute(
+        data_version_filter=[(endpoint, cluster, data_version)]
+        filtered_read=await self.default_controller.ReadAttribute(
             self.dut_node_id,
             [(endpoint, cluster, attribute)],
             dataVersionFilters=data_version_filter)
@@ -1305,7 +1306,7 @@ class IDMBaseTest(BasicCompositionTests):
             endpoint: Endpoint to read from (None for all endpoints)
             attribute: Non-global attribute to attempt to read
         """
-        attribute_path = AttributePath(
+        attribute_path=AttributePath(
             EndpointId=endpoint,
             ClusterId=None,
             AttributeId=attribute.attribute_id)
@@ -1337,24 +1338,24 @@ class IDMBaseTest(BasicCompositionTests):
             Tuple of (original_acl, read_response)
         """
         # Creates a second controller (TH2)
-        fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
-        TH2_nodeid = self.matter_test_config.controller_node_id + 1
-        TH2 = fabric_admin.NewController(nodeId=TH2_nodeid)
+        fabric_admin=self.certificate_authority_manager.activeCaList[0].adminList[0]
+        TH2_nodeid=self.matter_test_config.controller_node_id + 1
+        TH2=fabric_admin.NewController(nodeId=TH2_nodeid)
 
         # Read and save the original ACL using the default (admin) controller
-        read_acl = await self.default_controller.Read(
+        read_acl=await self.default_controller.Read(
             self.dut_node_id,
             [(endpoint, Clusters.AccessControl.Attributes.Acl)])
-        dut_acl_original = read_acl.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+        dut_acl_original=read_acl.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
         try:
             # Create an ACE that grants View access to TH2 for only ONE specific cluster
-            ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            ace=Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=cluster_id)],
                 subjects=[TH2_nodeid])
-            dut_acl = copy.deepcopy(dut_acl_original)
+            dut_acl=copy.deepcopy(dut_acl_original)
             dut_acl.append(ace)
 
             # Write the modified ACL to grant TH2 limited access
@@ -1364,7 +1365,7 @@ class IDMBaseTest(BasicCompositionTests):
             log.info("Granted TH2 View access to only cluster %s", cluster_id)
 
             # Use TH2 to read ALL attributes from ALL clusters at the endpoint
-            read_request = await TH2.Read(
+            read_request=await TH2.Read(
                 self.dut_node_id,
                 [(endpoint)])
 
@@ -1373,14 +1374,14 @@ class IDMBaseTest(BasicCompositionTests):
                               f"Endpoint {endpoint} not found in response - may not exist or have no accessible clusters")
 
             # Verify only the allowed cluster is returned
-            returned_clusters = list(read_request.attributes[endpoint].keys())
+            returned_clusters=list(read_request.attributes[endpoint].keys())
             log.info("Clusters returned with limited access (TH2): %s", [c.id for c in returned_clusters])
 
             # The allowed cluster should be present
-            allowed_cluster_obj = None
+            allowed_cluster_obj=None
             for cluster_obj in returned_clusters:
                 if cluster_obj.id == cluster_id:
-                    allowed_cluster_obj = cluster_obj
+                    allowed_cluster_obj=cluster_obj
                     break
             asserts.assert_is_not_none(allowed_cluster_obj,
                                        f"Expected cluster {cluster_id} (allowed) to be present in response")
@@ -1426,11 +1427,11 @@ class IDMBaseTest(BasicCompositionTests):
         Returns:
             Tuple of (first_cluster_read, both_clusters_read)
         """
-        read_a = await self.default_controller.ReadAttribute(
+        read_a=await self.default_controller.ReadAttribute(
             self.dut_node_id, [(endpoint, cluster, attribute)])
-        data_version_a = read_a[0][cluster][Clusters.Attribute.DataVersion]
-        data_version_filter_a = [(endpoint, cluster, data_version_a)]
-        read_both = await self.default_controller.ReadAttribute(
+        data_version_a=read_a[0][cluster][Clusters.Attribute.DataVersion]
+        data_version_filter_a=[(endpoint, cluster, data_version_a)]
+        read_both=await self.default_controller.ReadAttribute(
             self.dut_node_id,
             [(endpoint, cluster, attribute),
              (endpoint, other_cluster, other_attribute)],
@@ -1450,9 +1451,9 @@ class IDMBaseTest(BasicCompositionTests):
             Tuple of (initial_read, filtered_read_with_multiple_filters)
         """
         # First read to get the old data version
-        read_request = await self.default_controller.ReadAttribute(
+        read_request=await self.default_controller.ReadAttribute(
             self.dut_node_id, [(endpoint, cluster, attribute)])
-        data_version_old = read_request[0][cluster][Clusters.Attribute.DataVersion]
+        data_version_old=read_request[0][cluster][Clusters.Attribute.DataVersion]
 
         # Write to change the data version
         if test_value is not None:
@@ -1461,18 +1462,18 @@ class IDMBaseTest(BasicCompositionTests):
                 [(endpoint, attribute(value=test_value))])
 
         # Second read to get the new (correct) data version after write
-        read_after_write = await self.default_controller.ReadAttribute(
+        read_after_write=await self.default_controller.ReadAttribute(
             self.dut_node_id, [(endpoint, cluster, attribute)])
-        data_version_new = read_after_write[0][cluster][Clusters.Attribute.DataVersion]
+        data_version_new=read_after_write[0][cluster][Clusters.Attribute.DataVersion]
 
         # Create filters with BOTH the correct (new) version AND the older version
-        data_version_filters = [
+        data_version_filters=[
             (endpoint, cluster, data_version_new),  # Correct/current version
             (endpoint, cluster, data_version_old)   # Older version
         ]
 
         # Read with both filters
-        filtered_read = await self.default_controller.ReadAttribute(
+        filtered_read=await self.default_controller.ReadAttribute(
             self.dut_node_id,
             [(endpoint, cluster, attribute)],
             dataVersionFilters=data_version_filters)
@@ -1492,14 +1493,14 @@ class IDMBaseTest(BasicCompositionTests):
             AssertionError if verification fails
         """
         # Parts list validation
-        parts_list_a = read_request.tlvAttributes[0][Clusters.Descriptor.id][Clusters.Descriptor.Attributes.PartsList.attribute_id]
-        parts_list_b = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        parts_list_a=read_request.tlvAttributes[0][Clusters.Descriptor.id][Clusters.Descriptor.Attributes.PartsList.attribute_id]
+        parts_list_b=self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
         asserts.assert_equal(parts_list_a, parts_list_b, "Parts list is not the expected value")
 
         # Server list validation
         for endpoint in read_request.tlvAttributes:
-            returned_clusters = sorted(read_request.tlvAttributes[endpoint].keys())
-            server_list = sorted(read_request.tlvAttributes[endpoint][Clusters.Descriptor.id]
+            returned_clusters=sorted(read_request.tlvAttributes[endpoint].keys())
+            server_list=sorted(read_request.tlvAttributes[endpoint][Clusters.Descriptor.id]
                                  [Clusters.Descriptor.Attributes.ServerList.attribute_id])
             asserts.assert_equal(returned_clusters, server_list)
 
@@ -1533,10 +1534,10 @@ class IDMBaseTest(BasicCompositionTests):
         if cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
             return []
 
-        xml_cluster = self.xml_clusters[cluster_id]
-        all_attrs = cluster_data.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, [])
+        xml_cluster=self.xml_clusters[cluster_id]
+        all_attrs=cluster_data.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, [])
 
-        writable_attrs = []
+        writable_attrs=[]
         for attribute_id in all_attrs:
             if not is_standard_attribute_id(attribute_id):
                 continue
@@ -1557,13 +1558,13 @@ class IDMBaseTest(BasicCompositionTests):
             if (cluster_id, attribute_id) in self._cq_excluded_attr_ids:
                 continue
 
-            xml_attr = xml_cluster.attributes[attribute_id]
+            xml_attr=xml_cluster.attributes[attribute_id]
 
             # Skip obsolete/disallowed attributes (e.g. obsolete in spec)
             if is_disallowed(xml_attr.conformance):
                 continue
 
-            write_access = xml_attr.write_access
+            write_access=xml_attr.write_access
 
             if write_access is not None and write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
                 writable_attrs.append(attribute_id)
@@ -1599,12 +1600,12 @@ class IDMBaseTest(BasicCompositionTests):
         Returns:
             Number of attributes successfully changed and verified
         """
-        changed_count = 0
-        changed_attributes: list[ChangedAttribute] = []
+        changed_count=0
+        changed_attributes: list[ChangedAttribute]=[]
 
         for endpoint_id, clusters in priming_data.items():
             for cluster_class, attributes in clusters.items():
-                cluster_id = cluster_class.id
+                cluster_id=cluster_class.id
                 # Subscription priming data should never reference endpoints/clusters that
                 # the wildcard composition read didn't see; a mismatch indicates the DUT is
                 # reporting inconsistent composition and the test should fail.
@@ -1617,8 +1618,8 @@ class IDMBaseTest(BasicCompositionTests):
                     f"{test_step}: Cluster 0x{cluster_id:04X} on endpoint {endpoint_id} appeared in "
                     f"subscription priming data but is not present in the wildcard composition read of the DUT")
 
-                cluster_data = self.endpoints_tlv[endpoint_id][cluster_id]
-                writable_attr_ids = self.get_writable_attributes_for_cluster(cluster_id, cluster_data)
+                cluster_data=self.endpoints_tlv[endpoint_id][cluster_id]
+                writable_attr_ids=self.get_writable_attributes_for_cluster(cluster_id, cluster_data)
                 log.info('Writable attributes for cluster %s: %s', cluster_id, writable_attr_ids)
 
                 if not writable_attr_ids:
@@ -1630,14 +1631,14 @@ class IDMBaseTest(BasicCompositionTests):
                     if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
                         continue
 
-                    attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
+                    attribute=Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
 
                     # Check if we have this attribute in the priming data
                     if attribute not in attributes:
                         continue
 
                     # Skip attributes known to have write constraints
-                    ATTRIBUTES_WITH_WRITE_CONSTRAINTS = [
+                    ATTRIBUTES_WITH_WRITE_CONSTRAINTS=[
                         # If ACL attribute is written to a blank list in below logic, then unable to recover needed permissions to read it afterwards, as known from working on the ACL tests.
                         Clusters.AccessControl.Attributes.Acl,
                         # InterfaceEnabled only writeable attribute and returns error status 1. Writing to it would cause the DUT to disconnect if successful, spec 11.9.6.5 shows this could attribute could be protected and will return a INVALID_ACTION error if attempted to be written too.
@@ -1662,7 +1663,7 @@ class IDMBaseTest(BasicCompositionTests):
                         continue
 
                     # Get current value from priming data
-                    cached_val = attributes[attribute]
+                    cached_val=attributes[attribute]
 
                     # A ValueDecodeFailure here means the DUT returned an undecodable value
                     # for an attribute it itself claimed to support in AttributeList; that's
@@ -1676,7 +1677,7 @@ class IDMBaseTest(BasicCompositionTests):
                     # Determine new value based on type
                     if isinstance(cached_val, str):
                         # Normal strings - use unique timestamped value
-                        new_val = f"{test_step}_T{int(time.time())}_{changed_count}"
+                        new_val=f"{test_step}_T{int(time.time())}_{changed_count}"
 
                     elif isinstance(cached_val, list):
                         # List attribute - toggle between empty and non-empty to ensure actual change
@@ -1685,23 +1686,23 @@ class IDMBaseTest(BasicCompositionTests):
                             log.info("%s: Skipping %s - empty list", test_step, attribute.__name__)
                             continue
                         # Non-empty list -> write empty list (safe change)
-                        new_val = []
+                        new_val=[]
                     elif isinstance(cached_val, bool):
                         # Boolean attribute - flip the value to trigger actual change
-                        new_val = not cached_val
+                        new_val=not cached_val
                     elif isinstance(cached_val, (int, float)):
                         # increment to trigger actual change
                         # Try incrementing first, but respect reasonable upper bounds
                         if cached_val < 100:
                             # For values 0-99, safe to increment (handles percentages, small enums)
-                            new_val = cached_val + 1
+                            new_val=cached_val + 1
                         elif cached_val < 1000000:
                             # For larger values, decrement to ensure change without hitting constraints
                             # Example: DefaultOpenLevel is 0-100, so we can decrement to 99 to trigger a change, if we incremented to 101 then it hits a constraint error..
-                            new_val = cached_val - 1
+                            new_val=cached_val - 1
                         else:
                             # For very large values, use a safe 0 value
-                            new_val = 0
+                            new_val=0
                     else:
                         # For other types, skip to avoid writing same value
                         # Writing the same value should NOT trigger a report
@@ -1710,13 +1711,13 @@ class IDMBaseTest(BasicCompositionTests):
 
                     # Write the attribute
                     log.info("%s: Writing %s on EP%s: %s -> %s", test_step, attribute.__name__, endpoint_id, cached_val, new_val)
-                    resp = await self.default_controller.WriteAttribute(
+                    resp=await self.default_controller.WriteAttribute(
                         nodeId=self.dut_node_id,
                         attributes=[(endpoint_id, attribute(new_val))]
                     )
 
                     if resp[0].Status == Status.Success:
-                        readback = await self.read_single_attribute_check_success(
+                        readback=await self.read_single_attribute_check_success(
                             endpoint=endpoint_id, cluster=cluster_class, attribute=attribute,
                         )
 
@@ -1744,38 +1745,38 @@ class IDMBaseTest(BasicCompositionTests):
 
         # Wait for change reports to arrive
         # Wait in small increments, checking periodically
-        count = 0
-        last_report_count = len(handler.get_all_reported_attributes())
+        count=0
+        last_report_count=len(handler.get_all_reported_attributes())
         # DUT can batch a backlog of reports for unexpectedly long stretches
         # (~30s seen in CI on all-clusters-app) after a burst of writes. Cap
         # generously; the loop exits early via the changed_count check on
         # healthy runs.
-        max_wait_time = 60
+        max_wait_time=60
         while count < max_wait_time:
             await asyncio.sleep(1)
             count += 1
             # Log progress every interval
-            current_reports = len(handler.get_all_reported_attributes())
+            current_reports=len(handler.get_all_reported_attributes())
             if current_reports != last_report_count:
-                last_report_count = current_reports
+                last_report_count=current_reports
             elif current_reports == changed_count:
                 break
             else:
                 log.debug("%s: %ss elapsed, %s unique attributes reported (no change)", test_step, count, current_reports)
 
         # Verify that we received reports for all the changed attributes we wrote to
-        verified_count = 0
-        missing_reports = []
+        verified_count=0
+        missing_reports=[]
 
         for change in changed_attributes:
-            ep = change.endpoint
-            cluster = change.cluster
-            attr = change.attribute
+            ep=change.endpoint
+            cluster=change.cluster
+            attr=change.attribute
 
             # Check if handler received a report for this attribute
             if handler.was_attribute_reported(ep, cluster, attr):
                 verified_count += 1
-                reports_count = handler.get_attribute_report_count(ep, cluster, attr)
+                reports_count=handler.get_attribute_report_count(ep, cluster, attr)
                 log.info("Reports count for %s on endpoint %s: %s", cluster.__name__, ep, reports_count)
             else:
                 missing_reports.append(f"{attr.__name__} on endpoint {ep}")
@@ -1784,7 +1785,7 @@ class IDMBaseTest(BasicCompositionTests):
                  test_step, verified_count, len(changed_attributes))
 
         # Report summary of all attributes that received reports
-        all_reported = handler.get_all_reported_attributes()
+        all_reported=handler.get_all_reported_attributes()
         log.info("%s: Total unique attributes with reports: %s", test_step, len(all_reported))
 
         asserts.assert_less_equal(
@@ -1799,11 +1800,11 @@ class IDMBaseTest(BasicCompositionTests):
         # the verification above has already passed and we don't want cleanup noise to
         # mask the real test outcome.
         for change in changed_attributes:
-            ep = change.endpoint
-            attr = change.attribute
-            old_value = change.old_value
+            ep=change.endpoint
+            attr=change.attribute
+            old_value=change.old_value
 
-            resp = await self.default_controller.WriteAttribute(
+            resp=await self.default_controller.WriteAttribute(
                 nodeId=self.dut_node_id,
                 attributes=[(ep, attr(old_value))]
             )
