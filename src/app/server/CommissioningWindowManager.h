@@ -27,6 +27,9 @@
 #include <lib/dnssd/Advertiser.h>
 #include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceConfig.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <platform/ConnectivityManager.h>
+#endif
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
 
@@ -76,6 +79,14 @@ public:
      * this false, so opening a window advertises on the other supported transports only.
      */
     void SetWiFiPAFAdvertisingAllowed(bool allowed) { mWiFiPAFAdvertisingAllowed = allowed; }
+
+    /**
+     * Restart Wi-Fi PAF publish with new parameters (e.g. updated freq_list).
+     * Cancels the current publish (if active) and starts a new one with the given params.
+     * Must be called on the Matter thread.
+     * Returns CHIP_ERROR_INCORRECT_STATE if commissioning window is not open or PAF is not enabled.
+     */
+    CHIP_ERROR RestartWiFiPAFPublish(DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam & params);
 #endif
 
     /**

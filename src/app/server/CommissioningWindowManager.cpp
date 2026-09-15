@@ -600,6 +600,36 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, boo
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+CHIP_ERROR CommissioningWindowManager::RestartWiFiPAFPublish(DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam & params)
+{
+    VerifyOrReturnError(mCommissioningTimeoutTimerArmed, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mIsWiFiPAF, CHIP_ERROR_INCORRECT_STATE);
+
+    // Cancel the current publish if active.
+    if ((mPublishId != 0) && (mPublishId != WiFiPAF::kUndefinedWiFiPafSessionId))
+    {
+        ChipLogProgress(WiFiPAF, "Canceling Wi-Fi PAF publish for restart");
+        ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(false, mPublishId));
+        mPublishId = WiFiPAF::kUndefinedWiFiPafSessionId;
+    }
+
+    // Apply new parameters (e.g. updated freq_list).
+    DeviceLayer::ConnectivityMgr().WiFiPAFSetParam(params);
+
+    // Start a new publish with the updated parameters.
+    ChipLogProgress(WiFiPAF, "Starting Wi-Fi PAF publish with updated parameters");
+    auto err = DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(true, mPublishId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(WiFiPAF, "Failed to restart Wi-Fi PAF publish: %" CHIP_ERROR_FORMAT, err.Format());
+        mPublishId = WiFiPAF::kUndefinedWiFiPafSessionId;
+    }
+
+    return err;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 CHIP_ERROR CommissioningWindowManager::SetTemporaryDiscriminator(uint16_t discriminator)
 {
     return app::DnssdServer::Instance().SetEphemeralDiscriminator(MakeOptional(discriminator));
