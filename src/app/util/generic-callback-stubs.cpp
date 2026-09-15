@@ -17,6 +17,7 @@
 
 #include <app-common/zap-generated/callback.h>
 #include <app/util/basic-types.h>
+#include <app/util/generic-callbacks.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -40,6 +41,14 @@ emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, c
                                      uint8_t * buffer, uint16_t maxReadLength)
 {
     return chip::Protocols::InteractionModel::Status::Failure;
+}
+
+chip::Protocols::InteractionModel::Status __attribute__((weak))
+emberAfExternalAttributeReadWithContextCallback(EndpointId endpoint, ClusterId clusterId,
+                                                const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                uint16_t maxReadLength, const Access::SubjectDescriptor * subjectDescriptor)
+{
+    return emberAfExternalAttributeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
