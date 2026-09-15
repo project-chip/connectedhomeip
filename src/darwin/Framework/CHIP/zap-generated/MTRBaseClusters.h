@@ -6154,37 +6154,37 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command AddScene
  *
- * Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'.
+ * This command is used to add a new scene.
  */
 - (void)addSceneWithParams:(MTRScenesManagementClusterAddSceneParams *)params completion:(void (^)(MTRScenesManagementClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command ViewScene
  *
- * Retrieves the requested scene entry from its Scene table.
+ * This command returns the details for the requested scene.
  */
 - (void)viewSceneWithParams:(MTRScenesManagementClusterViewSceneParams *)params completion:(void (^)(MTRScenesManagementClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveScene
  *
- * Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table
+ * This command removes the specified scene.
  */
 - (void)removeSceneWithParams:(MTRScenesManagementClusterRemoveSceneParams *)params completion:(void (^)(MTRScenesManagementClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveAllScenes
  *
- * Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table
+ * This command removes all scenes for the specified GroupID.
  */
 - (void)removeAllScenesWithParams:(MTRScenesManagementClusterRemoveAllScenesParams *)params completion:(void (^)(MTRScenesManagementClusterRemoveAllScenesResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command StoreScene
  *
- * Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint
+ * This command will create a new entry for the requested scene.
  */
 - (void)storeSceneWithParams:(MTRScenesManagementClusterStoreSceneParams *)params completion:(void (^)(MTRScenesManagementClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RecallScene
  *
- * Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table
+ * This command will cause the specified scene to be recalled.
  */
 - (void)recallSceneWithParams:(MTRScenesManagementClusterRecallSceneParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -10573,6 +10573,42 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeThermostatSuggestionNotFollowingReasonWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
+- (void)readAttributeSensorsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSensorsWithParams:(MTRSubscribeParams *)params
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                              reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSensorsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAvailableSensorsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeAvailableSensorsWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeAvailableSensorsWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAvailableSensorsWithParams:(MTRSubscribeParams *)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAvailableSensorsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeEnabledSensorsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeEnabledSensorsWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeEnabledSensorsWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeEnabledSensorsWithParams:(MTRSubscribeParams *)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeEnabledSensorsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeNumberOfSensorScheduleTransitionsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeNumberOfSensorScheduleTransitionsWithParams:(MTRSubscribeParams *)params
+                                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeNumberOfSensorScheduleTransitionsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeSensorScheduleWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeSensorScheduleWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeSensorScheduleWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSensorScheduleWithParams:(MTRSubscribeParams *)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSensorScheduleWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -10917,8 +10953,8 @@ MTR_PROVISIONALLY_AVAILABLE
 + (void)readAttributeTargetSetpointWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeMistTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeMistTypeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeMistTypeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeMistTypeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeMistTypeWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeMistTypeWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
@@ -16201,7 +16237,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Mute
  *
- * This command SHALL set the value of the SoftMuted attribute to TRUE.
+ * This command allows the audio output of the device to be muted.
  */
 - (void)muteWithParams:(MTRAudioControlClusterMuteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)muteWithCompletion:(MTRStatusCompletion)completion
@@ -16209,7 +16245,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Unmute
  *
- * This command SHALL set the value of the SoftMuted attribute to FALSE.
+ * This command allows the audio output of the device to be unmuted.
  */
 - (void)unmuteWithParams:(MTRAudioControlClusterUnmuteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)unmuteWithCompletion:(MTRStatusCompletion)completion
@@ -16217,7 +16253,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ToggleMuted
  *
- * This command SHALL toggle the state of the SoftMuted attribute.
+ * This command allows the audio output of the device to be muted if it is unmuted, or unmuted if it is muted.
  */
 - (void)toggleMutedWithParams:(MTRAudioControlClusterToggleMutedParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)toggleMutedWithCompletion:(MTRStatusCompletion)completion
@@ -23080,6 +23116,7 @@ typedef NS_OPTIONS(uint32_t, MTRThermostatFeature) {
     MTRThermostatFeaturePresets MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x100,
     MTRThermostatFeatureEvents MTR_PROVISIONALLY_AVAILABLE = 0x200,
     MTRThermostatFeatureThermostatSuggestions MTR_PROVISIONALLY_AVAILABLE = 0x400,
+    MTRThermostatFeatureThermostatSensors MTR_PROVISIONALLY_AVAILABLE = 0x800,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatHVACSystemTypeBitmap) {

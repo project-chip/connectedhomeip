@@ -1192,6 +1192,37 @@ TEST_F(TestEnergyEvseCluster, TestTargetsCommands)
     setTargetsCmd.chargingTargetSchedules = DataModel::List<const Structs::ChargingTargetScheduleStruct::Type>(schedules, 2);
     EXPECT_FALSE(tester.Invoke(Commands::SetTargets::Id, setTargetsCmd).IsSuccess());
 
+    // --- Constraint Error: Empty DayOfWeekForSequence (0x00) ---
+
+    Structs::ChargingTargetStruct::Type validTarget;
+    validTarget.targetTimeMinutesPastMidnight = 480;
+    validTarget.targetSoC.SetValue(80);
+
+    Structs::ChargingTargetScheduleStruct::Type emptyDaySchedule;
+    emptyDaySchedule.dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(0); // Empty bitmask - invalid!
+    emptyDaySchedule.chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(&validTarget, 1);
+
+    setTargetsCmd.chargingTargetSchedules =
+        DataModel::List<const Structs::ChargingTargetScheduleStruct::Type>(&emptyDaySchedule, 1);
+    EXPECT_FALSE(tester.Invoke(Commands::SetTargets::Id, setTargetsCmd).IsSuccess());
+
+    // --- Constraint Error: Empty DayOfWeekForSequence in multi-schedule list (last entry) ---
+
+    Structs::ChargingTargetScheduleStruct::Type multiSchedulesWithEmpty[3];
+    multiSchedulesWithEmpty[0].dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(TargetDayOfWeekBitmap::kMonday);
+    multiSchedulesWithEmpty[0].chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(&validTarget, 1);
+    multiSchedulesWithEmpty[1].dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(TargetDayOfWeekBitmap::kTuesday);
+    multiSchedulesWithEmpty[1].chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(&validTarget, 1);
+    multiSchedulesWithEmpty[2].dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(0); // Empty - should fail entire command!
+    multiSchedulesWithEmpty[2].chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(&validTarget, 1);
+
+    setTargetsCmd.chargingTargetSchedules =
+        DataModel::List<const Structs::ChargingTargetScheduleStruct::Type>(multiSchedulesWithEmpty, 3);
+    EXPECT_FALSE(tester.Invoke(Commands::SetTargets::Id, setTargetsCmd).IsSuccess());
+
+    // Verify no partial data was persisted (targets should still be empty from earlier ClearTargets)
+    EXPECT_EQ(mockDelegate.GetTotalTargetsCount(), 0u);
+
     // --- Success: Set targets for multiple days ---
 
     Structs::ChargingTargetStruct::Type weekdayTarget;

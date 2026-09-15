@@ -41,6 +41,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
     - Service Area
+    - Thermostat
     - Thread Border Router Management
     - Thread Network Directory
     - Water Heater Management
@@ -58,7 +59,6 @@ ClustersWithInitFunctions:
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithAttributeChangedFunctions:
@@ -66,7 +66,6 @@ ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
     - Door Lock
     - Pump Configuration and Control
-    - Thermostat
     # keep-sorted end
 
 ClustersWithShutdownFunctions:
@@ -77,7 +76,6 @@ ClustersWithShutdownFunctions:
     - Level Control
     - On/Off
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithPreAttributeChangeFunctions:
@@ -87,7 +85,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Laundry Dryer Controls
     - Mode Select
     - Pump Configuration and Control
-    - Thermostat
     - Thermostat User Interface Configuration
     # keep-sorted end
     # Code Driven clusters are clusters that implement the ServerClusterInterface.
@@ -101,6 +98,7 @@ CodeDrivenClusters:
     - Administrator Commissioning
     - Air Quality
     - Ambient Context Sensing
+    - Audio Control
     - Basic Information
     - Binding
     - Boolean State
@@ -170,6 +168,7 @@ CodeDrivenClusters:
     - TLS Client Management
     - Temperature Control
     - Temperature Measurement
+    - Thermostat
     - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization

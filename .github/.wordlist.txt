@@ -1495,6 +1495,7 @@ subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
+superset
 suppressResponse
 svg
 SVR
@@ -1645,6 +1646,7 @@ unregister
 unregistration
 Unsecure
 Unselect
+unsynchronized
 untrusted
 updateAvailable
 updateNotAvailable

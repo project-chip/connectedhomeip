@@ -17,7 +17,6 @@
 
 #include "Setpoint.h"
 
-using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
 namespace chip {
@@ -77,7 +76,6 @@ temperature OptionalSetpoint::Temperature() const
     }
     return mAbsoluteSetpoint.Temperature();
 }
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

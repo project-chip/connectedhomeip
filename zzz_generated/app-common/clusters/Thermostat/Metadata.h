@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-inline constexpr uint32_t kRevision = 11;
+inline constexpr uint32_t kRevision = 12;
 
 namespace Attributes {
 
@@ -299,6 +299,32 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNo
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace ThermostatSuggestionNotFollowingReason
+namespace Sensors {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Sensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace Sensors
+namespace AvailableSensors {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AvailableSensors::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace AvailableSensors
+namespace EnabledSensors {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(EnabledSensors::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace EnabledSensors
+namespace NumberOfSensorScheduleTransitions {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfSensorScheduleTransitions::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace NumberOfSensorScheduleTransitions
+namespace SensorSchedule {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SensorSchedule::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace SensorSchedule
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     LocalTemperature::kMetadataEntry,
     ControlSequenceOfOperation::kMetadataEntry,
@@ -344,7 +370,7 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace RemoveThermostatSuggestion
 namespace AtomicRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AtomicRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
+                                                                Access::Privilege::kOperate);
 } // namespace AtomicRequest
 
 } // namespace Commands
