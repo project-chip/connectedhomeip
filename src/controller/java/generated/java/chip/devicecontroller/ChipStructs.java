@@ -11989,6 +11989,203 @@ public static class ThermostatClusterScheduleTypeStruct {
     return output.toString();
   }
 }
+public static class ThermostatClusterSensorScheduleTransitionStruct {
+  public Integer dayOfWeek;
+  public Integer transitionTime;
+  public ArrayList<byte[]> enabledSensors;
+  private static final long DAY_OF_WEEK_ID = 0L;
+  private static final long TRANSITION_TIME_ID = 1L;
+  private static final long ENABLED_SENSORS_ID = 2L;
+
+  public ThermostatClusterSensorScheduleTransitionStruct(
+    Integer dayOfWeek,
+    Integer transitionTime,
+    ArrayList<byte[]> enabledSensors
+  ) {
+    this.dayOfWeek = dayOfWeek;
+    this.transitionTime = transitionTime;
+    this.enabledSensors = enabledSensors;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(DAY_OF_WEEK_ID, new UIntType(dayOfWeek)));
+    values.add(new StructElement(TRANSITION_TIME_ID, new UIntType(transitionTime)));
+    values.add(new StructElement(ENABLED_SENSORS_ID, ArrayType.generateArrayType(enabledSensors, (elementenabledSensors) -> new ByteArrayType(elementenabledSensors))));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterSensorScheduleTransitionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer dayOfWeek = null;
+    Integer transitionTime = null;
+    ArrayList<byte[]> enabledSensors = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == DAY_OF_WEEK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          dayOfWeek = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TRANSITION_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          transitionTime = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ENABLED_SENSORS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          enabledSensors = castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class));
+        }
+      }
+    }
+    return new ThermostatClusterSensorScheduleTransitionStruct(
+      dayOfWeek,
+      transitionTime,
+      enabledSensors
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterSensorScheduleTransitionStruct {\n");
+    output.append("\tdayOfWeek: ");
+    output.append(dayOfWeek);
+    output.append("\n");
+    output.append("\ttransitionTime: ");
+    output.append(transitionTime);
+    output.append("\n");
+    output.append("\tenabledSensors: ");
+    output.append(enabledSensors);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThermostatClusterThermostatSensorStruct {
+  public String name;
+  public byte[] sensorHandle;
+  public Long cluster;
+  public Optional<Integer> endpoint;
+  public Optional<Long> node;
+  public Optional<Integer> fabricIndex;
+  private static final long NAME_ID = 0L;
+  private static final long SENSOR_HANDLE_ID = 1L;
+  private static final long CLUSTER_ID = 2L;
+  private static final long ENDPOINT_ID = 3L;
+  private static final long NODE_ID = 4L;
+  private static final long FABRIC_INDEX_ID = 5L;
+
+  public ThermostatClusterThermostatSensorStruct(
+    String name,
+    byte[] sensorHandle,
+    Long cluster,
+    Optional<Integer> endpoint,
+    Optional<Long> node,
+    Optional<Integer> fabricIndex
+  ) {
+    this.name = name;
+    this.sensorHandle = sensorHandle;
+    this.cluster = cluster;
+    this.endpoint = endpoint;
+    this.node = node;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(SENSOR_HANDLE_ID, new ByteArrayType(sensorHandle)));
+    values.add(new StructElement(CLUSTER_ID, new UIntType(cluster)));
+    values.add(new StructElement(ENDPOINT_ID, endpoint.<BaseTLVType>map((nonOptionalendpoint) -> new UIntType(nonOptionalendpoint)).orElse(new EmptyType())));
+    values.add(new StructElement(NODE_ID, node.<BaseTLVType>map((nonOptionalnode) -> new UIntType(nonOptionalnode)).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, fabricIndex.<BaseTLVType>map((nonOptionalfabricIndex) -> new UIntType(nonOptionalfabricIndex)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterThermostatSensorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String name = null;
+    byte[] sensorHandle = null;
+    Long cluster = null;
+    Optional<Integer> endpoint = Optional.empty();
+    Optional<Long> node = Optional.empty();
+    Optional<Integer> fabricIndex = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SENSOR_HANDLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          sensorHandle = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == CLUSTER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cluster = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == ENDPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpoint = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == NODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          node = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new ThermostatClusterThermostatSensorStruct(
+      name,
+      sensorHandle,
+      cluster,
+      endpoint,
+      node,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterThermostatSensorStruct {\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tsensorHandle: ");
+    output.append(Arrays.toString(sensorHandle));
+    output.append("\n");
+    output.append("\tcluster: ");
+    output.append(cluster);
+    output.append("\n");
+    output.append("\tendpoint: ");
+    output.append(endpoint);
+    output.append("\n");
+    output.append("\tnode: ");
+    output.append(node);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ThermostatClusterThermostatSuggestionStruct {
   public Integer uniqueID;
   public byte[] presetHandle;

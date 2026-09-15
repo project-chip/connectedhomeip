@@ -14,7 +14,7 @@ namespace Thermostat {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 69;
+inline constexpr uint32_t kAttributesCount = 74;
 
 namespace LocalTemperature {
 inline constexpr AttributeId Id = 0x00000000;
@@ -271,6 +271,26 @@ inline constexpr AttributeId Id = 0x00000055;
 namespace ThermostatSuggestionNotFollowingReason {
 inline constexpr AttributeId Id = 0x00000056;
 } // namespace ThermostatSuggestionNotFollowingReason
+
+namespace Sensors {
+inline constexpr AttributeId Id = 0x00000059;
+} // namespace Sensors
+
+namespace AvailableSensors {
+inline constexpr AttributeId Id = 0x0000005A;
+} // namespace AvailableSensors
+
+namespace EnabledSensors {
+inline constexpr AttributeId Id = 0x0000005B;
+} // namespace EnabledSensors
+
+namespace NumberOfSensorScheduleTransitions {
+inline constexpr AttributeId Id = 0x0000005C;
+} // namespace NumberOfSensorScheduleTransitions
+
+namespace SensorSchedule {
+inline constexpr AttributeId Id = 0x0000005D;
+} // namespace SensorSchedule
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
