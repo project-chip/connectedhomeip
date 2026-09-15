@@ -21,6 +21,7 @@
 #include <optional>
 #include <type_traits>
 
+#include <app/ConcreteAttributePath.h>
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -28,6 +29,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
+#include <oob-accessors/OOBDataSerializer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app::NamedPipe {
 
@@ -172,6 +175,34 @@ public:
         ReturnErrorOnFailure(message.Finalize(payload));
         return registry.HandleAction(actionName, payload);
     }
+
+    template <typename T>
+    static CHIP_ERROR DispatchSetAttribute(OOBAccessorRegistry & registry, const ConcreteAttributePath & path, const T & value)
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer, sizeof(buffer));
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagEndpointId), path.mEndpointId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagClusterId), path.mClusterId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagAttributeId), path.mAttributeId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagValue), value));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+        ReturnErrorOnFailure(writer.Finalize());
+
+        ByteSpan payload(buffer, writer.GetLengthWritten());
+        CHIP_ERROR err = registry.HandleAction("SetAttribute"_span, payload);
+        if (err == CHIP_ERROR_NOT_FOUND || err == CHIP_IM_GLOBAL_STATUS(UnsupportedWrite))
+        {
+            return WriteAttributeToDataModel(payload);
+        }
+        return err;
+    }
+
+private:
+    static CHIP_ERROR WriteAttributeToDataModel(ByteSpan payload);
 };
 
 } // namespace chip::app::NamedPipe

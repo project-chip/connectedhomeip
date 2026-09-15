@@ -360,6 +360,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     const std::string & namedPipePath = AppOptions::GetConfig().appPipePath;
     if (!namedPipePath.empty())
     {
+        NamedPipe::Dispatcher::Instance().SetDataModelProvider(&devices.DataModelProvider());
         SetupNamedPipe(namedPipePath.c_str());
     }
 
@@ -395,7 +396,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #if PW_RPC_ENABLED
-    static chip::app::PigweedAttributeAccessor sPwOobAccessor;
+    static chip::app::PigweedAttributeAccessor sPwOobAccessor(devices.DataModelProvider());
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
 
     const uint16_t rpcServerPort = AppOptions::GetConfig().rpcServerPort.value_or(AppOptions::kDefaultRpcServerPort);

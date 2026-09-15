@@ -16,137 +16,56 @@
 
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 
+#include <app/data-model/Decode.h>
+#include <clusters/OccupancySensing/AttributeIds.h>
+#include <clusters/OccupancySensing/ClusterId.h>
+#include <clusters/OccupancySensing/Enums.h>
 #include <lib/core/TLV.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <oob-accessors/OOBDataSerializer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app {
 
 std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
 {
-    if (action.data_equal("SetOccupancy"_span))
+    if (action.data_equal("SetAttribute"_span))
     {
-        return HandleSetOccupancy(tlvData);
-    }
-    if (action.data_equal("SetHoldTime"_span))
-    {
-        return HandleSetHoldTime(tlvData);
+        return HandleSetAttribute(tlvData);
     }
     return std::nullopt;
 }
 
-std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetOccupancy(ByteSpan tlvData) const
+std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetAttribute(ByteSpan tlvData) const
 {
-    TLV::TLVReader reader;
-    reader.Init(tlvData);
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-    EndpointId endpointId = kInvalidEndpointId;
-    bool occupancy        = false;
-    bool hasEndpointId    = false;
-    bool hasOccupancy     = false;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    auto parseResult = OOBDataSerializer::ParseAttributeRequest(tlvData);
+    if (std::holds_alternative<CHIP_ERROR>(parseResult))
     {
-        TLV::Tag tag = reader.GetTag();
-        if (!TLV::IsContextTag(tag))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(tag))
-        {
-        case 1:
-            ReturnErrorOnFailure(reader.Get(endpointId));
-            hasEndpointId = true;
-            break;
-        case 2: {
-            TLV::TLVType type = reader.GetType();
-            if (type == TLV::kTLVType_Boolean)
-            {
-                ReturnErrorOnFailure(reader.Get(occupancy));
-            }
-            else
-            {
-                uint8_t occVal = 0;
-                ReturnErrorOnFailure(reader.Get(occVal));
-                occupancy = (occVal != 0);
-            }
-            hasOccupancy = true;
-            break;
-        }
-        default:
-            break;
-        }
-    }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
-    VerifyOrReturnError(hasEndpointId && hasOccupancy, CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (endpointId != mEndpointId)
-    {
-        return std::nullopt;
+        CHIP_ERROR err = std::get<CHIP_ERROR>(parseResult);
+        ChipLogError(Support, "Failed to parse OOB attribute request: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
     }
 
-    mCluster.SetOccupancy(occupancy);
-    return CHIP_NO_ERROR;
-}
+    auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
+    VerifyOrReturnValue(request.path.mEndpointId == mEndpointId, std::nullopt);
+    VerifyOrReturnValue(request.path.mClusterId == Clusters::OccupancySensing::Id, std::nullopt);
 
-std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetHoldTime(ByteSpan tlvData) const
-{
-    TLV::TLVReader reader;
-    reader.Init(tlvData);
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-    EndpointId endpointId = kInvalidEndpointId;
-    uint16_t holdTime     = 0;
-    bool hasEndpointId    = false;
-    bool hasHoldTime      = false;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    switch (request.path.mAttributeId)
     {
-        TLV::Tag tag = reader.GetTag();
-        if (!TLV::IsContextTag(tag))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(tag))
-        {
-        case 1:
-            ReturnErrorOnFailure(reader.Get(endpointId));
-            hasEndpointId = true;
-            break;
-        case 2:
-            ReturnErrorOnFailure(reader.Get(holdTime));
-            hasHoldTime = true;
-            break;
-        default:
-            break;
-        }
+    case Clusters::OccupancySensing::Attributes::Occupancy::Id: {
+        // Occupancy is read-only per spec; only the cluster API can set it.
+        BitMask<Clusters::OccupancySensing::OccupancyBitmap> occupancy;
+        ReturnErrorOnFailure(DataModel::Decode(request.value, occupancy));
+        mCluster.SetOccupancy(occupancy.Has(Clusters::OccupancySensing::OccupancyBitmap::kOccupied));
+        return CHIP_NO_ERROR;
     }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
-    VerifyOrReturnError(hasEndpointId && hasHoldTime, CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (endpointId != mEndpointId)
-    {
-        return std::nullopt;
+    default:
+        // Return UnsupportedWrite here; callers (PigweedAttributeAccessor, NamedPipe::Dispatcher)
+        // fall back to the Matter DataModel provider for writable attributes such as HoldTime.
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
     }
-
-    auto status = mCluster.SetHoldTime(holdTime);
-    if (!status.IsSuccess())
-    {
-        return status.GetUnderlyingError();
-    }
-    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app

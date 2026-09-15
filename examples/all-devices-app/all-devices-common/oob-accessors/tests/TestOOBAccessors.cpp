@@ -123,10 +123,6 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
 {
     InMemoryOOBAccessorRegistry registry;
     Clusters::OccupancySensingCluster::Config config(1);
-    Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type limits{ .holdTimeMin     = 1,
-                                                                            .holdTimeMax     = 100,
-                                                                            .holdTimeDefault = 30 };
-    config.WithHoldTime(30, limits, mTimerDelegate);
     Clusters::OccupancySensingCluster cluster(config);
     EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
 
@@ -135,29 +131,60 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
 
     EXPECT_FALSE(cluster.IsOccupied());
 
-    // SetOccupancy = true
+    // SetAttribute for Occupancy = 1 (occupied)
     uint8_t buffer[64];
     TLV::TLVWriter writer;
     writer.Init(buffer);
     TLV::TLVType outer;
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), true), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::OccupancySensing::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::OccupancySensing::Attributes::Occupancy::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint8_t>(1)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetOccupancy"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.IsOccupied());
 
-    // SetHoldTime = 30
+    // SetAttribute for Occupancy = 0 (unoccupied)
     writer.Init(buffer);
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint16_t>(30)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::OccupancySensing::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::OccupancySensing::Attributes::Occupancy::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint8_t>(0)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetHoldTime"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_FALSE(cluster.IsOccupied());
+
+    // SetAttribute for HoldTime = 60 (declined by OccupancyOOBAccessor so it falls through to DataModel)
+    writer.Init(buffer);
+    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::OccupancySensing::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::OccupancySensing::Attributes::HoldTime::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint16_t>(60)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+
+    // SetAttribute for unknown attribute (should return UnsupportedWrite)
+    writer.Init(buffer);
+    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::OccupancySensing::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(3), static_cast<uint32_t>(0xFFFF)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint16_t>(60)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -173,19 +200,47 @@ TEST_F(TestOOBAccessors, BooleanStateOOBAccessor)
 
     EXPECT_FALSE(cluster.GetStateValue());
 
-    // SetBooleanState = true
+    // SetAttribute for StateValue = true
     uint8_t buffer[64];
     TLV::TLVWriter writer;
     writer.Init(buffer);
     TLV::TLVType outer;
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), true), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::BooleanState::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::BooleanState::Attributes::StateValue::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(4), true), CHIP_NO_ERROR);
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetBooleanState"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.GetStateValue());
+
+    // SetAttribute for StateValue = false
+    writer.Init(buffer);
+    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::BooleanState::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::BooleanState::Attributes::StateValue::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(4), false), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_FALSE(cluster.GetStateValue());
+
+    // SetAttribute for unknown attribute (should return UnsupportedWrite)
+    writer.Init(buffer);
+    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::BooleanState::Id), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(3), static_cast<uint32_t>(0xFFFF)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(4), true), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
