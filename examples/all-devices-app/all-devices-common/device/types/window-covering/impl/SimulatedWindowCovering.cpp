@@ -69,6 +69,19 @@ SimulatedWindowCovering::~SimulatedWindowCovering()
     mContext.timerDelegate.CancelTimer(this);
 }
 
+CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                             EndpointComposition composition)
+{
+    ReturnErrorOnFailure(WindowCovering::Register(endpoint, provider, composition));
+
+    // The device boots without a known position; enter calibration mode itself immediately
+    // rather than waiting for a client to request it, so it resolves to a known position
+    // shortly after startup on its own (see OnModeChanged()/TimerFired()).
+    WindowCoveringCluster().SetMode(chip::BitMask<Mode>(Mode::kCalibrationMode));
+
+    return CHIP_NO_ERROR;
+}
+
 void SimulatedWindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mContext.timerDelegate.CancelTimer(this);
@@ -94,22 +107,6 @@ CHIP_ERROR SimulatedWindowCovering::HandleMovement(Clusters::WindowCovering::Win
 {
     ChipLogProgress(DeviceLayer, "WindowCovering: HandleMovement type=%" PRIu16, static_cast<uint16_t>(type));
     auto & cluster = WindowCoveringCluster();
-
-    if (cluster.GetMode().Has(Mode::kCalibrationMode))
-    {
-        // Per spec 5.3.6.14.2, a movement command while in calibration mode triggers a
-        // self-calibration before the command executes. Defer this move until the fake
-        // calibration timer (started below) completes in TimerFired().
-        if (!mCalibrating)
-        {
-            mCalibrating = true;
-            cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
-            cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>());
-            mContext.timerDelegate.CancelTimer(this);
-            ReturnErrorOnFailure(mContext.timerDelegate.StartTimer(this, kCalibrationDuration));
-        }
-        return CHIP_NO_ERROR;
-    }
 
     if (type == Clusters::WindowCovering::WindowCoveringType::Lift)
     {
@@ -146,11 +143,6 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
     mContext.timerDelegate.CancelTimer(this);
     mMovingLift = false;
     mMovingTilt = false;
-
-    // Abort an in-progress fake calibration. Per spec 5.3.6.14.2, the only way to leave
-    // calibration mode is to complete the calibration routine, so we leave Mode's
-    // CalibrationMode bit set and positions null; the next movement command retries calibration.
-    mCalibrating = false;
 
     auto & cluster = WindowCoveringCluster();
 
@@ -197,26 +189,48 @@ void SimulatedWindowCovering::OnTargetPositionTiltChanged(DataModel::Nullable<Pe
     }
 }
 
+void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
+{
+    // Per spec 9.3.6.14.2, calibration mode is entered as soon as the bit is set (movement
+    // commands are rejected by WindowCoveringCluster's own motion lock while calibrating, so
+    // that can't be the trigger point - see HandleMovement()/GetMotionLockStatus()).
+    if (!newMode.Has(Mode::kCalibrationMode) || mCalibrating)
+    {
+        return;
+    }
+
+    ChipLogProgress(DeviceLayer, "WindowCovering: Starting fake calibration (%u ms)", kCalibrationDuration.count());
+    mCalibrating = true;
+    auto & cluster = WindowCoveringCluster();
+    cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
+    cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>());
+    mContext.timerDelegate.CancelTimer(this);
+    LogErrorOnFailure(mContext.timerDelegate.StartTimer(this, kCalibrationDuration));
+}
+
 void SimulatedWindowCovering::TimerFired()
 {
     auto & cluster = WindowCoveringCluster();
 
     if (mCalibrating)
     {
-        // Fake calibration finished: resolve to a known position, per spec 5.3.6.14.2 leave
-        // calibration mode by completing the routine, then run the deferred move for each axis.
+        // Fake calibration finished: resolve to a known position and leave calibration mode by
+        // completing the routine, per spec 9.3.6.14.2. No move was ever accepted by the cluster
+        // while calibrating (see OnModeChanged()), so there's nothing deferred to resume here -
+        // a client must send a fresh movement command now that the device is operational again.
         mCalibrating = false;
         cluster.SetCurrentPositionLiftPercent100ths(
             DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
         cluster.SetCurrentPositionTiltPercent100ths(
             DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
 
+        // NOTE: WindowCoveringCluster::WriteAttribute() does not currently reject a client write
+        // that clears CalibrationMode directly (spec 9.3.6.14.2 requires FAILURE in that case;
+        // see the disabled check there), so a client can bypass this simulated calibration by
+        // writing Mode=0 directly instead of waiting for it to complete.
         auto mode = cluster.GetMode();
         mode.Clear(Mode::kCalibrationMode);
         cluster.SetMode(mode);
-
-        LogErrorOnFailure(HandleMovement(Clusters::WindowCovering::WindowCoveringType::Lift));
-        LogErrorOnFailure(HandleMovement(Clusters::WindowCovering::WindowCoveringType::Tilt));
         return;
     }
 
