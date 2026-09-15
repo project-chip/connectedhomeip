@@ -30,6 +30,7 @@
 #include <lib/support/Span.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <oob-accessors/OOBDataSerializer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app::NamedPipe {
 
@@ -193,7 +194,7 @@ public:
 
         ByteSpan payload(buffer, writer.GetLengthWritten());
         CHIP_ERROR err = registry.HandleAction("SetAttribute"_span, payload);
-        if (err == CHIP_ERROR_NOT_FOUND)
+        if (err == CHIP_ERROR_NOT_FOUND || err == CHIP_IM_GLOBAL_STATUS(UnsupportedWrite))
         {
             return WriteAttributeToDataModel(payload);
         }

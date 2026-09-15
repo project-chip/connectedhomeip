@@ -25,6 +25,7 @@
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <oob-accessors/OOBDataSerializer.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app {
 
@@ -46,7 +47,7 @@ public:
 
         auto & buffer     = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
         CHIP_ERROR result = OOBAccessorRegistry::Instance().HandleAction("SetAttribute"_span, buffer);
-        if (result != CHIP_ERROR_NOT_FOUND)
+        if (result != CHIP_ERROR_NOT_FOUND && result != CHIP_IM_GLOBAL_STATUS(UnsupportedWrite))
         {
             if (result == CHIP_NO_ERROR)
             {

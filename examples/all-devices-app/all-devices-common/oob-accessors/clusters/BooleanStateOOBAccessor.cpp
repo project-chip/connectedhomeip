@@ -23,6 +23,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBDataSerializer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app {
 
@@ -60,7 +61,7 @@ std::optional<CHIP_ERROR> BooleanStateOOBAccessor::HandleSetAttribute(ByteSpan t
         return CHIP_NO_ERROR;
     }
     default:
-        return std::nullopt;
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
     }
 }
 

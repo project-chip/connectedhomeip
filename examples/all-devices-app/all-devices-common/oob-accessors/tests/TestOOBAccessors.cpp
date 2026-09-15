@@ -170,9 +170,10 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
-    // SetAttribute for unknown attribute (should return NOT_FOUND)
+    // SetAttribute for unknown attribute (should return UnsupportedWrite)
     writer.Init(buffer);
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
@@ -182,7 +183,8 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -227,7 +229,7 @@ TEST_F(TestOOBAccessors, BooleanStateOOBAccessor)
     EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
     EXPECT_FALSE(cluster.GetStateValue());
 
-    // SetAttribute for unknown attribute (should return NOT_FOUND)
+    // SetAttribute for unknown attribute (should return UnsupportedWrite)
     writer.Init(buffer);
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
@@ -237,7 +239,8 @@ TEST_F(TestOOBAccessors, BooleanStateOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

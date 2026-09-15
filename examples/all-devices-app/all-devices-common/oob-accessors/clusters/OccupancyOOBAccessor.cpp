@@ -25,6 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBDataSerializer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app {
 
@@ -61,8 +62,9 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetAttribute(ByteSpan tlvD
         return CHIP_NO_ERROR;
     }
     default:
-        // Writable attributes (such as HoldTime) fall through to the regular Matter DataModel write.
-        return std::nullopt;
+        // Return UnsupportedWrite here; callers (PigweedAttributeAccessor, NamedPipe::Dispatcher)
+        // fall back to the Matter DataModel provider for writable attributes such as HoldTime.
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
     }
 }
 
