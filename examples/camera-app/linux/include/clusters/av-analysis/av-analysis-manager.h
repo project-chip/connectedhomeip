@@ -72,6 +72,7 @@ public:
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
 <<<<<<< HEAD
+
 private:
 =======
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice) { mCameraDevice = aCameraDevice; }

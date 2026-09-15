@@ -152,6 +152,7 @@ public:
                                   Optional<NodeId> aSourceNodeId = NullOptional);
 
 >>>>>>> 05ad181 ([Camera] AV Analysis cluster test scripts (TC_AVANALY_2_4 to 2_14) and updates to cluster server and camera-app logic (#73851))
+
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
