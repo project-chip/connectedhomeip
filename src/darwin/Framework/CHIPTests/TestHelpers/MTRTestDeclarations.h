@@ -72,6 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #ifdef DEBUG
 @interface MTRDeviceController (TestDebug)
+@property (nonatomic, assign) BOOL unitTestSuppressGetSessionConnectivityMonitorFire;
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 @end
@@ -79,6 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRBaseDevice (TestDebug)
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
+- (void)invalidateCASESession;
 @end
 
 @interface MTRDevice (TestDebug)
