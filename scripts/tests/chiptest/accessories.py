@@ -29,8 +29,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Concatenate, ParamSpec, Self, TypeAlias, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
-from chiptest.concurrency.context import StartStopContextMixin, TerminableResource, mp_wrapped_spawn_context
-from chiptest.concurrency.process import ProcessConfig, WrappedProcess, with_annotated_exception
+from chiptest.concurrency.config import ProcessConfig
+from chiptest.concurrency.context import (StartStopContextMixin, TerminableResource, mp_wrapped_spawn_context,
+                                          with_annotated_exception)
+from chiptest.concurrency.process import WrappedProcess
 from chiptest.concurrency.work_queue import CancellableQueue, QueueCancelled
 from chiptest.log_config import LogConfig
 
@@ -73,7 +75,7 @@ class XmlRpcServerProcess(WrappedProcess[ProcessConfig, XmlRpcFuncCall, XmlRpcFu
 
     def _call(self, name: str, *args: Any) -> bool:
         log.debug("Call: %s%r", name, args)
-        self._work_queue.put(XmlRpcFuncCall(name, args))
+        self.work_queue.put(XmlRpcFuncCall(name, args))
 
         # Get the result from the response queue. If there was an exception, propagate it to the RPC server process, so that it can
         # be handled by it, and in turn propagated back to the caller of the RPC function.
@@ -225,7 +227,7 @@ class XmlRpcServerProcessManager(threading.Thread):
 
                 while True:
                     try:
-                        server._rsp_queue.put(self._proc_work(server._work_queue.get()))
+                        server._rsp_queue.put(self._proc_work(server.work_queue.get()))
                     except QueueCancelled:
                         log.debug("Stopping on a cancel event")
                         break
