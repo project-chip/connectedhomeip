@@ -8565,8 +8565,6 @@ endpoint 1 {
     callback attribute thermostatSuggestions;
     callback attribute currentThermostatSuggestion;
     callback attribute thermostatSuggestionNotFollowingReason;
-    callback attribute criticalFreezeProtection;
-    callback attribute criticalOverheatProtection;
     callback attribute sensors;
     callback attribute availableSensors;
     callback attribute enabledSensors;
