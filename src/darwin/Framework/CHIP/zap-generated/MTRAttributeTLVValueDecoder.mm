@@ -5741,6 +5741,32 @@ static id _Nullable DecodeAttributeValueForOvenModeCluster(AttributeId aAttribut
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
         // Not a known OvenMode attribute.
         break;
@@ -6060,6 +6086,32 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(AttributeId 
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
         // Not a known LaundryWasherMode attribute.
         break;
@@ -6137,6 +6189,32 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     default: {
@@ -6314,6 +6392,32 @@ static id _Nullable DecodeAttributeValueForRVCRunModeCluster(AttributeId aAttrib
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
         // Not a known RVCRunMode attribute.
         break;
@@ -6391,6 +6495,32 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeCluster(AttributeId aAttr
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     default: {
@@ -6615,6 +6745,32 @@ static id _Nullable DecodeAttributeValueForDishwasherModeCluster(AttributeId aAt
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     default: {
@@ -6942,6 +7098,32 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenModeCluster(AttributeId 
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     default: {
@@ -10332,6 +10514,32 @@ static id _Nullable DecodeAttributeValueForEnergyEVSEModeCluster(AttributeId aAt
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
         // Not a known EnergyEVSEMode attribute.
         break;
@@ -10411,6 +10619,32 @@ static id _Nullable DecodeAttributeValueForWaterHeaterModeCluster(AttributeId aA
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
         // Not a known WaterHeaterMode attribute.
         break;
@@ -10488,6 +10722,32 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementModeCluster(Att
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::CoreModeTags::Id: {
+        using TypeInfo = Attributes::CoreModeTags::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     default: {
@@ -13984,8 +14244,8 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::AvailableSensors::Id: {
-        using TypeInfo = Attributes::AvailableSensors::TypeInfo;
+    case Attributes::AvailableSensorHandles::Id: {
+        using TypeInfo = Attributes::AvailableSensorHandles::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -14010,8 +14270,8 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         }
         return value;
     }
-    case Attributes::EnabledSensors::Id: {
-        using TypeInfo = Attributes::EnabledSensors::TypeInfo;
+    case Attributes::EnabledSensorHandles::Id: {
+        using TypeInfo = Attributes::EnabledSensorHandles::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -14066,7 +14326,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                 newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.enabledSensors.begin();
+                    auto iter_2 = entry_0.enabledSensorHandles.begin();
                     while (iter_2.Next()) {
                         auto & entry_2 = iter_2.GetValue();
                         NSData * newElement_2;
@@ -14078,7 +14338,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                         *aError = err;
                         return nil;
                     }
-                    newElement_0.enabledSensors = array_2;
+                    newElement_0.enabledSensorHandles = array_2;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -20931,6 +21191,16 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
                 } else {
                     newElement_0.twoDCartesianZone = nil;
                 }
+                if (entry_0.nodeID.HasValue()) {
+                    newElement_0.nodeID = [NSNumber numberWithUnsignedLongLong:entry_0.nodeID.Value()];
+                } else {
+                    newElement_0.nodeID = nil;
+                }
+                if (entry_0.endpointID.HasValue()) {
+                    newElement_0.endpointID = [NSNumber numberWithUnsignedShort:entry_0.endpointID.Value()];
+                } else {
+                    newElement_0.endpointID = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -22411,6 +22681,21 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                 return nil;
             }
             value = array_0;
+        }
+        return value;
+    }
+    case Attributes::MaxZones::Id: {
+        using TypeInfo = Attributes::MaxZones::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
         }
         return value;
     }
@@ -25655,14 +25940,10 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
         } else {
             value.myBitmap = [NSNumber numberWithUnsignedInt:cppValue.myBitmap.Value().Raw()];
         }
-        if (cppValue.myEnum.HasValue()) {
-            if (cppValue.myEnum.Value().IsNull()) {
-                value.myEnum = nil;
-            } else {
-                value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.myEnum.Value().Value())];
-            }
-        } else {
+        if (cppValue.myEnum.IsNull()) {
             value.myEnum = nil;
+        } else {
+            value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.myEnum.Value())];
         }
         return value;
     }
@@ -26277,14 +26558,10 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
             } else {
                 value.myBitmap = [NSNumber numberWithUnsignedInt:cppValue.Value().myBitmap.Value().Raw()];
             }
-            if (cppValue.Value().myEnum.HasValue()) {
-                if (cppValue.Value().myEnum.Value().IsNull()) {
-                    value.myEnum = nil;
-                } else {
-                    value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().myEnum.Value().Value())];
-                }
-            } else {
+            if (cppValue.Value().myEnum.IsNull()) {
                 value.myEnum = nil;
+            } else {
+                value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().myEnum.Value())];
             }
         }
         return value;
