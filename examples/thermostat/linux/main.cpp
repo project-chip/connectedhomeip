@@ -25,19 +25,15 @@
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 #include "thermostat-delegate-impl.h"
-<<<<<<< HEAD
-=======
 #include "thermostat-hold-delegate-impl.h"
 #include "thermostat-mode-delegate-impl.h"
 #include "thermostat-presets-delegate-impl.h"
 #include "thermostat-sensors-delegate-impl.h"
 #include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
-    >>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
 
-    using namespace chip;
+using namespace chip;
 using namespace chip::app;
-// using namespace chip::app::Clusters;
 
 void OnIdentifyStart(Identify *)
 {
@@ -81,19 +77,6 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
-<<<<<<< HEAD
-void ApplicationInit()
-{
-    if (auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
-            chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
-        status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
-    }
-}
-
-void ApplicationShutdown() {}
-=======
 constexpr EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThermostatEndpoint);
@@ -120,7 +103,6 @@ void ApplicationShutdown()
     chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint,
                                                                            MatterClusterShutdownType::kClusterShutdown);
 }
->>>>>>> 3888116 ([HVAC] Initial implementation of Thermostat Sensors (#73484))
 
 int main(int argc, char * argv[])
 {
