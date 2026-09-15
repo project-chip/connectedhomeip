@@ -48,14 +48,6 @@
 # when doing manual dynamic linking), set:
 #   ignore_libs = true
 #
-# To select specific static archives with a GNU-compatible linker, set:
-#   static_libs = [ "foo" ]
-# Use extra_args = [ "--static" ] as well to include private dependencies.
-# Other libraries keep their normal linkage.
-#
-# To query a private installation without affecting other targets, set:
-#   pkg_config_path = "/path/to/lib/pkgconfig"
-#
 # To allow the build to proceed if (any of) the requested packages are absent, set:
 #   optional = true
 # In this case the resulting config object will be empty.
@@ -132,12 +124,6 @@ template("pkg_config") {
     if (defined(invoker.extra_args)) {
       args += invoker.extra_args
     }
-    if (defined(invoker.pkg_config_path)) {
-      args += [
-        "--pkg-config-path",
-        invoker.pkg_config_path,
-      ]
-    }
 
     # pkgresult = [present, includes, cflags, libs, lib_dirs]
     pkgresult = exec_script(pkg_config_script, args, "value")
@@ -151,25 +137,9 @@ template("pkg_config") {
       if (!defined(invoker.ignore_libs) || !invoker.ignore_libs) {
         libs = pkgresult[3]
         lib_dirs = pkgresult[4]
-        if (defined(invoker.static_libs)) {
-          libs = []
-          foreach(lib, pkgresult[3]) {
-            selected_lib = lib
-            foreach(static_lib, invoker.static_libs) {
-              if (lib == static_lib) {
-                selected_lib = ":lib${lib}.a"
-              }
-            }
-            libs += [ selected_lib ]
-          }
-        }
       }
 
-      forward_variables_from(invoker,
-                             [
-                               "defines",
-                               "ldflags",
-                             ])
+      forward_variables_from(invoker, [ "defines" ])
     }
   }
 

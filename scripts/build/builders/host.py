@@ -76,7 +76,6 @@ def _msan_validate_sysroot(chip_root: str) -> None:
 class HostCryptoLibrary(Enum):
     """Defines what cryptographic backend applications should use."""
     OPENSSL = auto()
-    OPENSSL_STATIC = auto()
     MBEDTLS = auto()
     BORINGSSL = auto()
     PSA = auto()
@@ -85,8 +84,6 @@ class HostCryptoLibrary(Enum):
     def gn_argument(self):
         if self == HostCryptoLibrary.OPENSSL:
             return 'chip_crypto="openssl"'
-        if self == HostCryptoLibrary.OPENSSL_STATIC:
-            return 'chip_crypto="openssl" chip_openssl_static=true'
         if self == HostCryptoLibrary.MBEDTLS:
             return 'chip_crypto="mbedtls"'
         if self == HostCryptoLibrary.BORINGSSL:
