@@ -1061,10 +1061,10 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     {
         secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
 
-        // A duplicate is still authentic, so updating on it would let a resent copy of an earlier message
-        // move the session's peer address and redirect outbound traffic.
-        // The cost is that a peer whose address changed is re-anchored by its next new message rather than by a retransmit; a
-        // retransmit and a resent copy are indistinguishable.
+        // Only a message with a new message counter may change the peer address: old messages can be
+        // captured and resent by anyone, and would otherwise let a third party choose where we send
+        // this session's traffic. If a peer changes its address, a retransmit from the new address
+        // therefore does not update it; its next new message does.
         Transport::PeerAddress mutablePeerAddress = peerAddress;
         CorrectPeerAddressInterfaceID(mutablePeerAddress);
         if (secureSession->GetPeerAddress() != mutablePeerAddress)
