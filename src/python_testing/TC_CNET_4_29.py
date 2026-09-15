@@ -430,14 +430,25 @@ class TC_CNET_4_29(WiFiFixtureMixin, CNETPDCBaseTest):
             await self.arm_failsafe(_CONNECT_FAILSAFE_EXPIRY_SECONDS)
             if any(network.networkID == _PDC_SSID for network in networks):
                 # Not only tidiness: the DUT may have no room for another network otherwise.
-                await self.send_single_cmd(cmd=cnet.Commands.RemoveNetwork(networkID=_PDC_SSID), endpoint=endpoint)
-            await self.send_single_cmd(
+                response = await self.send_single_cmd(
+                    cmd=cnet.Commands.RemoveNetwork(networkID=_PDC_SSID), endpoint=endpoint)
+                self.assert_network_config_success(response, f"RemoveNetwork for {_PDC_SSID!r}")
+            response = await self.send_single_cmd(
                 cmd=cnet.Commands.AddOrUpdateWiFiNetwork(ssid=operational_ssid, credentials=credentials.encode()),
                 endpoint=endpoint)
-            await self._connect_network(endpoint, operational_ssid)
+            self.assert_network_config_success(response, f"AddOrUpdateWiFiNetwork for {operational_ssid!r}")
+            # A lost ConnectNetworkResponse is the expected case, here as everywhere else in this
+            # test case, and whether the DUT arrived is what the re-discovery below answers. A
+            # response that did arrive and reports a failure is worth stopping on, since none of
+            # what follows can succeed after it.
+            status = await self._connect_network(endpoint, operational_ssid)
+            if status is not None:
+                asserts.assert_equal(status, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                                     f"ConnectNetwork for {operational_ssid!r} did not report NetworkingStatus "
+                                     "Success.")
 
         # Taking the access point down before we attempt to re-discover the DUT on the original
-        # network gets the DUT's address on this link out of the way: it would otherwise stays in
+        # network gets the DUT's address on this link out of the way: it would otherwise stay in
         # the mDNS resolver's cache for the record's TTL, and a link-local address is what the
         # sorter scores highest, so for as long as the interface is there the TH keeps being handed
         # the address the DUT has left.
