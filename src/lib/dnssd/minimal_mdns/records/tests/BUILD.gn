@@ -21,18 +21,32 @@ chip_test_suite("tests") {
   output_name = "libMinimalMdnsRecordsTests"
 
   test_sources = [
+<<<<<<< HEAD:src/lib/dnssd/minimal_mdns/records/tests/BUILD.gn
     "TestResourceRecord.cpp",
     "TestResourceRecordIP.cpp",
     "TestResourceRecordPtr.cpp",
     "TestResourceRecordSrv.cpp",
     "TestResourceRecordTxt.cpp",
+=======
+    "TestBdxOtaSenderPeerBinding.cpp",
+    "TestOTAProviderExample.cpp",
+>>>>>>> dec6004 ([OTA Provider Example] Bind BDX transfer to the QueryImage requester (#74130)):examples/ota-provider-app/ota-provider-common/tests/BUILD.gn
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+<<<<<<< HEAD:src/lib/dnssd/minimal_mdns/records/tests/BUILD.gn
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/dnssd/minimal_mdns/records",
+=======
+    "${chip_root}/examples/ota-provider-app/ota-provider-common",
+    "${chip_root}/src/app/clusters/ota-provider:user-consent",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/protocols/bdx",
+>>>>>>> dec6004 ([OTA Provider Example] Bind BDX transfer to the QueryImage requester (#74130)):examples/ota-provider-app/ota-provider-common/tests/BUILD.gn
   ]
 }
