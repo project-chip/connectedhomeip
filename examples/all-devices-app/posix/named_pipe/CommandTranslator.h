@@ -27,6 +27,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <oob-accessors/OOBDataSerializer.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app::NamedPipe {
@@ -171,6 +172,26 @@ public:
         ByteSpan payload;
         ReturnErrorOnFailure(message.Finalize(payload));
         return registry.HandleAction(actionName, payload);
+    }
+
+    template <typename T>
+    static CHIP_ERROR DispatchSetAttribute(OOBAccessorRegistry & registry, EndpointId endpointId, ClusterId clusterId,
+                                           AttributeId attributeId, const T & value)
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer, sizeof(buffer));
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagEndpointId), endpointId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagClusterId), clusterId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagAttributeId), attributeId));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagValue), value));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
+        ReturnErrorOnFailure(writer.Finalize());
+
+        return registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten()));
     }
 };
 

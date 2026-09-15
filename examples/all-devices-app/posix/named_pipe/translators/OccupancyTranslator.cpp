@@ -16,6 +16,11 @@
 
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 
+#include <clusters/OccupancySensing/AttributeIds.h>
+#include <clusters/OccupancySensing/ClusterId.h>
+#include <clusters/OccupancySensing/Enums.h>
+#include <lib/support/BitMask.h>
+
 namespace chip::app::NamedPipe {
 
 CHIP_ERROR OccupancyTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
@@ -38,7 +43,13 @@ CHIP_ERROR OccupancyTranslator::TranslateSetOccupancy(EndpointId endpointId, con
 {
     auto occupancy = ExtractBool(json, "Occupancy");
     VerifyOrReturnError(occupancy.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-    return DispatchAction(registry, "SetOccupancy"_span, endpointId, *occupancy);
+    BitMask<Clusters::OccupancySensing::OccupancyBitmap> occupancyMask;
+    if (*occupancy)
+    {
+        occupancyMask.Set(Clusters::OccupancySensing::OccupancyBitmap::kOccupied);
+    }
+    return DispatchSetAttribute(registry, endpointId, Clusters::OccupancySensing::Id,
+                                Clusters::OccupancySensing::Attributes::Occupancy::Id, occupancyMask);
 }
 
 CHIP_ERROR OccupancyTranslator::TranslateSetHoldTime(EndpointId endpointId, const Json::Value & json,

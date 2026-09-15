@@ -16,13 +16,25 @@
 
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 
+#include <access/SubjectDescriptor.h>
+#include <app/AttributeValueDecoder.h>
+#include <clusters/OccupancySensing/AttributeIds.h>
+#include <clusters/OccupancySensing/ClusterId.h>
+#include <clusters/OccupancySensing/Enums.h>
 #include <lib/core/TLV.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <oob-accessors/OOBDataSerializer.h>
 
 namespace chip::app {
 
 std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
 {
+    if (action.data_equal("SetAttribute"_span))
+    {
+        return HandleSetAttribute(tlvData);
+    }
     if (action.data_equal("SetOccupancy"_span))
     {
         return HandleSetOccupancy(tlvData);
@@ -32,6 +44,38 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleAction(CharSpan action, By
         return HandleSetHoldTime(tlvData);
     }
     return std::nullopt;
+}
+
+std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetAttribute(ByteSpan tlvData) const
+{
+    auto parseResult = OOBDataSerializer::ParseAttributeRequest(tlvData);
+    if (std::holds_alternative<CHIP_ERROR>(parseResult))
+    {
+        CHIP_ERROR err = std::get<CHIP_ERROR>(parseResult);
+        ChipLogError(Support, "Failed to parse OOB attribute request: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
+    VerifyOrReturnValue(request.path.mEndpointId == mEndpointId, std::nullopt);
+    VerifyOrReturnValue(request.path.mClusterId == Clusters::OccupancySensing::Id, std::nullopt);
+
+    switch (request.path.mAttributeId)
+    {
+    case Clusters::OccupancySensing::Attributes::Occupancy::Id: {
+        // Occupancy is read-only per spec; only the cluster API can set it.
+        Access::SubjectDescriptor subjectDescriptor{ .authMode = Access::AuthMode::kInternalDeviceAccess };
+        AttributeValueDecoder decoder(request.value, subjectDescriptor);
+        BitMask<Clusters::OccupancySensing::OccupancyBitmap> occupancy;
+        ReturnErrorOnFailure(decoder.Decode(occupancy));
+        mCluster.SetOccupancy(occupancy.Has(Clusters::OccupancySensing::OccupancyBitmap::kOccupied));
+        return CHIP_NO_ERROR;
+    }
+    default:
+        // HoldTime and the PIR/ultrasonic delays are writable per spec: decline so
+        // the caller falls through to the regular data-model write.
+        return std::nullopt;
+    }
 }
 
 std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetOccupancy(ByteSpan tlvData) const
