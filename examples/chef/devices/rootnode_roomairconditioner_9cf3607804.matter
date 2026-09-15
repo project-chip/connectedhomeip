@@ -2462,7 +2462,7 @@ endpoint 1 {
     ram      attribute speedMax default = 100;
     callback attribute speedSetting;
     callback attribute speedCurrent;
-    ram      attribute rockSupport default = 0x00;
+    ram      attribute rockSupport default = 0x01;
     callback attribute rockSetting;
     callback attribute airflowDirection;
     callback attribute generatedCommandList;
@@ -2480,8 +2480,8 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 2 {
