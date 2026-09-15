@@ -828,7 +828,6 @@ Alchemy: v1.7.9
 
     <command code="0xFE" source="client" name="AtomicRequest" optional="true" response="AtomicResponse">
       <description>Begins, Commits or Cancels an atomic write</description>
-      <access op="invoke" privilege="manage"/>
       <arg id="0" name="RequestType" type="AtomicRequestTypeEnum"/>
       <arg id="0" name="AttributeRequests" array="true" type="attrib_id"/>
       <arg id="0" name="Timeout" type="int16u" optional="true"/>

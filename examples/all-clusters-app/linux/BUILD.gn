@@ -63,7 +63,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tls-client-management-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/wifi-diagnostics-stub.cpp",
     "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
-    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
     "AllClustersCommandDelegate.cpp",
     "AllClustersCommandDelegate.h",
     "AppOptions.cpp",
@@ -79,6 +78,7 @@ source_set("chip-all-clusters-common") {
   deps = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/examples/thermostat/thermostat-common:thermostat-delegate-impl",
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/clusters/audio-control-server",
     "${chip_root}/src/app/clusters/groupcast",
