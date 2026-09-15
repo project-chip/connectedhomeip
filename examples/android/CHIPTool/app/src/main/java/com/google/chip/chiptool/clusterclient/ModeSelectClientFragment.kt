@@ -87,73 +87,75 @@ class ModeSelectClientFragment : Fragment() {
     val clusterId = ModeSelect.ID
     val attributeId = ChipPathId.forWildcard().id
     val path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
-    deviceController.readAttributePath(
-      object : ReportCallback {
-        override fun onError(
-          attributePath: ChipAttributePath?,
-          eventPath: ChipEventPath?,
-          e: Exception
-        ) {
-          requireActivity().runOnUiThread {
-            Toast.makeText(
-                requireActivity(),
-                R.string.ota_provider_invalid_attribute,
-                Toast.LENGTH_SHORT
-              )
-              .show()
-          }
-        }
-
-        override fun onReport(nodeState: NodeState?) {
-          val attributeStates =
-            nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.attributeStates
-              ?: return
-
-          requireActivity().runOnUiThread {
-            val description = attributeStates[ClusterIDMapping.ModeSelect.Attribute.Description.id]
-            binding.descriptionEd.setText(description?.value?.toString())
-
-            val standardNamespace =
-              attributeStates[ClusterIDMapping.ModeSelect.Attribute.StandardNamespace.id]
-            binding.standardNamespaceEd.setText(standardNamespace?.value?.toString())
-
-            val currentMode = attributeStates[ClusterIDMapping.ModeSelect.Attribute.CurrentMode.id]
-            binding.currentModeEd.setText(currentMode?.value?.toString())
-
-            setVisibility(
-              attributeStates[ClusterIDMapping.ModeSelect.Attribute.StartUpMode.id],
-              binding.startUpModeEd,
-              binding.startUpModeTv,
-              binding.startUpModeWriteBtn
-            )
-            setVisibility(
-              attributeStates[ClusterIDMapping.ModeSelect.Attribute.OnMode.id],
-              binding.onModeEd,
-              binding.onModeTv,
-              binding.onModeWriteBtn
-            )
-
-            val supportedModesTlv =
-              attributeStates[ClusterIDMapping.ModeSelect.Attribute.SupportedModes.id]?.tlv
-
-            supportedModesTlv?.let {
-              setSupportedModeSpinner(it, currentMode?.value?.toString()?.toUInt())
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
+        deviceController.readAttributePath(
+          object : ReportCallback {
+            override fun onError(
+              attributePath: ChipAttributePath?,
+              eventPath: ChipEventPath?,
+              e: Exception
+            ) {
+              requireActivity().runOnUiThread {
+                Toast.makeText(
+                    requireActivity(),
+                    R.string.ota_provider_invalid_attribute,
+                    Toast.LENGTH_SHORT
+                  )
+                  .show()
+              }
             }
-          }
-        }
-      },
-      devicePtr,
-      listOf<ChipAttributePath>(path),
-      0
-    )
+
+            override fun onReport(nodeState: NodeState?) {
+              val attributeStates =
+                nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.attributeStates
+                  ?: return
+
+              requireActivity().runOnUiThread {
+                val description =
+                  attributeStates[ClusterIDMapping.ModeSelect.Attribute.Description.id]
+                binding.descriptionEd.setText(description?.value?.toString())
+
+                val standardNamespace =
+                  attributeStates[ClusterIDMapping.ModeSelect.Attribute.StandardNamespace.id]
+                binding.standardNamespaceEd.setText(standardNamespace?.value?.toString())
+
+                val currentMode =
+                  attributeStates[ClusterIDMapping.ModeSelect.Attribute.CurrentMode.id]
+                binding.currentModeEd.setText(currentMode?.value?.toString())
+
+                setVisibility(
+                  attributeStates[ClusterIDMapping.ModeSelect.Attribute.StartUpMode.id],
+                  binding.startUpModeEd,
+                  binding.startUpModeTv,
+                  binding.startUpModeWriteBtn
+                )
+                setVisibility(
+                  attributeStates[ClusterIDMapping.ModeSelect.Attribute.OnMode.id],
+                  binding.onModeEd,
+                  binding.onModeTv,
+                  binding.onModeWriteBtn
+                )
+
+                val supportedModesTlv =
+                  attributeStates[ClusterIDMapping.ModeSelect.Attribute.SupportedModes.id]?.tlv
+
+                supportedModesTlv?.let {
+                  setSupportedModeSpinner(it, currentMode?.value?.toString()?.toUInt())
+                }
+              }
+            }
+          },
+          devicePtr,
+          listOf<ChipAttributePath>(path),
+          0
+        )
+      }
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun setVisibility(
@@ -203,65 +205,65 @@ class ModeSelectClientFragment : Fragment() {
   }
 
   private suspend fun changeToModeBtnClick() {
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
-    ChipClusters.ModeSelectCluster(devicePtr, addressUpdateFragment.endpointId)
-      .changeToMode(
-        object : ChipClusters.DefaultClusterCallback {
-          override fun onError(error: java.lang.Exception?) {
-            Log.d(TAG, "onError", error)
-            showMessage("Error : ${error.toString()}")
-          }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
+        ChipClusters.ModeSelectCluster(devicePtr, addressUpdateFragment.endpointId)
+          .changeToMode(
+            object : ChipClusters.DefaultClusterCallback {
+              override fun onError(error: java.lang.Exception?) {
+                Log.d(TAG, "onError", error)
+                showMessage("Error : ${error.toString()}")
+              }
 
-          override fun onSuccess() {
-            showMessage("Change Success")
-            scope.launch { readAttributeBtnClick() }
-          }
-        },
-        currentMode
-      )
+              override fun onSuccess() {
+                showMessage("Change Success")
+                scope.launch { readAttributeBtnClick() }
+              }
+            },
+            currentMode
+          )
+      }
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private suspend fun writeAttributeBtnClick(attribute: ModeSelect.Attribute, value: UInt) {
     val clusterId = ModeSelect.ID
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
-    deviceController.write(
-      object : WriteAttributesCallback {
-        override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {
-          showMessage("Write ${attribute.name} failure $ex")
-          Log.e(TAG, "Write ${attribute.name} failure", ex)
-        }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
+        deviceController.write(
+          object : WriteAttributesCallback {
+            override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {
+              showMessage("Write ${attribute.name} failure $ex")
+              Log.e(TAG, "Write ${attribute.name} failure", ex)
+            }
 
-        override fun onResponse(attributePath: ChipAttributePath, status: Status) {
-          showMessage("Write ${attribute.name} response: $status")
-        }
-      },
-      devicePtr,
-      listOf(
-        AttributeWriteRequest.newInstance(
-          addressUpdateFragment.endpointId,
-          clusterId,
-          attribute.id,
-          TlvWriter().put(AnonymousTag, value).getEncoded(),
-          Optional.empty()
+            override fun onResponse(attributePath: ChipAttributePath, status: Status) {
+              showMessage("Write ${attribute.name} response: $status")
+            }
+          },
+          devicePtr,
+          listOf(
+            AttributeWriteRequest.newInstance(
+              addressUpdateFragment.endpointId,
+              clusterId,
+              attribute.id,
+              TlvWriter().put(AnonymousTag, value).getEncoded(),
+              Optional.empty()
+            )
+          ),
+          0,
+          0
         )
-      ),
-      0,
-      0
-    )
+      }
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun ModeSelectClusterModeOptionStruct.show(): String {
