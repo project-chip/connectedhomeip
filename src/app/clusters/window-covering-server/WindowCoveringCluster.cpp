@@ -61,6 +61,26 @@ WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config
         VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kTilt), AppServer,
                            "Validation failed: PositionAwareTilt requires Tilt feature.");
     }
+
+    // Type is constrained by which of LF/TL are enabled (spec 9.3.6.2).
+    if (mFeatureMap.Has(Feature::kLift) && mFeatureMap.Has(Feature::kTilt))
+    {
+        VerifyOrDieWithMsg(mType == Type::kTiltBlindLiftAndTilt || mType == Type::kUnknown, AppServer,
+                           "Validation failed: Type is not valid when both Lift and Tilt are enabled.");
+    }
+    else if (mFeatureMap.Has(Feature::kLift))
+    {
+        VerifyOrDieWithMsg(mType == Type::kRollerShade || mType == Type::kRollerShade2Motor ||
+                               mType == Type::kRollerShadeExterior || mType == Type::kRollerShadeExterior2Motor ||
+                               mType == Type::kDrapery || mType == Type::kAwning || mType == Type::kShutter ||
+                               mType == Type::kProjectorScreen || mType == Type::kUnknown,
+                           AppServer, "Validation failed: Type is not valid when only Lift is enabled.");
+    }
+    else
+    {
+        VerifyOrDieWithMsg(mType == Type::kShutter || mType == Type::kTiltBlindTiltOnly || mType == Type::kUnknown, AppServer,
+                           "Validation failed: Type is not valid when only Tilt is enabled.");
+    }
 }
 
 CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
@@ -121,6 +141,9 @@ void WindowCoveringCluster::SetNumberOfActuationsTilt(uint16_t numOfTilts)
 void WindowCoveringCluster::SetConfigStatus(chip::BitMask<ConfigStatus> status)
 {
     VerifyOrReturn(SetAttributeValue(mConfigStatus, status, Attributes::ConfigStatus::Id));
+
+    mDelegate.OnConfigStatusChanged(status);
+
     VerifyOrReturn(mContext != nullptr);
 
     uint8_t rawConfigStatus = mConfigStatus.Raw();
@@ -148,6 +171,8 @@ void WindowCoveringCluster::SetTargetPositionLiftPercent100ths(NPercent100ths ne
     VerifyOrReturn(
         SetAttributeValue(mTargetPositionLiftPercent100ths, newTargetLift, Attributes::TargetPositionLiftPercent100ths::Id));
 
+    mDelegate.OnTargetPositionLiftChanged(newTargetLift);
+
     OperationalState opLift = OperationalState::Stall;
     if (!mTargetPositionLiftPercent100ths.IsNull() && !mCurrentPositionLiftPercent100ths.IsNull() &&
         mCurrentPositionLiftPercent100ths.Value() != mTargetPositionLiftPercent100ths.Value())
@@ -163,6 +188,8 @@ void WindowCoveringCluster::SetTargetPositionTiltPercent100ths(NPercent100ths ne
 {
     VerifyOrReturn(
         SetAttributeValue(mTargetPositionTiltPercent100ths, newTargetTilt, Attributes::TargetPositionTiltPercent100ths::Id));
+
+    mDelegate.OnTargetPositionTiltChanged(newTargetTilt);
 
     OperationalState opTilt = OperationalState::Stall;
     if (!mTargetPositionTiltPercent100ths.IsNull() && !mCurrentPositionTiltPercent100ths.IsNull() &&
@@ -243,6 +270,8 @@ void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
 
     VerifyOrReturn(SetAttributeValue(mMode, mode, Attributes::Mode::Id));
 
+    mDelegate.OnModeChanged(mode);
+
     if (mContext != nullptr)
     {
         uint8_t rawMode = mMode.Raw();
@@ -259,7 +288,9 @@ void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
 
 void WindowCoveringCluster::SetSafetyStatus(chip::BitMask<SafetyStatus> status)
 {
-    SetAttributeValue(mSafetyStatus, status, Attributes::SafetyStatus::Id);
+    VerifyOrReturn(SetAttributeValue(mSafetyStatus, status, Attributes::SafetyStatus::Id));
+
+    mDelegate.OnSafetyStatusChanged(status);
 }
 
 DataModel::ActionReturnStatus WindowCoveringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
