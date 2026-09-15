@@ -66,6 +66,7 @@ enum class StatusCode : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
+    kCoreModes        = 0x2,
     kDirectModeChange = 0x100000,
 };
 } // namespace RvcCleanMode
