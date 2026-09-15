@@ -114,8 +114,8 @@ The `setup-sdk-openssl` action validates the private installation already built
 into the image and exports only the SDK-specific selection variables. It fails
 if the installation is missing or has the wrong version; it never downloads or
 compiles OpenSSL. Publish the updated Docker image and update workflow image
-references before enabling this action. The published standalone tools come
-from the static job.
+references before enabling this action. The published standalone tools come from
+the static job.
 
 Static linking preserves the selected OpenSSL version; it does not add missing
 algorithms. For example, network-manager's Network Identity Management
