@@ -56,6 +56,7 @@ flowchart LR
         error.
     -   If no registered accessor handles the action (all return
         `std::nullopt`), `HandleAction` returns `CHIP_ERROR_NOT_FOUND`.
+-   **Standardized Attribute Writes**: To reduce boilerplate and unify handling, generic attribute updates should use the standardized `"SetAttribute"` action name. This approach uses a standard TLV payload format (encoding Endpoint ID, Cluster ID, Attribute ID, and Value) defined by `OOBDataSerializer`. If a custom OOB accessor does not intercept a `"SetAttribute"` request (e.g. for read-only attributes that require custom C++ API calls), the platform transports (Pigweed RPC, Named Pipe) gracefully fall back to writing directly to the Matter DataModel provider.
 -   **Transport Translation**: External protocols and transports (Named Pipe
     JSON, Pigweed RPC, Test Event Triggers) parse incoming requests, convert
     them into an action name and TLV payload, and forward them to
