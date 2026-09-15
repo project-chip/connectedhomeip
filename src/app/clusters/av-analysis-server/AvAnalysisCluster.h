@@ -208,6 +208,7 @@ public:
     CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId);
 
 >>>>>>> e054bb8 ([AVAnalysis] Server Implementation with Remote Context Detection (#73360))
+
 private:
     AvAnalysisServerLogic mLogic;
 };
