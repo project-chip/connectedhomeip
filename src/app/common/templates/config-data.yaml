@@ -81,9 +81,13 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
+<<<<<<< HEAD
     - Energy Preference
     - Laundry Dryer Controls
     - Mode Select
+=======
+    - Level Control
+>>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
     - Pump Configuration and Control
     - Thermostat User Interface Configuration
     # keep-sorted end

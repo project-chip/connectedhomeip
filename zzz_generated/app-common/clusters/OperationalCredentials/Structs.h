@@ -113,6 +113,40 @@ private:
 using DecodableType = Type;
 
 } // namespace NOCStruct
+<<<<<<< HEAD
+=======
+namespace PQCDeviceAttestationProfileStruct {
+enum class Fields : uint8_t
+{
+    kPAASupportedProfiles = 0,
+    kPAISupportedProfiles = 1,
+    kDACSupportedProfiles = 2,
+    kCDSupportedProfiles  = 3,
+};
+
+struct Type
+{
+public:
+    chip::BitMask<AttestationCryptoProfileBitmap> PAASupportedProfiles =
+        static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
+    chip::BitMask<AttestationCryptoProfileBitmap> PAISupportedProfiles =
+        static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
+    chip::BitMask<AttestationCryptoProfileBitmap> DACSupportedProfiles =
+        static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
+    chip::BitMask<AttestationCryptoProfileBitmap> CDSupportedProfiles =
+        static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PQCDeviceAttestationProfileStruct
+>>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
 } // namespace Structs
 } // namespace OperationalCredentials
 } // namespace Clusters

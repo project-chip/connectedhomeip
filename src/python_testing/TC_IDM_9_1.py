@@ -42,7 +42,12 @@ from mobly import asserts
 from support_modules.idm_support import IDMBaseTest, WritableAttributeInfo
 
 import matter.clusters as Clusters
+<<<<<<< HEAD
 from matter.interaction_model import InteractionModelError, Status
+=======
+from matter.exceptions import ChipStackError
+from matter.testing.conformance import is_disallowed
+>>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
 from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import is_standard_cluster_id
 from matter.testing.matter_testing import MatterBaseTest, TestStep
@@ -163,7 +168,12 @@ class TC_IDM_9_1(IDMBaseTest):
                 for attribute_id in self.checkable_attributes(cluster_id, device_cluster_data, xml_cluster):
                     xml_attr = xml_cluster.attributes[attribute_id]
 
-                    if xml_attr.write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
+                    # Skip obsolete/disallowed attributes (e.g. obsolete in spec)
+                    if is_disallowed(xml_attr.conformance):
+                        continue
+
+                    write_access = xml_attr.write_access
+                    if write_access is not None and write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
                         writable_attributes.append(WritableAttributeInfo(
                             endpoint_id=endpoint_id,
                             cluster_id=cluster_id,

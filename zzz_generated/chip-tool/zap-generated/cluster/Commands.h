@@ -4635,10 +4635,12 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeByCoreTag                                             |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -4683,6 +4685,44 @@ public:
 
 private:
     chip::app::Clusters::OvenMode::Commands::ChangeToMode::Type mRequest;
+};
+
+/*
+ * Command ChangeToModeByCoreTag
+ */
+class OvenModeChangeToModeByCoreTag : public ClusterCommand
+{
+public:
+    OvenModeChangeToModeByCoreTag(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-by-core-tag", credsIssuerConfig)
+    {
+        AddArgument("NewModeTag", 0, UINT16_MAX, &mRequest.newModeTag);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::OvenMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OvenMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::OvenMode::Commands::ChangeToModeByCoreTag::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -4783,10 +4823,12 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeByCoreTag                                             |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -4834,15 +4876,55 @@ private:
     chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Type mRequest;
 };
 
+/*
+ * Command ChangeToModeByCoreTag
+ */
+class LaundryWasherModeChangeToModeByCoreTag : public ClusterCommand
+{
+public:
+    LaundryWasherModeChangeToModeByCoreTag(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-by-core-tag", credsIssuerConfig)
+    {
+        AddArgument("NewModeTag", 0, UINT16_MAX, &mRequest.newModeTag);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::LaundryWasherMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::LaundryWasherMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeByCoreTag::Type mRequest;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster RefrigeratorAndTemperatureControlledCabinetMode             | 0x0052 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeByCoreTag                                             |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -4892,6 +4974,46 @@ private:
     chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToMode::Type mRequest;
 };
 
+/*
+ * Command ChangeToModeByCoreTag
+ */
+class RefrigeratorAndTemperatureControlledCabinetModeChangeToModeByCoreTag : public ClusterCommand
+{
+public:
+    RefrigeratorAndTemperatureControlledCabinetModeChangeToModeByCoreTag(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-by-core-tag", credsIssuerConfig)
+    {
+        AddArgument("NewModeTag", 0, UINT16_MAX, &mRequest.newModeTag);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeByCoreTag::Type mRequest;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster LaundryWasherControls                                       | 0x0053 |
 |------------------------------------------------------------------------------|
@@ -4916,10 +5038,12 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeByCoreTag                                             |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -4966,15 +5090,55 @@ private:
     chip::app::Clusters::RvcRunMode::Commands::ChangeToMode::Type mRequest;
 };
 
+/*
+ * Command ChangeToModeByCoreTag
+ */
+class RvcRunModeChangeToModeByCoreTag : public ClusterCommand
+{
+public:
+    RvcRunModeChangeToModeByCoreTag(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-by-core-tag", credsIssuerConfig)
+    {
+        AddArgument("NewModeTag", 0, UINT16_MAX, &mRequest.newModeTag);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcRunMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RvcRunMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcRunMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RvcRunMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::RvcRunMode::Commands::ChangeToModeByCoreTag::Type mRequest;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster RvcCleanMode                                                | 0x0055 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeByCoreTag                                             |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -5019,6 +5183,44 @@ public:
 
 private:
     chip::app::Clusters::RvcCleanMode::Commands::ChangeToMode::Type mRequest;
+};
+
+/*
+ * Command ChangeToModeByCoreTag
+ */
+class RvcCleanModeChangeToModeByCoreTag : public ClusterCommand
+{
+public:
+    RvcCleanModeChangeToModeByCoreTag(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-by-core-tag", credsIssuerConfig)
+    {
+        AddArgument("NewModeTag", 0, UINT16_MAX, &mRequest.newModeTag);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcCleanMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcCleanMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeByCoreTag::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -5106,10 +5308,12 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeByCoreTag                                             |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -5154,6 +5358,44 @@ public:
 
 private:
     chip::app::Clusters::DishwasherMode::Commands::ChangeToMode::Type mRequest;
+};
+
+/*
+ * Command ChangeToModeByCoreTag
+ */
+class DishwasherModeChangeToModeByCoreTag : public ClusterCommand
+{
+public:
+    DishwasherModeChangeToModeByCoreTag(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-by-core-tag", credsIssuerConfig)
+    {
+        AddArgument("NewModeTag", 0, UINT16_MAX, &mRequest.newModeTag);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DishwasherMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DishwasherMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DishwasherMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DishwasherMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DishwasherMode::Commands::ChangeToModeByCoreTag::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -5355,6 +5597,7 @@ private:
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -7890,10 +8133,12 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeByCoreTag                                             |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -7940,15 +8185,55 @@ private:
     chip::app::Clusters::EnergyEvseMode::Commands::ChangeToMode::Type mRequest;
 };
 
+/*
+ * Command ChangeToModeByCoreTag
+ */
+class EnergyEvseModeChangeToModeByCoreTag : public ClusterCommand
+{
+public:
+    EnergyEvseModeChangeToModeByCoreTag(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-by-core-tag", credsIssuerConfig)
+    {
+        AddArgument("NewModeTag", 0, UINT16_MAX, &mRequest.newModeTag);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::EnergyEvseMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::EnergyEvseMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeByCoreTag::Type mRequest;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster WaterHeaterMode                                             | 0x009E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeByCoreTag                                             |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -7995,15 +8280,55 @@ private:
     chip::app::Clusters::WaterHeaterMode::Commands::ChangeToMode::Type mRequest;
 };
 
+/*
+ * Command ChangeToModeByCoreTag
+ */
+class WaterHeaterModeChangeToModeByCoreTag : public ClusterCommand
+{
+public:
+    WaterHeaterModeChangeToModeByCoreTag(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-by-core-tag", credsIssuerConfig)
+    {
+        AddArgument("NewModeTag", 0, UINT16_MAX, &mRequest.newModeTag);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::WaterHeaterMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WaterHeaterMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::WaterHeaterMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WaterHeaterMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::WaterHeaterMode::Commands::ChangeToModeByCoreTag::Type mRequest;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster DeviceEnergyManagementMode                                  | 0x009F |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeByCoreTag                                             |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
 | * CurrentMode                                                       | 0x0001 |
+| * CoreModeTags                                                      | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -8049,6 +8374,44 @@ public:
 
 private:
     chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToMode::Type mRequest;
+};
+
+/*
+ * Command ChangeToModeByCoreTag
+ */
+class DeviceEnergyManagementModeChangeToModeByCoreTag : public ClusterCommand
+{
+public:
+    DeviceEnergyManagementModeChangeToModeByCoreTag(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-by-core-tag", credsIssuerConfig)
+    {
+        AddArgument("NewModeTag", 0, UINT16_MAX, &mRequest.newModeTag);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagementMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagementMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeByCoreTag::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeByCoreTag::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10129,8 +10492,8 @@ private:
 | * CriticalFreezeProtection                                          | 0x0057 |
 | * CriticalOverheatProtection                                        | 0x0058 |
 | * Sensors                                                           | 0x0059 |
-| * AvailableSensors                                                  | 0x005A |
-| * EnabledSensors                                                    | 0x005B |
+| * AvailableSensorHandles                                            | 0x005A |
+| * EnabledSensorHandles                                              | 0x005B |
 | * NumberOfSensorScheduleTransitions                                 | 0x005C |
 | * SensorSchedule                                                    | 0x005D |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -16174,6 +16537,8 @@ public:
         ClusterCommand("create-two-dcartesian-zone", credsIssuerConfig), mComplex_Zone(&mRequest.zone)
     {
         AddArgument("Zone", &mComplex_Zone);
+        AddArgument("NodeID", 0, UINT64_MAX, &mRequest.nodeID);
+        AddArgument("EndpointID", 0, UINT16_MAX, &mRequest.endpointID);
         ClusterCommand::AddArguments();
     }
 
@@ -16214,6 +16579,8 @@ public:
     {
         AddArgument("ZoneID", 0, UINT16_MAX, &mRequest.zoneID);
         AddArgument("Zone", &mComplex_Zone);
+        AddArgument("NodeID", 0, UINT64_MAX, &mRequest.nodeID);
+        AddArgument("EndpointID", 0, UINT16_MAX, &mRequest.endpointID);
         ClusterCommand::AddArguments();
     }
 
@@ -24936,14 +25303,16 @@ void registerClusterOvenMode(Commands & commands, CredentialIssuerCommands * cre
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),   //
-        make_unique<OvenModeChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),            //
+        make_unique<OvenModeChangeToMode>(credsIssuerConfig),          //
+        make_unique<OvenModeChangeToModeByCoreTag>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -24955,6 +25324,8 @@ void registerClusterOvenMode(Commands & commands, CredentialIssuerCommands * cre
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -24969,6 +25340,7 @@ void registerClusterOvenMode(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25181,14 +25553,16 @@ void registerClusterLaundryWasherMode(Commands & commands, CredentialIssuerComma
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),            //
-        make_unique<LaundryWasherModeChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                     //
+        make_unique<LaundryWasherModeChangeToMode>(credsIssuerConfig),          //
+        make_unique<LaundryWasherModeChangeToModeByCoreTag>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25200,6 +25574,8 @@ void registerClusterLaundryWasherMode(Commands & commands, CredentialIssuerComma
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25214,6 +25590,7 @@ void registerClusterLaundryWasherMode(Commands & commands, CredentialIssuerComma
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25239,14 +25616,16 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinetMode(Commands & c
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                          //
-        make_unique<RefrigeratorAndTemperatureControlledCabinetModeChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                                   //
+        make_unique<RefrigeratorAndTemperatureControlledCabinetModeChangeToMode>(credsIssuerConfig),          //
+        make_unique<RefrigeratorAndTemperatureControlledCabinetModeChangeToModeByCoreTag>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25258,6 +25637,8 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinetMode(Commands & c
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25272,6 +25653,7 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinetMode(Commands & c
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25361,14 +25743,16 @@ void registerClusterRvcRunMode(Commands & commands, CredentialIssuerCommands * c
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),     //
-        make_unique<RvcRunModeChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),              //
+        make_unique<RvcRunModeChangeToMode>(credsIssuerConfig),          //
+        make_unique<RvcRunModeChangeToModeByCoreTag>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25380,6 +25764,8 @@ void registerClusterRvcRunMode(Commands & commands, CredentialIssuerCommands * c
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25394,6 +25780,7 @@ void registerClusterRvcRunMode(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25418,14 +25805,16 @@ void registerClusterRvcCleanMode(Commands & commands, CredentialIssuerCommands *
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),       //
-        make_unique<RvcCleanModeChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                //
+        make_unique<RvcCleanModeChangeToMode>(credsIssuerConfig),          //
+        make_unique<RvcCleanModeChangeToModeByCoreTag>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25437,6 +25826,8 @@ void registerClusterRvcCleanMode(Commands & commands, CredentialIssuerCommands *
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25451,6 +25842,7 @@ void registerClusterRvcCleanMode(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25614,14 +26006,16 @@ void registerClusterDishwasherMode(Commands & commands, CredentialIssuerCommands
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),         //
-        make_unique<DishwasherModeChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                  //
+        make_unique<DishwasherModeChangeToMode>(credsIssuerConfig),          //
+        make_unique<DishwasherModeChangeToModeByCoreTag>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25633,6 +26027,8 @@ void registerClusterDishwasherMode(Commands & commands, CredentialIssuerCommands
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25647,6 +26043,7 @@ void registerClusterDishwasherMode(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25929,6 +26326,7 @@ void registerClusterMicrowaveOvenMode(Commands & commands, CredentialIssuerComma
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25940,6 +26338,8 @@ void registerClusterMicrowaveOvenMode(Commands & commands, CredentialIssuerComma
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25954,6 +26354,7 @@ void registerClusterMicrowaveOvenMode(Commands & commands, CredentialIssuerComma
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -27686,14 +28087,16 @@ void registerClusterEnergyEvseMode(Commands & commands, CredentialIssuerCommands
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),         //
-        make_unique<EnergyEvseModeChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                  //
+        make_unique<EnergyEvseModeChangeToMode>(credsIssuerConfig),          //
+        make_unique<EnergyEvseModeChangeToModeByCoreTag>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -27705,6 +28108,8 @@ void registerClusterEnergyEvseMode(Commands & commands, CredentialIssuerCommands
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -27719,6 +28124,7 @@ void registerClusterEnergyEvseMode(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -27743,14 +28149,16 @@ void registerClusterWaterHeaterMode(Commands & commands, CredentialIssuerCommand
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),          //
-        make_unique<WaterHeaterModeChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
+        make_unique<WaterHeaterModeChangeToMode>(credsIssuerConfig),          //
+        make_unique<WaterHeaterModeChangeToModeByCoreTag>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -27762,6 +28170,8 @@ void registerClusterWaterHeaterMode(Commands & commands, CredentialIssuerCommand
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -27776,6 +28186,7 @@ void registerClusterWaterHeaterMode(Commands & commands, CredentialIssuerCommand
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -27800,14 +28211,16 @@ void registerClusterDeviceEnergyManagementMode(Commands & commands, CredentialIs
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                     //
-        make_unique<DeviceEnergyManagementModeChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                              //
+        make_unique<DeviceEnergyManagementModeChangeToMode>(credsIssuerConfig),          //
+        make_unique<DeviceEnergyManagementModeChangeToModeByCoreTag>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -27819,6 +28232,8 @@ void registerClusterDeviceEnergyManagementMode(Commands & commands, CredentialIs
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "core-mode-tags", Attributes::CoreModeTags::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -27833,6 +28248,7 @@ void registerClusterDeviceEnergyManagementMode(Commands & commands, CredentialIs
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "core-mode-tags", Attributes::CoreModeTags::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29278,10 +29694,10 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
-                                   credsIssuerConfig),                                                            //
-        make_unique<ReadAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "available-sensors", Attributes::AvailableSensors::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "enabled-sensors", Attributes::EnabledSensors::Id, credsIssuerConfig),     //
+                                   credsIssuerConfig),                                                                         //
+        make_unique<ReadAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, "available-sensor-handles", Attributes::AvailableSensorHandles::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "enabled-sensor-handles", Attributes::EnabledSensorHandles::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "number-of-sensor-schedule-transitions", Attributes::NumberOfSensorScheduleTransitions::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "sensor-schedule", Attributes::SensorSchedule::Id, credsIssuerConfig),              //
@@ -29474,9 +29890,9 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
             chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ThermostatSensorStruct::Type>>>(
             Id, "sensors", Attributes::Sensors::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
-            Id, "available-sensors", Attributes::AvailableSensors::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "available-sensor-handles", Attributes::AvailableSensorHandles::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
-            Id, "enabled-sensors", Attributes::EnabledSensors::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "enabled-sensor-handles", Attributes::EnabledSensorHandles::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-sensor-schedule-transitions", 0, UINT8_MAX,
                                              Attributes::NumberOfSensorScheduleTransitions::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
@@ -29586,10 +30002,11 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "critical-freeze-protection", Attributes::CriticalFreezeProtection::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "critical-overheat-protection", Attributes::CriticalOverheatProtection::Id,
-                                        credsIssuerConfig),                                                            //
-        make_unique<SubscribeAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "available-sensors", Attributes::AvailableSensors::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "enabled-sensors", Attributes::EnabledSensors::Id, credsIssuerConfig),     //
+                                        credsIssuerConfig),                                         //
+        make_unique<SubscribeAttribute>(Id, "sensors", Attributes::Sensors::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "available-sensor-handles", Attributes::AvailableSensorHandles::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "enabled-sensor-handles", Attributes::EnabledSensorHandles::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-sensor-schedule-transitions",
                                         Attributes::NumberOfSensorScheduleTransitions::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "sensor-schedule", Attributes::SensorSchedule::Id, credsIssuerConfig),              //

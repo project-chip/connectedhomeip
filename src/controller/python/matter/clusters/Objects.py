@@ -309,6 +309,16 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
 
+        class CertificationTypeEnum(MatterIntEnum):
+            kDeviceAttestationPKI = 0x00
+            kOperationalPKI = 0x01
+            kVIDSignerPKI = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class LandmarkTag(MatterIntEnum):
             kAirConditioner = 0x00
             kAirPurifier = 0x01
@@ -402,6 +412,15 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 18
+
+        class MediumType(MatterIntEnum):
+            kAir = 0x00
+            kWater = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
 
         class PositionTag(MatterIntEnum):
             kLeft = 0x00
@@ -701,12 +720,12 @@ class Globals:
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="myBitmap", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]),
+                        ClusterObjectFieldDescriptor(Label="myEnum", Tag=2, Type=typing.Union[Nullable, Globals.Enums.TestGlobalEnum]),
                     ])
 
             name: 'str' = ""
             myBitmap: 'typing.Union[Nullable, uint]' = NullValue
-            myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
+            myEnum: 'typing.Union[Nullable, Globals.Enums.TestGlobalEnum]' = NullValue
 
         @dataclass
         class ViewportStruct(ClusterObject):
@@ -12944,6 +12963,26 @@ class OperationalCredentials(Cluster):
             vvsc: 'typing.Optional[bytes]' = None
             fabricIndex: 'uint' = 0
 
+<<<<<<< HEAD
+=======
+        @dataclass
+        class PQCDeviceAttestationProfileStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="PAASupportedProfiles", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="PAISupportedProfiles", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="DACSupportedProfiles", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="CDSupportedProfiles", Tag=3, Type=uint),
+                    ])
+
+            PAASupportedProfiles: 'uint' = 0
+            PAISupportedProfiles: 'uint' = 0
+            DACSupportedProfiles: 'uint' = 0
+            CDSupportedProfiles: 'uint' = 0
+
+>>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
     class Commands:
         @dataclass
         class AttestationRequest(ClusterCommand):
@@ -15295,6 +15334,7 @@ class OvenMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[OvenMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -15304,6 +15344,7 @@ class OvenMode(Cluster):
 
     supportedModes: typing.List[OvenMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -15340,6 +15381,10 @@ class OvenMode(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 10
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCoreModes = 0x2
 
     class Structs:
         @dataclass
@@ -15405,6 +15450,22 @@ class OvenMode(Cluster):
             status: uint = 0
             statusText: typing.Optional[str] = None
 
+        @dataclass
+        class ChangeToModeByCoreTag(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000049
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ChangeToModeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newModeTag", Tag=0, Type=uint),
+                    ])
+
+            newModeTag: uint = 0
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -15437,6 +15498,22 @@ class OvenMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000049
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -16090,6 +16167,7 @@ class LaundryWasherMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[LaundryWasherMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -16099,6 +16177,7 @@ class LaundryWasherMode(Cluster):
 
     supportedModes: typing.List[LaundryWasherMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -16126,6 +16205,10 @@ class LaundryWasherMode(Cluster):
             # cluster. As a result having kUnknownEnumValue in this enum is error
             # prone, and was removed. See
             # src/app/common/templates/config-data.yaml.
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCoreModes = 0x2
 
     class Structs:
         @dataclass
@@ -16191,6 +16274,22 @@ class LaundryWasherMode(Cluster):
             status: uint = 0
             statusText: typing.Optional[str] = None
 
+        @dataclass
+        class ChangeToModeByCoreTag(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000051
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ChangeToModeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newModeTag", Tag=0, Type=uint),
+                    ])
+
+            newModeTag: uint = 0
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -16223,6 +16322,22 @@ class LaundryWasherMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000051
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -16315,6 +16430,7 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[RefrigeratorAndTemperatureControlledCabinetMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -16324,6 +16440,7 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
 
     supportedModes: typing.List[RefrigeratorAndTemperatureControlledCabinetMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -16349,6 +16466,10 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
             # cluster. As a result having kUnknownEnumValue in this enum is error
             # prone, and was removed. See
             # src/app/common/templates/config-data.yaml.
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCoreModes = 0x2
 
     class Structs:
         @dataclass
@@ -16414,6 +16535,22 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
             status: uint = 0
             statusText: typing.Optional[str] = None
 
+        @dataclass
+        class ChangeToModeByCoreTag(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000052
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ChangeToModeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newModeTag", Tag=0, Type=uint),
+                    ])
+
+            newModeTag: uint = 0
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -16446,6 +16583,22 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000052
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -16730,6 +16883,7 @@ class RvcRunMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[RvcRunMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -16739,6 +16893,7 @@ class RvcRunMode(Cluster):
 
     supportedModes: typing.List[RvcRunMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -16783,6 +16938,7 @@ class RvcRunMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
+            kCoreModes = 0x2
             kDirectModeChange = 0x100000
 
     class Structs:
@@ -16849,6 +17005,22 @@ class RvcRunMode(Cluster):
             status: uint = 0
             statusText: typing.Optional[str] = None
 
+        @dataclass
+        class ChangeToModeByCoreTag(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000054
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ChangeToModeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newModeTag", Tag=0, Type=uint),
+                    ])
+
+            newModeTag: uint = 0
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -16881,6 +17053,22 @@ class RvcRunMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000054
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -16973,6 +17161,7 @@ class RvcCleanMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[RvcCleanMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -16982,6 +17171,7 @@ class RvcCleanMode(Cluster):
 
     supportedModes: typing.List[RvcCleanMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -17020,6 +17210,7 @@ class RvcCleanMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
+            kCoreModes = 0x2
             kDirectModeChange = 0x100000
 
     class Structs:
@@ -17086,6 +17277,22 @@ class RvcCleanMode(Cluster):
             status: uint = 0
             statusText: typing.Optional[str] = None
 
+        @dataclass
+        class ChangeToModeByCoreTag(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000055
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ChangeToModeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newModeTag", Tag=0, Type=uint),
+                    ])
+
+            newModeTag: uint = 0
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -17118,6 +17325,22 @@ class RvcCleanMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000055
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -17633,6 +17856,7 @@ class DishwasherMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[DishwasherMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -17642,6 +17866,7 @@ class DishwasherMode(Cluster):
 
     supportedModes: typing.List[DishwasherMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -17668,6 +17893,10 @@ class DishwasherMode(Cluster):
             # cluster. As a result having kUnknownEnumValue in this enum is error
             # prone, and was removed. See
             # src/app/common/templates/config-data.yaml.
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCoreModes = 0x2
 
     class Structs:
         @dataclass
@@ -17733,6 +17962,22 @@ class DishwasherMode(Cluster):
             status: uint = 0
             statusText: typing.Optional[str] = None
 
+        @dataclass
+        class ChangeToModeByCoreTag(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000059
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ChangeToModeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newModeTag", Tag=0, Type=uint),
+                    ])
+
+            newModeTag: uint = 0
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -17765,6 +18010,22 @@ class DishwasherMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000059
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -18879,6 +19140,7 @@ class MicrowaveOvenMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[MicrowaveOvenMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -18888,6 +19150,7 @@ class MicrowaveOvenMode(Cluster):
 
     supportedModes: typing.List[MicrowaveOvenMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -18913,6 +19176,10 @@ class MicrowaveOvenMode(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 10
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kCoreModes = 0x2
 
     class Structs:
         @dataclass
@@ -18975,6 +19242,22 @@ class MicrowaveOvenMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000005E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -26784,6 +27067,7 @@ class EnergyEvseMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[EnergyEvseMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -26793,6 +27077,7 @@ class EnergyEvseMode(Cluster):
 
     supportedModes: typing.List[EnergyEvseMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -26823,7 +27108,7 @@ class EnergyEvseMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kOnOff = 0x1
+            kCoreModes = 0x2
 
     class Structs:
         @dataclass
@@ -26889,6 +27174,22 @@ class EnergyEvseMode(Cluster):
             status: uint = 0
             statusText: typing.Optional[str] = None
 
+        @dataclass
+        class ChangeToModeByCoreTag(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000009D
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ChangeToModeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newModeTag", Tag=0, Type=uint),
+                    ])
+
+            newModeTag: uint = 0
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -26921,6 +27222,22 @@ class EnergyEvseMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -27013,6 +27330,7 @@ class WaterHeaterMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[WaterHeaterMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -27022,6 +27340,7 @@ class WaterHeaterMode(Cluster):
 
     supportedModes: typing.List[WaterHeaterMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -27051,7 +27370,7 @@ class WaterHeaterMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kOnOff = 0x1
+            kCoreModes = 0x2
 
     class Structs:
         @dataclass
@@ -27117,6 +27436,22 @@ class WaterHeaterMode(Cluster):
             status: uint = 0
             statusText: typing.Optional[str] = None
 
+        @dataclass
+        class ChangeToModeByCoreTag(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000009E
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ChangeToModeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newModeTag", Tag=0, Type=uint),
+                    ])
+
+            newModeTag: uint = 0
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -27149,6 +27484,22 @@ class WaterHeaterMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -27241,6 +27592,7 @@ class DeviceEnergyManagementMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[DeviceEnergyManagementMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="coreModeTags", Tag=0x00000004, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -27250,6 +27602,7 @@ class DeviceEnergyManagementMode(Cluster):
 
     supportedModes: typing.List[DeviceEnergyManagementMode.Structs.ModeOptionStruct] = field(default_factory=lambda: [])
     currentMode: uint = 0
+    coreModeTags: typing.Optional[typing.List[uint]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -27280,7 +27633,11 @@ class DeviceEnergyManagementMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
+<<<<<<< HEAD
             kOnOff = 0x1
+=======
+            kCoreModes = 0x2
+>>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
 
     class Structs:
         @dataclass
@@ -27346,6 +27703,22 @@ class DeviceEnergyManagementMode(Cluster):
             status: uint = 0
             statusText: typing.Optional[str] = None
 
+        @dataclass
+        class ChangeToModeByCoreTag(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000009F
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ChangeToModeResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newModeTag", Tag=0, Type=uint),
+                    ])
+
+            newModeTag: uint = 0
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -27378,6 +27751,22 @@ class DeviceEnergyManagementMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+        @dataclass
+        class CoreModeTags(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000009F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
+
+            value: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -33986,8 +34375,8 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="criticalFreezeProtection", Tag=0x00000057, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="criticalOverheatProtection", Tag=0x00000058, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="sensors", Tag=0x00000059, Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]]),
-                ClusterObjectFieldDescriptor(Label="availableSensors", Tag=0x0000005A, Type=typing.Optional[typing.List[bytes]]),
-                ClusterObjectFieldDescriptor(Label="enabledSensors", Tag=0x0000005B, Type=typing.Optional[typing.List[bytes]]),
+                ClusterObjectFieldDescriptor(Label="availableSensorHandles", Tag=0x0000005A, Type=typing.Optional[typing.List[bytes]]),
+                ClusterObjectFieldDescriptor(Label="enabledSensorHandles", Tag=0x0000005B, Type=typing.Optional[typing.List[bytes]]),
                 ClusterObjectFieldDescriptor(Label="numberOfSensorScheduleTransitions", Tag=0x0000005C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="sensorSchedule", Tag=0x0000005D, Type=typing.Optional[typing.List[Thermostat.Structs.SensorScheduleTransitionStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -34064,8 +34453,8 @@ class Thermostat(Cluster):
     criticalFreezeProtection: typing.Optional[bool] = None
     criticalOverheatProtection: typing.Optional[bool] = None
     sensors: typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]] = None
-    availableSensors: typing.Optional[typing.List[bytes]] = None
-    enabledSensors: typing.Optional[typing.List[bytes]] = None
+    availableSensorHandles: typing.Optional[typing.List[bytes]] = None
+    enabledSensorHandles: typing.Optional[typing.List[bytes]] = None
     numberOfSensorScheduleTransitions: typing.Optional[uint] = None
     sensorSchedule: typing.Optional[typing.List[Thermostat.Structs.SensorScheduleTransitionStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -34411,12 +34800,12 @@ class Thermostat(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transitionTime", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="enabledSensors", Tag=2, Type=typing.List[bytes]),
+                        ClusterObjectFieldDescriptor(Label="enabledSensorHandles", Tag=2, Type=typing.List[bytes]),
                     ])
 
             dayOfWeek: 'uint' = 0
             transitionTime: 'uint' = 0
-            enabledSensors: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            enabledSensorHandles: 'typing.List[bytes]' = field(default_factory=lambda: [])
 
         @dataclass
         class ThermostatSensorStruct(ClusterObject):
@@ -35763,7 +36152,7 @@ class Thermostat(Cluster):
             value: typing.Optional[typing.List[Thermostat.Structs.ThermostatSensorStruct]] = None
 
         @dataclass
-        class AvailableSensors(ClusterAttributeDescriptor):
+        class AvailableSensorHandles(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000201
@@ -35779,7 +36168,7 @@ class Thermostat(Cluster):
             value: typing.Optional[typing.List[bytes]] = None
 
         @dataclass
-        class EnabledSensors(ClusterAttributeDescriptor):
+        class EnabledSensorHandles(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000201
@@ -53368,6 +53757,7 @@ class ZoneManagement(Cluster):
             kPerZoneSensitivity = 0x2
             kUserDefined = 0x4
             kFocusZones = 0x8
+            kRemoteZones = 0x10
 
     class Structs:
         @dataclass
@@ -53410,12 +53800,16 @@ class ZoneManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="zoneType", Tag=1, Type=ZoneManagement.Enums.ZoneTypeEnum),
                         ClusterObjectFieldDescriptor(Label="zoneSource", Tag=2, Type=ZoneManagement.Enums.ZoneSourceEnum),
                         ClusterObjectFieldDescriptor(Label="twoDCartesianZone", Tag=3, Type=typing.Optional[ZoneManagement.Structs.TwoDCartesianZoneStruct]),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=5, Type=typing.Optional[uint]),
                     ])
 
             zoneID: 'uint' = 0
             zoneType: 'ZoneManagement.Enums.ZoneTypeEnum' = 0
             zoneSource: 'ZoneManagement.Enums.ZoneSourceEnum' = 0
             twoDCartesianZone: 'typing.Optional[ZoneManagement.Structs.TwoDCartesianZoneStruct]' = None
+            nodeID: 'typing.Optional[uint]' = None
+            endpointID: 'typing.Optional[uint]' = None
 
         @dataclass
         class ZoneTriggerControlStruct(ClusterObject):
@@ -53451,9 +53845,13 @@ class ZoneManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="zone", Tag=0, Type=ZoneManagement.Structs.TwoDCartesianZoneStruct),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=2, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             zone: ZoneManagement.Structs.TwoDCartesianZoneStruct = field(default_factory=lambda: ZoneManagement.Structs.TwoDCartesianZoneStruct())
+            nodeID: typing.Union[None, Nullable, uint] = None
+            endpointID: typing.Union[None, Nullable, uint] = None
 
         @dataclass
         class CreateTwoDCartesianZoneResponse(ClusterCommand):
@@ -53484,10 +53882,14 @@ class ZoneManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="zone", Tag=1, Type=ZoneManagement.Structs.TwoDCartesianZoneStruct),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=3, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             zoneID: uint = 0
             zone: ZoneManagement.Structs.TwoDCartesianZoneStruct = field(default_factory=lambda: ZoneManagement.Structs.TwoDCartesianZoneStruct())
+            nodeID: typing.Union[None, Nullable, uint] = None
+            endpointID: typing.Union[None, Nullable, uint] = None
 
         @dataclass
         class RemoveZone(ClusterCommand):
@@ -53747,10 +54149,14 @@ class ZoneManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="zone", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=ZoneManagement.Enums.ZoneEventTriggeredReasonEnum),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             zone: uint = 0
             reason: ZoneManagement.Enums.ZoneEventTriggeredReasonEnum = 0
+            nodeID: typing.Optional[uint] = None
+            endpointID: typing.Optional[uint] = None
 
         @dataclass
         class ZoneStopped(ClusterEvent):
@@ -53768,10 +54174,14 @@ class ZoneManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="zone", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="reason", Tag=1, Type=ZoneManagement.Enums.ZoneEventStoppedReasonEnum),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             zone: uint = 0
             reason: ZoneManagement.Enums.ZoneEventStoppedReasonEnum = 0
+            nodeID: typing.Optional[uint] = None
+            endpointID: typing.Optional[uint] = None
 
 
 @dataclass

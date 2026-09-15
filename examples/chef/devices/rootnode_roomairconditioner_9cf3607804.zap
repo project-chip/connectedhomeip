@@ -1742,7 +1742,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0001",
+              "defaultValue": "0x0003",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -2173,7 +2173,7 @@
         }
       ],
       "deviceVersions": [
-        4
+        5
       ],
       "deviceIdentifiers": [
         114
@@ -2502,7 +2502,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3112,7 +3112,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x000b",
+              "defaultValue": "0x000c",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3372,7 +3372,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0006",
+              "defaultValue": "0x0007",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

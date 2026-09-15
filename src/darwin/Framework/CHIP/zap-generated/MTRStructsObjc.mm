@@ -3248,6 +3248,45 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+<<<<<<< HEAD
+=======
+@implementation MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _paaSupportedProfiles = @(0);
+
+        _paiSupportedProfiles = @(0);
+
+        _dacSupportedProfiles = @(0);
+
+        _cdSupportedProfiles = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROperationalCredentialsClusterPQCDeviceAttestationProfileStruct alloc] init];
+
+    other.paaSupportedProfiles = self.paaSupportedProfiles;
+    other.paiSupportedProfiles = self.paiSupportedProfiles;
+    other.dacSupportedProfiles = self.dacSupportedProfiles;
+    other.cdSupportedProfiles = self.cdSupportedProfiles;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaSupportedProfiles:%@; paiSupportedProfiles:%@; dacSupportedProfiles:%@; cdSupportedProfiles:%@; >", NSStringFromClass([self class]), _paaSupportedProfiles, _paiSupportedProfiles, _dacSupportedProfiles, _cdSupportedProfiles];
+    return descriptionString;
+}
+
+@end
+
+>>>>>>> bd73b51 (Introduce Data Model Files at 0.9 ballot v1.7 (#73842))
 @implementation MTRGroupKeyManagementClusterGroupInfoMapStruct
 - (instancetype)init
 {
@@ -8658,7 +8697,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _enabledSensors = [NSArray array];
+        _enabledSensorHandles = [NSArray array];
     }
     return self;
 }
@@ -8669,14 +8708,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.dayOfWeek = self.dayOfWeek;
     other.transitionTime = self.transitionTime;
-    other.enabledSensors = self.enabledSensors;
+    other.enabledSensorHandles = self.enabledSensorHandles;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; enabledSensors:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, _enabledSensors];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; enabledSensorHandles:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, _enabledSensorHandles];
     return descriptionString;
 }
 
@@ -11799,6 +11838,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zoneSource = @(0);
 
         _twoDCartesianZone = nil;
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11811,13 +11854,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.zoneType = self.zoneType;
     other.zoneSource = self.zoneSource;
     other.twoDCartesianZone = self.twoDCartesianZone;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -11873,6 +11918,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zone = @(0);
 
         _reason = @(0);
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11883,13 +11932,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.zone = self.zone;
     other.reason = self.reason;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _reason, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -11903,6 +11954,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zone = @(0);
 
         _reason = @(0);
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11913,13 +11968,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.zone = self.zone;
     other.reason = self.reason;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _reason, _nodeID, _endpointID];
     return descriptionString;
 }
 
