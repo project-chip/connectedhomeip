@@ -5804,6 +5804,9 @@ static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttribute
     case Attributes::SessionIDList::Id: {
         return YES;
     }
+    case Attributes::RangingConstraints::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
