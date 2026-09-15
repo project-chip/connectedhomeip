@@ -99,8 +99,47 @@ void ClosureManager::Init()
 
     // Closure endpoints initialization
     SuccessOrDie(mClosureEndpoint1.Init());
-    SuccessOrDie(mClosurePanelEndpoint2.Init());
-    SuccessOrDie(mClosurePanelEndpoint3.Init());
+    ClosureDimension::ClusterConformance conformance2;
+    conformance2.FeatureMap()
+        .Set(ClosureDimension::Feature::kPositioning)
+        .Set(ClosureDimension::Feature::kMotionLatching)
+        .Set(ClosureDimension::Feature::kUnit)
+        .Set(ClosureDimension::Feature::kLimitation)
+        .Set(ClosureDimension::Feature::kSpeed)
+        .Set(ClosureDimension::Feature::kTranslation);
+
+    ClosureDimension::ClusterInitParameters clusterInitParameters2;
+    clusterInitParameters2.resolution           = 100;
+    clusterInitParameters2.stepValue            = 1000;
+    clusterInitParameters2.unit                 = ClosureUnitEnum::kMillimeter;
+    clusterInitParameters2.translationDirection = TranslationDirectionEnum::kDownward;
+    clusterInitParameters2.overflow             = OverflowEnum::kTopInside;
+    clusterInitParameters2.modulationType       = ModulationTypeEnum::kVentilation;
+    clusterInitParameters2.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+
+    SuccessOrDie(mClosurePanelEndpoint2.Init(conformance2, clusterInitParameters2));
+
+    ClosureDimension::ClusterConformance conformance3;
+    conformance3.FeatureMap()
+        .Set(ClosureDimension::Feature::kPositioning)
+        .Set(ClosureDimension::Feature::kMotionLatching)
+        .Set(ClosureDimension::Feature::kUnit)
+        .Set(ClosureDimension::Feature::kLimitation)
+        .Set(ClosureDimension::Feature::kSpeed)
+        .Set(ClosureDimension::Feature::kRotation);
+
+    ClosureDimension::ClusterInitParameters clusterInitParameters3;
+    clusterInitParameters3.resolution     = 100;
+    clusterInitParameters3.stepValue      = 1000;
+    clusterInitParameters3.unit           = ClosureUnitEnum::kDegree;
+    clusterInitParameters3.rotationAxis   = RotationAxisEnum::kCenteredVertical;
+    clusterInitParameters3.overflow       = OverflowEnum::kTopInside;
+    clusterInitParameters3.modulationType = ModulationTypeEnum::kVentilation;
+    clusterInitParameters3.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+
+    SuccessOrDie(mClosurePanelEndpoint3.Init(conformance3, clusterInitParameters3));
 
     // Set Taglist for Closure endpoints
     SuccessOrDie(
@@ -193,9 +232,18 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
 
     if (conformance.HasFeature(ClosureDimension::Feature::kUnit))
     {
-        ReturnErrorOnFailure(
-            closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
-                .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
+        if (conformance.HasFeature(ClosureDimension::Feature::kRotation))
+        {
+            ReturnErrorOnFailure(
+                closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
+                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(360) })); // degree
+        }
+        else
+        {
+            ReturnErrorOnFailure(
+                closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
+                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) })); // millimeter
+        }
     }
     if (conformance.HasFeature(ClosureDimension::Feature::kLimitation))
     {
