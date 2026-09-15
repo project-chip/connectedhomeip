@@ -21,7 +21,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "door-lock-server.h"
+#include "DoorLockCluster.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
