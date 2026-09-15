@@ -136,6 +136,10 @@ public:
     HandleFindTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                         const PushAvStreamTransport::Commands::FindTransport::DecodableType & commandData);
 
+    std::optional<DataModel::ActionReturnStatus>
+    HandleUpdateMotionZoneOptions(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                  const PushAvStreamTransport::Commands::UpdateMotionZoneOptions::DecodableType & commandData);
+
     // Send Push AV Stream Transport events
     Protocols::InteractionModel::Status
     GeneratePushTransportBeginEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,

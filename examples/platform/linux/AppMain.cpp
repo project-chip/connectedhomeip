@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <cstdlib>
 #include <string>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -129,6 +130,9 @@
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER
+#include <app/clusters/network-identity-management-server/NetworkIdentityManagementTestEventTriggerHandler.h>
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -984,6 +988,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     static CommodityMeteringTestEventTriggerHandler CommodityMeteringTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&CommodityMeteringTestEventTriggerHandler));
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER
+    static NetworkIdentityManagementTestEventTriggerHandler sNetworkIdentityManagementTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sNetworkIdentityManagementTestEventTriggerHandler));
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&Server::GetInstance().GetICDManager()));
 #endif
@@ -1008,6 +1016,8 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     {
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
+
+    ResolveDeviceAttestationCredentialsProvider();
 
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.

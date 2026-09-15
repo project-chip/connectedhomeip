@@ -105,6 +105,7 @@ bool ThermostatHeatingSetpoints::HandlesAttribute(AttributeId attributeId)
     case AbsMaxHeatSetpointLimit::Id:
     case MinHeatSetpointLimit::Id:
     case MaxHeatSetpointLimit::Id:
+    case CriticalFreezeProtection::Id:
         return true;
     default:
         return false;
@@ -286,6 +287,12 @@ ThermostatHeatingSetpoints::ReadAttribute(const DataModel::ReadAttributeRequest 
         VerifyOrReturnValue(status == Status::Success, status);
         return encoder.Encode(maxHeatSetpointLimit);
     }
+    case CriticalFreezeProtection::Id: {
+        bool enabled;
+        auto status = mDelegate.GetCriticalFreezeProtection(enabled);
+        VerifyOrReturnValue(status == Status::Success, status);
+        return encoder.Encode(enabled);
+    }
     default:
         return std::nullopt;
     }
@@ -304,6 +311,7 @@ ThermostatHeatingSetpoints::WriteAttribute(const DataModel::WriteAttributeReques
     {
     case AbsMinHeatSetpointLimit::Id:
     case AbsMaxHeatSetpointLimit::Id:
+    case CriticalFreezeProtection::Id:
         return Status::UnsupportedWrite;
     default:
         break;
@@ -357,6 +365,7 @@ CHIP_ERROR ThermostatHeatingSetpoints::Attributes(const ConcreteClusterPath & pa
         { optionalAttributes.AbsMaxHeatSetpointLimit, AbsMaxHeatSetpointLimit::kMetadataEntry },
         { optionalAttributes.MinHeatSetpointLimit, MinHeatSetpointLimit::kMetadataEntry },
         { optionalAttributes.MaxHeatSetpointLimit, MaxHeatSetpointLimit::kMetadataEntry },
+        { optionalAttributes.CriticalFreezeProtection, CriticalFreezeProtection::kMetadataEntry },
     };
 
     return AppendOptionalAttributes(builder, Span(attributes));

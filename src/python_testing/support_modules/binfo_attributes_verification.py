@@ -34,7 +34,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
             TestStep(1, "TH reads DataModelRevision (and, when supported, SpecificationVersion) from the DUT.",
                      "Verify that DataModelRevision matches the value expected for the DUT's Matter specification version "
-                     "(17 for 1.2/1.3, 18 for 1.4/1.4.1, 19 for 1.4.2/1.5, 20 for 1.5.1, 21 for 1.6/1.6.1). "
+                     "(17 for 1.2/1.3, 18 for 1.4/1.4.1, 19 for 1.4.2/1.5, 20 for 1.5.1, 21 for 1.6/1.6.1, 22 for 1.7). "
                      "If SpecificationVersion is not supported (pre-1.3 devices), verify the value is 1, 16, or 17."),
             TestStep(2, "TH reads VendorName from the DUT.", "Verify that the VendorName returns a string with max 32 bytes"),
             TestStep(3, "TH reads VendorID from the DUT.", "Verify value is in the range of 0x0001 to 0xFFF4"),

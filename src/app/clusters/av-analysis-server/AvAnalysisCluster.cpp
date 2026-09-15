@@ -153,34 +153,50 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(co
     return Status::UnsupportedCommand;
 }
 
-// Context detection
-CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList)
+// Attribute interactions
+bool AvAnalysisCluster::IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext,
+                                                  Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds)
 {
-    return mLogic.AnalysisSessionStart(aSessionId, aZoneList, mContext);
+    return mLogic.IsTriggeringContextActive(aContext, aZoneIds);
+}
+
+// Context detection
+CHIP_ERROR AvAnalysisCluster::CreateActiveSession(uint16_t & aSessionId, Optional<NodeId> aSourceNodeId, bool aUseSpecificSessionId)
+{
+    return mLogic.CreateActiveSession(aSessionId, aSourceNodeId, aUseSpecificSessionId);
+}
+
+CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
+                                                   Optional<NodeId> aSourceNodeId)
+{
+    return mLogic.AnalysisSessionStart(aSessionId, aZoneList, mContext, aSourceNodeId);
 }
 
 CHIP_ERROR
 AvAnalysisCluster::InitialTriggeringContextDetected(
-    uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext)
+    uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
+    Optional<NodeId> aSourceNodeId)
 {
-    return mLogic.InitialTriggeringContextDetected(aSessionId, aTriggeringContext, mContext);
+    return mLogic.InitialTriggeringContextDetected(aSessionId, aTriggeringContext, mContext, aSourceNodeId);
 }
 
 CHIP_ERROR AvAnalysisCluster::NewContextDetected(uint16_t aSessionId,
-                                                 const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext)
+                                                 const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext,
+                                                 Optional<NodeId> aSourceNodeId)
 {
-    return mLogic.NewContextDetected(aSessionId, aNewContext, mContext);
+    return mLogic.NewContextDetected(aSessionId, aNewContext, mContext, aSourceNodeId);
 }
 
 CHIP_ERROR AvAnalysisCluster::ContextNoLongerDetected(uint16_t aSessionId,
-                                                      const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext)
+                                                      const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext,
+                                                      Optional<NodeId> aSourceNodeId)
 {
-    return mLogic.ContextNoLongerDetected(aSessionId, aOldContext, mContext);
+    return mLogic.ContextNoLongerDetected(aSessionId, aOldContext, mContext, aSourceNodeId);
 }
 
-CHIP_ERROR AvAnalysisCluster::AnalysisSessionEnd(uint16_t aSessionId)
+CHIP_ERROR AvAnalysisCluster::AnalysisSessionEnd(uint16_t aSessionId, Optional<NodeId> aSourceNodeId)
 {
-    return mLogic.AnalysisSessionEnd(aSessionId, mContext);
+    return mLogic.AnalysisSessionEnd(aSessionId, mContext, aSourceNodeId);
 }
 
 } // namespace Clusters
