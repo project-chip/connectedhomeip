@@ -282,8 +282,8 @@ chip-tool-x86-64 thermostat read current-thermostat-suggestion <nodeID> 1 | grep
 (e.g. an active hold, schedule, or vacation mode overriding it). Note that this
 example app's delegate
 (`ThermostatSuggestionsDelegate::ReEvaluateCurrentSuggestion()`) always clears
-this attribute to `null` when it applies a suggestion, so a non-null value
-isn't currently exercised by this app:
+this attribute to `null` when it applies a suggestion, so a non-null value isn't
+currently exercised by this app:
 
 ```shell
 chip-tool-x86-64 thermostat read thermostat-suggestion-not-following-reason <nodeID> 1 | grep TOO
