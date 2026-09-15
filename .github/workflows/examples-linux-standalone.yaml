@@ -67,7 +67,6 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-cert \
-                        --target linux-x64-network-manager \
                         --target linux-x64-chip-tool \
                         build"
             - name: Verify SDK OpenSSL linkage
