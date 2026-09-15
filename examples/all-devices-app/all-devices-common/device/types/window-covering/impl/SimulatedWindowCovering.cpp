@@ -232,6 +232,8 @@ void SimulatedWindowCovering::TimerFired()
         auto mode = cluster.GetMode();
         mode.Clear(Mode::kCalibrationMode);
         cluster.SetMode(mode);
+
+        ChipLogProgress(DeviceLayer, "WindowCovering: Fake calibration complete, positions resolved");
         return;
     }
 
