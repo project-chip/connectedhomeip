@@ -92,6 +92,31 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAction(CharSpan actio
     {
         return HandleSetObjectCount(tlvData);
     }
+    if (action.data_equal("AddAmbientSensingContributor"_span))
+    {
+        return HandleAddAmbientSensingContributor(tlvData);
+    }
+    if (action.data_equal("RemoveAmbientSensingContributor"_span))
+    {
+        return HandleRemoveAmbientSensingContributor(tlvData);
+    }
+    if (action.data_equal("AddAmbientSensingNonMatterContributor"_span))
+    {
+        return HandleAddAmbientSensingNonMatterContributor(tlvData);
+    }
+    if (action.data_equal("RemoveAmbientSensingNonMatterContributor"_span))
+    {
+        return HandleRemoveAmbientSensingNonMatterContributor(tlvData);
+    }
+    if (action.data_equal("UpdateAmbientSensingContributorStatus"_span))
+    {
+        return HandleUpdateAmbientSensingContributorStatus(tlvData);
+    }
+    if (action.data_equal("SetAmbientSensingUnionName"_span))
+    {
+        return HandleSetAmbientSensingUnionName(tlvData);
+    }
+
     return std::nullopt;
 }
 
@@ -416,6 +441,367 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetObjectCount(ByteSp
     }
 
     return mCluster.SetObjectCount(objectCount);
+}
+
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientSensingContributor(ByteSpan tlvData) const
+{
+    TLV::TLVReader reader;
+    reader.Init(tlvData);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    EndpointId endpointId            = kInvalidEndpointId;
+    bool hasEndpointId               = false;
+    NodeId nodeId                    = kUndefinedNodeId;
+    bool hasNodeId                   = false;
+    EndpointId contributorEndpointId = kInvalidEndpointId;
+    bool hasContributorEndpointId    = false;
+    uint8_t statusRaw                = 0;
+    bool hasStatus                   = false;
+    CharSpan contributorName;
+    FabricIndex firstFabricIndex = 1;
+    FabricIndex fabricIndex      = firstFabricIndex;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = reader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(tag))
+        {
+        case 1:
+            ReturnErrorOnFailure(reader.Get(endpointId));
+            hasEndpointId = true;
+            break;
+        case 2:
+            ReturnErrorOnFailure(reader.Get(nodeId));
+            hasNodeId = true;
+            break;
+        case 3:
+            ReturnErrorOnFailure(reader.Get(contributorEndpointId));
+            hasContributorEndpointId = true;
+            break;
+        case 4:
+            ReturnErrorOnFailure(reader.Get(statusRaw));
+            hasStatus = true;
+            break;
+        case 5:
+            ReturnErrorOnFailure(reader.Get(contributorName));
+            break;
+        case 6:
+            ReturnErrorOnFailure(reader.Get(fabricIndex));
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+    VerifyOrReturnError(hasEndpointId && hasNodeId && hasContributorEndpointId && hasStatus, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (endpointId != mEndpointId)
+    {
+        return std::nullopt;
+    }
+
+    auto status = static_cast<Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(statusRaw);
+    return mUnionCluster.AddMatterContributor(nodeId, contributorEndpointId, status, fabricIndex, contributorName);
+}
+
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleRemoveAmbientSensingContributor(ByteSpan tlvData) const
+{
+    TLV::TLVReader reader;
+    reader.Init(tlvData);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    EndpointId endpointId            = kInvalidEndpointId;
+    bool hasEndpointId               = false;
+    NodeId nodeId                    = kUndefinedNodeId;
+    bool hasNodeId                   = false;
+    EndpointId contributorEndpointId = kInvalidEndpointId;
+    bool hasContributorEndpointId    = false;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = reader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(tag))
+        {
+        case 1:
+            ReturnErrorOnFailure(reader.Get(endpointId));
+            hasEndpointId = true;
+            break;
+        case 2:
+            ReturnErrorOnFailure(reader.Get(nodeId));
+            hasNodeId = true;
+            break;
+        case 3:
+            ReturnErrorOnFailure(reader.Get(contributorEndpointId));
+            hasContributorEndpointId = true;
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+    VerifyOrReturnError(hasEndpointId && hasNodeId && hasContributorEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (endpointId != mEndpointId)
+    {
+        return std::nullopt;
+    }
+
+    return mUnionCluster.RemoveMatterContributor(nodeId, contributorEndpointId);
+}
+
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAddAmbientSensingNonMatterContributor(ByteSpan tlvData) const
+{
+    TLV::TLVReader reader;
+    reader.Init(tlvData);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    EndpointId endpointId = kInvalidEndpointId;
+    bool hasEndpointId    = false;
+    CharSpan contributorName;
+    bool hasContributorName      = false;
+    uint8_t statusRaw            = 0;
+    bool hasStatus               = false;
+    FabricIndex firstFabricIndex = 1;
+    FabricIndex fabricIndex      = firstFabricIndex;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = reader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(tag))
+        {
+        case 1:
+            ReturnErrorOnFailure(reader.Get(endpointId));
+            hasEndpointId = true;
+            break;
+        case 2:
+            ReturnErrorOnFailure(reader.Get(contributorName));
+            hasContributorName = true;
+            break;
+        case 3:
+            ReturnErrorOnFailure(reader.Get(statusRaw));
+            hasStatus = true;
+            break;
+        case 4:
+            ReturnErrorOnFailure(reader.Get(fabricIndex));
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+    VerifyOrReturnError(hasEndpointId && hasContributorName && hasStatus, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (endpointId != mEndpointId)
+    {
+        return std::nullopt;
+    }
+
+    auto status = static_cast<Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(statusRaw);
+    return mUnionCluster.AddNonMatterContributor(contributorName, status, fabricIndex);
+}
+
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleRemoveAmbientSensingNonMatterContributor(ByteSpan tlvData) const
+{
+    TLV::TLVReader reader;
+    reader.Init(tlvData);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    EndpointId endpointId = kInvalidEndpointId;
+    bool hasEndpointId    = false;
+    CharSpan contributorName;
+    bool hasContributorName = false;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = reader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(tag))
+        {
+        case 1:
+            ReturnErrorOnFailure(reader.Get(endpointId));
+            hasEndpointId = true;
+            break;
+        case 2:
+            ReturnErrorOnFailure(reader.Get(contributorName));
+            hasContributorName = true;
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+    VerifyOrReturnError(hasEndpointId && hasContributorName, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (endpointId != mEndpointId)
+    {
+        return std::nullopt;
+    }
+
+    return mUnionCluster.RemoveNonMatterContributor(contributorName);
+}
+
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleUpdateAmbientSensingContributorStatus(ByteSpan tlvData) const
+{
+    TLV::TLVReader reader;
+    reader.Init(tlvData);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    EndpointId endpointId            = kInvalidEndpointId;
+    bool hasEndpointId               = false;
+    uint8_t statusRaw                = 0;
+    bool hasStatus                   = false;
+    NodeId nodeId                    = kUndefinedNodeId;
+    bool hasNodeId                   = false;
+    EndpointId contributorEndpointId = kInvalidEndpointId;
+    bool hasContributorEndpointId    = false;
+    CharSpan contributorName;
+    bool hasContributorName = false;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = reader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(tag))
+        {
+        case 1:
+            ReturnErrorOnFailure(reader.Get(endpointId));
+            hasEndpointId = true;
+            break;
+        case 2:
+            ReturnErrorOnFailure(reader.Get(statusRaw));
+            hasStatus = true;
+            break;
+        case 3:
+            ReturnErrorOnFailure(reader.Get(nodeId));
+            hasNodeId = true;
+            break;
+        case 4:
+            ReturnErrorOnFailure(reader.Get(contributorEndpointId));
+            hasContributorEndpointId = true;
+            break;
+        case 5:
+            ReturnErrorOnFailure(reader.Get(contributorName));
+            hasContributorName = true;
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+    VerifyOrReturnError(hasEndpointId && hasStatus, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(hasNodeId || hasContributorName, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (endpointId != mEndpointId)
+    {
+        return std::nullopt;
+    }
+
+    auto status = static_cast<Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(statusRaw);
+
+    if (hasNodeId)
+    {
+        VerifyOrReturnError(hasContributorEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+        return mUnionCluster.UpdateMatterContributorStatus(nodeId, contributorEndpointId, status);
+    }
+
+    return mUnionCluster.UpdateNonMatterContributorStatus(contributorName, status);
+}
+
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetAmbientSensingUnionName(ByteSpan tlvData) const
+{
+    TLV::TLVReader reader;
+    reader.Init(tlvData);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    EndpointId endpointId = kInvalidEndpointId;
+    bool hasEndpointId    = false;
+    CharSpan unionName;
+    bool hasUnionName = false;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = reader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(tag))
+        {
+        case 1:
+            ReturnErrorOnFailure(reader.Get(endpointId));
+            hasEndpointId = true;
+            break;
+        case 2:
+            ReturnErrorOnFailure(reader.Get(unionName));
+            hasUnionName = true;
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+    VerifyOrReturnError(hasEndpointId && hasUnionName, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (endpointId != mEndpointId)
+    {
+        return std::nullopt;
+    }
+
+    return mUnionCluster.SetUnionName(unionName);
 }
 
 } // namespace chip::app
