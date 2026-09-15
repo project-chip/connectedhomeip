@@ -27,7 +27,7 @@ import asyncio
 import hashlib
 import logging
 import time
-from typing import Mapping
+from collections.abc import Mapping
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
@@ -177,7 +177,6 @@ class PDCAccessPointFixture(AccessPointFixture):
     @staticmethod
     def _certificate_fingerprint(compact_identity: bytes) -> str:
         return hashlib.sha256(encode_network_identity_certificate(compact_identity)).hexdigest()
-
 
 
 class CNETPDCBaseTest(MatterTestCommissionedDevice):

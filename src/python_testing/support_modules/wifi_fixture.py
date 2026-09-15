@@ -35,10 +35,10 @@ import re
 import socket
 import time
 from collections import deque
+from collections.abc import Mapping
 from dataclasses import dataclass
 from itertools import count
 from pathlib import Path
-from typing import Mapping, Optional
 
 from mobly.logger import PrefixLoggerAdapter
 
@@ -105,7 +105,7 @@ class Event:
     name: str
     arguments: str = ""
     # Only set on a global control socket, which serves every interface of its daemon.
-    ifname: Optional[str] = None
+    ifname: str | None = None
 
     def __str__(self) -> str:
         return f"{self.name} {self.arguments}".strip()
@@ -118,7 +118,7 @@ class Event:
 _EVENT = re.compile(r"(?:IFNAME=(?P<ifname>\S+) )?<\d+>(?P<name>\S*)(?: (?P<arguments>.*))?", re.DOTALL)
 
 
-def _parse_event(message: str) -> Optional[Event]:
+def _parse_event(message: str) -> Event | None:
     """Returns the event a message carries, or None if it is a command reply."""
     match = _EVENT.fullmatch(message.rstrip("\n"))
     if match is None:
@@ -174,7 +174,7 @@ class Station:
         return "AUTHORIZED" in self.flags
 
     @property
-    def eap_identity(self) -> Optional[str]:
+    def eap_identity(self) -> str | None:
         """The identity this client sent in its EAP Identity Response, if it sent one.
 
         None where the network does not use 802.1X, and also where the client got onto it
@@ -212,7 +212,7 @@ class ControlConnection:
         # Next to the daemon's own socket, so it is inside the shared directory and both
         # ends resolve the path to the same file.
         client_path = path.parent / f"client-{os.getpid()}-{next(self._sequence)}"
-        self._client_path: Optional[Path] = None
+        self._client_path: Path | None = None
         try:
             self._socket.bind(str(client_path))
             # Only ours to remove once the bind has succeeded, so that a name that
@@ -264,7 +264,7 @@ class ControlConnection:
         """
         self.request_ok("ATTACH")
 
-    def next_event(self, timeout: float = DEFAULT_TIMEOUT) -> Optional[Event]:
+    def next_event(self, timeout: float = DEFAULT_TIMEOUT) -> Event | None:
         """Returns the next event, or None if none arrives within the timeout."""
         deadline = time.monotonic() + timeout
         while True:
@@ -291,7 +291,7 @@ class ControlConnection:
         self._events.append(event)
         return True
 
-    def _receive(self, deadline: float) -> Optional[str]:
+    def _receive(self, deadline: float) -> str | None:
         """Returns the next message on the socket, or None once the deadline has passed."""
         remaining = deadline - time.monotonic()
         if remaining <= 0:
@@ -485,7 +485,7 @@ class AccessPointFixture:
 
         self.radio = radio
         self.options = {**self._DEFAULT_OPTIONS, **options}
-        self._control: Optional[ControlConnection] = None
+        self._control: ControlConnection | None = None
         self._started = False
 
     @property
@@ -586,7 +586,7 @@ class AccessPointFixture:
         log.info("Reloading the configuration of the access point on %s", self.ifname)
         self.request_ok("RELOAD_CONFIG", timeout=RELOAD_TIMEOUT)
 
-    def next_event(self, timeout: float = DEFAULT_TIMEOUT) -> Optional[Event]:
+    def next_event(self, timeout: float = DEFAULT_TIMEOUT) -> Event | None:
         """Returns the next event hostapd has sent about this access point, if any."""
         if self._control is None:
             raise WiFiFixtureError(f"There is no access point running on {self.ifname}")
@@ -606,7 +606,7 @@ class AccessPointFixture:
             reply = self.request(f"STA-NEXT {station.address}")
         return stations
 
-    def station(self, address: str) -> Optional[Station]:
+    def station(self, address: str) -> Station | None:
         """Returns what hostapd has for one station, or None if it has nothing."""
         reply = self.request(f"STA {address}")
         if not reply or reply.startswith("FAIL"):

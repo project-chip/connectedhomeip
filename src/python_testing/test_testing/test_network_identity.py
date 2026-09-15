@@ -20,7 +20,7 @@ import hashlib
 import os
 import sys
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
@@ -314,8 +314,8 @@ class TestNetworkIdentityCertificate(unittest.TestCase):
         self.assertEqual(certificate.subject.rfc4514_string(), "CN=*")
         self.assertEqual(certificate.serial_number, 1)
         self.assertEqual(certificate.version, x509.Version.v3)
-        self.assertEqual(certificate.not_valid_before_utc, datetime(2000, 1, 1, 0, 0, 1, tzinfo=timezone.utc))
-        self.assertEqual(certificate.not_valid_after_utc, datetime(9999, 12, 31, 23, 59, 59, tzinfo=timezone.utc))
+        self.assertEqual(certificate.not_valid_before_utc, datetime(2000, 1, 1, 0, 0, 1, tzinfo=UTC))
+        self.assertEqual(certificate.not_valid_after_utc, datetime(9999, 12, 31, 23, 59, 59, tzinfo=UTC))
 
         public_key = certificate.public_key()
         self.assertIsInstance(public_key.curve, ec.SECP256R1)
