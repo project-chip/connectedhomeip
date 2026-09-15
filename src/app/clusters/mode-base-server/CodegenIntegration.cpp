@@ -46,8 +46,6 @@ namespace {
 // TODO: change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
 IntrusiveList<Instance> gModeBaseInstances;
 
-<<<<<<< HEAD
-=======
 // The 11 clusters that share this attribute structure.
 constexpr ClusterEntry kAliasedClusters[] = {
     kDeviceEnergyManagementMode,                      //
@@ -63,7 +61,6 @@ constexpr ClusterEntry kAliasedClusters[] = {
     kWaterHeaterMode,                                 //
 };
 
->>>>>>> 0de6400 ([HVAC] Initial implementation of Thermostat Mode cluster (#73965))
 } // namespace
 
 IntrusiveList<Instance> & GetModeBaseInstanceList()
@@ -101,16 +98,16 @@ CHIP_ERROR Instance::Init()
     const EmberAfCluster * cluster = emberAfFindServerCluster(mClusterPath.mEndpointId, mClusterPath.mClusterId);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    std::optional<uint32_t> clusterRevision;
+    std::optional<ClusterEntry> aliasedClusterEntry;
     for (const auto & entry : kAliasedClusters)
     {
         if (entry.id == mClusterPath.mClusterId)
         {
-            clusterRevision = entry.revision;
+            aliasedClusterEntry = entry;
             break;
         }
     }
-    VerifyOrReturnError(clusterRevision.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aliasedClusterEntry.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
     switch (mClusterPath.mClusterId)
     {
@@ -164,9 +161,8 @@ CHIP_ERROR Instance::Init()
                                     .optionalAttributeSet   = mOptionalAttributeSet,
                                     .appDelegate            = *mDelegate,
                                     .onOffValueForStartUp   = onOffValueForStartUp,
-                                    .diagnosticDataProvider = diagnosticDataProvider,
-                                    .clusterRevision        = clusterRevision.value() };
-    mCluster.Create(mClusterPath.mEndpointId, mClusterPath.mClusterId, config);
+                                    .diagnosticDataProvider = diagnosticDataProvider };
+    mCluster.Create(mClusterPath.mEndpointId, aliasedClusterEntry.value(), config);
     RegisterThisInstance();
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
