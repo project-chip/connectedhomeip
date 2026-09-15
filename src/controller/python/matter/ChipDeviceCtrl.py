@@ -133,6 +133,8 @@ _DevicePairingDelegate_OnFabricCheckFunct = CFUNCTYPE(
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
 # else seems to do it.
 _DeviceAvailableCallbackFunct = CFUNCTYPE(None, py_object, c_void_p, PyChipError)
+# void (*)(PyObject *, PyChipError, const char * address, uint16_t port).
+_NodeResolvedCallbackFunct = CFUNCTYPE(None, py_object, PyChipError, c_char_p, c_uint16)
 
 _IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
     None, py_object, PyChipError, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_uint64)
@@ -185,6 +187,11 @@ class ICDRegistrationParameters:
 @_DeviceAvailableCallbackFunct
 def _DeviceAvailableCallback(closure, device, err):
     closure.deviceAvailable(device, err)
+
+
+@_NodeResolvedCallbackFunct
+def _NodeResolvedCallback(closure, err, address, port):
+    closure.nodeResolved(err, address, port)
 
 
 @_IssueNOCChainCallbackPythonCallbackFunct
@@ -1241,6 +1248,81 @@ class ChipDeviceControllerBase:
 
         # Intentionally return None instead of raising exceptions on error
         return (address.value.decode(), port.value) if error == 0 else None
+
+    async def ResolveNode(self, nodeId: int, timeoutMs: int = 3000) -> tuple[str, int] | None:
+        '''
+        Resolve a node's operational address on this controller's fabric via DNS-SD.
+
+        Uses the controller's own resolver and opens no session. Returns the first answer
+        rather than waiting for the best of several addresses. The answer may come from the
+        DNS-SD cache, so a result means "advertised on this fabric recently", not
+        "reachable now".
+
+        Args:
+            nodeId (int): The node ID to resolve.
+            timeoutMs (int): Maximum time to wait for a DNS-SD answer.
+
+        Returns:
+            tuple: The IP address string and port, or None when the lookup times out.
+
+        Raises:
+            ChipStackError: On any failure other than a timeout, including a non-operational node ID.
+        '''
+        self.CheckIsActive()
+        timeoutMs = int(timeoutMs)
+        if timeoutMs <= 0:
+            raise ValueError("timeoutMs must be positive")
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        class NodeResolvedClosure:
+            def __init__(self, loop, future: asyncio.Future):
+                self._event_loop = loop
+                self._future = future
+                self._result = None
+                self._err = None
+
+            def _resolved(self):
+                if self._future.cancelled():
+                    return
+                if self._err.is_success:
+                    self._future.set_result(self._result)
+                elif self._err == CHIP_ERROR_TIMEOUT:
+                    self._future.set_result(None)
+                else:
+                    self._future.set_exception(self._err.to_exception())
+
+            def nodeResolved(self, err, address, port):
+                self._err = err
+                if err.is_success:
+                    self._result = (address.decode(), port)
+                try:
+                    self._event_loop.call_soon_threadsafe(self._resolved)
+                finally:
+                    # Release even if the loop is already closed (stack shutdown with a lookup active).
+                    ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
+
+        closure = NodeResolvedClosure(eventLoop, future)
+        ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
+        try:
+            await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_DeviceController_ResolveNode(
+                self.devCtrl, nodeId, timeoutMs, ctypes.py_object(closure), _NodeResolvedCallback))
+        except ChipStackError:
+            # The lookup never started, so the callback will not fire: release the closure here.
+            future.cancel()
+            ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
+            raise
+        except Exception:
+            future.cancel()
+            raise
+
+        # The resolver's own timeout produces the None result; the margin only guards against a lost callback.
+        await asyncio.wait_for(future, timeout=float(timeoutMs) / 1000 + 1.0)
+        result = future.result()
+        LOGGER.info("ResolveNode 0x%016X on fabric 0x%016X: %s", nodeId, self.GetCompressedFabricId(),
+                    result if result is not None else "not found")
+        return result
 
     def GetLastThreadMeshcopDiscoveryDiagnostic(self) -> dict[str, typing.Any]:
         '''
@@ -2912,6 +2994,10 @@ class ChipDeviceControllerBase:
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
             self._dmLib.pychip_DeviceController_GetAddressAndPort.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_ResolveNode.argtypes = [
+                c_void_p, c_uint64, c_uint32, py_object, _NodeResolvedCallbackFunct]
+            self._dmLib.pychip_DeviceController_ResolveNode.restype = PyChipError
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]

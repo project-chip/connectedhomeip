@@ -493,6 +493,11 @@ See
 -   `--commissioning-method`
     -   Need to re-commission to python controller as chip-tool and python
         commissioner do not share a credentials
+    -   The commissioning step is skipped when the DUT is already commissioned
+        on the controller's fabric (a CASE session can be established using the
+        stored credentials). Pass `--force-commissioning` to commission anyway.
+        Tests that declare `MatterTestUncommissionedDevice` or
+        `MatterTestCommissioner` are never skipped.
 -   `--discriminator`, `--passcode`, `--qr-code`, `--manual-code`
 -   `--tests` to select tests
 -   `--PICS`
@@ -889,10 +894,25 @@ for that run, e.g.:
 #     app-args: <app_arguments>
 #     script-args: <script_arguments>
 #     factory-reset: <true|false>
+#     fresh-dut: <true|false>   [optional, default false]
 #     timeout: <float>   [optional]
 #     quiet: <true|false>
 # === END CI TEST ARGUMENTS ===
 ```
+
+`factory-reset: true` used to wipe the app KVS, the controller storage and the
+`/tmp/chip*` files before every run. By default the runner now keeps that state
+so an already commissioned DUT is reused: the KVS is keyed by app binary and,
+for all-devices-app, by its `--device` value (`kvs1` becomes
+`kvs1.chip-all-clusters-app`), the controller storage is shared, and the test
+framework skips commissioning when the DUT answers over CASE (see
+`--force-commissioning`). The full wipe still happens when the header says
+`fresh-dut: true` (the test needs a DUT with no fabrics), when `--factory-reset`
+is given explicitly on the command line, when `--reuse-commissioned-dut` is
+turned off, or when there is no `--storage-path` to key the controller state. An
+app started without `--KVS` cannot keep its state apart from other apps, so only
+its app state is wiped and it is commissioned onto the kept fabric. A wipe of
+the controller storage also removes every keyed KVS commissioned against it.
 
 ### Description of Parameters
 

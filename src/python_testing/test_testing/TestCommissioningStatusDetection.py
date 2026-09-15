@@ -36,6 +36,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from python_path import PythonPath
 
+from matter.exceptions import ChipStackError
+
 # Add the python_testing directory to path so mdns_discovery module can be found
 with PythonPath('..', relative_to=__file__):
     import mdns_discovery.mdns_discovery  # noqa: F401
@@ -65,6 +67,7 @@ class MockDeviceController:
         self.ReadAttribute = AsyncMock()
         self.CreateManualCode = MagicMock(return_value="MT:YNJV7VSC00KA0648G00")
         self.FindOrEstablishPASESession = AsyncMock()
+        self.ResolveNode = AsyncMock(return_value=None)
 
     def GetCompressedFabricId(self) -> int:
         return self._compressed_fabric_id
@@ -555,109 +558,71 @@ async def test_parallel_session_no_pase_params():
 # CATEGORY C: is_commissioned() Tests
 # =============================================================================
 
-async def test_is_commissioned_on_current_fabric_scenario2_operational_shortcircuit():
-    """
-    Test: Device commissioned on THIS fabric.
-
-    Behavior: DNS-SD finds device operational -> return True immediately.
-    No PASE/CASE needed since DNS-SD confirms commissioning.
-
-    Value: This is the FAST PATH optimization. Avoids connection overhead
-    when DNS-SD already confirms the device is on our fabric.
-    """
+async def test_is_commissioned_unresolved():
+    """The node does not resolve on this fabric: False, no CASE attempted."""
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
+    mock_controller.ResolveNode.return_value = None
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
-        mock_dnssd.return_value = True
+    result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, resolve_timeout_ms=50)
 
-        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
-
-        if not result:
-            return "Expected True when DNS-SD confirms operational"
-        if not mock_dnssd.called:
-            return "DNS-SD check should have been called"
+    if result:
+        return "Expected False when the node does not resolve"
+    if mock_controller.ResolveNode.await_args.args != (TEST_NODE_ID, 50):
+        return f"Resolve called with unexpected arguments: {mock_controller.ResolveNode.await_args}"
+    if mock_controller.GetConnectedDevice.called:
+        return "CASE must not be attempted when the node does not resolve"
     return None
 
 
-async def test_is_commissioned_on_current_fabric_scenario1_factory_fresh():
-    """
-    Test: SCENARIO 1 - Device is commissionable (factory fresh, pairing window open).
-
-    Behavior:
-    - DNS-SD operational returns False (not on this fabric)
-    - DNS-SD commissionable returns True (device advertising _matterc._udp)
-    - is_commissioned returns False immediately (fast-fail)
-
-    Value: Factory-fresh devices are detected without side-effects (no PASE session opened).
-    """
+async def test_is_commissioned_resolved_and_case_succeeds():
+    """Node resolves and CASE succeeds: True."""
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
+    mock_controller.ResolveNode.return_value = ("fe80::1", 5540)
+    mock_controller.GetConnectedDevice.return_value = MagicMock()
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_op, \
-            patch.object(commissioning, '_is_device_commissionable_via_dnssd', new_callable=AsyncMock) as mock_comm:
+    result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, case_timeout_ms=75)
 
-        mock_op.return_value = False
-        mock_comm.return_value = True
-
-        result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
-
-        if result:
-            return "Expected False when device is commissionable (factory fresh)"
-        if not mock_comm.called:
-            return "Commissionable DNS-SD check should have been called"
+    if not result:
+        return "Expected True when CASE succeeds"
+    kwargs = mock_controller.GetConnectedDevice.await_args.kwargs
+    if kwargs.get("allowPASE") is not False or kwargs.get("timeoutMs") != 75:
+        return f"CASE attempt must be CASE-only with the given timeout, got {kwargs}"
     return None
 
 
-async def test_is_commissioned_neither_dnssd_conclusive():
-    """
-    Test: Neither DNS-SD check is conclusive (device off, broken, or on another fabric).
-
-    Behavior:
-    - DNS-SD operational returns False
-    - DNS-SD commissionable returns False
-    - is_commissioned returns False (device not reachable)
-
-    Value: No side-effects when device is unreachable. No PASE or CASE attempted.
-    """
+async def test_is_commissioned_resolved_but_case_fails():
+    """Node resolves (possibly from cache) but CASE fails: False, no exception."""
     from matter.testing import commissioning
 
-    mock_controller = MockDeviceController()
-
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_op, \
-            patch.object(commissioning, '_is_device_commissionable_via_dnssd', new_callable=AsyncMock) as mock_comm:
-
-        mock_op.return_value = False
-        mock_comm.return_value = False
+    for failure in (TimeoutError(), ChipStackError(0x32, "CHIP Error 0x00000032: Timeout")):
+        mock_controller = MockDeviceController()
+        mock_controller.ResolveNode.return_value = ("fe80::1", 5540)
+        mock_controller.GetConnectedDevice.side_effect = failure
 
         result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
 
         if result:
-            return "Expected False when neither DNS-SD check is conclusive"
+            return f"Expected False when CASE fails with {type(failure).__name__}"
     return None
 
 
-async def test_is_commissioned_exception_propagation():
-    """
-    Test: Exception from DNS-SD operational check propagates correctly.
-
-    Value: Ensures callers see infrastructure failures.
-    """
+async def test_is_commissioned_infrastructure_error_propagates():
+    """A failure in the resolve step itself is an infrastructure error and propagates."""
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
+    mock_controller.ResolveNode.side_effect = RuntimeError("resolver unavailable")
 
-    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
-        mock_dnssd.side_effect = RuntimeError("DNS-SD infrastructure failure")
-
-        try:
-            await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
-            return "Expected RuntimeError to propagate"
-        except RuntimeError as e:
-            if "DNS-SD infrastructure failure" not in str(e):
-                return f"Unexpected error message: {e}"
+    try:
+        await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
+        return "Expected RuntimeError to propagate"
+    except RuntimeError as e:
+        if "resolver unavailable" not in str(e):
+            return f"Unexpected error message: {e}"
     return None
 
 
@@ -778,14 +743,10 @@ def main():
         ("B5. Parallel: no PASE params (CASE only)", test_parallel_session_no_pase_params),
 
         # Category C: is_commissioned() Tests
-        ("C1. is_commissioned: operational shortcircuit",
-         test_is_commissioned_on_current_fabric_scenario2_operational_shortcircuit),
-        ("C2. is_commissioned: commissionable fast-fail (factory fresh)",
-         test_is_commissioned_on_current_fabric_scenario1_factory_fresh),
-        ("C3. is_commissioned: neither DNS-SD conclusive",
-         test_is_commissioned_neither_dnssd_conclusive),
-        ("C4. is_commissioned: exception propagation",
-         test_is_commissioned_exception_propagation),
+        ("C1. is_commissioned: node does not resolve", test_is_commissioned_unresolved),
+        ("C2. is_commissioned: resolved and CASE succeeds", test_is_commissioned_resolved_and_case_succeeds),
+        ("C3. is_commissioned: resolved but CASE fails", test_is_commissioned_resolved_but_case_fails),
+        ("C4. is_commissioned: infrastructure error propagates", test_is_commissioned_infrastructure_error_propagates),
 
         # Category D: get_commissioned_fabric_count() Tests
         ("D1. get_fabric_count: SCENARIO 2 - operational", test_get_fabric_count_scenario2_operational),
