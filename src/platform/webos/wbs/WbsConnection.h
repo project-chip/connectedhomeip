@@ -34,6 +34,7 @@ struct ConnectParams
 
 struct ConnectionDataBundle
 {
+    ConnectionDataBundle(WbsConnection * aConn, chip::System::PacketBufferHandle aBuf) : mConn(aConn), buf(std::move(aBuf)) {}
     WbsConnection * mConn;
     chip::System::PacketBufferHandle buf;
 };
@@ -43,6 +44,8 @@ class WbsConnection
 public:
     WbsConnection();
     ~WbsConnection() = default;
+    WbsConnection(const WbsConnection &)             = delete;
+    WbsConnection & operator=(const WbsConnection &) = delete;
     CHIP_ERROR InitConnectionData(bool aIsCentral, WbsEndpoint *& apEndpoint);
     CHIP_ERROR ShutdownWbsLayer(WbsEndpoint * apEndpoint);
 
@@ -63,6 +66,8 @@ public:
     /// 4. Unsubscribe from the CHIP TX characteristic on the remote peripheral device
     CHIP_ERROR UnsubscribeCharacteristic();
     CHIP_ERROR CloseConnection();
+
+    void ConfigureAsServerRole(const std::string & serverId);
 
     static bool GattGetStatus(std::string address);
     static bool GattGetServices(std::string address);
@@ -92,14 +97,19 @@ private:
     static CHIP_ERROR UnsubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT connection);
     static CHIP_ERROR CloseConnectionImpl(WbsConnection * conn);
     static void WbsOTConnectionDestroy(WbsConnection * aConn);
+    static void WbsOTConnectionDestroyNotify(gpointer aConn);
     static void UpdateConnectionTable(std::string remoteAddr, std::string clientId, WbsEndpoint & aEndpoint);
 
-    char * mPeerAddress;
-    bool mNotifyAcquired = false;
-    uint16_t mMtu        = 0;
+    char * mPeerAddress     = nullptr;
+    bool mNotifyAcquired    = false;
+    uint16_t mMtu           = 0;
     std::string mClientId;
-    uint32_t mMonitorToken;
-    WbsEndpoint * mEndpoint;
+    uint32_t mMonitorToken  = LSMESSAGE_TOKEN_INVALID;
+    WbsEndpoint * mEndpoint = nullptr;
+
+    // Set by ConfigureAsServerRole() - see its doc comment.
+    bool mIsServerRole = false;
+    std::string mServerId;
 };
 
 } // namespace Internal

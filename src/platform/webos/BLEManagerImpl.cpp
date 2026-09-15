@@ -43,7 +43,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 
+#include "wbs/WbsAdvertising.h"
 #include "wbs/WbsConnection.h"
+#include "wbs/WbsGattServer.h"
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 #include <platform/DeviceControlServer.h>
@@ -104,9 +106,13 @@ void BLEManagerImpl::_Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
 
     mDeviceScanner.Shutdown();
-    // Release BLE connection resources
-    // ShutdownWbsLayer(mEndpoint);
-    mFlags.Clear(Flags::kWBSManagerInitialized);
+    mAdvertising.Stop();
+    mGattServer.Shutdown();
+    // Release BLE connection resources. ShutdownWbsLayer() frees *mEndpoint - null the member out
+    // so a later _NumConnections() call or a second _Shutdown() cannot dereference/double-free it.
+    mConnection.ShutdownWbsLayer(mEndpoint);
+    mEndpoint = nullptr;
+    mFlags.Clear(Flags::kWBSManagerInitialized).Clear(Flags::kWBSBLELayerInitialized);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -179,8 +185,9 @@ exit:
 
 uint16_t BLEManagerImpl::_NumConnections()
 {
-    uint16_t numCons = 0;
-    return numCons;
+    return (mEndpoint != nullptr && mEndpoint->mConnectionMap != nullptr)
+        ? static_cast<uint16_t>(g_hash_table_size(mEndpoint->mConnectionMap))
+        : 0;
 }
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
@@ -196,14 +203,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
-        {
-            ChipDeviceEvent connectionEvent{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
-            PlatformMgr().PostEventOrDie(&connectionEvent);
-        }
+        NotifyCHIPoBLEConnectionEstablished();
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
+        NotifyCHIPoBLEConnectionClosed();
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
@@ -258,7 +263,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             mFlags.Clear(Flags::kWBSBLELayerInitialized);
             mFlags.Clear(Flags::kAdvertisingConfigured);
             mFlags.Clear(Flags::kAppRegistered);
-            mFlags.Clear(Flags::kAdvertising);
+            ClearAdvertisingFlag();
             CleanScanConfig();
             // Indicate that the adapter is no longer available
             err = BLE_ERROR_ADAPTER_UNAVAILABLE;
@@ -305,21 +310,18 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this));
         }
         mFlags.Set(Flags::kAdvertising);
+        NotifyCHIPoBLEAdvertisingChange(kActivity_Started);
         break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralAdvStopComplete:
         SuccessOrExit(err = apEvent->Platform.BLEPeripheralAdvStopComplete.mError);
         mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         // Transition to the not Advertising state...
-        if (mFlags.Has(Flags::kAdvertising))
-        {
-            mFlags.Clear(Flags::kAdvertising);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-        }
+        ClearAdvertisingFlag();
         break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralAdvReleased:
         // If the advertising was stopped due to a premature release, check if it needs to be restarted.
-        mFlags.Clear(Flags::kAdvertising);
+        ClearAdvertisingFlag();
         DriveBLEState();
         break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralRegisterAppComplete:
@@ -397,6 +399,10 @@ exit:
     return err;
 }
 
+// TODO: this only works for connections created by WbsConnection's central/client-role
+// ConnectDevice() flow. For the peripheral role, `conId` would need to identify an *incoming*
+// connection from a remote commissioner, which has no BLE_CONNECTION_OBJECT representation yet -
+// see the data-path TODOs in WbsGattServer.cpp.
 CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                           chip::System::PacketBufferHandle pBuf)
 {
@@ -491,6 +497,10 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     PlatformMgr().PostEventOrDie(&event);
 }
 
+// TODO: no caller wires this in on webOS yet - it's meant to fire when a remote commissioner
+// writes to our RX characteristic while we're acting as the CHIPoBLE peripheral/GATT server.
+// That requires WbsGattServer to subscribe via gatt/monitorCharacteristic(serverId, RX) and call
+// this from its callback; see the data-path TODOs in WbsGattServer.cpp.
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
     // Copy the data to a packet buffer.
@@ -513,6 +523,10 @@ void BLEManagerImpl::HandleConnectionClosed(BLE_CONNECTION_OBJECT conId)
     PlatformMgr().PostEventOrDie(&event);
 }
 
+// TODO: no caller wires this in on webOS yet - it's meant to fire when a remote commissioner
+// subscribes/unsubscribes (CCCD write) to our TX characteristic while we're acting as the
+// CHIPoBLE peripheral/GATT server. It is not yet confirmed which webOS LS2 API surfaces that
+// event; see the data-path TODOs in WbsGattServer.cpp.
 void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
 {
     VerifyOrReturn(conId != BLE_CONNECTION_UNINITIALIZED,
@@ -528,6 +542,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
     PlatformMgr().PostEventOrDie(&event);
 }
 
+// TODO: no caller wires this in on webOS yet - it's meant to fire once a server-role indication
+// push (see the planned WbsGattServer::SendIndication in WbsGattServer.cpp) completes.
 void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
 {
     // Post an event to the Chip queue to process the indicate confirmation.
@@ -567,6 +583,50 @@ void BLEManagerImpl::DriveBLEState()
         {
             SuccessOrExit(err = mConnection.InitConnectionData(mIsCentral, mEndpoint));
             mFlags.Set(Flags::kWBSBLELayerInitialized);
+        }
+    }
+
+    // Register the CHIPoBLE GATT service (gatt/openServer + gatt/addService) with the WBS layer
+    // if needed. This exposes the RX/TX characteristics so a remote commissioner can discover
+    // them once we start advertising below.
+    //
+    // TODO: WbsGattServer only implements service *registration* so far - the server-side data
+    // path (detecting a remote write to RX / a CCCD subscribe on TX, and pushing indications on
+    // TX) is not wired yet, pending confirmation of gatt/monitorCharacteristic and
+    // gatt/writeCharacteristicValue semantics with `serverId` on real hardware. See the TODOs in
+    // WbsGattServer.cpp for what remains. Until that's done, a remote commissioner can see this
+    // service advertised but cannot actually exchange CHIPoBLE handshake data with it.
+    if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
+    {
+        SuccessOrExit(err = mGattServer.Init());
+        mFlags.Set(Flags::kAppRegistered);
+    }
+
+    // If the application has enabled CHIPoBLE and BLE advertising...
+    if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
+    {
+        if (!mFlags.Has(Flags::kAdvertising))
+        {
+            // Start advertising. This is an asynchronous step; BLE manager will be notified of
+            // advertising start completion via a call to NotifyBLEPeripheralAdvStartComplete.
+            SuccessOrExit(err = mAdvertising.Start());
+            mFlags.Set(Flags::kControlOpInProgress);
+            ExitNow();
+        }
+        // NOTE: unlike BlueZ, webOS's le/configureAdvertisement API cannot update the advertising
+        // interval in place while advertising is active, so Flags::kAdvertisingRefreshNeeded
+        // (fast/slow/extended advertising interval transitions) is not acted upon here; it is
+        // simply cleared to avoid re-entering this branch on every DriveBLEState() call.
+        mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
+    }
+    // Otherwise stop advertising if needed...
+    else
+    {
+        if (mFlags.Has(Flags::kAdvertising))
+        {
+            SuccessOrExit(err = mAdvertising.Stop());
+            mFlags.Set(Flags::kControlOpInProgress);
+            ExitNow();
         }
     }
 
@@ -615,6 +675,32 @@ void BLEManagerImpl::CheckNonConcurrentBleClosing()
         DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
     }
 #endif
+}
+
+void BLEManagerImpl::ClearAdvertisingFlag()
+{
+    VerifyOrReturn(mFlags.Has(Flags::kAdvertising));
+    mFlags.Clear(Flags::kAdvertising);
+    NotifyCHIPoBLEAdvertisingChange(kActivity_Stopped);
+    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEConnectionEstablished()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEConnectionClosed()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEConnectionClosed };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEAdvertisingChange(enum ActivityChange change)
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEAdvertisingChange, .CHIPoBLEAdvertisingChange = { .Result = change } };
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 /*
