@@ -34,57 +34,7 @@ std::optional<CHIP_ERROR> BooleanStateOOBAccessor::HandleAction(CharSpan action,
         return HandleSetAttribute(tlvData);
     }
 
-    if (!action.data_equal("SetBooleanState"_span))
-    {
-        return std::nullopt;
-    }
-
-    TLV::TLVReader reader;
-    reader.Init(tlvData);
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-    EndpointId endpointId = kInvalidEndpointId;
-    bool newState         = false;
-    bool hasEndpointId    = false;
-    bool hasNewState      = false;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        TLV::Tag tag = reader.GetTag();
-        if (!TLV::IsContextTag(tag))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(tag))
-        {
-        case 1:
-            ReturnErrorOnFailure(reader.Get(endpointId));
-            hasEndpointId = true;
-            break;
-        case 2:
-            ReturnErrorOnFailure(reader.Get(newState));
-            hasNewState = true;
-            break;
-        default:
-            break;
-        }
-    }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
-    VerifyOrReturnError(hasEndpointId && hasNewState, CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (endpointId != mEndpointId)
-    {
-        return std::nullopt;
-    }
-
-    mCluster.SetStateValue(newState);
-    return CHIP_NO_ERROR;
+    return std::nullopt;
 }
 
 std::optional<CHIP_ERROR> BooleanStateOOBAccessor::HandleSetAttribute(ByteSpan tlvData) const

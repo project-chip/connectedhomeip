@@ -176,7 +176,7 @@ TEST_F(TestNamedPipeTranslators, OccupancyTranslator)
     // SetHoldTime
     Json::Value holdJson = ParseJson(R"({"Name": "SetHoldTime", "HoldTime": 120})");
     EXPECT_EQ(translator.TranslateAndExecute(1, holdJson, mRegistry), CHIP_NO_ERROR);
-    EXPECT_EQ(mMockAccessor->mLastAction, "SetHoldTime");
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetAttribute");
 
     // Invalid HoldTime
     Json::Value invalidHold = ParseJson(R"({"Name": "SetHoldTime", "HoldTime": -1})");

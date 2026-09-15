@@ -33,8 +33,6 @@ public:
 
 private:
     std::optional<CHIP_ERROR> HandleSetAttribute(ByteSpan tlvData) const;
-    std::optional<CHIP_ERROR> HandleSetOccupancy(ByteSpan tlvData) const;
-    std::optional<CHIP_ERROR> HandleSetHoldTime(ByteSpan tlvData) const;
 
     Clusters::OccupancySensingCluster & mCluster;
     EndpointId mEndpointId;

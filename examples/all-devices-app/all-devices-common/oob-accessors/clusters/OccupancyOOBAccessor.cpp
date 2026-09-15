@@ -35,14 +35,6 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleAction(CharSpan action, By
     {
         return HandleSetAttribute(tlvData);
     }
-    if (action.data_equal("SetOccupancy"_span))
-    {
-        return HandleSetOccupancy(tlvData);
-    }
-    if (action.data_equal("SetHoldTime"_span))
-    {
-        return HandleSetHoldTime(tlvData);
-    }
     return std::nullopt;
 }
 
@@ -71,126 +63,21 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetAttribute(ByteSpan tlvD
         mCluster.SetOccupancy(occupancy.Has(Clusters::OccupancySensing::OccupancyBitmap::kOccupied));
         return CHIP_NO_ERROR;
     }
+    case Clusters::OccupancySensing::Attributes::HoldTime::Id: {
+        Access::SubjectDescriptor subjectDescriptor{ .authMode = Access::AuthMode::kInternalDeviceAccess };
+        AttributeValueDecoder decoder(request.value, subjectDescriptor);
+        uint16_t holdTime = 0;
+        ReturnErrorOnFailure(decoder.Decode(holdTime));
+        auto status = mCluster.SetHoldTime(holdTime);
+        if (!status.IsSuccess())
+        {
+            return status.GetUnderlyingError();
+        }
+        return CHIP_NO_ERROR;
+    }
     default:
-        // HoldTime and the PIR/ultrasonic delays are writable per spec: decline so
-        // the caller falls through to the regular data-model write.
         return std::nullopt;
     }
-}
-
-std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetOccupancy(ByteSpan tlvData) const
-{
-    TLV::TLVReader reader;
-    reader.Init(tlvData);
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-    EndpointId endpointId = kInvalidEndpointId;
-    bool occupancy        = false;
-    bool hasEndpointId    = false;
-    bool hasOccupancy     = false;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        TLV::Tag tag = reader.GetTag();
-        if (!TLV::IsContextTag(tag))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(tag))
-        {
-        case 1:
-            ReturnErrorOnFailure(reader.Get(endpointId));
-            hasEndpointId = true;
-            break;
-        case 2: {
-            TLV::TLVType type = reader.GetType();
-            if (type == TLV::kTLVType_Boolean)
-            {
-                ReturnErrorOnFailure(reader.Get(occupancy));
-            }
-            else
-            {
-                uint8_t occVal = 0;
-                ReturnErrorOnFailure(reader.Get(occVal));
-                occupancy = (occVal != 0);
-            }
-            hasOccupancy = true;
-            break;
-        }
-        default:
-            break;
-        }
-    }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
-    VerifyOrReturnError(hasEndpointId && hasOccupancy, CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (endpointId != mEndpointId)
-    {
-        return std::nullopt;
-    }
-
-    mCluster.SetOccupancy(occupancy);
-    return CHIP_NO_ERROR;
-}
-
-std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetHoldTime(ByteSpan tlvData) const
-{
-    TLV::TLVReader reader;
-    reader.Init(tlvData);
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-    EndpointId endpointId = kInvalidEndpointId;
-    uint16_t holdTime     = 0;
-    bool hasEndpointId    = false;
-    bool hasHoldTime      = false;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        TLV::Tag tag = reader.GetTag();
-        if (!TLV::IsContextTag(tag))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(tag))
-        {
-        case 1:
-            ReturnErrorOnFailure(reader.Get(endpointId));
-            hasEndpointId = true;
-            break;
-        case 2:
-            ReturnErrorOnFailure(reader.Get(holdTime));
-            hasHoldTime = true;
-            break;
-        default:
-            break;
-        }
-    }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
-    VerifyOrReturnError(hasEndpointId && hasHoldTime, CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (endpointId != mEndpointId)
-    {
-        return std::nullopt;
-    }
-
-    auto status = mCluster.SetHoldTime(holdTime);
-    if (!status.IsSuccess())
-    {
-        return status.GetUnderlyingError();
-    }
-    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app

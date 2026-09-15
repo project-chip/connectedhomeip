@@ -57,7 +57,8 @@ CHIP_ERROR OccupancyTranslator::TranslateSetHoldTime(EndpointId endpointId, cons
 {
     auto holdTime = ExtractUInt<uint16_t>(json, "HoldTime");
     VerifyOrReturnError(holdTime.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-    return DispatchAction(registry, "SetHoldTime"_span, endpointId, *holdTime);
+    return DispatchSetAttribute(registry, endpointId, Clusters::OccupancySensing::Id,
+                                Clusters::OccupancySensing::Attributes::HoldTime::Id, *holdTime);
 }
 
 } // namespace chip::app::NamedPipe
