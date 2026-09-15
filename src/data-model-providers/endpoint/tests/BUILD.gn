@@ -18,16 +18,30 @@ chip_test_suite("tests") {
   output_name = "libEndpointProviderTests"
 
   test_sources = [
+<<<<<<< HEAD:src/data-model-providers/endpoint/tests/BUILD.gn
     "TestEndpointProviderRegistry.cpp",
     "TestSpanEndpointProvider.cpp",
+=======
+    "TestBdxOtaSenderPeerBinding.cpp",
+    "TestOTAProviderExample.cpp",
+>>>>>>> dec6004 ([OTA Provider Example] Bind BDX transfer to the QueryImage requester (#74130)):examples/ota-provider-app/ota-provider-common/tests/BUILD.gn
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+<<<<<<< HEAD:src/data-model-providers/endpoint/tests/BUILD.gn
     "${chip_root}/src/app/clusters/descriptor",
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/data-model-providers/endpoint",
+=======
+    "${chip_root}/examples/ota-provider-app/ota-provider-common",
+    "${chip_root}/src/app/clusters/ota-provider:user-consent",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/protocols/bdx",
+>>>>>>> dec6004 ([OTA Provider Example] Bind BDX transfer to the QueryImage requester (#74130)):examples/ota-provider-app/ota-provider-common/tests/BUILD.gn
   ]
 }
