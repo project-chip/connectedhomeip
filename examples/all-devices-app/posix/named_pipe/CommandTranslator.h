@@ -27,8 +27,8 @@
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
-#include <oob-accessors/OOBDataSerializer.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
+#include <oob-accessors/OOBDataSerializer.h>
 
 namespace chip::app::NamedPipe {
 
