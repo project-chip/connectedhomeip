@@ -131,7 +131,8 @@ class TestBuilder(unittest.TestCase):
 
     @unittest.skipUnless(sys.platform == 'linux', 'Build on linux test')
     @unittest.skipUnless(os.uname().machine == 'x86_64', 'Validation x64, requires linux x64')
-    def test_openssl_static_dry_runs(self):
+    def test_openssl_static_dry_runs(self) -> None:
+        """Verify that the static target suffix selects OpenSSL and static linkage."""
         for app in ('network-manager', 'all-clusters', 'chip-tool', 'chip-cert', 'python-bindings'):
             with self.subTest(app=app):
                 target = f'linux-x64-{app}'
