@@ -11,6 +11,46 @@ Contents of this directory:
     CHIP
 -   Dockerfile - description of the image
 
+OpenSSL is downloaded, checksum-verified, compiled, and installed when the image
+is built. The build checks the pinned version and the presence of both static
+and shared libraries. CI jobs reuse this installation; they must not download or
+compile OpenSSL during job setup. Publish the updated image and update CI image
+references before enabling jobs that require `/opt/matter/openssl`.
+
+Select SDK OpenSSL linkage with a `docker build` argument. The same choices
+apply to `chip-build-minimal` and `chip-cert-bins`:
+
+| Build argument         | SDK OpenSSL selection                |
+| ---------------------- | ------------------------------------ |
+| Omitted (or empty)     | Host OpenSSL (3.0 on Ubuntu 24.04)   |
+| `OPENSSL_STATIC=true`  | Private OpenSSL 3.5, static linkage  |
+| `OPENSSL_STATIC=false` | Private OpenSSL 3.5, dynamic linkage |
+
+An explicit value sets the SDK-only `CHIP_OPENSSL_STATIC` and
+`CHIP_OPENSSL_ROOT` defaults. OpenSSL 3.5 is installed privately under
+`/opt/matter/openssl`, selected through `CHIP_OPENSSL_ROOT` only by the SDK's
+OpenSSL configuration. Unrelated tools built in this image or derived images
+(such as Cirque) keep the system OpenSSL headers, pkg-config metadata and
+runtime libraries. Dynamically linked SDK binaries use a private RUNPATH; the
+system loader cache is unchanged. Cross-compilation sysroots are unaffected.
+Rebuild consuming binaries when updating OpenSSL. Host OpenSSL may lack
+algorithms needed by newer SDK features; choose private OpenSSL explicitly when
+those features are required.
+
+This applies to example applications and SDK tools built inside the image. For
+example, in a bootstrapped SDK checkout inside the static OpenSSL image:
+
+```sh
+./scripts/build/build_examples.py --target linux-x64-network-manager build
+```
+
+Use a fresh output directory or rerun GN generation after changing images; an
+existing Ninja build can retain the previous library selection. To request
+static OpenSSL per build in a regular image, use the
+`linux-x64-network-manager-openssl-static` target instead. See the
+[SDK build instructions](../../../../../scripts/build/README.md#static-openssl-on-linux)
+for other applications and direct GN builds.
+
 Please update version when any required tooling is updated. Some rough
 guidelines:
 
