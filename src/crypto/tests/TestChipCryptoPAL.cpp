@@ -78,6 +78,12 @@
 #include <mbedtls/memory_buffer_alloc.h>
 #endif
 
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL
+#include <openssl/bio.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+#endif
+
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
 extern "C" {
@@ -116,6 +122,70 @@ std::string StringJoin(const std::vector<std::string> & elements, const std::str
 
     return outStr;
 }
+
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44) && defined(EVP_PKEY_ML_DSA_65)
+#include "MlDsaAttestationChain_test_vectors.h"
+
+std::vector<uint8_t> DerCertificateFromPem(const char * pem)
+{
+    std::vector<uint8_t> der;
+    BIO * bio                = BIO_new_mem_buf(pem, -1);
+    X509 * x509              = nullptr;
+    unsigned char * derBytes = nullptr;
+
+    if (bio == nullptr)
+    {
+        return der;
+    }
+
+    x509 = PEM_read_bio_X509(bio, nullptr, nullptr, nullptr);
+    if (x509 == nullptr)
+    {
+        BIO_free(bio);
+        return der;
+    }
+
+    const int derLen = i2d_X509(x509, &derBytes);
+    if (derLen <= 0)
+    {
+        X509_free(x509);
+        BIO_free(bio);
+        return der;
+    }
+
+    der.assign(derBytes, derBytes + derLen);
+
+    OPENSSL_free(derBytes);
+    X509_free(x509);
+    BIO_free(bio);
+    return der;
+}
+
+// One row of the specification's table of valid PQC Phase 1 algorithm combinations.
+struct MlDsaAttestationChain
+{
+    const char * description;
+    const char * paaPem;
+    const char * paiPem;
+    const char * dacPem;
+    ByteSpan dacPublicKey;
+};
+
+const MlDsaAttestationChain kMlDsaAttestationChains[] = {
+    { "ML-DSA-65 PAA, ML-DSA-65 PAI", kMlDsa65PaaPem, kMlDsa65PaiPem, kMlDsa65PaiDacPem, ByteSpan(kMlDsa65PaiDacPublicKey) },
+    { "ML-DSA-65 PAA, ML-DSA-44 PAI", kMlDsa65PaaPem, kMlDsa44PaiUnderMlDsa65PaaPem, kMlDsa44PaiUnderMlDsa65PaaDacPem,
+      ByteSpan(kMlDsa44PaiUnderMlDsa65PaaDacPublicKey) },
+    { "ML-DSA-65 PAA, P-256 PAI", kMlDsa65PaaPem, kP256PaiUnderMlDsa65PaaPem, kP256PaiUnderMlDsa65PaaDacPem,
+      ByteSpan(kP256PaiUnderMlDsa65PaaDacPublicKey) },
+    { "ML-DSA-44 PAA, ML-DSA-44 PAI", kMlDsa44PaaPem, kMlDsa44PaiPem, kMlDsa44PaiDacPem, ByteSpan(kMlDsa44PaiDacPublicKey) },
+    { "ML-DSA-44 PAA, P-256 PAI", kMlDsa44PaaPem, kP256PaiUnderMlDsa44PaaPem, kP256PaiUnderMlDsa44PaaDacPem,
+      ByteSpan(kP256PaiUnderMlDsa44PaaDacPublicKey) },
+};
+
+// The specification lists five valid PAA/PAI/DAC algorithm combinations for PQC Phase 1.
+static_assert(MATTER_ARRAY_SIZE(kMlDsaAttestationChains) == 5, "One chain per specified combination is expected");
+
+#endif
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
 #if defined(MBEDTLS_MEMORY_DEBUG)
@@ -337,6 +407,21 @@ struct TestChipCryptoPAL : public ::testing::Test
 #endif
     }
 };
+
+TEST_F(TestChipCryptoPAL, MlDsaCapabilitiesMatchOpenSslHeaders)
+{
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44)
+    EXPECT_TRUE(IsMlDsa44Supported());
+#else
+    EXPECT_FALSE(IsMlDsa44Supported());
+#endif
+
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_65)
+    EXPECT_TRUE(IsMlDsa65Supported());
+#else
+    EXPECT_FALSE(IsMlDsa65Supported());
+#endif
+}
 
 TEST_F(TestChipCryptoPAL, TestAES_CTR_128CryptTestVectors)
 {
@@ -2592,6 +2677,127 @@ TEST_F(TestChipCryptoPAL, TestX509_CertChainValidation)
         EXPECT_EQ(chainValidationResult, testCase.expectedValResult);
     }
 }
+
+#if CHIP_CRYPTO_OPENSSL && !CHIP_CRYPTO_BORINGSSL && defined(EVP_PKEY_ML_DSA_44) && defined(EVP_PKEY_ML_DSA_65)
+// Every algorithm combination the specification lists as valid must be accepted; see
+// MlDsaAttestationChain_test_vectors.h for the table these chains come from.
+TEST_F(TestChipCryptoPAL, TestX509_MlDsaAttestationCertificateFormat)
+{
+    HeapChecker heapChecker;
+
+    for (const MlDsaAttestationChain & chain : kMlDsaAttestationChains)
+    {
+        SCOPED_TRACE(chain.description);
+
+        const std::vector<uint8_t> paaDer = DerCertificateFromPem(chain.paaPem);
+        const std::vector<uint8_t> paiDer = DerCertificateFromPem(chain.paiPem);
+        const std::vector<uint8_t> dacDer = DerCertificateFromPem(chain.dacPem);
+
+        ASSERT_FALSE(paaDer.empty());
+        ASSERT_FALSE(paiDer.empty());
+        ASSERT_FALSE(dacDer.empty());
+
+        EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(paaDer.data(), paaDer.size()), Crypto::AttestationCertType::kPAA),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(paiDer.data(), paiDer.size()), Crypto::AttestationCertType::kPAI),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(dacDer.data(), dacDer.size()), Crypto::AttestationCertType::kDAC),
+                  CHIP_NO_ERROR);
+    }
+}
+
+TEST_F(TestChipCryptoPAL, TestX509_StrongerThanIssuerRejected)
+{
+    HeapChecker heapChecker;
+
+    // A certificate must not carry a key stronger than the algorithm that signed it. Both of
+    // these are well-formed PAIs in every other respect, so only the strength rule rejects them.
+    const char * const strongerThanIssuer[] = { kMlDsa65PaiUnderMlDsa44PaaPem, kMlDsa65PaiUnderP256PaaPem };
+
+    for (const char * pem : strongerThanIssuer)
+    {
+        const std::vector<uint8_t> paiDer = DerCertificateFromPem(pem);
+        ASSERT_FALSE(paiDer.empty());
+
+        EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(paiDer.data(), paiDer.size()), Crypto::AttestationCertType::kPAI),
+                  CHIP_ERROR_INTERNAL);
+    }
+}
+
+TEST_F(TestChipCryptoPAL, TestX509_PaaKeyAndSignatureAlgorithmsMustMatch)
+{
+    HeapChecker heapChecker;
+
+    std::vector<uint8_t> paaDer = DerCertificateFromPem(kMlDsa44PaaPem);
+    ASSERT_FALSE(paaDer.empty());
+
+    // Change the two signature AlgorithmIdentifiers from ML-DSA-44 to ML-DSA-65 while leaving
+    // the subject public-key AlgorithmIdentifier as ML-DSA-44. Each OID is DER encoded as
+    // 2.16.840.1.101.3.4.3.17; the three occurrences are TBS signature, subject key, and outer
+    // signature, in that order.
+    constexpr uint8_t kMlDsa44OidDer[] = { 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x11 };
+    std::vector<size_t> oidOffsets;
+    for (size_t offset = 0; offset + sizeof(kMlDsa44OidDer) <= paaDer.size(); ++offset)
+    {
+        if (memcmp(paaDer.data() + offset, kMlDsa44OidDer, sizeof(kMlDsa44OidDer)) == 0)
+        {
+            oidOffsets.push_back(offset);
+        }
+    }
+    ASSERT_EQ(oidOffsets.size(), 3u);
+
+    constexpr uint8_t kMlDsa65OidLastByte                   = 0x12;
+    paaDer[oidOffsets.front() + sizeof(kMlDsa44OidDer) - 1] = kMlDsa65OidLastByte;
+    paaDer[oidOffsets.back() + sizeof(kMlDsa44OidDer) - 1]  = kMlDsa65OidLastByte;
+
+    EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(paaDer.data(), paaDer.size()), Crypto::AttestationCertType::kPAA),
+              CHIP_ERROR_INTERNAL);
+}
+
+TEST_F(TestChipCryptoPAL, TestX509_MlDsaKeyedDacRejected)
+{
+    HeapChecker heapChecker;
+
+    // Every valid combination gives the DAC a P-256 key, so an otherwise conforming DAC
+    // that carries an ML-DSA key must fail the format check. This certificate differs from
+    // the accepted row 4 DAC only in its subject key algorithm: same issuer, same signature
+    // algorithm, same extensions.
+    const std::vector<uint8_t> dacDer = DerCertificateFromPem(kMlDsa44KeyedDacPem);
+    ASSERT_FALSE(dacDer.empty());
+
+    EXPECT_EQ(VerifyAttestationCertificateFormat(ByteSpan(dacDer.data(), dacDer.size()), Crypto::AttestationCertType::kDAC),
+              CHIP_ERROR_INTERNAL);
+}
+
+TEST_F(TestChipCryptoPAL, TestX509_MlDsaAttestationChainValidation)
+{
+    HeapChecker heapChecker;
+
+    for (const MlDsaAttestationChain & chain : kMlDsaAttestationChains)
+    {
+        SCOPED_TRACE(chain.description);
+
+        const std::vector<uint8_t> paaDer = DerCertificateFromPem(chain.paaPem);
+        const std::vector<uint8_t> paiDer = DerCertificateFromPem(chain.paiPem);
+        const std::vector<uint8_t> dacDer = DerCertificateFromPem(chain.dacPem);
+
+        ASSERT_FALSE(paaDer.empty());
+        ASSERT_FALSE(paiDer.empty());
+        ASSERT_FALSE(dacDer.empty());
+
+        CertificateChainValidationResult chainValidationResult = CertificateChainValidationResult::kInternalFrameworkError;
+        const CHIP_ERROR err = ValidateCertificateChain(paaDer.data(), paaDer.size(), paiDer.data(), paiDer.size(), dacDer.data(),
+                                                        dacDer.size(), chainValidationResult);
+
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(chainValidationResult, CertificateChainValidationResult::kSuccess);
+
+        P256PublicKey publicKey;
+        EXPECT_EQ(ExtractPubkeyFromX509Cert(ByteSpan(dacDer.data(), dacDer.size()), publicKey), CHIP_NO_ERROR);
+        EXPECT_TRUE(chain.dacPublicKey.data_equal(ByteSpan(publicKey.ConstBytes(), publicKey.Length())));
+    }
+}
+#endif
 
 TEST_F(TestChipCryptoPAL, TestX509_IssuingTimestampValidation)
 {

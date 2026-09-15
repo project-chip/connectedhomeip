@@ -4663,7 +4663,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 11;
+  revision 12;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -4783,6 +4783,7 @@ cluster Thermostat = 513 {
     kPresets = 0x100;
     kEvents = 0x200;
     kThermostatSuggestions = 0x400;
+    kThermostatSensors = 0x800;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -4894,6 +4895,21 @@ cluster Thermostat = 513 {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
+  }
+
+  struct SensorScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    octet_string enabledSensors[] = 2;
+  }
+
+  struct ThermostatSensorStruct {
+    char_string<64> name = 0;
+    octet_string<16> sensorHandle = 1;
+    cluster_id cluster = 2;
+    optional endpoint_no endpoint = 3;
+    optional node_id node = 4;
+    optional fabric_idx fabricIndex = 5;
   }
 
   struct ThermostatSuggestionStruct {
@@ -5010,10 +5026,17 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
-  provisional readonly attribute optional int8u maxThermostatSuggestions = 83;
-  provisional readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
-  provisional readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
-  provisional readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  readonly attribute optional int8u maxThermostatSuggestions = 83;
+  readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
+  readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
+  readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
+  provisional readonly attribute optional boolean criticalFreezeProtection = 87;
+  provisional readonly attribute optional boolean criticalOverheatProtection = 88;
+  provisional readonly attribute optional ThermostatSensorStruct sensors[] = 89;
+  provisional attribute access(write: manage) optional octet_string availableSensors[] = 90;
+  provisional attribute access(write: manage) optional octet_string enabledSensors[] = 91;
+  provisional readonly attribute optional int8u numberOfSensorScheduleTransitions = 92;
+  provisional attribute access(write: manage) optional SensorScheduleTransitionStruct sensorSchedule[] = 93;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5095,7 +5118,7 @@ cluster Thermostat = 513 {
   /** This command will remove the specified suggestion. */
   command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
-  command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
+  command AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
@@ -6450,6 +6473,64 @@ provisional cluster SoilMeasurement = 1072 {
 
   readonly attribute MeasurementAccuracyStruct soilMoistureMeasurementLimits = 0;
   readonly attribute nullable percent soilMoistureMeasuredValue = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** The server cluster provides an interface to concentration measurement functionality. */
+provisional cluster SmokeConcentrationMeasurement = 1076 {
+  revision 5;
+
+  shared enum LevelValueEnum : enum8 {
+    kUnknown = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+    kCritical = 4;
+  }
+
+  shared enum MeasurementMediumEnum : enum8 {
+    kAir = 0;
+    kWater = 1;
+    kSoil = 2;
+  }
+
+  shared enum MeasurementUnitEnum : enum8 {
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kNumericMeasurement = 0x1;
+    kLevelIndication = 0x2;
+    kMediumLevel = 0x4;
+    kCriticalLevel = 0x8;
+    kPeakMeasurement = 0x10;
+    kAverageMeasurement = 0x20;
+  }
+
+  provisional readonly attribute optional nullable single measuredValue = 0;
+  provisional readonly attribute optional nullable single minMeasuredValue = 1;
+  provisional readonly attribute optional nullable single maxMeasuredValue = 2;
+  provisional readonly attribute optional nullable single peakMeasuredValue = 3;
+  provisional readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
+  provisional readonly attribute optional nullable single averageMeasuredValue = 5;
+  provisional readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
+  provisional readonly attribute optional single uncertainty = 7;
+  provisional readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
+  provisional readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  provisional readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8449,6 +8530,12 @@ endpoint 1 {
   }
 
   server cluster Thermostat {
+    emits event SystemModeChange;
+    emits event LocalTemperatureChange;
+    emits event SetpointChange;
+    emits event RunningStateChange;
+    emits event RunningModeChange;
+    emits event ActivePresetChange;
     ram      attribute localTemperature;
     ram      attribute absMinHeatSetpointLimit default = 0x02BC;
     ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
@@ -8480,10 +8567,17 @@ endpoint 1 {
     callback attribute thermostatSuggestions;
     callback attribute currentThermostatSuggestion;
     callback attribute thermostatSuggestionNotFollowingReason;
+    callback attribute criticalFreezeProtection;
+    callback attribute criticalOverheatProtection;
+    callback attribute sensors;
+    callback attribute availableSensors;
+    callback attribute enabledSensors;
+    callback attribute numberOfSensorScheduleTransitions;
+    callback attribute sensorSchedule;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0523;
+    ram      attribute featureMap default = 0x0F23;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
@@ -8912,6 +9006,25 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster SmokeConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster WakeOnLan {
