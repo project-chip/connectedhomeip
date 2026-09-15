@@ -86,7 +86,8 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
     CHIP_ERROR err = SetBlock(block);
 
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format()));
 
     TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
@@ -115,7 +116,9 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     uint32_t currentVersion;
     uint32_t targetVersion = requestor->GetTargetVersion();
     ReturnErrorOnFailure(ConfigurationMgr().GetSoftwareVersion(currentVersion));
-    VerifyOrReturnError(currentVersion == targetVersion, CHIP_ERROR_INCORRECT_STATE, ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion, targetVersion));
+    VerifyOrReturnError(currentVersion == targetVersion, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32,
+                                     currentVersion, targetVersion));
     return CHIP_NO_ERROR;
 }
 
@@ -143,7 +146,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
     sl_status_t status    = SL_STATUS_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    
+
     VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
     if (writeBufOffset != 0)
@@ -192,7 +195,8 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
     sl_status_t status = sl_si91x_fwup_abort();
-    VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(SoftwareUpdate, "sl_si91x_fwup_abort() error 0x%lx", static_cast<unsigned long>(status)));
+    VerifyOrReturn(status == SL_STATUS_OK,
+                   ChipLogError(SoftwareUpdate, "sl_si91x_fwup_abort() error 0x%lx", static_cast<unsigned long>(status)));
 
     mFwChunkType   = kRpsHeader;
     writeBufOffset = 0;
@@ -300,7 +304,8 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
     }
 
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format()));
     return CHIP_NO_ERROR;
 }
 
