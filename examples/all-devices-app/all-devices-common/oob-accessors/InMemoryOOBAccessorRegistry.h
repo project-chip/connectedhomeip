@@ -46,7 +46,8 @@ public:
     CHIP_ERROR Register(std::unique_ptr<OOBAccessor> accessor);
 
     /**
-     * @brief Dispatches an action to registered accessors in order.
+     * @brief Dispatches an action to registered accessors in order, falling back to
+     *        the Matter DataModel for "SetAttribute" writes not claimed by any OOB accessor.
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_FOUND if unhandled, or specific error on execution failure.
      */
     CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData);
@@ -62,6 +63,10 @@ public:
     size_t Size() const { return mAccessors.size(); }
 
 private:
+    /**
+     * @brief Fallback handler that writes an attribute directly to the Matter DataModel
+     *        when no registered OOB accessor intercepts a "SetAttribute" request.
+     */
     static CHIP_ERROR WriteAttributeToDataModel(ByteSpan tlvData);
 
     std::vector<std::unique_ptr<OOBAccessor>> mAccessors;
