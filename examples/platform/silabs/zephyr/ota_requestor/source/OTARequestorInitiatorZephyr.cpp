@@ -18,10 +18,17 @@
 
 #include "OTARequestorInitiator.h"
 
-#include <zephyr/dfu/mcuboot.h>
-#include <zephyr/logging/log.h>
+#if defined(CONFIG_SOC_SERIES_SIWG917)
 
-using namespace chip;
+void chip::Zephyr::App::OTARequestorInitiator::HandleSelfTest()
+{
+    // SiWx917 Security Bootloader installs the RPS from ota_swap on reboot.
+    // There is no MCUboot trial/confirm swap to finalize.
+}
+
+#else
+
+#include <zephyr/dfu/mcuboot.h>
 
 void chip::Zephyr::App::OTARequestorInitiator::HandleSelfTest()
 {
@@ -38,3 +45,5 @@ void chip::Zephyr::App::OTARequestorInitiator::HandleSelfTest()
         }
     }
 }
+
+#endif // CONFIG_SOC_SERIES_SIWG917

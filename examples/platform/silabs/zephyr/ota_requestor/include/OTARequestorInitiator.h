@@ -24,7 +24,11 @@
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 
+#if defined(CONFIG_SOC_SERIES_SIWG917)
+#include <platform/silabs/zephyr/OTAImageProcessorImpl.h>
+#else
 #include <platform/Zephyr/OTAImageProcessorImpl.h>
+#endif
 
 #include <stdint.h>
 

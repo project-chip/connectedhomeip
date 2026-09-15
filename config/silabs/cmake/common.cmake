@@ -46,6 +46,12 @@ matter_add_gn_arg_bool  ("chip_system_config_provide_statistics"  CONFIG_CHIP_ST
 matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
 matter_add_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
 
+# SiWx917 uses RPS firmware-upgrade instead of the default Zephyr MCUboot processor.
+if(CONFIG_SOC_SERIES_SIWG917)
+    matter_add_gn_arg_string("chip_zephyr_ota_image_processor"
+                             "//src/platform/silabs/zephyr:ota-image-processor")
+endif()
+
 if(CONFIG_DEBUG)
     matter_add_gn_arg_bool("optimize_debug" true)
     matter_add_gn_arg_string("optimize_debug_level" "0")

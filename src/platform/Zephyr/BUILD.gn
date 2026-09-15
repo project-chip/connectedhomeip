@@ -106,10 +106,14 @@ static_library("Zephyr") {
   }
 
   if (chip_enable_ota_requestor) {
-    sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
-    ]
+    if (chip_zephyr_ota_image_processor != "") {
+      deps += [ chip_zephyr_ota_image_processor ]
+    } else {
+      sources += [
+        "OTAImageProcessorImpl.cpp",
+        "OTAImageProcessorImpl.h",
+      ]
+    }
     deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
