@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 
@@ -27,7 +28,19 @@ class JFARpc
 public:
     virtual ~JFARpc() {}
     virtual CHIP_ERROR GetICACCSRForJF(MutableByteSpan & icacCSR) = 0;
-    virtual void CloseStreams()                                   = 0;
+
+    /**
+     * Request the JFC to cross-sign the commissionee's ICAC CSR under the
+     * anchor root CA and return the resulting cross-signed ICAC.
+     *
+     * @param anchorFabricId  The FabricId of the anchor fabric, embedded as
+     *                        matter-fabric-id in the cross-signed ICAC Subject DN.
+     * @param icacCSR         The raw ICAC CSR bytes received from the commissionee.
+     * @param crossSignedICAC Output buffer for the cross-signed ICAC (DER/TLV encoded).
+     */
+    virtual CHIP_ERROR GetCrossSignedICAC(FabricId anchorFabricId, ByteSpan icacCSR, MutableByteSpan & crossSignedICAC) = 0;
+
+    virtual void CloseStreams() = 0;
 };
 
 } // namespace chip

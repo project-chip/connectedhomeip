@@ -18,6 +18,7 @@ public:
 
     /* JFARpc overrides */
     CHIP_ERROR GetICACCSRForJF(chip::MutableByteSpan & icacCSR);
+    CHIP_ERROR GetCrossSignedICAC(chip::FabricId anchorFabricId, chip::ByteSpan icacCSR, chip::MutableByteSpan & crossSignedICAC);
     void CloseStreams();
 
 private:
