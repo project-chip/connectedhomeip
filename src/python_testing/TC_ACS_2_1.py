@@ -39,7 +39,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -68,15 +68,12 @@ SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 
 class TC_ACS_2_1(MatterBaseTest):
 
-    # @pics('ACS.S')
-    # @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
-    def pics_TC_ACS_2_1(self):
-        return ['ACS.S']
-
+    @pics('ACS.S')
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
 
+    # @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     @async_test_body
     async def test_TC_ACS_2_1(self):
         endpoint = self.get_endpoint()
@@ -99,6 +96,8 @@ class TC_ACS_2_1(MatterBaseTest):
         log.info("Rx'd SoundIdentificationSupported: %s", {self.SoundIdentificationSupported})
         self.PredictedActivitySupported = ((aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity) != 0)
         log.info("Rx'd PredictedActivitySupported: %s", {self.PredictedActivitySupported})
+        self.SensorFusionSupported = ((aFeatureMap & cluster.Bitmaps.Feature.kSensorFusion) != 0)
+        log.info("Rx'd SensorFusionSupported: %s", {self.SensorFusionSupported})
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
@@ -190,8 +189,13 @@ class TC_ACS_2_1(MatterBaseTest):
                         if (nsID == nsID_support) and (tagID == tagID_support):
                             num_support = num_support + 1
 
-                    asserts.assert_greater(num_support, 0, "Ambient Context is not scoped within AmbientContextSupport list.")
+                    asserts.assert_greater(num_support, 0, "Some Ambient Context is not scoped within AmbientContextSupport list.")
 
+                    # If SensorFusion feature supported
+                    if self.SensorFusionSupported:
+                        detectionConfidence = context.detectionConfidence
+                        if detectionConfidence != NullValue:
+                            asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("5")
@@ -347,6 +351,34 @@ class TC_ACS_2_1(MatterBaseTest):
             log.info("PredictedActivity Feature not supported. Test steps skipped")
             self.skip_step("13a")
             self.skip_step("13b")
+
+        if self.SensorFusionSupported:
+            self.step("14", "If DUT supports feature SensorFusion, when reading the SensorFusionSupported attribute, verify that the list size is less than equal to 50 and the attribute contains SemanticTagStruct data type containing namespace ID and tag ID available from the AmbientContextTypeSupported attribute.")
+            sensorFusionSupported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SensorFusionSupported
+            )
+            asserts.assert_greater_equal(len(sensorFusionSupported), 1,
+                                         "The attribute list size should be greater than equalt to a.")
+            asserts.assert_less_equal(len(sensorFusionSupported), 50, "The attribute list size should be less than equal to 50.")
+
+            # check if each SensorFusionSupported attribute is within AmbientContextTypeSupported list
+            for context in sensorFusionSupported:
+                nsID = context.sensorFusionSupported[0].namespaceID
+                tagID = context.sensorFusionSupported[0].tag
+
+                num_support = 0
+                for acts in ambientContextTypeSupported:
+                    nsID_support = acts.namespaceID
+                    tagID_support = acts.tag
+
+                    if (nsID == nsID_support) and (tagID == tagID_support):
+                        num_support = num_support + 1
+
+                asserts.assert_greater(
+                    num_support, 0, "Some SensorFusionSupported context is not scoped within AmbientContextSupport list.")
+
+        else:
+            self.skip_step("14")
 
 
 if __name__ == "__main__":
