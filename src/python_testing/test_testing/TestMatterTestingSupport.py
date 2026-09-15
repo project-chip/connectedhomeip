@@ -15,19 +15,23 @@
 #    limitations under the License.
 #
 
+import asyncio
 import os
 import time
 from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.clusters.Types import Nullable, NullValue
+from matter.testing import matter_testing
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.pics import parse_pics, parse_pics_xml
-from matter.testing.runner import convert_args_to_matter_config, default_matter_test_main, matter_test_args_parser
+from matter.testing.runner import (commissioning_needed, convert_args_to_matter_config, default_matter_test_main,
+                                   matter_test_args_parser)
 from matter.testing.taglist_and_topology_test import (TagProblem, build_tree_for_graph, create_device_type_list_for_root,
                                                       create_device_type_lists, find_tag_list_problems, find_tree_roots,
                                                       flat_list_ok, get_all_children, get_direct_children_of_root,
@@ -737,6 +741,60 @@ class TestMatterTestingSupport(CertificationUnitTestNoDevice):
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.1"), "foo")
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.STR.MULTI.2"), "bar")
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.JSON"), {"key": "value"})
+
+    def test_commissioning_needed(self):
+        """The runner commissions unless the DUT is already on our fabric and nothing forces or forbids the skip."""
+        from matter.testing import runner as runner_module
+        from matter.testing.matter_test_config import MatterTestConfig
+
+        class PlainTest(matter_testing.MatterBaseTest):
+            pass
+
+        class CommissionerTest(matter_testing.MatterTestCommissioner):
+            pass
+
+        loop = asyncio.new_event_loop()
+        try:
+            def decide(test_class=PlainTest, commissioned=(True,), nodes=1, **overrides):
+                config = MatterTestConfig(commissioning_method="on-network", dut_node_ids=[0x11, 0x22][:nodes])
+                for key, value in overrides.items():
+                    setattr(config, key, value)
+                with patch.object(runner_module, "is_commissioned", new_callable=AsyncMock) as mock_is_commissioned:
+                    mock_is_commissioned.side_effect = list(commissioned)
+                    needed, reason = commissioning_needed(config, test_class, MagicMock(), loop)
+                    return needed, reason, mock_is_commissioned.await_count
+
+            needed, reason, calls = decide(commissioning_method=None)
+            asserts.assert_equal((needed, calls), (False, 0), f"No method: nothing to do ({reason})")
+
+            needed, reason, calls = decide(force_commissioning=True)
+            asserts.assert_equal((needed, calls), (True, 0), f"Force wins without probing ({reason})")
+
+            needed, reason, calls = decide(commission_only=True)
+            asserts.assert_equal((needed, calls), (True, 0), f"Commission-only always commissions ({reason})")
+
+            needed, reason, calls = decide(test_class=CommissionerTest)
+            asserts.assert_equal((needed, calls), (True, 0), f"Commissioner tests are never skipped ({reason})")
+            asserts.assert_in("MatterTestCommissioner", reason)
+
+            needed, reason, calls = decide(commissioned=(False, False))
+            asserts.assert_equal((needed, calls), (True, 2), f"Fresh DUT is probed twice, then commissioned ({reason})")
+
+            needed, reason, calls = decide(commissioned=(False, True))
+            asserts.assert_equal((needed, calls), (False, 2), f"A late-starting app is caught by the second probe ({reason})")
+
+            needed, reason, calls = decide(commissioned=(True,))
+            asserts.assert_equal((needed, calls), (False, 1), f"Commissioned DUT is skipped ({reason})")
+
+            needed, reason, calls = decide(commissioned=(RuntimeError("resolver down"),))
+            asserts.assert_equal((needed, calls), (True, 1), f"A broken probe falls back to commissioning ({reason})")
+            asserts.assert_in("probe failed", reason)
+
+            needed, reason, calls = decide(commissioned=(True, False, False), nodes=2)
+            asserts.assert_equal((needed, calls), (True, 3), f"Any uncommissioned node commissions ({reason})")
+            asserts.assert_in("0x22", reason)
+        finally:
+            loop.close()
 
     def test_build_tree(self):
         # Root node is 0

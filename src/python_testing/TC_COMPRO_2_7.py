@@ -82,7 +82,7 @@ import logging
 from typing import Any
 
 from mobly import asserts
-from support_modules.compro_support import COMPROBaseTest, EDFixture, commission_if_needed
+from support_modules.compro_support import COMPROBaseTest, EDFixture
 
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
@@ -353,5 +353,4 @@ class TC_COMPRO_2_7(COMPROBaseTest):
 
 
 if __name__ == "__main__":
-    commission_if_needed()
     default_matter_test_main()

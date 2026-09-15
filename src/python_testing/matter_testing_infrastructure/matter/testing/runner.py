@@ -40,6 +40,7 @@ from mobly.test_runner import TestRunner
 
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute
+from matter.testing.commissioning import is_commissioned
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
 # Add imports for argument parsing dependencies
@@ -363,6 +364,54 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
     return info
 
 
+# A wrong "not commissioned" answer makes the runner commission a commissioned DUT, which fails
+# on the fabric conflict, so the probe errs on the side of looking again: a second resolve window
+# covers an app that is still starting, and a longer CASE bound covers slow links such as Thread.
+COMMISSIONED_PROBE_ATTEMPTS = 2
+COMMISSIONED_PROBE_CASE_TIMEOUT_MS = 5000
+
+
+def commissioning_needed(matter_test_config, test_class, default_controller, event_loop) -> tuple[bool, str]:
+    """Decide whether the commissioning step runs before the test class, and say why.
+
+    Commissioning is skipped only when a commissioning method was given, nothing forces it,
+    the test class does not require an uncommissioned DUT or act as the commissioner, and
+    every DUT node is already commissioned on this controller's fabric.
+
+    Returns:
+        (needed, reason)
+    """
+    if matter_test_config.commissioning_method is None:
+        return False, "no commissioning method given"
+    if matter_test_config.force_commissioning:
+        return True, "--force-commissioning given"
+    if matter_test_config.commission_only or matter_test_config.commission_only_re_open_window:
+        return True, "commission-only run"
+
+    # Imported here: matter_testing imports this module at load time.
+    from matter.testing.matter_testing import MatterTestCommissioner, MatterTestUncommissionedDevice, device_requirement
+    marker = device_requirement(test_class)
+    if marker in (MatterTestUncommissionedDevice, MatterTestCommissioner):
+        return True, f"{test_class.__name__} declares {marker.__name__}"
+
+    for node_id in matter_test_config.dut_node_ids:
+        for attempt in range(COMMISSIONED_PROBE_ATTEMPTS):
+            try:
+                commissioned = event_loop.run_until_complete(
+                    is_commissioned(default_controller, node_id, case_timeout_ms=COMMISSIONED_PROBE_CASE_TIMEOUT_MS))
+            except Exception as e:  # a broken probe must not stop the run; commission as before
+                LOGGER.warning("Commissioned-state probe failed for node 0x%X (%s: %s); commissioning as before",
+                               node_id, type(e).__name__, e)
+                return True, f"probe failed for node 0x{node_id:X}"
+            if commissioned:
+                break
+            if attempt + 1 < COMMISSIONED_PROBE_ATTEMPTS:
+                LOGGER.info("Node 0x%X not seen yet, probing again (the app may still be starting)", node_id)
+        else:
+            return True, f"node 0x{node_id:X} is not commissioned on this fabric"
+    return False, "DUT already commissioned on this fabric"
+
+
 def run_tests_no_exit(
         test_class,
         matter_test_config,
@@ -464,8 +513,13 @@ def run_tests_no_exit(
                             testbed_name=test_config.testbed_name)
 
         with runner.mobly_logger():
-            if matter_test_config.commissioning_method is not None:
+            needed, reason = commissioning_needed(matter_test_config, test_class, default_controller, event_loop)
+            if needed:
+                LOGGER.info("Commissioning the DUT first: %s", reason)
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
+            elif matter_test_config.commissioning_method is not None:
+                LOGGER.info("Skipping commissioning: %s (pass --force-commissioning to commission anyway)", reason)
+                matter_test_config.commissioning_skipped = True
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only and not matter_test_config.commission_only_re_open_window:
@@ -646,6 +700,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.in_test_commissioning_method = args.in_test_commissioning_method
     config.commission_only = args.commission_only
     config.commission_only_re_open_window = args.commission_only_re_open_window
+    config.force_commissioning = args.force_commissioning
 
     config.qr_code_content.extend(args.qr_code)
     config.manual_code.extend(args.manual_code)
@@ -1066,6 +1121,9 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
     commission_group.add_argument('--thread-ba-port', action="store", type=int,
                                   help="Border Agent port")
 
+    commission_group.add_argument('--force-commissioning', action="store_true", default=False,
+                                  help="Commission even when the DUT is already commissioned on this fabric. By default "
+                                       "the commissioning step is skipped when a CASE session to the DUT can be established.")
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
     commission_group.add_argument('--commission-only-re-open-window', action="store_true", default=False,

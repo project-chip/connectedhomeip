@@ -214,6 +214,10 @@ def run_timeout(run: Metadata) -> float:
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
 @click.option("--factory-reset-app-only/--no-factory-reset-app-only", default=None,
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests, but not the controller config')
+@click.option("--reuse-commissioned-dut/--no-reuse-commissioned-dut", default=True,
+              help='Keep the app KVS (keyed by app binary) and the controller storage across runs so an already '
+                   'commissioned DUT is reused; a header "factory-reset: true" then only wipes when the state cannot '
+                   'be kept. "fresh-dut: true" in the header, or an explicit --factory-reset, always wipes.')
 @click.option("--app-args", type=str, default='',
               help='The extra arguments passed to the device. Can use placeholders like {SCRIPT_BASE_NAME}')
 @click.option("--app-ready-pattern", type=str, default=None,
@@ -244,7 +248,9 @@ def run_timeout(run: Metadata) -> float:
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-         app_filter, pre_existing_fabric: bool):
+         app_filter, pre_existing_fabric: bool, reuse_commissioned_dut: bool):
+    # An explicit --factory-reset on the command line always wipes; the header value can be softened by reuse.
+    factory_reset_explicit = factory_reset is True
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -295,7 +301,9 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
-                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric)
+                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric,
+                  DutStatePolicy(reuse=reuse_commissioned_dut, fresh_dut=run.fresh_dut,
+                                 factory_reset_explicit=factory_reset_explicit))
 
 
 class AppRestartMonitor:
@@ -367,10 +375,14 @@ class AppRestartMonitor:
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False):
+              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False,
+              dut_state_policy: "DutStatePolicy | None" = None):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+    dut_state_policy = dut_state_policy or DutStatePolicy(reuse=False)
+    if dut_state_policy.reuse:
+        app_args = keyed_kvs_app_args(app, app_args)
 
     # Generate unique test run ID to avoid conflicts in concurrent test runs
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
@@ -384,10 +396,26 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     if ip_packet_capture:
         tcpdump.start()
 
-    # Remove app config and storage if factory reset is requested
-    if factory_reset or factory_reset_app_only:
-        reset_type = FactoryResetType.AppAndController if factory_reset else FactoryResetType.AppOnly
-        factory_reset_config_removal(app_args, script_args, reset_type)
+    # Remove app config and storage if factory reset is requested, unless the policy lets a
+    # commissioned DUT be kept for reuse.
+    decision = decide_dut_state(factory_reset, dut_state_policy, app_args, script_args)
+    if factory_reset_app_only and not decision.wipe_controller:
+        log.info("DUT state: app state reset (explicit --factory-reset-app-only); %s", decision.reason)
+    else:
+        log.info("DUT state: %s", decision.reason)
+    storage_match = re.search(r"--storage-path (?P<path>[^ ]+)", script_args)
+    kvs_match = re.search(r"--KVS (?P<path>[^ ]+)", app_args)
+    if decision.wipe_controller:
+        factory_reset_config_removal(app_args, script_args, FactoryResetType.AppAndController)
+    elif decision.wipe_app or factory_reset_app_only:
+        factory_reset_config_removal(app_args, script_args, FactoryResetType.AppOnly)
+    if dut_state_policy.reuse and storage_match and kvs_match:
+        register_keyed_kvs(storage_match.group("path"), kvs_match.group("path"))
+    # An explicit app-only reset leaves a fresh DUT too.
+    if (decision.force_commissioning or factory_reset_app_only) and "mobile-device-test.py" not in script:
+        # The DUT cannot be on this controller's fabric: commission without probing for it.
+        # (mobile-device-test.py has its own parser.)
+        script_args += " --force-commissioning"
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
@@ -484,8 +512,15 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     final_script_command = [i.replace('|', ' ') for i in script_command]
 
+    commissioning_decision: list[str] = []
+
+    def process_test_script_output_and_decision(line, is_stderr):
+        if not commissioning_decision and (decision := commissioning_decision_from_line(line)):
+            commissioning_decision.append(decision)
+        return process_test_script_output(line, is_stderr)
+
     test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
-                                     output_cb=process_test_script_output,
+                                     output_cb=process_test_script_output_and_decision,
                                      f_stdout=stream_output,
                                      f_stderr=stream_output)
     test_script_process.start()
@@ -500,6 +535,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
+        log.info("Commissioning decision: %s", commissioning_decision[0] if commissioning_decision
+                 else "none reported (no commissioning method, or the script did not start)")
 
         restart_monitor.stop()
 
@@ -549,6 +586,119 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
 
 
+@dataclasses.dataclass
+class DutStatePolicy:
+    """How the runner treats app and controller state left by a previous run."""
+    reuse: bool                          # keep state so an already commissioned DUT is reused
+    fresh_dut: bool = False              # the header says the test needs a DUT with no fabrics
+    factory_reset_explicit: bool = False  # --factory-reset was given on the command line
+
+
+@dataclasses.dataclass
+class DutStateDecision:
+    wipe_controller: bool      # remove the controller storage and every keyed KVS commissioned against it
+    wipe_app: bool             # remove the app KVS and the /tmp/chip* config files
+    force_commissioning: bool  # the DUT cannot be on our fabric, skip the probe
+    reason: str
+
+
+# Lines the test framework prints when it decides whether to commission (see runner.py).
+_COMMISSIONING_DECISION_MARKERS = (b"Skipping commissioning:", b"Commissioning the DUT first:")
+
+
+def commissioning_decision_from_line(line: bytes) -> str | None:
+    """Return the framework's commissioning decision if this output line carries it, else None.
+
+    The runner logs it at INFO once the script finishes so the decision is visible in CI logs even
+    when the script's own output is suppressed (quiet runs), which is what a skip count is made of.
+    """
+    for marker in _COMMISSIONING_DECISION_MARKERS:
+        if (pos := line.find(marker)) != -1:
+            return line[pos:].decode("utf-8", errors="replace").strip()
+    return None
+
+
+def keyed_kvs_app_args(app: str, app_args: str) -> str:
+    """Give each app its own KVS file so consecutive runs on different apps never share device state.
+
+    The key is the app binary name plus, for apps that compose their device from a --device argument
+    (all-devices-app), that device value: the same binary started as a light and as a thermostat is two
+    different DUTs.
+    """
+    if not app:
+        return app_args
+    suffix = "." + os.path.basename(app)
+    if device := re.search(r"--device (?P<value>[^ ]+)", app_args):
+        suffix += "." + re.sub(r"[^A-Za-z0-9_.-]", "-", device.group("value"))
+    return re.sub(r"(--KVS (?P<path>[^ ]+))",
+                  lambda m: m.group(1) if m.group("path").endswith(suffix) else f"--KVS {m.group('path')}{suffix}",
+                  app_args, count=1)
+
+
+def keyed_kvs_registry(storage_path: str) -> pathlib.Path:
+    """File next to the controller storage listing the keyed KVS files commissioned against it."""
+    return pathlib.Path(storage_path + ".kvs")
+
+
+def register_keyed_kvs(storage_path: str, kvs_path: str) -> None:
+    registry = keyed_kvs_registry(storage_path)
+    known = registry.read_text().split() if registry.exists() else []
+    if kvs_path not in known:
+        registry.write_text("\n".join([*known, kvs_path]) + "\n")
+
+
+def registered_keyed_kvs(storage_path: str) -> list[str]:
+    """Every keyed KVS ever commissioned against this controller storage. The list is never pruned:
+    deleting a file that is already gone is harmless, forgetting one leaves a DUT on a dead fabric."""
+    registry = keyed_kvs_registry(storage_path)
+    return registry.read_text().split() if registry.exists() else []
+
+
+def decide_dut_state(factory_reset: bool, policy: DutStatePolicy, app_args: str, script_args: str) -> DutStateDecision:
+    """Decide what to wipe before the run and whether commissioning can be skipped.
+
+    Without reuse, "factory-reset: true" wipes as it always has. With reuse, the controller storage
+    is wiped only when the test needs a fresh DUT, the user asked for it explicitly, or there is no
+    --storage-path to key it. An app without --KVS cannot keep state apart from other apps, so its
+    app state is wiped and it is commissioned onto the kept fabric. Otherwise state is kept and the
+    DUT is force-commissioned only when its KVS or the storage is missing, which means it was never
+    commissioned or was reset since.
+    """
+    if not factory_reset:
+        return DutStateDecision(False, False, False, "no factory reset requested")
+    if not policy.reuse:
+        return DutStateDecision(True, True, True, "factory reset (reuse disabled)")
+    if policy.factory_reset_explicit:
+        return DutStateDecision(True, True, True, "factory reset (explicit --factory-reset)")
+    if policy.fresh_dut:
+        return DutStateDecision(True, True, True, "factory reset (header fresh-dut: true)")
+
+    storage = re.search(r"--storage-path (?P<path>[^ ]+)", script_args)
+    if not storage:
+        return DutStateDecision(True, True, True, "factory reset (no --storage-path to key the controller state)")
+    kvs = re.search(r"--KVS (?P<path>[^ ]+)", app_args)
+    if not kvs:
+        return DutStateDecision(False, True, True,
+                                "app state reset, controller storage kept (no --KVS to keep app state apart)")
+    if re.search(r"--(qr-code|manual-code)\b", script_args):
+        return DutStateDecision(False, True, True,
+                                "app state reset, controller storage kept (the run commissions with a setup payload, "
+                                "which needs an uncommissioned DUT)")
+    if "--in-test-commissioning-method" in script_args and "--commissioning-method" not in script_args:
+        return DutStateDecision(False, True, True,
+                                "app state reset, controller storage kept (the test commissions the DUT itself, "
+                                "so it needs an uncommissioned DUT)")
+    if not os.path.exists(storage.group("path")):
+        return DutStateDecision(False, True, True,
+                                f"app state reset, no controller storage yet at {storage.group('path')}")
+    if not os.path.exists(kvs.group("path")):
+        return DutStateDecision(False, False, True,
+                                f"keeping controller storage; commissioning forced, no app state yet at {kvs.group('path')}")
+    return DutStateDecision(False, False, False,
+                            f"keeping state in {kvs.group('path')} and {storage.group('path')}; "
+                            "commissioning only if the DUT is not on our fabric")
+
+
 class FactoryResetType(enum.Enum):
     """Type of factory reset to perform."""
     AppOnly = 0
@@ -565,9 +715,11 @@ class FactoryResetType(enum.Enum):
             yield match.group("path")
 
         if self == FactoryResetType.AppAndController:
-            # Controller storage
+            # Controller storage, and every keyed KVS commissioned against it: a new controller
+            # fabric would leave those DUTs on a fabric that no longer exists.
             if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
                 yield match.group("path")
+                yield from registered_keyed_kvs(match.group("path"))
 
 
 # The tv-app's media store
@@ -576,7 +728,7 @@ TV_APP_MEDIA_DIR = "/tmp/chip-media-files"
 
 def factory_reset_config_removal(app_args: str, script_args: str, reset_type: FactoryResetType = None):
     """Handles app factory reset requests by removing configuration and storage files."""
-    for path in reset_type.config_files(app_args, script_args):
+    for path in dict.fromkeys(reset_type.config_files(app_args, script_args)):
         log.info("Removing config/storage file, path: '%s'...", path)
 
         # Targets the specific tv-app media directory if found, which
