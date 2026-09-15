@@ -115,12 +115,12 @@ void ClosureManager::Init()
         .Set(ClosureDimension::Feature::kRotation);
 
     ClosureDimension::ClusterInitParameters clusterInitParameters3;
-    clusterInitParameters3.resolution           = 100;
-    clusterInitParameters3.stepValue            = 1000;
-    clusterInitParameters3.unit                 = ClosureUnitEnum::kDegree;
-    clusterInitParameters3.rotationAxis         = RotationAxisEnum::kCenteredVertical;
-    clusterInitParameters3.overflow             = OverflowEnum::kTopInside;
-    clusterInitParameters3.modulationType       = ModulationTypeEnum::kVentilation;
+    clusterInitParameters3.resolution     = 100;
+    clusterInitParameters3.stepValue      = 1000;
+    clusterInitParameters3.unit           = ClosureUnitEnum::kDegree;
+    clusterInitParameters3.rotationAxis   = RotationAxisEnum::kCenteredVertical;
+    clusterInitParameters3.overflow       = OverflowEnum::kTopInside;
+    clusterInitParameters3.modulationType = ModulationTypeEnum::kVentilation;
     clusterInitParameters3.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
         .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
 
@@ -234,13 +234,13 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
         {
             ReturnErrorOnFailure(
                 closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
-                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(360) })); //degree
+                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(360) })); // degree
         }
         else
         {
-        ReturnErrorOnFailure(
+            ReturnErrorOnFailure(
                 closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
-                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) })); //millimeter
+                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) })); // millimeter
         }
     }
     if (conformance.HasFeature(ClosureDimension::Feature::kLimitation))
