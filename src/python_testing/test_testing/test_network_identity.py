@@ -23,7 +23,7 @@ import unittest
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
+from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature, encode_dss_signature
 
 # The helper under test lives in src/python_testing/support_modules, which is only on
 # sys.path when a test script is launched from src/python_testing. This file is run by
@@ -118,21 +118,15 @@ class TestGeneratedClientIdentity(unittest.TestCase):
 
     def test_self_signature_verifies_over_reconstructed_tbs(self):
         # The DUT reconstructs the TBS from the embedded public key and verifies
-        # the signature; mimic that to prove the identity would be accepted.
+        # the signature; validate_compact_identity mimics that, so a generated
+        # identity passing it proves the identity would be accepted.
         _, compact = ni.generate_network_client_identity()
-        public_key = ni.compact_identity_public_key(compact)
-        raw_signature = compact[4 + 65 + 3:4 + 65 + 3 + 64]
-        r = int.from_bytes(raw_signature[:32], "big")
-        s = int.from_bytes(raw_signature[32:], "big")
-
-        loaded = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), public_key)
-        tbs = ni._encode_network_identity_tbs(public_key)
-        loaded.verify(encode_dss_signature(r, s), tbs, ec.ECDSA(hashes.SHA256()))
+        ni.validate_compact_identity(compact)
 
     def test_verification_fails_for_tampered_tbs(self):
         _, compact = ni.generate_network_client_identity()
         public_key = ni.compact_identity_public_key(compact)
-        raw_signature = compact[4 + 65 + 3:4 + 65 + 3 + 64]
+        raw_signature = ni.compact_identity_signature(compact)
         r = int.from_bytes(raw_signature[:32], "big")
         s = int.from_bytes(raw_signature[32:], "big")
 
@@ -143,15 +137,103 @@ class TestGeneratedClientIdentity(unittest.TestCase):
             loaded.verify(encode_dss_signature(r, s), bytes(tampered), ec.ECDSA(hashes.SHA256()))
 
 
-def _verify_compact_self_signature(compact: bytes) -> None:
-    """Reconstructs the TBS from the embedded public key and verifies the signature,
-    mirroring the DUT's ValidateChipNetworkIdentity. Raises InvalidSignature on failure."""
-    public_key = ni.compact_identity_public_key(compact)
-    raw_signature = compact[4 + 65 + 3:4 + 65 + 3 + 64]
-    r = int.from_bytes(raw_signature[:32], "big")
-    s = int.from_bytes(raw_signature[32:], "big")
-    loaded = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), public_key)
-    loaded.verify(encode_dss_signature(r, s), ni._encode_network_identity_tbs(public_key), ec.ECDSA(hashes.SHA256()))
+class TestCompactIdentityAccessors(unittest.TestCase):
+    """Validates the field accessors and the structural checks around them."""
+
+    def test_signature_matches_the_raw_slice(self):
+        _, compact = ni.generate_network_client_identity()
+        signature = ni.compact_identity_signature(compact)
+        self.assertEqual(len(signature), ni.POSSESSION_SIGNATURE_LENGTH)
+        self.assertEqual(signature, compact[4 + 65 + 3:4 + 65 + 3 + 64])
+
+    def test_signature_rejects_wrong_length(self):
+        _, compact = ni.generate_network_client_identity()
+        with self.assertRaises(ValueError):
+            ni.compact_identity_signature(compact[:-1])
+
+    def test_signature_rejects_bad_element_header(self):
+        _, compact = ni.generate_network_client_identity()
+        mangled = bytearray(compact)
+        mangled[4 + 65 + 1] = 0x0C  # A context tag other than the expected ecdsa-signature.
+        with self.assertRaises(ValueError):
+            ni.compact_identity_signature(bytes(mangled))
+
+    def test_public_key_rejects_bad_element_header(self):
+        _, compact = ni.generate_network_client_identity()
+        mangled = bytearray(compact)
+        mangled[2] = 0x0A  # A context tag other than the expected ec-pub-key.
+        with self.assertRaises(ValueError):
+            ni.compact_identity_public_key(bytes(mangled))
+
+    def test_validate_rejects_wrong_length(self):
+        # An empty or truncated input must be reported as a malformed identity rather
+        # than escaping as an IndexError from the structural checks.
+        for candidate in (b"", b"\x15\x18", ni.generate_network_client_identity()[1][:-1]):
+            with self.subTest(length=len(candidate)), self.assertRaises(ValueError):
+                ni.validate_compact_identity(candidate)
+
+    def test_validate_rejects_non_structure(self):
+        _, compact = ni.generate_network_client_identity()
+        mangled = bytearray(compact)
+        mangled[0] = 0x16  # An anonymous array rather than an anonymous structure.
+        with self.assertRaises(ValueError):
+            ni.validate_compact_identity(bytes(mangled))
+
+
+def _sign_possession(private_key: ec.EllipticCurvePrivateKey, compact: bytes, nonce: bytes) -> bytes:
+    """Produces a PossessionSignature the way a DUT does: ECDSA-SHA256 over
+    (NetworkClientIdentity || PossessionNonce), as a raw (r || s) pair."""
+    r, s = decode_dss_signature(private_key.sign(compact + nonce, ec.ECDSA(hashes.SHA256())))
+    return r.to_bytes(32, "big") + s.to_bytes(32, "big")
+
+
+class TestPossessionSignature(unittest.TestCase):
+    """Validates the PossessionSignature check against signatures produced the way a DUT does."""
+
+    def test_accepts_a_signature_over_identity_and_nonce(self):
+        private_key, compact = ni.generate_network_client_identity()
+        nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
+        ni.verify_possession_signature(compact, nonce, _sign_possession(private_key, compact, nonce))
+
+    def test_rejects_a_signature_for_a_different_nonce(self):
+        private_key, compact = ni.generate_network_client_identity()
+        signature = _sign_possession(private_key, compact, os.urandom(ni.POSSESSION_NONCE_LENGTH))
+        with self.assertRaises(InvalidSignature):
+            ni.verify_possession_signature(compact, os.urandom(ni.POSSESSION_NONCE_LENGTH), signature)
+
+    def test_rejects_a_signature_from_a_different_key(self):
+        _, compact = ni.generate_network_client_identity()
+        other_key, _ = ni.generate_network_client_identity()
+        nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
+        with self.assertRaises(InvalidSignature):
+            ni.verify_possession_signature(compact, nonce, _sign_possession(other_key, compact, nonce))
+
+    def test_rejects_a_signature_over_the_nonce_alone(self):
+        # The identity has to be part of the signed message, so a DUT signing only the
+        # nonce must not pass.
+        private_key, compact = ni.generate_network_client_identity()
+        nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
+        r, s = decode_dss_signature(private_key.sign(nonce, ec.ECDSA(hashes.SHA256())))
+        with self.assertRaises(InvalidSignature):
+            ni.verify_possession_signature(compact, nonce, r.to_bytes(32, "big") + s.to_bytes(32, "big"))
+
+    def test_rejects_bad_nonce_and_signature_lengths(self):
+        private_key, compact = ni.generate_network_client_identity()
+        nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
+        signature = _sign_possession(private_key, compact, nonce)
+        with self.assertRaises(ValueError):
+            ni.verify_possession_signature(compact, nonce[:16], signature)
+        with self.assertRaises(ValueError):
+            ni.verify_possession_signature(compact, nonce, signature[:32])
+
+    def test_rejects_a_padded_identity(self):
+        # The signed message starts with the identity, so a caller appending bytes and signing
+        # the result would otherwise verify against a malformed identity.
+        private_key, compact = ni.generate_network_client_identity()
+        padded = compact + b"\x00"
+        nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
+        with self.assertRaises(ValueError):
+            ni.verify_possession_signature(padded, nonce, _sign_possession(private_key, padded, nonce))
 
 
 class TestCollidingAndInvalidIdentities(unittest.TestCase):
@@ -163,7 +245,7 @@ class TestCollidingAndInvalidIdentities(unittest.TestCase):
         # Same identifier (same public key) but different bytes, and still self-verifies.
         self.assertEqual(ni.network_identity_identifier(colliding), ni.network_identity_identifier(original))
         self.assertNotEqual(colliding, original)
-        _verify_compact_self_signature(colliding)
+        ni.validate_compact_identity(colliding)
 
     def test_corrupted_identity_keeps_structure_but_fails_verification(self):
         _, original = ni.generate_network_client_identity()
@@ -174,7 +256,7 @@ class TestCollidingAndInvalidIdentities(unittest.TestCase):
         # Public key (and thus identifier) is untouched, but the signature no longer verifies.
         self.assertEqual(ni.compact_identity_public_key(corrupted), ni.compact_identity_public_key(original))
         with self.assertRaises(InvalidSignature):
-            _verify_compact_self_signature(corrupted)
+            ni.validate_compact_identity(corrupted)
 
 
 class TestEcdsaNetworkIdentityDerivation(unittest.TestCase):
@@ -213,6 +295,71 @@ class TestNetworkAdministratorSecret(unittest.TestCase):
     def test_rejects_bad_secret_length(self):
         with self.assertRaises(ValueError):
             ni.encode_network_administrator_secret(0, b"\x00" * 16)
+
+
+class TestNetworkAdministratorSecretDecoding(unittest.TestCase):
+    def test_round_trips_encoded_secret(self):
+        raw_secret = bytes(range(ni.NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
+        created = 0x01020304
+        decoded = ni.decode_network_administrator_secret(
+            ni.encode_network_administrator_secret(created, raw_secret))
+        self.assertEqual(decoded.version, 0)
+        self.assertEqual(decoded.created, created)
+        self.assertEqual(decoded.raw_secret, raw_secret)
+
+    def test_accepts_narrow_created_encodings(self):
+        # The C++ TLV writer emits the smallest unsigned encoding that fits, so a small
+        # timestamp comes back as a 1- or 2-byte element rather than the 4 bytes the
+        # Python encoder always writes.
+        raw_secret = bytes(range(ni.NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
+        for control, value_bytes, expected in ((0x24, b"\x07", 7), (0x25, b"\x34\x12", 0x1234)):
+            encoded = (bytes([0x15, 0x24, 0x01, 0x00, control, 0x02]) + value_bytes
+                       + bytes([0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]))
+            self.assertEqual(ni.decode_network_administrator_secret(encoded).created, expected)
+
+    def test_rejects_malformed_secrets(self):
+        raw_secret = bytes(ni.NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH)
+        valid = ni.encode_network_administrator_secret(0x01020304, raw_secret)
+        # Each case names the rejection it must produce. Matching the message keeps two cases
+        # from silently landing in the same branch and leaving another one unreached: dropping
+        # bytes off the end of a valid NASS, for instance, takes the closing 0x18 with them and
+        # is rejected as a bad structure long before any truncation check runs.
+        cases = {
+            "not a structure": (valid[1:], "anonymous TLV structure"),
+            "no closing tag": (valid[:-1], "anonymous TLV structure"),
+            # Ends between two fields, with less than a control-and-tag pair left.
+            "ends after the version": (bytes([0x15, 0x24, 0x01, 0x00, 0x18]), "truncated before field 2"),
+            # Ends right after the octet string's tag, so its length prefix is off the end.
+            "ends after the raw secret tag": (bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                     0x30, 0x03, 0x18]),
+                                              "truncated before the length of field 3"),
+            # Declares 32 bytes of raw secret but carries 28, so the field runs off the end.
+            "raw secret shorter than its length prefix": (valid[:-5] + bytes([0x18]), "truncated inside field 3"),
+            "trailing field": (valid[:-1] + bytes([0x24, 0x04, 0x00, 0x18]), "unexpected trailing fields"),
+            "nonzero version": (bytes([0x15, 0x24, 0x01, 0x01]) + valid[4:], "version must be 0"),
+            "short raw secret": (bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                        0x30, 0x03, 0x10]) + raw_secret[:16] + bytes([0x18]),
+                                 "raw secret must be 32 bytes"),
+            "out of tag order": (bytes([0x15, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01, 0x24, 0x01, 0x00,
+                                        0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]),
+                                 "out of tag order"),
+            # Each field's TLV type is enforced, so callers can rely on `created` being an
+            # integer they can do arithmetic on rather than getting bytes back.
+            "version as an octet string": (bytes([0x15, 0x30, 0x01, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]),
+                                           "field 1 must be an unsigned integer"),
+            "created as an octet string": (bytes([0x15, 0x24, 0x01, 0x00, 0x30, 0x02, 0x04, 0x04, 0x03, 0x02, 0x01,
+                                                  0x30, 0x03, 0x20]) + raw_secret + bytes([0x18]),
+                                           "field 2 must be an unsigned integer"),
+            "raw secret as an integer": (bytes([0x15, 0x24, 0x01, 0x00, 0x26, 0x02, 0x04, 0x03, 0x02, 0x01,
+                                                0x26, 0x03, 0x04, 0x03, 0x02, 0x01, 0x18]),
+                                         "field 3 must be an octet string"),
+        }
+        for name, (encoded, expected_message) in cases.items():
+            with self.subTest(name=name):
+                with self.assertRaises(ValueError) as caught:
+                    ni.decode_network_administrator_secret(encoded)
+                self.assertIn(expected_message, str(caught.exception))
 
 
 if __name__ == "__main__":

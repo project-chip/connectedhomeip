@@ -536,14 +536,61 @@ private:
         {
             RegisterCreator("oven", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingOven>(mContext->timerDelegate);
+                // Tagged with PositionTag::kTop to disambiguate from oven-2 under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kOvenTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingOven>(mContext->timerDelegate,
+                                               LoggingOven::Config{
+                                                   .cavityCount = 1,
+                                                   .tagList     = Span(&kOvenTag, 1),
+                                               });
+            });
+            RegisterCreator("oven-2", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from oven (see comment above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kOven2Tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingOven>(mContext->timerDelegate,
+                                               LoggingOven::Config{
+                                                   .cavityCount = 2,
+                                                   .tagList     = Span(&kOven2Tag, 1),
+                                               });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_REFRIGERATOR)
         {
             RegisterCreator("refrigerator", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate);
+                // Tagged with PositionTag::kTop to disambiguate from refrigerator-2 under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigeratorTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
+                                                       LoggingRefrigerator::Config{
+                                                           .tagList = Span(&kRefrigeratorTag, 1),
+                                                       });
+            });
+            RegisterCreator("refrigerator-2", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from refrigerator (see comment above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kRefrigerator2Tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingRefrigerator>(mContext->timerDelegate,
+                                                       LoggingRefrigerator::Config{
+                                                           .cabinetCount = 2,
+                                                           .tagList      = Span(&kRefrigerator2Tag, 1),
+                                                       });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)

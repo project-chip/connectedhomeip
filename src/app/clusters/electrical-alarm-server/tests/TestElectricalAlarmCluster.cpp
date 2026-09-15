@@ -583,7 +583,7 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_CrossPairVoltageViolation)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestElectricalAlarmCluster, SetThresholds_ImportExportBothZero)
+TEST_F(TestElectricalAlarmCluster, SetThresholds_ImportExportBothZeroFails)
 {
     TestServerClusterContext context;
     MockElectricalAlarmDelegate delegate;
@@ -593,11 +593,17 @@ TEST_F(TestElectricalAlarmCluster, SetThresholds_ImportExportBothZero)
 
     ClusterTester tester(cluster);
     Commands::SetElectricalAlarmThresholds::Type cmd;
-    // Both at zero is a valid quiescent state (import >= export with non-strict check).
+    // PowerImportThreshold is min maxOf(0, PowerExportThreshold + 1), which is 1 when
+    // PowerExportThreshold is 0, so both at zero is out of range.
     cmd.powerImportThreshold = MakeOptional<int64_t>(0);
     cmd.powerExportThreshold = MakeOptional<int64_t>(0);
     auto result              = tester.Invoke(Commands::SetElectricalAlarmThresholds::Id, cmd);
-    EXPECT_TRUE(result.status.has_value() && result.status->IsSuccess());
+    ASSERT_FALSE(result.IsSuccess());
+    auto statusCode = result.GetStatusCode();
+    if (statusCode.has_value())
+    {
+        EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
