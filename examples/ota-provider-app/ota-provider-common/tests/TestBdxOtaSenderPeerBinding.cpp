@@ -63,6 +63,7 @@ class TestableBdxOtaSender : public BdxOtaSender
 {
 public:
     using BdxOtaSender::OnMessageReceived;
+    using BdxOtaSender::PollForOutput;
 };
 
 class TestBdxOtaSenderPeerBinding : public chip::Testing::LoopbackMessagingContext
@@ -192,8 +193,8 @@ TEST_F(TestBdxOtaSenderPeerBinding, RejectsTheSameNodeIdOnADifferentFabric)
 }
 
 // The override must not reject a later message on the exchange already driving the transfer:
-// an early return there would skip the base's WillSendMessage() and free that exchange. Guards
-// against a future gate reintroducing that use-after-free (ASan flags it at teardown).
+// an early return there would skip the base's WillSendMessage() and free that exchange in the
+// real message path. Guards against a future gate reintroducing that.
 TEST_F(TestBdxOtaSenderPeerBinding, DoesNotRejectALaterMessageOnTheDrivingExchange)
 {
     ArmForArmedRequester();
@@ -201,8 +202,16 @@ TEST_F(TestBdxOtaSenderPeerBinding, DoesNotRejectALaterMessageOnTheDrivingExchan
     Messaging::ExchangeContext * driving = NewExchangeFor(mArmedSession.Get().Value());
     ASSERT_SUCCESS(DeliverReceiveInitOn(driving));
 
-    // A second init is a base state-machine error, not the override's rejection code.
-    EXPECT_NE(DeliverReceiveInitOn(driving), CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+    // Drain the pending output the init produced: the first poll accepts the transfer, the second
+    // sends the ReceiveAccept. Without this the transfer session rejects any further message before
+    // its own state machine sees it, which would hide what this test is asserting.
+    mSender->PollForOutput();
+    mSender->PollForOutput();
+    DrainAndServiceIO();
+
+    // The base now handles the second init and answers it with an unexpected-message status report,
+    // so any early return in the override - whatever code it picks - turns this red.
+    EXPECT_SUCCESS(DeliverReceiveInitOn(driving));
 }
 
 } // namespace
