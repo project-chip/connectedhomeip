@@ -34,8 +34,9 @@ CHIP_ERROR BooleanStateTranslator::TranslateAndExecute(EndpointId endpointId, co
         newState = ExtractBool(json, "BooleanState");
     }
     VerifyOrReturnError(newState.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-    return DispatchSetAttribute(registry, endpointId, Clusters::BooleanState::Id,
-                                Clusters::BooleanState::Attributes::StateValue::Id, *newState);
+    return DispatchSetAttribute(
+        registry, ConcreteAttributePath(endpointId, Clusters::BooleanState::Id, Clusters::BooleanState::Attributes::StateValue::Id),
+        *newState);
 }
 
 } // namespace chip::app::NamedPipe

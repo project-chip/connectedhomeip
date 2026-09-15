@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
+#include <app/AttributeValueDecoder.h>
+#include <app/data-model-provider/MetadataLookup.h>
+#include <app/data-model-provider/Provider.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
@@ -27,7 +31,7 @@ namespace chip::app {
 class PigweedAttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor
 {
 public:
-    PigweedAttributeAccessor()           = default;
+    explicit PigweedAttributeAccessor(DataModel::Provider & dataModelProvider) : mDataModelProvider(dataModelProvider) {}
     ~PigweedAttributeAccessor() override = default;
 
     std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, const TLV::TLVReader & reader) override
@@ -52,8 +56,27 @@ public:
             return ::pw::Status::Internal();
         }
 
-        return std::nullopt;
+        // No OOB accessor handled this attribute write; fall back to the injected Matter DataModel provider.
+        DataModel::ServerClusterFinder serverClusterFinder(&mDataModelProvider);
+        if (!serverClusterFinder.Find(path).has_value())
+        {
+            return ::pw::Status::NotFound();
+        }
+
+        Access::SubjectDescriptor subjectDescriptor{ .authMode = Access::AuthMode::kInternalDeviceAccess };
+        DataModel::WriteAttributeRequest writeRequest(path, subjectDescriptor);
+        TLV::TLVReader readerCopy = reader;
+        AttributeValueDecoder decoder(readerCopy, subjectDescriptor);
+        DataModel::ActionReturnStatus writeStatus = mDataModelProvider.WriteAttribute(writeRequest, decoder);
+        if (!writeStatus.IsSuccess())
+        {
+            return ::pw::Status::Internal();
+        }
+        return ::pw::OkStatus();
     }
+
+private:
+    DataModel::Provider & mDataModelProvider;
 };
 
 } // namespace chip::app

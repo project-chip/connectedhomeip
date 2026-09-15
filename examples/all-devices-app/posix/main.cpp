@@ -143,25 +143,25 @@ public:
         mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
         mRootNode(
             {
-                .commissioningWindowManager              = mContext.commissioningWindowManager, //
-                    .configurationManager                = mContext.configurationManager,       //
-                    .deviceControlServer                 = mContext.deviceControlServer,        //
-                    .fabricTable                         = mContext.fabricTable,                //
-                    .accessControl                       = mContext.accessControl,              //
-                    .persistentStorage                   = mContext.persistentStorage,          //
-                    .failSafeContext                     = mContext.failSafeContext,            //
-                    .deviceInstanceInfoProvider          = mContext.deviceInstanceInfoProvider, //
-                    .platformManager                     = mContext.platformManager,            //
-                    .groupDataProvider                   = mContext.groupDataProvider,          //
-                    .sessionManager                      = mContext.sessionManager,             //
-                    .dnssdServer                         = mContext.dnssdServer,                //
-                    .deviceLoadStatusProvider            = mContext.deviceLoadStatusProvider,   //
-                    .diagnosticDataProvider              = mContext.diagnosticDataProvider,     //
-                    .testEventTriggerDelegate            = mContext.testEventTriggerDelegate,   //
-                    .dacProvider                         = mContext.dacProvider,                //
-                    .eventManagement                     = mContext.eventManagement,            //
-                    .timerDelegate                       = mContext.timerDelegate,              //
-                    .minGuaranteedSubscriptionsPerFabric = mContext.minGuaranteedSubscriptionsPerFabric,
+                .commissioningWindowManager          = mContext.commissioningWindowManager, //
+                .configurationManager                = mContext.configurationManager,       //
+                .deviceControlServer                 = mContext.deviceControlServer,        //
+                .fabricTable                         = mContext.fabricTable,                //
+                .accessControl                       = mContext.accessControl,              //
+                .persistentStorage                   = mContext.persistentStorage,          //
+                .failSafeContext                     = mContext.failSafeContext,            //
+                .deviceInstanceInfoProvider          = mContext.deviceInstanceInfoProvider, //
+                .platformManager                     = mContext.platformManager,            //
+                .groupDataProvider                   = mContext.groupDataProvider,          //
+                .sessionManager                      = mContext.sessionManager,             //
+                .dnssdServer                         = mContext.dnssdServer,                //
+                .deviceLoadStatusProvider            = mContext.deviceLoadStatusProvider,   //
+                .diagnosticDataProvider              = mContext.diagnosticDataProvider,     //
+                .testEventTriggerDelegate            = mContext.testEventTriggerDelegate,   //
+                .dacProvider                         = mContext.dacProvider,                //
+                .eventManagement                     = mContext.eventManagement,            //
+                .timerDelegate                       = mContext.timerDelegate,              //
+                .minGuaranteedSubscriptionsPerFabric = mContext.minGuaranteedSubscriptionsPerFabric,
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -321,30 +321,29 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SetDeviceAttestationCredentialsProvider(&sDacProvider);
 
     static CodeDrivenDataModelDevices devices({
-        .storageDelegate                = *initParams.persistentStorageDelegate,                   //
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),   //
-            .configurationManager       = DeviceLayer::ConfigurationMgr(),                         //
-            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
-            .fabricTable                = Server::GetInstance().GetFabricTable(),                  //
-            .accessControl              = Server::GetInstance().GetAccessControl(),                //
-            .persistentStorage          = Server::GetInstance().GetPersistentStorage(),            //
-            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),              //
-            .deviceInstanceInfoProvider = *provider,                                               //
-            .platformManager            = DeviceLayer::PlatformMgr(),                              //
-            .groupDataProvider          = gGroupDataProvider,                                      //
-            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),         //
-            .dnssdServer                = DnssdServer::Instance(),                                 //
-            .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                  //
-            .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),                //
-            .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                     //
-            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
-            .eventManagement            = EventManagement::GetInstance(),                          //
-            .timerDelegate              = gTimerDelegate,                                          //
-            .minGuaranteedSubscriptionsPerFabric =
-                InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
+        .storageDelegate                     = *initParams.persistentStorageDelegate,                                           //
+        .commissioningWindowManager          = Server::GetInstance().GetCommissioningWindowManager(),                           //
+        .configurationManager                = DeviceLayer::ConfigurationMgr(),                                                 //
+        .deviceControlServer                 = DeviceLayer::DeviceControlServer::DeviceControlSvr(),                            //
+        .fabricTable                         = Server::GetInstance().GetFabricTable(),                                          //
+        .accessControl                       = Server::GetInstance().GetAccessControl(),                                        //
+        .persistentStorage                   = Server::GetInstance().GetPersistentStorage(),                                    //
+        .failSafeContext                     = Server::GetInstance().GetFailSafeContext(),                                      //
+        .deviceInstanceInfoProvider          = *provider,                                                                       //
+        .platformManager                     = DeviceLayer::PlatformMgr(),                                                      //
+        .groupDataProvider                   = gGroupDataProvider,                                                              //
+        .sessionManager                      = Server::GetInstance().GetSecureSessionManager(),                                 //
+        .dnssdServer                         = DnssdServer::Instance(),                                                         //
+        .deviceLoadStatusProvider            = *InteractionModelEngine::GetInstance(),                                          //
+        .diagnosticDataProvider              = DeviceLayer::GetDiagnosticDataProvider(),                                        //
+        .testEventTriggerDelegate            = initParams.testEventTriggerDelegate,                                             //
+        .dacProvider                         = *Credentials::GetDeviceAttestationCredentialsProvider(),                         //
+        .eventManagement                     = EventManagement::GetInstance(),                                                  //
+        .timerDelegate                       = gTimerDelegate,                                                                  //
+        .minGuaranteedSubscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
@@ -360,6 +359,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     const std::string & namedPipePath = AppOptions::GetConfig().appPipePath;
     if (!namedPipePath.empty())
     {
+        NamedPipe::Dispatcher::Instance().SetDataModelProvider(&devices.DataModelProvider());
         SetupNamedPipe(namedPipePath.c_str());
     }
 
@@ -395,7 +395,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #if PW_RPC_ENABLED
-    static chip::app::PigweedAttributeAccessor sPwOobAccessor;
+    static chip::app::PigweedAttributeAccessor sPwOobAccessor(devices.DataModelProvider());
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
 
     chip::rpc::Init(33000); // TODO: Add an arg for Pw port.

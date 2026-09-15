@@ -44,12 +44,11 @@ CHIP_ERROR OccupancyTranslator::TranslateSetOccupancy(EndpointId endpointId, con
     auto occupancy = ExtractBool(json, "Occupancy");
     VerifyOrReturnError(occupancy.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
     BitMask<Clusters::OccupancySensing::OccupancyBitmap> occupancyMask;
-    if (*occupancy)
-    {
-        occupancyMask.Set(Clusters::OccupancySensing::OccupancyBitmap::kOccupied);
-    }
-    return DispatchSetAttribute(registry, endpointId, Clusters::OccupancySensing::Id,
-                                Clusters::OccupancySensing::Attributes::Occupancy::Id, occupancyMask);
+    occupancyMask.Set(Clusters::OccupancySensing::OccupancyBitmap::kOccupied, *occupancy);
+    return DispatchSetAttribute(
+        registry,
+        ConcreteAttributePath(endpointId, Clusters::OccupancySensing::Id, Clusters::OccupancySensing::Attributes::Occupancy::Id),
+        occupancyMask);
 }
 
 CHIP_ERROR OccupancyTranslator::TranslateSetHoldTime(EndpointId endpointId, const Json::Value & json,
@@ -57,8 +56,10 @@ CHIP_ERROR OccupancyTranslator::TranslateSetHoldTime(EndpointId endpointId, cons
 {
     auto holdTime = ExtractUInt<uint16_t>(json, "HoldTime");
     VerifyOrReturnError(holdTime.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-    return DispatchSetAttribute(registry, endpointId, Clusters::OccupancySensing::Id,
-                                Clusters::OccupancySensing::Attributes::HoldTime::Id, *holdTime);
+    return DispatchSetAttribute(
+        registry,
+        ConcreteAttributePath(endpointId, Clusters::OccupancySensing::Id, Clusters::OccupancySensing::Attributes::HoldTime::Id),
+        *holdTime);
 }
 
 } // namespace chip::app::NamedPipe

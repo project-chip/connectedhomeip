@@ -16,8 +16,7 @@
 
 #include <oob-accessors/clusters/BooleanStateOOBAccessor.h>
 
-#include <access/SubjectDescriptor.h>
-#include <app/AttributeValueDecoder.h>
+#include <app/data-model/Decode.h>
 #include <clusters/BooleanState/AttributeIds.h>
 #include <clusters/BooleanState/ClusterId.h>
 #include <lib/core/TLV.h>
@@ -55,10 +54,8 @@ std::optional<CHIP_ERROR> BooleanStateOOBAccessor::HandleSetAttribute(ByteSpan t
     {
     case Clusters::BooleanState::Attributes::StateValue::Id: {
         // StateValue is read-only per spec; only the cluster API can set it.
-        Access::SubjectDescriptor subjectDescriptor{ .authMode = Access::AuthMode::kInternalDeviceAccess };
-        AttributeValueDecoder decoder(request.value, subjectDescriptor);
         bool stateValue = false;
-        ReturnErrorOnFailure(decoder.Decode(stateValue));
+        ReturnErrorOnFailure(DataModel::Decode(request.value, stateValue));
         mCluster.SetStateValue(stateValue);
         return CHIP_NO_ERROR;
     }

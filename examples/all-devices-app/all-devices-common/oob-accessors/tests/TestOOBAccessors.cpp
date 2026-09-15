@@ -123,10 +123,6 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
 {
     InMemoryOOBAccessorRegistry registry;
     Clusters::OccupancySensingCluster::Config config(1);
-    Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type limits{ .holdTimeMin     = 1,
-                                                                            .holdTimeMax     = 100,
-                                                                            .holdTimeDefault = 30 };
-    config.WithHoldTime(30, limits, mTimerDelegate);
     Clusters::OccupancySensingCluster cluster(config);
     EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
 

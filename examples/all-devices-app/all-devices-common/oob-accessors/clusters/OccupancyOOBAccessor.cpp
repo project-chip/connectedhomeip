@@ -16,8 +16,7 @@
 
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 
-#include <access/SubjectDescriptor.h>
-#include <app/AttributeValueDecoder.h>
+#include <app/data-model/Decode.h>
 #include <clusters/OccupancySensing/AttributeIds.h>
 #include <clusters/OccupancySensing/ClusterId.h>
 #include <clusters/OccupancySensing/Enums.h>
@@ -56,10 +55,8 @@ std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleSetAttribute(ByteSpan tlvD
     {
     case Clusters::OccupancySensing::Attributes::Occupancy::Id: {
         // Occupancy is read-only per spec; only the cluster API can set it.
-        Access::SubjectDescriptor subjectDescriptor{ .authMode = Access::AuthMode::kInternalDeviceAccess };
-        AttributeValueDecoder decoder(request.value, subjectDescriptor);
         BitMask<Clusters::OccupancySensing::OccupancyBitmap> occupancy;
-        ReturnErrorOnFailure(decoder.Decode(occupancy));
+        ReturnErrorOnFailure(DataModel::Decode(request.value, occupancy));
         mCluster.SetOccupancy(occupancy.Has(Clusters::OccupancySensing::OccupancyBitmap::kOccupied));
         return CHIP_NO_ERROR;
     }
