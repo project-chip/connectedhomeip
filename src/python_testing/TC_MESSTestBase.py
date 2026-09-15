@@ -61,15 +61,20 @@ class MESSTestBase:
     async def send_present_message(self, endpoint, message_id: bytes, message_control: int,
                                    priority=_MESSAGES.Enums.MessagePriorityEnum.kLow,
                                    message_text: str = "", language_code: str | None = None,
-                                   message_uri: str | None = None):
-        """Send PresentMessagesRequest and assert it is accepted."""
+                                   message_uri: str | None = None, duration_ms: int | None = None):
+        """Send PresentMessagesRequest and assert it is accepted.
+
+        ``duration_ms`` of None sends a null Duration, which the specification defines as
+        "until changed" - the message stays presented and never completes on its own. Pass a
+        value when the test needs the message to finish.
+        """
         return await self.send_single_cmd(
             cmd=_MESSAGES.Commands.PresentMessagesRequest(
                 messageID=message_id,
                 priority=priority,
                 messageControl=message_control,
                 startTime=NullValue,
-                duration=NullValue,
+                duration=duration_ms if duration_ms is not None else NullValue,
                 messageText=message_text,
                 languageCode=language_code,
                 messageURI=message_uri),
