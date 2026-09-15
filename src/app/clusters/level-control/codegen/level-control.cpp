@@ -985,7 +985,16 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
-    scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+
+    // Execute immediate transitions synchronously instead of scheduling a 0ms timer.
+    if (state->transitionTimeMs == 0)
+    {
+        emberAfLevelControlClusterServerTickCallback(endpoint);
+    }
+    else
+    {
+        scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+    }
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF
     // Check that the received MoveToLevelWithOnOff produces a On action and that the onoff support the lighting featuremap
@@ -1135,7 +1144,16 @@ static void moveHandler(CommandHandler * commandObj, const ConcreteCommandPath &
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
-    scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+
+    // Execute immediate transitions synchronously instead of scheduling a 0ms timer.
+    if (state->transitionTimeMs == 0)
+    {
+        emberAfLevelControlClusterServerTickCallback(endpoint);
+    }
+    else
+    {
+        scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+    }
     status = Status::Success;
 
 send_default_response:
@@ -1282,7 +1300,16 @@ static void stepHandler(CommandHandler * commandObj, const ConcreteCommandPath &
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
     // The setup was successful, so mark the new state as active and return.
-    scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+
+    // Execute immediate transitions synchronously instead of scheduling a 0ms timer.
+    if (state->transitionTimeMs == 0)
+    {
+        emberAfLevelControlClusterServerTickCallback(endpoint);
+    }
+    else
+    {
+        scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
+    }
     status = Status::Success;
 
 send_default_response:
