@@ -18,7 +18,7 @@
 # This test requires an all-clusters-app. Specify with --string-arg th_server_app_path:<path_to_app>
 #
 # Example invocation:
-#   python src/python_testing/test_testing/TestResolveNode.py --no-wildcard-subscription \
+#   python src/python_testing/test_testing/TestResolveNodeAddress.py --no-wildcard-subscription \
 #     --string-arg th_server_app_path:./out/linux-x64-all-clusters-no-ble/chip-all-clusters-app
 #
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
@@ -38,9 +38,9 @@
 # === END CI TEST ARGUMENTS ===
 
 """
-Integration tests for the controller's ResolveNode query.
+Integration tests for the controller's ResolveNodeAddress query.
 
-ResolveNode answers "is this node advertising on my fabric" through the controller's own
+ResolveNodeAddress answers "is this node advertising on my fabric" through the controller's own
 DNS-SD resolver without opening a session. It is a prior, not proof: the answer can come
 from the resolver's cache for a while after a device goes away. A CASE session is what
 settles it. The tests below pin down exactly that.
@@ -71,7 +71,7 @@ LOGGER = logging.getLogger(__name__)
 RESOLVE_TIMEOUT_MS = 2000
 
 
-class TestResolveNode(MatterTestCommissioner):
+class TestResolveNodeAddress(MatterTestCommissioner):
 
     def setup_class(self):
         super().setup_class()
@@ -133,7 +133,7 @@ class TestResolveNode(MatterTestCommissioner):
         """A device that is not on our fabric does not resolve."""
         self.start_th_server()
 
-        resolved = await self.default_controller.ResolveNode(self.th_server_local_nodeid, RESOLVE_TIMEOUT_MS)
+        resolved = await self.default_controller.ResolveNodeAddress(self.th_server_local_nodeid, RESOLVE_TIMEOUT_MS)
         asserts.assert_is_none(resolved, "Factory-fresh device must not resolve on our fabric")
 
     @async_test_body
@@ -149,8 +149,8 @@ class TestResolveNode(MatterTestCommissioner):
 
         # Two lookups for the same node at once must both complete with the same answer.
         resolved, resolved_again = await asyncio.gather(
-            self.default_controller.ResolveNode(self.th_server_local_nodeid, RESOLVE_TIMEOUT_MS),
-            self.default_controller.ResolveNode(self.th_server_local_nodeid, RESOLVE_TIMEOUT_MS))
+            self.default_controller.ResolveNodeAddress(self.th_server_local_nodeid, RESOLVE_TIMEOUT_MS),
+            self.default_controller.ResolveNodeAddress(self.th_server_local_nodeid, RESOLVE_TIMEOUT_MS))
         asserts.assert_is_not_none(resolved, "Commissioned device must resolve on our fabric")
         asserts.assert_equal(resolved, resolved_again, "Concurrent lookups must agree")
         address, port = resolved
@@ -173,7 +173,7 @@ class TestResolveNode(MatterTestCommissioner):
         self.default_controller.ExpireSessions(self.th_server_local_nodeid)
 
         # Cache dependent, so not asserted either way; logged for the record.
-        resolved = await self.default_controller.ResolveNode(self.th_server_local_nodeid, RESOLVE_TIMEOUT_MS)
+        resolved = await self.default_controller.ResolveNodeAddress(self.th_server_local_nodeid, RESOLVE_TIMEOUT_MS)
         LOGGER.info("Resolve after stop (cache dependent): %s", resolved)
         with asserts.assert_raises((ChipStackError, asyncio.TimeoutError), "CASE to a stopped device must fail"):
             await self.default_controller.GetConnectedDevice(
@@ -183,9 +183,9 @@ class TestResolveNode(MatterTestCommissioner):
     async def test_4_invalid_inputs_are_rejected(self):
         """Non-operational node IDs and non-positive timeouts are rejected before any lookup starts."""
         with asserts.assert_raises(ChipStackError, "Node ID 0 is not operational"):
-            await self.default_controller.ResolveNode(0, RESOLVE_TIMEOUT_MS)
+            await self.default_controller.ResolveNodeAddress(0, RESOLVE_TIMEOUT_MS)
         with asserts.assert_raises(ValueError, "A zero timeout is rejected"):
-            await self.default_controller.ResolveNode(self.th_server_local_nodeid, 0)
+            await self.default_controller.ResolveNodeAddress(self.th_server_local_nodeid, 0)
 
 
 if __name__ == "__main__":

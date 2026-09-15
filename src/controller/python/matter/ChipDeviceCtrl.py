@@ -1249,9 +1249,11 @@ class ChipDeviceControllerBase:
         # Intentionally return None instead of raising exceptions on error
         return (address.value.decode(), port.value) if error == 0 else None
 
-    async def ResolveNode(self, nodeId: int, timeoutMs: int = 3000) -> tuple[str, int] | None:
+    async def ResolveNodeAddress(self, nodeId: int, timeoutMs: int = 3000) -> tuple[str, int] | None:
         '''
         Resolve a node's operational address on this controller's fabric via DNS-SD.
+
+        Unlike ResolveNode(), which establishes a CASE session, this only queries DNS-SD.
 
         Uses the controller's own resolver and opens no session. Returns the first answer
         rather than waiting for the best of several addresses. The answer may come from the
@@ -1306,7 +1308,7 @@ class ChipDeviceControllerBase:
         closure = NodeResolvedClosure(eventLoop, future)
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
         try:
-            await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_DeviceController_ResolveNode(
+            await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_DeviceController_ResolveNodeAddress(
                 self.devCtrl, nodeId, timeoutMs, ctypes.py_object(closure), _NodeResolvedCallback))
         except ChipStackError:
             # The lookup never started, so the callback will not fire: release the closure here.
@@ -1320,7 +1322,7 @@ class ChipDeviceControllerBase:
         # The resolver's own timeout produces the None result; the margin only guards against a lost callback.
         await asyncio.wait_for(future, timeout=float(timeoutMs) / 1000 + 1.0)
         result = future.result()
-        LOGGER.info("ResolveNode 0x%016X on fabric 0x%016X: %s", nodeId, self.GetCompressedFabricId(),
+        LOGGER.info("ResolveNodeAddress 0x%016X on fabric 0x%016X: %s", nodeId, self.GetCompressedFabricId(),
                     result if result is not None else "not found")
         return result
 
@@ -2995,9 +2997,9 @@ class ChipDeviceControllerBase:
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
             self._dmLib.pychip_DeviceController_GetAddressAndPort.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_ResolveNode.argtypes = [
+            self._dmLib.pychip_DeviceController_ResolveNodeAddress.argtypes = [
                 c_void_p, c_uint64, c_uint32, py_object, _NodeResolvedCallbackFunct]
-            self._dmLib.pychip_DeviceController_ResolveNode.restype = PyChipError
+            self._dmLib.pychip_DeviceController_ResolveNodeAddress.restype = PyChipError
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]

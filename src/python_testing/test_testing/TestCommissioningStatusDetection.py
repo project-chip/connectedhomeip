@@ -67,7 +67,7 @@ class MockDeviceController:
         self.ReadAttribute = AsyncMock()
         self.CreateManualCode = MagicMock(return_value="MT:YNJV7VSC00KA0648G00")
         self.FindOrEstablishPASESession = AsyncMock()
-        self.ResolveNode = AsyncMock(return_value=None)
+        self.ResolveNodeAddress = AsyncMock(return_value=None)
 
     def GetCompressedFabricId(self) -> int:
         return self._compressed_fabric_id
@@ -563,14 +563,14 @@ async def test_is_commissioned_unresolved():
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
-    mock_controller.ResolveNode.return_value = None
+    mock_controller.ResolveNodeAddress.return_value = None
 
     result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, resolve_timeout_ms=50)
 
     if result:
         return "Expected False when the node does not resolve"
-    if mock_controller.ResolveNode.await_args.args != (TEST_NODE_ID, 50):
-        return f"Resolve called with unexpected arguments: {mock_controller.ResolveNode.await_args}"
+    if mock_controller.ResolveNodeAddress.await_args.args != (TEST_NODE_ID, 50):
+        return f"Resolve called with unexpected arguments: {mock_controller.ResolveNodeAddress.await_args}"
     if mock_controller.GetConnectedDevice.called:
         return "CASE must not be attempted when the node does not resolve"
     return None
@@ -581,7 +581,7 @@ async def test_is_commissioned_resolved_and_case_succeeds():
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
-    mock_controller.ResolveNode.return_value = ("fe80::1", 5540)
+    mock_controller.ResolveNodeAddress.return_value = ("fe80::1", 5540)
     mock_controller.GetConnectedDevice.return_value = MagicMock()
 
     result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, case_timeout_ms=75)
@@ -600,7 +600,7 @@ async def test_is_commissioned_resolved_but_case_fails():
 
     for failure in (TimeoutError(), ChipStackError(0x32, "CHIP Error 0x00000032: Timeout")):
         mock_controller = MockDeviceController()
-        mock_controller.ResolveNode.return_value = ("fe80::1", 5540)
+        mock_controller.ResolveNodeAddress.return_value = ("fe80::1", 5540)
         mock_controller.GetConnectedDevice.side_effect = failure
 
         result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)
@@ -615,7 +615,7 @@ async def test_is_commissioned_infrastructure_error_propagates():
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
-    mock_controller.ResolveNode.side_effect = RuntimeError("resolver unavailable")
+    mock_controller.ResolveNodeAddress.side_effect = RuntimeError("resolver unavailable")
 
     try:
         await commissioning.is_commissioned(mock_controller, TEST_NODE_ID)

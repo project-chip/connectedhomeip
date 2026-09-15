@@ -417,9 +417,9 @@ PyChipError pychip_DeviceController_DeleteDeviceController(chip::Controller::Dev
                                                            chip::Controller::ScriptDevicePairingDelegate * pairingDelegate);
 PyChipError pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                       char * outAddress, uint64_t maxAddressLen, uint16_t * outPort);
-PyChipError pychip_DeviceController_ResolveNode(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                                uint32_t timeoutMs, chip::Controller::Python::PyObject * context,
-                                                NodeResolvedFunc callback);
+PyChipError pychip_DeviceController_ResolveNodeAddress(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
+                                                       uint32_t timeoutMs, chip::Controller::Python::PyObject * context,
+                                                       NodeResolvedFunc callback);
 PyChipError pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 PyChipError pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 PyChipError pychip_DeviceController_GetRootPublicKeyBytes(chip::Controller::DeviceCommissioner * devCtrl, uint8_t * buf,
@@ -716,9 +716,9 @@ struct ResolveNodeCallbacks : public AddressResolve::NodeListener
 
 } // anonymous namespace
 
-PyChipError pychip_DeviceController_ResolveNode(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                                uint32_t timeoutMs, chip::Controller::Python::PyObject * context,
-                                                NodeResolvedFunc callback)
+PyChipError pychip_DeviceController_ResolveNodeAddress(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
+                                                       uint32_t timeoutMs, chip::Controller::Python::PyObject * context,
+                                                       NodeResolvedFunc callback)
 {
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturnError(callback != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));

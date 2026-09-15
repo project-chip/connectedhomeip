@@ -573,7 +573,7 @@ async def is_commissioned(
 
     The answer is a live CASE session, not an advertisement:
 
-    1. Resolve the node on this fabric via DNS-SD, first answer wins. No answer within the
+    1. Resolve the node's address on this fabric via DNS-SD, first answer wins. No answer within the
        timeout means the device is off, factory fresh, or not on this fabric: False.
     2. Resolved: establish or reuse a CASE session with a short timeout. Success is the proof:
        True. Failure means the address came from a stale DNS-SD cache or the device dropped
@@ -595,7 +595,7 @@ async def is_commissioned(
     Raises:
         ChipStackError: On infrastructure failures in the resolve step.
     """
-    resolved = await dev_ctrl.ResolveNode(node_id, resolve_timeout_ms)
+    resolved = await dev_ctrl.ResolveNodeAddress(node_id, resolve_timeout_ms)
     if resolved is None:
         LOGGER.info("Node 0x%X: did not resolve on this fabric within %d ms - not commissioned (or unreachable)",
                     node_id, resolve_timeout_ms)
