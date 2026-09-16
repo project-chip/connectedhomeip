@@ -242,7 +242,6 @@ void BLEManagerImpl::_Shutdown()
 
     CancelBleAdvTimeoutTimer();
 
-    mFlags.Clear(Flags::kNetworkHandoffPending);
     BleLayer::Shutdown();
 
     // selectively setting kGATTServiceStarted flag, in order to notify the state machine to stop the CHIPoBLE GATT service
@@ -667,15 +666,10 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogDetail(Ble, "Received notification of closed CHIPoBLE connection (con %u)", conId);
     LogErrorOnFailure(CloseConnection(conId));
-}
-
-void BLEManagerImpl::CompleteNetworkHandoffIfReady()
-{
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (mFlags.Has(Flags::kNetworkHandoffPending) && mNumGAPCons == 0)
+    if (!IsInitialized())
     {
-        mFlags.Clear(Flags::kNetworkHandoffPending);
-        // The close-all-BLE event was queued first; start the operational network after the last GAP disconnect.
+        // Continue the deferred ConnectNetwork command after the commissioning transport has been shut down.
         LogErrorOnFailure(DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent());
     }
 #endif
@@ -683,20 +677,13 @@ void BLEManagerImpl::CompleteNetworkHandoffIfReady()
 
 void BLEManagerImpl::CheckNonConcurrentBleClosing()
 {
+    // ESP32 supports Wi-Fi/Thread and BLE coexistence. This handoff is only needed
+    // when concurrent connections are explicitly disabled in the configuration.
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (IsBleClosing() && !mFlags.Has(Flags::kNetworkHandoffPending))
+    if (IsBleClosing())
     {
         // The ConnectNetwork response has finished transmitting, so the commissioning transport can now be closed.
-        CHIP_ERROR err = DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
-        if (err == CHIP_NO_ERROR)
-        {
-            mFlags.Set(Flags::kNetworkHandoffPending);
-            CompleteNetworkHandoffIfReady();
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "Failed to schedule non-concurrent BLE handoff: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        LogErrorOnFailure(DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent());
     }
 #endif
 }
@@ -1757,7 +1744,6 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
     {
         mNumGAPCons--;
     }
-    CompleteNetworkHandoffIfReady();
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     peer_delete(gapEvent->disconnect.conn.conn_handle);
