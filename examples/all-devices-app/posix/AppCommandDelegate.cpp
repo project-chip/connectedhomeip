@@ -47,14 +47,12 @@ struct CommandContext
  *   echo '{"Name":"ManageDevice","EndpointId":1234,"Command":"CreateAndRegister","device":"sensor:2,parent=1"}'> /tmp/acs_fifo
  *   echo '{"Name":"ManageDevice","EndpointId":10,"Command":"UnregisterAndDestroy","deviceId":0}'> /tmp/acs_fifo
  *
+ * This command will ignore the `EndpointId` field.
+ *
  * Supported subcommands are CreateAndRegister and UnregisterAndDestroy.
  *
  * CreateAndRegister
- *  - For this command, the "EndpointId" will be ignored.
  *  - The parameter "device" will be parsed like the command line argument "--device".
- *
- * UnregisterAndDestroy
- *  - For this command, the "EndpointId" and "deviceId" will be used to find the correct device.
  */
 class ManageDeviceCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
