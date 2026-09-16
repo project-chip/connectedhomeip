@@ -238,7 +238,7 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
                 closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
                     .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(360) })); // degree
         }
-        else
+        if (conformance.HasFeature(ClosureDimension::Feature::kTranslation))
         {
             ReturnErrorOnFailure(
                 closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
