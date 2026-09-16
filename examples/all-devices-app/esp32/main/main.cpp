@@ -54,8 +54,6 @@
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceDisplay.h"
-#include "Display.h"
-#include "ScreenManager.h"
 #endif // CONFIG_HAVE_DISPLAY
 
 #if CONFIG_ENABLE_CHIP_SHELL
@@ -596,10 +594,7 @@ CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType)
     }
 
 #if CONFIG_HAVE_DISPLAY
-    TFT_fillScreen(TFT_BLACK);
-    TFT_setFont(DEJAVU24_FONT, nullptr);
-    tft_fg = ScreenNormalColor;
-    TFT_print("Restarting...", 40, DisplayHeight / 2 - 20);
+    ShowRestartingMessage();
 #endif
 
     vTaskDelay(pdMS_TO_TICKS(300));

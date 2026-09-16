@@ -37,6 +37,7 @@ set(PRIV_INCLUDE_DIRS_LIST
 if (CONFIG_HAVE_DISPLAY)
     list(APPEND PRIV_INCLUDE_DIRS_LIST
         "${CMAKE_CURRENT_LIST_DIR}/display"
+        "${CMAKE_CURRENT_LIST_DIR}/display/tft/screens"
         "${CHIP_ROOT}/examples/common/screen-framework/include"
         "${CHIP_ROOT}/examples/common/QRCode/repo/c"
     )
@@ -66,8 +67,11 @@ set(SRC_DIRS_LIST
 )
 
 if (CONFIG_HAVE_DISPLAY)
+    # Exactly one renderer implementation is compiled; it supplies the
+    # display/DeviceDisplay.h interface that main.cpp depends on.
     list(APPEND SRC_DIRS_LIST
-        "${CMAKE_CURRENT_LIST_DIR}/display"
+        "${CMAKE_CURRENT_LIST_DIR}/display/tft"
+        "${CMAKE_CURRENT_LIST_DIR}/display/tft/screens"
     )
 endif()
 

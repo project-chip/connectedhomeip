@@ -63,6 +63,14 @@ void PushFactoryResetScreen()
     ScreenManager::PushScreen(screen);
 }
 
+void ShowRestartingMessage()
+{
+    TFT_fillScreen(TFT_BLACK);
+    TFT_setFont(DEJAVU24_FONT, nullptr);
+    tft_fg = ScreenNormalColor;
+    TFT_print("Restarting...", 40, DisplayHeight / 2 - 20);
+}
+
 void InitDeviceDisplay()
 {
     // Create buffer for QR code that can fit max size and null terminator.
