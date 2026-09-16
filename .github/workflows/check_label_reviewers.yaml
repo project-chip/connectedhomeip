@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event_name != 'issue_comment' ||
-      (github.event.issue.pull_request != null && contains(github.event.comment.body, '/check-sme'))
+      (github.event.issue.pull_request != null && startsWith(github.event.comment.body, '/check-sme'))
     permissions:
       contents: read
       pull-requests: read
@@ -60,49 +60,63 @@ jobs:
 
       - name: Determine PR Number and Options
         id: params
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] || [ "$EVENT_NAME" = "push" ]; then
             echo "pr_number=" >> "$GITHUB_OUTPUT"
             echo "sync_labels=true" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event_name }}" = "issue_comment" ]; then
-            echo "pr_number=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT_NAME" = "issue_comment" ]; then
+            echo "pr_number=${ISSUE_NUMBER}" >> "$GITHUB_OUTPUT"
             echo "sync_labels=false" >> "$GITHUB_OUTPUT"
           else
-            echo "pr_number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+            echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
             echo "sync_labels=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Fetch PR Configuration
-        if: steps.params.outputs.pr_number != ''
-        run: |
-          git fetch origin "refs/pull/${{ steps.params.outputs.pr_number }}/head" --depth=1
-          git checkout FETCH_HEAD -- .github/label_reviewers.yaml || true
 
       - name: Run Unit Tests
         run: |
           python3 -m unittest scripts/tools/tests/test_check_label_reviewers.py
 
-      - name: Validate Configuration File
+      - name: Validate Base Configuration File
         run: |
           python3 scripts/tools/check_label_reviewers.py \
             --config .github/label_reviewers.yaml \
             --validate-config
 
+      - name: Validate Pull Request Configuration File
+        if: steps.params.outputs.pr_number != ''
+        env:
+          PR_NUMBER: ${{ steps.params.outputs.pr_number }}
+        run: |
+          git fetch origin "refs/pull/${PR_NUMBER}/head" --depth=1
+          if git cat-file -e FETCH_HEAD:.github/label_reviewers.yaml 2>/dev/null; then
+            git show FETCH_HEAD:.github/label_reviewers.yaml > /tmp/pr_label_reviewers.yaml
+            python3 scripts/tools/check_label_reviewers.py \
+              --config /tmp/pr_label_reviewers.yaml \
+              --validate-config
+          fi
+
       - name: Execute SME Reviewer Check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SYNC_LABELS: ${{ steps.params.outputs.sync_labels }}
+          PR_NUMBER: ${{ steps.params.outputs.pr_number }}
+          REPO: ${{ github.repository }}
         run: |
-          if [ "${{ steps.params.outputs.sync_labels }}" = "true" ]; then
+          if [ "$SYNC_LABELS" = "true" ]; then
             python3 scripts/tools/check_label_reviewers.py \
-              --repo "${{ github.repository }}" \
+              --repo "$REPO" \
               --config .github/label_reviewers.yaml \
               --sync-labels
           fi
 
-          if [ -n "${{ steps.params.outputs.pr_number }}" ]; then
+          if [ -n "$PR_NUMBER" ]; then
             python3 scripts/tools/check_label_reviewers.py \
-              --pr "${{ steps.params.outputs.pr_number }}" \
-              --repo "${{ github.repository }}" \
+              --pr "$PR_NUMBER" \
+              --repo "$REPO" \
               --config .github/label_reviewers.yaml
           fi

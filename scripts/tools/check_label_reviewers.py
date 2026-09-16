@@ -40,21 +40,50 @@ DEFAULT_CONFIG_PATH = ".github/label_reviewers.yaml"
 DEFAULT_OVERRIDE_LABELS = ("no-sme-check-required", "sdk-maintainer-approved")
 DEFAULT_OVERRIDE_LABEL = DEFAULT_OVERRIDE_LABELS[0]
 
+LOGGER = logging.getLogger(__name__)
+
+
+class UniqueKeySafeLoader(yaml.SafeLoader):
+    """YAML SafeLoader that raises ValueError on duplicate mapping keys."""
+
+
+def _construct_mapping(
+    loader: yaml.SafeLoader, node: yaml.MappingNode, deep: bool = False
+) -> dict[Any, Any]:
+    """Constructs a YAML mapping while rejecting duplicate keys."""
+    mapping: dict[Any, Any] = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        if key in mapping:
+            raise ValueError(f"Duplicate YAML key detected: {key!r}")
+        mapping[key] = loader.construct_object(value_node, deep=deep)
+    return mapping
+
+
+UniqueKeySafeLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _construct_mapping
+)
+
 
 @dataclass
 class LabelRule:
+    """Represents a configured label and its designated SME reviewers."""
+
     name: str
     smes: list[str]
 
 
 @dataclass
 class LabelEvaluation:
+    """Represents the evaluation status of a single label on a pull request."""
+
     rule: LabelRule
     present_on_pr: bool
     approvers: list[str] = field(default_factory=list)
 
     @property
     def satisfied(self) -> bool:
+        """Returns True if the label is either not on the PR or has at least one SME approver."""
         return not self.present_on_pr or len(self.approvers) > 0
 
 
@@ -94,7 +123,7 @@ def parse_label_config(config_path: str) -> dict[str, LabelRule]:
 
     try:
         with open(config_path, encoding="utf-8") as f:
-            content = yaml.safe_load(f) or {}
+            content = yaml.load(f, Loader=UniqueKeySafeLoader) or {}
     except yaml.YAMLError as e:
         raise ValueError(f"YAML syntax error in {config_path}: {e}") from e
 
@@ -105,10 +134,18 @@ def parse_label_config(config_path: str) -> dict[str, LabelRule]:
 
     mapping: dict[str, LabelRule] = {}
     for label_raw, val in content.items():
-        if not isinstance(label_raw, str):
-            continue
+        if not isinstance(label_raw, str) or not label_raw.strip():
+            raise ValueError(
+                f"Invalid label key {label_raw!r} in {config_path}: expected a non-empty string."
+            )
         label_name = label_raw.strip()
         label_key = label_name.lower()
+
+        if label_key in mapping:
+            raise ValueError(
+                f"Duplicate normalized label key '{label_name}' in {config_path} "
+                f"(conflicts with '{mapping[label_key].name}')."
+            )
 
         if not isinstance(val, list):
             raise ValueError(
@@ -162,7 +199,11 @@ def evaluate_pr_labels(
     approvers: set[str],
 ) -> list[LabelEvaluation]:
     """Evaluates each matching label attached to the PR against active approvers."""
-    pr_label_keys = {l.strip().lower() for l in pr_labels if l and l.strip()}
+    pr_label_keys = {
+        label.strip().lower()
+        for label in pr_labels
+        if label and label.strip()
+    }
     evaluations: list[LabelEvaluation] = []
 
     for key, rule in config_mapping.items():
@@ -189,7 +230,11 @@ def find_active_override(
     else:
         target_list = list(override_labels)
 
-    clean_pr_labels = {l.strip().lower(): l.strip() for l in pr_labels if l and l.strip()}
+    clean_pr_labels = {
+        label.strip().lower(): label.strip()
+        for label in pr_labels
+        if label and label.strip()
+    }
     for target in target_list:
         key = target.strip().lower()
         if key in clean_pr_labels:
@@ -295,7 +340,7 @@ def write_github_outputs(output_path: str, outputs: dict[str, str]) -> None:
             for k, v in outputs.items():
                 f.write(f"{k}={v}\n")
     except OSError as e:
-        logging.warning(f"Failed writing to GITHUB_OUTPUT: {e}")
+        LOGGER.warning("Failed writing to GITHUB_OUTPUT: %s", e)
 
 
 def write_step_summary(summary_path: str, summary_markdown: str) -> None:
@@ -304,7 +349,7 @@ def write_step_summary(summary_path: str, summary_markdown: str) -> None:
         with open(summary_path, "a", encoding="utf-8") as f:
             f.write(summary_markdown + "\n")
     except OSError as e:
-        logging.warning(f"Failed writing to GITHUB_STEP_SUMMARY: {e}")
+        LOGGER.warning("Failed writing to GITHUB_STEP_SUMMARY: %s", e)
 
 
 def sync_labels_to_github(
@@ -320,18 +365,27 @@ def sync_labels_to_github(
         existing_labels = {
             item["name"].strip().lower() for item in data if "name" in item
         }
+    except subprocess.CalledProcessError as e:
+        LOGGER.error("Could not list existing labels on %s: %s", repo, e.stderr.strip())
+        raise RuntimeError(
+            f"Could not list existing labels on {repo}: {e.stderr.strip()}"
+        ) from e
     except Exception as e:
-        logging.warning(f"Could not list existing labels on {repo}: {e}")
-        existing_labels = set()
+        LOGGER.error("Could not list existing labels on %s: %s", repo, e)
+        raise RuntimeError(f"Could not list existing labels on {repo}: {e}") from e
 
     created: list[str] = []
 
-    target_override_labels = [override_labels] if isinstance(override_labels, str) else list(override_labels)
+    target_override_labels = (
+        [override_labels] if isinstance(override_labels, str) else list(override_labels)
+    )
 
     for o_label in target_override_labels:
         if o_label and o_label.strip().lower() not in existing_labels:
-            logging.info(
-                f"Override label '{o_label}' does not exist on {repo}. Creating..."
+            LOGGER.info(
+                "Override label '%s' does not exist on %s. Creating...",
+                o_label,
+                repo,
             )
             create_cmd = [
                 "gh",
@@ -348,18 +402,26 @@ def sync_labels_to_github(
             try:
                 subprocess.run(create_cmd, capture_output=True, text=True, check=True)
                 created.append(o_label)
-                logging.info(
-                    f"✅ Successfully created override label '{o_label}' on GitHub."
+                LOGGER.info(
+                    "✅ Successfully created override label '%s' on GitHub.",
+                    o_label,
                 )
             except subprocess.CalledProcessError as e:
-                logging.warning(
-                    f"Could not create override label '{o_label}': {e.stderr.strip()}"
+                LOGGER.error(
+                    "Could not create override label '%s': %s",
+                    o_label,
+                    e.stderr.strip(),
                 )
+                raise RuntimeError(
+                    f"Could not create override label '{o_label}': {e.stderr.strip()}"
+                ) from e
 
     for key, rule in config_mapping.items():
         if key not in existing_labels:
-            logging.info(
-                f"Label '{rule.name}' does not exist on {repo}. Creating..."
+            LOGGER.info(
+                "Label '%s' does not exist on %s. Creating...",
+                rule.name,
+                repo,
             )
             create_cmd = [
                 "gh",
@@ -376,18 +438,25 @@ def sync_labels_to_github(
             try:
                 subprocess.run(create_cmd, capture_output=True, text=True, check=True)
                 created.append(rule.name)
-                logging.info(
-                    f"✅ Successfully created label '{rule.name}' on GitHub."
+                LOGGER.info(
+                    "✅ Successfully created label '%s' on GitHub.",
+                    rule.name,
                 )
             except subprocess.CalledProcessError as e:
-                logging.warning(
-                    f"Could not create label '{rule.name}': {e.stderr.strip()}"
+                LOGGER.error(
+                    "Could not create label '%s': %s",
+                    rule.name,
+                    e.stderr.strip(),
                 )
+                raise RuntimeError(
+                    f"Could not create label '{rule.name}': {e.stderr.strip()}"
+                ) from e
 
     return created
 
 
 def main() -> int:
+    """CLI entry point for checking SME label reviewers on pull requests."""
     parser = argparse.ArgumentParser(
         description="Verify that PRs with designated labels are approved by designated SME reviewers."
     )
@@ -443,16 +512,16 @@ def main() -> int:
         format="%(asctime)s [%(levelname)s] %(message)s",
     )
 
-    logging.info(f"Loading configuration from {args.config}...")
+    LOGGER.info("Loading configuration from %s...", args.config)
     try:
         config_mapping = parse_label_config(args.config)
     except Exception as e:
-        logging.error(f"Failed to load config: {e}")
+        LOGGER.error("Failed to load config: %s", e)
         return 2
 
-    logging.info(f"Configured labels with SME reviewers ({len(config_mapping)}):")
-    for key, rule in config_mapping.items():
-        logging.debug(f"  - '{rule.name}': {rule.smes}")
+    LOGGER.info("Configured labels with SME reviewers (%d):", len(config_mapping))
+    for rule in config_mapping.values():
+        LOGGER.debug("  - '%s': %s", rule.name, rule.smes)
 
     if args.validate_config:
         print(
@@ -461,8 +530,12 @@ def main() -> int:
         return 0
 
     if args.sync_labels:
-        logging.info(f"Syncing labels from {args.config} to repository {args.repo}...")
-        created = sync_labels_to_github(args.repo, config_mapping, override_labels)
+        LOGGER.info("Syncing labels from %s to repository %s...", args.config, args.repo)
+        try:
+            created = sync_labels_to_github(args.repo, config_mapping, override_labels)
+        except Exception as e:
+            LOGGER.error("Label synchronization failed: %s", e)
+            return 1
         if created:
             print(f"Created {len(created)} new label(s) on GitHub: {', '.join(created)}")
         else:
@@ -471,21 +544,21 @@ def main() -> int:
             return 0
 
     if not args.pr:
-        logging.error("PR number not provided. Pass --pr <number>.")
+        LOGGER.error("PR number not provided. Pass --pr <number>.")
         return 2
 
     pr_number = args.pr
-    logging.info(f"Fetching PR #{pr_number} from {args.repo}...")
+    LOGGER.info("Fetching PR #%d from %s...", pr_number, args.repo)
     try:
         pr_data = fetch_pull_request_data(args.repo, pr_number)
     except Exception as e:
-        logging.error(f"Failed to fetch PR #{pr_number}: {e}")
+        LOGGER.error("Failed to fetch PR #%d: %s", pr_number, e)
         return 2
 
     pr_title = pr_data.get("title", "")
     pr_author = pr_data.get("author", {}).get("login", "")
     pr_state = pr_data.get("state", "")
-    pr_labels = [l.get("name", "") for l in pr_data.get("labels", [])]
+    pr_labels = [label.get("name", "") for label in pr_data.get("labels", [])]
 
     print("\n" + "=" * 72)
     print(f"SME Label Review Check for PR #{pr_number}: '{pr_title}'")
@@ -494,7 +567,7 @@ def main() -> int:
     print(f"Active PR labels: {pr_labels}\n")
 
     approvers = extract_approvers(pr_data)
-    logging.info(f"Active approved reviews from: {sorted(approvers) or 'None'}")
+    LOGGER.info("Active approved reviews from: %s", sorted(approvers) or "None")
 
     active_override = find_active_override(pr_labels, override_labels)
     overridden = active_override is not None
@@ -570,7 +643,8 @@ def main() -> int:
             pr_author,
             passed,
             overridden=overridden,
-            override_label=active_override or (override_labels[0] if override_labels else DEFAULT_OVERRIDE_LABEL),
+            override_label=active_override
+            or (override_labels[0] if override_labels else DEFAULT_OVERRIDE_LABEL),
         )
         write_step_summary(gh_summary, summary_md)
 
