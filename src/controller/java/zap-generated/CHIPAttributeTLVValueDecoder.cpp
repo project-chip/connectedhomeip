@@ -52791,209 +52791,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                         newElement_0_audioStreamsInsideOptional, newElement_0_audioStreams);
                 }
-                jobject newElement_0_SFrameConfig;
-                if (!entry_0.SFrameConfig.HasValue())
-                {
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_SFrameConfig);
-                }
-                else
-                {
-                    jobject newElement_0_SFrameConfigInsideOptional;
-                    if (entry_0.SFrameConfig.Value().IsNull())
-                    {
-                        newElement_0_SFrameConfigInsideOptional = nullptr;
-                    }
-                    else
-                    {
-                        jobject newElement_0_SFrameConfigInsideOptional_audioCipherSuite;
-                        std::string newElement_0_SFrameConfigInsideOptional_audioCipherSuiteClassName     = "java/lang/Integer";
-                        std::string newElement_0_SFrameConfigInsideOptional_audioCipherSuiteCtorSignature = "(I)V";
-                        jint jninewElement_0_SFrameConfigInsideOptional_audioCipherSuite =
-                            static_cast<jint>(entry_0.SFrameConfig.Value().Value().audioCipherSuite);
-                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_0_SFrameConfigInsideOptional_audioCipherSuiteClassName.c_str(),
-                            newElement_0_SFrameConfigInsideOptional_audioCipherSuiteCtorSignature.c_str(),
-                            jninewElement_0_SFrameConfigInsideOptional_audioCipherSuite,
-                            newElement_0_SFrameConfigInsideOptional_audioCipherSuite);
-                        jobject newElement_0_SFrameConfigInsideOptional_videoCipherSuite;
-                        std::string newElement_0_SFrameConfigInsideOptional_videoCipherSuiteClassName     = "java/lang/Integer";
-                        std::string newElement_0_SFrameConfigInsideOptional_videoCipherSuiteCtorSignature = "(I)V";
-                        jint jninewElement_0_SFrameConfigInsideOptional_videoCipherSuite =
-                            static_cast<jint>(entry_0.SFrameConfig.Value().Value().videoCipherSuite);
-                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_0_SFrameConfigInsideOptional_videoCipherSuiteClassName.c_str(),
-                            newElement_0_SFrameConfigInsideOptional_videoCipherSuiteCtorSignature.c_str(),
-                            jninewElement_0_SFrameConfigInsideOptional_videoCipherSuite,
-                            newElement_0_SFrameConfigInsideOptional_videoCipherSuite);
-                        jobject newElement_0_SFrameConfigInsideOptional_senderKey;
-                        jobject newElement_0_SFrameConfigInsideOptional_senderKey_kid;
-                        jbyteArray newElement_0_SFrameConfigInsideOptional_senderKey_kidByteArray =
-                            env->NewByteArray(static_cast<jsize>(entry_0.SFrameConfig.Value().Value().senderKey.kid.size()));
-                        env->SetByteArrayRegion(
-                            newElement_0_SFrameConfigInsideOptional_senderKey_kidByteArray, 0,
-                            static_cast<jsize>(entry_0.SFrameConfig.Value().Value().senderKey.kid.size()),
-                            reinterpret_cast<const jbyte *>(entry_0.SFrameConfig.Value().Value().senderKey.kid.data()));
-                        newElement_0_SFrameConfigInsideOptional_senderKey_kid =
-                            newElement_0_SFrameConfigInsideOptional_senderKey_kidByteArray;
-                        jobject newElement_0_SFrameConfigInsideOptional_senderKey_baseKey;
-                        jbyteArray newElement_0_SFrameConfigInsideOptional_senderKey_baseKeyByteArray =
-                            env->NewByteArray(static_cast<jsize>(entry_0.SFrameConfig.Value().Value().senderKey.baseKey.size()));
-                        env->SetByteArrayRegion(
-                            newElement_0_SFrameConfigInsideOptional_senderKey_baseKeyByteArray, 0,
-                            static_cast<jsize>(entry_0.SFrameConfig.Value().Value().senderKey.baseKey.size()),
-                            reinterpret_cast<const jbyte *>(entry_0.SFrameConfig.Value().Value().senderKey.baseKey.data()));
-                        newElement_0_SFrameConfigInsideOptional_senderKey_baseKey =
-                            newElement_0_SFrameConfigInsideOptional_senderKey_baseKeyByteArray;
-
-                        {
-                            jclass SFrameKeyStructStructClass_5;
-                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                                env, "chip/devicecontroller/ChipStructs$WebRTCTransportProviderClusterSFrameKeyStruct",
-                                SFrameKeyStructStructClass_5);
-                            if (err != CHIP_NO_ERROR)
-                            {
-                                ChipLogError(Zcl, "Could not find class ChipStructs$WebRTCTransportProviderClusterSFrameKeyStruct");
-                                return nullptr;
-                            }
-
-                            jmethodID SFrameKeyStructStructCtor_5;
-                            err = chip::JniReferences::GetInstance().FindMethod(env, SFrameKeyStructStructClass_5, "<init>",
-                                                                                "([B[B)V", &SFrameKeyStructStructCtor_5);
-                            if (err != CHIP_NO_ERROR || SFrameKeyStructStructCtor_5 == nullptr)
-                            {
-                                ChipLogError(
-                                    Zcl, "Could not find ChipStructs$WebRTCTransportProviderClusterSFrameKeyStruct constructor");
-                                return nullptr;
-                            }
-
-                            newElement_0_SFrameConfigInsideOptional_senderKey =
-                                env->NewObject(SFrameKeyStructStructClass_5, SFrameKeyStructStructCtor_5,
-                                               newElement_0_SFrameConfigInsideOptional_senderKey_kid,
-                                               newElement_0_SFrameConfigInsideOptional_senderKey_baseKey);
-                        }
-                        jobject newElement_0_SFrameConfigInsideOptional_receiveKeys;
-                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(
-                            newElement_0_SFrameConfigInsideOptional_receiveKeys);
-
-                        auto iter_newElement_0_SFrameConfigInsideOptional_receiveKeys_5 =
-                            entry_0.SFrameConfig.Value().Value().receiveKeys.begin();
-                        while (iter_newElement_0_SFrameConfigInsideOptional_receiveKeys_5.Next())
-                        {
-                            auto & entry_5 = iter_newElement_0_SFrameConfigInsideOptional_receiveKeys_5.GetValue();
-                            jobject newElement_5;
-                            jobject newElement_5_kid;
-                            jbyteArray newElement_5_kidByteArray = env->NewByteArray(static_cast<jsize>(entry_5.kid.size()));
-                            env->SetByteArrayRegion(newElement_5_kidByteArray, 0, static_cast<jsize>(entry_5.kid.size()),
-                                                    reinterpret_cast<const jbyte *>(entry_5.kid.data()));
-                            newElement_5_kid = newElement_5_kidByteArray;
-                            jobject newElement_5_baseKey;
-                            jbyteArray newElement_5_baseKeyByteArray =
-                                env->NewByteArray(static_cast<jsize>(entry_5.baseKey.size()));
-                            env->SetByteArrayRegion(newElement_5_baseKeyByteArray, 0, static_cast<jsize>(entry_5.baseKey.size()),
-                                                    reinterpret_cast<const jbyte *>(entry_5.baseKey.data()));
-                            newElement_5_baseKey = newElement_5_baseKeyByteArray;
-
-                            {
-                                jclass SFrameKeyStructStructClass_6;
-                                err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                                    env, "chip/devicecontroller/ChipStructs$WebRTCTransportProviderClusterSFrameKeyStruct",
-                                    SFrameKeyStructStructClass_6);
-                                if (err != CHIP_NO_ERROR)
-                                {
-                                    ChipLogError(Zcl,
-                                                 "Could not find class ChipStructs$WebRTCTransportProviderClusterSFrameKeyStruct");
-                                    return nullptr;
-                                }
-
-                                jmethodID SFrameKeyStructStructCtor_6;
-                                err = chip::JniReferences::GetInstance().FindMethod(env, SFrameKeyStructStructClass_6, "<init>",
-                                                                                    "([B[B)V", &SFrameKeyStructStructCtor_6);
-                                if (err != CHIP_NO_ERROR || SFrameKeyStructStructCtor_6 == nullptr)
-                                {
-                                    ChipLogError(
-                                        Zcl,
-                                        "Could not find ChipStructs$WebRTCTransportProviderClusterSFrameKeyStruct constructor");
-                                    return nullptr;
-                                }
-
-                                newElement_5 = env->NewObject(SFrameKeyStructStructClass_6, SFrameKeyStructStructCtor_6,
-                                                              newElement_5_kid, newElement_5_baseKey);
-                            }
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(
-                                newElement_0_SFrameConfigInsideOptional_receiveKeys, newElement_5);
-                        }
-                        jobject newElement_0_SFrameConfigInsideOptional_ratchetBits;
-                        std::string newElement_0_SFrameConfigInsideOptional_ratchetBitsClassName     = "java/lang/Integer";
-                        std::string newElement_0_SFrameConfigInsideOptional_ratchetBitsCtorSignature = "(I)V";
-                        jint jninewElement_0_SFrameConfigInsideOptional_ratchetBits =
-                            static_cast<jint>(entry_0.SFrameConfig.Value().Value().ratchetBits);
-                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_0_SFrameConfigInsideOptional_ratchetBitsClassName.c_str(),
-                            newElement_0_SFrameConfigInsideOptional_ratchetBitsCtorSignature.c_str(),
-                            jninewElement_0_SFrameConfigInsideOptional_ratchetBits,
-                            newElement_0_SFrameConfigInsideOptional_ratchetBits);
-                        jobject newElement_0_SFrameConfigInsideOptional_ratchetTime;
-                        if (!entry_0.SFrameConfig.Value().Value().ratchetTime.HasValue())
-                        {
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                                nullptr, newElement_0_SFrameConfigInsideOptional_ratchetTime);
-                        }
-                        else
-                        {
-                            jobject newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional;
-                            std::string newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptionalClassName =
-                                "java/lang/Integer";
-                            std::string newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptionalCtorSignature = "(I)V";
-                            jint jninewElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional =
-                                static_cast<jint>(entry_0.SFrameConfig.Value().Value().ratchetTime.Value());
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                                newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptionalClassName.c_str(),
-                                newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptionalCtorSignature.c_str(),
-                                jninewElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional,
-                                newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional);
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                                newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional,
-                                newElement_0_SFrameConfigInsideOptional_ratchetTime);
-                        }
-
-                        {
-                            jclass SFrameStructStructClass_4;
-                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                                env, "chip/devicecontroller/ChipStructs$WebRTCTransportProviderClusterSFrameStruct",
-                                SFrameStructStructClass_4);
-                            if (err != CHIP_NO_ERROR)
-                            {
-                                ChipLogError(Zcl, "Could not find class ChipStructs$WebRTCTransportProviderClusterSFrameStruct");
-                                return nullptr;
-                            }
-
-                            jmethodID SFrameStructStructCtor_4;
-                            err = chip::JniReferences::GetInstance().FindMethod(
-                                env, SFrameStructStructClass_4, "<init>",
-                                "(Ljava/lang/Integer;Ljava/lang/Integer;Lchip/devicecontroller/"
-                                "ChipStructs$WebRTCTransportProviderClusterSFrameKeyStruct;Ljava/util/ArrayList;Ljava/lang/"
-                                "Integer;Ljava/util/Optional;)V",
-                                &SFrameStructStructCtor_4);
-                            if (err != CHIP_NO_ERROR || SFrameStructStructCtor_4 == nullptr)
-                            {
-                                ChipLogError(Zcl,
-                                             "Could not find ChipStructs$WebRTCTransportProviderClusterSFrameStruct constructor");
-                                return nullptr;
-                            }
-
-                            newElement_0_SFrameConfigInsideOptional =
-                                env->NewObject(SFrameStructStructClass_4, SFrameStructStructCtor_4,
-                                               newElement_0_SFrameConfigInsideOptional_audioCipherSuite,
-                                               newElement_0_SFrameConfigInsideOptional_videoCipherSuite,
-                                               newElement_0_SFrameConfigInsideOptional_senderKey,
-                                               newElement_0_SFrameConfigInsideOptional_receiveKeys,
-                                               newElement_0_SFrameConfigInsideOptional_ratchetBits,
-                                               newElement_0_SFrameConfigInsideOptional_ratchetTime);
-                        }
-                    }
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                        newElement_0_SFrameConfigInsideOptional, newElement_0_SFrameConfig);
-                }
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -53017,8 +52814,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/"
-                        "Optional;Ljava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/"
-                        "Integer;)V",
+                        "Optional;Ljava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -53027,11 +52823,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
-                                                  newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
-                                                  newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
-                                                  newElement_0_metadataEnabled, newElement_0_videoStreams,
-                                                  newElement_0_audioStreams, newElement_0_SFrameConfig, newElement_0_fabricIndex);
+                    newElement_0 =
+                        env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
+                                       newElement_0_peerNodeID, newElement_0_peerEndpointID, newElement_0_streamUsage,
+                                       newElement_0_videoStreamID, newElement_0_audioStreamID, newElement_0_metadataEnabled,
+                                       newElement_0_videoStreams, newElement_0_audioStreams, newElement_0_fabricIndex);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -53333,210 +53129,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                         newElement_0_audioStreamsInsideOptional, newElement_0_audioStreams);
                 }
-                jobject newElement_0_SFrameConfig;
-                if (!entry_0.SFrameConfig.HasValue())
-                {
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_SFrameConfig);
-                }
-                else
-                {
-                    jobject newElement_0_SFrameConfigInsideOptional;
-                    if (entry_0.SFrameConfig.Value().IsNull())
-                    {
-                        newElement_0_SFrameConfigInsideOptional = nullptr;
-                    }
-                    else
-                    {
-                        jobject newElement_0_SFrameConfigInsideOptional_audioCipherSuite;
-                        std::string newElement_0_SFrameConfigInsideOptional_audioCipherSuiteClassName     = "java/lang/Integer";
-                        std::string newElement_0_SFrameConfigInsideOptional_audioCipherSuiteCtorSignature = "(I)V";
-                        jint jninewElement_0_SFrameConfigInsideOptional_audioCipherSuite =
-                            static_cast<jint>(entry_0.SFrameConfig.Value().Value().audioCipherSuite);
-                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_0_SFrameConfigInsideOptional_audioCipherSuiteClassName.c_str(),
-                            newElement_0_SFrameConfigInsideOptional_audioCipherSuiteCtorSignature.c_str(),
-                            jninewElement_0_SFrameConfigInsideOptional_audioCipherSuite,
-                            newElement_0_SFrameConfigInsideOptional_audioCipherSuite);
-                        jobject newElement_0_SFrameConfigInsideOptional_videoCipherSuite;
-                        std::string newElement_0_SFrameConfigInsideOptional_videoCipherSuiteClassName     = "java/lang/Integer";
-                        std::string newElement_0_SFrameConfigInsideOptional_videoCipherSuiteCtorSignature = "(I)V";
-                        jint jninewElement_0_SFrameConfigInsideOptional_videoCipherSuite =
-                            static_cast<jint>(entry_0.SFrameConfig.Value().Value().videoCipherSuite);
-                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_0_SFrameConfigInsideOptional_videoCipherSuiteClassName.c_str(),
-                            newElement_0_SFrameConfigInsideOptional_videoCipherSuiteCtorSignature.c_str(),
-                            jninewElement_0_SFrameConfigInsideOptional_videoCipherSuite,
-                            newElement_0_SFrameConfigInsideOptional_videoCipherSuite);
-                        jobject newElement_0_SFrameConfigInsideOptional_senderKey;
-                        jobject newElement_0_SFrameConfigInsideOptional_senderKey_kid;
-                        jbyteArray newElement_0_SFrameConfigInsideOptional_senderKey_kidByteArray =
-                            env->NewByteArray(static_cast<jsize>(entry_0.SFrameConfig.Value().Value().senderKey.kid.size()));
-                        env->SetByteArrayRegion(
-                            newElement_0_SFrameConfigInsideOptional_senderKey_kidByteArray, 0,
-                            static_cast<jsize>(entry_0.SFrameConfig.Value().Value().senderKey.kid.size()),
-                            reinterpret_cast<const jbyte *>(entry_0.SFrameConfig.Value().Value().senderKey.kid.data()));
-                        newElement_0_SFrameConfigInsideOptional_senderKey_kid =
-                            newElement_0_SFrameConfigInsideOptional_senderKey_kidByteArray;
-                        jobject newElement_0_SFrameConfigInsideOptional_senderKey_baseKey;
-                        jbyteArray newElement_0_SFrameConfigInsideOptional_senderKey_baseKeyByteArray =
-                            env->NewByteArray(static_cast<jsize>(entry_0.SFrameConfig.Value().Value().senderKey.baseKey.size()));
-                        env->SetByteArrayRegion(
-                            newElement_0_SFrameConfigInsideOptional_senderKey_baseKeyByteArray, 0,
-                            static_cast<jsize>(entry_0.SFrameConfig.Value().Value().senderKey.baseKey.size()),
-                            reinterpret_cast<const jbyte *>(entry_0.SFrameConfig.Value().Value().senderKey.baseKey.data()));
-                        newElement_0_SFrameConfigInsideOptional_senderKey_baseKey =
-                            newElement_0_SFrameConfigInsideOptional_senderKey_baseKeyByteArray;
-
-                        {
-                            jclass SFrameKeyStructStructClass_5;
-                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                                env, "chip/devicecontroller/ChipStructs$WebRTCTransportRequestorClusterSFrameKeyStruct",
-                                SFrameKeyStructStructClass_5);
-                            if (err != CHIP_NO_ERROR)
-                            {
-                                ChipLogError(Zcl,
-                                             "Could not find class ChipStructs$WebRTCTransportRequestorClusterSFrameKeyStruct");
-                                return nullptr;
-                            }
-
-                            jmethodID SFrameKeyStructStructCtor_5;
-                            err = chip::JniReferences::GetInstance().FindMethod(env, SFrameKeyStructStructClass_5, "<init>",
-                                                                                "([B[B)V", &SFrameKeyStructStructCtor_5);
-                            if (err != CHIP_NO_ERROR || SFrameKeyStructStructCtor_5 == nullptr)
-                            {
-                                ChipLogError(
-                                    Zcl, "Could not find ChipStructs$WebRTCTransportRequestorClusterSFrameKeyStruct constructor");
-                                return nullptr;
-                            }
-
-                            newElement_0_SFrameConfigInsideOptional_senderKey =
-                                env->NewObject(SFrameKeyStructStructClass_5, SFrameKeyStructStructCtor_5,
-                                               newElement_0_SFrameConfigInsideOptional_senderKey_kid,
-                                               newElement_0_SFrameConfigInsideOptional_senderKey_baseKey);
-                        }
-                        jobject newElement_0_SFrameConfigInsideOptional_receiveKeys;
-                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(
-                            newElement_0_SFrameConfigInsideOptional_receiveKeys);
-
-                        auto iter_newElement_0_SFrameConfigInsideOptional_receiveKeys_5 =
-                            entry_0.SFrameConfig.Value().Value().receiveKeys.begin();
-                        while (iter_newElement_0_SFrameConfigInsideOptional_receiveKeys_5.Next())
-                        {
-                            auto & entry_5 = iter_newElement_0_SFrameConfigInsideOptional_receiveKeys_5.GetValue();
-                            jobject newElement_5;
-                            jobject newElement_5_kid;
-                            jbyteArray newElement_5_kidByteArray = env->NewByteArray(static_cast<jsize>(entry_5.kid.size()));
-                            env->SetByteArrayRegion(newElement_5_kidByteArray, 0, static_cast<jsize>(entry_5.kid.size()),
-                                                    reinterpret_cast<const jbyte *>(entry_5.kid.data()));
-                            newElement_5_kid = newElement_5_kidByteArray;
-                            jobject newElement_5_baseKey;
-                            jbyteArray newElement_5_baseKeyByteArray =
-                                env->NewByteArray(static_cast<jsize>(entry_5.baseKey.size()));
-                            env->SetByteArrayRegion(newElement_5_baseKeyByteArray, 0, static_cast<jsize>(entry_5.baseKey.size()),
-                                                    reinterpret_cast<const jbyte *>(entry_5.baseKey.data()));
-                            newElement_5_baseKey = newElement_5_baseKeyByteArray;
-
-                            {
-                                jclass SFrameKeyStructStructClass_6;
-                                err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                                    env, "chip/devicecontroller/ChipStructs$WebRTCTransportRequestorClusterSFrameKeyStruct",
-                                    SFrameKeyStructStructClass_6);
-                                if (err != CHIP_NO_ERROR)
-                                {
-                                    ChipLogError(Zcl,
-                                                 "Could not find class ChipStructs$WebRTCTransportRequestorClusterSFrameKeyStruct");
-                                    return nullptr;
-                                }
-
-                                jmethodID SFrameKeyStructStructCtor_6;
-                                err = chip::JniReferences::GetInstance().FindMethod(env, SFrameKeyStructStructClass_6, "<init>",
-                                                                                    "([B[B)V", &SFrameKeyStructStructCtor_6);
-                                if (err != CHIP_NO_ERROR || SFrameKeyStructStructCtor_6 == nullptr)
-                                {
-                                    ChipLogError(
-                                        Zcl,
-                                        "Could not find ChipStructs$WebRTCTransportRequestorClusterSFrameKeyStruct constructor");
-                                    return nullptr;
-                                }
-
-                                newElement_5 = env->NewObject(SFrameKeyStructStructClass_6, SFrameKeyStructStructCtor_6,
-                                                              newElement_5_kid, newElement_5_baseKey);
-                            }
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(
-                                newElement_0_SFrameConfigInsideOptional_receiveKeys, newElement_5);
-                        }
-                        jobject newElement_0_SFrameConfigInsideOptional_ratchetBits;
-                        std::string newElement_0_SFrameConfigInsideOptional_ratchetBitsClassName     = "java/lang/Integer";
-                        std::string newElement_0_SFrameConfigInsideOptional_ratchetBitsCtorSignature = "(I)V";
-                        jint jninewElement_0_SFrameConfigInsideOptional_ratchetBits =
-                            static_cast<jint>(entry_0.SFrameConfig.Value().Value().ratchetBits);
-                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                            newElement_0_SFrameConfigInsideOptional_ratchetBitsClassName.c_str(),
-                            newElement_0_SFrameConfigInsideOptional_ratchetBitsCtorSignature.c_str(),
-                            jninewElement_0_SFrameConfigInsideOptional_ratchetBits,
-                            newElement_0_SFrameConfigInsideOptional_ratchetBits);
-                        jobject newElement_0_SFrameConfigInsideOptional_ratchetTime;
-                        if (!entry_0.SFrameConfig.Value().Value().ratchetTime.HasValue())
-                        {
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                                nullptr, newElement_0_SFrameConfigInsideOptional_ratchetTime);
-                        }
-                        else
-                        {
-                            jobject newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional;
-                            std::string newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptionalClassName =
-                                "java/lang/Integer";
-                            std::string newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptionalCtorSignature = "(I)V";
-                            jint jninewElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional =
-                                static_cast<jint>(entry_0.SFrameConfig.Value().Value().ratchetTime.Value());
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                                newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptionalClassName.c_str(),
-                                newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptionalCtorSignature.c_str(),
-                                jninewElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional,
-                                newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional);
-                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                                newElement_0_SFrameConfigInsideOptional_ratchetTimeInsideOptional,
-                                newElement_0_SFrameConfigInsideOptional_ratchetTime);
-                        }
-
-                        {
-                            jclass SFrameStructStructClass_4;
-                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                                env, "chip/devicecontroller/ChipStructs$WebRTCTransportRequestorClusterSFrameStruct",
-                                SFrameStructStructClass_4);
-                            if (err != CHIP_NO_ERROR)
-                            {
-                                ChipLogError(Zcl, "Could not find class ChipStructs$WebRTCTransportRequestorClusterSFrameStruct");
-                                return nullptr;
-                            }
-
-                            jmethodID SFrameStructStructCtor_4;
-                            err = chip::JniReferences::GetInstance().FindMethod(
-                                env, SFrameStructStructClass_4, "<init>",
-                                "(Ljava/lang/Integer;Ljava/lang/Integer;Lchip/devicecontroller/"
-                                "ChipStructs$WebRTCTransportRequestorClusterSFrameKeyStruct;Ljava/util/ArrayList;Ljava/lang/"
-                                "Integer;Ljava/util/Optional;)V",
-                                &SFrameStructStructCtor_4);
-                            if (err != CHIP_NO_ERROR || SFrameStructStructCtor_4 == nullptr)
-                            {
-                                ChipLogError(Zcl,
-                                             "Could not find ChipStructs$WebRTCTransportRequestorClusterSFrameStruct constructor");
-                                return nullptr;
-                            }
-
-                            newElement_0_SFrameConfigInsideOptional =
-                                env->NewObject(SFrameStructStructClass_4, SFrameStructStructCtor_4,
-                                               newElement_0_SFrameConfigInsideOptional_audioCipherSuite,
-                                               newElement_0_SFrameConfigInsideOptional_videoCipherSuite,
-                                               newElement_0_SFrameConfigInsideOptional_senderKey,
-                                               newElement_0_SFrameConfigInsideOptional_receiveKeys,
-                                               newElement_0_SFrameConfigInsideOptional_ratchetBits,
-                                               newElement_0_SFrameConfigInsideOptional_ratchetTime);
-                        }
-                    }
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                        newElement_0_SFrameConfigInsideOptional, newElement_0_SFrameConfig);
-                }
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -53560,8 +53152,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/"
-                        "Optional;Ljava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/"
-                        "Integer;)V",
+                        "Optional;Ljava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -53570,11 +53161,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
-                                                  newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
-                                                  newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
-                                                  newElement_0_metadataEnabled, newElement_0_videoStreams,
-                                                  newElement_0_audioStreams, newElement_0_SFrameConfig, newElement_0_fabricIndex);
+                    newElement_0 =
+                        env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
+                                       newElement_0_peerNodeID, newElement_0_peerEndpointID, newElement_0_streamUsage,
+                                       newElement_0_videoStreamID, newElement_0_audioStreamID, newElement_0_metadataEnabled,
+                                       newElement_0_videoStreams, newElement_0_audioStreams, newElement_0_fabricIndex);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

@@ -5095,6 +5095,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::WebRTCTransportProvider::Attributes::CurrentSessions::Id:
             return "CurrentSessions";
+        case chip::app::Clusters::WebRTCTransportProvider::Attributes::SupportedSFrameCipherSuites::Id:
+            return "SupportedSFrameCipherSuites";
         case chip::app::Clusters::WebRTCTransportProvider::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::WebRTCTransportProvider::Attributes::AcceptedCommandList::Id:
@@ -7050,6 +7052,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ProvideICECandidates";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
             return "EndSession";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::UpdateSession::Id:
+            return "UpdateSession";
         default:
             return "Unknown";
         }

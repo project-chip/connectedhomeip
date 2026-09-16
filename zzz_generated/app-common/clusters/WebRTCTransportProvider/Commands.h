@@ -82,6 +82,11 @@ struct Type;
 struct DecodableType;
 } // namespace EndSession
 
+namespace UpdateSession {
+struct Type;
+struct DecodableType;
+} // namespace UpdateSession
+
 } // namespace Commands
 
 namespace Commands {
@@ -405,6 +410,49 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace EndSession
+namespace UpdateSession {
+enum class Fields : uint8_t
+{
+    kWebRTCSessionID           = 0,
+    kSFrameSenderKey           = 1,
+    kSFrameReceiveKeysToAdd    = 2,
+    kSFrameReceiveKIDsToRemove = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UpdateSession::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+
+    uint16_t webRTCSessionID = static_cast<uint16_t>(0);
+    Optional<Structs::SFrameKeyStruct::Type> SFrameSenderKey;
+    Optional<DataModel::List<const Structs::SFrameKeyStruct::Type>> SFrameReceiveKeysToAdd;
+    Optional<DataModel::List<const chip::ByteSpan>> SFrameReceiveKIDsToRemove;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UpdateSession::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    uint16_t webRTCSessionID = static_cast<uint16_t>(0);
+    Optional<Structs::SFrameKeyStruct::DecodableType> SFrameSenderKey;
+    Optional<DataModel::DecodableList<Structs::SFrameKeyStruct::DecodableType>> SFrameReceiveKeysToAdd;
+    Optional<DataModel::DecodableList<chip::ByteSpan>> SFrameReceiveKIDsToRemove;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+};
+}; // namespace UpdateSession
 } // namespace Commands
 } // namespace WebRTCTransportProvider
 } // namespace Clusters

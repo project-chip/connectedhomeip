@@ -41,6 +41,71 @@ namespace Clusters {
 namespace detail {
 namespace Structs {
 
+namespace SFrameKeyStruct {
+enum class Fields : uint8_t
+{
+    kKid     = 0,
+    kBaseKey = 1,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan kid;
+    chip::ByteSpan baseKey;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace SFrameKeyStruct
+namespace SFrameStruct {
+enum class Fields : uint8_t
+{
+    kAudioCipherSuite = 0,
+    kVideoCipherSuite = 1,
+    kSenderKey        = 2,
+    kReceiveKeys      = 3,
+    kRatchetBits      = 4,
+    kRatchetTime      = 5,
+};
+
+struct Type
+{
+public:
+    uint16_t audioCipherSuite = static_cast<uint16_t>(0);
+    uint16_t videoCipherSuite = static_cast<uint16_t>(0);
+    Structs::SFrameKeyStruct::Type senderKey;
+    DataModel::List<const Structs::SFrameKeyStruct::Type> receiveKeys;
+    uint8_t ratchetBits = static_cast<uint8_t>(0);
+    Optional<uint8_t> ratchetTime;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint16_t audioCipherSuite = static_cast<uint16_t>(0);
+    uint16_t videoCipherSuite = static_cast<uint16_t>(0);
+    Structs::SFrameKeyStruct::DecodableType senderKey;
+    DataModel::DecodableList<Structs::SFrameKeyStruct::DecodableType> receiveKeys;
+    uint8_t ratchetBits = static_cast<uint8_t>(0);
+    Optional<uint8_t> ratchetTime;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace SFrameStruct
 namespace ModeTagStruct {
 enum class Fields : uint8_t
 {
@@ -397,6 +462,40 @@ using DecodableType = Type;
 
 } // namespace AtomicAttributeStatusStruct
 
+namespace AttributionData {
+enum class Fields : uint8_t
+{
+    kContextInformation = 0,
+    kSourceContext      = 1,
+    kNodeID             = 2,
+    kGroupID            = 3,
+    kSystemTimeStamp    = 4,
+    kEpochTimeStamp     = 5,
+    kFabricIndex        = 6,
+};
+
+struct Type
+{
+public:
+    uint8_t contextInformation = static_cast<uint8_t>(0);
+    Optional<uint32_t> sourceContext;
+    Optional<chip::NodeId> nodeID;
+    Optional<chip::GroupId> groupID;
+    Optional<uint64_t> systemTimeStamp;
+    Optional<uint64_t> epochTimeStamp;
+    DataModel::Nullable<chip::FabricIndex> fabricIndex;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AttributionData
+
 namespace ICECandidateStruct {
 enum class Fields : uint8_t
 {
@@ -539,6 +638,40 @@ public:
 using DecodableType = Type;
 
 } // namespace SemanticTagStruct
+
+namespace SuppliedAttributionData {
+enum class Fields : uint8_t
+{
+    kContextInformation = 0,
+    kSourceContext      = 1,
+    kFabricIndex        = 254,
+};
+
+struct Type
+{
+public:
+    uint8_t contextInformation = static_cast<uint8_t>(0);
+    Optional<uint32_t> sourceContext;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+using DecodableType = Type;
+
+} // namespace SuppliedAttributionData
 
 namespace TestGlobalStruct {
 enum class Fields : uint8_t

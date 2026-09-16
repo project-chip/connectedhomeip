@@ -20569,29 +20569,105 @@ public static class WebRTCTransportProviderClusterICECandidateStruct {
     return output.toString();
   }
 }
-public static class WebRTCTransportProviderClusterSFrameStruct {
-  public Integer cipherSuite;
-  public byte[] baseKey;
+public static class WebRTCTransportProviderClusterSFrameKeyStruct {
   public byte[] kid;
-  private static final long CIPHER_SUITE_ID = 0L;
+  public byte[] baseKey;
+  private static final long KID_ID = 0L;
   private static final long BASE_KEY_ID = 1L;
-  private static final long KID_ID = 2L;
 
-  public WebRTCTransportProviderClusterSFrameStruct(
-    Integer cipherSuite,
-    byte[] baseKey,
-    byte[] kid
+  public WebRTCTransportProviderClusterSFrameKeyStruct(
+    byte[] kid,
+    byte[] baseKey
   ) {
-    this.cipherSuite = cipherSuite;
-    this.baseKey = baseKey;
     this.kid = kid;
+    this.baseKey = baseKey;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(CIPHER_SUITE_ID, new UIntType(cipherSuite)));
-    values.add(new StructElement(BASE_KEY_ID, new ByteArrayType(baseKey)));
     values.add(new StructElement(KID_ID, new ByteArrayType(kid)));
+    values.add(new StructElement(BASE_KEY_ID, new ByteArrayType(baseKey)));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportProviderClusterSFrameKeyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] kid = null;
+    byte[] baseKey = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == KID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          kid = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == BASE_KEY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          baseKey = castingValue.value(byte[].class);
+        }
+      }
+    }
+    return new WebRTCTransportProviderClusterSFrameKeyStruct(
+      kid,
+      baseKey
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportProviderClusterSFrameKeyStruct {\n");
+    output.append("\tkid: ");
+    output.append(Arrays.toString(kid));
+    output.append("\n");
+    output.append("\tbaseKey: ");
+    output.append(Arrays.toString(baseKey));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WebRTCTransportProviderClusterSFrameStruct {
+  public Integer audioCipherSuite;
+  public Integer videoCipherSuite;
+  public ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct senderKey;
+  public ArrayList<ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct> receiveKeys;
+  public Integer ratchetBits;
+  public Optional<Integer> ratchetTime;
+  private static final long AUDIO_CIPHER_SUITE_ID = 0L;
+  private static final long VIDEO_CIPHER_SUITE_ID = 1L;
+  private static final long SENDER_KEY_ID = 2L;
+  private static final long RECEIVE_KEYS_ID = 3L;
+  private static final long RATCHET_BITS_ID = 4L;
+  private static final long RATCHET_TIME_ID = 5L;
+
+  public WebRTCTransportProviderClusterSFrameStruct(
+    Integer audioCipherSuite,
+    Integer videoCipherSuite,
+    ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct senderKey,
+    ArrayList<ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct> receiveKeys,
+    Integer ratchetBits,
+    Optional<Integer> ratchetTime
+  ) {
+    this.audioCipherSuite = audioCipherSuite;
+    this.videoCipherSuite = videoCipherSuite;
+    this.senderKey = senderKey;
+    this.receiveKeys = receiveKeys;
+    this.ratchetBits = ratchetBits;
+    this.ratchetTime = ratchetTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AUDIO_CIPHER_SUITE_ID, new UIntType(audioCipherSuite)));
+    values.add(new StructElement(VIDEO_CIPHER_SUITE_ID, new UIntType(videoCipherSuite)));
+    values.add(new StructElement(SENDER_KEY_ID, senderKey.encodeTlv()));
+    values.add(new StructElement(RECEIVE_KEYS_ID, ArrayType.generateArrayType(receiveKeys, (elementreceiveKeys) -> elementreceiveKeys.encodeTlv())));
+    values.add(new StructElement(RATCHET_BITS_ID, new UIntType(ratchetBits)));
+    values.add(new StructElement(RATCHET_TIME_ID, ratchetTime.<BaseTLVType>map((nonOptionalratchetTime) -> new UIntType(nonOptionalratchetTime)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -20600,31 +20676,52 @@ public static class WebRTCTransportProviderClusterSFrameStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer cipherSuite = null;
-    byte[] baseKey = null;
-    byte[] kid = null;
+    Integer audioCipherSuite = null;
+    Integer videoCipherSuite = null;
+    ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct senderKey = null;
+    ArrayList<ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct> receiveKeys = null;
+    Integer ratchetBits = null;
+    Optional<Integer> ratchetTime = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == CIPHER_SUITE_ID) {
+      if (element.contextTagNum() == AUDIO_CIPHER_SUITE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          cipherSuite = castingValue.value(Integer.class);
+          audioCipherSuite = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == BASE_KEY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          baseKey = castingValue.value(byte[].class);
+      } else if (element.contextTagNum() == VIDEO_CIPHER_SUITE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoCipherSuite = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == KID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          kid = castingValue.value(byte[].class);
+      } else if (element.contextTagNum() == SENDER_KEY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          senderKey = ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == RECEIVE_KEYS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          receiveKeys = castingValue.map((elementcastingValue) -> ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == RATCHET_BITS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ratchetBits = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == RATCHET_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ratchetTime = Optional.of(castingValue.value(Integer.class));
         }
       }
     }
     return new WebRTCTransportProviderClusterSFrameStruct(
-      cipherSuite,
-      baseKey,
-      kid
+      audioCipherSuite,
+      videoCipherSuite,
+      senderKey,
+      receiveKeys,
+      ratchetBits,
+      ratchetTime
     );
   }
 
@@ -20632,14 +20729,23 @@ public static class WebRTCTransportProviderClusterSFrameStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("WebRTCTransportProviderClusterSFrameStruct {\n");
-    output.append("\tcipherSuite: ");
-    output.append(cipherSuite);
+    output.append("\taudioCipherSuite: ");
+    output.append(audioCipherSuite);
     output.append("\n");
-    output.append("\tbaseKey: ");
-    output.append(Arrays.toString(baseKey));
+    output.append("\tvideoCipherSuite: ");
+    output.append(videoCipherSuite);
     output.append("\n");
-    output.append("\tkid: ");
-    output.append(Arrays.toString(kid));
+    output.append("\tsenderKey: ");
+    output.append(senderKey);
+    output.append("\n");
+    output.append("\treceiveKeys: ");
+    output.append(receiveKeys);
+    output.append("\n");
+    output.append("\tratchetBits: ");
+    output.append(ratchetBits);
+    output.append("\n");
+    output.append("\tratchetTime: ");
+    output.append(ratchetTime);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -20988,6 +21094,188 @@ public static class WebRTCTransportRequestorClusterICECandidateStruct {
     output.append("\n");
     output.append("\tSDPMLineIndex: ");
     output.append(SDPMLineIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WebRTCTransportRequestorClusterSFrameKeyStruct {
+  public byte[] kid;
+  public byte[] baseKey;
+  private static final long KID_ID = 0L;
+  private static final long BASE_KEY_ID = 1L;
+
+  public WebRTCTransportRequestorClusterSFrameKeyStruct(
+    byte[] kid,
+    byte[] baseKey
+  ) {
+    this.kid = kid;
+    this.baseKey = baseKey;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(KID_ID, new ByteArrayType(kid)));
+    values.add(new StructElement(BASE_KEY_ID, new ByteArrayType(baseKey)));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportRequestorClusterSFrameKeyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] kid = null;
+    byte[] baseKey = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == KID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          kid = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == BASE_KEY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          baseKey = castingValue.value(byte[].class);
+        }
+      }
+    }
+    return new WebRTCTransportRequestorClusterSFrameKeyStruct(
+      kid,
+      baseKey
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportRequestorClusterSFrameKeyStruct {\n");
+    output.append("\tkid: ");
+    output.append(Arrays.toString(kid));
+    output.append("\n");
+    output.append("\tbaseKey: ");
+    output.append(Arrays.toString(baseKey));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class WebRTCTransportRequestorClusterSFrameStruct {
+  public Integer audioCipherSuite;
+  public Integer videoCipherSuite;
+  public ChipStructs.WebRTCTransportRequestorClusterSFrameKeyStruct senderKey;
+  public ArrayList<ChipStructs.WebRTCTransportRequestorClusterSFrameKeyStruct> receiveKeys;
+  public Integer ratchetBits;
+  public Optional<Integer> ratchetTime;
+  private static final long AUDIO_CIPHER_SUITE_ID = 0L;
+  private static final long VIDEO_CIPHER_SUITE_ID = 1L;
+  private static final long SENDER_KEY_ID = 2L;
+  private static final long RECEIVE_KEYS_ID = 3L;
+  private static final long RATCHET_BITS_ID = 4L;
+  private static final long RATCHET_TIME_ID = 5L;
+
+  public WebRTCTransportRequestorClusterSFrameStruct(
+    Integer audioCipherSuite,
+    Integer videoCipherSuite,
+    ChipStructs.WebRTCTransportRequestorClusterSFrameKeyStruct senderKey,
+    ArrayList<ChipStructs.WebRTCTransportRequestorClusterSFrameKeyStruct> receiveKeys,
+    Integer ratchetBits,
+    Optional<Integer> ratchetTime
+  ) {
+    this.audioCipherSuite = audioCipherSuite;
+    this.videoCipherSuite = videoCipherSuite;
+    this.senderKey = senderKey;
+    this.receiveKeys = receiveKeys;
+    this.ratchetBits = ratchetBits;
+    this.ratchetTime = ratchetTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AUDIO_CIPHER_SUITE_ID, new UIntType(audioCipherSuite)));
+    values.add(new StructElement(VIDEO_CIPHER_SUITE_ID, new UIntType(videoCipherSuite)));
+    values.add(new StructElement(SENDER_KEY_ID, senderKey.encodeTlv()));
+    values.add(new StructElement(RECEIVE_KEYS_ID, ArrayType.generateArrayType(receiveKeys, (elementreceiveKeys) -> elementreceiveKeys.encodeTlv())));
+    values.add(new StructElement(RATCHET_BITS_ID, new UIntType(ratchetBits)));
+    values.add(new StructElement(RATCHET_TIME_ID, ratchetTime.<BaseTLVType>map((nonOptionalratchetTime) -> new UIntType(nonOptionalratchetTime)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static WebRTCTransportRequestorClusterSFrameStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer audioCipherSuite = null;
+    Integer videoCipherSuite = null;
+    ChipStructs.WebRTCTransportRequestorClusterSFrameKeyStruct senderKey = null;
+    ArrayList<ChipStructs.WebRTCTransportRequestorClusterSFrameKeyStruct> receiveKeys = null;
+    Integer ratchetBits = null;
+    Optional<Integer> ratchetTime = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == AUDIO_CIPHER_SUITE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          audioCipherSuite = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == VIDEO_CIPHER_SUITE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoCipherSuite = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SENDER_KEY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          senderKey = ChipStructs.WebRTCTransportRequestorClusterSFrameKeyStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == RECEIVE_KEYS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          receiveKeys = castingValue.map((elementcastingValue) -> ChipStructs.WebRTCTransportRequestorClusterSFrameKeyStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == RATCHET_BITS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ratchetBits = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == RATCHET_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ratchetTime = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new WebRTCTransportRequestorClusterSFrameStruct(
+      audioCipherSuite,
+      videoCipherSuite,
+      senderKey,
+      receiveKeys,
+      ratchetBits,
+      ratchetTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("WebRTCTransportRequestorClusterSFrameStruct {\n");
+    output.append("\taudioCipherSuite: ");
+    output.append(audioCipherSuite);
+    output.append("\n");
+    output.append("\tvideoCipherSuite: ");
+    output.append(videoCipherSuite);
+    output.append("\n");
+    output.append("\tsenderKey: ");
+    output.append(senderKey);
+    output.append("\n");
+    output.append("\treceiveKeys: ");
+    output.append(receiveKeys);
+    output.append("\n");
+    output.append("\tratchetBits: ");
+    output.append(ratchetBits);
+    output.append("\n");
+    output.append("\tratchetTime: ");
+    output.append(ratchetTime);
     output.append("\n");
     output.append("}\n");
     return output.toString();
