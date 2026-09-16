@@ -382,7 +382,7 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::BuildProvideOffer(WebRTCTransportProvi
     aVideoStream = mRequest.VideoStreamId();
 
     aRequest.webRTCSessionID.SetNull(); // a new session, to be assigned by the camera
-    aRequest.sdp         = CharSpan(mOfferSdp.data(), mOfferSdp.size());
+    aRequest.sdp                 = CharSpan(mOfferSdp.data(), mOfferSdp.size());
     aRequest.streamUsage.Value() = Globals::StreamUsageEnum::kAnalysis;
     // The requestor cluster's registered path is where the camera's answering commands must land
     aRequest.originatingEndpointID = MakeOptional(mRequestorCluster->GetPaths().front().mEndpointId);
