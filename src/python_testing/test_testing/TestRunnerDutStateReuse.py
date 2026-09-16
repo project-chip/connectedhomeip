@@ -90,7 +90,9 @@ class TestDecideDutState(unittest.TestCase):
         return (d.wipe_controller, d.wipe_app, d.force_commissioning, d.restore_golden)
 
     def snapshot(self):
+        """Both halves of the commissioned pair: the app's KVS and the commissioning authority."""
         pathlib.Path(self.runner.commissioned_snapshot_file(self.kvs)).touch()
+        pathlib.Path(self.runner.commissioned_snapshot_file(self.storage)).touch()
 
     def test_no_factory_reset_never_wipes_or_forces(self):
         self.assertEqual(self.outcome(self.decide(factory_reset=False)), (False, False, False, False))
@@ -145,6 +147,16 @@ class TestDecideDutState(unittest.TestCase):
         self.snapshot()
         d = self.decide()
         self.assertEqual(self.outcome(d), (False, False, False, True))
+
+    def test_half_a_snapshot_is_not_a_snapshot(self):
+        """Without the authority that signed it the app snapshot is useless, and vice versa."""
+        pathlib.Path(self.storage).touch()
+        pathlib.Path(self.kvs).touch()
+        for half in (self.kvs, self.storage):
+            snapshot = self.runner.commissioned_snapshot_file(half)
+            pathlib.Path(snapshot).touch()
+            self.assertEqual(self.outcome(self.decide()), (False, True, True, False), half)
+            os.unlink(snapshot)
 
     def test_fresh_dut_and_explicit_resets_ignore_the_snapshot(self):
         pathlib.Path(self.storage).touch()
@@ -205,22 +217,31 @@ class TestCommissionedSnapshot(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             kvs = os.path.join(tmp, "kvs1.app")
             pathlib.Path(kvs).write_text("fabric")
-            runner.capture_commissioned_snapshot(f"--discriminator 1234 --KVS {kvs}")
+            storage = os.path.join(tmp, "admin_storage.json")
+            pathlib.Path(storage).write_text("authority")
+            runner.capture_commissioned_snapshot(f"--discriminator 1234 --KVS {kvs}", f"--storage-path {storage}")
             self.assertEqual(pathlib.Path(runner.commissioned_snapshot_file(kvs)).read_text(), "fabric")
+            self.assertEqual(pathlib.Path(runner.commissioned_snapshot_file(storage)).read_text(), "authority")
             self.assertFalse(os.path.exists(runner.commissioned_snapshot_file(kvs) + ".tmp"), "no leftover temp file")
+
+            # The authority is captured once and shared: every app is commissioned by the same one.
+            pathlib.Path(storage).write_text("a later authority")
+            runner.capture_commissioned_snapshot(f"--KVS {kvs}", f"--storage-path {storage}")
+            self.assertEqual(pathlib.Path(runner.commissioned_snapshot_file(storage)).read_text(), "authority")
 
     def test_capture_leaves_no_temp_file_behind_when_the_kvs_is_gone(self):
         runner = load_runner()
         with tempfile.TemporaryDirectory() as tmp:
             kvs = os.path.join(tmp, "kvs1.app")
-            runner.capture_commissioned_snapshot(f"--KVS {kvs}")
+            runner.capture_commissioned_snapshot(f"--KVS {kvs}", f"--storage-path {os.path.join(tmp, 'gone.json')}")
             self.assertEqual(os.listdir(tmp), [], "a failed capture leaves nothing behind")
 
     def test_capture_without_a_kvs_or_a_missing_file_is_harmless(self):
         runner = load_runner()
-        runner.capture_commissioned_snapshot("--discriminator 1234")
+        runner.capture_commissioned_snapshot("--discriminator 1234", "--storage-path x")
         with tempfile.TemporaryDirectory() as tmp:
-            runner.capture_commissioned_snapshot(f"--KVS {os.path.join(tmp, 'never-created')}")
+            runner.capture_commissioned_snapshot(f"--KVS {os.path.join(tmp, 'never-created')}",
+                                                 f"--storage-path {os.path.join(tmp, 'no-storage')}")
 
 
 class TestCommissioningDecisionLine(unittest.TestCase):
@@ -249,8 +270,9 @@ class TestCommissioningDecisionLine(unittest.TestCase):
             for f in (snapshot_a, snapshot_b):
                 pathlib.Path(f).touch()
             wiped = list(runner.FactoryResetType.AppAndController.config_files("--KVS " + kvs_a, "--storage-path " + storage))
-            self.assertTrue({kvs_a, kvs_b, storage, snapshot_a, snapshot_b} <= set(wiped),
-                            "a new controller fabric invalidates every KVS and its snapshot")
+            self.assertTrue({kvs_a, kvs_b, storage, snapshot_a, snapshot_b,
+                             runner.commissioned_snapshot_file(storage)} <= set(wiped),
+                            "a new controller fabric invalidates every KVS, every snapshot and the authority")
             runner.factory_reset_config_removal("--KVS " + kvs_a, "--storage-path " + storage,
                                                 runner.FactoryResetType.AppAndController)
             self.assertFalse(os.path.exists(kvs_a) or os.path.exists(kvs_b) or os.path.exists(storage))

@@ -357,7 +357,7 @@ class AppRestartMonitor:
                 reset_type = FactoryResetType.AppOnly
 
             if flag_file_content == SNAPSHOT_COMMISSIONED_STATE:
-                capture_commissioned_snapshot(self.config.app_args)
+                capture_commissioned_snapshot(self.config.app_args, self.config.script_args)
                 os.unlink(self.restart_flag_file)
                 continue
 
@@ -419,9 +419,10 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         factory_reset_config_removal(app_args, script_args, FactoryResetType.AppOnly)
     if dut_state_policy.reuse and storage_match and kvs_match:
         register_keyed_kvs(storage_match.group("path"), kvs_match.group("path"))
-    if decision.restore_golden and kvs_match:
+    if decision.restore_golden and kvs_match and storage_match:
         try:
             shutil.copyfile(commissioned_snapshot_file(kvs_match.group("path")), kvs_match.group("path"))
+            shutil.copyfile(commissioned_snapshot_file(storage_match.group("path")), storage_match.group("path"))
         except OSError as e:
             # The framework probes the DUT anyway, so a lost snapshot costs a commissioning, not the run.
             log.warning("Could not restore the commissioned state: %s; the DUT will be commissioned if needed", e)
@@ -683,19 +684,36 @@ def commissioned_snapshot_file(kvs_path: str) -> str:
     return kvs_path + ".commissioned"
 
 
-def capture_commissioned_snapshot(app_args: str) -> None:
-    """Copy the app's KVS aside while the DUT is commissioned and no test has touched it yet."""
-    match = re.search(r"--KVS (?P<path>[^ ]+)", app_args)
-    if not match:
-        return
-    kvs, snapshot = match.group("path"), commissioned_snapshot_file(match.group("path"))
+def _copy_aside(source: str, snapshot: str) -> bool:
+    """Copy a file to its snapshot, via a temporary name so an interrupted runner leaves nothing half-written."""
     try:
-        # Written aside then renamed so an interrupted runner never leaves a half-written snapshot.
-        shutil.copyfile(kvs, snapshot + ".tmp")
+        shutil.copyfile(source, snapshot + ".tmp")
         os.replace(snapshot + ".tmp", snapshot)
-        log.info("Captured the commissioned state of '%s' in '%s'", kvs, snapshot)
+        return True
     except OSError as e:
-        log.warning("Could not capture the commissioned state of '%s': %s", kvs, e)
+        log.warning("Could not snapshot '%s': %s", source, e)
+        with contextlib.suppress(OSError):
+            os.unlink(snapshot + ".tmp")
+        return False
+
+
+def capture_commissioned_snapshot(app_args: str, script_args: str) -> None:
+    """Snapshot the commissioned pair while no test has touched the DUT yet.
+
+    The app's KVS holds its fabric membership and cluster state. The controller storage holds the
+    certificate authority that signed it, and it also grows a fabric every time a test builds a
+    controller, so it has to be rolled back with the app or its fabric table fills up. The
+    controller snapshot is taken once and shared: every app is commissioned by that same authority.
+    """
+    kvs = re.search(r"--KVS (?P<path>[^ ]+)", app_args)
+    storage = re.search(r"--storage-path (?P<path>[^ ]+)", script_args)
+    if not kvs or not storage:
+        return
+    if _copy_aside(kvs.group("path"), commissioned_snapshot_file(kvs.group("path"))):
+        log.info("Captured the commissioned state of '%s'", kvs.group("path"))
+    storage_snapshot = commissioned_snapshot_file(storage.group("path"))
+    if not os.path.exists(storage_snapshot) and _copy_aside(storage.group("path"), storage_snapshot):
+        log.info("Captured the commissioning authority in '%s'", storage_snapshot)
 
 
 def keyed_kvs_registry(storage_path: str) -> pathlib.Path:
@@ -768,7 +786,7 @@ def decide_dut_state(factory_reset: bool, policy: DutStatePolicy, app_args: str,
                                 f"app state reset, no controller storage yet at {storage.group('path')}")
 
     snapshot = commissioned_snapshot_file(kvs.group("path"))
-    if os.path.exists(snapshot):
+    if os.path.exists(snapshot) and os.path.exists(commissioned_snapshot_file(storage.group("path"))):
         return DutStateDecision(False, False, False,
                                 f"restoring the commissioned state from {snapshot}; "
                                 "the DUT starts commissioned to this fabric and otherwise at factory defaults",
@@ -800,6 +818,7 @@ class FactoryResetType(enum.Enum):
             # a new controller fabric would leave those DUTs on a fabric that no longer exists.
             if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
                 yield match.group("path")
+                yield commissioned_snapshot_file(match.group("path"))
                 for kvs_path in registered_keyed_kvs(match.group("path")):
                     yield kvs_path
                     yield commissioned_snapshot_file(kvs_path)
