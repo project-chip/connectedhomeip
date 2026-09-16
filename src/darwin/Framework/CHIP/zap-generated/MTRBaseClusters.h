@@ -17423,7 +17423,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command ProvideICECandidates
  *
- * This command allows for string based ICE candidates generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
+ * This command allows for string based ICE candidates Rfc8839, Section 5.1, generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event Rfc9429, Section 4.1.20, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
  */
 - (void)provideICECandidatesWithParams:(MTRWebRTCTransportProviderClusterProvideICECandidatesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -17432,12 +17432,24 @@ MTR_PROVISIONALLY_AVAILABLE
  * This command instructs the stream provider to end the WebRTC session.
  */
 - (void)endSessionWithParams:(MTRWebRTCTransportProviderClusterEndSessionParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command UpdateSession
+ *
+ * This command allows for updating the SFrame configuration for a session and can be used to perform a sender side key roll, add additional far-end keys, or remove far-end keys.
+ */
+- (void)updateSessionWithParams:(MTRWebRTCTransportProviderClusterUpdateSessionParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeCurrentSessionsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeCurrentSessionsWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeCurrentSessionsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeSupportedSFrameCipherSuitesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedSFrameCipherSuitesWithParams:(MTRSubscribeParams *)params
+                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedSFrameCipherSuitesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -20227,12 +20239,6 @@ typedef NS_ENUM(uint8_t, MTRDataTypeAtomicRequestTypeEnum) {
     MTRDataTypeAtomicRequestTypeEnumRollbackWrite MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x02,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
-typedef NS_ENUM(uint8_t, MTRDataTypeCertificationTypeEnum) {
-    MTRDataTypeCertificationTypeEnumDeviceAttestationPKI MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDataTypeCertificationTypeEnumOperationalPKI MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDataTypeCertificationTypeEnumVIDSignerPKI MTR_PROVISIONALLY_AVAILABLE = 0x02,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_ENUM(uint8_t, MTRDataTypeLandmarkTag) {
     MTRDataTypeLandmarkTagAirConditioner MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
     MTRDataTypeLandmarkTagAirPurifier MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
@@ -20346,11 +20352,29 @@ typedef NS_ENUM(uint8_t, MTRDataTypeRelativePositionTag) {
     MTRDataTypeRelativePositionTagBehind MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRDataTypeServerAttributionContextInformation) {
+    MTRDataTypeServerAttributionContextInformationServerAutomationRule MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRDataTypeServerAttributionContextInformationServerSchedule MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRDataTypeServerAttributionContextInformationServerTimer MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRDataTypeServerAttributionContextInformationSecurityEvent MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRDataTypeServerAttributionContextInformationDemandResponseEvent MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRDataTypeServerAttributionContextInformationPhysicalInteraction MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDataTypeServerAttributionContextInformationExternalProtocol MTR_PROVISIONALLY_AVAILABLE = 0x11,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeStreamUsageEnum) {
     MTRDataTypeStreamUsageEnumInternal MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeStreamUsageEnumRecording MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeStreamUsageEnumAnalysis MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRDataTypeStreamUsageEnumLiveView MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeSuppliedAttributionContextInformation) {
+    MTRDataTypeSuppliedAttributionContextInformationDefaultClientAction MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeSuppliedAttributionContextInformationUserInteraction MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeSuppliedAttributionContextInformationClientAutomationRule MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeSuppliedAttributionContextInformationClientSchedule MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeSuppliedAttributionContextInformationClientTimer MTR_PROVISIONALLY_AVAILABLE = 0x04,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeTariffPriceTypeEnum) {
