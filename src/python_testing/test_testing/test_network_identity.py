@@ -16,14 +16,18 @@
 #
 
 import base64
+import hashlib
 import os
 import sys
 import unittest
+from datetime import UTC, datetime
 
+from cryptography import x509
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature, encode_dss_signature
+from cryptography.x509.oid import ExtendedKeyUsageOID
 
 # The helper under test lives in src/python_testing/support_modules, which is only on
 # sys.path when a test script is launched from src/python_testing. This file is run by
@@ -65,6 +69,20 @@ _PDCID01_KEY_ID = bytes([
 # The tbs_certificate portion of the DER above (bytes 4..247), i.e. the exact
 # input EncodeNetworkIdentityTBSCert produces and signs.
 _PDCID01_TBS = _PDCID01_DER[4:4 + 244]
+# What follows the TBSCertificate: the 12-byte ecdsa-with-SHA256 AlgorithmIdentifier,
+# then the signatureValue BIT STRING. Past the BIT STRING's tag, length and unused-bits
+# octet sits the DER ECDSA-Sig-Value, which is the same signature the compact identity
+# stores as a raw (r || s) pair. test_pdcid01_der_layout guards these offsets.
+_PDCID01_TBS_END = 4 + len(_PDCID01_TBS)
+_PDCID01_SIGNATURE_ALGORITHM = bytes([0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02])
+_PDCID01_SIGNATURE_DER = _PDCID01_DER[_PDCID01_TBS_END + len(_PDCID01_SIGNATURE_ALGORITHM) + 3:]
+# The PDCID01 identity in compact form: the public key plus that signature as (r || s).
+_PDCID01_COMPACT_IDENTITY = ni._encode_compact_identity(
+    _PDCID01_PUBLIC_KEY,
+    b"".join(value.to_bytes(32, "big") for value in decode_dss_signature(_PDCID01_SIGNATURE_DER)))
+# SHA-256 over the full certificate DER. This is the value a hostapd eap_user allow-list
+# entry names as "cert-sha256-<hex>" to admit exactly this identity.
+_PDCID01_CERTIFICATE_SHA256 = "84b9e5049e0cbc8703736a1c7eb91ddc3e918afccd4bf10411ab4e900323c93c"
 
 # NASS spec vector from src/app/clusters/network-identity-management-server/tests/NASS_test_vectors.h
 # (kNASSTestVector1_*), also used by the C++ DeriveNASSSpecVector test. The raw secret is chosen so
@@ -100,17 +118,17 @@ class TestNetworkIdentityTbsEncoding(unittest.TestCase):
         self.assertEqual(ni.network_identity_identifier(_PDCID01_PUBLIC_KEY), _PDCID01_KEY_ID)
 
 
-class TestGeneratedClientIdentity(unittest.TestCase):
+class TestGeneratedIdentity(unittest.TestCase):
     """Validates freshly generated identities round-trip and self-verify."""
 
     def test_length_and_structure(self):
-        _, compact = ni.generate_network_client_identity()
+        _, compact = ni.generate_network_identity()
         self.assertEqual(len(compact), ni.COMPACT_IDENTITY_LENGTH)
         self.assertEqual(compact[0], 0x15)
         self.assertEqual(compact[-1], 0x18)
 
     def test_identifier_derivation_is_consistent(self):
-        private_key, compact = ni.generate_network_client_identity()
+        private_key, compact = ni.generate_network_identity()
         public_key = ni.compact_identity_public_key(compact)
         self.assertEqual(public_key, private_key.public_key().public_bytes(
             encoding=serialization.Encoding.X962, format=serialization.PublicFormat.UncompressedPoint))
@@ -120,11 +138,11 @@ class TestGeneratedClientIdentity(unittest.TestCase):
         # The DUT reconstructs the TBS from the embedded public key and verifies
         # the signature; validate_compact_identity mimics that, so a generated
         # identity passing it proves the identity would be accepted.
-        _, compact = ni.generate_network_client_identity()
+        _, compact = ni.generate_network_identity()
         ni.validate_compact_identity(compact)
 
     def test_verification_fails_for_tampered_tbs(self):
-        _, compact = ni.generate_network_client_identity()
+        _, compact = ni.generate_network_identity()
         public_key = ni.compact_identity_public_key(compact)
         raw_signature = ni.compact_identity_signature(compact)
         r = int.from_bytes(raw_signature[:32], "big")
@@ -141,25 +159,25 @@ class TestCompactIdentityAccessors(unittest.TestCase):
     """Validates the field accessors and the structural checks around them."""
 
     def test_signature_matches_the_raw_slice(self):
-        _, compact = ni.generate_network_client_identity()
+        _, compact = ni.generate_network_identity()
         signature = ni.compact_identity_signature(compact)
         self.assertEqual(len(signature), ni.POSSESSION_SIGNATURE_LENGTH)
         self.assertEqual(signature, compact[4 + 65 + 3:4 + 65 + 3 + 64])
 
     def test_signature_rejects_wrong_length(self):
-        _, compact = ni.generate_network_client_identity()
+        _, compact = ni.generate_network_identity()
         with self.assertRaises(ValueError):
             ni.compact_identity_signature(compact[:-1])
 
     def test_signature_rejects_bad_element_header(self):
-        _, compact = ni.generate_network_client_identity()
+        _, compact = ni.generate_network_identity()
         mangled = bytearray(compact)
         mangled[4 + 65 + 1] = 0x0C  # A context tag other than the expected ecdsa-signature.
         with self.assertRaises(ValueError):
             ni.compact_identity_signature(bytes(mangled))
 
     def test_public_key_rejects_bad_element_header(self):
-        _, compact = ni.generate_network_client_identity()
+        _, compact = ni.generate_network_identity()
         mangled = bytearray(compact)
         mangled[2] = 0x0A  # A context tag other than the expected ec-pub-key.
         with self.assertRaises(ValueError):
@@ -168,12 +186,12 @@ class TestCompactIdentityAccessors(unittest.TestCase):
     def test_validate_rejects_wrong_length(self):
         # An empty or truncated input must be reported as a malformed identity rather
         # than escaping as an IndexError from the structural checks.
-        for candidate in (b"", b"\x15\x18", ni.generate_network_client_identity()[1][:-1]):
+        for candidate in (b"", b"\x15\x18", ni.generate_network_identity()[1][:-1]):
             with self.subTest(length=len(candidate)), self.assertRaises(ValueError):
                 ni.validate_compact_identity(candidate)
 
     def test_validate_rejects_non_structure(self):
-        _, compact = ni.generate_network_client_identity()
+        _, compact = ni.generate_network_identity()
         mangled = bytearray(compact)
         mangled[0] = 0x16  # An anonymous array rather than an anonymous structure.
         with self.assertRaises(ValueError):
@@ -191,19 +209,19 @@ class TestPossessionSignature(unittest.TestCase):
     """Validates the PossessionSignature check against signatures produced the way a DUT does."""
 
     def test_accepts_a_signature_over_identity_and_nonce(self):
-        private_key, compact = ni.generate_network_client_identity()
+        private_key, compact = ni.generate_network_identity()
         nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
         ni.verify_possession_signature(compact, nonce, _sign_possession(private_key, compact, nonce))
 
     def test_rejects_a_signature_for_a_different_nonce(self):
-        private_key, compact = ni.generate_network_client_identity()
+        private_key, compact = ni.generate_network_identity()
         signature = _sign_possession(private_key, compact, os.urandom(ni.POSSESSION_NONCE_LENGTH))
         with self.assertRaises(InvalidSignature):
             ni.verify_possession_signature(compact, os.urandom(ni.POSSESSION_NONCE_LENGTH), signature)
 
     def test_rejects_a_signature_from_a_different_key(self):
-        _, compact = ni.generate_network_client_identity()
-        other_key, _ = ni.generate_network_client_identity()
+        _, compact = ni.generate_network_identity()
+        other_key, _ = ni.generate_network_identity()
         nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
         with self.assertRaises(InvalidSignature):
             ni.verify_possession_signature(compact, nonce, _sign_possession(other_key, compact, nonce))
@@ -211,14 +229,14 @@ class TestPossessionSignature(unittest.TestCase):
     def test_rejects_a_signature_over_the_nonce_alone(self):
         # The identity has to be part of the signed message, so a DUT signing only the
         # nonce must not pass.
-        private_key, compact = ni.generate_network_client_identity()
+        private_key, compact = ni.generate_network_identity()
         nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
         r, s = decode_dss_signature(private_key.sign(nonce, ec.ECDSA(hashes.SHA256())))
         with self.assertRaises(InvalidSignature):
             ni.verify_possession_signature(compact, nonce, r.to_bytes(32, "big") + s.to_bytes(32, "big"))
 
     def test_rejects_bad_nonce_and_signature_lengths(self):
-        private_key, compact = ni.generate_network_client_identity()
+        private_key, compact = ni.generate_network_identity()
         nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
         signature = _sign_possession(private_key, compact, nonce)
         with self.assertRaises(ValueError):
@@ -229,7 +247,7 @@ class TestPossessionSignature(unittest.TestCase):
     def test_rejects_a_padded_identity(self):
         # The signed message starts with the identity, so a caller appending bytes and signing
         # the result would otherwise verify against a malformed identity.
-        private_key, compact = ni.generate_network_client_identity()
+        private_key, compact = ni.generate_network_identity()
         padded = compact + b"\x00"
         nonce = os.urandom(ni.POSSESSION_NONCE_LENGTH)
         with self.assertRaises(ValueError):
@@ -240,16 +258,16 @@ class TestCollidingAndInvalidIdentities(unittest.TestCase):
     """Validates the helpers used to build collision and invalid-identity test inputs."""
 
     def test_regenerated_identity_collides_but_differs(self):
-        private_key, original = ni.generate_network_client_identity()
-        colliding = ni.regenerate_network_client_identity(private_key)
+        private_key, original = ni.generate_network_identity()
+        colliding = ni.regenerate_network_identity(private_key)
         # Same identifier (same public key) but different bytes, and still self-verifies.
         self.assertEqual(ni.network_identity_identifier(colliding), ni.network_identity_identifier(original))
         self.assertNotEqual(colliding, original)
         ni.validate_compact_identity(colliding)
 
     def test_corrupted_identity_keeps_structure_but_fails_verification(self):
-        _, original = ni.generate_network_client_identity()
-        corrupted = ni.corrupt_network_client_identity(original)
+        _, original = ni.generate_network_identity()
+        corrupted = ni.corrupt_network_identity(original)
         self.assertEqual(len(corrupted), len(original))
         self.assertEqual(corrupted[0], 0x15)
         self.assertEqual(corrupted[-1], 0x18)
@@ -277,6 +295,100 @@ class TestEcdsaNetworkIdentityDerivation(unittest.TestCase):
     def test_rejects_bad_secret_length(self):
         with self.assertRaises(ValueError):
             ni.derive_ecdsa_network_identity(b"\x00" * 16)
+
+
+class TestNetworkIdentityCertificate(unittest.TestCase):
+    """Validates the X.509 expansion of an identity against the C++ vector and a third-party parser.
+
+    Our TLV encoder, TBS template and signing are all hand-rolled, so the cross-validation
+    tests here load the encoded certificate with cryptography's X.509 parser and check that an
+    independent implementation agrees about the signature, the names and every extension.
+    """
+
+    def _assert_parser_agrees(self, compact: bytes):
+        certificate = x509.load_der_x509_certificate(ni.encode_network_identity_certificate(compact))
+        # In cryptography 43 this is the whole of "self-signed, and the signature checks out".
+        certificate.verify_directly_issued_by(certificate)
+
+        self.assertEqual(certificate.subject, certificate.issuer)
+        self.assertEqual(certificate.subject.rfc4514_string(), "CN=*")
+        self.assertEqual(certificate.serial_number, 1)
+        self.assertEqual(certificate.version, x509.Version.v3)
+        self.assertEqual(certificate.not_valid_before_utc, datetime(2000, 1, 1, 0, 0, 1, tzinfo=UTC))
+        self.assertEqual(certificate.not_valid_after_utc, datetime(9999, 12, 31, 23, 59, 59, tzinfo=UTC))
+
+        public_key = certificate.public_key()
+        self.assertIsInstance(public_key.curve, ec.SECP256R1)
+        self.assertEqual(public_key.public_bytes(encoding=serialization.Encoding.X962,
+                                                 format=serialization.PublicFormat.UncompressedPoint),
+                         ni.compact_identity_public_key(compact))
+
+        self.assertEqual(len(certificate.extensions), 3)
+        basic_constraints = certificate.extensions.get_extension_for_class(x509.BasicConstraints)
+        self.assertTrue(basic_constraints.critical)
+        self.assertFalse(basic_constraints.value.ca)
+
+        key_usage = certificate.extensions.get_extension_for_class(x509.KeyUsage)
+        self.assertTrue(key_usage.critical)
+        # encipher_only/decipher_only are not listed: reading them raises unless key_agreement is set.
+        self.assertEqual([name for name in ("digital_signature", "content_commitment", "key_encipherment",
+                                            "data_encipherment", "key_agreement", "key_cert_sign", "crl_sign")
+                          if getattr(key_usage.value, name)], ["digital_signature"])
+
+        extended_key_usage = certificate.extensions.get_extension_for_class(x509.ExtendedKeyUsage)
+        self.assertTrue(extended_key_usage.critical)
+        self.assertEqual(list(extended_key_usage.value), [ExtendedKeyUsageOID.CLIENT_AUTH, ExtendedKeyUsageOID.SERVER_AUTH])
+
+    def test_pdcid01_der_layout(self):
+        # Guards the slicing _PDCID01_COMPACT_IDENTITY is reconstructed from, so a mistake
+        # there shows up here rather than as a confusing known-answer failure.
+        algorithm_end = _PDCID01_TBS_END + len(_PDCID01_SIGNATURE_ALGORITHM)
+        self.assertEqual(_PDCID01_DER[_PDCID01_TBS_END:algorithm_end], _PDCID01_SIGNATURE_ALGORITHM)
+        self.assertEqual(_PDCID01_DER[algorithm_end:algorithm_end + 3],
+                         bytes([0x03, len(_PDCID01_SIGNATURE_DER) + 1, 0x00]))  # BIT STRING, 0 unused bits
+
+    def test_pdcid01_certificate_is_byte_exact(self):
+        self.assertEqual(ni.encode_network_identity_certificate(_PDCID01_COMPACT_IDENTITY), _PDCID01_DER)
+
+    def test_pdcid01_certificate_parses(self):
+        self._assert_parser_agrees(_PDCID01_COMPACT_IDENTITY)
+
+    def test_generated_identity_certificate_parses(self):
+        self._assert_parser_agrees(ni.generate_network_identity()[1])
+
+    def test_derived_identity_certificate_parses(self):
+        self._assert_parser_agrees(ni.derive_ecdsa_network_identity(_NASS_VECTOR_RAW_SECRET)[1])
+
+    def test_corrupted_identity_certificate_fails_verification(self):
+        # A corrupted identity still expands to a well-formed certificate, which pins down
+        # that the signature really is carried through into the DER rather than recomputed.
+        corrupted = ni.corrupt_network_identity(ni.generate_network_identity()[1])
+        certificate = x509.load_der_x509_certificate(ni.encode_network_identity_certificate(corrupted))
+        with self.assertRaises(InvalidSignature):
+            certificate.verify_directly_issued_by(certificate)
+
+    def test_pem_matches_the_der(self):
+        _, compact = ni.generate_network_identity()
+        pem = ni.network_identity_certificate_pem(compact)
+        self.assertEqual(pem.splitlines()[0], "-----BEGIN CERTIFICATE-----")
+        self.assertEqual(x509.load_pem_x509_certificate(pem.encode()).public_bytes(serialization.Encoding.DER),
+                         ni.encode_network_identity_certificate(compact))
+
+    def test_certificate_sha256_matches_the_vector(self):
+        # The digest hostapd matches against an eap_user "cert-sha256-<hex>" allow-list entry.
+        _, compact = ni.generate_network_identity()
+        digest = hashlib.sha256(ni.encode_network_identity_certificate(compact)).hexdigest()
+        self.assertRegex(digest, r"\A[0-9a-f]{64}\Z")
+        self.assertEqual(hashlib.sha256(ni.encode_network_identity_certificate(_PDCID01_COMPACT_IDENTITY)).hexdigest(),
+                         _PDCID01_CERTIFICATE_SHA256)
+
+    def test_rejects_malformed_identities(self):
+        for candidate in (b"", _PDCID01_COMPACT_IDENTITY[:-1], bytes(ni.COMPACT_IDENTITY_LENGTH)):
+            with self.subTest(candidate=candidate[:4].hex()):
+                with self.assertRaises(ValueError):
+                    ni.encode_network_identity_certificate(candidate)
+                with self.assertRaises(ValueError):
+                    ni.network_identity_certificate_pem(candidate)
 
 
 class TestNetworkAdministratorSecret(unittest.TestCase):
@@ -360,6 +472,15 @@ class TestNetworkAdministratorSecretDecoding(unittest.TestCase):
                 with self.assertRaises(ValueError) as caught:
                     ni.decode_network_administrator_secret(encoded)
                 self.assertIn(expected_message, str(caught.exception))
+
+
+class TestPreviousNames(unittest.TestCase):
+    def test_previous_names_still_resolve(self):
+        # TC_CNET_4_25/4_26/4_27 and TC_NETIM_1_1 through 1_5 still import these, so the
+        # aliases have to keep pointing at the renamed functions until those are updated.
+        self.assertIs(ni.generate_network_client_identity, ni.generate_network_identity)
+        self.assertIs(ni.regenerate_network_client_identity, ni.regenerate_network_identity)
+        self.assertIs(ni.corrupt_network_client_identity, ni.corrupt_network_identity)
 
 
 if __name__ == "__main__":

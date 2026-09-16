@@ -1,5 +1,7 @@
 /*
+ *
  *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,30 +15,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-class MockAvAnalysisDelegate : public AvAnalysisDelegate
+/**
+ * Migrate subclass for CameraAvSettingsUserLevelManagementCluster.
+ *
+ * Performs one-time migration of TLV-encoded persistent attributes from
+ * SafeAttributePersistenceProvider to AttributePersistenceProvider during Startup().
+ */
+class MigrateCameraAvSettingsUserLevelManagementCluster : public CameraAvSettingsUserLevelManagementCluster
 {
 public:
-    void ShutdownApp() override {}
+    using CameraAvSettingsUserLevelManagementCluster::CameraAvSettingsUserLevelManagementCluster;
 
-    CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) override { return mZoneVerificationResult; }
-
-    bool CanAddContextTriggers() override { return mCanAddContextTriggers; }
-
-    void ActiveAmbientContextTriggersUpdated() override {}
-
-    CHIP_ERROR PersistentAttributesLoadedCallback() override { return CHIP_NO_ERROR; }
-
-    // What the zone check and the capacity check answer
-    CHIP_ERROR mZoneVerificationResult = CHIP_NO_ERROR;
-    bool mCanAddContextTriggers        = true;
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 };
 
 } // namespace Clusters
