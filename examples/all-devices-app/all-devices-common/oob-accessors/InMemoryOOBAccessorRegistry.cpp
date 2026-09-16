@@ -29,12 +29,6 @@ CHIP_ERROR InMemoryOOBAccessorRegistry::Register(std::unique_ptr<OOBAccessor> ac
 
 CHIP_ERROR InMemoryOOBAccessorRegistry::HandleAction(CharSpan action, ByteSpan tlvData)
 {
-    // Give registered cluster OOB accessors a chance to handle the action.
-    // For "SetAttribute", read-only or constant attributes (such as OccupancySensing::Occupancy
-    // or BooleanState::StateValue) cannot be written via the Matter DataModel and MUST be
-    // intercepted here by their respective cluster OOB accessor calling the cluster's C++ API.
-    // If no accessor claims the action or attribute, CHIP_ERROR_NOT_FOUND is returned so
-    // callers (e.g. Pigweed RPC or Named Pipe) can fall back to their injected DataModel provider.
     for (const auto & accessor : mAccessors)
     {
         auto result = accessor->HandleAction(action, tlvData);
@@ -43,7 +37,6 @@ CHIP_ERROR InMemoryOOBAccessorRegistry::HandleAction(CharSpan action, ByteSpan t
             return *result;
         }
     }
-
     return CHIP_ERROR_NOT_FOUND;
 }
 

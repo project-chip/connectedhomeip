@@ -16,13 +16,9 @@
 
 #include <posix/named_pipe/Dispatcher.h>
 
-#include <access/SubjectDescriptor.h>
-#include <app/AttributeValueDecoder.h>
-#include <app/data-model-provider/MetadataLookup.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <oob-accessors/OOBDataSerializer.h>
 #include <platform/PlatformManager.h>
 
 namespace chip::app::NamedPipe {
@@ -37,11 +33,6 @@ struct CommandContext
 
 } // namespace
 
-CHIP_ERROR CommandTranslator::WriteAttributeToDataModel(ByteSpan payload)
-{
-    return Dispatcher::Instance().WriteAttributeToDataModel(payload);
-}
-
 Dispatcher & Dispatcher::Instance()
 {
     static Dispatcher instance(OOBAccessorRegistry::Instance());
@@ -51,29 +42,6 @@ Dispatcher & Dispatcher::Instance()
 Dispatcher::~Dispatcher()
 {
     LogErrorOnFailure(Stop());
-}
-
-CHIP_ERROR Dispatcher::WriteAttributeToDataModel(ByteSpan tlvData) const
-{
-    VerifyOrReturnError(mDataModelProvider != nullptr, CHIP_ERROR_NOT_FOUND);
-
-    auto parseResult = OOBDataSerializer::ParseAttributeRequest(tlvData);
-    if (std::holds_alternative<CHIP_ERROR>(parseResult))
-    {
-        return std::get<CHIP_ERROR>(parseResult);
-    }
-
-    auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
-
-    DataModel::ServerClusterFinder serverClusterFinder(mDataModelProvider);
-    auto info = serverClusterFinder.Find(request.path);
-    VerifyOrReturnError(info.has_value(), CHIP_ERROR_NOT_FOUND);
-
-    Access::SubjectDescriptor subjectDescriptor{ .authMode = Access::AuthMode::kInternalDeviceAccess };
-    DataModel::WriteAttributeRequest writeRequest(request.path, subjectDescriptor);
-    AttributeValueDecoder decoder(request.value, subjectDescriptor);
-
-    return mDataModelProvider->WriteAttribute(writeRequest, decoder).GetUnderlyingError();
 }
 
 CHIP_ERROR Dispatcher::Start(const char * fifoPath)

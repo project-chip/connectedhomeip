@@ -160,20 +160,27 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
     EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
     EXPECT_FALSE(cluster.IsOccupied());
 
-    // SetAttribute for HoldTime = 60 (declined by OccupancyOOBAccessor so it falls through to DataModel)
+    // SetAttribute for HoldTime = 60 on endpoint 2 configured with HoldTime
+    DefaultTimerDelegate timerDelegate;
+    Clusters::OccupancySensingCluster::Config holdTimeConfig(2);
+    holdTimeConfig.WithHoldTime(30, { 1, 300, 30 }, timerDelegate);
+    Clusters::OccupancySensingCluster holdTimeCluster(holdTimeConfig);
+    EXPECT_EQ(holdTimeCluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(std::make_unique<OccupancyOOBAccessor>(holdTimeCluster, 2)), CHIP_NO_ERROR);
+
     writer.Init(buffer);
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(2)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::OccupancySensing::Id), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::OccupancySensing::Attributes::HoldTime::Id), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint16_t>(60)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_EQ(holdTimeCluster.GetHoldTime(), 60U);
 
-    // SetAttribute for unknown attribute (should return UnsupportedWrite)
+    // SetAttribute for unknown attribute (accessor returns std::nullopt -> registry returns CHIP_ERROR_NOT_FOUND)
     writer.Init(buffer);
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
@@ -183,9 +190,9 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
 
+    holdTimeCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -229,7 +236,7 @@ TEST_F(TestOOBAccessors, BooleanStateOOBAccessor)
     EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
     EXPECT_FALSE(cluster.GetStateValue());
 
-    // SetAttribute for unknown attribute (should return UnsupportedWrite)
+    // SetAttribute for unknown attribute (accessor returns std::nullopt -> registry returns CHIP_ERROR_NOT_FOUND)
     writer.Init(buffer);
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
@@ -239,8 +246,7 @@ TEST_F(TestOOBAccessors, BooleanStateOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())),
-              CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

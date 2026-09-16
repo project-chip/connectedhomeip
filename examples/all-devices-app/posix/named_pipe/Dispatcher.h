@@ -22,7 +22,6 @@
 #include <vector>
 
 #include <NamedPipeCommands.h>
-#include <app/data-model-provider/Provider.h>
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
@@ -37,17 +36,6 @@ public:
 
     explicit Dispatcher(OOBAccessorRegistry & oobRegistry) : mOobRegistry(oobRegistry) {}
     ~Dispatcher() override;
-
-    /**
-     * @brief Injects the Matter DataModel provider for fallback writes when no OOB accessor claims an attribute.
-     */
-    void SetDataModelProvider(DataModel::Provider * provider) { mDataModelProvider = provider; }
-
-    /**
-     * @brief Fallback handler that writes an attribute directly to the injected Matter DataModel provider
-     *        when no registered OOB accessor intercepts a "SetAttribute" request.
-     */
-    CHIP_ERROR WriteAttributeToDataModel(ByteSpan tlvData) const;
 
     /**
      * @brief Starts listening on the named pipe FIFO.
@@ -117,7 +105,6 @@ private:
     static void DispatchCommand(intptr_t context);
 
     OOBAccessorRegistry & mOobRegistry;
-    DataModel::Provider * mDataModelProvider = nullptr;
     NamedPipeCommands mNamedPipeCommands;
     std::unordered_map<std::string, std::shared_ptr<const CommandTranslator>> mTranslators;
 };
