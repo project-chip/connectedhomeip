@@ -5,10 +5,11 @@ continuous integration and other builds.
 
 Contents of this directory:
 
-- build.sh - utility for building (and optionally) tagging and pushing the
-  chip-build Docker image
-- version - the semver-style version of the image in use for this branch of CHIP
-- Dockerfile - description of the image
+-   build.sh - utility for building (and optionally) tagging and pushing the
+    chip-build Docker image
+-   version - the semver-style version of the image in use for this branch of
+    CHIP
+-   Dockerfile - description of the image
 
 OpenSSL is downloaded, checksum-verified, compiled, and installed when the image
 is built. The build checks the pinned version and the presence of both static
@@ -59,10 +60,10 @@ for other applications and direct GN builds.
 Please update version when any required tooling is updated. Some rough
 guidelines:
 
-- Updating a tool? Increment dot version unless the tool has a major version
-  delta or a backward incompatibility
-- Adding a tool? Increment minor version: e.g. 0.2.1 -> 0.3.0
-- Removing a tool? Increment major version: e.g. 1.2 -> 2.0
+-   Updating a tool? Increment dot version unless the tool has a major version
+    delta or a backward incompatibility
+-   Adding a tool? Increment minor version: e.g. 0.2.1 -> 0.3.0
+-   Removing a tool? Increment major version: e.g. 1.2 -> 2.0
 
 Note, you must have privileged access to the connectedhomeip:chip-build on
 Docker Hub
