@@ -123,3 +123,15 @@ CONFIG_LV_USE_CLIB_MALLOC=y
 # The commissioning screen renders the onboarding payload as a QR code.
 CONFIG_LV_USE_QRCODE=y
 
+# Navigation widgets
+CONFIG_LV_USE_TABVIEW=y
+CONFIG_LV_USE_MSGBOX=y
+
+# Touch responsiveness: 60Hz polling & refresh, higher scroll threshold to avoid accidental scroll drag
+CONFIG_LV_DEF_REFR_PERIOD=16
+CONFIG_LV_INDEV_DEF_SCROLL_LIMIT=20
+
+# Use dark theme
+CONFIG_LV_THEME_DEFAULT_DARK=y
+
+

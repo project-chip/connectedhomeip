@@ -18,14 +18,15 @@
 
 #include "DeviceDisplay.h"
 #include "CommissioningCodesScreen.h"
+#include "HomeScreen.h"
+#include "NavigationStack.h"
+#include "SystemMenuScreen.h"
 
+#include <app/server/Server.h>
 #include <bsp/esp-bsp.h>
+#include <cinttypes>
 #include <esp_log.h>
 #include <lvgl.h>
-
-#include <setup_payload/OnboardingCodesUtil.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
 
 namespace {
 
@@ -34,32 +35,65 @@ const char TAG[] = "Display";
 // bsp_display_lock() treats 0 as "wait indefinitely".
 constexpr uint32_t kWaitForever = 0;
 
+// 30 seconds of inactivity before blanking the LCD backlight.
+constexpr uint32_t kInactivityTimeoutMs = 30000;
+
 // Non-null once the panel is up; both entry points are no-ops before that and
 // after a failed bring-up.
 lv_display_t * gDisplay = nullptr;
+
+bool sBacklightOn       = true;
+lv_obj_t * sWakeOverlay = nullptr;
+
+void OnWakeOverlayTouch(lv_event_t * event)
+{
+    ESP_LOGI(TAG, "Touch detected while sleeping; waking display");
+    bsp_display_backlight_on();
+    sBacklightOn = true;
+
+    if (sWakeOverlay != nullptr)
+    {
+        lv_obj_delete(sWakeOverlay);
+        sWakeOverlay = nullptr;
+    }
+    lv_display_trigger_activity(gDisplay);
+}
+
+void CheckInactivityTimer(lv_timer_t * timer)
+{
+    if (gDisplay == nullptr)
+    {
+        return;
+    }
+
+    if (sBacklightOn)
+    {
+        uint32_t inactiveMs = lv_display_get_inactive_time(gDisplay);
+        if (inactiveMs >= kInactivityTimeoutMs)
+        {
+            ESP_LOGI(TAG, "Display inactive for %" PRIu32 " ms; turning off backlight", inactiveMs);
+            bsp_display_backlight_off();
+            sBacklightOn = false;
+
+            // Place an invisible overlay on the top layer to intercept the wake touch
+            // so waking the device does not trigger underlying button actions.
+            if (sWakeOverlay == nullptr)
+            {
+                sWakeOverlay = lv_obj_create(lv_layer_top());
+                lv_obj_set_size(sWakeOverlay, LV_PCT(100), LV_PCT(100));
+                lv_obj_set_style_bg_opa(sWakeOverlay, LV_OPA_TRANSP, LV_PART_MAIN);
+                lv_obj_set_style_border_width(sWakeOverlay, 0, LV_PART_MAIN);
+                lv_obj_clear_flag(sWakeOverlay, LV_OBJ_FLAG_SCROLLABLE);
+                lv_obj_add_event_cb(sWakeOverlay, OnWakeOverlayTouch, LV_EVENT_PRESSED, nullptr);
+            }
+        }
+    }
+}
 
 } // namespace
 
 void InitDeviceDisplay()
 {
-    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
-    chip::MutableCharSpan qrCodeText(qrCodeBuffer);
-    CHIP_ERROR err = GetQRCode(qrCodeText, chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "GetQRCode() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
-
-    char manualCodeBuffer[chip::kManualSetupLongCodeCharLength + 1];
-    chip::MutableCharSpan manualCodeText(manualCodeBuffer);
-    err = GetManualPairingCode(manualCodeText, chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "GetManualPairingCode() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
-
     // Powers the panel rails, starts the SPI panel and the LVGL port task.
     gDisplay = bsp_display_start();
     if (gDisplay == nullptr)
@@ -73,12 +107,38 @@ void InitDeviceDisplay()
         ESP_LOGE(TAG, "Could not take the LVGL lock");
         return;
     }
-    ShowCommissioningCodes(lv_display_get_screen_active(gDisplay), qrCodeText.data(), manualCodeText.data());
+
+    // Configure dark theme
+    lv_theme_t * theme = lv_theme_default_init(gDisplay, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_CYAN),
+                                               /* dark = */ true, LV_FONT_DEFAULT);
+    lv_display_set_theme(gDisplay, theme);
+
+    lv_obj_t * screen = lv_display_get_screen_active(gDisplay);
+
+    // Initialize the hierarchical navigation shell
+    NavigationStack::Init(screen);
+
+    // Root is always Home
+    NavigationStack::Push("Home", ShowHome);
+
+    // If the device is not yet commissioned, auto-push to the QR Code screen so
+    // the onboarding payload is immediately visible on boot.
+    // Breadcrumbs will display: Home > System > QR Code.
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+    {
+        NavigationStack::Push("System", ShowSystemMenu);
+        NavigationStack::Push("QR Code", ShowCommissioningCodesScreen);
+    }
+
+    // Register inactivity timer to blank display after 30s
+    lv_timer_create(CheckInactivityTimer, 1000, nullptr);
+
     bsp_display_unlock();
 
     // Only turn the backlight on once there is something to look at, to avoid
     // showing the uninitialized panel contents.
     ESP_ERROR_CHECK_WITHOUT_ABORT(bsp_display_backlight_on());
+    sBacklightOn = true;
 }
 
 void ShowRestartingMessage()
@@ -93,11 +153,17 @@ void ShowRestartingMessage()
         return;
     }
 
+    if (!sBacklightOn)
+    {
+        bsp_display_backlight_on();
+        sBacklightOn = true;
+    }
+
     lv_obj_t * screen = lv_display_get_screen_active(gDisplay);
     lv_obj_clean(screen);
     lv_obj_t * label = lv_label_create(screen);
     lv_label_set_text_static(label, "Restarting...");
-    lv_obj_set_style_text_color(label, lv_color_black(), LV_PART_MAIN);
+    lv_obj_set_style_text_color(label, lv_color_white(), LV_PART_MAIN);
     lv_obj_center(label);
 
     bsp_display_unlock();

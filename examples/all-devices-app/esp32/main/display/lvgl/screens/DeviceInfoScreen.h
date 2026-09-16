@@ -21,16 +21,16 @@
 #include <lvgl.h>
 
 /**
- * Fills @a parent with the commissioning codes: the QR code a commissioner
- * scans, plus the manual pairing code as a fallback.
+ * Populates @a parent with the device status information:
+ * commissioning state, IP address, active device type, and heap statistics.
  *
- * Both strings are copied into the widgets, so the caller may reuse its
- * buffers afterwards. The LVGL port lock must be held by the caller.
+ * The caller must hold the LVGL lock.
  */
-void ShowCommissioningCodes(lv_obj_t * parent, const char * qrCodePayload, const char * manualPairingCode);
+void ShowDeviceInfo(lv_obj_t * parent);
 
 /**
- * Convenience entry point matching RenderScreenFn: queries setup codes and
- * calls ShowCommissioningCodes().
+ * Refreshes status values within @a parent.
+ *
+ * The caller must hold the LVGL lock.
  */
-void ShowCommissioningCodesScreen(lv_obj_t * parent);
+void UpdateDeviceInfo(lv_obj_t * parent);

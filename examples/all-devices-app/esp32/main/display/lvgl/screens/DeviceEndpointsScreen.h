@@ -21,16 +21,10 @@
 #include <lvgl.h>
 
 /**
- * Fills @a parent with the commissioning codes: the QR code a commissioner
- * scans, plus the manual pairing code as a fallback.
+ * Populates @a parent with the active device / endpoint view:
+ * in '*' mode, displays the list of running bridged endpoints;
+ * in single-device mode, displays the active device control summary.
  *
- * Both strings are copied into the widgets, so the caller may reuse its
- * buffers afterwards. The LVGL port lock must be held by the caller.
+ * The caller must hold the LVGL lock.
  */
-void ShowCommissioningCodes(lv_obj_t * parent, const char * qrCodePayload, const char * manualPairingCode);
-
-/**
- * Convenience entry point matching RenderScreenFn: queries setup codes and
- * calls ShowCommissioningCodes().
- */
-void ShowCommissioningCodesScreen(lv_obj_t * parent);
+void ShowDeviceEndpoints(lv_obj_t * parent);

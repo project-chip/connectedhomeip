@@ -38,6 +38,7 @@ if (CONFIG_HAVE_DISPLAY)
     list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/display")
     if (CONFIG_DISPLAY_LVGL)
         list(APPEND PRIV_INCLUDE_DIRS_LIST
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl"
             "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/screens"
         )
     else()
