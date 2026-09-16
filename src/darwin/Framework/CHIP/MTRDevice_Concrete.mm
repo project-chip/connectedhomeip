@@ -79,11 +79,12 @@
 // can be changed in the future)
 #define MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC (60 * 5)
 
-// We only respond to time synchronization issues once every hour after
-// detecting an issue for the first time. Unit tests can override this using
-// unitTestTimeSynchronizationLossDetectionCadenceIsZero, so you should
-// probably use shouldDetectTimeSynchronizationLoss instead of this constant.
+// We repair a device's clock at most BUDGET times per CADENCE, so a device that cannot
+// keep its clock does not have us updating it forever. It's a budget rather than a single
+// repair because a device with no battery-backed RTC loses its clock on every power cycle,
+// and several power cycles in a row are expected during setup.
 #define MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE (1 * 60 * 60)
+#define MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET 5
 
 #pragma mark - Constant string definitions
 
@@ -406,7 +407,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device;
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
-- (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device;
+- (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
 @end
 #endif
@@ -450,8 +451,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // This boolean keeps track, during a priming read, of whether time
     // synchronization loss has been detected.
     BOOL _timeSynchronizationLossDetected;
-    // Keep track of the last time we detected a time synchronization loss.
-    NSDate * _Nullable _timeSynchronizationLossDetectedTime;
+    // Times at which we scheduled a time synchronization repair, oldest first. Pruned
+    // lazily, so only the count after a prune says how much budget is left.
+    NSMutableArray<NSDate *> * _Nullable _timeSynchronizationRepairTimes;
 
     // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when any of the following happen:
     //   1. Subscription establishes
@@ -730,6 +732,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return delay;
 }
 
+// Whether we have budget left to repair a time synchronization loss. Prunes the window as
+// a side effect, so it is not a pure query.
 - (BOOL)shouldDetectTimeSynchronizationLoss
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -739,26 +743,53 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return NO;
     }
 
-    if (_timeSynchronizationLossDetectedTime == nil) {
-        return YES;
-    }
+    [self _dropExpiredTimeSynchronizationRepairTimes];
+
+    return _timeSynchronizationRepairTimes.count < MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET;
+}
+
+- (void)_dropExpiredTimeSynchronizationRepairTimes
+{
+    os_unfair_lock_assert_owner(&self->_lock);
 
     __block NSTimeInterval cadence = MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE;
 
 #ifdef DEBUG
     [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectionCadenceIsZero:)]
-            && [testDelegate unitTestTimeSynchronizationLossDetectionCadenceIsZero:self]) {
-            cadence = 0;
+        if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectionCadenceOverride:)]) {
+            NSNumber * override = [testDelegate unitTestTimeSynchronizationLossDetectionCadenceOverride:self];
+            if (override != nil) {
+                cadence = override.doubleValue;
+            }
         }
     }];
 #endif
 
-    if ([_timeSynchronizationLossDetectedTime timeIntervalSinceNow] * -1 >= cadence) {
-        return YES;
+    NSUInteger countBeforePruning = _timeSynchronizationRepairTimes.count;
+
+    // Oldest first, so the first entry still inside the window ends this.
+    while (_timeSynchronizationRepairTimes.count > 0
+        && [_timeSynchronizationRepairTimes.firstObject timeIntervalSinceNow] * -1 >= cadence) {
+        [_timeSynchronizationRepairTimes removeObjectAtIndex:0];
     }
 
-    return NO;
+    if (countBeforePruning != _timeSynchronizationRepairTimes.count) {
+        MTR_LOG_DEBUG("%@ %lu time synchronization repair(s) aged out, %lu still counted", self,
+            static_cast<unsigned long>(countBeforePruning - _timeSynchronizationRepairTimes.count),
+            static_cast<unsigned long>(_timeSynchronizationRepairTimes.count));
+    }
+}
+
+// Spends one unit of budget. Call this where the repair is issued, not where the loss is
+// noticed, so seeing one loss several times only costs one repair.
+- (void)_noteTimeSynchronizationRepairScheduled
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (!_timeSynchronizationRepairTimes) {
+        _timeSynchronizationRepairTimes = [NSMutableArray array];
+    }
+    [_timeSynchronizationRepairTimes addObject:[NSDate now]];
 }
 
 - (void)_setTimeOnDevice
@@ -862,24 +893,32 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_performScheduledTimeUpdate
 {
+    std::lock_guard lock(_timeSyncLock);
+
+    // The source that invoked us has already cancelled itself, so this timer is spent
+    // whichever way we exit. Leaving it set would block all future scheduling.
+    BOOL hadScheduledTimer = self.timeUpdateTimer != nil;
+    self.timeUpdateTimer = nil;
+
+    // Device must not be invalidated
+    if (!hadScheduledTimer) {
+        MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
+        return;
+    }
+
+    // Read the state under _timeSyncLock so it cannot go stale while we wait for the lock.
     MTRDeviceState currentState;
     {
-        std::lock_guard lock(_lock);
+        std::lock_guard stateLock(_lock);
         currentState = _state;
     }
 
-    std::lock_guard lock(_timeSyncLock);
-    // Device needs to still be reachable
+    // Nothing to reschedule here: _handleSubscriptionEstablished does it when the device
+    // comes back.
     if (currentState != MTRDeviceStateReachable) {
         MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", self);
         return;
     }
-    // Device must not be invalidated
-    if (self.timeUpdateTimer == nil) {
-        MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
-        return;
-    }
-    self.timeUpdateTimer = nil;
     [self _updateDeviceTimeAndScheduleNextUpdate];
 }
 
@@ -1436,6 +1475,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_lock(&self->_timeSyncLock);
 
+    // Baseline update for this subscription rather than a repair, so it costs no budget.
     if (self.timeUpdateTimer == nil) {
         [self _scheduleNextUpdate:newUpdateDelay];
     }
@@ -2302,6 +2342,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     if (timeSynchronizationLossDetected && longTimeUpdateScheduled) {
         MTR_LOG("%@ Trying to correct time synchronization loss, reschedule time update", self);
+        {
+            // Lock order is _timeSyncLock then _lock, as in _setTimeOnDevice.
+            std::lock_guard lock(_lock);
+            [self _noteTimeSynchronizationRepairScheduled];
+        }
         dispatch_source_cancel(self.timeUpdateTimer);
         self.timeUpdateTimer = nil;
         [self _scheduleNextUpdate:newUpdateDelay];
@@ -2478,6 +2523,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     [self _injectAttributeReport:attributeReport fromSubscription:isFromSubscription];
+}
+
+- (void)unitTestNoteTimeSynchronizationRepairScheduled
+{
+    std::lock_guard lock(_lock);
+    [self _noteTimeSynchronizationRepairScheduled];
+}
+
+- (BOOL)unitTestShouldDetectTimeSynchronizationLoss
+{
+    std::lock_guard lock(_lock);
+    return [self shouldDetectTimeSynchronizationLoss];
 }
 #endif
 
@@ -4533,9 +4590,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [self _attributeValue:attributeDataValue reportedForPath:attributePath];
             }
 
-            // If we've never detected a time synchronization loss, or it's
-            // been a while since we last detected a time synchronization
-            // loss then check for a time synchronization loss now.
+            // Check for a loss if we still have repair budget. Noticing is free; the
+            // budget is spent when _handleReportEnd schedules the repair.
             //
             // This check must be done unconditionally (not just when the
             // cache value changed) because CurrentTime has the C (non-
@@ -4555,7 +4611,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     if (std::abs([deviceDate timeIntervalSinceNow]) > MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC) {
                         MTR_LOG("%@ Time synchronization loss detected", self);
                         _timeSynchronizationLossDetected = YES;
-                        _timeSynchronizationLossDetectedTime = [NSDate now];
 #ifdef DEBUG
                         [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
                             if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectedForDevice:)]) {
