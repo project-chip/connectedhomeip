@@ -994,7 +994,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
     # rebuilt several times. A background wildcard subscription cannot survive that and
     # only adds noise/instability, similar to the issue avoided in TC_CGEN_2_2
     # (https://github.com/project-chip/connectedhomeip/issues/72732).
-    disable_wildcard_subscription = True 
+    disable_wildcard_subscription = True
 
     @classmethod
     def setup_class(cls):
