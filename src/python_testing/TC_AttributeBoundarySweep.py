@@ -112,6 +112,9 @@ class SweepTally:
     counts: dict[ProbeOutcome, int] = field(default_factory=dict)
     notable: list[ProbeResult] = field(default_factory=list)
     dirty: list[ProbeResult] = field(default_factory=list)
+    # path_str of every attribute that produced at least one probe. A collected attribute
+    # yields no probe when none of its bounds can be turned into a writable value.
+    probed: set[str] = field(default_factory=set)
 
 
 class AttributeBoundarySweep(IDMBaseTest):
@@ -326,6 +329,7 @@ class AttributeBoundarySweep(IDMBaseTest):
             tally.counts[outcome] = 0
         for probe_result in results:
             tally.counts[probe_result.outcome] += 1
+            tally.probed.add(probe_result.path_str)
             if probe_result.outcome in (ProbeOutcome.REJECTED, ProbeOutcome.IGNORED, ProbeOutcome.OTHER_STATUS,
                                         ProbeOutcome.ERROR):
                 tally.notable.append(probe_result)
@@ -334,10 +338,11 @@ class AttributeBoundarySweep(IDMBaseTest):
         return tally
 
     @staticmethod
-    def _log_report(tally: SweepTally, attribute_count: int) -> None:
+    def _log_report(tally: SweepTally, collected_count: int) -> None:
         """Print the sweep report: tally, then every result worth attention."""
         total = sum(tally.counts.values())
-        log.info("=== Boundary sweep: %s probes across %s attributes ===", total, attribute_count)
+        log.info("=== Boundary sweep: %s probes across %s of %s collected attributes ===",
+                 total, len(tally.probed), collected_count)
         for outcome, count in tally.counts.items():
             log.info("  %-18s %s", outcome.value, count)
 
