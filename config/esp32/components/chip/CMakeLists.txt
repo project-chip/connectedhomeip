@@ -468,6 +468,20 @@ target_include_directories(${COMPONENT_LIB} PRIVATE
     "${freertos_dir}/include/freertos"
     "${freertos_dir}/FreeRTOS-Kernel/include/freertos")
 
+# ESP32SecureCertDACProvider.cpp includes esp_tee_sec_storage.h (owned by the tee_sec_storage
+# component, an esp_tee subproject component that is not in this component's REQUIRES) on the
+# PBKDF2 TEE-DAC path. Add its include dir to the gn compile path for that feature. A config-gated
+# PRIV_REQUIRES is unreliable here: CONFIG_* is unset during IDF's early-expansion pass when
+# REQUIRES is resolved, so inject the dir directly instead.
+if (CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2)
+    idf_component_get_property(tee_sec_storage_dir tee_sec_storage COMPONENT_DIR)
+    set(tee_sec_storage_inc "${tee_sec_storage_dir}/include")
+    if (NOT EXISTS "${tee_sec_storage_inc}")
+        message(FATAL_ERROR "tee_sec_storage include dir not found: ${tee_sec_storage_inc}")
+    endif()
+    target_include_directories(${COMPONENT_LIB} PRIVATE "${tee_sec_storage_inc}")
+endif()
+
 target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/src/platform/ESP32"
     "${CHIP_ROOT}/src/platform/OpenThread"

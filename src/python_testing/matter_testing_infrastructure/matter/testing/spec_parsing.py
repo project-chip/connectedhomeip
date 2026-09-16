@@ -410,6 +410,7 @@ ALIAS_PICS = {0x040C: 'CMOCONC',
               0x042D: 'PMKCONC',
               0x042E: 'TVOCCONC',
               0x042F: 'RNCONC',
+              0x0434: 'SMOKECONC',
               0x0071: 'HEPAFREMON',
               0x0072: 'ACFREMON',
               0x0405: 'RH',
@@ -1386,6 +1387,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_5_1 = auto()
     k1_6 = auto()
     k1_6_1 = auto()
+    k1_7 = auto()
 
     @property
     def dirname(self):
@@ -1407,6 +1409,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.6"
         if self == PrebuiltDataModelDirectory.k1_6_1:
             return "1.6.1"
+        if self == PrebuiltDataModelDirectory.k1_7:
+            return "1.7"
         raise KeyError(f"Invalid enum: {self!r}")
 
 
@@ -2157,6 +2161,7 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         0x01050100: PrebuiltDataModelDirectory.k1_5_1,
         0x01060000: PrebuiltDataModelDirectory.k1_6,
         0x01060100: PrebuiltDataModelDirectory.k1_6_1,
+        0x01070000: PrebuiltDataModelDirectory.k1_7,
     }
 
     if specification_version not in version_to_dm:

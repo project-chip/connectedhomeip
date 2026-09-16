@@ -165,6 +165,19 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     defines +=
         [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${_enable_joint_fabric}" ]
 
+    # On most platforms, CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC is configured via
+    # CHIPDevicePlatformConfig.h based on whether or not the platform's driver
+    # supports PDC. However on Linux practical support also depends on
+    # wpa_supplicant, so make the flag controllable directly via GN.
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      _enable_wifi_pdc = chip_device_config_enable_wifi_pdc || chip_build_tests
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC=${_enable_wifi_pdc}" ]
+    } else {
+      assert(
+          !chip_device_config_enable_wifi_pdc,
+          "chip_device_config_enable_wifi_pdc is not applicable for chip_device_platform = '${chip_device_platform}'")
+    }
+
     public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||

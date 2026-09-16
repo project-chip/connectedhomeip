@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/clusters/audio-control-server/AudioControlDelegate.h>
+#include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
@@ -29,7 +30,7 @@
 
 namespace chip::app::Clusters {
 
-class AudioControlCluster : public DefaultServerCluster
+class AudioControlCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl
 {
 public:
     /// Bitset of optional attributes that can be individually enabled.
@@ -165,6 +166,21 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
+
+    // scenes::SceneHandler overrides. Registered with the scene table (only when a Scenes
+    // Management cluster is present on the endpoint) by the CodegenIntegration layer. The
+    // scene-able attributes are SoftMuted, Volume and, when the BasicEqualizer feature and the
+    // corresponding band attribute are enabled, Bass/Mid/Treble (AudioControl.adoc "Scene
+    // Table Extensions"). Transition time is ignored: the stored values are applied at once.
+    // ApplyScene routes through the delegate (HandleVolumeAndMuteChange / HandleBassChanged /
+    // ...) before committing, like the command handlers, so a scene recall reaches hardware and
+    // any coordinating clusters. Stored values outside the current constraints are saturated to
+    // the closest legal value rather than rejected, so a scene captured before MaxUserVolume or
+    // the correction range shrank still recalls.
+    bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override;
+    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override;
+    CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                          scenes::TransitionTimeMs timeMs) override;
 
     // Application-facing API — call these from application code (e.g. hardware event handlers).
     // SetSoftMuted/SetVolume/SetPhysicallyMuted/SetBass/SetMid/SetTreble reflect hardware-initiated
