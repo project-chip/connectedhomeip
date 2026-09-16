@@ -1072,6 +1072,12 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    // Resolve an explicitly requested provider for applications with their own initialization path.
+    if (gDeviceOptions.dacProviderFile.HasValue())
+    {
+        ResolveDeviceAttestationCredentialsProvider();
+    }
     return CHIP_NO_ERROR;
 }
 

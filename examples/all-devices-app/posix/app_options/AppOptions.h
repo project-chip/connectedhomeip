@@ -30,6 +30,11 @@
 class AppOptions
 {
 public:
+    /// Default listen port for the Pigweed RPC server. Matches the default used by the
+    /// other Linux examples (see LinuxDeviceOptions::rpcServerPort) so that existing
+    /// tooling keeps working when no port is given on the command line.
+    static constexpr uint16_t kDefaultRpcServerPort = 33000;
+
     struct AppConfig
     {
         std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
@@ -47,6 +52,12 @@ public:
         uint8_t testEventTriggerEnableKey[16] = { 0 };
         bool enableWiFi                       = false;
         uint32_t bleController                = 0;
+        /// Listen port for the Pigweed RPC server, unset when --rpc-server-port was not given.
+        /// This is unconditionally parsed, but only consumed by builds compiled with Pigweed RPC
+        /// support (chip_enable_pw_rpc), so that the option stays unit-testable and the struct
+        /// layout does not vary per build flavor. Callers should fall back to
+        /// kDefaultRpcServerPort.
+        std::optional<uint16_t> rpcServerPort;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         std::string wifipafExtCmds;
         // Frequencies in MHz parsed out of "--wifipaf freq_list=", in the order given.
@@ -57,6 +68,11 @@ public:
     static chip::ArgParser::OptionSet * GetOptions();
 
     static const AppConfig & GetConfig();
+
+    /// Parse a TCP/UDP port number given on the command line. Accepts decimal, octal and
+    /// hexadecimal notation (strtoul with base 0). Returns false, leaving `port` untouched,
+    /// when the value is empty, is not entirely numeric, or does not fit in a uint16_t.
+    static bool ParsePortNumber(const char * value, uint16_t & port);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     /// Parse the frequencies out of a "--wifipaf" argument of the form

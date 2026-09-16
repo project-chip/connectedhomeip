@@ -143,6 +143,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "RvcOperationalState";
     case chip::app::Clusters::ScenesManagement::Id:
         return "ScenesManagement";
+    case chip::app::Clusters::ThermostatMode::Id:
+        return "ThermostatMode";
     case chip::app::Clusters::Groupcast::Id:
         return "Groupcast";
     case chip::app::Clusters::HepaFilterMonitoring::Id:
@@ -1624,6 +1626,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::OvenMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::OvenMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::OvenMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::OvenMode::Attributes::AcceptedCommandList::Id:
@@ -1716,6 +1720,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::LaundryWasherMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::LaundryWasherMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::LaundryWasherMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::LaundryWasherMode::Attributes::AcceptedCommandList::Id:
@@ -1737,6 +1743,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::AcceptedCommandList::Id:
@@ -1783,6 +1791,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::RvcRunMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::RvcRunMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::RvcRunMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::RvcRunMode::Attributes::AcceptedCommandList::Id:
@@ -1804,6 +1814,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::RvcCleanMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::RvcCleanMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::RvcCleanMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::RvcCleanMode::Attributes::AcceptedCommandList::Id:
@@ -1877,6 +1889,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::DishwasherMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::DishwasherMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::DishwasherMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DishwasherMode::Attributes::AcceptedCommandList::Id:
@@ -1987,6 +2001,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::MicrowaveOvenMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::MicrowaveOvenMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::MicrowaveOvenMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::MicrowaveOvenMode::Attributes::AcceptedCommandList::Id:
@@ -2110,6 +2126,31 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ScenesManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ScenesManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ThermostatMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ThermostatMode::Attributes::SupportedModes::Id:
+            return "SupportedModes";
+        case chip::app::Clusters::ThermostatMode::Attributes::CurrentMode::Id:
+            return "CurrentMode";
+        case chip::app::Clusters::ThermostatMode::Attributes::StartUpMode::Id:
+            return "StartUpMode";
+        case chip::app::Clusters::ThermostatMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
+        case chip::app::Clusters::ThermostatMode::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ThermostatMode::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ThermostatMode::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ThermostatMode::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ThermostatMode::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -2619,6 +2660,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::EnergyEvseMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::EnergyEvseMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::EnergyEvseMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::EnergyEvseMode::Attributes::AcceptedCommandList::Id:
@@ -2640,6 +2683,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::WaterHeaterMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::WaterHeaterMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::WaterHeaterMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::WaterHeaterMode::Attributes::AcceptedCommandList::Id:
@@ -2661,6 +2706,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
+        case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::CoreModeTags::Id:
+            return "CoreModeTags";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DeviceEnergyManagementMode::Attributes::AcceptedCommandList::Id:
@@ -3268,12 +3315,16 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentThermostatSuggestion";
         case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestionNotFollowingReason::Id:
             return "ThermostatSuggestionNotFollowingReason";
+        case chip::app::Clusters::Thermostat::Attributes::CriticalFreezeProtection::Id:
+            return "CriticalFreezeProtection";
+        case chip::app::Clusters::Thermostat::Attributes::CriticalOverheatProtection::Id:
+            return "CriticalOverheatProtection";
         case chip::app::Clusters::Thermostat::Attributes::Sensors::Id:
             return "Sensors";
-        case chip::app::Clusters::Thermostat::Attributes::AvailableSensors::Id:
-            return "AvailableSensors";
-        case chip::app::Clusters::Thermostat::Attributes::EnabledSensors::Id:
-            return "EnabledSensors";
+        case chip::app::Clusters::Thermostat::Attributes::AvailableSensorHandles::Id:
+            return "AvailableSensorHandles";
+        case chip::app::Clusters::Thermostat::Attributes::EnabledSensorHandles::Id:
+            return "EnabledSensorHandles";
         case chip::app::Clusters::Thermostat::Attributes::NumberOfSensorScheduleTransitions::Id:
             return "NumberOfSensorScheduleTransitions";
         case chip::app::Clusters::Thermostat::Attributes::SensorSchedule::Id:
@@ -6019,6 +6070,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::OvenMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        case chip::app::Clusters::OvenMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -6037,6 +6090,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        case chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -6046,6 +6101,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -6055,6 +6112,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::RvcRunMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        case chip::app::Clusters::RvcRunMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -6064,6 +6123,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::RvcCleanMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        case chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -6082,6 +6143,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::DishwasherMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        case chip::app::Clusters::DishwasherMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -6164,6 +6227,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "GetSceneMembership";
         case chip::app::Clusters::ScenesManagement::Commands::CopyScene::Id:
             return "CopyScene";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ThermostatMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ThermostatMode::Commands::ChangeToMode::Id:
+            return "ChangeToMode";
+        case chip::app::Clusters::ThermostatMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -6320,6 +6394,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::EnergyEvseMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        case chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -6329,6 +6405,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::WaterHeaterMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        case chip::app::Clusters::WaterHeaterMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -6338,6 +6416,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToMode::Id:
             return "ChangeToMode";
+        case chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeByCoreTag::Id:
+            return "ChangeToModeByCoreTag";
         default:
             return "Unknown";
         }
@@ -7493,6 +7573,15 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ThermostatMode::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ThermostatMode::Commands::ChangeToModeResponse::Id:
+            return "ChangeToModeResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::Groupcast::Id: {
         switch (id)
         {
@@ -7953,6 +8042,10 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Battery Storage";
     case 0x00000019:
         return "Secondary Network Interface";
+    case 0x00000020:
+        return "Streaming Audio Player";
+    case 0x00000021:
+        return "Casting Audio Player";
     case 0x00000022:
         return "Speaker";
     case 0x00000023:
@@ -8125,6 +8218,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Electrical Surge Protector";
     case 0x00000519:
         return "Residual Current Circuit Breaker";
+    case 0x00000520:
+        return "Auxiliary Load Switch";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:
