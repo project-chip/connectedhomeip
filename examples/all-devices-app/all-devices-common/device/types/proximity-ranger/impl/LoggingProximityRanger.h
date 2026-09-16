@@ -29,6 +29,7 @@ namespace app {
  * ranging hardware. Owns a LoggingRangingAdapter for each of the three
  * technologies the cluster supports (BLE Beacon RSSI, Wi-Fi USD, Bluetooth
  * Channel Sounding) and injects them into the base ProximityRanger.
+ * In addition implements optional attributes with test management interface.
  */
 class LoggingProximityRanger : public ProximityRanger
 {
