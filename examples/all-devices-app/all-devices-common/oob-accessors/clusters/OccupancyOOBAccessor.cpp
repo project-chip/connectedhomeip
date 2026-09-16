@@ -30,7 +30,7 @@ namespace chip::app {
 
 std::optional<CHIP_ERROR> OccupancyOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
 {
-    if (action.data_equal("SetAttribute"_span))
+    if (action.data_equal(OOBDataSerializer::kSetAttributeAction))
     {
         return HandleSetAttribute(tlvData);
     }

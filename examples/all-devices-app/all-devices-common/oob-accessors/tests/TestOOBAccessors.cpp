@@ -27,6 +27,7 @@
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/NoopOOBAccessorRegistry.h>
+#include <oob-accessors/OOBDataSerializer.h>
 #include <oob-accessors/clusters/AmbientContextOOBAccessor.h>
 #include <oob-accessors/clusters/BasicInformationOOBAccessor.h>
 #include <oob-accessors/clusters/BooleanStateOOBAccessor.h>
@@ -132,33 +133,26 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
     EXPECT_FALSE(cluster.IsOccupied());
 
     // SetAttribute for Occupancy = 1 (occupied)
-    uint8_t buffer[64];
-    TLV::TLVWriter writer;
-    writer.Init(buffer);
-    TLV::TLVType outer;
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::OccupancySensing::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::OccupancySensing::Attributes::Occupancy::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint8_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-    EXPECT_TRUE(cluster.IsOccupied());
+    {
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
+            ConcreteAttributePath(1, Clusters::OccupancySensing::Id, Clusters::OccupancySensing::Attributes::Occupancy::Id),
+            static_cast<uint8_t>(1));
+        ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+        EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(cluster.IsOccupied());
+    }
 
     // SetAttribute for Occupancy = 0 (unoccupied)
-    writer.Init(buffer);
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::OccupancySensing::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::OccupancySensing::Attributes::Occupancy::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint8_t>(0)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-    EXPECT_FALSE(cluster.IsOccupied());
+    {
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
+            ConcreteAttributePath(1, Clusters::OccupancySensing::Id, Clusters::OccupancySensing::Attributes::Occupancy::Id),
+            static_cast<uint8_t>(0));
+        ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+        EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
+                  CHIP_NO_ERROR);
+        EXPECT_FALSE(cluster.IsOccupied());
+    }
 
     // SetAttribute for HoldTime = 60 on endpoint 2 configured with HoldTime
     DefaultTimerDelegate timerDelegate;
@@ -168,29 +162,24 @@ TEST_F(TestOOBAccessors, OccupancyOOBAccessor)
     EXPECT_EQ(holdTimeCluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
     EXPECT_EQ(registry.Register(std::make_unique<OccupancyOOBAccessor>(holdTimeCluster, 2)), CHIP_NO_ERROR);
 
-    writer.Init(buffer);
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(2)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::OccupancySensing::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::OccupancySensing::Attributes::HoldTime::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint16_t>(60)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-    EXPECT_EQ(holdTimeCluster.GetHoldTime(), 60U);
+    {
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
+            ConcreteAttributePath(2, Clusters::OccupancySensing::Id, Clusters::OccupancySensing::Attributes::HoldTime::Id),
+            static_cast<uint16_t>(60));
+        ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+        EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(holdTimeCluster.GetHoldTime(), 60U);
+    }
 
     // SetAttribute for unknown attribute (accessor returns std::nullopt -> registry returns CHIP_ERROR_NOT_FOUND)
-    writer.Init(buffer);
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::OccupancySensing::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(3), static_cast<uint32_t>(0xFFFF)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(4), static_cast<uint16_t>(60)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    {
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
+            ConcreteAttributePath(1, Clusters::OccupancySensing::Id, static_cast<AttributeId>(0xFFFF)), static_cast<uint16_t>(60));
+        ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+        EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
+                  CHIP_ERROR_NOT_FOUND);
+    }
 
     holdTimeCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -208,45 +197,33 @@ TEST_F(TestOOBAccessors, BooleanStateOOBAccessor)
     EXPECT_FALSE(cluster.GetStateValue());
 
     // SetAttribute for StateValue = true
-    uint8_t buffer[64];
-    TLV::TLVWriter writer;
-    writer.Init(buffer);
-    TLV::TLVType outer;
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::BooleanState::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::BooleanState::Attributes::StateValue::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(4), true), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-    EXPECT_TRUE(cluster.GetStateValue());
+    {
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
+            ConcreteAttributePath(1, Clusters::BooleanState::Id, Clusters::BooleanState::Attributes::StateValue::Id), true);
+        ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+        EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(cluster.GetStateValue());
+    }
 
     // SetAttribute for StateValue = false
-    writer.Init(buffer);
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::BooleanState::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(3), Clusters::BooleanState::Attributes::StateValue::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(4), false), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-    EXPECT_FALSE(cluster.GetStateValue());
+    {
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
+            ConcreteAttributePath(1, Clusters::BooleanState::Id, Clusters::BooleanState::Attributes::StateValue::Id), false);
+        ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+        EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
+                  CHIP_NO_ERROR);
+        EXPECT_FALSE(cluster.GetStateValue());
+    }
 
     // SetAttribute for unknown attribute (accessor returns std::nullopt -> registry returns CHIP_ERROR_NOT_FOUND)
-    writer.Init(buffer);
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(2), Clusters::BooleanState::Id), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(3), static_cast<uint32_t>(0xFFFF)), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Put(TLV::ContextTag(4), true), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    EXPECT_EQ(registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    {
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
+            ConcreteAttributePath(1, Clusters::BooleanState::Id, static_cast<AttributeId>(0xFFFF)), true);
+        ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+        EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
+                  CHIP_ERROR_NOT_FOUND);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

@@ -178,20 +178,14 @@ public:
     template <typename T>
     static CHIP_ERROR DispatchSetAttribute(OOBAccessorRegistry & registry, const ConcreteAttributePath & path, const T & value)
     {
-        uint8_t buffer[128];
-        TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(path, value);
+        if (std::holds_alternative<CHIP_ERROR>(buildResult))
+        {
+            return std::get<CHIP_ERROR>(buildResult);
+        }
 
-        TLV::TLVType outerType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagEndpointId), path.mEndpointId));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagClusterId), path.mClusterId));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagAttributeId), path.mAttributeId));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagValue), value));
-        ReturnErrorOnFailure(writer.EndContainer(outerType));
-        ReturnErrorOnFailure(writer.Finalize());
-
-        return registry.HandleAction("SetAttribute"_span, ByteSpan(buffer, writer.GetLengthWritten()));
+        auto & buffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
+        return registry.HandleAction(OOBDataSerializer::kSetAttributeAction, buffer);
     }
 };
 
