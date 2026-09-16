@@ -227,6 +227,10 @@ _available_devices = [
     "TEMPERATURE_SENSOR",
   ],
   [
+    "thread-border-router",
+    "THREAD_BORDER_ROUTER",
+  ],
+  [
     "water-freeze-detector",
     "WATER_FREEZE_DETECTOR",
   ],
