@@ -229,6 +229,7 @@
     "AccessControlEnforcement": [],
     "EnergyEVSE": ["Test_TC_EEVSE_2_1"],
     "PowerTopology": [],
+    "ProximityRanging": ["Test_TC_PROXR_3_1", "Test_TC_PROXR_3_2"],
     "collection": [
         "DeviceDiscovery",
         "Groups",
@@ -301,6 +302,7 @@
         "UserLabel",
         "BridgedDeviceBasicInformation",
         "AccessControlEnforcement",
-        "LaundryWasherControl"
+        "LaundryWasherControl",
+        "ProximityRanging"
     ]
 }

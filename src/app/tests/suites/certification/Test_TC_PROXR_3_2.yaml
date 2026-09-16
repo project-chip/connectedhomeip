@@ -1,0 +1,336 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2. [TC-PROXR-3.2] Trigger Periodic Proximity Ranging (DUT as Client)
+
+PICS:
+    - PROXR.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Proximity Ranging"
+    endpoint: 1
+
+tests:
+    - label: "Note"
+      verification: |
+          The DUT is a Proximity Ranging client (commissioner). The chip-tool commands below stand in for the
+          DUT's client behaviour so a tester can compare the DUT against a known-good invocation. For
+          certification, the product maker must provide a way to trigger the equivalent behaviour on the DUT.
+          This is the periodic variant of TC-PROXR-3.1: the StartRangingRequest trigger carries a
+          RangingInstanceInterval and the TH emits one RangingResult event per interval (there is no Stop step).
+
+          Two TH server instances are needed (TH_I initiator, TH_R reflector), plus a controller acting as the
+          DUT stand-in. Reference setup:
+
+              APP=<path>/all-devices-app
+              CT=<path>/chip-tool
+              SD=/tmp/pr_ctl            # create before first use: mkdir -p $SD
+              $APP --device proximity-ranger:1 --discriminator 3841 --port 5541 --KVS /tmp/pr_thi_kvs.ini   # TH_I
+              $APP --device proximity-ranger:1 --discriminator 3842 --port 5542 --KVS /tmp/pr_thr_kvs.ini   # TH_R
+
+          NOTE: this app build has no --passcode flag and uses --port; both instances use passcode 20202021 and
+          must be paired BY DISCRIMINATOR. The RangingResult event cadence (timing) is what matters for this
+          periodic test; the exact EventNumber values are session-relative to the reference run.
+
+          INTERVAL: the plan text specifies RangingInstanceInterval = 3, which collides with the reference stub's
+          3 s simulated measurement latency
+          (examples/all-devices-app/all-devices-common/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp:77)
+          and makes the driver skip ticks with CHIP_ERROR_BUSY
+          (examples/all-devices-app/all-devices-common/device/types/proximity-ranger/ProximityRangingDriver.cpp:493-501).
+          The commands below use interval 5, which runs clean. Interval 3 is a plan issue against this stub.
+      disabled: true
+
+    - label: "Step 1: Commission TH_I and TH_R to DUT."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT pairing onnetwork-long 0x11 20202021 3841 --storage-directory $SD    # TH_I
+              $CT pairing onnetwork-long 0x22 20202021 3842 --storage-directory $SD    # TH_R
+
+          Verify both commissionings succeed on the controller (DUT stand-in) log:
+
+              [TOO] Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Step 2: Enable the WFUSDPD feature and configure the Technology to
+          WiFiRoundTripTimeRanging and disable other Proximity Ranging features
+          on TH_I and TH_R."
+      verification: |
+          NOT VERIFIABLE against the reference all-devices-app. The example TH cannot present a single-feature
+          FeatureMap: LoggingProximityRanger's constructor hardcodes all three ranging adapters
+          (examples/all-devices-app/all-devices-common/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp:28-34)
+          and ProximityRanger::DeriveFeatures() computes the FeatureMap from those adapters with no runtime setter
+          (examples/all-devices-app/all-devices-common/device/types/proximity-ranger/ProximityRanger.h:64-73). Only
+          a build-time switch exists; a step-3 read returns 3 capability entries (all features present). The
+          server still accepts a WiFi-only StartRangingRequest, so steps 3-6 can be driven; the precondition
+          cannot be enforced. No chip-tool command exists for this step.
+      disabled: true
+
+    - label: "Step 3: Trigger DUT to read all attributes from TH_I and TH_R."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging read ranging-capabilities 0x11 1 --storage-directory $SD
+              $CT proximityranging read wi-fi-dev-ik         0x11 1 --storage-directory $SD
+              (repeat for 0x22; record both WiFiDevIK values for step 4)
+
+          Verify the DUT discovers both THs and obtains their attributes. Observed:
+
+              RangingCapabilities: 3 entries (a common Technology across TH_I and TH_R is required;
+                  PeriodicRangingSupport: TRUE)
+              WiFiDevIK (TH_I): DBB1F234DF110D7D43D8273A9F008E83
+              WiFiDevIK (TH_R): 77C0BF94E4B28FD157EB251360244C3B
+      disabled: true
+
+    - label:
+          "Step 4: Trigger DUT to send StartRangingRequest to TH_I (subscriber)
+          and TH_R (publisher), with StartTime 0, EndTime 30 and
+          RangingInstanceInterval (plan says 3; 5 used here - see Note)."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          Technology positional = 1 (WiFiRoundTripTime). PeerWiFiDevIK crossed; PMK common. The trigger now
+          carries rangingInstanceInterval (field 0x2). Per the plan asymmetry, the interval is expected on the
+          TH_I command; the plan omits it from the TH_R expected outcome (intentional - matches the responder
+          treatment in the server-side plan).
+
+              $CT proximityranging start-ranging-request 1 '{"startTime":0,"endTime":30,"rangingInstanceInterval":5}' 0x11 1 \
+                --WiFiRangingDeviceRoleConfig '{"role":0,"peerWiFiDevIK":"hex:77C0BF94E4B28FD157EB251360244C3B","pmk":"hex:000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"}' \
+                --storage-directory $SD
+              $CT proximityranging start-ranging-request 1 '{"startTime":0,"endTime":30,"rangingInstanceInterval":5}' 0x22 1 \
+                --WiFiRangingDeviceRoleConfig '{"role":1,"peerWiFiDevIK":"hex:DBB1F234DF110D7D43D8273A9F008E83","pmk":"hex:000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"}' \
+                --storage-directory $SD
+
+          Verify from the TH_I server log the StartRangingRequest with the interval carried in the trigger
+          (field 0x6 inner 0x2). Observed TH_I (WiFiSubscriber, peer = TH_R's WiFiDevIK):
+
+              CHIP:DMG:       CommandFields =
+              CHIP:DMG:       {
+              CHIP:DMG:         0x0 = 1 (unsigned),
+              CHIP:DMG:         0x1 = { 0x0 = 0 (unsigned),
+              CHIP:DMG:                 0x1 = [ 0x77, 0xc0, ... 0x4c, 0x3b, ] (16 bytes)
+              CHIP:DMG:                 0x2 = [ 0x00, 0x01, ... 0x1f, ] (32 bytes) },
+              CHIP:DMG:         0x6 = { 0x0 = 0 (unsigned), 0x1 = 30 (unsigned), 0x2 = 5 (unsigned), },
+              CHIP:DMG:       },
+              CHIP:SVR: [LoggingRangingAdapter:WFUSDPD] PrepareSession id=2 tech=WiFiRoundTripTime
+              CHIP:SVR: [LoggingRangingAdapter:WFUSDPD]   WiFiRoleConfig role=WiFiSubscriber peerWiFiDevIK.size=16 pmk=present
+
+          TH_R side is the WiFiPublisher with TH_I's WiFiDevIK and the same PMK (per the plan asymmetry the
+          responder's expected outcome omits the interval).
+      disabled: true
+
+    - label:
+          "Step 5: TH_I and TH_R each send a StartRangingResponse with a uint8
+          SessionID."
+      verification: |
+          Observed on the DUT stand-in: StartRangingResponse { sessionID: 2 } from both THs (any uint8 is
+          permitted by the plan).
+      disabled: true
+
+    - label:
+          "Step 6: TH_I emits a RangingResult event once every interval; DUT
+          obtains the events."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging subscribe-event ranging-result 1 10 0x11 1 --storage-directory $SD
+              (or repeated read-event ranging-result over the session lifetime)
+
+          Verify the DUT obtains one RangingResult per interval. Observed cadence with interval 5 (epoch seconds
+          from the TH_I log; the driver re-arms every 5 s and each measurement lands ~3 s after its StartSession,
+          the stub's simulated latency):
+
+              StartSession id=2 at 220.70, 225.70, 230.70, 235.70, 240.70
+              RangingResult   at 223.70, 228.70, 233.70, 238.70, 243.71
+
+          One RangingResult every 5 s until EndTime. (At the plan's interval 3 the tick collides with the 3 s
+          latency and the driver logs CHIP_ERROR_BUSY tick-skips - see Note.) The periodic session runs to
+          EndTime; the plan defines no Stop step for the periodic test.
+      disabled: true
+
+    - label:
+          "Step 7: Enable the BLTCS feature and disable other Proximity Ranging
+          features on TH_I and TH_R; configure BLTCSSecurityLevel and
+          BLTCSModeCapability the same on both."
+      verification: |
+          NOT VERIFIABLE against the reference all-devices-app, same root cause as step 2:
+          LoggingProximityRanger.cpp:28-34 hardcodes all three adapters and ProximityRanger.h:64-73 derives the
+          FeatureMap with no runtime setter. The BLTCS security level and mode are additionally hardcoded
+          (Three / Both) at LoggingRangingAdapter.cpp:335-336. Observed reads: both THs report
+          BLTCSSecurityLevel=3, BLTCSModeCapability=2. No chip-tool command exists for this step.
+      disabled: true
+
+    - label: "Step 8: Trigger DUT to read all attributes from TH_I and TH_R."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging read bltdev-ik            0x11 1 --storage-directory $SD
+              $CT proximityranging read bltcssecurity-level  0x11 1 --storage-directory $SD
+              $CT proximityranging read bltcsmode-capability 0x11 1 --storage-directory $SD
+              (repeat for 0x22; record both BLTDevIK values for step 9)
+
+          Observed:
+
+              BLTDevIK (TH_I): B895063C772EC49FC89855852E34A78C
+              BLTDevIK (TH_R): E434DF0871C7FADF3B5457BD6F98A9B8
+              BLTCSSecurityLevel: 3 (both)   BLTCSModeCapability: 2 (both)
+      disabled: true
+
+    - label:
+          "Step 9: Trigger DUT to send StartRangingRequest to TH_I (initiator)
+          and TH_R (reflector), with StartTime 0, EndTime 30 and
+          RangingInstanceInterval (plan says 3; 5 used here - see Note)."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          Technology positional = 0 (BluetoothChannelSounding). PeerBLTDevIK crossed; LTK, BLTCSSecurityLevel (3)
+          and BLTCSMode (2) common. Trigger carries the interval at field 0x6 inner 0x2.
+
+              $CT proximityranging start-ranging-request 0 '{"startTime":0,"endTime":30,"rangingInstanceInterval":5}' 0x11 1 \
+                --BLTChannelSoundingDeviceRoleConfig '{"role":4,"peerBLTDevIK":"hex:E434DF0871C7FADF3B5457BD6F98A9B8","BLTCSSecurityLevel":3,"ltk":"hex:0102030405060708090A0B0C0D0E0F10","BLTCSMode":2}' \
+                --storage-directory $SD
+              $CT proximityranging start-ranging-request 0 '{"startTime":0,"endTime":30,"rangingInstanceInterval":5}' 0x22 1 \
+                --BLTChannelSoundingDeviceRoleConfig '{"role":5,"peerBLTDevIK":"hex:B895063C772EC49FC89855852E34A78C","BLTCSSecurityLevel":3,"ltk":"hex:0102030405060708090A0B0C0D0E0F10","BLTCSMode":2}' \
+                --storage-directory $SD
+
+          Verify from the TH_I server log: 0x0 = Technology (0), the BLTChannelSoundingDeviceRoleConfig struct at
+          command field 0x3 (inner 0x0 = role, 0x1 = peerBLTDevIK, 0x2 = BLTCSMode, 0x3 = BLTCSSecurityLevel,
+          0x4 = ltk), and the interval carried in the trigger. Observed TH_I (BLTInitiator):
+
+              CHIP:DMG:         0x0 = 0 (unsigned),
+              CHIP:DMG:         0x3 = { 0x0 = 4 (unsigned),
+              CHIP:DMG:                 0x1 = [ 0xe4, 0x34, ... 0xa9, 0xb8, ] (16 bytes)
+              CHIP:DMG:                 0x2 = 2 (unsigned), 0x3 = 3 (unsigned),
+              CHIP:DMG:                 0x4 = [ 0x01, 0x02, ... 0x10, ] (16 bytes) },
+              CHIP:DMG:         0x6 = { 0x0 = 0 (unsigned), 0x1 = 30 (unsigned), 0x2 = 5 (unsigned), },
+              CHIP:SVR: [LoggingRangingAdapter:BLTCS] PrepareSession id=1 tech=BluetoothChannelSounding
+              CHIP:SVR: [LoggingRangingAdapter:BLTCS]   BLTRoleConfig role=BLTInitiator peerBLTDevIK.size=16 BLTCSMode=present BLTCSSecurityLevel=present ltk=present
+
+          TH_R side is the BLTReflector with TH_I's BLTDevIK and the same LTK (field 0x4 identical).
+      disabled: true
+
+    - label:
+          "Step 10: TH_I and TH_R each send a StartRangingResponse with a uint8
+          SessionID."
+      verification: |
+          Observed on the DUT stand-in: StartRangingResponse { sessionID: 1 } from both THs.
+      disabled: true
+
+    - label:
+          "Step 11: TH_I emits a RangingResult event once every interval; DUT
+          obtains the events."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging subscribe-event ranging-result 1 10 0x11 1 --storage-directory $SD
+
+          Verify one RangingResult per interval (BLTDevIK echoes the PEER's key). Observed cadence with
+          interval 5 (epoch seconds from the TH_I log):
+
+              StartSession id=1 at 307.95, 312.95, 317.96, 322.96, 327.96, 332.96 (every ~5 s)
+              RangingResult   at 310.96, 315.96, 320.96, 325.96, 330.96 (each ~3 s after StartSession)
+
+          Cadence is technology-independent (WiFi/BLTCS/BLERBC identical). No Stop step for the periodic test.
+      disabled: true
+
+    - label:
+          "Step 12: Enable the BLERBC feature and disable other Proximity
+          Ranging features on TH_I and TH_R."
+      verification: |
+          NOT VERIFIABLE against the reference all-devices-app, same root cause as steps 2 and 7:
+          LoggingProximityRanger.cpp:28-34 hardcodes all three adapters and ProximityRanger.h:64-73 derives the
+          FeatureMap with no runtime setter. No chip-tool command exists for this step.
+      disabled: true
+
+    - label: "Step 13: Trigger DUT to read all attributes from TH_I and TH_R."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging read bledevice-id 0x11 1 --storage-directory $SD
+              (repeat for 0x22; record both BLEDeviceID values for step 14)
+
+          Observed:
+
+              BLEDeviceID (TH_I): 304103825536486059
+              BLEDeviceID (TH_R): 5110338547267191820
+      disabled: true
+
+    - label:
+          "Step 14: Trigger DUT to send StartRangingRequest to TH_I (scanning)
+          and TH_R (beacon), with StartTime 0, EndTime 30 and
+          RangingInstanceInterval (plan says 3; 5 used here - see Note)."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          Technology positional = 3 (BLEBeaconRSSI). PeerBLEDeviceID crossed; BLERBCSecurityMode = 0 and
+          SessionKey common. Trigger carries the interval at field 0x6 inner 0x2.
+
+              $CT proximityranging start-ranging-request 3 '{"startTime":0,"endTime":30,"rangingInstanceInterval":5}' 0x11 1 \
+                --BLERangingDeviceRoleConfig '{"role":2,"peerBLEDeviceID":5110338547267191820,"BLERBCSecurityMode":0,"sessionKey":"hex:AABBCCDDEEFF00112233445566778899"}' \
+                --storage-directory $SD
+              $CT proximityranging start-ranging-request 3 '{"startTime":0,"endTime":30,"rangingInstanceInterval":5}' 0x22 1 \
+                --BLERangingDeviceRoleConfig '{"role":3,"peerBLEDeviceID":304103825536486059,"BLERBCSecurityMode":0,"sessionKey":"hex:AABBCCDDEEFF00112233445566778899"}' \
+                --storage-directory $SD
+
+          Verify from the TH_I server log: 0x0 = Technology (3), the BLERangingDeviceRoleConfig struct at command
+          field 0x2 (inner 0x0 = role, 0x1 = peerBLEDeviceID, 0x2 = BLERBCSecurityMode, 0x3 = sessionKey), and
+          the interval carried in the trigger. Observed TH_I (BLEScanning, peer = TH_R's BLEDeviceID):
+
+              CHIP:DMG:         0x0 = 3 (unsigned),
+              CHIP:DMG:         0x2 = { 0x0 = 2 (unsigned),
+              CHIP:DMG:                 0x1 = 5110338547267191820 (unsigned),
+              CHIP:DMG:                 0x2 = 0 (unsigned),
+              CHIP:DMG:                 0x3 = [ 0xaa, 0xbb, ... 0x99, ] (16 bytes) },
+              CHIP:DMG:         0x6 = { 0x0 = 0 (unsigned), 0x1 = 30 (unsigned), 0x2 = 5 (unsigned), },
+              CHIP:SVR: [LoggingRangingAdapter:BLERBC] PrepareSession id=2 tech=BLEBeaconRSSI
+              CHIP:SVR: [LoggingRangingAdapter:BLERBC]   BLERoleConfig role=BLEScanning peerBLEDeviceID=0x46eb91d53fd8c40c
+
+          TH_R side is the BLEBeacon with TH_I's BLEDeviceID and the same SessionKey (field 0x3 identical).
+      disabled: true
+
+    - label:
+          "Step 15: TH_I and TH_R each send a StartRangingResponse with a uint8
+          SessionID."
+      verification: |
+          Observed on the DUT stand-in: StartRangingResponse { sessionID: 2 } from both THs.
+      disabled: true
+
+    - label:
+          "Step 16: TH_I emits a RangingResult event once every interval; DUT
+          obtains the events."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging subscribe-event ranging-result 1 10 0x11 1 --storage-directory $SD
+
+          Verify one RangingResult per interval (BLEDeviceID echoes the PEER's = TH_R's). Observed cadence with
+          interval 5 (epoch seconds from the TH_I log):
+
+              StartSession id=2 at 350.34, 355.35, 360.35 (every ~5 s)
+              RangingResult   at 353.35, 358.35, 363.35 (each ~3 s after StartSession)
+
+          Cadence is technology-independent. No Stop step for the periodic test.
+      disabled: true

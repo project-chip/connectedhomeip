@@ -1,0 +1,430 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.1. [TC-PROXR-3.1] Trigger Instant Proximity Ranging (DUT as Client)
+
+PICS:
+    - PROXR.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Proximity Ranging"
+    endpoint: 1
+
+tests:
+    - label: "Note"
+      verification: |
+          The DUT is a Proximity Ranging client (commissioner). The chip-tool commands below stand in for the
+          DUT's client behaviour so a tester can compare the DUT against a known-good invocation. For
+          certification, the product maker must provide a way to trigger the equivalent behaviour on the DUT.
+
+          Two TH server instances are needed (TH_I initiator, TH_R reflector), plus a controller acting as the
+          DUT stand-in. Reference setup (all-devices-app is the only example exposing ProximityRanging):
+
+              APP=<path>/all-devices-app
+              CT=<path>/chip-tool
+              SD=/tmp/pr_ctl            # create before first use: mkdir -p $SD
+              $APP --device proximity-ranger:1 --discriminator 3841 --port 5541 --KVS /tmp/pr_thi_kvs.ini   # TH_I
+              $APP --device proximity-ranger:1 --discriminator 3842 --port 5542 --KVS /tmp/pr_thr_kvs.ini   # TH_R
+
+          NOTE: this app build has no --passcode flag and uses --port (not --secured-device-port); both instances
+          use the default passcode 20202021 and must be paired BY DISCRIMINATOR.
+
+          The RangingResult EventNumbers shown in later steps are session-relative to the reference run (they
+          increment across all sessions on that TH instance); compare the RangingResult PAYLOAD, not the exact
+          EventNumber value.
+      disabled: true
+
+    - label: "Step 1: Commission TH_I and TH_R to DUT."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT pairing onnetwork-long 0x11 20202021 3841 --storage-directory $SD    # TH_I
+              $CT pairing onnetwork-long 0x22 20202021 3842 --storage-directory $SD    # TH_R
+
+          Verify both commissionings succeed on the controller (DUT stand-in) log:
+
+              [TOO] Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Step 2: Enable the WFUSDPD feature and configure the Technology to
+          WiFiRoundTripTimeRanging and disable other Proximity Ranging features
+          on TH_I and TH_R."
+      verification: |
+          NOT VERIFIABLE against the reference all-devices-app. The example TH cannot present a single-feature
+          FeatureMap: LoggingProximityRanger's constructor hardcodes all three ranging adapters
+          (examples/all-devices-app/all-devices-common/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp:28-34)
+          and ProximityRanger::DeriveFeatures() computes the FeatureMap from those adapters with no runtime setter
+          (examples/all-devices-app/all-devices-common/device/types/proximity-ranger/ProximityRanger.h:64-73). Only
+          a build-time switch (device-factory/enabled_devices.gni) exists. A step-3 read returns
+          RangingCapabilities with 3 entries (WiFi + BLTCS + BLERBC all present), so "disable other features"
+          is not truthfully representable on this app. The server still accepts a WiFi-only StartRangingRequest,
+          so steps 3-6 can be driven; the precondition just cannot be enforced. No chip-tool command exists for
+          this step.
+      disabled: true
+
+    - label: "Step 3: Trigger DUT to read all attributes from TH_I and TH_R."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging read ranging-capabilities 0x11 1 --storage-directory $SD
+              $CT proximityranging read wi-fi-dev-ik         0x11 1 --storage-directory $SD
+              $CT proximityranging read session-idlist       0x11 1 --storage-directory $SD
+              (repeat for 0x22; record both WiFiDevIK values for step 4)
+
+          Verify the DUT discovers both THs and obtains their attributes. Observed reads (values are per-device;
+          the WiFiDevIK of each TH becomes the PeerWiFiDevIK the DUT must cross-send in step 4):
+
+              RangingCapabilities: 3 entries
+                  Technology: 1  FrequencyBand: 13  Bandwidth: 0  SupportedRangingRoles: 3
+                  PeriodicRangingSupport: TRUE  MaxConcurrentSessions: 4
+                  Technology: 3 ...  (a common Technology across TH_I and TH_R is required)
+              WiFiDevIK (TH_I): DBB1F234DF110D7D43D8273A9F008E83
+              WiFiDevIK (TH_R): 77C0BF94E4B28FD157EB251360244C3B
+              SessionIDList: 0 entries
+      disabled: true
+
+    - label:
+          "Step 4: Trigger DUT to send StartRangingRequest to TH_I (subscriber)
+          and TH_R (publisher), without the RangingInstanceInterval field."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          Technology positional = 1 (WiFiRoundTripTime). The PeerWiFiDevIK values are crossed (TH_I gets TH_R's
+          key and vice-versa); the PMK is the same 32-byte value in both commands. Use a generous EndTime (60)
+          so the Stop in step 6 lands inside the session window (see step 6).
+
+              $CT proximityranging start-ranging-request 1 '{"startTime":0,"endTime":60}' 0x11 1 \
+                --WiFiRangingDeviceRoleConfig '{"role":0,"peerWiFiDevIK":"hex:77C0BF94E4B28FD157EB251360244C3B","pmk":"hex:000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"}' \
+                --storage-directory $SD
+              $CT proximityranging start-ranging-request 1 '{"startTime":0,"endTime":60}' 0x22 1 \
+                --WiFiRangingDeviceRoleConfig '{"role":1,"peerWiFiDevIK":"hex:DBB1F234DF110D7D43D8273A9F008E83","pmk":"hex:000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"}' \
+                --storage-directory $SD
+
+          Verify from the TH_I server log the received StartRangingRequest: CommandFields 0x0 = Technology (1),
+          0x1 = WiFiRangingDeviceRoleConfig { 0x0 = role, 0x1 = peerWiFiDevIK, 0x2 = pmk }, 0x6 = trigger.
+          The DUT's field values are readable in the InvokeRequestMessage pretty-print (octet strings print as
+          full byte lists). "PMK common for both" = field 0x1/0x2 identical across the TH_I and TH_R logs.
+
+          NOTE: this reference excerpt was captured with EndTime 30; the trigger EndTime field (0x1) echoes
+          whatever EndTime you pass. TH_I log (WiFiSubscriber, peer = TH_R's WiFiDevIK):
+
+              CHIP:DMG: InvokeRequestMessage =
+              CHIP:DMG: {
+              CHIP:DMG:   InvokeRequests =
+              CHIP:DMG:   [
+              CHIP:DMG:     CommandDataIB =
+              CHIP:DMG:     {
+              CHIP:DMG:       CommandPathIB = { EndpointId = 0x1, ClusterId = 0x433, CommandId = 0x0, },
+              CHIP:DMG:       CommandFields =
+              CHIP:DMG:       {
+              CHIP:DMG:         0x0 = 1 (unsigned),
+              CHIP:DMG:         0x1 =
+              CHIP:DMG:         {
+              CHIP:DMG:           0x0 = 0 (unsigned),
+              CHIP:DMG:           0x1 = [ 0x77, 0xc0, 0xbf, 0x94, 0xe4, 0xb2, 0x8f, 0xd1, 0x57, 0xeb, 0x25, 0x13, 0x60, 0x24, 0x4c, 0x3b, ] (16 bytes)
+              CHIP:DMG:           0x2 = [ 0x00, 0x01, 0x02, ... 0x1d, 0x1e, 0x1f, ] (32 bytes)
+              CHIP:DMG:         },
+              CHIP:DMG:         0x6 = { 0x0 = 0 (unsigned), 0x1 = 30 (unsigned), },
+              CHIP:DMG:       },
+              CHIP:DMG:     },
+              CHIP:DMG:   ],
+              CHIP:DMG: },
+              CHIP:SVR: [LoggingRangingAdapter:WFUSDPD] PrepareSession id=1 tech=WiFiRoundTripTime
+              CHIP:SVR: [LoggingRangingAdapter:WFUSDPD]   WiFiRoleConfig role=WiFiSubscriber peerWiFiDevIK.size=16 pmk=present
+
+          TH_R log (WiFiPublisher, peer = TH_I's WiFiDevIK; PMK field 0x1/0x2 IDENTICAL to TH_I):
+
+              CHIP:DMG:         0x1 = { 0x0 = 1 (unsigned),
+              CHIP:DMG:                 0x1 = [ 0xdb, 0xb1, 0xf2, 0x34, ... 0x8e, 0x83, ] (16 bytes)
+              CHIP:DMG:                 0x2 = [ 0x00, 0x01, ... 0x1f, ] (32 bytes) }
+              CHIP:SVR: [LoggingRangingAdapter:WFUSDPD]   WiFiRoleConfig role=WiFiPublisher peerWiFiDevIK.size=16 pmk=present
+              CHIP:SVR: [LoggingRangingAdapter:WFUSDPD] sid=1 passive responder role; will not emit measurements
+      disabled: true
+
+    - label:
+          "Step 5: TH_I and TH_R each send a StartRangingResponse with a uint8
+          SessionID."
+      verification: |
+          On the DUT stand-in (chip-tool) each start-ranging-request prints the response. Observed:
+
+              Received Command Response Data, Endpoint=1 Cluster=0x0000_0433 Command=0x0000_0001
+                StartRangingResponse: { sessionID: 1 }
+
+          Both THs returned sessionID 1. The plan only says "an uint8 value" here, which is weaker than both the
+          non-zero requirement in TC-PROXR-2.3/2.4 and the cluster definition, which constrains SessionID to
+          min="1" on StartRangingResponse and StopRangingRequest
+          (src/app/zap-templates/zcl/data-model/chip/proximity-ranging-cluster.xml:292,298). Treat a SessionID of
+          0 as a failure. Record TH_R's SessionID for the Stop in step 6.
+      disabled: true
+
+    - label:
+          "Step 6: TH_I emits a RangingResult event; DUT obtains it and sends a
+          StopRangingRequest to TH_R with TH_R's SessionID."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging read-event ranging-result 0x11 1 --storage-directory $SD
+
+          Verify the DUT obtains the RangingResult event (Distance 100 / ErrorMargin 10 / offset 1 are the
+          stub's fixed constants; WiFiDevIK echoes the PEER's key):
+
+              EventNumber = 0x0000000000000003
+              RangingResult: { SessionID: 1
+                RangingResultData: { WiFiDevIK: 77C0BF94E4B28FD157EB251360244C3B
+                                     TimeOfMeasurementOffset: 1  Distance: 100  ErrorMargin: 10 } }
+
+          Then the DUT sends StopRangingRequest to TH_R with TH_R's SessionID:
+
+              $CT proximityranging stop-ranging-request 1 0x22 1 --storage-directory $SD
+
+          Verify success on the DUT stand-in and the command on TH_R's log:
+
+              Received Command Response Status for Endpoint=1 Cluster=0x0000_0433 Command=0x0000_0002 Status=0x0
+              CHIP:DMG:  CommandId = 0x2, CommandFields = { 0x0 = 1 (unsigned), }   <- SessionID from TH_R
+              CHIP:SVR: [LoggingRangingAdapter:WFUSDPD] StopSession id=1
+
+          TIMING TRAP (observed): a StopRangingRequest issued AFTER the session EndTime has elapsed returns
+          status 0xcb (INVALID_IN_STATE) / IM Error 0x000005CB. This is a CORRECT rejection, not a test failure.
+          The DUT must send Stop inside the session window; use a generous EndTime (60) in step 4 for headroom.
+      disabled: true
+
+    - label:
+          "Step 7: Enable the BLTCS feature and disable other Proximity Ranging
+          features on TH_I and TH_R; configure BLTCSSecurityLevel and
+          BLTCSModeCapability the same on both."
+      verification: |
+          NOT VERIFIABLE against the reference all-devices-app, same root cause as step 2:
+          LoggingProximityRanger.cpp:28-34 hardcodes all three adapters and ProximityRanger.h:64-73 derives the
+          FeatureMap with no runtime setter, so features cannot be isolated. Additionally the BLTCS security
+          level and mode are hardcoded (Three / Both) at
+          examples/all-devices-app/all-devices-common/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp:335-336,
+          so "configure the same on both" is fixed, not configurable. Observed reads confirm both THs report
+          BLTCSSecurityLevel=3 and BLTCSModeCapability=2 (Both). No chip-tool command exists for this step.
+      disabled: true
+
+    - label: "Step 8: Trigger DUT to read all attributes from TH_I and TH_R."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging read bltdev-ik            0x11 1 --storage-directory $SD
+              $CT proximityranging read bltcssecurity-level  0x11 1 --storage-directory $SD
+              $CT proximityranging read bltcsmode-capability 0x11 1 --storage-directory $SD
+              (repeat for 0x22; record both BLTDevIK values for step 9)
+
+          Verify the DUT obtains the attributes. Observed:
+
+              BLTDevIK (TH_I): B895063C772EC49FC89855852E34A78C
+              BLTDevIK (TH_R): E434DF0871C7FADF3B5457BD6F98A9B8
+              BLTCSSecurityLevel: 3 (both)   BLTCSModeCapability: 2 (Both, on both)
+      disabled: true
+
+    - label:
+          "Step 9: Trigger DUT to send StartRangingRequest to TH_I (initiator)
+          and TH_R (reflector), without the RangingInstanceInterval field."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          Technology positional = 0 (BluetoothChannelSounding). PeerBLTDevIK crossed; LTK, BLTCSSecurityLevel (3)
+          and BLTCSMode (2) common to both.
+
+              $CT proximityranging start-ranging-request 0 '{"startTime":0,"endTime":60}' 0x11 1 \
+                --BLTChannelSoundingDeviceRoleConfig '{"role":4,"peerBLTDevIK":"hex:E434DF0871C7FADF3B5457BD6F98A9B8","BLTCSSecurityLevel":3,"ltk":"hex:0102030405060708090A0B0C0D0E0F10","BLTCSMode":2}' \
+                --storage-directory $SD
+              $CT proximityranging start-ranging-request 0 '{"startTime":0,"endTime":60}' 0x22 1 \
+                --BLTChannelSoundingDeviceRoleConfig '{"role":5,"peerBLTDevIK":"hex:B895063C772EC49FC89855852E34A78C","BLTCSSecurityLevel":3,"ltk":"hex:0102030405060708090A0B0C0D0E0F10","BLTCSMode":2}' \
+                --storage-directory $SD
+
+          Verify from the TH_I server log: 0x0 = Technology (0), the BLTChannelSoundingDeviceRoleConfig struct at
+          command field 0x3 with inner fields 0x0 = role, 0x1 = peerBLTDevIK, 0x2 = BLTCSMode, 0x3 =
+          BLTCSSecurityLevel, 0x4 = ltk. "LTK common for both" = field 0x3/0x4 identical across the two logs.
+          Observed TH_I (BLTInitiator, peer = TH_R's BLTDevIK):
+
+              CHIP:DMG:       CommandPathIB = { EndpointId = 0x1, ClusterId = 0x433, CommandId = 0x0, },
+              CHIP:DMG:       CommandFields =
+              CHIP:DMG:       {
+              CHIP:DMG:         0x0 = 0 (unsigned),
+              CHIP:DMG:         0x3 =
+              CHIP:DMG:         {
+              CHIP:DMG:           0x0 = 4 (unsigned),
+              CHIP:DMG:           0x1 = [ 0xe4, 0x34, 0xdf, 0x08, 0x71, 0xc7, 0xfa, 0xdf, 0x3b, 0x54, 0x57, 0xbd, 0x6f, 0x98, 0xa9, 0xb8, ] (16 bytes)
+              CHIP:DMG:           0x2 = 2 (unsigned),
+              CHIP:DMG:           0x3 = 3 (unsigned),
+              CHIP:DMG:           0x4 = [ 0x01, 0x02, 0x03, ... 0x0e, 0x0f, 0x10, ] (16 bytes)
+              CHIP:DMG:         },
+              CHIP:DMG:         0x6 = { 0x0 = 0 (unsigned), 0x1 = 60 (unsigned), },
+              CHIP:DMG:       },
+              CHIP:SVR: [LoggingRangingAdapter:BLTCS] PrepareSession id=1 tech=BluetoothChannelSounding
+              CHIP:SVR: [LoggingRangingAdapter:BLTCS]   BLTRoleConfig role=BLTInitiator peerBLTDevIK.size=16 BLTCSMode=present BLTCSSecurityLevel=present ltk=present
+
+          Observed TH_R (BLTReflector, peer = TH_I's BLTDevIK; LTK field 0x4 IDENTICAL):
+
+              CHIP:DMG:         0x3 = { 0x0 = 5 (unsigned),
+              CHIP:DMG:                 0x1 = [ 0xb8, 0x95, 0x06, 0x3c, ... 0xa7, 0x8c, ] (16 bytes)
+              CHIP:DMG:                 0x2 = 2 (unsigned), 0x3 = 3 (unsigned),
+              CHIP:DMG:                 0x4 = [ 0x01, 0x02, ... 0x10, ] (16 bytes) }
+              CHIP:SVR: [LoggingRangingAdapter:BLTCS]   BLTRoleConfig role=BLTReflector peerBLTDevIK.size=16 BLTCSMode=present BLTCSSecurityLevel=present ltk=present
+      disabled: true
+
+    - label:
+          "Step 10: TH_I and TH_R each send a StartRangingResponse with a uint8
+          SessionID."
+      verification: |
+          Observed on the DUT stand-in: StartRangingResponse { sessionID: 1 } from both THs. Record TH_R's
+          SessionID for the Stop in step 11.
+      disabled: true
+
+    - label:
+          "Step 11: TH_I emits a RangingResult event; DUT obtains it and sends a
+          StopRangingRequest to TH_R with TH_R's SessionID."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging read-event ranging-result 0x11 1 --storage-directory $SD
+
+          Verify the DUT obtains the RangingResult event (BLTDevIK echoes the PEER's key = TH_R's):
+
+              EventNumber = 0x0000000000000003
+              RangingResult: { SessionID: 1
+                RangingResultData: { BLTDevIK: E434DF0871C7FADF3B5457BD6F98A9B8
+                                     TimeOfMeasurementOffset: 1  Distance: 100  ErrorMargin: 10 } }
+
+          Then the DUT sends StopRangingRequest to TH_R:
+
+              $CT proximityranging stop-ranging-request 1 0x22 1 --storage-directory $SD
+
+          Verify success and the command on TH_R's log:
+
+              Received Command Response Status for Endpoint=1 Cluster=0x0000_0433 Command=0x0000_0002 Status=0x0
+              CHIP:DMG:  CommandId = 0x2, CommandFields = { 0x0 = 1 (unsigned), }
+              CHIP:SVR: [LoggingRangingAdapter:BLTCS] StopSession id=1
+              CHIP:EVL: LogEvent ... cluster id: 0x0000_0433 event id: 0x1   <- RangingSessionStatus
+
+          Same TIMING TRAP as step 6: Stop after EndTime returns 0xcb INVALID_IN_STATE (a correct rejection).
+      disabled: true
+
+    - label:
+          "Step 12: Enable the BLERBC feature and disable other Proximity
+          Ranging features on TH_I and TH_R."
+      verification: |
+          NOT VERIFIABLE against the reference all-devices-app, same root cause as steps 2 and 7:
+          LoggingProximityRanger.cpp:28-34 hardcodes all three adapters and ProximityRanger.h:64-73 derives the
+          FeatureMap with no runtime setter. The TH always presents all three features. No chip-tool command
+          exists for this step.
+      disabled: true
+
+    - label: "Step 13: Trigger DUT to read all attributes from TH_I and TH_R."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging read bledevice-id 0x11 1 --storage-directory $SD
+              (repeat for 0x22; record both BLEDeviceID values for step 14)
+
+          Verify the DUT obtains the attributes. Observed:
+
+              BLEDeviceID (TH_I): 304103825536486059
+              BLEDeviceID (TH_R): 5110338547267191820
+      disabled: true
+
+    - label:
+          "Step 14: Trigger DUT to send StartRangingRequest to TH_I (scanning)
+          and TH_R (beacon), without the RangingInstanceInterval field."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          Technology positional = 3 (BLEBeaconRSSI). PeerBLEDeviceID crossed; BLERBCSecurityMode = 0
+          (BLEDeviceIDObfuscation) and the SessionKey common to both.
+
+              $CT proximityranging start-ranging-request 3 '{"startTime":0,"endTime":60}' 0x11 1 \
+                --BLERangingDeviceRoleConfig '{"role":2,"peerBLEDeviceID":5110338547267191820,"BLERBCSecurityMode":0,"sessionKey":"hex:AABBCCDDEEFF00112233445566778899"}' \
+                --storage-directory $SD
+              $CT proximityranging start-ranging-request 3 '{"startTime":0,"endTime":60}' 0x22 1 \
+                --BLERangingDeviceRoleConfig '{"role":3,"peerBLEDeviceID":304103825536486059,"BLERBCSecurityMode":0,"sessionKey":"hex:AABBCCDDEEFF00112233445566778899"}' \
+                --storage-directory $SD
+
+          Verify from the TH_I server log: 0x0 = Technology (3), the BLERangingDeviceRoleConfig struct at command
+          field 0x2 with inner fields 0x0 = role, 0x1 = peerBLEDeviceID, 0x2 = BLERBCSecurityMode, 0x3 =
+          sessionKey. "SessionKey common for both" = field 0x2/0x3 identical across the two logs. Observed TH_I
+          (BLEScanning, peer = TH_R's BLEDeviceID):
+
+              CHIP:DMG:       CommandPathIB = { EndpointId = 0x1, ClusterId = 0x433, CommandId = 0x0, },
+              CHIP:DMG:       CommandFields =
+              CHIP:DMG:       {
+              CHIP:DMG:         0x0 = 3 (unsigned),
+              CHIP:DMG:         0x2 =
+              CHIP:DMG:         {
+              CHIP:DMG:           0x0 = 2 (unsigned),
+              CHIP:DMG:           0x1 = 5110338547267191820 (unsigned),
+              CHIP:DMG:           0x2 = 0 (unsigned),
+              CHIP:DMG:           0x3 = [ 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, ] (16 bytes)
+              CHIP:DMG:         },
+              CHIP:DMG:         0x6 = { 0x0 = 0 (unsigned), 0x1 = 60 (unsigned), },
+              CHIP:DMG:       },
+              CHIP:SVR: [LoggingRangingAdapter:BLERBC] PrepareSession id=2 tech=BLEBeaconRSSI
+              CHIP:SVR: [LoggingRangingAdapter:BLERBC]   BLERoleConfig role=BLEScanning peerBLEDeviceID=0x46eb91d53fd8c40c
+
+          Observed TH_R (BLEBeacon, peer = TH_I's BLEDeviceID; SessionKey field 0x3 IDENTICAL):
+
+              CHIP:DMG:         0x2 = { 0x0 = 3 (unsigned),
+              CHIP:DMG:                 0x1 = 304103825536486059 (unsigned),
+              CHIP:DMG:                 0x2 = 0 (unsigned),
+              CHIP:DMG:                 0x3 = [ 0xaa, 0xbb, ... 0x99, ] (16 bytes) }
+              CHIP:SVR: [LoggingRangingAdapter:BLERBC]   BLERoleConfig role=BLEBeacon peerBLEDeviceID=0x043864d16ff08aab
+      disabled: true
+
+    - label:
+          "Step 15: TH_I and TH_R each send a StartRangingResponse with a uint8
+          SessionID."
+      verification: |
+          Observed on the DUT stand-in: StartRangingResponse { sessionID: 2 } from both THs. Record TH_R's
+          SessionID for the Stop in step 16.
+      disabled: true
+
+    - label:
+          "Step 16: TH_I emits a RangingResult event; DUT obtains it and sends a
+          StopRangingRequest to TH_R with TH_R's SessionID."
+      PICS: PROXR.C
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+              $CT proximityranging read-event ranging-result 0x11 1 --storage-directory $SD
+
+          Verify the DUT obtains the RangingResult event (BLEDeviceID echoes the PEER's = TH_R's):
+
+              EventNumber = 0x0000000000000005
+              RangingResult: { SessionID: 2
+                RangingResultData: { BLEDeviceID: 5110338547267191820
+                                     TimeOfMeasurementOffset: 1  Distance: 100  ErrorMargin: 10 } }
+
+          Then the DUT sends StopRangingRequest to TH_R:
+
+              $CT proximityranging stop-ranging-request 2 0x22 1 --storage-directory $SD
+
+          Verify success and the command on TH_R's log:
+
+              Received Command Response Status for Endpoint=1 Cluster=0x0000_0433 Command=0x0000_0002 Status=0x0
+              CHIP:SVR: [LoggingRangingAdapter:BLERBC] StopSession id=2
+
+          Same TIMING TRAP as step 6: Stop after EndTime returns 0xcb INVALID_IN_STATE (a correct rejection).
+      disabled: true
