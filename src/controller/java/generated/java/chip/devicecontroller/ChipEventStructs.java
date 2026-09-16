@@ -7984,21 +7984,31 @@ public static class MediaFileManagementClusterSharedFilesAddedEvent {
 public static class ZoneManagementClusterZoneTriggeredEvent {
   public Integer zone;
   public Integer reason;
+  public Optional<Long> nodeID;
+  public Optional<Integer> endpointID;
   private static final long ZONE_ID = 0L;
   private static final long REASON_ID = 1L;
+  private static final long NODE_ID_ID = 2L;
+  private static final long ENDPOINT_ID_ID = 3L;
 
   public ZoneManagementClusterZoneTriggeredEvent(
     Integer zone,
-    Integer reason
+    Integer reason,
+    Optional<Long> nodeID,
+    Optional<Integer> endpointID
   ) {
     this.zone = zone;
     this.reason = reason;
+    this.nodeID = nodeID;
+    this.endpointID = endpointID;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ZONE_ID, new UIntType(zone)));
     values.add(new StructElement(REASON_ID, new UIntType(reason)));
+    values.add(new StructElement(NODE_ID_ID, nodeID.<BaseTLVType>map((nonOptionalnodeID) -> new UIntType(nonOptionalnodeID)).orElse(new EmptyType())));
+    values.add(new StructElement(ENDPOINT_ID_ID, endpointID.<BaseTLVType>map((nonOptionalendpointID) -> new UIntType(nonOptionalendpointID)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -8009,6 +8019,8 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
     }
     Integer zone = null;
     Integer reason = null;
+    Optional<Long> nodeID = Optional.empty();
+    Optional<Integer> endpointID = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ZONE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -8020,11 +8032,23 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
           UIntType castingValue = element.value(UIntType.class);
           reason = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          nodeID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new ZoneManagementClusterZoneTriggeredEvent(
       zone,
-      reason
+      reason,
+      nodeID,
+      endpointID
     );
   }
 
@@ -8038,6 +8062,12 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
     output.append("\treason: ");
     output.append(reason);
     output.append("\n");
+    output.append("\tnodeID: ");
+    output.append(nodeID);
+    output.append("\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
@@ -8045,21 +8075,31 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
 public static class ZoneManagementClusterZoneStoppedEvent {
   public Integer zone;
   public Integer reason;
+  public Optional<Long> nodeID;
+  public Optional<Integer> endpointID;
   private static final long ZONE_ID = 0L;
   private static final long REASON_ID = 1L;
+  private static final long NODE_ID_ID = 2L;
+  private static final long ENDPOINT_ID_ID = 3L;
 
   public ZoneManagementClusterZoneStoppedEvent(
     Integer zone,
-    Integer reason
+    Integer reason,
+    Optional<Long> nodeID,
+    Optional<Integer> endpointID
   ) {
     this.zone = zone;
     this.reason = reason;
+    this.nodeID = nodeID;
+    this.endpointID = endpointID;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ZONE_ID, new UIntType(zone)));
     values.add(new StructElement(REASON_ID, new UIntType(reason)));
+    values.add(new StructElement(NODE_ID_ID, nodeID.<BaseTLVType>map((nonOptionalnodeID) -> new UIntType(nonOptionalnodeID)).orElse(new EmptyType())));
+    values.add(new StructElement(ENDPOINT_ID_ID, endpointID.<BaseTLVType>map((nonOptionalendpointID) -> new UIntType(nonOptionalendpointID)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -8070,6 +8110,8 @@ public static class ZoneManagementClusterZoneStoppedEvent {
     }
     Integer zone = null;
     Integer reason = null;
+    Optional<Long> nodeID = Optional.empty();
+    Optional<Integer> endpointID = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ZONE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -8081,11 +8123,23 @@ public static class ZoneManagementClusterZoneStoppedEvent {
           UIntType castingValue = element.value(UIntType.class);
           reason = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          nodeID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new ZoneManagementClusterZoneStoppedEvent(
       zone,
-      reason
+      reason,
+      nodeID,
+      endpointID
     );
   }
 
@@ -8098,6 +8152,12 @@ public static class ZoneManagementClusterZoneStoppedEvent {
     output.append("\n");
     output.append("\treason: ");
     output.append(reason);
+    output.append("\n");
+    output.append("\tnodeID: ");
+    output.append(nodeID);
+    output.append("\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
     output.append("\n");
     output.append("}\n");
     return output.toString();

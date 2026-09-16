@@ -127,6 +127,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         else
         {
             mAVAnalysisServer.Cluster().SetCameraClient(&mAVAnalysisCameraClient);
+            mAVAnalysisServer.Cluster().SetWebRTCClient(&mAVAnalysisWebRTCClient);
         }
     }
 

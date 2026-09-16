@@ -129,7 +129,7 @@ CHIP_ERROR AvAnalysisManager::TriggerSessionStart(const std::vector<uint16_t> & 
     }
 
     uint16_t sessionId = 0;
-    CHIP_ERROR err     = server->AnalysisSessionStart(sessionId, zoneList, aSourceNodeId);
+    CHIP_ERROR err     = server->AnalysisSessionStart(sessionId, zoneList, aSourceNodeId.ValueOr(chip::kUndefinedNodeId));
     if (err == CHIP_NO_ERROR)
     {
         mLatestSessionId           = sessionId;
@@ -156,7 +156,8 @@ AvAnalysisManager::TriggerPerceivedContext(const std::vector<AvAnalysis::Structs
     if (!mHasActiveSession)
     {
         uint16_t sid = aSessionId.ValueOr(0);
-        ReturnErrorOnFailure(server->CreateActiveSession(sid, aSourceNodeId, aSessionId.HasValue()));
+        ReturnErrorOnFailure(
+            server->CreateActiveSession(sid, aSourceNodeId.ValueOr(chip::kUndefinedNodeId), 0, aSessionId.HasValue()));
         mLatestSessionId           = sid;
         mHasActiveSession          = true;
         mSessionHasTrackedContexts = false;
@@ -169,7 +170,7 @@ AvAnalysisManager::TriggerPerceivedContext(const std::vector<AvAnalysis::Structs
         CHIP_ERROR err = CHIP_NO_ERROR;
         if (!mSessionHasTrackedContexts)
         {
-            err = server->InitialTriggeringContextDetected(sessionId, aNewContexts, aSourceNodeId);
+            err = server->InitialTriggeringContextDetected(sessionId, aNewContexts);
             if (err == CHIP_NO_ERROR)
             {
                 mSessionHasTrackedContexts = true;
@@ -177,26 +178,26 @@ AvAnalysisManager::TriggerPerceivedContext(const std::vector<AvAnalysis::Structs
         }
         else
         {
-            err = server->NewContextDetected(sessionId, aNewContexts, aSourceNodeId);
+            err = server->NewContextDetected(sessionId, aNewContexts);
         }
         ReturnErrorOnFailure(err);
     }
 
     if (!aExpiredContexts.empty())
     {
-        ReturnErrorOnFailure(server->ContextNoLongerDetected(sessionId, aExpiredContexts, aSourceNodeId));
+        ReturnErrorOnFailure(server->ContextNoLongerDetected(sessionId, aExpiredContexts));
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AvAnalysisManager::TriggerSessionEnd(chip::Optional<uint16_t> aSessionId, chip::Optional<chip::NodeId> aSourceNodeId)
+CHIP_ERROR AvAnalysisManager::TriggerSessionEnd(chip::Optional<uint16_t> aSessionId)
 {
     AvAnalysisCluster * server = GetServer();
     VerifyOrReturnError(server != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     uint16_t sessionId = aSessionId.ValueOr(mLatestSessionId);
-    CHIP_ERROR err     = server->AnalysisSessionEnd(sessionId, aSourceNodeId);
+    CHIP_ERROR err     = server->AnalysisSessionEnd(sessionId);
     if (err == CHIP_NO_ERROR)
     {
         if (sessionId == mLatestSessionId)
