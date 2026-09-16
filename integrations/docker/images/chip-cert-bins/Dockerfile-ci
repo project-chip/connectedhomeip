@@ -50,6 +50,10 @@ RUN apt-get update -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy OpenSSL3.5 libraries
+COPY --chmod=0755 openssl-lib/libssl.so* /opt/matter/openssl/lib/
+COPY --chmod=0755 openssl-lib/libcrypto.so* /opt/matter/openssl/lib/
+
 WORKDIR /root/
 RUN echo $COMMITHASH > .sdk-sha-version
 COPY --chmod=0755 apps ./apps
