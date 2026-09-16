@@ -378,6 +378,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeThreadNetworkDirectoryID:
         result = @"ThreadNetworkDirectory";
         break;
+    case MTRClusterIDTypeThreadBorderRouterDiagnosticsID:
+        result = @"ThreadBorderRouterDiagnostics";
+        break;
     case MTRClusterIDTypeCommissioningProxyID:
         result = @"CommissioningProxy";
         break;
@@ -8410,6 +8413,46 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeThreadBorderRouterDiagnosticsID:
+
+        switch (attributeID) {
+
+            // Cluster ThreadBorderRouterDiagnostics attributes
+        case MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeStatusID:
+            result = @"Status";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeActiveFaultsListID:
+            result = @"ActiveFaultsList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ThreadBorderRouterDiagnostics attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeCommissioningProxyID:
 
         switch (attributeID) {
@@ -12984,6 +13027,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeThreadBorderRouterDiagnosticsID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeCommissioningProxyID:
 
         switch (commandID) {
@@ -15582,6 +15635,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeThreadBorderRouterDiagnosticsID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeCommissioningProxyID:
 
         switch (commandID) {
@@ -17941,6 +18004,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeThreadNetworkDirectoryID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeThreadBorderRouterDiagnosticsID:
 
         switch (eventID) {
 

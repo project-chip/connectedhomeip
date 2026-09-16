@@ -567,6 +567,10 @@
 #include <clusters/ThermostatUserInterfaceConfiguration/Commands.ipp>
 #include <clusters/ThermostatUserInterfaceConfiguration/Events.ipp>
 #include <clusters/ThermostatUserInterfaceConfiguration/Structs.ipp>
+#include <clusters/ThreadBorderRouterDiagnostics/Attributes.ipp>
+#include <clusters/ThreadBorderRouterDiagnostics/Commands.ipp>
+#include <clusters/ThreadBorderRouterDiagnostics/Events.ipp>
+#include <clusters/ThreadBorderRouterDiagnostics/Structs.ipp>
 #include <clusters/ThreadBorderRouterManagement/Attributes.ipp>
 #include <clusters/ThreadBorderRouterManagement/Commands.ipp>
 #include <clusters/ThreadBorderRouterManagement/Events.ipp>

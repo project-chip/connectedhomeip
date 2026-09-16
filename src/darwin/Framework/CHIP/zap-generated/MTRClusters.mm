@@ -18766,6 +18766,45 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterThreadBorderRouterDiagnostics
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeStatusID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveFaultsListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeActiveFaultsListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadBorderRouterDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadBorderRouterDiagnosticsAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterCommissioningProxy
 
 - (void)proxyConnectRequestWithParams:(MTRCommissioningProxyClusterProxyConnectRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRCommissioningProxyClusterProxyConnectResponseParams * _Nullable data, NSError * _Nullable error))completion

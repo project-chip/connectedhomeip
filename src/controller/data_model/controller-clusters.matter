@@ -10067,6 +10067,32 @@ cluster ThreadNetworkDirectory = 1107 {
   command access(invoke: manage) GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
 }
 
+/** This cluster allows a Client to obtain diagnostic information and metrics related to the Server Thread Border Router node or the Thread network in which the Border Router is associated. */
+provisional cluster ThreadBorderRouterDiagnostics = 1108 {
+  revision 1;
+
+  enum BorderRouterOperationalStatusEnum : enum8 {
+    kRunning = 0;
+    kStopped = 1;
+    kDisabled = 2;
+  }
+
+  enum ThreadBorderRouterFaultEnum : enum8 {
+    kGeneralFault = 0;
+    kAdjacentInfraIfFault = 1;
+    kServicesAtCapacity = 2;
+    kChildrenAtCapacity = 3;
+  }
+
+  readonly attribute BorderRouterOperationalStatusEnum status = 0;
+  readonly attribute ThreadBorderRouterFaultEnum activeFaultsList[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster provides a proxy service allowing a Commissioner to utilize commissioning transports not supported locally, or to extend the commissioning range of the Commissioner. */
 provisional cluster CommissioningProxy = 1109 {
   revision 1;

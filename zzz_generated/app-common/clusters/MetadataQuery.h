@@ -282,6 +282,8 @@
 #include <clusters/ThermostatMode/MetadataProvider.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Ids.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/MetadataProvider.h>
+#include <clusters/ThreadBorderRouterDiagnostics/Ids.h>
+#include <clusters/ThreadBorderRouterDiagnostics/MetadataProvider.h>
 #include <clusters/ThreadBorderRouterManagement/Ids.h>
 #include <clusters/ThreadBorderRouterManagement/MetadataProvider.h>
 #include <clusters/ThreadNetworkDiagnostics/Ids.h>
@@ -1028,6 +1030,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == ThermostatUserInterfaceConfiguration::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ThermostatUserInterfaceConfiguration::Id>::EntryFor(
                 command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThreadBorderRouterDiagnostics::Id) || ...))
+    {
+        if (id == ThreadBorderRouterDiagnostics::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ThreadBorderRouterDiagnostics::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ThreadBorderRouterManagement::Id) || ...))
     {
