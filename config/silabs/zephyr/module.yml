@@ -18,8 +18,6 @@ name: connectedhomeip
 build:
     cmake: .
     kconfig: Kconfig
-<<<<<<< HEAD
-=======
     sysbuild-cmake: sysbuild
     depends:
         - mbedtls
@@ -29,4 +27,3 @@ package-managers:
     pip:
         requirement-files:
             - ../../scripts/setup/requirements.zephyr.txt
->>>>>>> 7b27eac ([silabs] More zephyr fixes (#73738))

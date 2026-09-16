@@ -317,13 +317,8 @@ config NET_BUF_RX_COUNT
 config NET_BUF_TX_COUNT
     default 16
 
-<<<<<<< HEAD
-config NET_SOCKETS_POLL_MAX
-    default 6 if CHIP_WIFI
-=======
 config ZVFS_POLL_MAX
 	default 6 if CHIP_WIFI
->>>>>>> 7b27eac ([silabs] More zephyr fixes (#73738))
 
 # ==============================================================================
 # Bluetooth Low Energy configuration
