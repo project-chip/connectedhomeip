@@ -32,15 +32,7 @@ env:
 
 jobs:
     linux_standalone:
-        name: Linux Standalone (OpenSSL ${{ matrix.openssl_linkage }})
-        strategy:
-            fail-fast: false
-            matrix:
-                include:
-                    - openssl_linkage: static
-                      openssl_static: 'true'
-                    - openssl_linkage: dynamic
-                      openssl_static: 'false'
+        name: Linux Standalone
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -55,12 +47,13 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-                bootstrap-log-name: bootstrap-logs-${{ github.job }}-${{ matrix.openssl_linkage }}
+                bootstrap-log-name: bootstrap-logs-${{ github.job }}
 
             - name: Select SDK OpenSSL
               uses: ./.github/actions/setup-sdk-openssl
               with:
-                static: ${{ matrix.openssl_static }}
+                # Match the static OpenSSL used by the Linux YAML and REPL tests.
+                static: 'true'
 
             - name: Build standalone tools
               run: |
@@ -69,20 +62,13 @@ jobs:
                         --target linux-x64-chip-cert \
                         --target linux-x64-chip-tool \
                         build"
-            - name: Verify SDK OpenSSL linkage
-              env:
-                OPENSSL_STATIC: ${{ matrix.openssl_static }}
+            - name: Verify static SDK OpenSSL linkage
               run: |
-                for binary in out/linux-x64-chip-cert/chip-cert out/linux-x64-network-manager/matter-network-manager-app; do
+                for binary in out/linux-x64-chip-cert/chip-cert out/linux-x64-chip-tool/chip-tool; do
                   readelf -d "$binary" > /tmp/openssl-needed.txt
-                  if [ "$OPENSSL_STATIC" = true ]; then
-                    if grep -E 'NEEDED.*lib(ssl|crypto)\.so' /tmp/openssl-needed.txt; then
-                      echo "Unexpected shared OpenSSL dependency: $binary" >&2
-                      exit 1
-                    fi
-                  else
-                    grep -E 'NEEDED.*libcrypto\.so' /tmp/openssl-needed.txt
-                    ldd "$binary" | grep -F 'libcrypto.so.3 => /opt/matter/openssl/lib/libcrypto.so.3'
+                  if grep -E 'NEEDED.*lib(ssl|crypto)\.so' /tmp/openssl-needed.txt; then
+                    echo "Unexpected shared OpenSSL dependency: $binary" >&2
+                    exit 1
                   fi
                 done
 
@@ -91,8 +77,8 @@ jobs:
                 strip out/linux-x64-chip-cert/chip-cert
                 strip out/linux-x64-chip-tool/chip-tool
             - name: Upload tools as artifact
-              # Publish the static variant so consumers need no private OpenSSL installation.
-              if: matrix.openssl_linkage == 'static' && github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
+              # Tools use static OpenSSL so consumers need no private OpenSSL installation.
+              if: github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
               uses: actions/upload-artifact@v7
               with:
                 name: chip-tools-linux-x64

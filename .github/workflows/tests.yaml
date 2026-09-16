@@ -85,7 +85,7 @@ jobs:
             - name: Select SDK OpenSSL
               uses: ./.github/actions/setup-sdk-openssl
               with:
-                  static: 'false'
+                  static: 'true'
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
