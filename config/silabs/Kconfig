@@ -20,23 +20,30 @@ if CHIP
 
 menu "Silabs Matter Config"
 
-# See config/zephyr/Kconfig for full definition
+# See config/common/cmake/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	string "Vendor Name"
 	default "Silicon Laboratories"
 
-# See config/zephyr/Kconfig for full definition.
-# SiWx917 uses the NWP/Security Bootloader RPS path (SIWX91X_FIRMWARE_UPGRADE).
-# EFR32 uses MCUboot (slot-based DFU).
+# See config/common/cmake/Kconfig for the base CHIP_OTA_REQUESTOR definition.
+# Silabs selects the DFU backend below from SoC series.
 config CHIP_OTA_REQUESTOR
 	bool "Enable OTA Requestor"
 	default n
-	select SIWX91X_FIRMWARE_UPGRADE if SOC_SERIES_SIWG917
-	imply REBOOT if SOC_SERIES_SIWG917
-	imply BOOTLOADER_MCUBOOT if !SOC_SERIES_SIWG917
-	imply IMG_MANAGER if !SOC_SERIES_SIWG917
-	imply STREAM_FLASH if !SOC_SERIES_SIWG917
-	imply STREAM_FLASH_ERASE if !SOC_SERIES_SIWG917
+
+# SiWx917: NWP / Security Bootloader RPS path (SIWX91X_FIRMWARE_UPGRADE).
+config CHIP_OTA_BACKEND_SIWX91X
+	def_bool CHIP_OTA_REQUESTOR && SOC_SERIES_SIWG917
+	select SIWX91X_FIRMWARE_UPGRADE
+	imply REBOOT
+
+# EFR32 (and other non-SiWx): MCUboot slot-based DFU.
+config CHIP_OTA_BACKEND_MCUBOOT
+	def_bool CHIP_OTA_REQUESTOR && !CHIP_OTA_BACKEND_SIWX91X
+	imply BOOTLOADER_MCUBOOT
+	imply IMG_MANAGER
+	imply STREAM_FLASH
+	imply STREAM_FLASH_ERASE
 
 config CHIP_OTA_IMAGE_BUILD
 	bool

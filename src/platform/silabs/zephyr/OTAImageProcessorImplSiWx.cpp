@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <platform/silabs/zephyr/OTAImageProcessorImpl.h>
+#include <platform/silabs/zephyr/OTAImageProcessorImplSiWx.h>
 
 #include <cinttypes>
 
