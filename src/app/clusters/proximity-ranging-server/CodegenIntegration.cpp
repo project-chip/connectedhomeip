@@ -32,7 +32,7 @@ ProximityRangingServer::~ProximityRangingServer()
     Deinit();
 }
 
-CHIP_ERROR ProximityRangingServer::Init(BitMask<Feature> features, uint32_t optionalAttributeBits))
+CHIP_ERROR ProximityRangingServer::Init(BitMask<Feature> features, uint32_t optionalAttributeBits)
 {
     VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_ALREADY_INITIALIZED);
 
