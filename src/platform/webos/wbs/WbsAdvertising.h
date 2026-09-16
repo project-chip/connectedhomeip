@@ -31,14 +31,9 @@ public:
     ~WbsAdvertising() = default;
 
     /// Configure and start CHIPoBLE advertising.
-    ///
-    /// Must be called while in the Matter context (from the Matter event loop, or while
-    /// holding the Matter stack lock). Completion is reported asynchronously via
-    /// BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete().
     CHIP_ERROR Start();
 
     /// Stop CHIPoBLE advertising. Completion is reported asynchronously via
-    /// BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete().
     CHIP_ERROR Stop();
 
     bool IsAdvertising() const { return mIsAdvertising; }

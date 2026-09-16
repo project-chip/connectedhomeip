@@ -19,11 +19,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 // LS_REQ_SERVICE_NAME can be overridden at build time.
-// GN builds: set ls_req_service_name in args.gni or gn gen --args.
-// Yocto/CMake builds: pass -DLS_REQ_SERVICE_NAME=\"...\" via CFLAGS/EXTRA_OECMAKE.
-// The default is also defined in config/CHIPProjectAppConfig.h (included first via
-// chip_device_project_config_include), so the #ifndef here suppresses the fallback
-// below when either of those injection paths is active.
 #ifndef LS_REQ_SERVICE_NAME
 #define LS_REQ_SERVICE_NAME "com.webos.service.unifiedmatter-req"
 #endif
@@ -31,11 +26,6 @@
 std::atomic<LsRequester *> LsRequester::_singleton;
 std::mutex LsRequester::_mutex;
 
-// Ownership: held via std::shared_ptr so that whichever side - the synchronous caller (on
-// timeout) or the LS2 callback (which may fire concurrently on the glib thread even after
-// call.cancel(), since cancellation does not guarantee suppression of an already-queued reply)
-// - finishes last is the one that actually frees it. All field access is guarded by `mutex`,
-// since the LS2 callback runs on a separate thread from the caller.
 struct SyncCallbackContext
 {
     std::mutex mutex;
@@ -66,15 +56,8 @@ LsRequester * LsRequester::getInstance()
             std::atomic_thread_fence(std::memory_order_release);
             _singleton.store(inst, std::memory_order_relaxed);
         }
-        // Freshly constructed inside this call: the lsTask thread was just spawned and may not
-        // have entered g_main_loop_run() yet, so checking g_main_loop_is_running() here would
-        // false-positive into an unnecessary restart of a brand-new instance.
         return inst;
     }
-    // GMainLoop health check. The check and any recovery run while holding _mutex so that
-    // concurrent callers cannot both restart (which would leak a loop/thread and re-register
-    // the service twice), and so that this read of m_mainLoop can't race stop()/restart()
-    // mutating it on another thread.
     {
         std::lock_guard<std::mutex> lock(_mutex);
         if (!inst->m_mainLoop || !g_main_loop_is_running(inst->m_mainLoop))
@@ -91,8 +74,6 @@ void LsRequester::initLocked()
 {
     GMainContext * pCxt = g_main_context_new();
     m_mainLoop          = g_main_loop_new(pCxt, false);
-    // g_main_loop_new takes its own reference on the context; drop ours so the
-    // context is released together with the loop in stopLocked() (avoids a leak per restart()).
     g_main_context_unref(pCxt);
     try
     {
@@ -136,9 +117,6 @@ void LsRequester::stop()
     stopLocked();
 }
 
-// Assumes _mutex is held by the caller. Idempotent: safe to call even if already stopped
-// (m_thread/m_mainLoop are nulled out after release so a repeat call is a no-op, not a
-// double g_thread_unref()/g_main_loop_unref()).
 void LsRequester::stopLocked()
 {
     try
@@ -165,9 +143,6 @@ void LsRequester::stopLocked()
 
 bool LsRequester::_callbackSync(LSHandle * sh, LSMessage * reply, void * ctx)
 {
-    // ctx owns one shared_ptr reference to the context; releasing this wrapper drops that
-    // reference. The context itself stays alive as long as lsCallSync()'s local shared_ptr
-    // (or this one) still references it, so it is never freed while either side is using it.
     std::unique_ptr<std::shared_ptr<SyncCallbackContext>> ctxOwner(static_cast<std::shared_ptr<SyncCallbackContext> *>(ctx));
     std::shared_ptr<SyncCallbackContext> cc = *ctxOwner;
 
@@ -302,13 +277,6 @@ bool LsRequester::lsSubscribe(const char * pAPI, const char * pParams, void * ct
 
     ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
 
-    // NOTE: LSCall() is the raw C API - it never throws, it reports failure via its bool return
-    // + the LSError out-param. Passing NULL for the latter (as this used to) discards both: a
-    // rejected call (bad permissions, service not registered, malformed URI, ...) would silently
-    // report success here with pulToken left dangling, so the caller (e.g.
-    // WbsDeviceScanner::StartScanImpl) believes the subscription is live and just waits forever
-    // for a callback that will never come - indistinguishable from bluetooth2 simply not
-    // responding. Check the return value and surface the real error instead.
     LSError lserror;
     LSErrorInit(&lserror);
     bool ok = false;

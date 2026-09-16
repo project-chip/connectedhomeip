@@ -48,8 +48,6 @@ CHIP_ERROR WbsConnection::InitConnectionData(bool aIsCentral, WbsEndpoint *& apE
     endpoint = g_new0(WbsEndpoint, 1);
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "FAIL: memory allocation in %s", __func__));
 
-    // No key-destroy func: the key is the same g_strdup'd buffer as the value's mPeerAddress,
-    // freed once by WbsOTConnectionDestroy via the value-destroy func below.
     endpoint->mConnectionMap = g_hash_table_new_full(g_str_hash, g_str_equal, nullptr, WbsOTConnectionDestroyNotify);
     endpoint->mIsCentral     = aIsCentral;
 
@@ -85,10 +83,6 @@ CHIP_ERROR WbsConnection::SendIndicationImpl(ConnectionDataBundle * data)
     pbnjson::JValue responsePayload;
     WbsConnection * conn      = data->mConn;
 
-    // Peripheral role (a remote central connected to our local GATT server, see
-    // ConfigureAsServerRole()): push data out on our own TX/indicate characteristic via
-    // gatt/writeCharacteristicValue(serverId, ...). Central role (default): write to the remote
-    // peripheral's RX characteristic via gatt/writeCharacteristicValue(clientId, ...), as before.
     if (conn->mIsServerRole)
     {
         lunaParam.put("serverId", conn->mServerId);
@@ -191,10 +185,6 @@ CHIP_ERROR WbsConnection::CloseConnectionImpl(WbsConnection * conn)
 
     if (conn->mIsServerRole)
     {
-        // webOS's bluetooth2 gatt/disconnect only accepts a clientId, so there is no LS2 API to
-        // force-drop a specific remote central connected to our local GATT server (serverId).
-        // Just clear local subscription state; the central itself is responsible for
-        // disconnecting, and WbsGattServer's CCCD poll will detect if it unsubscribes/drops.
         ChipLogDetail(DeviceLayer, "%s: server-role connection has no LS2 disconnect API - clearing local state only", __func__);
         conn->mNotifyAcquired = false;
         return CHIP_NO_ERROR;
@@ -449,9 +439,6 @@ CHIP_ERROR WbsConnection::ConnectDeviceImpl(ConnectParams * apParams)
             serviceAvailable = true;
             break;
         }
-        // Give a slow peripheral time to publish its GATT services before the next poll
-        // (and before falling back to a forced discoverServices). PRODUCT used 2000ms;
-        // 500ms balances slow-device tolerance against connect latency.
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
     if (serviceAvailable == false)
@@ -535,9 +522,6 @@ void WbsConnection::UpdateConnectionTable(std::string remoteAddr, std::string cl
     {
         ChipLogDetail(DeviceLayer, "Wbs disconnected");
         // Cancel any still-active characteristic monitor before freeing the connection below, so
-        // a queued gattMonitorCharateristicsCb() callback is less likely to run against freed memory.
-        // (LS2's cancel API does not guarantee suppression of an already-queued reply, so this
-        // narrows but does not fully close that window.)
         if (connection->mMonitorToken != LSMESSAGE_TOKEN_INVALID)
         {
             LsRequester::getInstance()->lsCallCancel(connection->mMonitorToken);

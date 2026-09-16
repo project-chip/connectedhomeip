@@ -60,13 +60,6 @@ CHIP_ERROR WbsGattServer::InitImpl(WbsGattServer * self)
                         ChipLogError(DeviceLayer, "gatt/openServer response missing serverId"));
     self->mServerId = responsePayload["serverId"].asString();
 
-    // RX: the commissioner writes handshake data to us.
-    //
-    // TODO(needs real-device confirmation): per gatt/monitorCharacteristic's docs, monitoring
-    // fails if the characteristic is not marked notifiable. The Matter spec only requires RX to
-    // be writable over the air, so if a future gatt/monitorCharacteristic(serverId, RX) call
-    // (see the data-path TODO below) fails with a "not notifiable" error, add "notify":true here
-    // and re-test - see the WbsGattServer test plan in the project notes.
     pbnjson::JValue rxProps = pbnjson::JObject();
     rxProps.put("write", true);
     pbnjson::JValue rxPerms = pbnjson::JObject();
@@ -134,13 +127,6 @@ CHIP_ERROR WbsGattServer::InitImpl(WbsGattServer * self)
     self->mPeerConnection = chip::Platform::New<WbsConnection>();
     self->mPeerConnection->ConfigureAsServerRole(self->mServerId);
 
-    // RX data path: subscribe to remote writes on the RX characteristic. Unlike a CCCD write (see
-    // below), a local characteristic's value change *is* delivered to LS2 monitorCharacteristic
-    // subscribers regardless of role - confirmed against
-    // BluetoothGattProfileService::characteristicValueChanged(service, characteristic,
-    // adapterAddress) in com.webos.service.bluetooth2, which notifies mMonitorCharacteristicSubscriptions
-    // unconditionally, not only for subscriptions that reached SIL registration (that part is
-    // skipped for local/server characteristics, but the notification still fires).
     {
         pbnjson::JValue monitorParam = pbnjson::JObject();
         monitorParam.put("serverId", self->mServerId);
@@ -160,11 +146,6 @@ CHIP_ERROR WbsGattServer::InitImpl(WbsGattServer * self)
         }
     }
 
-    // TX subscribe-state path: a remote CCCD write (enabling/disabling indications on TX) has no
-    // LS2 push notification - BluetoothGattProfileService::descriptorValueChanged() only notifies
-    // in-process profile observers inside the bluetooth2 service, never mMonitorCharacteristicSubscriptions.
-    // Detect it instead by short-interval polling of gatt/readDescriptorValue(serverId, TX, CCCD),
-    // which does reflect the live value (updated by the same descriptorValueChanged() callback).
     self->mCccdIndicateEnabled = false;
     DeviceLayer::SystemLayer().StartTimer(kCccdPollInterval, HandleCccdPollTimer, self);
 

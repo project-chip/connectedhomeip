@@ -108,8 +108,6 @@ void BLEManagerImpl::_Shutdown()
     mDeviceScanner.Shutdown();
     mAdvertising.Stop();
     mGattServer.Shutdown();
-    // Release BLE connection resources. ShutdownWbsLayer() frees *mEndpoint - null the member out
-    // so a later _NumConnections() call or a second _Shutdown() cannot dereference/double-free it.
     mConnection.ShutdownWbsLayer(mEndpoint);
     mEndpoint = nullptr;
     mFlags.Clear(Flags::kWBSManagerInitialized).Clear(Flags::kWBSBLELayerInitialized);
@@ -399,10 +397,6 @@ exit:
     return err;
 }
 
-// TODO: this only works for connections created by WbsConnection's central/client-role
-// ConnectDevice() flow. For the peripheral role, `conId` would need to identify an *incoming*
-// connection from a remote commissioner, which has no BLE_CONNECTION_OBJECT representation yet -
-// see the data-path TODOs in WbsGattServer.cpp.
 CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                           chip::System::PacketBufferHandle pBuf)
 {
@@ -497,10 +491,6 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     PlatformMgr().PostEventOrDie(&event);
 }
 
-// TODO: no caller wires this in on webOS yet - it's meant to fire when a remote commissioner
-// writes to our RX characteristic while we're acting as the CHIPoBLE peripheral/GATT server.
-// That requires WbsGattServer to subscribe via gatt/monitorCharacteristic(serverId, RX) and call
-// this from its callback; see the data-path TODOs in WbsGattServer.cpp.
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
     // Copy the data to a packet buffer.
@@ -523,10 +513,6 @@ void BLEManagerImpl::HandleConnectionClosed(BLE_CONNECTION_OBJECT conId)
     PlatformMgr().PostEventOrDie(&event);
 }
 
-// TODO: no caller wires this in on webOS yet - it's meant to fire when a remote commissioner
-// subscribes/unsubscribes (CCCD write) to our TX characteristic while we're acting as the
-// CHIPoBLE peripheral/GATT server. It is not yet confirmed which webOS LS2 API surfaces that
-// event; see the data-path TODOs in WbsGattServer.cpp.
 void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
 {
     VerifyOrReturn(conId != BLE_CONNECTION_UNINITIALIZED,
@@ -589,13 +575,7 @@ void BLEManagerImpl::DriveBLEState()
     // Register the CHIPoBLE GATT service (gatt/openServer + gatt/addService) with the WBS layer
     // if needed. This exposes the RX/TX characteristics so a remote commissioner can discover
     // them once we start advertising below.
-    //
-    // TODO: WbsGattServer only implements service *registration* so far - the server-side data
-    // path (detecting a remote write to RX / a CCCD subscribe on TX, and pushing indications on
-    // TX) is not wired yet, pending confirmation of gatt/monitorCharacteristic and
-    // gatt/writeCharacteristicValue semantics with `serverId` on real hardware. See the TODOs in
-    // WbsGattServer.cpp for what remains. Until that's done, a remote commissioner can see this
-    // service advertised but cannot actually exchange CHIPoBLE handshake data with it.
+
     if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
     {
         SuccessOrExit(err = mGattServer.Init());
@@ -613,10 +593,6 @@ void BLEManagerImpl::DriveBLEState()
             mFlags.Set(Flags::kControlOpInProgress);
             ExitNow();
         }
-        // NOTE: unlike BlueZ, webOS's le/configureAdvertisement API cannot update the advertising
-        // interval in place while advertising is active, so Flags::kAdvertisingRefreshNeeded
-        // (fast/slow/extended advertising interval transitions) is not acted upon here; it is
-        // simply cleared to avoid re-entering this branch on every DriveBLEState() call.
         mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
     }
     // Otherwise stop advertising if needed...
@@ -641,10 +617,7 @@ void BLEManagerImpl::DisableBLEService(CHIP_ERROR err)
 {
     ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-    // Stop all timers if the error is other than BLE adapter unavailable. In case of BLE adapter
-    // beeing unavailable, we will keep timers running, as the adapter might become available in
-    // the nearest future (e.g. WBS restart due to crash). By doing that we will ensure that BLE
-    // adapter reappearance will not extend timeouts for the ongoing operations.
+    // Stop all timers if the error is other than BLE adapter unavailable
     if (err != BLE_ERROR_ADAPTER_UNAVAILABLE)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);

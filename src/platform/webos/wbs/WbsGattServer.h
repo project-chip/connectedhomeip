@@ -26,22 +26,6 @@ namespace Internal {
 
 class WbsConnection;
 
-/// Exposes the CHIPoBLE GATT service (RX write / TX indicate characteristics) as a local GATT
-/// server via webOS's bluetooth2 LS2 service (gatt/openServer, gatt/addService,
-/// gatt/removeService, gatt/closeServer), and implements the server-side data path on top of it:
-///  - RX writes from a remote commissioner are delivered via a persistent
-///    gatt/monitorCharacteristic(serverId, RX, subscribe:true) subscription.
-///  - A remote commissioner subscribing to (or unsubscribing from) indications on TX - i.e. a
-///    CCCD write - has no push notification in webOS's bluetooth2 LS2 API (unlike a remote write
-///    to RX, this event is only ever delivered to in-process observers inside the bluetooth2
-///    service, never to an LS2 client - see the investigation notes for WbsGattServer.cpp). It is
-///    instead detected by short-interval polling of gatt/readDescriptorValue(serverId, TX, CCCD).
-///  - Outgoing data is pushed via gatt/writeCharacteristicValue(serverId, TX, value), through
-///    WbsConnection::SendIndication() on the WbsConnection returned by GetPeerConnection() (see
-///    WbsConnection::ConfigureAsServerRole()).
-///
-/// Only a single inbound (peripheral-role) connection is modeled at a time, matching
-/// BLEManagerImpl::kMaxConnections.
 class WbsGattServer
 {
 public:
