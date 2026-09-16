@@ -38,6 +38,11 @@ and :func:`verify_possession_signature` are here as well: they check the
 ``ClientIdentity`` and ``PossessionSignature`` a DUT returns from
 ``AddOrUpdateWiFiNetwork`` and ``QueryIdentity``.
 
+A compact identity is a lossless compression of exactly one X.509v3 certificate,
+so :func:`encode_network_identity_certificate` can expand one back into DER and
+:func:`network_identity_certificate_pem` into PEM, which is the form a PDC access
+point needs for its server certificate.
+
 The encoders are exercised against the C++ known-answer vectors in
 ``src/python_testing/test_testing/test_network_identity.py``.
 """
@@ -49,6 +54,7 @@ import os
 import time
 from typing import NamedTuple
 
+from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature, encode_dss_signature
@@ -189,18 +195,20 @@ def _compact_identity_from_private_key(private_key: ec.EllipticCurvePrivateKey, 
     return _encode_compact_identity(public_key, raw_signature)
 
 
-def generate_network_client_identity() -> tuple[ec.EllipticCurvePrivateKey, bytes]:
-    """Generates a fresh Network (Client) Identity.
+def generate_network_identity() -> tuple[ec.EllipticCurvePrivateKey, bytes]:
+    """Generates a fresh Network Identity.
 
     Returns a tuple of (private_key, compact_identity) where compact_identity is
-    the 137-byte compact-pdc-identity accepted by the AddClient command.
+    the 137-byte compact-pdc-identity accepted by the AddClient command. A Network
+    Client Identity is the same artifact in the client role, so this generates one of
+    those too.
     """
     private_key = ec.generate_private_key(ec.SECP256R1())
     return private_key, _compact_identity_from_private_key(private_key, deterministic=False)
 
 
-def regenerate_network_client_identity(private_key: ec.EllipticCurvePrivateKey) -> bytes:
-    """Re-signs an existing keypair to produce a colliding Network (Client) Identity.
+def regenerate_network_identity(private_key: ec.EllipticCurvePrivateKey) -> bytes:
+    """Re-signs an existing keypair to produce a colliding Network Identity.
 
     The result shares the public key (and therefore the 20-byte identifier) of the
     original identity but carries a fresh random signature, so its bytes differ. The
@@ -209,7 +217,7 @@ def regenerate_network_client_identity(private_key: ec.EllipticCurvePrivateKey) 
     return _compact_identity_from_private_key(private_key, deterministic=False)
 
 
-def corrupt_network_client_identity(compact_identity: bytes) -> bytes:
+def corrupt_network_identity(compact_identity: bytes) -> bytes:
     """Returns a copy of a compact identity with an invalidated signature.
 
     A single byte inside the ECDSA signature is flipped, leaving the TLV structure
@@ -342,6 +350,51 @@ def verify_possession_signature(compact_identity: bytes, nonce: bytes, possessio
 
 
 # ---------------------------------------------------------------------------
+# X.509 rendering of the identity.
+# ---------------------------------------------------------------------------
+
+
+def encode_network_identity_certificate(compact_identity: bytes) -> bytes:
+    """Encodes the certificate a compact identity stands for, and returns the X.509v3 DER.
+
+    A compact identity carries exactly the two parts of that certificate that cannot be
+    reconstructed: the public key and the self-signature. Everything else is the fixed
+    TBSCertificate template that ``ValidateChipNetworkIdentity`` recomputes to verify the
+    identity, so nothing is lost either way.
+
+    A PDC access point needs the expanded form: hostapd takes the certificate as its
+    ``server_cert``, and SHA-256 over the returned DER is what an ``eap_user`` entry
+    "cert-sha256-<hex>" matches a supplicant's certificate against.
+
+    Raises:
+        ValueError: If the encoding is not a well-formed compact identity.
+    """
+    public_key = compact_identity_public_key(compact_identity)
+    raw_signature = compact_identity_signature(compact_identity)
+    r = int.from_bytes(raw_signature[:32], "big")
+    s = int.from_bytes(raw_signature[32:], "big")
+    # signatureValue is a BIT STRING (0 unused bits) wrapping the DER ECDSA-Sig-Value,
+    # not the raw (r || s) pair the compact identity stores.
+    signature = _der(0x03, b"\x00" + encode_dss_signature(r, s))
+    signature_algorithm = _der(0x30, _OID_ECDSA_WITH_SHA256)
+    return _der(0x30, _encode_network_identity_tbs(public_key) + signature_algorithm + signature)
+
+
+def network_identity_certificate_pem(compact_identity: bytes) -> str:
+    """Encodes the same certificate in the PEM form hostapd reads as ``server_cert``.
+
+    Going through the X.509 parser rather than base64-encoding the DER by hand costs
+    nothing and makes a malformed encoding fail here, rather than as an unexplained
+    rejection of the hostapd ADD at runtime.
+
+    Raises:
+        ValueError: If the encoding is not a well-formed compact identity.
+    """
+    der = encode_network_identity_certificate(compact_identity)
+    return x509.load_der_x509_certificate(der).public_bytes(serialization.Encoding.PEM).decode()
+
+
+# ---------------------------------------------------------------------------
 # Network Administrator Shared Secret (NASS) encoding.
 # ---------------------------------------------------------------------------
 
@@ -440,3 +493,15 @@ def decode_network_administrator_secret(encoded: bytes) -> NetworkAdministratorS
     if len(raw_secret) != NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH:
         raise ValueError(f"NASS raw secret must be {NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH} bytes, got {len(raw_secret)}")
     return NetworkAdministratorSecret(version=version, created=created, raw_secret=raw_secret)
+
+
+# ---------------------------------------------------------------------------
+# Previous names of the three generic helpers above, from when they were assumed
+# to only ever produce a Network Client Identity. Kept until the test scripts
+# still importing them are updated: TC_CNET_4_25, TC_CNET_4_26, TC_CNET_4_27 and
+# TC_NETIM_1_1 through TC_NETIM_1_5.
+# ---------------------------------------------------------------------------
+
+generate_network_client_identity = generate_network_identity
+regenerate_network_client_identity = regenerate_network_identity
+corrupt_network_client_identity = corrupt_network_identity
