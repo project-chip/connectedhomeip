@@ -13,11 +13,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+# This test reads the AccessControlEntryChanged event that commissioning produces. Events live in
+# the app's memory and do not survive its restart, so the test has to commission the DUT itself:
+# fresh-dut keeps the runner from handing it an already commissioned one.
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
+#     fresh-dut: true
 #     quiet: true
 #     app-args: >
 #       --discriminator 1234

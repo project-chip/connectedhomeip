@@ -304,6 +304,8 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
                   ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric,
                   DutStatePolicy(reuse=reuse_commissioned_dut, fresh_dut=run.fresh_dut,
+                                 pre_existing_fabric=run.pre_existing_fabric,
+                                 uncommissioned_dut_marker=script_needs_uncommissioned_dut(run.py_script_path),
                                  factory_reset_explicit=factory_reset_explicit))
 
 
@@ -606,6 +608,8 @@ class DutStatePolicy:
     """How the runner treats app and controller state left by a previous run."""
     reuse: bool                          # keep state so an already commissioned DUT is reused
     fresh_dut: bool = False              # the header says the test needs a DUT with no fabrics
+    pre_existing_fabric: bool = False    # the run commissions an ephemeral fabric first, so the DUT must be fresh
+    uncommissioned_dut_marker: str | None = None  # the test class declares it needs a DUT with no fabric
     factory_reset_explicit: bool = False  # --factory-reset was given on the command line
 
 
@@ -653,6 +657,25 @@ def keyed_kvs_app_args(app: str, app_args: str) -> str:
     return re.sub(r"(--KVS (?P<path>[^ ]+))",
                   lambda m: m.group(1) if m.group("path").endswith(suffix) else f"--KVS {m.group('path')}{suffix}",
                   app_args, count=1)
+
+
+# Test classes that declare one of these need a DUT that carries no fabric: they commission it
+# themselves, or they test what an uncommissioned device does. See the device-requirement markers
+# in matter/testing/matter_testing.py; the framework enforces them once the test class loads, and
+# the runner has to agree before it decides what state to hand the DUT in.
+_UNCOMMISSIONED_DUT_MARKERS = ("MatterTestUncommissionedDevice", "MatterTestCommissioner")
+
+
+def script_needs_uncommissioned_dut(script: str) -> str | None:
+    """Return the device-requirement marker the script declares, if it needs an uncommissioned DUT."""
+    try:
+        source = pathlib.Path(script).read_text(errors="replace")
+    except OSError:
+        return None
+    for marker in _UNCOMMISSIONED_DUT_MARKERS:
+        if re.search(rf"^class\s+\w+\s*\([^)]*\b{marker}\b", source, re.MULTILINE):
+            return marker
+    return None
 
 
 def commissioned_snapshot_file(kvs_path: str) -> str:
@@ -712,6 +735,16 @@ def decide_dut_state(factory_reset: bool, policy: DutStatePolicy, app_args: str,
         return DutStateDecision(True, True, True, "factory reset (explicit --factory-reset)")
     if policy.fresh_dut:
         return DutStateDecision(True, True, True, "factory reset (header fresh-dut: true)")
+    if policy.uncommissioned_dut_marker:
+        return DutStateDecision(False, True, True,
+                                f"app state reset, controller storage kept (the test class declares "
+                                f"{policy.uncommissioned_dut_marker})")
+    if policy.pre_existing_fabric:
+        # The run commissions an ephemeral fabric onto the DUT before the test's own, which only
+        # works on a DUT that carries no fabric yet. The controller storage stays: the ephemeral
+        # one is a separate file.
+        return DutStateDecision(False, True, True,
+                                "app state reset, controller storage kept (header pre-existing-fabric: true)")
 
     storage = re.search(r"--storage-path (?P<path>[^ ]+)", script_args)
     if not storage:

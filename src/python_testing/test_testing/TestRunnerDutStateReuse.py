@@ -124,6 +124,21 @@ class TestDecideDutState(unittest.TestCase):
         pathlib.Path(self.kvs).touch()
         self.assertEqual(self.outcome(self.decide()), (False, True, True, False), "a live KVS is not a snapshot")
 
+    def test_a_class_needing_an_uncommissioned_dut_gets_a_fresh_app(self):
+        pathlib.Path(self.storage).touch()
+        pathlib.Path(self.kvs).touch()
+        self.snapshot()
+        d = self.decide(uncommissioned_dut_marker="MatterTestCommissioner")
+        self.assertEqual(self.outcome(d), (False, True, True, False))
+        self.assertIn("MatterTestCommissioner", d.reason)
+
+    def test_pre_existing_fabric_runs_get_a_fresh_app_and_keep_the_storage(self):
+        """The ephemeral fabric is commissioned onto the DUT first, which needs a DUT with no fabric."""
+        pathlib.Path(self.storage).touch()
+        pathlib.Path(self.kvs).touch()
+        self.snapshot()
+        self.assertEqual(self.outcome(self.decide(pre_existing_fabric=True)), (False, True, True, False))
+
     def test_with_a_snapshot_the_app_is_restored_and_not_commissioned(self):
         pathlib.Path(self.storage).touch()
         pathlib.Path(self.kvs).touch()
@@ -158,6 +173,29 @@ class TestDecideDutState(unittest.TestCase):
             d = self.runner.decide_dut_state(True, self.runner.DutStatePolicy(reuse=True), self.app_args,
                                              f"--storage-path {self.storage} --commissioning-method on-network {payload}")
             self.assertEqual(self.outcome(d), (False, True, True, False), payload)
+
+
+class TestUncommissionedDutMarkerScan(unittest.TestCase):
+
+    def test_marker_is_found_in_the_class_definition_only(self):
+        runner = load_runner()
+        with tempfile.TemporaryDirectory() as tmp:
+            def script(body):
+                path = os.path.join(tmp, "s.py")
+                pathlib.Path(path).write_text(body)
+                return runner.script_needs_uncommissioned_dut(path)
+
+            self.assertEqual(script("class TC_X(MatterTestCommissioner):\n    pass\n"), "MatterTestCommissioner")
+            self.assertEqual(script("class TC_X(MatterBaseTest, MatterTestUncommissionedDevice):\n    pass\n"),
+                             "MatterTestUncommissionedDevice")
+            self.assertIsNone(script("class TC_X(MatterTestCommissionedDevice):\n    pass\n"),
+                              "a class that wants a commissioned DUT is not a match")
+            self.assertIsNone(script("# MatterTestCommissioner is mentioned in a comment\n"),
+                              "a mention outside a class definition is not a declaration")
+
+    def test_missing_script_is_harmless(self):
+        runner = load_runner()
+        self.assertIsNone(runner.script_needs_uncommissioned_dut("/nonexistent/script.py"))
 
 
 class TestCommissionedSnapshot(unittest.TestCase):
