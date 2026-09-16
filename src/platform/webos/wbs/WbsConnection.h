@@ -43,7 +43,7 @@ class WbsConnection
 {
 public:
     WbsConnection();
-    ~WbsConnection() = default;
+    ~WbsConnection()                                 = default;
     WbsConnection(const WbsConnection &)             = delete;
     WbsConnection & operator=(const WbsConnection &) = delete;
     CHIP_ERROR InitConnectionData(bool aIsCentral, WbsEndpoint *& apEndpoint);
@@ -100,9 +100,9 @@ private:
     static void WbsOTConnectionDestroyNotify(gpointer aConn);
     static void UpdateConnectionTable(std::string remoteAddr, std::string clientId, WbsEndpoint & aEndpoint);
 
-    char * mPeerAddress     = nullptr;
-    bool mNotifyAcquired    = false;
-    uint16_t mMtu           = 0;
+    char * mPeerAddress  = nullptr;
+    bool mNotifyAcquired = false;
+    uint16_t mMtu        = 0;
     std::string mClientId;
     uint32_t mMonitorToken  = LSMESSAGE_TOKEN_INVALID;
     WbsEndpoint * mEndpoint = nullptr;

@@ -169,10 +169,10 @@ bool LsRequester::lsCallSync(const char * pAPI, const char * pParams, pbnjson::J
         return false;
     }
     // ChipLogDetail(DeviceLayer, "lsCallSync calling API: %s, params: %s, timeout: %d", pAPI, pParams, timeout);
-    auto cc                                     = std::make_shared<SyncCallbackContext>();
-    auto * ctxOwner                             = new std::shared_ptr<SyncCallbackContext>(cc);
-    bool retVal                                 = true;
-    bool gotReply                               = false;
+    auto cc         = std::make_shared<SyncCallbackContext>();
+    auto * ctxOwner = new std::shared_ptr<SyncCallbackContext>(cc);
+    bool retVal     = true;
+    bool gotReply   = false;
     try
     {
         auto call = m_handle.callOneReply(pAPI, pParams, _callbackSync, (void *) ctxOwner);

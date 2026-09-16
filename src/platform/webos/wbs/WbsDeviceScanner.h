@@ -106,7 +106,7 @@ private:
     WbsDeviceScannerDelegate * mDelegate = nullptr;
     WbsDeviceScannerState mScannerState  = WbsDeviceScannerState::UNINITIALIZED;
     BLEChipDevice * mBleChipDevice       = nullptr;
-    uint32_t mLeInternalStartScanToken = LSMESSAGE_TOKEN_INVALID;
+    uint32_t mLeInternalStartScanToken   = LSMESSAGE_TOKEN_INVALID;
     std::string mAddress;
 };
 

@@ -84,8 +84,7 @@ bool WbsAdvertising::OnAdvertisingStatusChanged(LSHandle * sh, LSMessage * messa
 
     if (!responsePayload["returnValue"].asBool())
     {
-        ChipLogError(DeviceLayer, "le/startAdvertising subscription error: %s",
-                     responsePayload["errorText"].asString().c_str());
+        ChipLogError(DeviceLayer, "le/startAdvertising subscription error: %s", responsePayload["errorText"].asString().c_str());
         self->mIsAdvertising = false;
         BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR_INTERNAL);
         return true;
