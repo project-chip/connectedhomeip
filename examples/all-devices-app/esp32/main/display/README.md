@@ -12,6 +12,7 @@ Exactly one renderer is compiled, selected by the board configuration in
 | Directory | Used by                       | Built on                                              |
 | --------- | ----------------------------- | ----------------------------------------------------- |
 | `tft/`    | M5Stack (ESP32), WROVER-KIT   | `examples/common/screen-framework` + the vendored TFT library |
+| `lvgl/`   | M5Stack CoreS3 (ESP32-S3)     | LVGL 9, via the `espressif/m5stack_core_s3` board support package |
 
 Each renderer directory provides a `DeviceDisplay.cpp` implementing the
 interface, and keeps its screen classes in a `screens/` subdirectory. Screens

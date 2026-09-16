@@ -108,3 +108,18 @@ CONFIG_SPIRAM_USE_MALLOC=y
 CONFIG_SPIRAM_ALLOW_STACK_EXTERNAL_MEMORY=y
 CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=0
 CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=y
+
+# Display: the board support package drives the panel through LVGL.
+#
+# The BSP defaults to two 320x100 draw buffers in internal DMA-capable RAM
+# (128kB).  40 rows is enough for smooth updates of the screens used here and
+# leaves that memory to the WiFi, BLE and Matter stacks.
+CONFIG_BSP_LCD_DRAW_BUF_HEIGHT=40
+
+# Let LVGL allocate from the IDF heap, which is backed by PSRAM here, instead of
+# reserving its own 64kB pool in internal RAM.
+CONFIG_LV_USE_CLIB_MALLOC=y
+
+# The commissioning screen renders the onboarding payload as a QR code.
+CONFIG_LV_USE_QRCODE=y
+

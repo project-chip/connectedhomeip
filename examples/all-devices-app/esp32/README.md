@@ -19,9 +19,10 @@ This application supports **WiFi-based ESP32 SoCs only**
 | M5Stack Basic / Gray | `esp32-m5stack-all-devices`        | LCD UI with the three front buttons   |
 | M5Stack CoreS3       | `esp32-m5stack-cores3-all-devices` | ESP32-S3, 16MB flash, 8MB PSRAM       |
 
-> **Note:** On the CoreS3 the LCD and capacitive touch panel are not driven yet.
-> The display library used by the other M5Stack boards is ESP32-only, so the
-> CoreS3 currently runs headless and is controlled through the serial shell.
+> **Note:** The CoreS3 has no physical buttons, and its touch panel is not wired
+> up yet, so its LCD only displays the commissioning codes. Use the serial shell
+> to change the active device type. The other M5Stack boards keep their
+> button-driven menus.
 
 ## Building the Example
 

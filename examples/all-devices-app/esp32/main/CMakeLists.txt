@@ -35,12 +35,18 @@ set(PRIV_INCLUDE_DIRS_LIST
 )
 
 if (CONFIG_HAVE_DISPLAY)
-    list(APPEND PRIV_INCLUDE_DIRS_LIST
-        "${CMAKE_CURRENT_LIST_DIR}/display"
-        "${CMAKE_CURRENT_LIST_DIR}/display/tft/screens"
-        "${CHIP_ROOT}/examples/common/screen-framework/include"
-        "${CHIP_ROOT}/examples/common/QRCode/repo/c"
-    )
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/display")
+    if (CONFIG_DISPLAY_LVGL)
+        list(APPEND PRIV_INCLUDE_DIRS_LIST
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/screens"
+        )
+    else()
+        list(APPEND PRIV_INCLUDE_DIRS_LIST
+            "${CMAKE_CURRENT_LIST_DIR}/display/tft/screens"
+            "${CHIP_ROOT}/examples/common/screen-framework/include"
+            "${CHIP_ROOT}/examples/common/QRCode/repo/c"
+        )
+    endif()
 endif()
 
 # Keep top-level src/app files explicit to avoid pulling unrelated src/app/*.cpp.
@@ -69,10 +75,17 @@ set(SRC_DIRS_LIST
 if (CONFIG_HAVE_DISPLAY)
     # Exactly one renderer implementation is compiled; it supplies the
     # display/DeviceDisplay.h interface that main.cpp depends on.
-    list(APPEND SRC_DIRS_LIST
-        "${CMAKE_CURRENT_LIST_DIR}/display/tft"
-        "${CMAKE_CURRENT_LIST_DIR}/display/tft/screens"
-    )
+    if (CONFIG_DISPLAY_LVGL)
+        list(APPEND SRC_DIRS_LIST
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/screens"
+        )
+    else()
+        list(APPEND SRC_DIRS_LIST
+            "${CMAKE_CURRENT_LIST_DIR}/display/tft"
+            "${CMAKE_CURRENT_LIST_DIR}/display/tft/screens"
+        )
+    endif()
 endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}

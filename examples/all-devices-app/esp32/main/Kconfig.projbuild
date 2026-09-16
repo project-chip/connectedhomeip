@@ -116,8 +116,16 @@ menu "Demo"
 
     config HAVE_DISPLAY
         bool
-        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT
-        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT)
+        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT || DEVICE_TYPE_M5STACK_CORES3
+        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT || DEVICE_TYPE_M5STACK_CORES3)
+
+    config DISPLAY_LVGL
+        bool
+        depends on HAVE_DISPLAY
+        default y if DEVICE_TYPE_M5STACK_CORES3
+        help
+            Selects the LVGL display implementation instead of the default one
+            built on the vendored TFT library, which is ESP32-only.
 
     config RENDEZVOUS_MODE
        int
