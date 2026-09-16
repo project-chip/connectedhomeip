@@ -828,7 +828,6 @@ CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilte
         status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, "sl_wifi_allowlist_mcast_remove_all failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
 
-<<<<<<< HEAD
     if (!enableBroadcastFilter)
     {
         // Filter disabled: allowlist Matter mDNS (ff02::fb) so only that multicast is received.
@@ -841,11 +840,6 @@ CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilte
         VerifyOrReturnError(parseStatus == 1, CHIP_ERROR_INTERNAL,
                             ChipLogError(DeviceLayer, "Failed to parse Matter mDNS IPv6 multicast address"));
         mdnsIpv6McastAddress.type = SL_IPV6;
-=======
-    status = sl_wifi_filter_broadcast(beaconDropThreshold, filterBcastInTim, 1 /* valid till next update*/);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "sl_wifi_filter_broadcast failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
->>>>>>> b83c34c ([Silabs] Fixed Si917 compatibility with clang. (#73111))
 
         sl_ip_address_handle_t allowlistHandle = UINT8_MAX;
         status                                 = sl_wifi_allowlist_mcast_add_ip(&mdnsIpv6McastAddress, &allowlistHandle);
