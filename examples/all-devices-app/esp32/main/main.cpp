@@ -20,6 +20,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -27,6 +28,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/root-node/WifiRootNode.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -103,6 +105,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
+LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<DeviceInterface> gRootNode;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
@@ -261,14 +264,15 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    auto & deviceFactory = DeviceFactory::GetInstance();
+    auto & deviceFactory = NoHooksDeviceFactory::GetInstance();
 
     // figure out the default
     if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
     {
         gDeviceType = deviceFactory.GetDefaultDevice();
     }
-    gConstructedDevice = deviceFactory.Create(gDeviceType);
+    auto created       = deviceFactory.Create(gDeviceType);
+    gConstructedDevice = std::move(created.device);
 
     if (gConstructedDevice == nullptr)
     {
@@ -282,6 +286,10 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     {
         ESP_LOGE(TAG, "Failed to register device: %" CHIP_ERROR_FORMAT, err.Format());
         return nullptr;
+    }
+    if (created.onDeviceRegistered)
+    {
+        created.onDeviceRegistered();
     }
 
     return &dataModelProvider;
@@ -297,25 +305,32 @@ void InitServer(intptr_t context)
         return;
     }
 
-    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider      = gGroupDataProvider,                     //
-        .fabricTable            = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate          = gTimerDelegate,                         //
-        .storageDelegate        = *initParams.persistentStorageDelegate,  //
-        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager        = DeviceLayer::PlatformMgr(),
-        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable           = Clusters::Binding::Table::GetInstance(),
-        .bindingManager         = Clusters::Binding::Manager::GetInstance(),
+    // Initialize the test event trigger delegate
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
+    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
+        .groupDataProvider        = gGroupDataProvider,                     //
+        .fabricTable              = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate            = gTimerDelegate,                         //
+        .storageDelegate          = *initParams.persistentStorageDelegate,  //
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable             = Clusters::Binding::Table::GetInstance(),
+        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
-    DeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
-        return std::make_unique<ESP32DimmableLight>(ESP32DimmableLight::Context{
+    NoHooksDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return NoHooksDeviceFactory::MakeDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,
+            .identifyDelegate  = gIdentifyDelegate,
         });
     });
 #endif

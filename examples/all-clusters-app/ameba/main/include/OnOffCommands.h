@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
 #include <app/clusters/bindings/BindingManager.h>
+#include <lib/support/CodeUtils.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
@@ -55,33 +56,33 @@ void ProcessOnOffUnicastBindingRead(BindingCommandData * data, const Clusters::B
     switch (data->attributeId)
     {
     case Clusters::OnOff::Attributes::AttributeList::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::AttributeList::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::AttributeList::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::OnOff::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::GlobalSceneControl::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::OnTime::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::OnTime::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::OffWaitTime::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::StartUpOnOff::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
     }
 }
@@ -109,38 +110,44 @@ void ProcessOnOffUnicastBindingCommand(BindingCommandData * data, const Clusters
     switch (data->commandId)
     {
     case Clusters::OnOff::Commands::Toggle::Id:
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         toggleCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote, toggleCommand,
+                                                           onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::On::Id:
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote, onCommand,
+                                                           onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         offCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote, offCommand,
+                                                           onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::OffWithEffect::Id:
         offwitheffectCommand.effectIdentifier = static_cast<Clusters::OnOff::EffectIdentifierEnum>(data->args[0]);
         offwitheffectCommand.effectVariant    = static_cast<uint8_t>(data->args[1]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         offwitheffectCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           offwitheffectCommand, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id:
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onwithrecallglobalsceneCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           onwithrecallglobalsceneCommand, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::OnWithTimedOff::Id:
         onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<Clusters::OnOff::OnOffControlBitmap>>(data->args[0]);
         onwithtimedoffCommand.onTime       = static_cast<uint16_t>(data->args[1]);
         onwithtimedoffCommand.offWaitTime  = static_cast<uint16_t>(data->args[2]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onwithtimedoffCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           onwithtimedoffCommand, onSuccess, onFailure));
         break;
     }
 }
@@ -159,32 +166,35 @@ void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const Clusters::
     switch (data->commandId)
     {
     case Clusters::OnOff::Commands::Toggle::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand));
         break;
 
     case Clusters::OnOff::Commands::On::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand));
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand));
         break;
 
     case Clusters::OnOff::Commands::OffWithEffect::Id:
         offwitheffectCommand.effectIdentifier = static_cast<Clusters::OnOff::EffectIdentifierEnum>(data->args[0]);
         offwitheffectCommand.effectVariant    = static_cast<uint8_t>(data->args[1]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand);
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand));
         break;
 
     case Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id:
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithrecallglobalsceneCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                onwithrecallglobalsceneCommand));
         break;
 
     case Clusters::OnOff::Commands::OnWithTimedOff::Id:
         onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<Clusters::OnOff::OnOffControlBitmap>>(data->args[0]);
         onwithtimedoffCommand.onTime       = static_cast<uint16_t>(data->args[1]);
         onwithtimedoffCommand.offWaitTime  = static_cast<uint16_t>(data->args[2]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithtimedoffCommand);
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithtimedoffCommand));
         break;
     }
 }
@@ -216,8 +226,7 @@ CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
     data->commandId           = Clusters::OnOff::Commands::On::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
@@ -226,8 +235,7 @@ CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
     data->commandId           = Clusters::OnOff::Commands::Off::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
@@ -236,8 +244,7 @@ CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
     data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OffWithEffectSwitchCommandHandler(int argc, char ** argv)
@@ -253,8 +260,7 @@ CHIP_ERROR OffWithEffectSwitchCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** argv)
@@ -263,8 +269,7 @@ CHIP_ERROR OnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** argv)
     data->commandId           = Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id;
     data->clusterId           = Clusters::OnOff::Id;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
@@ -281,8 +286,7 @@ CHIP_ERROR OnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->args[2]             = atoi(argv[2]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -312,8 +316,7 @@ CHIP_ERROR OnOffReadAttributeList(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadOnOff(int argc, char ** argv)
@@ -323,8 +326,7 @@ CHIP_ERROR OnOffReadOnOff(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadGlobalSceneControl(int argc, char ** argv)
@@ -334,8 +336,7 @@ CHIP_ERROR OnOffReadGlobalSceneControl(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadOnTime(int argc, char ** argv)
@@ -345,8 +346,7 @@ CHIP_ERROR OnOffReadOnTime(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadOffWaitTime(int argc, char ** argv)
@@ -356,8 +356,7 @@ CHIP_ERROR OnOffReadOffWaitTime(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR OnOffReadStartUpOnOff(int argc, char ** argv)
@@ -367,8 +366,7 @@ CHIP_ERROR OnOffReadStartUpOnOff(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 /********************************************************
@@ -398,8 +396,7 @@ CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
@@ -409,8 +406,7 @@ CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
@@ -420,8 +416,7 @@ CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupOffWithEffectSwitchCommandHandler(int argc, char ** argv)
@@ -438,8 +433,7 @@ CHIP_ERROR GroupOffWithEffectSwitchCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupOnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** argv)
@@ -449,8 +443,7 @@ CHIP_ERROR GroupOnWithRecallGlobalSceneSwitchCommandHandler(int argc, char ** ar
     data->clusterId           = Clusters::OnOff::Id;
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 
 CHIP_ERROR GroupOnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
@@ -468,7 +461,6 @@ CHIP_ERROR GroupOnWithTimedOffSwitchCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
+    return ScheduleSwitchCommandWork(data);
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL

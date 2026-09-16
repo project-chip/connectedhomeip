@@ -78,6 +78,7 @@ bool sendResponse = true;
 bool asyncCommand = false;
 
 constexpr EndpointId kTestEndpointId                      = 1;
+constexpr EndpointId kTestEndpointId2                     = 2;
 constexpr ClusterId kTestClusterId                        = 3;
 constexpr CommandId kTestCommandIdWithData                = 4;
 constexpr CommandId kTestCommandIdNoData                  = 5;
@@ -109,6 +110,21 @@ const chip::Testing::MockNodeConfig & TestMockNodeConfig()
     // clang-format off
     static const MockNodeConfig config({
         MockEndpointConfig(chip::kTestEndpointId, {
+            MockClusterConfig(Clusters::Identify::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+            },
+            {},      // events
+            {
+                kTestCommandIdWithData,
+                kTestCommandIdNoData,
+                kTestCommandIdCommandSpecificResponse,
+                kTestCommandIdFillResponseMessage,
+                kTestCommandIdIgnoreCommandFields,
+            }, // accepted commands
+            {} // generated commands
+          ),
+        }),
+        MockEndpointConfig(chip::kTestEndpointId2, {
             MockClusterConfig(Clusters::Identify::Id, {
                 ClusterRevision::Id, FeatureMap::Id,
             },
@@ -234,7 +250,7 @@ struct BadFields
 static Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
 {
     // Mock cluster catalog, only support commands on one cluster on one endpoint.
-    if (aRequestCommandPath.mEndpointId != kTestEndpointId)
+    if (aRequestCommandPath.mEndpointId != kTestEndpointId && aRequestCommandPath.mEndpointId != kTestEndpointId2)
     {
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
@@ -410,6 +426,19 @@ public:
     bool mResponseDropped = false;
 };
 
+class MockGroupCommandResponder : public MockCommandResponder
+{
+public:
+    MockGroupCommandResponder(GroupId aGroupId, FabricIndex aFabricIndex = 1) : mGroupId(aGroupId), mFabricIndex(aFabricIndex) {}
+
+    Optional<GroupId> GetGroupId() const override { return MakeOptional(mGroupId); }
+    FabricIndex GetAccessingFabricIndex() const override { return mFabricIndex; }
+
+private:
+    GroupId mGroupId;
+    FabricIndex mFabricIndex;
+};
+
 class MockCommandHandlerCallback : public CommandHandlerImpl::Callback
 {
 public:
@@ -436,10 +465,11 @@ public:
         return Status::Success;
     }
 
-    void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> /* targetedEndpoints */) override
+    void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) override
     {
         onDelayReportCalledTimes++;
         mLastDelayReport = aDelay;
+        mLastTargetedEndpoints.assign(targetedEndpoints.begin(), targetedEndpoints.end());
     }
 
     void ResetCounter()
@@ -447,11 +477,13 @@ public:
         onFinalCalledTimes       = 0;
         onDelayReportCalledTimes = 0;
         mLastDelayReport         = System::Clock::Timeout::zero();
+        mLastTargetedEndpoints.clear();
     }
 
     int onFinalCalledTimes                  = 0;
     int onDelayReportCalledTimes            = 0;
     System::Clock::Timeout mLastDelayReport = System::Clock::Timeout::zero();
+    std::vector<EndpointId> mLastTargetedEndpoints;
 } mockCommandHandlerDelegate;
 
 class TestCommandInteractionModel : public TestImCustomDataModel
@@ -545,6 +577,12 @@ public:
     void TestCommandHandler_ReleaseWithExchangeClosed();
     void TestCommandHandler_GetExchangeContextWhenAsync();
     void TestCommandHandler_DelayReportData();
+    void TestCommandHandler_DelayReportData_Deduplication();
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+    void TestCommandHandler_DelayReportData_MultipleEndpoints();
+#endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+    void TestCommandHandler_DelayReportData_InvalidCommandPath();
+    void TestCommandHandler_DelayReportData_Groupcast();
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -607,6 +645,16 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
 CommandPathParams MakeTestCommandPath(CommandId aCommandId = kTestCommandIdWithData)
 {
     return CommandPathParams(kTestEndpointId, 0, kTestClusterId, aCommandId, (chip::app::CommandPathFlags::kEndpointIdValid));
+}
+
+CommandPathParams MakeTestCommandPath(EndpointId aEndpointId, ClusterId aClusterId, CommandId aCommandId)
+{
+    return CommandPathParams(aEndpointId, 0, aClusterId, aCommandId, (chip::app::CommandPathFlags::kEndpointIdValid));
+}
+
+CommandPathParams MakeTestGroupCommandPath(GroupId aGroupId, ClusterId aClusterId, CommandId aCommandId)
+{
+    return CommandPathParams(0, aGroupId, aClusterId, aCommandId, (chip::app::CommandPathFlags::kGroupIdValid));
 }
 
 void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & aPayload, bool aSuppressResponse,
@@ -2288,6 +2336,222 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData)
         std::chrono::duration_cast<std::chrono::milliseconds>(mockCommandHandlerDelegate.mLastDelayReport).count());
     EXPECT_GE(delayMs, 1000u);
     EXPECT_LT(delayMs, 1500u);
+    ASSERT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints.size(), 1u);
+    EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_Deduplication)
+{
+    isCommandDispatched = false;
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+
+    app::CommandSender::ConfigParameters configParameters;
+    configParameters.SetRemoteMaxPathsPerInvoke(2);
+    EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
+
+    InvokeRequestMessage::DelayReportData delayReportData;
+    delayReportData.delayMinMs          = 1000;
+    delayReportData.delayJitterWindowMs = 500;
+    commandSender.SetDelayReportData(delayReportData);
+
+    // Prepare 2 commands targeting the SAME endpoint (kTestEndpointId) with different command IDs
+    {
+        CommandPathParams commandPath = MakeTestCommandPath(kTestCommandIdWithData);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true).SetCommandRef(0);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true).SetCommandRef(0);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+    }
+    {
+        CommandPathParams commandPath = MakeTestCommandPath(kTestCommandIdCommandSpecificResponse);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true).SetCommandRef(1);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true).SetCommandRef(1);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+    }
+
+    BasicCommandPathRegistry<4> basicCommandPathRegistry;
+    MockCommandResponder mockCommandResponder;
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+
+    System::PacketBufferHandle commandDatabuf;
+    EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+
+    mockCommandHandlerDelegate.ResetCounter();
+    commandDispatchedCount = 0;
+
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
+
+    EXPECT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+    ASSERT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints.size(), 1u);
+    EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
+}
+
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_MultipleEndpoints)
+{
+    isCommandDispatched = false;
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+
+    app::CommandSender::ConfigParameters configParameters;
+    configParameters.SetRemoteMaxPathsPerInvoke(2);
+    EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
+
+    InvokeRequestMessage::DelayReportData delayReportData;
+    delayReportData.delayMinMs          = 1000;
+    delayReportData.delayJitterWindowMs = 500;
+    commandSender.SetDelayReportData(delayReportData);
+
+    // Command 1 on Endpoint 1
+    {
+        CommandPathParams commandPath = MakeTestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true).SetCommandRef(0);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true).SetCommandRef(0);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+    }
+    // Command 2 on Endpoint 2
+    {
+        CommandPathParams commandPath = MakeTestCommandPath(kTestEndpointId2, kTestClusterId, kTestCommandIdWithData);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true).SetCommandRef(1);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true).SetCommandRef(1);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+    }
+
+    BasicCommandPathRegistry<4> basicCommandPathRegistry;
+    MockCommandResponder mockCommandResponder;
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+
+    System::PacketBufferHandle commandDatabuf;
+    EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+
+    mockCommandHandlerDelegate.ResetCounter();
+    commandDispatchedCount = 0;
+
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
+
+    EXPECT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+    ASSERT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints.size(), 2u);
+    EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
+    EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[1], kTestEndpointId2);
+}
+#endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_InvalidCommandPath)
+{
+    isCommandDispatched = false;
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+
+    app::CommandSender::ConfigParameters configParameters;
+    configParameters.SetRemoteMaxPathsPerInvoke(1);
+    EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
+
+    InvokeRequestMessage::DelayReportData delayReportData;
+    delayReportData.delayMinMs          = 1000;
+    delayReportData.delayJitterWindowMs = 500;
+    commandSender.SetDelayReportData(delayReportData);
+
+    // Command with non-existent / unsupported command ID
+    {
+        CommandPathParams commandPath = MakeTestCommandPath(kTestNonExistCommandId);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+    }
+
+    BasicCommandPathRegistry<4> basicCommandPathRegistry;
+    MockCommandResponder mockCommandResponder;
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+
+    System::PacketBufferHandle commandDatabuf;
+    EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+
+    mockCommandHandlerDelegate.ResetCounter();
+    commandDispatchedCount = 0;
+
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
+
+    // When all commands in invoke are invalid/unsupported, no endpoints should be recorded and OnDelayReport must not be called.
+    EXPECT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 0);
+    EXPECT_TRUE(mockCommandHandlerDelegate.mLastTargetedEndpoints.empty());
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData_Groupcast)
+{
+    isCommandDispatched = false;
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+
+    InvokeRequestMessage::DelayReportData delayReportData;
+    delayReportData.delayMinMs          = 1000;
+    delayReportData.delayJitterWindowMs = 500;
+    commandSender.SetDelayReportData(delayReportData);
+
+    constexpr GroupId kTestGroupId = 0x0101; // Group 1 in GroupTesting::InitData maps to endpoint 1
+
+    // Prepare group command
+    {
+        CommandPathParams commandPath = MakeTestGroupCommandPath(kTestGroupId, kTestClusterId, kTestCommandIdWithData);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+    }
+
+    BasicCommandPathRegistry<4> basicCommandPathRegistry;
+    MockGroupCommandResponder mockGroupCommandResponder(kTestGroupId, GetBobFabricIndex());
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockGroupCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+
+    System::PacketBufferHandle commandDatabuf;
+    EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+
+    mockCommandHandlerDelegate.ResetCounter();
+    commandDispatchedCount = 0;
+
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
+
+    EXPECT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+    ASSERT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints.size(), 1u);
+    EXPECT_EQ(mockCommandHandlerDelegate.mLastTargetedEndpoints[0], kTestEndpointId);
 }
 
 TEST(TestEncodableResponsePayloadAdapter, EncodeToBothWriters)

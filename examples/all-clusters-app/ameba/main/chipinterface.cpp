@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <DeviceCallbacks.h>
 #include <Globals.h>
 #include <LEDWidget.h>
+#include <lib/support/CodeUtils.h>
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -202,7 +203,7 @@ extern "C" void ChipTest(void)
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!\r\n");
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
+    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0));
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
 

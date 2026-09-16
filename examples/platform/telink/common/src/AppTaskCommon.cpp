@@ -100,6 +100,8 @@ bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
 
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
 void EnablePostCommissioningBle(intptr_t)
 {
@@ -111,22 +113,27 @@ void EnablePostCommissioningBle(intptr_t)
 }
 #endif
 
-#if APP_SET_DEVICE_INFO_PROVIDER
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-#endif
-
 #ifndef IDENTIFY_CLUSTER_DISABLED
 
 void OnIdentifyTriggerEffect(Identify * identify)
 {
+    chip::EndpointId endpoint = identify->mCluster.Cluster().GetPaths()[0].mEndpointId;
+    ChipLogProgress(Zcl, "OnIdentifyTriggerEffect for endpoint %u, effect: %u", endpoint,
+                    static_cast<unsigned>(identify->mCurrentEffectIdentifier));
     AppTaskCommon::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
 }
 
-Identify sIdentify = {
-    kExampleEndpointId,           AppTask::IdentifyStartHandler,
-    AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnIdentifyTriggerEffect,
-};
+#ifndef TELINK_APP_IDENTIFY_ENDPOINTS
+#define TELINK_APP_IDENTIFY_ENDPOINTS(X) X(kExampleEndpointId)
+#endif
+
+#define TELINK_IDENTIFY_INSTANCE(endpoint)                                                                                         \
+    { endpoint, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,                                                       \
+      Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, OnIdentifyTriggerEffect },
+
+Identify sIdentifyInstances[] = { TELINK_APP_IDENTIFY_ENDPOINTS(TELINK_IDENTIFY_INSTANCE) };
+
+#undef TELINK_IDENTIFY_INSTANCE
 
 #endif
 
@@ -308,10 +315,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif
     LogErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
-#if APP_SET_DEVICE_INFO_PROVIDER
+
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-#endif
+
     initParams.appDelegate              = &sCallbacks;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
@@ -366,25 +373,33 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     return CHIP_NO_ERROR;
 }
 
-void AppTaskCommon::IdentifyStartHandler(Identify *)
+void AppTaskCommon::IdentifyStartHandler(Identify * identify)
 {
-    AppEvent event;
+    AppEvent event            = {};
+    chip::EndpointId endpoint = identify->mCluster.Cluster().GetPaths()[0].mEndpointId;
 
-    event.Type    = AppEvent::kEventType_IdentifyStart;
-    event.Handler = [](AppEvent * event) {
-        ChipLogProgress(Zcl, "OnIdentifyStart");
+    event.Type               = AppEvent::kEventType_IdentifyStart;
+    event.TimerEvent.Context = reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint));
+    event.Handler            = [](AppEvent * event) {
+        chip::EndpointId ep = static_cast<chip::EndpointId>(reinterpret_cast<uintptr_t>(event->TimerEvent.Context));
+        ChipLogProgress(Zcl, "OnIdentifyStart for endpoint %u", ep);
+
         PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
     };
     GetAppTask().PostEvent(&event);
 }
 
-void AppTaskCommon::IdentifyStopHandler(Identify *)
+void AppTaskCommon::IdentifyStopHandler(Identify * identify)
 {
-    AppEvent event;
+    AppEvent event            = {};
+    chip::EndpointId endpoint = identify->mCluster.Cluster().GetPaths()[0].mEndpointId;
 
-    event.Type    = AppEvent::kEventType_IdentifyStop;
-    event.Handler = [](AppEvent * event) {
-        ChipLogProgress(Zcl, "OnIdentifyStop");
+    event.Type               = AppEvent::kEventType_IdentifyStop;
+    event.TimerEvent.Context = reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint));
+    event.Handler            = [](AppEvent * event) {
+        chip::EndpointId ep = static_cast<chip::EndpointId>(reinterpret_cast<uintptr_t>(event->TimerEvent.Context));
+        ChipLogProgress(Zcl, "OnIdentifyStop for endpoint %u", ep);
+
         PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Indication, false);
     };
     GetAppTask().PostEvent(&event);

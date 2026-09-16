@@ -140,6 +140,14 @@ if (is_si917_board) {
 } else if (silabs_board == "BRD4187C") {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B220F1536IM48"
+} else if (silabs_board == "BRD2601B") {
+  silabs_family = "efr32mg24"
+  silabs_mcu = "EFR32MG24B310F1536IM48"
+
+  # ThunderBoards don't have a LCD,
+  show_qr_code = false
+  disable_lcd = true
+  sl_enable_rgb_led = true
 } else if (silabs_board == "BRD2703A") {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B020F1536IM48"

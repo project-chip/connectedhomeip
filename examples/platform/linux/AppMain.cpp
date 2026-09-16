@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <cstdlib>
 #include <string>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -97,6 +98,12 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_ALARM_TRIGGER
+#include <app/clusters/electrical-alarm-server/ElectricalAlarmTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_PROTECTION_ALARM_TRIGGER
+#include <app/clusters/electrical-protection-alarm-server/ElectricalProtectionAlarmTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
 #include <app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h>
 #endif
@@ -123,6 +130,9 @@
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER
+#include <app/clusters/network-identity-management-server/NetworkIdentityManagementTestEventTriggerHandler.h>
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -934,6 +944,14 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     static BooleanStateConfigurationTestEventTriggerHandler sBooleanStateConfigurationTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sBooleanStateConfigurationTestEventTriggerHandler));
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_ALARM_TRIGGER
+    static ElectricalAlarmTestEventTriggerHandler sElectricalAlarmTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sElectricalAlarmTestEventTriggerHandler));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_PROTECTION_ALARM_TRIGGER
+    static ElectricalProtectionAlarmTestEventTriggerHandler sElectricalProtectionAlarmTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sElectricalProtectionAlarmTestEventTriggerHandler));
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
     static CommodityPriceTestEventTriggerHandler sCommodityPriceTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler));
@@ -970,6 +988,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     static CommodityMeteringTestEventTriggerHandler CommodityMeteringTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&CommodityMeteringTestEventTriggerHandler));
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER
+    static NetworkIdentityManagementTestEventTriggerHandler sNetworkIdentityManagementTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sNetworkIdentityManagementTestEventTriggerHandler));
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&Server::GetInstance().GetICDManager()));
 #endif
@@ -994,6 +1016,8 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     {
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
+
+    ResolveDeviceAttestationCredentialsProvider();
 
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.

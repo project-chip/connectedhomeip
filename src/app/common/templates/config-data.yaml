@@ -24,8 +24,8 @@ CommandHandlerInterfaceOnlyClusters:
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
     - Camera AV Settings User Level Management
-    - Commodity Price
     - Commodity Tariff
+    - Electrical Alarm
     - Electrical Distribution
     - Electrical Energy Measurement
     - Joint Fabric Administrator
@@ -80,9 +80,8 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Mode Select
+    - Level Control
     - Pump Configuration and Control
-    - Thermostat User Interface Configuration
     # keep-sorted end
     # Code Driven clusters are clusters that implement the ServerClusterInterface.
     # The clusters in this list require Init() and/or Shutdown() callbacks, defined
@@ -95,6 +94,8 @@ CodeDrivenClusters:
     - Administrator Commissioning
     - Air Quality
     - Ambient Context Sensing
+    - Ambient Sensing Union
+    - Audio Control
     - Basic Information
     - Binding
     - Boolean State
@@ -106,13 +107,17 @@ CodeDrivenClusters:
     - Closure Dimension
     - Commissioner Control
     - Commissioning Proxy
+    - Commodity Price
     - Descriptor
     - Device Energy Management
     - Device Energy Management Mode
     - Diagnostic Logs
+    - Dishwasher Alarm
     - Dishwasher Mode
     - Dynamic Lighting
+    - Electrical Alarm
     - Electrical Power Measurement
+    - Electrical Protection Alarm
     - Energy EVSE
     - Energy EVSE Mode
     - Energy Preference
@@ -137,6 +142,7 @@ CodeDrivenClusters:
     - Media File Management
     - Microwave Oven Control
     - Microwave Oven Mode
+    - Mode Select
     - Network Identity Management
     - OTA Software Update Provider
     - OTA Software Update Requestor
@@ -152,6 +158,7 @@ CodeDrivenClusters:
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
+    - Refrigerator Alarm
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Relative Humidity Measurement
     - Scenes Management
@@ -165,6 +172,8 @@ CodeDrivenClusters:
     - Temperature Control
     - Temperature Measurement
     - Thermostat
+    - Thermostat Mode
+    - Thermostat User Interface Configuration
     - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization

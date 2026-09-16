@@ -23,6 +23,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -31,6 +32,7 @@
 #include <device/api/Interface.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
+#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 #include <device/types/root-node/RootNode.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -70,6 +72,7 @@ bool gServerStarted = false;
 DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
+LoggingIdentifyDelegate gIdentifyDelegate;
 DefaultTimerDelegate gTimerDelegate;
 
 std::unique_ptr<CodeDrivenDataModelProvider> gDataModelProvider;
@@ -149,23 +152,28 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         std::make_unique<CodeDrivenDataModelProvider>(*initParams.persistentStorageDelegate, gAttributePersistenceProvider);
     VerifyOrReturnError(gDataModelProvider != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    static SimpleTestEventTriggerDelegate testEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+
     ReturnErrorOnFailure(CreateAndRegisterRootNode(initParams));
 
-    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider      = gGroupDataProvider,
-        .fabricTable            = Server::GetInstance().GetFabricTable(),
-        .timerDelegate          = gTimerDelegate,
-        .storageDelegate        = *initParams.persistentStorageDelegate,
-        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager        = DeviceLayer::PlatformMgr(),
-        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable           = Clusters::Binding::Table::GetInstance(),
-        .bindingManager         = Clusters::Binding::Manager::GetInstance(),
+    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
+        .groupDataProvider        = gGroupDataProvider,
+        .fabricTable              = Server::GetInstance().GetFabricTable(),
+        .timerDelegate            = gTimerDelegate,
+        .storageDelegate          = *initParams.persistentStorageDelegate,
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable             = Clusters::Binding::Table::GetInstance(),
+        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto & deviceFactory = DeviceFactory::GetInstance();
+    auto & deviceFactory = NoHooksDeviceFactory::GetInstance();
 
     if (!deviceFactory.IsValidDevice(gDeviceType))
     {
@@ -173,11 +181,16 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    gConstructedDevice = deviceFactory.Create(gDeviceType);
-    VerifyOrReturnError(gConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
+    auto created = deviceFactory.Create(gDeviceType);
+    VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
-    ReturnErrorOnFailure(gConstructedDevice->Register(allocator, *gDataModelProvider));
+    ReturnErrorOnFailure(created.device->Register(allocator, *gDataModelProvider));
+    if (created.onDeviceRegistered)
+    {
+        created.onDeviceRegistered();
+    }
+    gConstructedDevice = std::move(created.device);
 
     initParams.dataModelProvider = gDataModelProvider.get();
 
