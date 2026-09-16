@@ -41,7 +41,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ class _ToneControl:
     value: int | None = None
 
 
-class TC_AUDIOCONTROL_2_1(MatterBaseTest, AUDIOCONTROLTestBase):
+class TC_AUDIOCONTROL_2_1(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def desc_TC_AUDIOCONTROL_2_1(self) -> str:
         return "[TC-AUDIOCONTROL-2.1] Attributes with DUT as Server"

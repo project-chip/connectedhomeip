@@ -23,7 +23,7 @@ from TC_MESSTestBase import MESSAGE_ID_1, MESSAGE_ID_2, MESSTestBase
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -39,7 +39,7 @@ _TRUNCATION_LIMIT_SEC = 20
 _TRUNCATION_TOLERANCE_SEC = 5
 
 
-class TC_MESS_3_2(MatterBaseTest, MESSTestBase):
+class TC_MESS_3_2(MatterTestCommissionedDevice, MESSTestBase):
 
     def desc_TC_MESS_3_2(self) -> str:
         return "[TC-MESS-3.2] Audio Message Delivery Verification (DUT as Server)"

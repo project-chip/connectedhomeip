@@ -88,6 +88,12 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "TC_EPALM_2_1.py",
         "TC_AVANALY_2_1.py",
         "TC_PWRTL_2_2.py",
+        # Representatives of two shapes that would otherwise read as exceptions: a test that
+        # inherits its marker from a uniform support-module base (HSTATBase), and one that opens
+        # a commissioning window and a PASE session against its *already-commissioned* DUT to
+        # check access control -- incidental PASE does not make a test MatterTestCommissioner.
+        "TC_HSTAT_2_1.py",
+        "TC_NETIM_1_4.py",
     ],
     MatterTestCommissioner: [
         "test_testing/TestCommissioningStatusDetectionIntegration.py",
@@ -124,10 +130,18 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "TC_JFDS_2_3.py",
         "TC_JFDS_2_4.py",
         "TC_SC_3_5.py",
+        # Also a DUT-as-commissioner test, but carrying its marker on the shared
+        # NetworkIdentityTHServerTest base rather than on the test class.
+        "TC_NETIM_1_5.py",
     ],
     MatterTestUncommissionedDevice: [
         "TC_DD_1_16_17.py",
         "TC_DD_1_5.py",
+        # DUT-role DNS-SD tests: the DUT stays off-fabric and neither side commissions anything,
+        # so they are Uncommissioned rather than Commissioner even though a commissioner role is
+        # in play (in 4.6 the DUT advertises the service, in 4.7 the DUT scans for it).
+        "TC_SC_4_6.py",
+        "TC_SC_4_7.py",
     ],
 }
 

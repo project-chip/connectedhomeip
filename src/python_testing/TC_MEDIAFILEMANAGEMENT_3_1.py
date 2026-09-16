@@ -42,7 +42,7 @@ from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -55,7 +55,7 @@ _REQUEST_ID_2 = 0x1002
 _UINT16_MAX = 0xFFFF
 
 
-class TC_MEDIAFILEMANAGEMENT_3_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
+class TC_MEDIAFILEMANAGEMENT_3_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEMENTTestBase):
 
     def desc_TC_MEDIAFILEMANAGEMENT_3_1(self) -> str:
         return "[TC-MEDIAFILEMANAGEMENT-3.1] File Sharing Verification - PROVISIONAL"

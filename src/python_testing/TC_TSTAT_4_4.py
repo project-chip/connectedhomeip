@@ -47,6 +47,7 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -54,7 +55,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.Thermostat
 
 
-class TC_TSTAT_4_4(ThermostatBaseTest):
+class TC_TSTAT_4_4(MatterTestCommissionedDevice, ThermostatBaseTest):
     """Test case for Thermostat Sensors (SENS) feature on Thermostat cluster."""
 
     def check_sensors_attribute(self, sensors: list) -> list[bytes]:
