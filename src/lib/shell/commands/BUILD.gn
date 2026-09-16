@@ -42,6 +42,10 @@ source_set("commands") {
       "WiFi.cpp",
       "WiFi.h",
     ]
+    deps += [
+      "${chip_root}/src/app/server:server",
+      "${chip_root}/src/lib/support:arg_parser",
+    ]
   }
 
   if (chip_enable_ble && chip_device_platform != "none") {
