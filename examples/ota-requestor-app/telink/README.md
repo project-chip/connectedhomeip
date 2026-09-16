@@ -25,12 +25,6 @@ The example supports building and running on the following devices:
     $ integrations/docker/images/stage-2/chip-build-telink/Dockerfile
     ```
 
-    If you need to use Zephyr 3.3.0, use the following container instead:
-
-    ```bash
-    $ docker run -it --rm -v $PWD:/host -w /host ghcr.io/project-chip/chip-build-telink-zephyr_3_3:$(wget -q -O - https://raw.githubusercontent.com/project-chip/connectedhomeip/master/.github/workflows/examples-telink.yaml 2> /dev/null | grep chip-build-telink-zephyr_3_3 | awk -F: '{print $NF}')
-    ```
-
     You can check the compatible Docker image version in:
 
     ```bash

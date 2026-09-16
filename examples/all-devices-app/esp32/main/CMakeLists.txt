@@ -31,6 +31,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${ALL_DEVICES_COMMON_DIR}"
                       "${CHIP_ROOT}/examples/providers"
                       "${CMAKE_CURRENT_BINARY_DIR}"  # for generated app_config/enabled_devices.h
+                      ${ALL_DEVICES_EXTRA_INCLUDE_DIRS}
 )
 
 # Keep top-level src/app files explicit to avoid pulling unrelated src/app/*.cpp.
@@ -38,6 +39,12 @@ set(APP_TOPLEVEL_EXTRA_SRCS
     "${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp"
     "${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp"
 )
+
+if (CONFIG_ENABLE_MATTER_OVER_THREAD)
+    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.cpp")
+else()
+    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/WifiRootNode.cpp")
+endif()
 
 set(SRC_DIRS_LIST
     "${CMAKE_CURRENT_LIST_DIR}"
@@ -48,13 +55,12 @@ set(SRC_DIRS_LIST
     "${CHIP_ROOT}/src/app/server"
     "${CHIP_ROOT}/src/app/persistence"
     "${CHIP_ROOT}/src/app/server-cluster"
-    ${ALL_DEVICES_DEVICE_SRCDIRS}
 )
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST})
 
-target_sources(${COMPONENT_LIB} PRIVATE ${APP_TOPLEVEL_EXTRA_SRCS} ${ALL_DEVICES_CLUSTER_SOURCES})
+target_sources(${COMPONENT_LIB} PRIVATE ${APP_TOPLEVEL_EXTRA_SRCS} ${ALL_DEVICES_DEVICE_SOURCES} ${ALL_DEVICES_CLUSTER_SOURCES})
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC

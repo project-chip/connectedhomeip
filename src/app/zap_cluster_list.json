@@ -91,6 +91,7 @@
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
         "NETWORK_IDENTITY_MANAGEMENT_CLUSTER": [],
+        "ONOFF_CLUSTER": [],
         "PROXIMITY_RANGING_CLUSTER": [],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
@@ -128,8 +129,10 @@
         "RVC_CLEAN_MODE_CLUSTER": [],
         "RVC_RUN_MODE_CLUSTER": [],
         "SCENES_CLUSTER": [],
+        "SCENES_MANAGEMENT_CLUSTER": [],
         "SERVICE_AREA_CLUSTER": [],
         "SMOKE_CO_ALARM_CLUSTER": [],
+        "SMOKE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": [],
         "SOIL_MEASUREMENT_CLUSTER": [],
         "SWITCH_CLUSTER": [],
@@ -138,6 +141,7 @@
         "TEMPERATURE_CONTROL_CLUSTER": [],
         "TEMPERATURE_MEASUREMENT_CLUSTER": [],
         "THERMOSTAT_CLUSTER": [],
+        "THERMOSTAT_MODE_CLUSTER": [],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [],
         "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -181,10 +185,10 @@
         "AIR_QUALITY_CLUSTER": ["air-quality-server"],
         "ALARM_CLUSTER": [],
         "AMBIENT_CONTEXT_SENSING_CLUSTER": ["ambient-context-sensing-server"],
-        "AMBIENT_SENSING_UNION_CLUSTER": [],
+        "AMBIENT_SENSING_UNION_CLUSTER": ["ambient-sensing-union-server"],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
-        "AUDIO_CONTROL_CLUSTER": [],
+        "AUDIO_CONTROL_CLUSTER": ["audio-control-server"],
         "AUDIO_OUTPUT_CLUSTER": ["audio-output-server"],
         "AV_ANALYSIS_CLUSTER": [],
         "BALLAST_CONFIGURATION_CLUSTER": [],
@@ -231,7 +235,7 @@
         "DISHWASHER_ALARM_CLUSTER": ["dishwasher-alarm-server"],
         "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
         "DYNAMIC_LIGHTING_CLUSTER": ["dynamic-lighting-server"],
-        "ELECTRICAL_ALARM_CLUSTER": [],
+        "ELECTRICAL_ALARM_CLUSTER": ["electrical-alarm-server"],
         "ELECTRICAL_DISTRIBUTION_CLUSTER": ["electrical-distribution-server"],
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
             "electrical-grid-conditions-server"
@@ -296,6 +300,7 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
+        "ONOFF_CLUSTER": [],
         "PROXIMITY_RANGING_CLUSTER": ["proximity-ranging-server"],
         "PUSH_AV_STREAM_TRANSPORT_CLUSTER": ["push-av-stream-transport-server"],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
@@ -350,8 +355,12 @@
         "RVC_CLEAN_MODE_CLUSTER": ["mode-base-server"],
         "RVC_RUN_MODE_CLUSTER": ["mode-base-server"],
         "SCENES_CLUSTER": ["scenes-server"],
+        "SCENES_MANAGEMENT_CLUSTER": [],
         "SERVICE_AREA_CLUSTER": ["service-area-server"],
         "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
+        "SMOKE_CONCENTRATION_MEASUREMENT_CLUSTER": [
+            "concentration-measurement-server"
+        ],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
         "SOIL_MEASUREMENT_CLUSTER": ["soil-measurement-server"],
         "SWITCH_CLUSTER": ["switch-server"],
@@ -360,6 +369,7 @@
         "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
         "TEMPERATURE_MEASUREMENT_CLUSTER": ["temperature-measurement-server"],
         "THERMOSTAT_CLUSTER": ["thermostat-server"],
+        "THERMOSTAT_MODE_CLUSTER": ["mode-base-server"],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [
             "thermostat-user-interface-configuration-server"
         ],

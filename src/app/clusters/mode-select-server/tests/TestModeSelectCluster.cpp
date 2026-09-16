@@ -235,7 +235,7 @@ TEST_F(TestModeSelectCluster, ReadCurrentMode)
     EXPECT_EQ(currentMode, 0u);
 }
 
-TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultsToCurrentMode)
+TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultsToNull)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
     ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
@@ -244,11 +244,7 @@ TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultsToCurrentMode)
 
     DataModel::Nullable<uint8_t> startUpMode;
     ASSERT_EQ(tester.ReadAttribute(StartUpMode::Id, startUpMode), CHIP_NO_ERROR);
-    // Workaround: StartUpMode is initialized to CurrentMode when unset, so that existing
-    // certification tests (which assert StartUpMode is an integer) continue to pass.
-    // CurrentMode defaults to mode 0 (first supported mode in mock).
-    ASSERT_FALSE(startUpMode.IsNull());
-    EXPECT_EQ(startUpMode.Value(), static_cast<uint8_t>(0));
+    EXPECT_TRUE(startUpMode.IsNull());
 }
 
 TEST_F(TestModeSelectCluster, ReadOnModeDefaultNull)
