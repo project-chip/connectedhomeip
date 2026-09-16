@@ -275,7 +275,8 @@ void LoggingRangingAdapter::SetConstraints(Span<const Structs::RangingConstraint
 // CSPRNG-based generator for the BLEDeviceID.
 LoggingRangingAdapter::LoggingRangingAdapter(RangingTechEnum technology, TimerDelegate & timerDelegate,
                                              PersistentStorageDelegate * storage, bool periodicRangingSupport) :
-    mPeriodicRangingSupport(periodicRangingSupport), mTechnology(technology), mTimerDelegate(timerDelegate), mpStore(storage)
+    mPeriodicRangingSupport(periodicRangingSupport),
+    mTechnology(technology), mTimerDelegate(timerDelegate), mpStore(storage)
 {
     if (mTechnology == RangingTechEnum::kBLEBeaconRSSIRanging)
     {
