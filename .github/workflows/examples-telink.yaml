@@ -62,7 +62,7 @@ jobs:
             - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
               run: |
                 scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py \
-                  https://github.com/telink-semi/tl_zephyr.git 07c49fec445512ac4b4a6dc5e066ff768c9e0d6e \
+                  https://github.com/telink-semi/tl_zephyr.git 9f6d24607560e3cd8197775d159f9bceaea2a865 \
                   --sdk-repo https://github.com/telink-semi/tl_ble_sdk_zephyr.git \
                   --sdk-hash 209df1123d3488a80b5217c4d470c3a906ef1098"
 
