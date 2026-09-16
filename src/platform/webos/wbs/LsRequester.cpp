@@ -20,7 +20,7 @@
 
 // LS_REQ_SERVICE_NAME can be overridden at build time.
 #ifndef LS_REQ_SERVICE_NAME
-#define LS_REQ_SERVICE_NAME "com.webos.service.unifiedmatter-req"
+#define LS_REQ_SERVICE_NAME nullptr
 #endif
 
 std::atomic<LsRequester *> LsRequester::_singleton;
@@ -34,6 +34,7 @@ struct SyncCallbackContext
     bool timeOut  = false;
     bool error    = false;
     bool received = false;
+    std::atomic<bool> ownerReleased{ false };
 };
 
 void * LsRequester::lsTask(void * arg)
@@ -127,7 +128,7 @@ void LsRequester::stopLocked()
 
         if (m_thread)
         {
-            g_thread_unref(m_thread);
+            g_thread_join(m_thread);
             m_thread = nullptr;
         }
         if (m_mainLoop)
@@ -143,21 +144,33 @@ void LsRequester::stopLocked()
 
 bool LsRequester::_callbackSync(LSHandle * sh, LSMessage * reply, void * ctx)
 {
-    std::unique_ptr<std::shared_ptr<SyncCallbackContext>> ctxOwner(static_cast<std::shared_ptr<SyncCallbackContext> *>(ctx));
+    auto * ctxOwner                         = static_cast<std::shared_ptr<SyncCallbackContext> *>(ctx);
     std::shared_ptr<SyncCallbackContext> cc = *ctxOwner;
 
     LS::Message response(reply);
-    std::lock_guard<std::mutex> lock(cc->mutex);
-    if (cc->timeOut || cc->error)
+    bool result = true;
     {
-        ChipLogError(DeviceLayer, "return by timeout or error");
-        return false;
+        std::lock_guard<std::mutex> lock(cc->mutex);
+        if (cc->timeOut || cc->error)
+        {
+            ChipLogError(DeviceLayer, "return by timeout or error");
+            result = false;
+        }
+        else
+        {
+            cc->result.assign(response.getPayload());
+            cc->received = true;
+            cc->cond.notify_all();
+            // ChipLogDetail(DeviceLayer, "Response: %s", response.getPayload());
+        }
     }
-    cc->result.assign(response.getPayload());
-    cc->received = true;
-    cc->cond.notify_all();
-    // ChipLogDetail(DeviceLayer, "Response: %s", response.getPayload());
-    return true;
+
+    bool expected = false;
+    if (cc->ownerReleased.compare_exchange_strong(expected, true))
+    {
+        delete ctxOwner;
+    }
+    return result;
 }
 
 bool LsRequester::lsCallSync(const char * pAPI, const char * pParams, pbnjson::JValue & response, int timeout)
@@ -185,6 +198,14 @@ bool LsRequester::lsCallSync(const char * pAPI, const char * pParams, pbnjson::J
             waitLock.unlock();
             ChipLogError(DeviceLayer, "lsCallSync timed out after %d seconds for API: %s", timeout, pAPI);
             call.cancel();
+            // If cancel() fully suppressed the pending callback, _callbackSync() will never run to
+            // free ctxOwner - claim and free it here instead. If a callback is still in flight, it
+            // will win the race on ownerReleased and this becomes a no-op.
+            bool expected = false;
+            if (cc->ownerReleased.compare_exchange_strong(expected, true))
+            {
+                delete ctxOwner;
+            }
             return false;
         }
         // ChipLogDetail(DeviceLayer, "lsCallSync received response for API: %s, result: %s", pAPI, cc->result.c_str());

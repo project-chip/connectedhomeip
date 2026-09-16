@@ -261,6 +261,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             mFlags.Clear(Flags::kWBSBLELayerInitialized);
             mFlags.Clear(Flags::kAdvertisingConfigured);
             mFlags.Clear(Flags::kAppRegistered);
+            mAdvertising.Stop();
             ClearAdvertisingFlag();
             CleanScanConfig();
             // Indicate that the adapter is no longer available

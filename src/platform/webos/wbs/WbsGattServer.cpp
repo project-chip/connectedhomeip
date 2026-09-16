@@ -114,8 +114,14 @@ CHIP_ERROR WbsGattServer::InitImpl(WbsGattServer * self)
     addServiceParam.put("characteristics", characteristics);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_ADDSERVICE, addServiceParam.stringify().c_str(), responsePayload);
-    VerifyOrReturnError(ret && responsePayload.hasKey(STR_RETURN_VALUE) && responsePayload[STR_RETURN_VALUE].asBool(),
-                        CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "gatt/addService failed"));
+    if (!ret || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    {
+        ChipLogError(DeviceLayer, "gatt/addService failed");
+        // gatt/openServer above already opened a server (self->mServerId) - close it instead of
+        // leaking it. ShutdownImpl() doesn't depend on mIsOpen, which is still false here.
+        ShutdownImpl(self);
+        return CHIP_ERROR_INTERNAL;
+    }
 
     self->mIsOpen = true;
     ChipLogDetail(DeviceLayer, "WbsGattServer: CHIPoBLE service registered (serverId=%s)", self->mServerId.c_str());
@@ -138,10 +144,11 @@ CHIP_ERROR WbsGattServer::InitImpl(WbsGattServer * self)
                                                    OnRxCharacteristicChanged, &self->mRxMonitorToken);
         if (!subscribed)
         {
-            chip::Platform::Delete(self->mPeerConnection);
-            self->mPeerConnection = nullptr;
-            self->mIsOpen         = false;
             ChipLogError(DeviceLayer, "WbsGattServer: failed to subscribe RX characteristic monitor");
+            // Undo the already-registered CHIPoBLE service (openServer/addService above), not just
+            // mPeerConnection, so a later retry does not find it still registered on the daemon
+            // side. ShutdownImpl() doesn't depend on mIsOpen, which is still false here.
+            ShutdownImpl(self);
             return CHIP_ERROR_INTERNAL;
         }
     }

@@ -772,11 +772,14 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             if (context->mServices.size())
             {
                 context->mServices.erase(std::remove_if(
-                    context->mServices.begin(), context->mServices.end(),
-                    [name, type, removedInterface, removedTransportType](const DnssdService & service) {
-                        return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol) &&
-                            service.mInterface == removedInterface && service.mTransportType == removedTransportType;
-                    }));
+                   context->mServices.begin(), context->mServices.end(),
+                                              [name, type, removedInterface, removedTransportType](const DnssdService & service) {
+                                                  return strcmp(name, service.mName) == 0 &&
+                                                      type == GetFullType(service.mType, service.mProtocol) &&
+                                                      service.mInterface == removedInterface &&
+                                                      service.mTransportType == removedTransportType;
+                                              }),
+                                          context->mServices.end());
             }
 
             if (context->mReceivedAllCached)

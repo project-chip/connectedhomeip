@@ -115,7 +115,8 @@ bool WbsAdvertising::OnAdvertisingStatusChanged(LSHandle * sh, LSMessage * messa
 
 CHIP_ERROR WbsAdvertising::Stop()
 {
-    VerifyOrReturnValue(mIsAdvertising, CHIP_NO_ERROR, ChipLogDetail(DeviceLayer, "BLE advertising already stopped"));
+    VerifyOrReturnValue(mIsAdvertising || mSubscribeToken != LSMESSAGE_TOKEN_INVALID, CHIP_NO_ERROR,
+                        ChipLogDetail(DeviceLayer, "BLE advertising already stopped"));
     return PlatformMgrImpl().GLibMatterContextInvokeSync(StopImpl, this);
 }
 

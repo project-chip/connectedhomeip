@@ -398,6 +398,20 @@ void WbsConnection::EndpointCleanup(WbsEndpoint * apEndpoint)
     {
         if (apEndpoint->mConnectionMap != nullptr)
         {
+            GHashTableIter iter;
+            gpointer key;
+            gpointer value;
+            g_hash_table_iter_init(&iter, apEndpoint->mConnectionMap);
+            while (g_hash_table_iter_next(&iter, &key, &value))
+            {
+                auto * connection = static_cast<WbsConnection *>(value);
+                if (connection->mMonitorToken != LSMESSAGE_TOKEN_INVALID)
+                {
+                    LsRequester::getInstance()->lsCallCancel(connection->mMonitorToken);
+                    connection->mMonitorToken = LSMESSAGE_TOKEN_INVALID;
+                }
+            }
+
             g_hash_table_destroy(apEndpoint->mConnectionMap);
             apEndpoint->mConnectionMap = nullptr;
         }
