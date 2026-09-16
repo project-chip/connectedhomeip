@@ -28,10 +28,7 @@ namespace Controller {
 
 using namespace chip::app;
 
-AndroidWebRTCTransportProviderClient::AndroidWebRTCTransportProviderClient(chip::CommandId commandId) :
-    mCommandId(commandId)
-{
-}
+AndroidWebRTCTransportProviderClient::AndroidWebRTCTransportProviderClient(chip::CommandId commandId) : mCommandId(commandId) {}
 
 CHIP_ERROR AndroidWebRTCTransportProviderClient::InitJni(jobject javaCallbackObject)
 {
@@ -65,7 +62,7 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::InitJni(jobject javaCallbackObj
     {
         mOnResponseMethod = env->GetMethodID(callbackClass, "onResponse", "(IZLjava/lang/Integer;Ljava/lang/Integer;)V");
     }
-    
+
     if (mOnResponseMethod == nullptr)
     {
         if (env->ExceptionCheck())
@@ -100,8 +97,7 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
                                                               Optional<DataModel::Nullable<uint16_t>> audioStreamID,
                                                               const CharSpan & offerSdp, jobject jcallback)
 {
-    auto * client =
-        new AndroidWebRTCTransportProviderClient(Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id);
+    auto * client = new AndroidWebRTCTransportProviderClient(Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = client->InitJni(jcallback);
@@ -168,8 +164,7 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
 CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId,
                                                               jobject jcallback)
 {
-    auto * client =
-        new AndroidWebRTCTransportProviderClient(Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id);
+    auto * client = new AndroidWebRTCTransportProviderClient(Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = client->InitJni(jcallback);

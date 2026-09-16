@@ -130,7 +130,7 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnOffer(uint16_t sessionId, c
 
     jint status = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnOfferMethod, sessionId, jOffer);
     env->DeleteLocalRef(jOffer);
-    
+
     if (env->ExceptionCheck())
     {
         env->ExceptionDescribe();
