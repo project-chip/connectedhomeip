@@ -43,7 +43,7 @@ ThreadBorderRouter::~ThreadBorderRouter()
 }
 
 CHIP_ERROR ThreadBorderRouter::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                      EndpointComposition composition)
+                                        EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

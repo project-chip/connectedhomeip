@@ -606,8 +606,8 @@ private:
         {
             RegisterCreator("thread-border-router", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<ThreadBorderRouter>(mContext->timerDelegate, mContext->storageDelegate,
-                                                      mContext->platformManager, mContext->failSafeContext);
+                return MakeDevice<ThreadBorderRouter>(mContext->timerDelegate, mContext->storageDelegate, mContext->platformManager,
+                                                      mContext->failSafeContext);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
