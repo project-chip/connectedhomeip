@@ -52,7 +52,7 @@ while IFS= read -r TEST; do
 
     if [[ " ${SKIP[*]} " == *" $NAME "* ]]; then
         echo -e "SKIP: \e[33m$NAME\e[0m"
-        ((COUNT_SKIP++))
+        COUNT_SKIP=$((COUNT_SKIP + 1))
         continue
     fi
 
@@ -61,12 +61,12 @@ while IFS= read -r TEST; do
 
     if [ "$RV" -eq 0 ]; then
         echo -e "DONE: \e[32mSUCCESS\e[0m"
-        ((COUNT_PASS++))
+        COUNT_PASS=$((COUNT_PASS + 1))
     else
         FAILED+=("$NAME")
         STATUS=$((STATUS + 1))
         echo -e "DONE: \e[31mFAIL\e[0m"
-        ((COUNT_FAIL++))
+        COUNT_FAIL=$((COUNT_FAIL + 1))
     fi
 
 done < <(find /mnt/chip/tests -type f -executable ! -name runner.sh)
