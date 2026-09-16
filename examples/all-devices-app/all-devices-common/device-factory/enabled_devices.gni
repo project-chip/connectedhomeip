@@ -75,6 +75,14 @@ _available_devices = [
     "CHIME",
   ],
   [
+    "closure",
+    "CLOSURE",
+  ],
+  [
+    "closure-panel",
+    "CLOSURE_PANEL",
+  ],
+  [
     "color-temperature-light",
     "COLOR_TEMPERATURE_LIGHT",
   ],

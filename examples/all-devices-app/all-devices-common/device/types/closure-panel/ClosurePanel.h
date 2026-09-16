@@ -18,7 +18,6 @@
 #include <app/clusters/closure-dimension-server/ClosureDimensionCluster.h>
 #include <app/clusters/closure-dimension-server/ClosureDimensionClusterDelegate.h>
 #include <device/api/SingleEndpoint.h>
-
 #include <variant>
 
 namespace chip::app {
@@ -48,14 +47,15 @@ public:
     struct Config
     {
         bool withAccess = false;
-        std::variant<std::monostate, TranslationParams, RotationParams, ModulationParams> motion;
+        std::optional<std::pair<Percent100ths, Percent100ths>> positioning;  // resolution, stepValue
+        std::optional<BitFlags<Clusters::ClosureDimension::LatchControlModesBitmap>> motionLatching;  
+        std::variant<TranslationParams, RotationParams, ModulationParams> motion;
     };
 
     ClosurePanel(Clusters::ClosureDimension::ClosureDimensionClusterDelegate & dimensionDelegate, Config config);
     ~ClosurePanel() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition) override;
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::ClosureDimension::ClosureDimensionCluster & ClosureDimensionCluster()
@@ -63,7 +63,6 @@ public:
         VerifyOrDie(mClosureDimensionCluster.IsConstructed());
         return mClosureDimensionCluster.Cluster();
     }
-
 private:
     const Config mConfig;
     Clusters::ClosureDimension::ClosureDimensionClusterDelegate & mDimensionDelegate;

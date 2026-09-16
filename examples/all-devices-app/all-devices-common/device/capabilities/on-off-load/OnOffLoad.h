@@ -55,6 +55,7 @@ namespace app {
  */
 class OnOffLoad : public SingleEndpoint
 {
+    friend class LoggingClosure;
 public:
     struct Context
     {

@@ -16,19 +16,17 @@
 
 #include "ClosurePanel.h"
 #include <devices/Types.h>
-
+#include <device/types/closure-panel/ClosureSematicTags.h>
 
 namespace {
-constexpr uint8_t kClosureNamespaceId      = 0x44;
-constexpr uint8_t kClosurePanelNamespaceId = 0x45;
 
 CHIP_ERROR ValidateClosurePanelTagList(chip::Span<const chip::app::EndpointComposition::SemanticTag> tags)
 {
     size_t panelTagCount = 0;
     for (auto & tag : tags)
     {
-        VerifyOrReturnError(tag.namespaceID != kClosureNamespaceId, CHIP_ERROR_INVALID_ARGUMENT);
-        if (tag.namespaceID == kClosurePanelNamespaceId)
+        VerifyOrReturnError(tag.namespaceID != chip::app::kClosureNamespaceId, CHIP_ERROR_INVALID_ARGUMENT);
+        if (tag.namespaceID == chip::app::kClosurePanelNamespaceId)
         {
             ++panelTagCount;
         }
@@ -49,10 +47,9 @@ ClosurePanel::ClosurePanel(Clusters::ClosureDimension::ClosureDimensionClusterDe
 CHIP_ERROR ClosurePanel::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     ReturnErrorOnFailure(ValidateClosurePanelTagList(composition.tagList));
-    DeviceRegistrationTransaction transaction(*this, provider);
 
-    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
-    
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider,composition));
+
     Clusters::ClosureDimension::ClosureDimensionCluster::Config dimensionConfig(endpoint, mDimensionDelegate);
     if (mConfig.withAccess)
     {
@@ -70,11 +67,18 @@ CHIP_ERROR ClosurePanel::Register(EndpointId endpoint, CodeDrivenDataModelProvid
     {
         dimensionConfig.WithModulation(modulation->type);
     }
-    
+    if (mConfig.positioning.has_value())
+    {
+        dimensionConfig.WithPositioning(mConfig.positioning->first, mConfig.positioning->second);
+    }
+    if (mConfig.motionLatching.has_value())
+    {
+        dimensionConfig.WithMotionLatching(mConfig.motionLatching.value());
+    }
+
     mClosureDimensionCluster.Create(dimensionConfig);
     ReturnErrorOnFailure(provider.AddCluster(mClosureDimensionCluster.Registration()));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
-    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 

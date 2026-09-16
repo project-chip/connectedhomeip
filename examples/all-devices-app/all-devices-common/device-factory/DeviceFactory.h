@@ -29,6 +29,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/closure/impl/LoggingClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
@@ -350,23 +351,76 @@ private:
                                                "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
+        if constexpr (ALL_DEVICES_ENABLE_CHIME)
         {
-            RegisterCreator("color-temperature-light", [this]() {
+            RegisterCreator("chime", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                static const Chime::Sound kDefaultSounds[] = {
+                    { 0, "Ding Dong"_span },
+                    { 1, "Ring Ring"_span },
+                };
+                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
+        if constexpr (ALL_DEVICES_ENABLE_CLOSURE)
         {
-            RegisterCreator("contact-sensor", [this]() {
+            RegisterCreator("closure", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
-                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+                ClosurePanel::Config c1{
+                    .withAccess    = true,
+                    .positioning   = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
+                    .motion        = ClosurePanel::TranslationParams{ Clusters::ClosureDimension::TranslationDirectionEnum::kBackward },
+                };
+                ClosurePanel::Config c2{
+                    .withAccess    = false,
+                    .positioning   = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
+                    .motion        = ClosurePanel::ModulationParams{ Clusters::ClosureDimension::ModulationTypeEnum::kSlatsOpenwork },
+                };
+                ClosurePanel::Config c3{
+                    .withAccess     = true,
+                    .positioning    = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
+                    .motionLatching = BitFlags<Clusters::ClosureDimension::LatchControlModesBitmap>(
+                                        Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteLatching,
+                                        Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching),
+                    .motion         = ClosurePanel::RotationParams{ Clusters::ClosureDimension::RotationAxisEnum::kLeft },
+                };
+
+
+                static EndpointComposition::SemanticTag kLiftTag[] = {
+                { 
+                    .namespaceID = kClosurePanelNamespaceId, .tag = to_underlying(ClosurePanelTag::kLift) }
+                };
+                static  EndpointComposition::SemanticTag kRotateTag[] = {
+                { 
+                    .namespaceID = kClosurePanelNamespaceId, .tag = to_underlying(ClosurePanelTag::kRotate) }
+                };
+                static  EndpointComposition::SemanticTag kSlideTag[] = {
+                { 
+                    .namespaceID = kClosurePanelNamespaceId, .tag = to_underlying(ClosurePanelTag::kSliding) }
+                };
+                static  EndpointComposition::SemanticTag kDoorTag[] = {
+                { 
+                    .namespaceID = kClosureNamespaceId, .tag = to_underlying(ClosureTag::kDoor) }
+                };
+                
+                std::vector<PanelList> panels = {PanelList{c1,Span<EndpointComposition::SemanticTag>(kLiftTag)},PanelList{c2,Span<EndpointComposition::SemanticTag>(kRotateTag)},PanelList{c3,Span<EndpointComposition::SemanticTag>(kSlideTag)}};
+                Closure::Config CCconfig{
+                    .tags               = Span<EndpointComposition::SemanticTag>(kDoorTag),
+                    .withPositioning    = true,
+                    .withMotionLatching = true,
+                    .latchControlModes  = BitFlags<Clusters::ClosureControl::LatchControlModesBitmap>(
+                                            Clusters::ClosureControl::LatchControlModesBitmap::kRemoteLatching,
+                                            Clusters::ClosureControl::LatchControlModesBitmap::kRemoteUnlatching),
+                    .withInstantaneous     = false,   // mutually exclusive with Speed below
+                    .withSpeed             = true,
+                    .withPedestrian        = true,
+                    .withCalibration       = true,
+                    .withManuallyOperable  = true,
+                    .withAccess            = true,
+                };
+
+
+                return MakeDevice<LoggingClosure>(mContext->timerDelegate,mContext->identifyDelegate,CCconfig,mContext->groupDataProvider,mContext->fabricTable,std::move(panels));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
@@ -384,15 +438,23 @@ private:
                 return MakeDevice<LoggingOccupancySensor>(mContext->timerDelegate);
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_CHIME)
+        if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
         {
-            RegisterCreator("chime", [this]() {
+            RegisterCreator("color-temperature-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                static const Chime::Sound kDefaultSounds[] = {
-                    { 0, "Ding Dong"_span },
-                    { 1, "Ring Ring"_span },
-                };
-                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
+                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
+        {
+            RegisterCreator("contact-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
+                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_COOKTOP)
