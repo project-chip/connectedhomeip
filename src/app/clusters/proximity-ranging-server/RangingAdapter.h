@@ -246,6 +246,10 @@ public:
     /// Default returns std::nullopt.
     virtual std::optional<BltcsConfig> GetBltcsConfig() { return std::nullopt; }
 
+    /// Override only on adapters that implelement Ranging Constraints
+    /// Default returns no entries.
+    virtual Span<const Structs::RangingConstraintStruct::Type> GetConstraints() const { return {}; }
+
 protected:
     Callback * mCallback = nullptr;
 };
