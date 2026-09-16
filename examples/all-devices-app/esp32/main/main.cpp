@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "DeviceTypeSelection.h"
 #include <ESP32DimmableLight.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
@@ -37,7 +38,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <nvs_flash.h>
-#include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32Utils.h>
@@ -139,7 +139,6 @@ LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<DeviceInterface> gRootNode;
 std::vector<std::unique_ptr<DeviceInterface>> gConstructedDevices;
-std::vector<std::unique_ptr<OOBAccessor>> gConstructedAccessors;
 DefaultTimerDelegate gTimerDelegate;
 
 void DeInitBLEIfCommissioned()
@@ -407,9 +406,21 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         }
         else
         {
-            auto defaultDevName = deviceFactory.GetDefaultDevice();
-            gDeviceType         = defaultDevName;
-            auto defaultDevice  = deviceFactory.Create(defaultDevName);
+            std::string defaultDevName;
+            for (const auto & dev : deviceFactory.SupportedDeviceTypes())
+            {
+                if (dev != "aggregator" && dev != "bridged-node")
+                {
+                    defaultDevName = dev;
+                    break;
+                }
+            }
+            if (defaultDevName.empty())
+            {
+                defaultDevName = deviceFactory.GetDefaultDevice();
+            }
+            gDeviceType        = defaultDevName;
+            auto defaultDevice = deviceFactory.Create(defaultDevName);
             if (defaultDevice.device == nullptr)
             {
                 ESP_LOGE(TAG, "Failed to create default device %s", defaultDevName.c_str());
@@ -435,7 +446,19 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     {
         if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
         {
-            gDeviceType = deviceFactory.GetDefaultDevice();
+            gDeviceType.clear();
+            for (const auto & dev : deviceFactory.SupportedDeviceTypes())
+            {
+                if (dev != "aggregator" && dev != "bridged-node")
+                {
+                    gDeviceType = dev;
+                    break;
+                }
+            }
+            if (gDeviceType.empty())
+            {
+                gDeviceType = deviceFactory.GetDefaultDevice();
+            }
         }
         auto device = deviceFactory.Create(gDeviceType);
         if (device.device == nullptr)

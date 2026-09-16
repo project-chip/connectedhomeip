@@ -17,7 +17,6 @@
  */
 
 #include "DeviceDisplay.h"
-#include "Button.h"
 #include "DeviceInfoScreen.h"
 #include "DeviceSelectionScreen.h"
 #include "Display.h"
@@ -34,7 +33,10 @@
 
 static const char TAG[] = "DeviceDisplay";
 
-Button gButtons[BUTTON_NUMBER] = { Button(BUTTON_1_GPIO_NUM), Button(BUTTON_2_GPIO_NUM), Button(BUTTON_3_GPIO_NUM) };
+#if CONFIG_DEVICE_TYPE_M5STACK
+#include "Button.h"
+Button gButtons[BUTTON_NUMBER] = { Button(BUTTON_1_GPIO_NUM, 1), Button(BUTTON_2_GPIO_NUM, 2), Button(BUTTON_3_GPIO_NUM, 3) };
+#endif // CONFIG_DEVICE_TYPE_M5STACK
 
 void PushFactoryResetScreen()
 {

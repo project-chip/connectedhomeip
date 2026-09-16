@@ -20,13 +20,11 @@
 
 #if CONFIG_HAVE_DISPLAY
 
+#include "DeviceTypeSelection.h"
 #include "ScreenManager.h"
 #include <device-factory/DeviceFactory.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType);
-const std::string & GetActiveDeviceType();
 
 DeviceSelectionListModel::DeviceSelectionListModel()
 {

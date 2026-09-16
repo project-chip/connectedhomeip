@@ -20,6 +20,7 @@
 
 #if CONFIG_HAVE_DISPLAY
 
+#include "DeviceTypeSelection.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
 #include <app/server/Server.h>
@@ -28,8 +29,6 @@
 #include <lib/support/CHIPMem.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-
-const std::string & GetActiveDeviceType();
 
 namespace {
 

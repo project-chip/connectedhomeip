@@ -47,8 +47,12 @@ void Button::TimerCallback(TimerHandle_t xTimer)
     int state = gpio_get_level(button->mGPIONum);
     if (state == APP_BUTTON_PRESSED)
     {
-        WakeDisplay();
-        int buttonId = 40 - button->mGPIONum;
+        bool woken = WakeDisplay();
+        if (woken)
+        {
+            return;
+        }
+        int buttonId = button->mButtonId;
         LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t arg) { ScreenManager::ButtonPressed(static_cast<int>(arg)); }, static_cast<intptr_t>(buttonId)));
     }
@@ -92,6 +96,8 @@ esp_err_t Button::Init(gpio_num_t gpioNum)
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "gpio_isr_handler_add failed for pin %d: %s", gpioNum, esp_err_to_name(err));
+        xTimerDelete(mButtonTimer, 0);
+        mButtonTimer = nullptr;
         return err;
     }
 

@@ -32,12 +32,13 @@ class Button
 {
 public:
     Button() = default;
-    explicit Button(gpio_num_t gpioNum) : mGPIONum(gpioNum) {}
+    explicit Button(gpio_num_t gpioNum, uint8_t buttonId = 0) : mGPIONum(gpioNum), mButtonId(buttonId) {}
 
     esp_err_t Init();
     esp_err_t Init(gpio_num_t gpioNum);
 
     gpio_num_t GetGPIONum() const { return mGPIONum; }
+    uint8_t GetButtonId() const { return mButtonId; }
 
     static void TimerCallback(TimerHandle_t xTimer);
 
@@ -45,5 +46,6 @@ public:
 
 private:
     gpio_num_t mGPIONum        = GPIO_NUM_NC;
+    uint8_t mButtonId          = 0;
     TimerHandle_t mButtonTimer = nullptr;
 };

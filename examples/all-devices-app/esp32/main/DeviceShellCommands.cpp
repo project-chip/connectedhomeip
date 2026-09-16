@@ -15,13 +15,11 @@
  *    limitations under the License.
  */
 
-#include <DeviceShellCommands.h>
+#include "DeviceShellCommands.h"
+#include "DeviceTypeSelection.h"
 #include <cstring>
 #include <device-factory/DeviceFactory.h>
 #include <lib/shell/streamer.h>
-
-// Forward declaration of the function defined in main.cpp
-CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType);
 
 namespace chip {
 namespace Shell {
