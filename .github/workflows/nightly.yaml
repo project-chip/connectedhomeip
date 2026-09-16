@@ -454,3 +454,46 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    nightly_clang_release_icf_tests_linux:
+        name: Nightly Clang Release ICF Tests - Linux
+        if: github.actor != 'restyled-io[bot]'
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: ghcr.io/project-chip/chip-build:200
+            volumes:
+                - "/:/runner-root-volume"
+                - "/tmp/log_output:/tmp/test_logs"
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=1
+                --sysctl net.ipv6.conf.all.forwarding=1
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-clang-release-icf
+
+            - name: Setup Build
+              run: |
+                  BUILD_TYPE=clang_release scripts/build/gn_gen.sh \
+                      --args="is_clang=true is_debug=false enable_icf=true"
+
+            - name: Run Build and Tests
+              run: |
+                  BUILD_TYPE=clang_release scripts/tests/gn_tests.sh
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                  slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
