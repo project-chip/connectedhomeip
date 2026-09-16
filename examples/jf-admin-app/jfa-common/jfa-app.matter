@@ -406,6 +406,7 @@ fabric_scoped struct WebRTCSessionStruct {
   boolean metadataEnabled = 6;
   optional int16u videoStreams[] = 7;
   optional int16u audioStreams[] = 8;
+  optional nullable SFrameStruct SFrameConfig = 9;
   fabric_idx fabricIndex = 254;
 }
 

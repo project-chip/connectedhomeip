@@ -77,19 +77,19 @@ NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
 bool SFrameFollowsSpecConstraints(const Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & sframeConfig)
 {
     // Spec constraint: CipherSuite >= 1
-    if (sframeConfig.cipherSuite < 1)
+    if ((sframeConfig.audioCipherSuite < 1) || (sframeConfig.videoCipherSuite <1))
     {
         return false;
     }
 
     // Spec constraint: BaseKey length <= 128
-    if (sframeConfig.baseKey.size() > 128)
+    if (sframeConfig.senderKey.baseKey.size() > 128)
     {
         return false;
     }
 
     // Spec constraint: KID length must be 2-8
-    if (sframeConfig.kid.size() < 2 || sframeConfig.kid.size() > 8)
+    if (sframeConfig.senderKey.kid.size() < 2 || sframeConfig.senderKey.kid.size() > 8)
     {
         return false;
     }
@@ -97,6 +97,36 @@ bool SFrameFollowsSpecConstraints(const Clusters::WebRTCTransportProvider::Struc
     return true;
 }
 
+using SFrameKeyStructType = Structs::SFrameKeyStruct::Type;                                                                                                   
+                                                                                                                                                                
+/**
+ * @brief Converts a decoded SFrameConfig into an encodable SFrameStruct::Type.                                                                               
+ *                                                                                                                                                            
+ * The decodable and encodable forms are distinct generated types with no implicit
+ * conversion, so copy field by field. `receiveKeys` is materialized into                                                                                     
+ * `receiveKeysStorage`, which must outlive the returned value.                                                                                               
+ */                                                                                                                                                           
+Structs::SFrameStruct::Type ConvertSFrameConfig(const Structs::SFrameStruct::DecodableType & in,                                                              
+                                                std::vector<SFrameKeyStructType> & receiveKeysStorage)                                                        
+{                                                                                                                                                             
+    Structs::SFrameStruct::Type out;                                                                                                                          
+    out.audioCipherSuite = in.audioCipherSuite;                                                                                                               
+    out.videoCipherSuite = in.videoCipherSuite;                                                                                                               
+    out.senderKey        = in.senderKey;                                                                                                                      
+    out.ratchetBits      = in.ratchetBits;                                                                                                                    
+    out.ratchetTime      = in.ratchetTime;                                                                                                                    
+                                                                                                                                                                
+    receiveKeysStorage.clear();                                                                                                                               
+    auto iter = in.receiveKeys.begin();                                                                                                                       
+    while (iter.Next())                                                                                                                                       
+    {                                                                                                                                                       
+        receiveKeysStorage.push_back(iter.GetValue());                                                                                                        
+    }                                                                                                                                                         
+    out.receiveKeys = DataModel::List<const SFrameKeyStructType>(receiveKeysStorage.data(), receiveKeysStorage.size());
+                                                                                                                                                                
+    return out;                                                                                                                                               
+}   
+  
 /**
  * @brief Checks if a URL has a turns or stuns scheme.
  *
@@ -714,7 +744,7 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     if (req.SFrameConfig.HasValue())
     {
         const auto & sframeConfig = req.SFrameConfig.Value();
-        CHIP_ERROR err            = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
+        CHIP_ERROR err            = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -757,10 +787,11 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     args.fabricIndex           = commandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
 
-    if (req.SFrameConfig.HasValue())
-    {
-        args.sFrameConfig.SetValue(req.SFrameConfig.Value());
-    }
+    std::vector<SFrameKeyStructType> sframeReceiveKeys;                                                                                                       
+    if (req.SFrameConfig.HasValue())                                                                                                                          
+    {                                                                                                                                                         
+        args.sFrameConfig.SetValue(ConvertSFrameConfig(req.SFrameConfig.Value(), sframeReceiveKeys));                                                         
+    }     
 
     // ICEServers: copy the validated list
     if (req.ICEServers.HasValue())
@@ -1050,7 +1081,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         if (req.SFrameConfig.HasValue())
         {
             const auto & sframeConfig = req.SFrameConfig.Value();
-            err                       = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
+            err                       = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "HandleProvideOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -1086,9 +1117,10 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
     args.originatingEndpointId = req.originatingEndpointID.ValueOr(outSession.peerEndpointID);
 
-    if (req.SFrameConfig.HasValue())
-    {
-        args.sFrameConfig.SetValue(req.SFrameConfig.Value());
+    std::vector<SFrameKeyStructType> sframeReceiveKeys;                                                                                                       
+    if (req.SFrameConfig.HasValue())                                                                                                                          
+    {                                                                                                                                                         
+        args.sFrameConfig.SetValue(ConvertSFrameConfig(req.SFrameConfig.Value(), sframeReceiveKeys));                                                         
     }
 
     // ICEServers: copy the validated list

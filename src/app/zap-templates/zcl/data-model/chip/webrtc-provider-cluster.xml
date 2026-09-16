@@ -33,12 +33,12 @@ Alchemy: v1.7.10
   <struct name="SFrameStruct" apiMaturity="provisional">
     <cluster code="0x0553"/>
     <cluster code="0x0554"/>
-    <item fieldId="0" name="AudioCipherSuite" type="int16u" min="1" apiMaturity="provisional"/>
-    <item fieldId="1" name="VideoCipherSuite" type="int16u" min="1" apiMaturity="provisional"/>
-    <item fieldId="2" name="SenderKey" type="SFrameKeyStruct" apiMaturity="provisional"/>
-    <item fieldId="3" name="ReceiveKeys" array="true" type="SFrameKeyStruct" length="64" apiMaturity="provisional"/>
-    <item fieldId="4" name="RatchetBits" type="int8u" max="16" apiMaturity="provisional"/>
-    <item fieldId="5" name="RatchetTime" type="int8u" optional="true" apiMaturity="provisional"/>
+    <item fieldId="0" name="AudioCipherSuite" type="int16u" min="1"/>
+    <item fieldId="1" name="VideoCipherSuite" type="int16u" min="1"/>
+    <item fieldId="2" name="SenderKey" type="SFrameKeyStruct"/>
+    <item fieldId="3" name="ReceiveKeys" array="true" type="SFrameKeyStruct" length="64"/>
+    <item fieldId="4" name="RatchetBits" type="int8u" max="16"/>
+    <item fieldId="5" name="RatchetTime" type="int8u" optional="true"/>
   </struct>
 
   <cluster>

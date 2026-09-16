@@ -131,5 +131,6 @@ Alchemy: v1.7.10
     <item fieldId="6" name="MetadataEnabled" type="boolean"/>
     <item fieldId="7" name="VideoStreams" type="int16u" array="true" optional="true" length="16" minLength="1"/>
     <item fieldId="8" name="AudioStreams" type="int16u" array="true" optional="true" length="16" minLength="1"/>
+    <item fieldId="9" name="SFrameConfig" type="SFrameStruct" isNullable="true" optional="true"/>
   </struct>
 </configurator>

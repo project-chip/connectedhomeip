@@ -537,6 +537,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _audioStreams = nil;
 
+        _sFrameConfig = nil;
+
         _fabricIndex = @(0);
     }
     return self;
@@ -555,6 +557,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.metadataEnabled = self.metadataEnabled;
     other.videoStreams = self.videoStreams;
     other.audioStreams = self.audioStreams;
+    other.sFrameConfig = self.sFrameConfig;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -562,7 +565,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataEnabled:%@; videoStreams:%@; audioStreams:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataEnabled, _videoStreams, _audioStreams, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataEnabled:%@; videoStreams:%@; audioStreams:%@; sFrameConfig:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataEnabled, _videoStreams, _audioStreams, _sFrameConfig, _fabricIndex];
     return descriptionString;
 }
 
