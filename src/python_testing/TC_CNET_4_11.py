@@ -996,8 +996,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
     # (https://github.com/project-chip/connectedhomeip/issues/72732).
     disable_wildcard_subscription = True
 
-    @classmethod
-    def setup_class(cls):
+    def setup_class(self):
         """Remove default route from LAN interface to force traffic through Wi-Fi during test. (Linux only)"""
         super().setup_class()
 
