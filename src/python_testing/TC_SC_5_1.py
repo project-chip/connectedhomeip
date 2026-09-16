@@ -321,7 +321,7 @@ class TC_SC_5_1(MatterBaseTest):
             self.skip_step("12b")
 
         # Step 12b: GroupTable (GroupNames not supported)
-        else:
+        elif not groupcast_enabled:
             self.skip_step("12a")
             self.step("12b")
             group_table = await self.read_single_attribute_check_success(
@@ -330,6 +330,9 @@ class TC_SC_5_1(MatterBaseTest):
             asserts.assert_equal(group_table[0].groupId, 0x0103, "GroupTable groupId mismatch")
             asserts.assert_equal(group_table[0].endpoints, [groups_endpoint], "GroupTable endpoints mismatch")
             asserts.assert_equal(group_table[0].groupName, "", "GroupTable groupName mismatch")
+        else:
+            self.skip_step("12a")
+            self.skip_step("12b")
 
         # Step 13: KeySetRemove
         self.step("13")

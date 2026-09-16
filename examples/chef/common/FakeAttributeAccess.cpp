@@ -476,7 +476,8 @@ public:
         case RadonConcentrationMeasurement::Id:
         case TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
         case OzoneConcentrationMeasurement::Id:
-        case FormaldehydeConcentrationMeasurement::Id: {
+        case FormaldehydeConcentrationMeasurement::Id:
+        case SmokeConcentrationMeasurement::Id: {
             auto & registry                           = CodegenDataModelProvider::Instance().Registry();
             ServerClusterInterface * clusterInterface = registry.Get(ConcreteClusterPath(path.mEndpointId, path.mClusterId));
             if (clusterInterface == nullptr)
