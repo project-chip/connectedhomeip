@@ -825,13 +825,13 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     // If VideoStreamID was in the request, it should be in the response
     if (req.videoStreamID.HasValue())
     {
-        resp.videoStreamID.SetValue(outSession.videoStreamID);
+        resp.videoStreamID = outSession.videoStreamID;
     }
 
     // If AudioStreamID was in the request, it should be in the response
     if (req.audioStreamID.HasValue())
     {
-        resp.audioStreamID.SetValue(outSession.audioStreamID);
+        resp.audioStreamID = outSession.audioStreamID;
     }
 
     ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::SolicitOffer::Id);
@@ -855,21 +855,6 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     Delegate::ProvideOfferRequestArgs args;
 
     // ===== Validate all conformance and constraint checks (data model validation) =====
-
-    // Validate the streamUsage field against the allowed enum values.
-    if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
-    {
-        ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
-        return Status::ConstraintError;
-    }
-
-    // At least one of Video Stream ID, Audio Stream ID, AudioStreamID or VideoStreams has to be present
-    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue() && !req.videoStreams.HasValue() &&
-        !req.audioStreams.HasValue())
-    {
-        ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID, AudioStreamID, VideoStreams, AudioStreams must be present");
-        return Status::InvalidCommand;
-    }
 
     if (req.SFrameConfig.HasValue())
     {
@@ -922,6 +907,15 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             return Status::NotFound;
         }
 
+        // StreamUsage is optional when the Session ID is null, if present, validate against the allowed enum values.
+        if (req.streamUsage.HasValue())
+        {
+            if (req.streamUsage.Value() == StreamUsageEnum::kUnknownEnumValue)
+            {
+                ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage.Value()));
+                return Status::ConstraintError;
+            }
+        }
         // Use the existing session for further processing (re-offer case).
         outSession = *existingSession;
 
@@ -930,41 +924,64 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 
         // For re-offers, populate videoStreams/audioStreams from the deprecated fields if provided.
         // This allows the re-offer to keep or change the stream assignments.
-        if (req.videoStreamID.HasValue())
+        // Validate deprecated VideoStreamID field
+        Status status = ValidateStreamID("HandleSolicitOffer", req.videoStreamID, videoStreams, StreamType::kVideo);
+        if (status != Status::Success)
         {
-            std::vector<uint16_t> streams;
-            if (!req.videoStreamID.Value().IsNull())
-            {
-                streams.push_back(req.videoStreamID.Value().Value());
-            }
-            videoStreams.SetValue(std::move(streams));
+            return status;
         }
 
-        if (req.audioStreamID.HasValue())
+        // Validate deprecated AudioStreamID field
+        status = ValidateStreamID("HandleSolicitOffer", req.audioStreamID, audioStreams, StreamType::kAudio);
+        if (status != Status::Success)
         {
-            std::vector<uint16_t> streams;
-            if (!req.audioStreamID.Value().IsNull())
-            {
-                streams.push_back(req.audioStreamID.Value().Value());
-            }
-            audioStreams.SetValue(std::move(streams));
+            return status;
+        }
+
+        // For re-offers, if we have stream lists, use these
+        // Validate VideoStreams array if present
+        status = ValidateStreams("HandleProvideOffer", req.videoStreams, videoStreams, StreamType::kVideo);
+        if (status != Status::Success)
+        {
+            return status;
+        }
+
+        // Validate AudioStreams array if present
+        status = ValidateStreams("HandleProvideOffer", req.audioStreams, audioStreams, StreamType::kAudio);
+        if (status != Status::Success)
+        {
+            return status;
         }
     }
     else
     {
         // WebRTCSessionID is null - new session request
 
+        // StreamUsage is mandatory when the Session ID is null
+        if (!req.streamUsage.HasValue())
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Missing mandated streamUsage.");
+            return Status::InvalidCommand;
+        }
+
+        if (req.streamUsage.Value() == StreamUsageEnum::kUnknownEnumValue)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage.Value()));
+            return Status::ConstraintError;
+        }
+
         // Check privacy modes (per spec: only for new sessions)
-        Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage);
+        Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage.Value());
         if (status != Status::Success)
         {
             return status;
         }
 
         // Validate that the StreamUsage is in the StreamUsagePriorities list
-        if (mDelegate.IsStreamUsageSupported(req.streamUsage) != CHIP_NO_ERROR)
+        if (mDelegate.IsStreamUsageSupported(req.streamUsage.Value()) != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities", to_underlying(req.streamUsage));
+            ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities",
+                         to_underlying(req.streamUsage.Value()));
             return Status::DynamicConstraintError;
         }
 
@@ -1018,7 +1035,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 
         // If not able to meet the Resource Management and Stream Priorities conditions or unable to provide another WebRTC session:
         // Respond with a response status of RESOURCE_EXHAUSTED
-        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreams, audioStreams);
+        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage.Value(), videoStreams, audioStreams);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Cannot provide stream usage requested");
@@ -1061,13 +1078,13 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         args.sessionId = sessionId;
     }
 
-    args.streamUsage           = req.streamUsage;
+    args.streamUsage           = req.streamUsage.ValueOr(outSession.streamUsage);
     args.videoStreams          = videoStreams;
     args.audioStreams          = audioStreams;
     args.peerNodeId            = peerNodeId;
     args.fabricIndex           = peerFabricIndex;
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
-    args.originatingEndpointId = req.originatingEndpointID;
+    args.originatingEndpointId = req.originatingEndpointID.ValueOr(outSession.peerEndpointID);
 
     if (req.SFrameConfig.HasValue())
     {
@@ -1117,13 +1134,13 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     // Set VideoStreamID only if present in the original request.
     if (req.videoStreamID.HasValue())
     {
-        resp.videoStreamID.SetValue(outSession.videoStreamID);
+        resp.videoStreamID = outSession.videoStreamID;
     }
 
     // Set AudioStreamID only if present in the original request.
     if (req.audioStreamID.HasValue())
     {
-        resp.audioStreamID.SetValue(outSession.audioStreamID);
+        resp.audioStreamID = outSession.audioStreamID;
     }
 
     ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::ProvideOffer::Id);

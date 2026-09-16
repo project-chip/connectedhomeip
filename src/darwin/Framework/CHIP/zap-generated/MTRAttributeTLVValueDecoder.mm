@@ -22464,15 +22464,23 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
                 newElement_0.peerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.peerNodeID];
                 newElement_0.peerEndpointID = [NSNumber numberWithUnsignedShort:entry_0.peerEndpointID];
                 newElement_0.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.streamUsage)];
-                if (entry_0.videoStreamID.IsNull()) {
+                if (entry_0.videoStreamID.HasValue()) {
+                    if (entry_0.videoStreamID.Value().IsNull()) {
+                        newElement_0.videoStreamID = nil;
+                    } else {
+                        newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value().Value()];
+                    }
+                } else {
                     newElement_0.videoStreamID = nil;
-                } else {
-                    newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value()];
                 }
-                if (entry_0.audioStreamID.IsNull()) {
-                    newElement_0.audioStreamID = nil;
+                if (entry_0.audioStreamID.HasValue()) {
+                    if (entry_0.audioStreamID.Value().IsNull()) {
+                        newElement_0.audioStreamID = nil;
+                    } else {
+                        newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value().Value()];
+                    }
                 } else {
-                    newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
+                    newElement_0.audioStreamID = nil;
                 }
                 newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
                 if (entry_0.videoStreams.HasValue()) {
@@ -22515,7 +22523,71 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
                 } else {
                     newElement_0.audioStreams = nil;
                 }
+                if (entry_0.SFrameConfig.HasValue()) {
+                    if (entry_0.SFrameConfig.Value().IsNull()) {
+                        newElement_0.sFrameConfig = nil;
+                    } else {
+                        newElement_0.sFrameConfig = [MTRWebRTCTransportProviderClusterSFrameStruct new];
+                        newElement_0.sFrameConfig.audioCipherSuite = [NSNumber numberWithUnsignedShort:entry_0.SFrameConfig.Value().Value().audioCipherSuite];
+                        newElement_0.sFrameConfig.videoCipherSuite = [NSNumber numberWithUnsignedShort:entry_0.SFrameConfig.Value().Value().videoCipherSuite];
+                        newElement_0.sFrameConfig.senderKey = [MTRWebRTCTransportProviderClusterSFrameKeyStruct new];
+                        newElement_0.sFrameConfig.senderKey.kid = AsData(entry_0.SFrameConfig.Value().Value().senderKey.kid);
+                        newElement_0.sFrameConfig.senderKey.baseKey = AsData(entry_0.SFrameConfig.Value().Value().senderKey.baseKey);
+                        { // Scope for our temporary variables
+                            auto * array_5 = [NSMutableArray new];
+                            auto iter_5 = entry_0.SFrameConfig.Value().Value().receiveKeys.begin();
+                            while (iter_5.Next()) {
+                                auto & entry_5 = iter_5.GetValue();
+                                MTRWebRTCTransportProviderClusterSFrameKeyStruct * newElement_5;
+                                newElement_5 = [MTRWebRTCTransportProviderClusterSFrameKeyStruct new];
+                                newElement_5.kid = AsData(entry_5.kid);
+                                newElement_5.baseKey = AsData(entry_5.baseKey);
+                                [array_5 addObject:newElement_5];
+                            }
+                            CHIP_ERROR err = iter_5.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_0.sFrameConfig.receiveKeys = array_5;
+                        }
+                        newElement_0.sFrameConfig.ratchetBits = [NSNumber numberWithUnsignedChar:entry_0.SFrameConfig.Value().Value().ratchetBits];
+                        if (entry_0.SFrameConfig.Value().Value().ratchetTime.HasValue()) {
+                            newElement_0.sFrameConfig.ratchetTime = [NSNumber numberWithUnsignedChar:entry_0.SFrameConfig.Value().Value().ratchetTime.Value()];
+                        } else {
+                            newElement_0.sFrameConfig.ratchetTime = nil;
+                        }
+                    }
+                } else {
+                    newElement_0.sFrameConfig = nil;
+                }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::SupportedSFrameCipherSuites::Id: {
+        using TypeInfo = Attributes::SupportedSFrameCipherSuites::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -22559,15 +22631,23 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
                 newElement_0.peerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.peerNodeID];
                 newElement_0.peerEndpointID = [NSNumber numberWithUnsignedShort:entry_0.peerEndpointID];
                 newElement_0.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.streamUsage)];
-                if (entry_0.videoStreamID.IsNull()) {
+                if (entry_0.videoStreamID.HasValue()) {
+                    if (entry_0.videoStreamID.Value().IsNull()) {
+                        newElement_0.videoStreamID = nil;
+                    } else {
+                        newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value().Value()];
+                    }
+                } else {
                     newElement_0.videoStreamID = nil;
-                } else {
-                    newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value()];
                 }
-                if (entry_0.audioStreamID.IsNull()) {
-                    newElement_0.audioStreamID = nil;
+                if (entry_0.audioStreamID.HasValue()) {
+                    if (entry_0.audioStreamID.Value().IsNull()) {
+                        newElement_0.audioStreamID = nil;
+                    } else {
+                        newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value().Value()];
+                    }
                 } else {
-                    newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
+                    newElement_0.audioStreamID = nil;
                 }
                 newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
                 if (entry_0.videoStreams.HasValue()) {
@@ -22609,6 +22689,44 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
                     }
                 } else {
                     newElement_0.audioStreams = nil;
+                }
+                if (entry_0.SFrameConfig.HasValue()) {
+                    if (entry_0.SFrameConfig.Value().IsNull()) {
+                        newElement_0.sFrameConfig = nil;
+                    } else {
+                        newElement_0.sFrameConfig = [MTRWebRTCTransportRequestorClusterSFrameStruct new];
+                        newElement_0.sFrameConfig.audioCipherSuite = [NSNumber numberWithUnsignedShort:entry_0.SFrameConfig.Value().Value().audioCipherSuite];
+                        newElement_0.sFrameConfig.videoCipherSuite = [NSNumber numberWithUnsignedShort:entry_0.SFrameConfig.Value().Value().videoCipherSuite];
+                        newElement_0.sFrameConfig.senderKey = [MTRWebRTCTransportRequestorClusterSFrameKeyStruct new];
+                        newElement_0.sFrameConfig.senderKey.kid = AsData(entry_0.SFrameConfig.Value().Value().senderKey.kid);
+                        newElement_0.sFrameConfig.senderKey.baseKey = AsData(entry_0.SFrameConfig.Value().Value().senderKey.baseKey);
+                        { // Scope for our temporary variables
+                            auto * array_5 = [NSMutableArray new];
+                            auto iter_5 = entry_0.SFrameConfig.Value().Value().receiveKeys.begin();
+                            while (iter_5.Next()) {
+                                auto & entry_5 = iter_5.GetValue();
+                                MTRWebRTCTransportRequestorClusterSFrameKeyStruct * newElement_5;
+                                newElement_5 = [MTRWebRTCTransportRequestorClusterSFrameKeyStruct new];
+                                newElement_5.kid = AsData(entry_5.kid);
+                                newElement_5.baseKey = AsData(entry_5.baseKey);
+                                [array_5 addObject:newElement_5];
+                            }
+                            CHIP_ERROR err = iter_5.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_0.sFrameConfig.receiveKeys = array_5;
+                        }
+                        newElement_0.sFrameConfig.ratchetBits = [NSNumber numberWithUnsignedChar:entry_0.SFrameConfig.Value().Value().ratchetBits];
+                        if (entry_0.SFrameConfig.Value().Value().ratchetTime.HasValue()) {
+                            newElement_0.sFrameConfig.ratchetTime = [NSNumber numberWithUnsignedChar:entry_0.SFrameConfig.Value().Value().ratchetTime.Value()];
+                        } else {
+                            newElement_0.sFrameConfig.ratchetTime = nil;
+                        }
+                    }
+                } else {
+                    newElement_0.sFrameConfig = nil;
                 }
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];

@@ -261,8 +261,8 @@ class WebRTCTransportProviderCluster(
   suspend fun provideOffer(
     webRTCSessionID: UShort?,
     sdp: String,
-    streamUsage: UByte,
-    originatingEndpointID: UShort,
+    streamUsage: UByte?,
+    originatingEndpointID: UShort?,
     videoStreamID: UShort?,
     audioStreamID: UShort?,
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
@@ -287,10 +287,12 @@ class WebRTCTransportProviderCluster(
     tlvWriter.put(ContextSpecificTag(TAG_SDP_REQ), sdp)
 
     val TAG_STREAM_USAGE_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
+    streamUsage?.let { tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage) }
 
     val TAG_ORIGINATING_ENDPOINT_ID_REQ: Int = 3
-    tlvWriter.put(ContextSpecificTag(TAG_ORIGINATING_ENDPOINT_ID_REQ), originatingEndpointID)
+    originatingEndpointID?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_ORIGINATING_ENDPOINT_ID_REQ), originatingEndpointID)
+    }
 
     val TAG_VIDEO_STREAM_ID_REQ: Int = 4
     videoStreamID?.let { tlvWriter.put(ContextSpecificTag(TAG_VIDEO_STREAM_ID_REQ), videoStreamID) }

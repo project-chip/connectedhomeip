@@ -196,6 +196,51 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeAttributionData
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contextInformation = @(0);
+
+        _sourceContext = nil;
+
+        _nodeID = nil;
+
+        _groupID = nil;
+
+        _systemTimeStamp = nil;
+
+        _epochTimeStamp = nil;
+
+        _fabricIndex = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeAttributionData alloc] init];
+
+    other.contextInformation = self.contextInformation;
+    other.sourceContext = self.sourceContext;
+    other.nodeID = self.nodeID;
+    other.groupID = self.groupID;
+    other.systemTimeStamp = self.systemTimeStamp;
+    other.epochTimeStamp = self.epochTimeStamp;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contextInformation:%@; sourceContext:%@; nodeID:%@; groupID:%@; systemTimeStamp:%@; epochTimeStamp:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contextInformation, _sourceContext, _nodeID, _groupID, _systemTimeStamp, _epochTimeStamp, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeICECandidateStruct
 - (instancetype)init
 {
@@ -367,6 +412,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeSuppliedAttributionData
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contextInformation = @(0);
+
+        _sourceContext = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeSuppliedAttributionData alloc] init];
+
+    other.contextInformation = self.contextInformation;
+    other.sourceContext = self.sourceContext;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contextInformation:%@; sourceContext:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contextInformation, _sourceContext, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeTestGlobalStruct
 - (instancetype)init
 {
@@ -459,6 +537,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _audioStreams = nil;
 
+        _sFrameConfig = nil;
+
         _fabricIndex = @(0);
     }
     return self;
@@ -477,6 +557,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.metadataEnabled = self.metadataEnabled;
     other.videoStreams = self.videoStreams;
     other.audioStreams = self.audioStreams;
+    other.sFrameConfig = self.sFrameConfig;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -484,7 +565,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataEnabled:%@; videoStreams:%@; audioStreams:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataEnabled, _videoStreams, _audioStreams, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataEnabled:%@; videoStreams:%@; audioStreams:%@; sFrameConfig:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataEnabled, _videoStreams, _audioStreams, _sFrameConfig, _fabricIndex];
     return descriptionString;
 }
 
@@ -12561,16 +12642,52 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRWebRTCTransportProviderClusterSFrameKeyStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _kid = [NSData data];
+
+        _baseKey = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportProviderClusterSFrameKeyStruct alloc] init];
+
+    other.kid = self.kid;
+    other.baseKey = self.baseKey;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: kid:%@; baseKey:%@; >", NSStringFromClass([self class]), [_kid base64EncodedStringWithOptions:0], [_baseKey base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRWebRTCTransportProviderClusterSFrameStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _cipherSuite = @(0);
+        _audioCipherSuite = @(0);
 
-        _baseKey = [NSData data];
+        _videoCipherSuite = @(0);
 
-        _kid = [NSData data];
+        _senderKey = [MTRWebRTCTransportProviderClusterSFrameKeyStruct new];
+
+        _receiveKeys = [NSArray array];
+
+        _ratchetBits = @(0);
+
+        _ratchetTime = nil;
     }
     return self;
 }
@@ -12579,16 +12696,91 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRWebRTCTransportProviderClusterSFrameStruct alloc] init];
 
-    other.cipherSuite = self.cipherSuite;
-    other.baseKey = self.baseKey;
-    other.kid = self.kid;
+    other.audioCipherSuite = self.audioCipherSuite;
+    other.videoCipherSuite = self.videoCipherSuite;
+    other.senderKey = self.senderKey;
+    other.receiveKeys = self.receiveKeys;
+    other.ratchetBits = self.ratchetBits;
+    other.ratchetTime = self.ratchetTime;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cipherSuite:%@; baseKey:%@; kid:%@; >", NSStringFromClass([self class]), _cipherSuite, [_baseKey base64EncodedStringWithOptions:0], [_kid base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: audioCipherSuite:%@; videoCipherSuite:%@; senderKey:%@; receiveKeys:%@; ratchetBits:%@; ratchetTime:%@; >", NSStringFromClass([self class]), _audioCipherSuite, _videoCipherSuite, _senderKey, _receiveKeys, _ratchetBits, _ratchetTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterSFrameKeyStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _kid = [NSData data];
+
+        _baseKey = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterSFrameKeyStruct alloc] init];
+
+    other.kid = self.kid;
+    other.baseKey = self.baseKey;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: kid:%@; baseKey:%@; >", NSStringFromClass([self class]), [_kid base64EncodedStringWithOptions:0], [_baseKey base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportRequestorClusterSFrameStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _audioCipherSuite = @(0);
+
+        _videoCipherSuite = @(0);
+
+        _senderKey = [MTRWebRTCTransportRequestorClusterSFrameKeyStruct new];
+
+        _receiveKeys = [NSArray array];
+
+        _ratchetBits = @(0);
+
+        _ratchetTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWebRTCTransportRequestorClusterSFrameStruct alloc] init];
+
+    other.audioCipherSuite = self.audioCipherSuite;
+    other.videoCipherSuite = self.videoCipherSuite;
+    other.senderKey = self.senderKey;
+    other.receiveKeys = self.receiveKeys;
+    other.ratchetBits = self.ratchetBits;
+    other.ratchetTime = self.ratchetTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: audioCipherSuite:%@; videoCipherSuite:%@; senderKey:%@; receiveKeys:%@; ratchetBits:%@; ratchetTime:%@; >", NSStringFromClass([self class]), _audioCipherSuite, _videoCipherSuite, _senderKey, _receiveKeys, _ratchetBits, _ratchetTime];
     return descriptionString;
 }
 
