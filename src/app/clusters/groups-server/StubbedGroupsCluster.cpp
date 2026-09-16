@@ -78,11 +78,8 @@ DataModel::ActionReturnStatus StubbedGroupsCluster::ReadAttribute(const DataMode
 
     switch (request.path.mAttributeId)
     {
-    case ClusterRevision::Id: {
-        // TODO : (#73746) Remove this, only use kRevision (from metadata) when datamodel is updated with the new revision.
-        constexpr uint16_t enforcedRev = kRevision < 5 ? 5 : kRevision;
-        return encoder.Encode(enforcedRev);
-    }
+    case ClusterRevision::Id:
+        return encoder.Encode(kRevision);
     case FeatureMap::Id:
         // Group names is hardcoded (feature is M conformance in the spec)
         return encoder.Encode(Feature::kGroupNames);
