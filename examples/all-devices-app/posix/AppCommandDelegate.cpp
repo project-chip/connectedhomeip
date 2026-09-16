@@ -18,12 +18,14 @@
 #include "include/AppCommandDelegate.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app_options/DeviceTypeParser.h>
 #include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -38,6 +40,130 @@ struct CommandContext
     EndpointId endpointId;
     AllDevicesAppCommandDelegate * delegate;
     AllDevicesAppNamedPipeCommandHandler * handler;
+};
+
+/**
+ * Named pipe usage:
+ *   echo '{"Name":"ManageDevice","EndpointId":1234,"Command":"CreateAndRegister","device":"sensor:2,parent=1"}'> /tmp/acs_fifo
+ *   echo '{"Name":"ManageDevice","EndpointId":10,"Command":"UnregisterAndDestroy","deviceId":0}'> /tmp/acs_fifo
+ *
+ * Supported subcommands are CreateAndRegister and UnregisterAndDestroy.
+ *
+ * CreateAndRegister
+ *  - For this command, the "EndpointId" will be ignored.
+ *  - The parameter "device" will be parsed like the command line argument "--device".
+ *
+ * UnregisterAndDestroy
+ *  - For this command, the "EndpointId" and "deviceId" will be used to find the correct device.
+ */
+class ManageDeviceCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "ManageDevice"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        if (!json.isMember("Command") || !json["Command"].isString())
+        {
+            ChipLogError(AppServer, "Invalid ManageDevice command: missing 'Command' field");
+            return;
+        }
+
+        const auto command = json["Command"].asString();
+
+        auto * deviceManager = delegate->GetDeviceManager();
+        if (deviceManager == nullptr)
+        {
+            ChipLogError(AppServer, "ManageDevice is unavailable");
+            return;
+        }
+
+        if (command == "CreateAndRegister")
+        {
+            if (!json.isMember("device") || !json["device"].isString())
+            {
+                ChipLogError(AppServer, "Invalid CreateAndRegister command: missing 'device' field");
+                return;
+            }
+
+            DeviceTypeParser temporaryDeviceTypeParser;
+            if (temporaryDeviceTypeParser.ParseSingleDeviceString(json["device"].asCString()) != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Invalid CreateAndRegister command: invalid 'device' value");
+                return;
+            }
+
+            std::vector<std::string> supportedDeviceTypes;
+            for (const auto & deviceType : DeviceFactory::GetInstance().SupportedDeviceTypes())
+            {
+                if (deviceType != "aggregator" && deviceType != "bridged-node")
+                {
+                    supportedDeviceTypes.push_back(deviceType);
+                }
+            }
+            temporaryDeviceTypeParser.ExpandWildcards(supportedDeviceTypes);
+
+            auto & deviceTypeParser = DeviceTypeParser::GetInstance();
+            const auto & permanentDeviceTypeEntries = deviceTypeParser.GetDeviceTypeEntries();
+            const auto & temporaryDeviceTypeEntries = temporaryDeviceTypeParser.GetDeviceTypeEntries();
+            std::vector<DeviceTypeParser::Entry> combinedDeviceTypeEntries;
+            combinedDeviceTypeEntries.reserve(permanentDeviceTypeEntries.size() + temporaryDeviceTypeEntries.size());
+            combinedDeviceTypeEntries.insert(combinedDeviceTypeEntries.end(), permanentDeviceTypeEntries.begin(),
+                                              permanentDeviceTypeEntries.end());
+            combinedDeviceTypeEntries.insert(combinedDeviceTypeEntries.end(), temporaryDeviceTypeEntries.begin(),
+                                              temporaryDeviceTypeEntries.end());
+            if (DeviceTypeParser::ValidateConfig(combinedDeviceTypeEntries) != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Invalid CreateAndRegister command: invalid device configuration");
+                return;
+            }
+
+            for (const auto & deviceEntry : temporaryDeviceTypeEntries)
+            {
+                deviceTypeParser.AddDeviceTypeEntry(deviceEntry);
+            }
+            auto * endpointIdAllocator = deviceManager->GetEndpointIdAllocator();
+            if (endpointIdAllocator == nullptr)
+            {
+                ChipLogError(AppServer, "CreateAndRegister is unavailable");
+                return;
+            }
+
+            for (const auto & deviceEntry : temporaryDeviceTypeEntries)
+            {
+                if (deviceEntry.endpoint != chip::kInvalidEndpointId)
+                {
+                    static_cast<DynamicEndpointIdAllocator *>(endpointIdAllocator)->ForceNext(deviceEntry.endpoint);
+                }
+                auto deviceId = deviceManager->CreateAndRegisterDevice(
+                    deviceEntry.type, *endpointIdAllocator, deviceEntry.label, EndpointComposition::WithParent(deviceEntry.parentId));
+                if (!deviceId.has_value())
+                {
+                    ChipLogError(AppServer, "CreateAndRegister failed for device '%s'", deviceEntry.type.c_str());
+                    return;
+                }
+                ChipLogProgress(AppServer, "CreateAndRegister device '%s' with id %u on endpoint %u with parent 0x%04X",
+                                deviceEntry.type.c_str(), deviceId.value().value, deviceEntry.endpoint, deviceEntry.parentId);
+            }
+            return;
+        }
+        if (command == "UnregisterAndDestroy")
+        {
+            if (!json.isMember("deviceId") || !json["deviceId"].isUInt() || json["deviceId"].asUInt() > UINT16_MAX)
+            {
+                ChipLogError(AppServer, "Invalid UnregisterAndDestroy command: missing or invalid 'deviceId' field");
+                return;
+            }
+
+            DeviceManager::DeviceId deviceId(static_cast<uint16_t>(json["deviceId"].asUInt()));
+            deviceManager->UnregisterAndDestroyDevice(deviceId);
+            ChipLogProgress(AppServer, "UnregisterAndDestroy device ID %u", deviceId.value);
+            return;
+        }
+
+        // more subcommands can be added
+
+        ChipLogError(AppServer, "Invalid ManageDevice command: unknown action '%s'", command.c_str());
+    }
 };
 
 class IncreaseConfigurationVersionCommandHandler : public AllDevicesAppNamedPipeCommandHandler
@@ -708,6 +834,7 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandler(std::unique_ptr<AllDev
 
 void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
 {
+    RegisterCommandHandler(std::make_unique<ManageDeviceCommandHandler>());
     RegisterCommandHandler(std::make_unique<IncreaseConfigurationVersionCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOccupancyCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetHoldTimeCommandHandler>());

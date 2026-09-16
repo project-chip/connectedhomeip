@@ -26,7 +26,7 @@ enabled_devices_buildconfig_header("enabled_devices_buildconfig") {
 }
 
 source_set("device-factory") {
-  sources = [ "DeviceFactory.h" ]
+  sources = [ "DeviceFactory.h", "DeviceManager.h" ]
 
   public_deps = [
     ":enabled_devices_buildconfig",

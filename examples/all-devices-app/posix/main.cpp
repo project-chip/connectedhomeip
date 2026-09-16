@@ -43,6 +43,7 @@
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
 #include <device-factory/DeviceFactory.h>
+#include <device-factory/DeviceManager.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
@@ -168,7 +169,7 @@ public:
                 features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::GetConfig().enableWiFi);
 #endif
                 return features;
-            }())
+            }()), mDeviceManager(DeviceFactory::GetInstance(), mDataModelProvider)
     {}
 
     std::set<EndpointId> GetReservedEndpointIds() const
@@ -190,30 +191,35 @@ public:
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
-        DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
-        endpointIdAllocator.ForceNext(kRootEndpointId);
-        ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
+        mEndpointIdAllocator.emplace(GetReservedEndpointIds());
+        mDeviceManager.SetEndpointIdAllocator(&mEndpointIdAllocator.value());
+        mEndpointIdAllocator->ForceNext(kRootEndpointId);
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(mEndpointIdAllocator.value(), mDataModelProvider));
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
-            auto device = DeviceFactory::GetInstance().Create(entry.type, entry.label);
-
-            VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
-            ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
-                            entry.endpoint, entry.parentId);
             if (entry.endpoint != kInvalidEndpointId)
             {
-                endpointIdAllocator.ForceNext(entry.endpoint);
+                mEndpointIdAllocator->ForceNext(entry.endpoint);
             }
-            ReturnErrorOnFailure(
-                device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
-            auto oobAccessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, *device);
+            ChipLogProgress(AppServer, "Creating and registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(), entry.endpoint,
+                            entry.parentId);
+            auto deviceId = mDeviceManager.CreateAndRegisterDevice(entry.type, mEndpointIdAllocator.value(), entry.label,
+                                                                   EndpointComposition::WithParent(entry.parentId));
+            VerifyOrReturnError(deviceId.has_value(), CHIP_ERROR_INCORRECT_STATE);
+
+            auto deviceWithStateOptinoal = mDeviceManager.GetDevice(deviceId.value());
+
+            // This should always succeed. In case of failure this line should not be reached.
+            VerifyOrDie(deviceWithStateOptinoal.has_value());
+            VerifyOrDie(deviceWithStateOptinoal->isRegistered);
+
+            auto oobAccessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, deviceWithStateOptinoal->device);
             if (oobAccessor)
             {
                 OOBAccessorRegistry::Instance().Register(*oobAccessor);
                 mConstructedAccessors.push_back(std::move(oobAccessor));
             }
-            mConstructedDevices.push_back(std::move(device));
         }
 
         return CHIP_NO_ERROR;
@@ -222,11 +228,7 @@ public:
     void Shutdown()
     {
         mConstructedAccessors.clear();
-        for (auto & device : mConstructedDevices)
-        {
-            device->Unregister(mDataModelProvider);
-        }
-        mConstructedDevices.clear();
+        mDeviceManager.UnregisterAndDestroyAllDevices();
         mRootNode.RootDevice().Unregister(mDataModelProvider);
     }
 
@@ -234,7 +236,9 @@ public:
 
     AppRootNode & RootNode() { return mRootNode; }
 
-    const std::vector<std::unique_ptr<DeviceInterface>> & GetConstructedDevices() const { return mConstructedDevices; }
+    chip::app::DeviceManager & GetDeviceManager() { return mDeviceManager; }
+
+    std::vector<DeviceInterface*> GetConstructedDevices() const { return mDeviceManager.GetRegisteredDevices(); }
 
 private:
     Context mContext;
@@ -242,7 +246,8 @@ private:
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     AppRootNode mRootNode;
-    std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
+    chip::app::DeviceManager mDeviceManager;
+    std::optional<DynamicEndpointIdAllocator> mEndpointIdAllocator;
 
     std::vector<std::unique_ptr<chip::app::OOBAccessor>> mConstructedAccessors;
 };
@@ -262,7 +267,7 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
     for (size_t i = 0; i < deviceConfigs.size(); i++)
     {
         const auto & config = deviceConfigs[i];
-        auto * device       = constructedDevices[i].get();
+        auto * device       = constructedDevices[i];
 
         if (config.type == "occupancy-sensor")
         {
@@ -301,6 +306,7 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
     gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
         .RegisterClusterInstance<chip::app::Clusters::BasicInformationCluster>(
             &devices.RootNode().GetRootNode().BasicInformation());
+    gAllDevicesAppCommandDelegate.SetDeviceManager(&devices.GetDeviceManager());
     gAllDevicesAppCommandDelegate.RegisterCommandHandlers();
 
     CHIP_ERROR err = gNamedPipeCommands.Start(namedPipePath, &gAllDevicesAppCommandDelegate);

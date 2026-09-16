@@ -19,6 +19,7 @@
 
 #include "AllDevicesAppClusterImplementationRegistry.h"
 #include <NamedPipeCommands.h>
+#include <device-factory/DeviceManager.h>
 #include <app/util/basic-types.h>
 #include <json/json.h>
 #include <map>
@@ -34,6 +35,8 @@ public:
     void OnEventCommandReceived(const char * json) override;
 
     AllDevicesAppClusterImplementationRegistry & GetClusterImplementationRegistry() { return mRegistry; }
+    void SetDeviceManager(chip::app::DeviceManager * deviceManager) { mDeviceManager = deviceManager; }
+    chip::app::DeviceManager * GetDeviceManager() { return mDeviceManager; }
 
     void RegisterCommandHandler(std::unique_ptr<AllDevicesAppNamedPipeCommandHandler> handler);
     void RegisterCommandHandlers();
@@ -48,6 +51,6 @@ private:
     // when executing commands.
     //
     AllDevicesAppClusterImplementationRegistry mRegistry;
-
+    chip::app::DeviceManager * mDeviceManager = nullptr;
     std::map<std::string, std::unique_ptr<AllDevicesAppNamedPipeCommandHandler>> mCommandHandlers;
 };
