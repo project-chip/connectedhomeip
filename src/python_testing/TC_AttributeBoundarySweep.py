@@ -38,6 +38,7 @@ Example with the chip-all-clusters-app:
     ./scripts/tests/run_python_test.py --factory-reset --app out/linux-x64-all-clusters/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1" --script src/python_testing/TC_AttributeBoundarySweep.py --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values"
 """
 
+import copy
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
@@ -206,9 +207,10 @@ class AttributeBoundarySweep(IDMBaseTest):
 
     async def _probe_attribute(self, attr_info: WritableAttributeInfo) -> list[ProbeResult]:
         """Write every boundary value of one attribute, restoring state after each."""
-        constraints = attr_info.constraints
         # Bounds expressed as a reference to another attribute are resolved against the
         # live DUT; an unresolvable reference leaves that bound unset and it is skipped.
+        # The constraints object belongs to the shared spec XML, so resolve into a copy.
+        constraints = copy.copy(attr_info.constraints)
         if constraints.min_value_ref:
             constraints.min_value = await self.resolve_dynamic_constraint(
                 attr_info.cluster_class, attr_info.endpoint_id, constraints.min_value_ref)
