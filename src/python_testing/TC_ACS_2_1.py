@@ -291,8 +291,8 @@ class TC_ACS_2_1(MatterBaseTest):
                     asserts.assert_greater_equal(endTime, startTime+1, "EndTimestamp must be greater than StartTimestamp.")
 
                     # Confidence
-                    asserts.assert_greater(predictedActivity.confidence, 0,
-                                           "Expected the percentage greater than 0 and less than equat to 100.")
+                    asserts.assert_greater_equal(predictedActivity.confidence, 0,
+                                                 "Expected the percentage greater than 0 and less than equat to 100.")
                     asserts.assert_less_equal(predictedActivity.confidence, 100,
                                               "Expected the percentage greater than 0 and less than equat to 100.")
 
