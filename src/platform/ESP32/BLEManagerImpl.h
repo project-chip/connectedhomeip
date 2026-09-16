@@ -231,7 +231,6 @@ private:
         kAdvertisingRefreshNeeded = 0x0800, /**< The advertising configuration/state in ESP BLE layer needs to be updated. */
         kExtAdvertisingEnabled    = 0x1000, /**< The application has enabled Extended BLE announcement. */
         kBleDeinitAndMemReleased  = 0x2000, /**< The ble is deinitialized and memory is reclaimed. */
-        kNetworkHandoffPending    = 0x4000, /**< BLE is closing before starting the operational network. */
     };
 
     enum
@@ -286,7 +285,6 @@ private:
     CHIPoBLEServiceMode mServiceMode;
 #ifdef CONFIG_BT_BLUEDROID_ENABLED
     esp_gatt_if_t mAppIf;
-    uint16_t mNumGAPCons;
 #elif defined(CONFIG_BT_NIMBLE_ENABLED)
     uint16_t mNumGAPCons;
     std::vector<struct ble_gatt_svc_def> mGattSvcs;
@@ -301,7 +299,6 @@ private:
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
     CHIP_ERROR MapBLEError(int bleErr);
-    void CompleteNetworkHandoffIfReady();
 
     void DriveBLEState(void);
     CHIP_ERROR InitESPBleLayer(void);
