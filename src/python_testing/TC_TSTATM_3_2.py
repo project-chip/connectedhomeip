@@ -51,6 +51,7 @@ logger = logging.getLogger(__name__)
 
 
 class TC_TSTATM_3_2(MatterBaseTest):
+    disable_wildcard_subscription = True
 
     def desc_TC_TSTATM_3_2(self) -> str:
         return "[TC-TSTATM-3.2] Startup Mode functionality with DUT as Server"
