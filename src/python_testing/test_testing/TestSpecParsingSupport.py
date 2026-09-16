@@ -266,14 +266,36 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
 """
 
 # This file lives at <repo root>/src/python_testing/test_testing/, so the repository root is three
-# directories up. Derive it from __file__ rather than the working directory: only CI happens to run
-# these tests from the repository root.
+# directories up. spec_parsing loads data models from the zips packaged into matter.testing, which
+# do not exist in the source tree, so the checked-in copies are located from here instead. Derive
+# these from __file__ rather than the working directory: only CI happens to run these tests from
+# the repository root.
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
+_DATA_MODEL_DIR = _CHIP_ROOT / "data_model"
 _REVISIONS_HEADER = _CHIP_ROOT / "src" / "app" / "SpecificationDefinedRevisions.h"
 
 # Repo-relative names, so failure messages name the file to edit.
 _REVISIONS_HEADER_NAME = "src/app/SpecificationDefinedRevisions.h"
 _SPEC_PARSING_NAME = "src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py"
+
+# data_model/ holds one directory per specification version ("1.4", "1.6.1", ...) alongside files
+# such as README.md and errata_future.yaml. Requiring an all-numeric dotted name also skips
+# in-progress directories, which have historically been named things like "1.5_in_progress".
+_VERSION_DIR_PATTERN = re.compile(r"^\d+(?:\.\d+)*$")
+
+# Checked-in data models that the test infrastructure deliberately does not expose.
+# PrebuiltDataModelDirectory starts at 1.2, and nothing selects 1.0 or 1.1. This is not an escape
+# hatch for landing new XMLs ahead of the Python mappings: a newly added data_model directory
+# belongs in PrebuiltDataModelDirectory, not here.
+_UNSUPPORTED_DATA_MODEL_DIRNAMES: frozenset[str] = frozenset({"1.0", "1.1"})
+
+
+def _checked_in_data_model_dirnames() -> list[str]:
+    asserts.assert_true(_DATA_MODEL_DIR.is_dir(),
+                        f"Expected the checked-in data models at {_DATA_MODEL_DIR} - "
+                        "this test must run from a source checkout")
+    return [entry.name for entry in _DATA_MODEL_DIR.iterdir()
+            if entry.is_dir() and _VERSION_DIR_PATTERN.match(entry.name)]
 
 
 def _spec_version_from_dirname(dirname: str) -> int:
@@ -788,12 +810,14 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         # nothing else cross-checks. Missing any of them only surfaces when a test runs against a
         # DUT reporting the new version, so assert coverage of every member here instead.
         selectable = set(_SPEC_VERSION_TO_DM.values())
+        mapped_dirnames: set[str] = set()
         for data_model in PrebuiltDataModelDirectory:
             try:
                 dirname = data_model.dirname
             except KeyError:
                 asserts.fail(f"{data_model.name} has no dirname - update PrebuiltDataModelDirectory.dirname")
             asserts.assert_true(dirname, f"{data_model.name} has an empty dirname")
+            mapped_dirnames.add(dirname)
 
             asserts.assert_in(data_model, _DM_TO_DATA_MODEL_REVISION,
                               f"{data_model.name} has no DataModelRevision - add an entry to _DM_TO_DATA_MODEL_REVISION")
@@ -817,6 +841,36 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
                                  f"(data_model/{data_model.dirname}/), but that version encodes as "
                                  f"0x{derived_spec_version:08X} - fix the key in {_SPEC_PARSING_NAME}")
 
+        # Anchor the members above to the checked-in data models. Everything up to this point
+        # iterates PrebuiltDataModelDirectory, so none of it can fail for a specification version
+        # that was never added to the enum in the first place, and data_model/ is the only record of
+        # which versions exist that is independent of the mappings being checked.
+        checked_in_dirnames = _checked_in_data_model_dirnames()
+        asserts.assert_true(checked_in_dirnames, f"No specification version directories found in {_DATA_MODEL_DIR}")
+
+        # Encode every checked-in directory, including the unsupported ones, so that a name with no
+        # SpecificationVersion encoding is rejected when the directory lands rather than whenever it
+        # first reaches _SPEC_VERSION_TO_DM.
+        for dirname in checked_in_dirnames:
+            _spec_version_from_dirname(dirname)
+
+        stale = sorted(_UNSUPPORTED_DATA_MODEL_DIRNAMES - set(checked_in_dirnames))
+        asserts.assert_false(stale,
+                             f"_UNSUPPORTED_DATA_MODEL_DIRNAMES in this file lists {stale}, which is not checked in "
+                             "under data_model/ - remove the stale entries")
+
+        unmapped = sorted(set(checked_in_dirnames) - _UNSUPPORTED_DATA_MODEL_DIRNAMES - mapped_dirnames)
+        asserts.assert_false(unmapped,
+                             f"data_model/ contains {unmapped}, which no PrebuiltDataModelDirectory member names. Add a "
+                             f"member with a matching dirname in {_SPEC_PARSING_NAME}, together with its "
+                             "_DM_TO_DATA_MODEL_REVISION and _SPEC_VERSION_TO_DM entries, so that the coverage asserted "
+                             "above applies to it.")
+
+        absent = sorted(mapped_dirnames - set(checked_in_dirnames))
+        asserts.assert_false(absent,
+                             f"PrebuiltDataModelDirectory names {absent}, which is not checked in under data_model/ - "
+                             f"correct the dirname in {_SPEC_PARSING_NAME}")
+
     def test_data_model_revision_from_dm(self):
         asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_3), 17,
                              "Incorrect DataModelRevision for 1.3")
@@ -830,10 +884,6 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         # kSpecificationVersion was updated every time, because nothing tied the two constants
         # together (fixed in PR #72874). TC_BINFO_2_1 now catches this against a running device;
         # checking it here as well reports it in milliseconds instead of after an app build.
-        #
-        # This deliberately says nothing about whether kSpecificationVersion is the newest
-        # specification the SDK has data models for. Checking that would only trade one
-        # easy-to-forget step for another, and falling behind is caught at the test events anyway.
         header_spec_version = _header_constant("kSpecificationVersion")
         asserts.assert_in(header_spec_version, _SPEC_VERSION_TO_DM,
                           f"{_REVISIONS_HEADER_NAME} sets kSpecificationVersion = 0x{header_spec_version:08X}, which is not a "
