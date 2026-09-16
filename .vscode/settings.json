@@ -207,5 +207,6 @@
     },
     "files.exclude": {
         "**/examples/**/third_party/connectedhomeip/**": true
-    }
+    },
+    "cmake.sourceDirectory": "/home/worker/connectedhomeip/src"
 }

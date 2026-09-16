@@ -43,7 +43,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 
+#include "wbs/WbsAdvertising.h"
 #include "wbs/WbsConnection.h"
+#include "wbs/WbsGattServer.h"
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 #include <platform/DeviceControlServer.h>
@@ -104,9 +106,11 @@ void BLEManagerImpl::_Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
 
     mDeviceScanner.Shutdown();
-    // Release BLE connection resources
-    // ShutdownWbsLayer(mEndpoint);
-    mFlags.Clear(Flags::kWBSManagerInitialized);
+    mAdvertising.Stop();
+    mGattServer.Shutdown();
+    mConnection.ShutdownWbsLayer(mEndpoint);
+    mEndpoint = nullptr;
+    mFlags.Clear(Flags::kWBSManagerInitialized).Clear(Flags::kWBSBLELayerInitialized);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -179,8 +183,9 @@ exit:
 
 uint16_t BLEManagerImpl::_NumConnections()
 {
-    uint16_t numCons = 0;
-    return numCons;
+    return (mEndpoint != nullptr && mEndpoint->mConnectionMap != nullptr)
+        ? static_cast<uint16_t>(g_hash_table_size(mEndpoint->mConnectionMap))
+        : 0;
 }
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
@@ -196,14 +201,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     {
     case DeviceEventType::kCHIPoBLESubscribe:
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
-        {
-            ChipDeviceEvent connectionEvent{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
-            PlatformMgr().PostEventOrDie(&connectionEvent);
-        }
+        NotifyCHIPoBLEConnectionEstablished();
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
+        NotifyCHIPoBLEConnectionClosed();
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
@@ -258,7 +261,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             mFlags.Clear(Flags::kWBSBLELayerInitialized);
             mFlags.Clear(Flags::kAdvertisingConfigured);
             mFlags.Clear(Flags::kAppRegistered);
-            mFlags.Clear(Flags::kAdvertising);
+            ClearAdvertisingFlag();
             CleanScanConfig();
             // Indicate that the adapter is no longer available
             err = BLE_ERROR_ADAPTER_UNAVAILABLE;
@@ -305,21 +308,18 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this));
         }
         mFlags.Set(Flags::kAdvertising);
+        NotifyCHIPoBLEAdvertisingChange(kActivity_Started);
         break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralAdvStopComplete:
         SuccessOrExit(err = apEvent->Platform.BLEPeripheralAdvStopComplete.mError);
         mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         // Transition to the not Advertising state...
-        if (mFlags.Has(Flags::kAdvertising))
-        {
-            mFlags.Clear(Flags::kAdvertising);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-        }
+        ClearAdvertisingFlag();
         break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralAdvReleased:
         // If the advertising was stopped due to a premature release, check if it needs to be restarted.
-        mFlags.Clear(Flags::kAdvertising);
+        ClearAdvertisingFlag();
         DriveBLEState();
         break;
     case DeviceEventType::kPlatformWebOSBLEPeripheralRegisterAppComplete:
@@ -528,6 +528,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
     PlatformMgr().PostEventOrDie(&event);
 }
 
+// TODO: no caller wires this in on webOS yet - it's meant to fire once a server-role indication
+// push (see the planned WbsGattServer::SendIndication in WbsGattServer.cpp) completes.
 void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
 {
     // Post an event to the Chip queue to process the indicate confirmation.
@@ -570,6 +572,40 @@ void BLEManagerImpl::DriveBLEState()
         }
     }
 
+    // Register the CHIPoBLE GATT service (gatt/openServer + gatt/addService) with the WBS layer
+    // if needed. This exposes the RX/TX characteristics so a remote commissioner can discover
+    // them once we start advertising below.
+
+    if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
+    {
+        SuccessOrExit(err = mGattServer.Init());
+        mFlags.Set(Flags::kAppRegistered);
+    }
+
+    // If the application has enabled CHIPoBLE and BLE advertising...
+    if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
+    {
+        if (!mFlags.Has(Flags::kAdvertising))
+        {
+            // Start advertising. This is an asynchronous step; BLE manager will be notified of
+            // advertising start completion via a call to NotifyBLEPeripheralAdvStartComplete.
+            SuccessOrExit(err = mAdvertising.Start());
+            mFlags.Set(Flags::kControlOpInProgress);
+            ExitNow();
+        }
+        mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
+    }
+    // Otherwise stop advertising if needed...
+    else
+    {
+        if (mFlags.Has(Flags::kAdvertising))
+        {
+            SuccessOrExit(err = mAdvertising.Stop());
+            mFlags.Set(Flags::kControlOpInProgress);
+            ExitNow();
+        }
+    }
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -581,10 +617,7 @@ void BLEManagerImpl::DisableBLEService(CHIP_ERROR err)
 {
     ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-    // Stop all timers if the error is other than BLE adapter unavailable. In case of BLE adapter
-    // beeing unavailable, we will keep timers running, as the adapter might become available in
-    // the nearest future (e.g. WBS restart due to crash). By doing that we will ensure that BLE
-    // adapter reappearance will not extend timeouts for the ongoing operations.
+    // Stop all timers if the error is other than BLE adapter unavailable
     if (err != BLE_ERROR_ADAPTER_UNAVAILABLE)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
@@ -615,6 +648,32 @@ void BLEManagerImpl::CheckNonConcurrentBleClosing()
         DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
     }
 #endif
+}
+
+void BLEManagerImpl::ClearAdvertisingFlag()
+{
+    VerifyOrReturn(mFlags.Has(Flags::kAdvertising));
+    mFlags.Clear(Flags::kAdvertising);
+    NotifyCHIPoBLEAdvertisingChange(kActivity_Stopped);
+    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEConnectionEstablished()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEConnectionClosed()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEConnectionClosed };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEAdvertisingChange(enum ActivityChange change)
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEAdvertisingChange, .CHIPoBLEAdvertisingChange = { .Result = change } };
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 /*

@@ -29,8 +29,10 @@
 #include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
+#include "wbs/WbsAdvertising.h"
 #include "wbs/WbsConnection.h"
 #include "wbs/WbsDeviceScanner.h"
+#include "wbs/WbsGattServer.h"
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -176,10 +178,16 @@ private:
     // BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     void InitiateScan(BleScanState scanType);
     void CleanScanConfig();
+    void ClearAdvertisingFlag();
 
     static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
     static void HandleScanTimer(chip::System::Layer *, void * appState);
     static void HandleConnectTimer(chip::System::Layer *, void * appState);
+
+    // Public CHIPoBLE notifications
+    void NotifyCHIPoBLEConnectionEstablished();
+    void NotifyCHIPoBLEConnectionClosed();
+    void NotifyCHIPoBLEAdvertisingChange(enum ActivityChange change);
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
@@ -192,6 +200,8 @@ private:
 
     WbsDeviceScanner mDeviceScanner;
     WbsConnection mConnection;
+    WbsAdvertising mAdvertising;
+    WbsGattServer mGattServer;
     BLEScanConfig mBLEScanConfig;
 };
 

@@ -90,11 +90,11 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
              (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
              messageHeader = NLMSG_NEXT(messageHeader, len))
         {
-            if (messageHeader->nlmsg_type == RTM_NEWADDR)
+            if (header->nlmsg_type == RTM_NEWADDR)
             {
-                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(messageHeader);
+                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(header);
                 struct rtattr * routeInfo         = IFA_RTA(addressMessage);
-                size_t rtl                        = IFA_PAYLOAD(messageHeader);
+                size_t rtl                        = IFA_PAYLOAD(header);
 
                 for (; rtl && RTA_OK(routeInfo, rtl); routeInfo = RTA_NEXT(routeInfo, rtl))
                 {
