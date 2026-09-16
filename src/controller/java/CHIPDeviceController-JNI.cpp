@@ -2414,6 +2414,13 @@ JNI_METHOD(void, webRTCTransportSolicitOffer)
 
     ChipLogProgress(Controller, "webRTCTransportSolicitOffer() called with device ID and callback object");
 
+    if (!chip::CanCastTo<chip::EndpointId>(endpointId))
+    {
+        ChipLogError(Controller, "Invalid endpoint ID: out of chip::EndpointId range.");
+        chip::JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+
     err = AndroidWebRTCTransportProviderClient::SolicitOffer(wrapper->Controller(), static_cast<chip::NodeId>(deviceId),
                                                              static_cast<chip::EndpointId>(endpointId), callback);
 
@@ -2433,6 +2440,13 @@ JNI_METHOD(void, webRTCTransportProvideOffer)
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "webRTCTransportProvideOffer() called with device ID and callback object");
+
+    if (!chip::CanCastTo<chip::EndpointId>(endpointId))
+    {
+        ChipLogError(Controller, "Invalid endpoint ID: out of chip::EndpointId range.");
+        chip::JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
 
     chip::JniUtfString jniOfferSdp(env, offerSdp);
     chip::CharSpan offerSpan(jniOfferSdp.c_str(), jniOfferSdp.size());

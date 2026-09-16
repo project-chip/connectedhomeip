@@ -202,8 +202,11 @@ void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
 
     if (mClientSdp.HasValue())
     {
-        WebRTCManager::Instance().SetClientICECandidates(mClientSdp.Value());
-        ReturnAndLogOnFailure(WebRTCManager::Instance().SendProvideOffer(app::DataModel::NullNullable, mClientSdp.Value(),
+        auto clientSdpCopy = mClientSdp.Value();
+        mClientSdp.ClearValue();
+
+        WebRTCManager::Instance().SetClientICECandidates(clientSdpCopy);
+        ReturnAndLogOnFailure(WebRTCManager::Instance().SendProvideOffer(app::DataModel::NullNullable, clientSdpCopy,
                                                                          streamUsage, videoStreamIdOptional, NullOptional),
                               Camera, "Fail to Send ProviderOffer");
         return;

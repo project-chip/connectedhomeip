@@ -118,8 +118,19 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnOffer(uint16_t sessionId, c
     VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     jstring jOffer = env->NewStringUTF(offer);
-    jint status    = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnOfferMethod, sessionId, jOffer);
+    if (jOffer == nullptr)
+    {
+        if (env->ExceptionCheck())
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    jint status = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnOfferMethod, sessionId, jOffer);
     env->DeleteLocalRef(jOffer);
+    
     if (env->ExceptionCheck())
     {
         env->ExceptionDescribe();
@@ -142,7 +153,17 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnAnswer(uint16_t sessionId, 
     VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL);
 
     jstring jAnswer = env->NewStringUTF(answer);
-    jint status     = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnAnswerMethod, sessionId, jAnswer);
+    if (jAnswer == nullptr)
+    {
+        if (env->ExceptionCheck())
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    jint status = env->CallIntMethod(Instance().mJavaCallbackObj, Instance().mOnAnswerMethod, sessionId, jAnswer);
     env->DeleteLocalRef(jAnswer);
 
     if (env->ExceptionCheck())
@@ -180,19 +201,77 @@ CHIP_ERROR AndroidWebRTCTransportRequestorManager::OnICECandidates(uint16_t sess
     }
 
     jmethodID constructorId = env->GetMethodID(iceCandidateClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;I)V");
-    VerifyOrReturnError(constructorId != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (constructorId == nullptr)
+    {
+        if (env->ExceptionCheck())
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     // Creates a Java object array to pass.
     jobjectArray jCandidatesArray = env->NewObjectArray(candidateCount, iceCandidateClass, nullptr);
-    VerifyOrReturnError(jCandidatesArray != nullptr, CHIP_ERROR_NO_MEMORY);
+    if (jCandidatesArray == nullptr)
+    {
+        if (env->ExceptionCheck())
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
     for (int i = 0; i < candidateCount; ++i)
     {
         jstring jCandidateStr = env->NewStringUTF(candidates[i].candidate);
-        jstring jSdpMidStr    = candidates[i].sdpMid ? env->NewStringUTF(candidates[i].sdpMid) : nullptr;
+        if (jCandidateStr == nullptr)
+        {
+            if (env->ExceptionCheck())
+            {
+                env->ExceptionDescribe();
+                env->ExceptionClear();
+            }
+            env->DeleteLocalRef(jCandidatesArray);
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        jstring jSdpMidStr = nullptr;
+        if (candidates[i].sdpMid)
+        {
+            jSdpMidStr = env->NewStringUTF(candidates[i].sdpMid);
+            if (jSdpMidStr == nullptr)
+            {
+                if (env->ExceptionCheck())
+                {
+                    env->ExceptionDescribe();
+                    env->ExceptionClear();
+                }
+                env->DeleteLocalRef(jCandidateStr);
+                env->DeleteLocalRef(jCandidatesArray);
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
 
         jobject jCandidateObj =
             env->NewObject(iceCandidateClass, constructorId, jCandidateStr, jSdpMidStr, candidates[i].sdpMLineIndex);
+        if (jCandidateObj == nullptr)
+        {
+            if (env->ExceptionCheck())
+            {
+                env->ExceptionDescribe();
+                env->ExceptionClear();
+            }
+            env->DeleteLocalRef(jCandidateStr);
+            if (jSdpMidStr)
+            {
+                env->DeleteLocalRef(jSdpMidStr);
+            }
+            env->DeleteLocalRef(jCandidatesArray);
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
         env->SetObjectArrayElement(jCandidatesArray, i, jCandidateObj);
 
         env->DeleteLocalRef(jCandidateStr);

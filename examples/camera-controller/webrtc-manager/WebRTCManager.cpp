@@ -207,6 +207,13 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(const WebRTCSessionStruct & sessio
         std::string mergedSdp = MergeICECandidatesIntoSDP(mClientSDP, candidates);
 
         size_t maxBase64Len = BASE64_ENCODED_LEN(mergedSdp.length());
+
+        if (maxBase64Len > UINT16_MAX)
+        {
+            ChipLogError(Camera, "Merged SDP base64 length (%zu) exceeds UINT16_MAX. Cannot encode.", maxBase64Len);
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+
         std::vector<char> base64SdpBuf(maxBase64Len + 1);
 
         uint16_t base64SdpLen = chip::Base64Encode(reinterpret_cast<const uint8_t *>(mergedSdp.data()),

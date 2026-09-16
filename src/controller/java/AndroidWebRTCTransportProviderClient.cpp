@@ -28,21 +28,35 @@ namespace Controller {
 
 using namespace chip::app;
 
-AndroidWebRTCTransportProviderClient::AndroidWebRTCTransportProviderClient(jobject javaCallbackObject, chip::CommandId commandId) :
+AndroidWebRTCTransportProviderClient::AndroidWebRTCTransportProviderClient(chip::CommandId commandId) :
     mCommandId(commandId)
 {
+}
+
+CHIP_ERROR AndroidWebRTCTransportProviderClient::InitJni(jobject javaCallbackObject)
+{
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
 
     // Initialize the global reference for the Java callback object.
     CHIP_ERROR err = mJavaCallback.Init(javaCallbackObject);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to initialize JNI global reference for callback");
-        return;
+        return err;
     }
 
     jclass callbackClass = env->GetObjectClass(javaCallbackObject);
+    if (callbackClass == nullptr)
+    {
+        if (env->ExceptionCheck())
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
     if (mCommandId == Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id)
     {
         mOnResponseMethod = env->GetMethodID(callbackClass, "onResponse", "(ILjava/lang/Integer;Ljava/lang/Integer;)V");
@@ -51,7 +65,29 @@ AndroidWebRTCTransportProviderClient::AndroidWebRTCTransportProviderClient(jobje
     {
         mOnResponseMethod = env->GetMethodID(callbackClass, "onResponse", "(IZLjava/lang/Integer;Ljava/lang/Integer;)V");
     }
+    
+    if (mOnResponseMethod == nullptr)
+    {
+        if (env->ExceptionCheck())
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
     mOnErrorMethod = env->GetMethodID(callbackClass, "onError", "(I)V");
+    if (mOnErrorMethod == nullptr)
+    {
+        if (env->ExceptionCheck())
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 AndroidWebRTCTransportProviderClient::~AndroidWebRTCTransportProviderClient()
@@ -65,8 +101,15 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
                                                               const CharSpan & offerSdp, jobject jcallback)
 {
     auto * client =
-        new AndroidWebRTCTransportProviderClient(jcallback, Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id);
+        new AndroidWebRTCTransportProviderClient(Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    CHIP_ERROR err = client->InitJni(jcallback);
+    if (err != CHIP_NO_ERROR)
+    {
+        delete client;
+        return err;
+    }
 
     client->InitCallbacks(HandleCommandResponse, HandleCommandError, HandleCommandDone);
     client->Init(deviceId, controller->GetFabricIndex(), endpointId);
@@ -96,7 +139,8 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
 
     chip::TLV::TLVWriter writer;
     writer.Init(payloadBuffer.Get(), requiredBufferSize);
-    CHIP_ERROR err = chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
+
+    err = chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
     if (err == CHIP_NO_ERROR)
     {
         err = writer.Finalize();
@@ -125,8 +169,15 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController *
                                                               jobject jcallback)
 {
     auto * client =
-        new AndroidWebRTCTransportProviderClient(jcallback, Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id);
+        new AndroidWebRTCTransportProviderClient(Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    CHIP_ERROR err = client->InitJni(jcallback);
+    if (err != CHIP_NO_ERROR)
+    {
+        delete client;
+        return err;
+    }
 
     client->InitCallbacks(HandleCommandResponse, HandleCommandError, HandleCommandDone);
     client->Init(deviceId, controller->GetFabricIndex(), endpointId);
@@ -154,7 +205,7 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController *
     chip::TLV::TLVWriter writer;
     writer.Init(payloadBuffer.Get(), kPayloadSize);
 
-    CHIP_ERROR err = chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
+    err = chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
     if (err == CHIP_NO_ERROR)
     {
         err = writer.Finalize();

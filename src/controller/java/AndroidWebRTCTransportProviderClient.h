@@ -46,8 +46,10 @@ public:
 private:
     // Constructors and destructors are set to private because the object lifecycle
     // is managed internally for asynchronous operations.
-    AndroidWebRTCTransportProviderClient(jobject javaCallbackObject, chip::CommandId commandId);
+    AndroidWebRTCTransportProviderClient(chip::CommandId commandId);
     ~AndroidWebRTCTransportProviderClient();
+
+    CHIP_ERROR InitJni(jobject javaCallbackObject);
 
     static void HandleCommandResponse(void * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                       chip::CommandId commandId, size_t index, chip::Protocols::InteractionModel::Status status,

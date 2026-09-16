@@ -141,6 +141,7 @@ class CameraFragment : Fragment() {
         override fun onEnd(sessionId: Int, reason: Int): Int {
           Log.d(TAG, "WebRTC Session Ended (Session: $sessionId, Reason: $reason)")
           peerConnection?.close()
+          peerConnection?.dispose()
           peerConnection = null
           return 0
         }
@@ -457,7 +458,19 @@ class CameraFragment : Fragment() {
         .createPeerConnectionFactory()
   }
 
-  private fun createPeerConnection() {
+private fun createPeerConnection() {
+    peerConnection?.let {
+      Log.d(TAG, "Disposing existing PeerConnection before creating a new one.")
+      it.close()
+      it.dispose()
+      peerConnection = null
+    }
+
+    if (peerConnectionFactory == null) {
+      Log.e(TAG, "PeerConnectionFactory is null. Cannot create PeerConnection.")
+      return
+    }
+
     val iceServers =
       listOf(PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer())
     val rtcConfig = PeerConnection.RTCConfiguration(iceServers)
