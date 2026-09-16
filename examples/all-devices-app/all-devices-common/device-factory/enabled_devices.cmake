@@ -156,6 +156,7 @@ endif()
 #   - Keep list in sync with enabled_devices.gni
 #   - ensure enabled_devices_config.h.in contains required ALL_DEVICES_ENABLE* defines
 #   - Update scripts/build/build/targets.py to include the new device
+#   - Update examples/all-devices-app/zephyr/Kconfig.devices
 foreach(_key
         # keep-sorted: start
         aggregator
