@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <app/clusters/av-analysis-server/AvAnalysisWebRTCClient.h>
 #include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 /**
  * Stands in for an Analysis Node's WebRTC client when the camera itself runs the AV Analysis
