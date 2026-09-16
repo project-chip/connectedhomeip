@@ -26,6 +26,7 @@ menu "Demo"
         default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
         default DEVICE_TYPE_ESP32_C2_DEVKITM if IDF_TARGET_ESP32C2
         default DEVICE_TYPE_ESP32_C6_DEVKITC if IDF_TARGET_ESP32C6
+        default DEVICE_TYPE_M5STACK_CORES3 if IDF_TARGET_ESP32S3
         default DEVICE_TYPE_ESP32_S31_DEVKITC if IDF_TARGET_ESP32S31
         default DEVICE_TYPE_ESP32_H2_DEVKITM if IDF_TARGET_ESP32H2
         default DEVICE_TYPE_ESP32_H21_DEVKITM if IDF_TARGET_ESP32H21
@@ -46,6 +47,14 @@ menu "Demo"
         config DEVICE_TYPE_M5STACK
             bool "M5Stack"
             depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_M5STACK_CORES3
+            bool "M5Stack CoreS3"
+            depends on IDF_TARGET_ESP32S3
+            help
+                M5Stack CoreS3 / CoreS3 SE (ESP32-S3, 16MB flash, 8MB quad PSRAM).
+
+                The LCD and capacitive touch panel are not driven yet: the vendored TFT
+                library used by the other M5Stack boards is ESP32-only.
         config DEVICE_TYPE_ESP32_C3_DEVKITM
             bool "ESP32C3-DevKitM"
             depends on IDF_TARGET_ESP32C3
