@@ -458,7 +458,7 @@ class CameraFragment : Fragment() {
         .createPeerConnectionFactory()
   }
 
-private fun createPeerConnection() {
+  private fun createPeerConnection() {
     peerConnection?.let {
       Log.d(TAG, "Disposing existing PeerConnection before creating a new one.")
       it.close()
