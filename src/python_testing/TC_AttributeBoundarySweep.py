@@ -96,9 +96,10 @@ class ProbeResult:
     # True when the probe changed the attribute and the original value could not be put
     # back; the DUT is left holding a value the sweep wrote.
     restore_failed: bool = False
-    # repr() of the value the attribute read back after the probe write, or None when that
-    # read did not complete. The DUT can clamp a write, so this is not necessarily the
-    # probe value; it is what the device is left holding when restore_failed is set.
+    # repr() of the value the attribute last read back, from after the probe write or, when
+    # the restore did not take, from after the restore. None when no read completed. The DUT
+    # can clamp a write, so this is not necessarily the probe value; it is what the device is
+    # left holding when restore_failed is set.
     stored_repr: str | None = None
 
     @property
@@ -311,9 +312,23 @@ class AttributeBoundarySweep(IDMBaseTest):
                         timedRequestTimeoutMs=timed_request_timeout_ms)
                     restore_status = getattr(restore_result[0].Status, 'name', restore_result[0].Status)
                     restore_failed = restore_result[0].Status != Status.Success
+                    if not restore_failed:
+                        # A restore write can be answered Success and still be clamped or
+                        # discarded, the same way a probe write can, so the status alone does
+                        # not say the attribute is back to where it started.
+                        restored = await self.read_single_attribute_check_success(
+                            endpoint=attr_info.endpoint_id, cluster=attr_info.cluster_class,
+                            attribute=attr_info.attribute)
+                        restore_failed = restored != original
+                        if restore_failed:
+                            stored_repr = repr(restored)
+                            restore_status = f'write succeeded but attribute reads {stored_repr}'
                 except Exception as e:
                     restore_status = e
                     restore_failed = True
+                    # Neither the write nor the read after it completed, so what the DUT is
+                    # holding is no longer known.
+                    stored_repr = None
                 if restore_failed:
                     log.error("Could not restore %s.%s on EP%s to %r: %s", attr_info.cluster_name,
                               attr_info.attribute_name, attr_info.endpoint_id, original, restore_status)
