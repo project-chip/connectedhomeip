@@ -52,6 +52,8 @@ jobs:
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             LSAN_OPTIONS: detect_leaks=1
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
@@ -82,11 +84,6 @@ jobs:
             - uses: actions/checkout@v7
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
-            - name: Select SDK OpenSSL
-              uses: ./.github/actions/setup-sdk-openssl
-              with:
-                  static: 'true'
-
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -794,6 +791,8 @@ jobs:
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
@@ -823,11 +822,6 @@ jobs:
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v7
-            - name: Select SDK OpenSSL
-              uses: ./.github/actions/setup-sdk-openssl
-              with:
-                  static: 'true'
-
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -1111,7 +1105,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:

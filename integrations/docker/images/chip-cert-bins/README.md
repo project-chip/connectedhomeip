@@ -61,10 +61,8 @@ docker buildx build --load --build-arg OPENSSL_STATIC=true -t chip-cert-bins:sta
 ```
 
 Pass `--build-arg OPENSSL_STATIC=false` to explicitly select dynamic linkage to
-OpenSSL 3.5. The `Build Certification Image` workflow exposes the same three
-choices through its string input `openssl_static`: leave it empty for host
-libraries, or enter `true` or `false`. Reusable workflow callers must quote
-these values as strings.
+OpenSSL 3.5. The `Build Certification Image` workflow always uses static OpenSSL
+3.5.
 
 An explicit value sets the SDK-only `CHIP_OPENSSL_STATIC` default and
 `CHIP_OPENSSL_ROOT` to the private installation under `/opt/matter/openssl`.

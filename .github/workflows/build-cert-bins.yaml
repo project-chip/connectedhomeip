@@ -7,20 +7,10 @@ on:
                 required: false
                 type: string
                 default: ''
-            openssl_static:
-                description: 'OpenSSL selection: empty uses host; true uses private static libraries; false uses private dynamic libraries'
-                required: false
-                type: string
-                default: ''
     workflow_dispatch:
         inputs:
             commit_hash:
                 description: 'Upstream project-chip/connectedhomeip commit to build (defaults to the workflow trigger SHA)'
-                required: false
-                type: string
-                default: ''
-            openssl_static:
-                description: 'OpenSSL selection: empty uses host; true uses private static libraries; false uses private dynamic libraries'
                 required: false
                 type: string
                 default: ''
@@ -41,7 +31,7 @@ jobs:
                   password: ${{ secrets.CHIP_CERT_BINS_REGISTRY_TOKEN }}
                   registry: docker.io
                   platforms: linux/arm64
-                  buildargs: COMMITHASH=${{ inputs.commit_hash || github.sha }},OPENSSL_STATIC=${{ inputs.openssl_static }}
+                  buildargs: COMMITHASH=${{ inputs.commit_hash || github.sha }},OPENSSL_STATIC=true
             - name: Notify Slack on Failure
               if: failure()
               uses: ./.github/actions/notify-slack-failure

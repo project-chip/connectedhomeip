@@ -5,17 +5,22 @@ continuous integration and other builds.
 
 Contents of this directory:
 
--   build.sh - utility for building (and optionally) tagging and pushing the
-    chip-build Docker image
--   version - the semver-style version of the image in use for this branch of
-    CHIP
--   Dockerfile - description of the image
+- build.sh - utility for building (and optionally) tagging and pushing the
+  chip-build Docker image
+- version - the semver-style version of the image in use for this branch of CHIP
+- Dockerfile - description of the image
 
 OpenSSL is downloaded, checksum-verified, compiled, and installed when the image
 is built. The build checks the pinned version and the presence of both static
 and shared libraries. CI jobs reuse this installation; they must not download or
 compile OpenSSL during job setup. Publish the updated image and update CI image
 references before enabling jobs that require `/opt/matter/openssl`.
+
+Linux CI build jobs select the static OpenSSL 3.5 libraries already installed in
+image 213 by setting `CHIP_OPENSSL_ROOT=/opt/matter/openssl` and
+`CHIP_OPENSSL_STATIC=true` in their job environment. This requires no image
+rebuild or separate setup step, preserves PQC and PDC coverage, and lets the
+Python controller coexist with Python's system OpenSSL.
 
 Select SDK OpenSSL linkage with a `docker build` argument. The same choices
 apply to `chip-build-minimal` and `chip-cert-bins`:
@@ -54,10 +59,10 @@ for other applications and direct GN builds.
 Please update version when any required tooling is updated. Some rough
 guidelines:
 
--   Updating a tool? Increment dot version unless the tool has a major version
-    delta or a backward incompatibility
--   Adding a tool? Increment minor version: e.g. 0.2.1 -> 0.3.0
--   Removing a tool? Increment major version: e.g. 1.2 -> 2.0
+- Updating a tool? Increment dot version unless the tool has a major version
+  delta or a backward incompatibility
+- Adding a tool? Increment minor version: e.g. 0.2.1 -> 0.3.0
+- Removing a tool? Increment major version: e.g. 1.2 -> 2.0
 
 Note, you must have privileged access to the connectedhomeip:chip-build on
 Docker Hub
