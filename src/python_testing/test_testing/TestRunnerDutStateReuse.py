@@ -20,6 +20,7 @@
 import importlib.util
 import os
 import pathlib
+import re
 import tempfile
 import unittest
 
@@ -41,18 +42,27 @@ class TestKeyedKvs(unittest.TestCase):
     def setUp(self):
         self.runner = load_runner()
 
-    def test_kvs_is_keyed_by_app_basename_once(self):
+    def kvs_of(self, app, args):
+        return re.search(r"--KVS (\S+)", self.runner.keyed_kvs_app_args(app, args)).group(1)
+
+    def test_kvs_is_keyed_by_app_and_only_keyed_once(self):
         args = "--discriminator 1234 --KVS kvs1 --trace-to json:x.json"
         keyed = self.runner.keyed_kvs_app_args("out/linux/chip-all-clusters-app", args)
-        self.assertEqual(keyed, "--discriminator 1234 --KVS kvs1.chip-all-clusters-app --trace-to json:x.json")
+        self.assertRegex(keyed, r"--KVS kvs1\.chip-all-clusters-app\.[0-9a-f]{8} ")
         self.assertEqual(self.runner.keyed_kvs_app_args("out/linux/chip-all-clusters-app", keyed), keyed, "idempotent")
 
+    def test_same_binary_name_from_a_different_build_is_a_different_dut(self):
+        args = "--discriminator 1234 --KVS kvs1"
+        self.assertNotEqual(self.kvs_of("out/all-clusters/chip-all-clusters-app", args),
+                            self.kvs_of("out/all-clusters-no-groupcast/chip-all-clusters-app", args),
+                            "two builds shipping the same binary name must not share device state")
+
     def test_device_argument_is_part_of_the_key(self):
-        args = "--device extended-color-light:1 --discriminator 1234 --KVS kvs1"
-        keyed = self.runner.keyed_kvs_app_args("out/all-devices-app", args)
-        self.assertEqual(keyed, "--device extended-color-light:1 --discriminator 1234 --KVS kvs1.all-devices-app.extended-color-light-1")
-        other = self.runner.keyed_kvs_app_args("out/all-devices-app", "--device fan --KVS kvs1")
-        self.assertEqual(other, "--device fan --KVS kvs1.all-devices-app.fan")
+        light = self.kvs_of("out/all-devices-app", "--device extended-color-light:1 --KVS kvs1")
+        fan = self.kvs_of("out/all-devices-app", "--device fan --KVS kvs1")
+        self.assertIn("all-devices-app.extended-color-light-1.", light)
+        self.assertIn("all-devices-app.fan.", fan)
+        self.assertNotEqual(light, fan)
 
     def test_no_kvs_or_no_app_is_untouched(self):
         self.assertEqual(self.runner.keyed_kvs_app_args("out/app", "--discriminator 1234"), "--discriminator 1234")
@@ -77,60 +87,102 @@ class TestDecideDutState(unittest.TestCase):
         return self.runner.decide_dut_state(factory_reset, self.runner.DutStatePolicy(**policy), self.app_args, self.script_args)
 
     def outcome(self, d):
-        return (d.wipe_controller, d.wipe_app, d.force_commissioning)
+        return (d.wipe_controller, d.wipe_app, d.force_commissioning, d.restore_golden)
+
+    def snapshot(self):
+        pathlib.Path(self.runner.commissioned_snapshot_file(self.kvs)).touch()
 
     def test_no_factory_reset_never_wipes_or_forces(self):
-        self.assertEqual(self.outcome(self.decide(factory_reset=False)), (False, False, False))
+        self.assertEqual(self.outcome(self.decide(factory_reset=False)), (False, False, False, False))
 
     def test_reuse_off_explicit_and_fresh_dut_wipe_everything(self):
         for policy in ({"reuse": False}, {"factory_reset_explicit": True}, {"fresh_dut": True}):
-            self.assertEqual(self.outcome(self.decide(**policy)), (True, True, True), policy)
+            self.assertEqual(self.outcome(self.decide(**policy)), (True, True, True, False), policy)
 
     def test_no_storage_path_wipes_everything(self):
         d = self.runner.decide_dut_state(True, self.runner.DutStatePolicy(
             reuse=True), self.app_args, "--commissioning-method on-network")
-        self.assertEqual(self.outcome(d), (True, True, True))
+        self.assertEqual(self.outcome(d), (True, True, True, False))
 
     def test_no_kvs_wipes_app_state_only(self):
         pathlib.Path(self.storage).touch()
         d = self.runner.decide_dut_state(True, self.runner.DutStatePolicy(reuse=True), "--discriminator 1234", self.script_args)
-        self.assertEqual(self.outcome(d), (False, True, True), "controller storage must survive an unkeyable app")
+        self.assertEqual(self.outcome(d), (False, True, True, False), "controller storage must survive an unkeyable app")
 
     def test_missing_storage_resets_app_state_and_forces(self):
         pathlib.Path(self.kvs).touch()
         d = self.decide()
-        self.assertEqual(self.outcome(d), (False, True, True),
+        self.assertEqual(self.outcome(d), (False, True, True, False),
                          "a kept KVS is stale without the storage it was commissioned against")
 
-    def test_missing_kvs_keeps_storage_and_forces(self):
+    def test_without_a_snapshot_the_app_is_reset_and_commissioned_to_capture_one(self):
+        """The first run of an app resets it, commissions, and the runner captures that state."""
         pathlib.Path(self.storage).touch()
         d = self.decide()
-        self.assertEqual(self.outcome(d), (False, False, True))
-        self.assertIn(self.kvs, d.reason)
+        self.assertEqual(self.outcome(d), (False, True, True, False), "no snapshot yet")
+        self.assertIn(self.runner.commissioned_snapshot_file(self.kvs), d.reason)
+        pathlib.Path(self.kvs).touch()
+        self.assertEqual(self.outcome(self.decide()), (False, True, True, False), "a live KVS is not a snapshot")
 
-    def test_present_state_keeps_and_probes(self):
+    def test_with_a_snapshot_the_app_is_restored_and_not_commissioned(self):
+        pathlib.Path(self.storage).touch()
+        pathlib.Path(self.kvs).touch()
+        self.snapshot()
+        d = self.decide()
+        self.assertEqual(self.outcome(d), (False, False, False, True))
+
+    def test_fresh_dut_and_explicit_resets_ignore_the_snapshot(self):
+        pathlib.Path(self.storage).touch()
+        pathlib.Path(self.kvs).touch()
+        self.snapshot()
+        for policy in ({"fresh_dut": True}, {"factory_reset_explicit": True}, {"reuse": False}):
+            self.assertEqual(self.outcome(self.decide(**policy)), (True, True, True, False), policy)
+
+    def test_runs_without_a_runner_commissioning_method_get_a_fresh_app(self):
         pathlib.Path(self.kvs).touch()
         pathlib.Path(self.storage).touch()
-        self.assertEqual(self.outcome(self.decide()), (False, False, False))
-
-    def test_in_test_commissioning_runs_get_a_fresh_app(self):
-        pathlib.Path(self.kvs).touch()
-        pathlib.Path(self.storage).touch()
-        d = self.runner.decide_dut_state(True, self.runner.DutStatePolicy(reuse=True), self.app_args,
-                                         f"--storage-path {self.storage} --in-test-commissioning-method on-network")
-        self.assertEqual(self.outcome(d), (False, True, True))
-        d = self.runner.decide_dut_state(True, self.runner.DutStatePolicy(reuse=True), self.app_args,
-                                         f"--storage-path {self.storage} --commissioning-method on-network "
-                                         "--in-test-commissioning-method on-network")
-        self.assertEqual(self.outcome(d), (False, False, False), "with a runner method the DUT may be reused")
+        for args in (f"--storage-path {self.storage} --in-test-commissioning-method on-network",
+                     f"--storage-path {self.storage} --endpoint 0"):
+            d = self.runner.decide_dut_state(True, self.runner.DutStatePolicy(reuse=True), self.app_args, args)
+            self.assertEqual(self.outcome(d), (False, True, True, False), args)
+        self.snapshot()
+        with_method = f"--storage-path {self.storage} --commissioning-method on-network --in-test-commissioning-method on-network"
+        d = self.runner.decide_dut_state(True, self.runner.DutStatePolicy(reuse=True), self.app_args, with_method)
+        self.assertEqual(self.outcome(d), (False, False, False, True), "with a runner method the snapshot is restored")
 
     def test_setup_payload_runs_get_a_fresh_app(self):
         pathlib.Path(self.kvs).touch()
         pathlib.Path(self.storage).touch()
+        self.snapshot()
         for payload in ("--qr-code MT:-24J0AFN00KA0648G00", "--manual-code 10054912339"):
             d = self.runner.decide_dut_state(True, self.runner.DutStatePolicy(reuse=True), self.app_args,
                                              f"--storage-path {self.storage} --commissioning-method on-network {payload}")
-            self.assertEqual(self.outcome(d), (False, True, True), payload)
+            self.assertEqual(self.outcome(d), (False, True, True, False), payload)
+
+
+class TestCommissionedSnapshot(unittest.TestCase):
+
+    def test_capture_copies_the_kvs_aside(self):
+        runner = load_runner()
+        with tempfile.TemporaryDirectory() as tmp:
+            kvs = os.path.join(tmp, "kvs1.app")
+            pathlib.Path(kvs).write_text("fabric")
+            runner.capture_commissioned_snapshot(f"--discriminator 1234 --KVS {kvs}")
+            self.assertEqual(pathlib.Path(runner.commissioned_snapshot_file(kvs)).read_text(), "fabric")
+            self.assertFalse(os.path.exists(runner.commissioned_snapshot_file(kvs) + ".tmp"), "no leftover temp file")
+
+    def test_capture_leaves_no_temp_file_behind_when_the_kvs_is_gone(self):
+        runner = load_runner()
+        with tempfile.TemporaryDirectory() as tmp:
+            kvs = os.path.join(tmp, "kvs1.app")
+            runner.capture_commissioned_snapshot(f"--KVS {kvs}")
+            self.assertEqual(os.listdir(tmp), [], "a failed capture leaves nothing behind")
+
+    def test_capture_without_a_kvs_or_a_missing_file_is_harmless(self):
+        runner = load_runner()
+        runner.capture_commissioned_snapshot("--discriminator 1234")
+        with tempfile.TemporaryDirectory() as tmp:
+            runner.capture_commissioned_snapshot(f"--KVS {os.path.join(tmp, 'never-created')}")
 
 
 class TestCommissioningDecisionLine(unittest.TestCase):
@@ -155,8 +207,12 @@ class TestCommissioningDecisionLine(unittest.TestCase):
             pathlib.Path(storage).touch()
             self.assertEqual(runner.registered_keyed_kvs(storage), [kvs_a, kvs_b], "listed once each")
 
+            snapshot_a, snapshot_b = runner.commissioned_snapshot_file(kvs_a), runner.commissioned_snapshot_file(kvs_b)
+            for f in (snapshot_a, snapshot_b):
+                pathlib.Path(f).touch()
             wiped = list(runner.FactoryResetType.AppAndController.config_files("--KVS " + kvs_a, "--storage-path " + storage))
-            self.assertTrue({kvs_a, kvs_b, storage} <= set(wiped), wiped)
+            self.assertTrue({kvs_a, kvs_b, storage, snapshot_a, snapshot_b} <= set(wiped),
+                            "a new controller fabric invalidates every KVS and its snapshot")
             runner.factory_reset_config_removal("--KVS " + kvs_a, "--storage-path " + storage,
                                                 runner.FactoryResetType.AppAndController)
             self.assertFalse(os.path.exists(kvs_a) or os.path.exists(kvs_b) or os.path.exists(storage))
@@ -164,6 +220,7 @@ class TestCommissioningDecisionLine(unittest.TestCase):
 
             app_only = list(runner.FactoryResetType.AppOnly.config_files("--KVS " + kvs_a, "--storage-path " + storage))
             self.assertNotIn(kvs_b, app_only, "an app-only reset touches only its own KVS")
+            self.assertNotIn(snapshot_a, app_only, "the snapshot outlives an app-only reset: the fabric is still valid")
 
 
 class TestFreshDutHeaderKey(unittest.TestCase):

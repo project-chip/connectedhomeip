@@ -701,6 +701,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.commission_only = args.commission_only
     config.commission_only_re_open_window = args.commission_only_re_open_window
     config.force_commissioning = args.force_commissioning
+    config.snapshot_commissioned_state = args.snapshot_commissioned_state
 
     config.qr_code_content.extend(args.qr_code)
     config.manual_code.extend(args.manual_code)
@@ -1121,6 +1122,8 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
     commission_group.add_argument('--thread-ba-port', action="store", type=int,
                                   help="Border Agent port")
 
+    commission_group.add_argument('--snapshot-commissioned-state', action="store_true", default=False,
+                                  help=argparse.SUPPRESS)  # set by scripts/tests/run_python_test.py, see SNAPSHOT_COMMISSIONED_STATE
     commission_group.add_argument('--force-commissioning', action="store_true", default=False,
                                   help="Commission even when the DUT is already commissioned on this fabric. By default "
                                        "the commissioning step is skipped when a CASE session to the DUT can be established.")

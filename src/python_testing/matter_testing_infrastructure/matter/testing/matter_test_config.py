@@ -34,6 +34,8 @@ class MatterTestConfig:
     force_commissioning: bool = False
     # Set by the runner when it found the DUT commissioned and did not run the commissioning step.
     commissioning_skipped: bool = False
+    # Ask the test runner to snapshot the app's state once commissioning is done (runner use only).
+    snapshot_commissioned_state: bool = False
     spec_errata_path: str | Traversable | None = None
 
     admin_vendor_id: int = TestingDefaults.ADMIN_VENDOR_ID

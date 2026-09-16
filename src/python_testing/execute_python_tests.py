@@ -309,7 +309,9 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
     nightly_tests = {item["name"] for item in metadata["nightly"]}
 
-    all_python_files = g.glob(os.path.join(search_directory, "*.py"))
+    # Sorted: the run order decides which tests share a DUT with which, so it must not vary with
+    # the filesystem's directory order.
+    all_python_files = sorted(g.glob(os.path.join(search_directory, "*.py")))
 
     for pattern in glob:
         if pattern.startswith('!'):

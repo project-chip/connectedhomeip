@@ -901,18 +901,19 @@ for that run, e.g.:
 ```
 
 `factory-reset: true` used to wipe the app KVS, the controller storage and the
-`/tmp/chip*` files before every run. By default the runner now keeps that state
-so an already commissioned DUT is reused: the KVS is keyed by app binary and,
-for all-devices-app, by its `--device` value (`kvs1` becomes
-`kvs1.chip-all-clusters-app`), the controller storage is shared, and the test
-framework skips commissioning when the DUT answers over CASE (see
-`--force-commissioning`). The full wipe still happens when the header says
+`/tmp/chip*` files before every run. The runner now keeps a snapshot of the
+app's state taken the moment it was commissioned, and restores that before each
+later run of the same app: the DUT starts commissioned to the controller's
+fabric and otherwise at factory defaults, so the test framework can skip
+commissioning (see `--force-commissioning`) without inheriting the previous
+test's cluster state. The snapshot is keyed by app binary, by its `--device`
+value for all-devices-app, and by a digest of the app's path, so two builds
+never share one. The full wipe still happens when the header says
 `fresh-dut: true` (the test needs a DUT with no fabrics), when `--factory-reset`
 is given explicitly on the command line, when `--reuse-commissioned-dut` is
-turned off, or when there is no `--storage-path` to key the controller state. An
-app started without `--KVS` cannot keep its state apart from other apps, so only
-its app state is wiped and it is commissioned onto the kept fabric. A wipe of
-the controller storage also removes every keyed KVS commissioned against it.
+turned off, or when there is no `--storage-path` to key the controller state. A
+wipe of the controller storage also removes every snapshot taken against it,
+since those DUTs would be left on a fabric that no longer exists.
 
 ### Description of Parameters
 
