@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <app/clusters/av-analysis-server/AvAnalysisWebRTCClient.h>
+#include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 
 /**
  * Stands in for an Analysis Node's WebRTC client when the camera itself runs the AV Analysis
@@ -33,6 +35,13 @@ public:
     CHIP_ERROR RequestSession(const chip::ScopedNodeId & aCameraNode, chip::EndpointId aWebRTCEndpoint, uint16_t aVideoStreamId,
                               Callback & aCallback) override
     {
+        if (chip::app::CodegenDataModelProvider::Instance().Registry().Get(
+                chip::app::ConcreteClusterPath(aWebRTCEndpoint, chip::app::Clusters::WebRTCTransportProvider::Id)) == nullptr)
+        {
+            aCallback.OnSessionInitiated(chip::Protocols::InteractionModel::Status::NotFound, 0, /* aOfferSent = */ false);
+            return CHIP_NO_ERROR;
+        }
+
         const uint16_t sessionId = mNextSessionId++;
         aCallback.OnSessionInitiated(chip::Protocols::InteractionModel::Status::Success, sessionId, /* aOfferSent = */ true);
         aCallback.OnSessionActive(aCameraNode, sessionId);
