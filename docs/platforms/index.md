@@ -16,6 +16,7 @@ nxp/index
 openthread/index
 silabs/index
 stm32/index
+telink/index
 ti/index
 ```
 
