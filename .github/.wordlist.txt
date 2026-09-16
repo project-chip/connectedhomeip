@@ -215,6 +215,7 @@ CDEEDC
 CDVersionNumber
 ced
 centric
+cert's
 cfg
 CFLAGS
 cgit

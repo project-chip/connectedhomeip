@@ -139,7 +139,12 @@ def main():
                       dest='version_as_components')
     parser.add_option('--static', action='store_true',
                       dest='static')
+    parser.add_option('--pkg-config-path', dest='pkg_config_path',
+                      help='Override PKG_CONFIG_PATH for this query only.')
     (options, args) = parser.parse_args()
+
+    if options.pkg_config_path is not None:
+        os.environ['PKG_CONFIG_PATH'] = options.pkg_config_path
 
     # Make a list of regular expressions to strip out.
     strip_out = []

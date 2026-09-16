@@ -45,6 +45,48 @@ Prerequisites:
 docker buildx build --load .
 ```
 
+OpenSSL selection applies to `chip-cert` and the other SDK binaries in this
+image:
+
+| Build argument         | OpenSSL selection                                   |
+| ---------------------- | --------------------------------------------------- |
+| Omitted (or empty)     | Native host libraries (OpenSSL 3.0 on Ubuntu 24.04) |
+| `OPENSSL_STATIC=true`  | Private OpenSSL 3.5, statically linked              |
+| `OPENSSL_STATIC=false` | Private OpenSSL 3.5, dynamically linked             |
+
+To test static OpenSSL linkage, pass `--build-arg OPENSSL_STATIC=true`:
+
+```shell
+docker buildx build --load --build-arg OPENSSL_STATIC=true -t chip-cert-bins:static-openssl .
+```
+
+Pass `--build-arg OPENSSL_STATIC=false` to explicitly select dynamic linkage to
+OpenSSL 3.5. The `Build Certification Image` workflow exposes the same three
+choices through its string input `openssl_static`: leave it empty for host
+libraries, or enter `true` or `false`. Reusable workflow callers must quote
+these values as strings.
+
+An explicit value sets the SDK-only `CHIP_OPENSSL_STATIC` default and
+`CHIP_OPENSSL_ROOT` to the private installation under `/opt/matter/openssl`.
+When omitted, the root stays empty so SDK builds use their normal host library
+discovery. SDK revisions requiring newer crypto APIs may fail with host OpenSSL;
+select private OpenSSL explicitly for those revisions.
+
+Older SDK revisions without this SDK-specific configuration ignore these
+variables and retain their existing OpenSSL selection; passing the static flag
+does not enable static linkage for those revisions. Unrelated tools continue to
+build and run with system OpenSSL. SDK binaries explicitly built with private
+dynamic OpenSSL carry a RUNPATH to the private library directory, which is also
+copied into the final image without changing the loader cache. Rebuild the
+binaries to pick up OpenSSL security updates.
+
+To check chip-cert's direct library dependencies, run
+`readelf -d /root/connectedhomeip/out/chip-cert` in the `chip-build-cert-bins`
+build stage; the static variant should have no `NEEDED` entry for `libcrypto.so`
+or `libssl.so`. Exercise the required certificate operations in the final image
+as well. Transitive dependencies of other applications may still load shared
+OpenSSL.
+
 The above command will build the image and load them into your local Docker
 instance.
 

@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
 
         steps:
             - name: Checkout
@@ -47,6 +47,13 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
+                bootstrap-log-name: bootstrap-logs-${{ github.job }}
+
+            - name: Select SDK OpenSSL
+              uses: ./.github/actions/setup-sdk-openssl
+              with:
+                # Match the static OpenSSL used by the Linux YAML and REPL tests.
+                static: 'true'
 
             - name: Build standalone tools
               run: |
@@ -55,11 +62,22 @@ jobs:
                         --target linux-x64-chip-cert \
                         --target linux-x64-chip-tool \
                         build"
+            - name: Verify static SDK OpenSSL linkage
+              run: |
+                for binary in out/linux-x64-chip-cert/chip-cert out/linux-x64-chip-tool/chip-tool; do
+                  readelf -d "$binary" > /tmp/openssl-needed.txt
+                  if grep -E 'NEEDED.*lib(ssl|crypto)\.so' /tmp/openssl-needed.txt; then
+                    echo "Unexpected shared OpenSSL dependency: $binary" >&2
+                    exit 1
+                  fi
+                done
+
             - name: Strip executables
               run: |
                 strip out/linux-x64-chip-cert/chip-cert
                 strip out/linux-x64-chip-tool/chip-tool
             - name: Upload tools as artifact
+              # Tools use static OpenSSL so consumers need no private OpenSSL installation.
               if: github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
               uses: actions/upload-artifact@v7
               with:

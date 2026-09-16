@@ -19,6 +19,14 @@ assert(current_toolchain != "",
 declare_args() {
   # Crypto implementation: mbedtls, psa, openssl, boringssl, platform.
   chip_crypto = ""
+
+  # Private OpenSSL installation for SDK targets. Empty uses pkg-config defaults
+  # (or CHIP_OPENSSL_ROOT from a build image for native Linux builds).
+  chip_openssl_root = ""
+
+  # Link OpenSSL archives on Linux instead of shared libraries. Build images
+  # set this SDK-only default without changing other tools' library selection.
+  chip_openssl_static = getenv("CHIP_OPENSSL_STATIC") == "true"
   chip_with_se05x = 0
 
   # Compile mbedtls externally. Only used if chip_crypto == "mbedtls"

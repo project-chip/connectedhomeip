@@ -59,7 +59,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -79,6 +79,11 @@ jobs:
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v7
+            - name: Select SDK OpenSSL
+              uses: ./.github/actions/setup-sdk-openssl
+              with:
+                  static: 'true'
+
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
