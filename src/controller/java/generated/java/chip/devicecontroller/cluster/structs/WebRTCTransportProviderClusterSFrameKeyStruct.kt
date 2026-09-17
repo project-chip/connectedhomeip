@@ -22,8 +22,8 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WebRTCTransportProviderClusterSFrameKeyStruct (val kid: ByteArray, val baseKey: ByteArray) {
-  override fun toString(): String  = buildString {
+class WebRTCTransportProviderClusterSFrameKeyStruct(val kid: ByteArray, val baseKey: ByteArray) {
+  override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterSFrameKeyStruct {\n")
     append("\tkid : $kid\n")
     append("\tbaseKey : $baseKey\n")

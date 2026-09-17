@@ -83,13 +83,13 @@ class WebRTCTransportRequestorClusterSFrameStruct(
       val receiveKeys =
         buildList<WebRTCTransportRequestorClusterSFrameKeyStruct> {
           tlvReader.enterArray(ContextSpecificTag(TAG_RECEIVE_KEYS))
-          while(!tlvReader.isEndOfContainer()) {
+          while (!tlvReader.isEndOfContainer()) {
             add(WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(AnonymousTag, tlvReader))
           }
           tlvReader.exitContainer()
         }
       val ratchetBits = tlvReader.getUByte(ContextSpecificTag(TAG_RATCHET_BITS))
-      val ratchetTime = 
+      val ratchetTime =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATCHET_TIME))) {
           Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_RATCHET_TIME)))
         } else {
@@ -103,7 +103,7 @@ class WebRTCTransportRequestorClusterSFrameStruct(
         videoCipherSuite,
         senderKey,
         receiveKeys,
-        ratchetBits, 
+        ratchetBits,
         ratchetTime
       )
     }

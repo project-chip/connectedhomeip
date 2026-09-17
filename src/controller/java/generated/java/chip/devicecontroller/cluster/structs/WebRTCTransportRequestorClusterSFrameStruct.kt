@@ -24,7 +24,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WebRTCTransportRequestorClusterSFrameStruct (
+class WebRTCTransportRequestorClusterSFrameStruct(
   val audioCipherSuite: UInt,
   val videoCipherSuite: UInt,
   val senderKey: WebRTCTransportRequestorClusterSFrameKeyStruct,
@@ -32,7 +32,7 @@ class WebRTCTransportRequestorClusterSFrameStruct (
   val ratchetBits: UInt,
   val ratchetTime: Optional<UInt>
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterSFrameStruct {\n")
     append("\taudioCipherSuite : $audioCipherSuite\n")
     append("\tvideoCipherSuite : $videoCipherSuite\n")
@@ -75,7 +75,7 @@ class WebRTCTransportRequestorClusterSFrameStruct (
       tlvReader.enterStructure(tlvTag)
       val audioCipherSuite = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_CIPHER_SUITE))
       val videoCipherSuite = tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_CIPHER_SUITE))
-      val senderKey = 
+      val senderKey =
         WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(
           ContextSpecificTag(TAG_SENDER_KEY),
           tlvReader
@@ -83,7 +83,7 @@ class WebRTCTransportRequestorClusterSFrameStruct (
       val receiveKeys =
         buildList<WebRTCTransportRequestorClusterSFrameKeyStruct> {
           tlvReader.enterArray(ContextSpecificTag(TAG_RECEIVE_KEYS))
-          while(!tlvReader.isEndOfContainer()) {
+          while (!tlvReader.isEndOfContainer()) {
             add(WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(AnonymousTag, tlvReader))
           }
           tlvReader.exitContainer()
