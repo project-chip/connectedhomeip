@@ -25,8 +25,8 @@ namespace app {
 
 TemperatureSensor::TemperatureSensor(TimerDelegate & timerDelegate, TemperatureMeasurementCluster::StartupConfiguration tempConfig,
                                      TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureSensor, 1)), mTimerDelegate(timerDelegate),
-    mTempConfig(tempConfig), mOptionalAttributes(optionalAttributes)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureSensor, 1)),
+    mTimerDelegate(timerDelegate), mTempConfig(tempConfig), mOptionalAttributes(optionalAttributes)
 {}
 
 CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
