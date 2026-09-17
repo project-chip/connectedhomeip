@@ -96,8 +96,19 @@ class TC_ACS_2_1(MatterBaseTest):
         log.info("Rx'd SoundIdentificationSupported: %s", {self.SoundIdentificationSupported})
         self.PredictedActivitySupported = ((aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity) != 0)
         log.info("Rx'd PredictedActivitySupported: %s", {self.PredictedActivitySupported})
-        self.SensorFusionSupported = ((aFeatureMap & cluster.Bitmaps.Feature.kSensorFusion) != 0)
-        log.info("Rx'd SensorFusionSupported: %s", {self.SensorFusionSupported})
+        self.SensorFusionDetected = ((aFeatureMap & cluster.Bitmaps.Feature.kSensorFusion) != 0)
+        log.info("Rx'd SensorFusionDetected: %s", {self.SensorFusionDetected})
+
+        # Add AmbientContextSupported elements for CI purpose
+        # Human activity walking, Object identification person, Audio identification barking are default
+        if self.is_ci:
+            self.write_to_app_pipe(
+                f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}},{{"TypeId":75,"TagId":3}}]}}')
+            await asyncio.sleep(1)
+            if self.SensorFusionDetected:
+                # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
+                self.write_to_app_pipe(
+                    f'{{"Name":"SetSensorFusionSupported", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}]}}')
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
@@ -192,7 +203,7 @@ class TC_ACS_2_1(MatterBaseTest):
                     asserts.assert_greater(num_support, 0, "Some Ambient Context is not scoped within AmbientContextSupport list.")
 
                     # If SensorFusion feature supported
-                    if self.SensorFusionSupported:
+                    if self.SensorFusionDetected:
                         detectionConfidence = context.detectionConfidence
                         if detectionConfidence != NullValue:
                             asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
@@ -352,7 +363,7 @@ class TC_ACS_2_1(MatterBaseTest):
             self.skip_step("13a")
             self.skip_step("13b")
 
-        if self.SensorFusionSupported:
+        if self.SensorFusionDetected:
             self.step("14", "If DUT supports feature SensorFusion, when reading the SensorFusionSupported attribute, verify that the list size is less than equal to 50 and the attribute contains SemanticTagStruct data type containing namespace ID and tag ID available from the AmbientContextTypeSupported attribute.")
             sensorFusionSupported = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SensorFusionSupported
