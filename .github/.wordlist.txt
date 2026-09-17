@@ -119,12 +119,14 @@ autotools
 avahi
 avL
 AwaitNextAction
+AXP
 AXXXF
 Axxxx
 AYNJV
 babaf
 backend
 backends
+backlight
 backticks
 backtrace
 backwards
@@ -1680,6 +1682,7 @@ VCP
 Vectorcall
 VendorID
 VendorName
+vendored
 vendorpayload
 venv
 ver

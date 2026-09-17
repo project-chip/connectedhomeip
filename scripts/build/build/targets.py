@@ -303,6 +303,7 @@ def BuildEsp32Target():
     # boards
     target.AppendFixedTargets([
         TargetPart('m5stack', board=Esp32Board.M5Stack),
+        TargetPart('m5stack-core2', board=Esp32Board.M5StackCore2),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
         TargetPart('p4functionev', board=Esp32Board.P4FunctionEV),

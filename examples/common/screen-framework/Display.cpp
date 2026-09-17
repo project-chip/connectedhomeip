@@ -28,7 +28,11 @@
 
 #if CONFIG_HAVE_DISPLAY
 
+#if CONFIG_DEVICE_TYPE_M5STACK_CORE2
+#include "Core2Power.h"
+#else
 #include "driver/ledc.h"
+#endif
 
 // Brightness picked such that it's easy for cameras to focus on
 #define DEFAULT_BRIGHTNESS_PERCENT 10
@@ -116,7 +120,21 @@ esp_err_t InitDisplay()
     spi_lobo_set_speed(spi, DEFAULT_SPI_CLOCK);
 
     TFT_setGammaCurve(0);
+    // First set a normal named rotation so tft_width/tft_height get swapped
+    // to landscape (this is done by _tft_setRotation() and only depends on
+    // the rotation index's parity, not on which MADCTL bits end up set).
     TFT_setRotation(LANDSCAPE);
+#if CONFIG_DEVICE_TYPE_M5STACK_CORE2
+    // Unlike the Basic/Gray, the Core2's panel is already scanned in
+    // landscape order natively: none of the MX/MY/MV bits are needed, only
+    // the BGR color-order bit. Confirmed on hardware -- every one of this
+    // library's 4 named rotations (which all set MV, MX|MV, MY|MV or
+    // MX|MY|MV) came out rotated or upside down. TFT_setRotation() treats
+    // any value > 3 as a raw MADCTL byte to write directly instead of a
+    // named rotation index, which lets us reach this combination even
+    // though it isn't one of the 4 the library's tables offer.
+    TFT_setRotation(TFT_RGB_BGR);
+#endif
     TFT_resetclipwin();
 
     DisplayWidth  = (uint16_t) (1 + tft_dispWin.x2 - tft_dispWin.x1);
@@ -140,12 +158,18 @@ esp_err_t InitDisplay()
 
 void SetBrightness(uint16_t brightness_percent)
 {
+#if CONFIG_DEVICE_TYPE_M5STACK_CORE2
+    // The Core2's backlight is a rail switched by the AXP192, not a GPIO, so
+    // there's no PWM dimming available here -- only on/off.
+    Core2Power::SetBacklight(brightness_percent > 0);
+#else
     uint16_t brightness = (brightness_percent * BRIGHTNESS_MAX) / 100;
     if (ledc_set_duty(LEDC_HIGH_SPEED_MODE, BACKLIGHT_CHANNEL, brightness) ||
         ledc_update_duty(LEDC_HIGH_SPEED_MODE, BACKLIGHT_CHANNEL))
     {
         ESP_LOGE(TAG, "Failed to set display brightness...");
     }
+#endif
 }
 
 bool WakeDisplay()
@@ -199,6 +223,11 @@ void TimerCallback(TimerHandle_t xTimer)
 
 void SetupBrightnessControl()
 {
+#if CONFIG_DEVICE_TYPE_M5STACK_CORE2
+    // Nothing to configure here: the backlight rail is already brought up by
+    // Core2Power::Init(), which must run before InitDisplay().
+    return;
+#else
     ledc_timer_config_t ledc_timer;
     memset(&ledc_timer, 0, sizeof(ledc_timer));
 
@@ -218,6 +247,7 @@ void SetupBrightnessControl()
     ledc_channel.speed_mode = LEDC_HIGH_SPEED_MODE;
     ledc_channel.timer_sel  = LEDC_TIMER_0;
     ledc_channel_config(&ledc_channel);
+#endif // CONFIG_DEVICE_TYPE_M5STACK_CORE2
 }
 
 #endif // CONFIG_HAVE_DISPLAY

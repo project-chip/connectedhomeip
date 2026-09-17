@@ -28,6 +28,7 @@ log = logging.getLogger(__name__)
 class Esp32Board(Enum):
     DevKitC = auto()
     M5Stack = auto()
+    M5StackCore2 = auto()
     C3DevKit = auto()
     P4FunctionEV = auto()
     QEMU = auto()
@@ -129,6 +130,9 @@ class Esp32App(Enum):
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         if board == Esp32Board.P4FunctionEV:
             return self == Esp32App.ALL_CLUSTERS
+        if board == Esp32Board.M5StackCore2:
+            # Only all-devices-app has Core2-specific display/power support so far.
+            return self == Esp32App.ALL_DEVICES
         return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
 
@@ -141,10 +145,8 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
                         Esp32App.TEMPERATURE_MEASUREMENT}
     if app == Esp32App.TESTS:
         return 'sdkconfig_qemu.defaults'
-    if app not in rpc_enabled_apps:
-        return 'sdkconfig.defaults'
 
-    rpc = "_rpc" if enable_rpcs else ""
+    rpc = "_rpc" if enable_rpcs and (app in rpc_enabled_apps) else ""
     if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit or board == Esp32Board.P4FunctionEV:
         return f'sdkconfig{rpc}.defaults'
     if board == Esp32Board.M5Stack:
@@ -153,11 +155,16 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         specific_apps = {
             Esp32App.ALL_CLUSTERS,
             Esp32App.ALL_CLUSTERS_MINIMAL,
+            Esp32App.ALL_DEVICES,
             Esp32App.LIGHT,
             Esp32App.OTA_REQUESTOR,
         }
         if app in specific_apps:
             return f'sdkconfig_m5stack{rpc}.defaults'
+        return f'sdkconfig{rpc}.defaults'
+    if board == Esp32Board.M5StackCore2:
+        if app == Esp32App.ALL_DEVICES:
+            return f'sdkconfig_m5stack_core2{rpc}.defaults'
         return f'sdkconfig{rpc}.defaults'
     raise Exception('Unknown board type')
 
