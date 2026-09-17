@@ -17,6 +17,8 @@
 
 #include "ThermostatClusterAttributes.h"
 
+#include <lib/support/CodeUtils.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {

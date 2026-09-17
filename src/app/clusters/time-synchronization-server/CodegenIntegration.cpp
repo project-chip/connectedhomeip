@@ -57,13 +57,13 @@ public:
         SupportsDNSResolve::TypeInfo::Type supportsDNSResolve = false;
         if (featureMap.Has(Feature::kNTPClient))
         {
-            VerifyOrDie(SupportsDNSResolve::GetDefault(endpointId, &supportsDNSResolve) == Status::Success);
+            VerifyOrDie(SupportsDNSResolve::GetDefault(endpointId, supportsDNSResolve) == Status::Success);
         }
 
         TimeZoneDatabaseEnum timeZoneDatabase = TimeZoneDatabaseEnum::kNone;
         if (featureMap.Has(Feature::kTimeZone))
         {
-            VerifyOrDie(TimeZoneDatabase::GetDefault(endpointId, &timeZoneDatabase) == Status::Success);
+            VerifyOrDie(TimeZoneDatabase::GetDefault(endpointId, timeZoneDatabase) == Status::Success);
         }
 
         TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
@@ -74,13 +74,13 @@ public:
         }
         else if (optionalAttributeSet.IsSet(TimeSource::Id))
         {
-            VerifyOrDie(TimeSource::GetDefault(endpointId, &timeSource) == Status::Success);
+            VerifyOrDie(TimeSource::GetDefault(endpointId, timeSource) == Status::Success);
         }
 
         NTPServerAvailable::TypeInfo::Type ntpServerAvailable = false;
         if (featureMap.Has(Feature::kNTPServer))
         {
-            VerifyOrDie(NTPServerAvailable::GetDefault(endpointId, &ntpServerAvailable) == Status::Success);
+            VerifyOrDie(NTPServerAvailable::GetDefault(endpointId, ntpServerAvailable) == Status::Success);
         }
 
         TimeSynchronizationCluster::StartupConfiguration startupConfiguration = { .supportsDNSResolve = supportsDNSResolve,
