@@ -36,9 +36,9 @@ directory is needed.
 
 The device is commissioned over Bluetooth Low Energy: the device and the Matter
 controller exchange security information through the Rendez-vous procedure, and
-the controller then provisions the Wi-Fi SSID and passphrase. Once joined to
-the Wi-Fi network, the device is controlled over IPv6 and discovered through
-CHIP's minimal mDNS.
+the controller then provisions the Wi-Fi SSID and passphrase. Once joined to the
+Wi-Fi network, the device is controlled over IPv6 and discovered through CHIP's
+minimal mDNS.
 
 The example drives a single GPIO as the light output and is intended both as a
 means to explore Matter on Zephyr for Espressif SoCs and as a template for real
@@ -46,8 +46,8 @@ products.
 
 ## Supported Hardware
 
-| Board                           | SoC      | Transport                  |
-| ------------------------------- | -------- | -------------------------- |
+| Board                            | SoC      | Transport                  |
+| -------------------------------- | -------- | -------------------------- |
 | `esp32c6_devkitc/esp32c6/hpcore` | ESP32-C6 | Wi-Fi (2.4 GHz), BLE setup |
 
 The board files in `boards/` apply automatically for this target. They set the
@@ -63,15 +63,14 @@ Prerequisites:
     Matter environment (`scripts/bootstrap.sh`).
 -   Follow the
     [Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
-    to install the Zephyr SDK (1.0.1 or newer, `riscv64-zephyr-elf`
-    toolchain).
+    to install the Zephyr SDK (1.0.1 or newer, `riscv64-zephyr-elf` toolchain).
 -   Build [chip-tool](../../../chip-tool/README.md) as the commissioner.
 
-| Component | Version            | Notes                                                                   |
-| --------- | ------------------ | ----------------------------------------------------------------------- |
-| Zephyr    | **v4.4.2**         | earlier releases ship mbedTLS 3.x and need the classic crypto backend   |
-| Python    | **3.12** or newer  | required by Zephyr 4.4; the Matter environment ships 3.11, so a separate venv is used |
-| ZAP       | see `scripts/setup/zap.json` | installed by `scripts/bootstrap.sh`                            |
+| Component | Version                      | Notes                                                                                 |
+| --------- | ---------------------------- | ------------------------------------------------------------------------------------- |
+| Zephyr    | **v4.4.2**                   | earlier releases ship mbedTLS 3.x and need the classic crypto backend                 |
+| Python    | **3.12** or newer            | required by Zephyr 4.4; the Matter environment ships 3.11, so a separate venv is used |
+| ZAP       | see `scripts/setup/zap.json` | installed by `scripts/bootstrap.sh`                                                   |
 
 ### Setting up the Zephyr workspace
 
@@ -108,15 +107,15 @@ Python to CMake. Set `ZEPHYR_SDK_INSTALL_DIR` only if Zephyr does not discover
 the SDK by itself.
 
 > **Note**: `west: unknown command "build"` means `ZEPHYR_BASE` is not set in
-> this terminal; source `zephyr-env.sh` again (it must be sourced, not run).
-> If `which west` shows the Matter `.environment` venv instead of the Zephyr
-> one, activate the Zephyr venv after `scripts/activate.sh` or any `.envrc`
-> that sources it, so that the Python 3.12 `west` comes first on `PATH`.
+> this terminal; source `zephyr-env.sh` again (it must be sourced, not run). If
+> `which west` shows the Matter `.environment` venv instead of the Zephyr one,
+> activate the Zephyr venv after `scripts/activate.sh` or any `.envrc` that
+> sources it, so that the Python 3.12 `west` comes first on `PATH`.
 
 ### Building the example
 
-Build from the example directory. As with the ESP-IDF examples, the output
-lands in the example's `build/` folder.
+Build from the example directory. As with the ESP-IDF examples, the output lands
+in the example's `build/` folder.
 
 ```shell
 cd "$CHIP/examples/lighting-app/esp32/zephyr"
@@ -137,9 +136,9 @@ west build -b esp32c6_devkitc/esp32c6/hpcore
 
 The binaries are created in `build/zephyr` as `zephyr.elf` and `zephyr.bin`.
 
-The same build is available as a helper script, following the other
-platforms' `scripts/examples/*_example.sh` convention. It needs no activation;
-point it at the Zephyr tree and it finds the venv in the workspace root:
+The same build is available as a helper script, following the other platforms'
+`scripts/examples/*_example.sh` convention. It needs no activation; point it at
+the Zephyr tree and it finds the venv in the workspace root:
 
 ```shell
 export ESP32_ZEPHYR_BASE="$WS/zephyr"
@@ -189,13 +188,12 @@ The output lands in `out/esp32-zephyr-c6devkitc-light/zephyr/`.
 
     Without `-e`, the monitor looks for the ELF relative to the current
     directory, so it would have to be run from `build/`. Its `-d` flag means
-    `--enable-address-decoding`, not build directory. Always pass `-p`; on
-    macOS it otherwise probes the phantom Bluetooth serial ports first and
-    stalls. Exit with `Ctrl-]`. Any serial terminal at 115200 baud also works.
+    `--enable-address-decoding`, not build directory. Always pass `-p`; on macOS
+    it otherwise probes the phantom Bluetooth serial ports first and stalls.
+    Exit with `Ctrl-]`. Any serial terminal at 115200 baud also works.
 
-> **Note**: Only one process may own the serial port. A monitor left open is
-> the usual cause of `Resource busy` or `No serial data received` when
-> flashing.
+> **Note**: Only one process may own the serial port. A monitor left open is the
+> usual cause of `Resource busy` or `No serial data received` when flashing.
 
 ## Running the Complete Example
 
@@ -228,8 +226,8 @@ The fabric is stored in NVS and survives reboot.
 
 ### Testing with chip-tool
 
-Commission the device over BLE-Wi-Fi from a host with BLE in range and the
-2.4 GHz access point reachable:
+Commission the device over BLE-Wi-Fi from a host with BLE in range and the 2.4
+GHz access point reachable:
 
 ```shell
 ./out/linux-x64-chip-tool/chip-tool pairing ble-wifi ${NODE_ID} ${SSID} ${PASSWORD} 20202021 3840
@@ -318,13 +316,13 @@ The largest single block (about 100 KB) is the Zephyr system heap sized by
 1. **Prototype configuration.** The example uses test attestation credentials
    and the test passcode. Factory data (`CONFIG_CHIP_FACTORY_DATA`) is not
    enabled.
-2. **No OTA.** The image boots through `ESP_SIMPLE_BOOT` without MCUboot
-   slots, so `CONFIG_CHIP_OTA_REQUESTOR` is off.
-3. **Single GPIO output.** The on-board WS2812 LED on GPIO8 (a strapping pin)
-   is not driven; wire a plain LED to GPIO2 or repoint the `led0` alias in the
+2. **No OTA.** The image boots through `ESP_SIMPLE_BOOT` without MCUboot slots,
+   so `CONFIG_CHIP_OTA_REQUESTOR` is off.
+3. **Single GPIO output.** The on-board WS2812 LED on GPIO8 (a strapping pin) is
+   not driven; wire a plain LED to GPIO2 or repoint the `led0` alias in the
    board overlay. There are no buttons or status LEDs.
-4. **Separate Python environment.** Until the Matter environment provides
-   Python 3.12, the Zephyr venv must be maintained alongside it.
+4. **Separate Python environment.** Until the Matter environment provides Python
+   3.12, the Zephyr venv must be maintained alongside it.
 
 ---
 
