@@ -99,6 +99,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/room-air-conditioner/RoomAirConditioner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/RootNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
@@ -198,6 +200,7 @@ foreach(_key
         rain-sensor
         refrigerator
         robotic-vacuum-cleaner
+        room-air-conditioner
         smoke-co-alarm
         soil-sensor
         speaker
