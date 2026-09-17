@@ -108,7 +108,7 @@ class TC_ACS_2_1(MatterBaseTest):
             if self.SensorFusionDetected:
                 # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
                 self.write_to_app_pipe(
-                    f'{{"Name":"SetSensorFusionSupported", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}]}}')
+                    f'{{"Name":"SetSensorFusionSupported", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}]}}')
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
