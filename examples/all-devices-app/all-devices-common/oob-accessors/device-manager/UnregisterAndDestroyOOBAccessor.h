@@ -18,6 +18,7 @@
 
 #include <device-factory/DeviceManager.h>
 #include <lib/core/TLV.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessor.h>
 
 namespace chip::app {
@@ -44,6 +45,7 @@ public:
 
         EndpointId endpointId = kInvalidEndpointId;
         DeviceId deviceId;
+        uint16_t deviceIdValue = 0;
         bool hasEndpointId = false;
         bool hasDeviceId   = false;
         CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -61,7 +63,8 @@ public:
                 hasEndpointId = true;
                 break;
             case 2:
-                ReturnErrorOnFailure(reader.Get(deviceId));
+                ReturnErrorOnFailure(reader.Get(deviceIdValue));
+                deviceId = DeviceId(deviceIdValue);
                 hasDeviceId = true;
                 break;
             default:
@@ -73,7 +76,13 @@ public:
         VerifyOrReturnError(hasEndpointId && hasDeviceId, CHIP_ERROR_INVALID_ARGUMENT);
         static_cast<void>(endpointId);
 
+        auto device = mDeviceManager.GetDevice(deviceId);
+        VerifyOrReturnError(device.has_value(), CHIP_ERROR_NOT_FOUND);
+        const std::string deviceName = device->name;
+        const bool wasRegistered     = device->isRegistered;
         mDeviceManager.UnregisterAndDestroyDevice(deviceId);
+        ChipLogProgress(AppServer, "UnregisterAndDestroy succeeded: deviceId=%u name='%s' wasRegistered=%s",
+                deviceId.value, deviceName.c_str(), wasRegistered ? "true" : "false");
         return CHIP_NO_ERROR;
     }
 

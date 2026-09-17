@@ -20,6 +20,7 @@
 #include <device-factory/DeviceManager.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <lib/core/TLV.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessor.h>
 
 #include <string>
@@ -116,11 +117,13 @@ public:
                 auto * dynamicAllocator = static_cast<DynamicEndpointIdAllocator *>(&mEndpointIdAllocator);
                 dynamicAllocator->ForceNext(deviceEntry.endpoint);
             }
-            VerifyOrReturnError(mDeviceManager.CreateAndRegisterDevice(
-                                    deviceEntry.type, mEndpointIdAllocator, deviceEntry.label,
-                                    EndpointComposition::WithParent(deviceEntry.parentId))
-                                    .has_value(),
-                                CHIP_ERROR_INTERNAL);
+            auto deviceId = mDeviceManager.CreateAndRegisterDevice(
+                deviceEntry.type, mEndpointIdAllocator, deviceEntry.label, EndpointComposition::WithParent(deviceEntry.parentId));
+            VerifyOrReturnError(deviceId.has_value(), CHIP_ERROR_INTERNAL);
+            ChipLogProgress(AppServer,
+                            "CreateAndRegister succeeded: deviceId=%u type='%s' label='%s' requestedEndpoint=%u parent=0x%04X",
+                            deviceId->value, deviceEntry.type.c_str(), deviceEntry.label.c_str(), deviceEntry.endpoint,
+                            deviceEntry.parentId);
         }
 
         return CHIP_NO_ERROR;

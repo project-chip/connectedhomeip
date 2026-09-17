@@ -174,7 +174,7 @@ public:
                 features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::GetConfig().enableWiFi);
 #endif
                 return features;
-            }()), mDeviceManager(DeviceFactory::GetInstance(), mDataModelProvider)
+            }()), mDeviceManager(PosixDeviceFactory::GetInstance(), mDataModelProvider)
     {}
 
     std::set<EndpointId> GetReservedEndpointIds() const
@@ -234,7 +234,7 @@ public:
 
     AppRootNode & RootNode() { return mRootNode; }
 
-    chip::app::DeviceManager & GetDeviceManager() { return mDeviceManager; }
+    chip::app::DeviceManager<PosixDeviceFactory> & GetDeviceManager() { return mDeviceManager; }
 
     std::vector<DeviceInterface*> GetConstructedDevices() const { return mDeviceManager.GetRegisteredDevices(); }
 
@@ -244,7 +244,7 @@ private:
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     AppRootNode mRootNode;
-    chip::app::DeviceManager mDeviceManager;
+    chip::app::DeviceManager<PosixDeviceFactory> mDeviceManager;
     std::optional<DynamicEndpointIdAllocator> mEndpointIdAllocator;
 };
 

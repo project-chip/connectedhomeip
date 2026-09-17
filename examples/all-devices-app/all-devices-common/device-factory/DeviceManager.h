@@ -51,7 +51,7 @@ private:
     struct DeviceWithStateOwning
     {
         std::string name;
-        DeviceFactoryT::DeviceRegistrationEntry device;
+        typename DeviceFactoryT::DeviceRegistrationEntry device;
         bool isRegistered;
     };
 
@@ -78,15 +78,14 @@ public:
     };
     CHIP_ERROR RegisterDevice(DeviceId deviceId, EndpointIdAllocator & endpointIdAllocator, EndpointComposition composition = {})
     {
-        auto deviceWithState = GetDevice(deviceId);
-        VerifyOrReturnError(deviceWithState.has_value(), CHIP_ERROR_NOT_FOUND);
-        VerifyOrReturnError(!deviceWithState.value().isRegistered, CHIP_ERROR_INVALID_ARGUMENT);
-        auto & device = deviceWithState.value().device;
-        ReturnErrorOnFailure(device.Register(endpointIdAllocator, mProvider, composition));
-        auto onDeviceRegistered = GetOnDeviceRegisteredCallback(deviceId);
-        if (onDeviceRegistered)
+        auto it = mConstructedDevices.find(deviceId);
+        VerifyOrReturnError(it != mConstructedDevices.end(), CHIP_ERROR_NOT_FOUND);
+        auto & deviceWithState = it->second;
+        VerifyOrReturnError(!deviceWithState.isRegistered, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(deviceWithState.device.device->Register(endpointIdAllocator, mProvider, composition));
+        if (deviceWithState.device.onDeviceRegistered)
         {
-            onDeviceRegistered();
+            deviceWithState.device.onDeviceRegistered();
         }
         deviceWithState.isRegistered = true;
         return CHIP_NO_ERROR;
@@ -115,7 +114,7 @@ public:
         auto it = mConstructedDevices.find(deviceId);
         if (it != mConstructedDevices.end())
         {
-            return DeviceWithState{ it->second.name, *it->second.device, it->second.isRegistered };
+            return DeviceWithState{ it->second.name, *it->second.device.device, it->second.isRegistered };
         }
         return std::nullopt;
     };
@@ -135,7 +134,7 @@ public:
         {
             if (deviceWithState.isRegistered)
             {
-                registeredDevices.push_back(deviceWithState.device.get());
+                registeredDevices.push_back(deviceWithState.device.device.get());
             }
         }
         return registeredDevices;
@@ -146,7 +145,7 @@ public:
         VerifyOrReturn(it != mConstructedDevices.end());
         auto & deviceWithState = it->second;
         VerifyOrReturn(deviceWithState.isRegistered);
-        deviceWithState.device->Unregister(mProvider);
+        deviceWithState.device.device->Unregister(mProvider);
         deviceWithState.isRegistered = false;
     };
     void UnregisterAndDestroyDevice(DeviceId deviceId)
@@ -164,7 +163,7 @@ public:
         {
             if (deviceWithState.isRegistered)
             {
-                deviceWithState.device->Unregister(mProvider);
+                deviceWithState.device.device->Unregister(mProvider);
                 deviceWithState.isRegistered = false;
             }
         }
@@ -182,7 +181,7 @@ private:
     };
 
     std::unordered_map<DeviceId, DeviceWithStateOwning, DeviceIdHash> mConstructedDevices;
-    DeviceFactory & mDeviceFactory;
+    DeviceFactoryT & mDeviceFactory;
     CodeDrivenDataModelProvider & mProvider;
     EndpointIdAllocator * mEndpointIdAllocator = nullptr;
 };
