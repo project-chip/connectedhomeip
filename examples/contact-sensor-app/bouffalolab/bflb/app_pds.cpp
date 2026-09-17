@@ -518,8 +518,7 @@ static int lp_exit(void * arg)
 
 extern "C" int app_dtim_sleep_check(void)
 {
-    (void) app_dtim_pm_check();
-    return pm_pbufc_check();
+    return app_dtim_pm_check();
 }
 
 extern "C" void app_pre_matter_init(void)
