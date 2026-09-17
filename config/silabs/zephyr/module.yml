@@ -18,3 +18,11 @@ name: connectedhomeip
 build:
     cmake: .
     kconfig: Kconfig
+    depends:
+        - mbedtls
+        - cmsis_6
+
+package-managers:
+    pip:
+        requirement-files:
+            - ../../scripts/setup/requirements.zephyr.txt
