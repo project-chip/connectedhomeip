@@ -519,10 +519,13 @@ See
 
 ## Support functionality
 
+<<<<<<< HEAD
 Shared helpers and test bases belong in src/python_testing/support_modules/ and
 are imported as from support_modules.x import Y, enforced currently by
 TestSupportModuleLocation.py
 
+=======
+>>>>>>> 493d6bca7c (Revert "Add docstring for notice on support modules needing to be in support_module folder")
 To create a controller on a new fabric:
 
 ```python
