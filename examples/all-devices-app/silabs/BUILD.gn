@@ -139,6 +139,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thermostat",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
 
     # Providers
