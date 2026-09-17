@@ -19,6 +19,7 @@
 #include "DeviceScreenRegistration.h"
 #include "devices/BooleanStateSensorScreen.h"
 #include "devices/DimmableLightScreen.h"
+#include "devices/FanLoadScreen.h"
 #include "devices/OccupancySensorScreen.h"
 #include "devices/OnOffLightScreen.h"
 #include "devices/TemperatureSensorScreen.h"
@@ -165,6 +166,40 @@ void RegisterDeviceScreen(TemperatureSensor & device, DeviceScreenRegistry & reg
         .endpointId = device.GetEndpointId(),
         .deviceType = "temperature-sensor",
         .renderFn   = [&device](lv_obj_t * parent) { ShowTemperatureSensorScreen(parent, device); },
+    });
+}
+
+void RegisterDeviceScreen(Fan & device, DeviceScreenRegistry & registry)
+{
+    const bool hasOnOff     = (device.OnOffCluster() != nullptr);
+    const char * title      = hasOnOff ? "Fan" : "Fan (No On/Off)";
+    const char * deviceType = hasOnOff ? "fan" : "fan-no-onoff";
+
+    registry.Register({
+        .title      = title,
+        .endpointId = device.GetEndpointId(),
+        .deviceType = deviceType,
+        .renderFn   = [&device, title](lv_obj_t * parent) { ShowFanLoadScreen(parent, title, device); },
+    });
+}
+
+void RegisterDeviceScreen(AirPurifier & device, DeviceScreenRegistry & registry)
+{
+    registry.Register({
+        .title      = "Air Purifier",
+        .endpointId = device.GetEndpointId(),
+        .deviceType = "air-purifier",
+        .renderFn   = [&device](lv_obj_t * parent) { ShowFanLoadScreen(parent, "Air Purifier", device); },
+    });
+}
+
+void RegisterDeviceScreen(ExtractorHood & device, DeviceScreenRegistry & registry)
+{
+    registry.Register({
+        .title      = "Extractor Hood",
+        .endpointId = device.GetEndpointId(),
+        .deviceType = "extractor-hood",
+        .renderFn   = [&device](lv_obj_t * parent) { ShowFanLoadScreen(parent, "Extractor Hood", device); },
     });
 }
 

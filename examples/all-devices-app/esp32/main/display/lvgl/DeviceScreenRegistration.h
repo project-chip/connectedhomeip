@@ -19,9 +19,12 @@
 #pragma once
 
 #include "DeviceScreenRegistry.h"
+#include <device/types/air-purifier/AirPurifier.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/dimmable-light/DimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
+#include <device/types/extractor-hood/ExtractorHood.h>
+#include <device/types/fan/Fan.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
 #include <device/types/mounted-on-off-control/MountedOnOffControl.h>
 #include <device/types/occupancy-sensor/OccupancySensor.h>
@@ -40,5 +43,8 @@ void RegisterDeviceScreen(MountedDimmableLoadControl & device, DeviceScreenRegis
 void RegisterDeviceScreen(BooleanStateSensor & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(OccupancySensor & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(TemperatureSensor & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(Fan & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(AirPurifier & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(ExtractorHood & device, DeviceScreenRegistry & registry);
 
 } // namespace chip::app
