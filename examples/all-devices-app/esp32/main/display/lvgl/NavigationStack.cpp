@@ -35,14 +35,8 @@ struct StackEntry
 
 std::vector<StackEntry> sStack;
 lv_obj_t * sTopBar           = nullptr;
-lv_obj_t * sBackBtn          = nullptr;
 lv_obj_t * sCrumbContainer   = nullptr;
 lv_obj_t * sContentContainer = nullptr;
-
-void OnBackClicked(lv_event_t * event)
-{
-    Pop();
-}
 
 void OnCrumbClicked(lv_event_t * event)
 {
@@ -55,16 +49,6 @@ void RefreshView()
     if (sStack.empty() || sContentContainer == nullptr || sTopBar == nullptr)
     {
         return;
-    }
-
-    // Update Back button visibility
-    if (sStack.size() <= 1)
-    {
-        lv_obj_add_flag(sBackBtn, LV_OBJ_FLAG_HIDDEN);
-    }
-    else
-    {
-        lv_obj_clear_flag(sBackBtn, LV_OBJ_FLAG_HIDDEN);
     }
 
     // Refresh breadcrumbs
@@ -142,21 +126,9 @@ void Init(lv_obj_t * rootScreen)
     lv_obj_set_style_radius(sTopBar, 0, LV_PART_MAIN);
     lv_obj_clear_flag(sTopBar, LV_OBJ_FLAG_SCROLLABLE);
 
-    // Back button (36x30px with 8px extended click area)
-    sBackBtn = lv_button_create(sTopBar);
-    lv_obj_set_size(sBackBtn, 36, 30);
-    lv_obj_set_style_pad_all(sBackBtn, 0, LV_PART_MAIN);
-    lv_obj_set_style_radius(sBackBtn, 4, LV_PART_MAIN);
-    lv_obj_set_ext_click_area(sBackBtn, 8);
-    lv_obj_t * backLabel = lv_label_create(sBackBtn);
-    lv_label_set_text_static(backLabel, "<");
-    lv_obj_center(backLabel);
-    lv_obj_add_event_cb(sBackBtn, OnBackClicked, LV_EVENT_CLICKED, nullptr);
-
-    // Breadcrumb container
+    // Breadcrumb container (spans full top bar)
     sCrumbContainer = lv_obj_create(sTopBar);
-    lv_obj_set_size(sCrumbContainer, LV_SIZE_CONTENT, LV_PCT(100));
-    lv_obj_set_flex_grow(sCrumbContainer, 1);
+    lv_obj_set_size(sCrumbContainer, LV_PCT(100), LV_PCT(100));
     lv_obj_set_flex_flow(sCrumbContainer, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(sCrumbContainer, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_all(sCrumbContainer, 0, LV_PART_MAIN);
