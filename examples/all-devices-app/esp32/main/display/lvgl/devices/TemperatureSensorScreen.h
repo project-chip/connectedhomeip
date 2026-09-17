@@ -18,21 +18,15 @@
 
 #pragma once
 
-#include <device/capabilities/on-off-load/OnOffLoad.h>
-#include <device/types/on-off-light/OnOffLight.h>
+#include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <lvgl.h>
 
 namespace chip::app {
 
 /**
- * Renders the device control screen for any OnOffLoad-based device (light, plug-in unit, mounted control).
+ * Renders the device control screen for a TemperatureSensor.
  * Must be called while holding the LVGL lock.
  */
-void ShowOnOffLoadScreen(lv_obj_t * parent, const char * title, OnOffLoad & device);
-
-inline void ShowOnOffLightScreen(lv_obj_t * parent, OnOffLight & device)
-{
-    ShowOnOffLoadScreen(parent, "On/Off Light", device);
-}
+void ShowTemperatureSensorScreen(lv_obj_t * parent, TemperatureSensor & device);
 
 } // namespace chip::app

@@ -18,21 +18,17 @@
 
 #pragma once
 
-#include <device/capabilities/on-off-load/OnOffLoad.h>
-#include <device/types/on-off-light/OnOffLight.h>
+#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <lvgl.h>
 
 namespace chip::app {
 
 /**
- * Renders the device control screen for any OnOffLoad-based device (light, plug-in unit, mounted control).
+ * Creates a compact LVGL card displaying BooleanState cluster status and an interactive toggle button
+ * to simulate sensor state transitions.
  * Must be called while holding the LVGL lock.
  */
-void ShowOnOffLoadScreen(lv_obj_t * parent, const char * title, OnOffLoad & device);
-
-inline void ShowOnOffLightScreen(lv_obj_t * parent, OnOffLight & device)
-{
-    ShowOnOffLoadScreen(parent, "On/Off Light", device);
-}
+lv_obj_t * CreateBooleanStateClusterWidget(lv_obj_t * parent, Clusters::BooleanStateCluster & cluster,
+                                           const char * trueLabel = "Active (True)", const char * falseLabel = "Inactive (False)");
 
 } // namespace chip::app

@@ -18,16 +18,21 @@
 
 #pragma once
 
+#include <device/capabilities/dimmable-load/DimmableLoad.h>
 #include <device/types/dimmable-light/DimmableLight.h>
 #include <lvgl.h>
 
 namespace chip::app {
 
 /**
- * Renders the device control screen for a DimmableLight.
- * Composes device header, OnOff cluster widget, and LevelControl cluster widget.
+ * Renders the device control screen for any DimmableLoad-based device (light, plug-in unit, mounted control).
  * Must be called while holding the LVGL lock.
  */
-void ShowDimmableLightScreen(lv_obj_t * parent, DimmableLight & device);
+void ShowDimmableLoadScreen(lv_obj_t * parent, const char * title, DimmableLoad & device);
+
+inline void ShowDimmableLightScreen(lv_obj_t * parent, DimmableLight & device)
+{
+    ShowDimmableLoadScreen(parent, "Dimmable Light", device);
+}
 
 } // namespace chip::app

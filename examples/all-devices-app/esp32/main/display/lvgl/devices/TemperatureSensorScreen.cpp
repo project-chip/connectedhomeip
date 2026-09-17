@@ -16,23 +16,22 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <device/capabilities/on-off-load/OnOffLoad.h>
-#include <device/types/on-off-light/OnOffLight.h>
-#include <lvgl.h>
+#include "TemperatureSensorScreen.h"
+#include "DeviceHeader.h"
+#include "clusters/TemperatureMeasurementClusterWidget.h"
 
 namespace chip::app {
 
-/**
- * Renders the device control screen for any OnOffLoad-based device (light, plug-in unit, mounted control).
- * Must be called while holding the LVGL lock.
- */
-void ShowOnOffLoadScreen(lv_obj_t * parent, const char * title, OnOffLoad & device);
-
-inline void ShowOnOffLightScreen(lv_obj_t * parent, OnOffLight & device)
+void ShowTemperatureSensorScreen(lv_obj_t * parent, TemperatureSensor & device)
 {
-    ShowOnOffLoadScreen(parent, "On/Off Light", device);
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_hor(parent, 8, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(parent, 4, LV_PART_MAIN);
+    lv_obj_set_style_pad_row(parent, 4, LV_PART_MAIN);
+    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    CreateDeviceHeader(parent, "Temperature Sensor", device.GetEndpointId());
+    CreateTemperatureMeasurementClusterWidget(parent, device.TemperatureMeasurementCluster());
 }
 
 } // namespace chip::app

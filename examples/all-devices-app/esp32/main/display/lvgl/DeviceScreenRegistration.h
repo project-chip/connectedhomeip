@@ -19,12 +19,26 @@
 #pragma once
 
 #include "DeviceScreenRegistry.h"
+#include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/dimmable-light/DimmableLight.h>
+#include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
+#include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
+#include <device/types/mounted-on-off-control/MountedOnOffControl.h>
+#include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/OnOffLight.h>
+#include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
+#include <device/types/temperature-sensor/TemperatureSensor.h>
 
 namespace chip::app {
 
 void RegisterDeviceScreen(OnOffLight & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(DimmableLight & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(OnOffPlugInUnit & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(DimmablePlugInUnit & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(MountedOnOffControl & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(MountedDimmableLoadControl & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(BooleanStateSensor & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(OccupancySensor & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(TemperatureSensor & device, DeviceScreenRegistry & registry);
 
 } // namespace chip::app

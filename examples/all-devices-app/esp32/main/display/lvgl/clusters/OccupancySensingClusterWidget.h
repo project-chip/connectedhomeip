@@ -18,21 +18,16 @@
 
 #pragma once
 
-#include <device/capabilities/on-off-load/OnOffLoad.h>
-#include <device/types/on-off-light/OnOffLight.h>
+#include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <lvgl.h>
 
 namespace chip::app {
 
 /**
- * Renders the device control screen for any OnOffLoad-based device (light, plug-in unit, mounted control).
+ * Creates a compact LVGL card displaying OccupancySensing cluster state and an interactive toggle button
+ * to simulate occupancy changes.
  * Must be called while holding the LVGL lock.
  */
-void ShowOnOffLoadScreen(lv_obj_t * parent, const char * title, OnOffLoad & device);
-
-inline void ShowOnOffLightScreen(lv_obj_t * parent, OnOffLight & device)
-{
-    ShowOnOffLoadScreen(parent, "On/Off Light", device);
-}
+lv_obj_t * CreateOccupancySensingClusterWidget(lv_obj_t * parent, Clusters::OccupancySensingCluster & cluster);
 
 } // namespace chip::app

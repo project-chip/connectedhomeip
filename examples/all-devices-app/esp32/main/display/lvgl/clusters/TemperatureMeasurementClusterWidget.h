@@ -18,21 +18,16 @@
 
 #pragma once
 
-#include <device/capabilities/on-off-load/OnOffLoad.h>
-#include <device/types/on-off-light/OnOffLight.h>
+#include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
 #include <lvgl.h>
 
 namespace chip::app {
 
 /**
- * Renders the device control screen for any OnOffLoad-based device (light, plug-in unit, mounted control).
+ * Creates a compact LVGL card displaying TemperatureMeasurement cluster value and an interactive slider
+ * to simulate ambient temperature changes.
  * Must be called while holding the LVGL lock.
  */
-void ShowOnOffLoadScreen(lv_obj_t * parent, const char * title, OnOffLoad & device);
-
-inline void ShowOnOffLightScreen(lv_obj_t * parent, OnOffLight & device)
-{
-    ShowOnOffLoadScreen(parent, "On/Off Light", device);
-}
+lv_obj_t * CreateTemperatureMeasurementClusterWidget(lv_obj_t * parent, Clusters::TemperatureMeasurementCluster & cluster);
 
 } // namespace chip::app

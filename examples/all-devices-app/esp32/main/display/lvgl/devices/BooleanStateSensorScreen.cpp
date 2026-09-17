@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 
-#include "DimmableLightScreen.h"
+#include "BooleanStateSensorScreen.h"
 #include "DeviceHeader.h"
-#include "clusters/LevelControlClusterWidget.h"
-#include "clusters/OnOffClusterWidget.h"
+#include "clusters/BooleanStateClusterWidget.h"
 
 namespace chip::app {
 
-void ShowDimmableLoadScreen(lv_obj_t * parent, const char * title, DimmableLoad & device)
+void ShowBooleanStateSensorScreen(lv_obj_t * parent, const char * title, BooleanStateSensor & device, const char * trueLabel,
+                                  const char * falseLabel)
 {
     lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_hor(parent, 8, LV_PART_MAIN);
@@ -32,8 +32,7 @@ void ShowDimmableLoadScreen(lv_obj_t * parent, const char * title, DimmableLoad 
     lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     CreateDeviceHeader(parent, title, device.GetEndpointId());
-    CreateOnOffClusterWidget(parent, device.OnOffCluster());
-    CreateLevelControlClusterWidget(parent, device.LevelControlCluster());
+    CreateBooleanStateClusterWidget(parent, device.BooleanState(), trueLabel, falseLabel);
 }
 
 } // namespace chip::app
