@@ -17,18 +17,12 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class WebRTCTransportRequestorClusterSFrameKeyStruct (
-    val kid: ByteArray,
-    val baseKey: ByteArray) {
+class WebRTCTransportRequestorClusterSFrameKeyStruct (val kid: ByteArray, val baseKey: ByteArray) {
   override fun toString(): String  = buildString {
     append("WebRTCTransportRequestorClusterSFrameKeyStruct {\n")
     append("\tkid : $kid\n")
@@ -49,11 +43,11 @@ class WebRTCTransportRequestorClusterSFrameKeyStruct (
     private const val TAG_KID = 0
     private const val TAG_BASE_KEY = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WebRTCTransportRequestorClusterSFrameKeyStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WebRTCTransportRequestorClusterSFrameKeyStruct {
       tlvReader.enterStructure(tlvTag)
       val kid = tlvReader.getByteArray(ContextSpecificTag(TAG_KID))
       val baseKey = tlvReader.getByteArray(ContextSpecificTag(TAG_BASE_KEY))
-      
+
       tlvReader.exitContainer()
 
       return WebRTCTransportRequestorClusterSFrameKeyStruct(kid, baseKey)
