@@ -49,7 +49,10 @@ from matter.testing.matter_testing import AttributeMatcher, MatterTestCommission
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
+
 class TC_AVSUM_2_9(MatterTestCommissionedDevice, AVSUMTestBase):
+    # Step 22 reboots the DUT, which the background wildcard subscription does not survive.
+    disable_wildcard_subscription = True
 
     def desc_TC_AVSUM_2_9(self) -> str:
         return "[TC-AVSUM-2.9] MptzSetPosition Command Validation"
