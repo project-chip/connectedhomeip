@@ -51,6 +51,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_AVANALY_2_11(MatterBaseTest, AVANALYTestBase):
+    # Step 4 reboots the DUT, which the background wildcard subscription does not survive.
+    disable_wildcard_subscription = True
 
     def desc_TC_AVANALY_2_11(self) -> str:
         return "[TC-AVANALY-2.11] Validate persistence of attributes and active triggers with Server as DUT"
