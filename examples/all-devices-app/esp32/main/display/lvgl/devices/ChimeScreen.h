@@ -18,17 +18,15 @@
 
 #pragma once
 
-#include "sdkconfig.h"
-#include <device-factory/DeviceFactory.h>
-
-#if CONFIG_DISPLAY_LVGL
-#include "DeviceScreenHook.h"
+#include <device/types/chime/Chime.h>
+#include <lvgl.h>
 
 namespace chip::app {
-using AppDeviceFactory = DeviceFactory<DeviceScreenHook>;
+
+/**
+ * Renders the device control screen for a Chime device.
+ * Must be called while holding the LVGL lock.
+ */
+void ShowChimeScreen(lv_obj_t * parent, Chime & device);
+
 } // namespace chip::app
-#else
-namespace chip::app {
-using AppDeviceFactory = NoHooksDeviceFactory;
-} // namespace chip::app
-#endif

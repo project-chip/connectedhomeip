@@ -127,6 +127,24 @@ menu "Demo"
             Selects the LVGL display implementation instead of the default one
             built on the vendored TFT library, which is ESP32-only.
 
+    config HAVE_SPEAKER
+        bool
+        default y if DEVICE_TYPE_M5STACK_CORES3
+        default n if !DEVICE_TYPE_M5STACK_CORES3
+
+    config CHIME_ATTENUATION_DB
+        int "Chime attenuation (dB below maximum)"
+        depends on HAVE_SPEAKER
+        range 0 96
+        default 40
+        help
+            Attenuation applied to the chime output, in decibels below the
+            amplifier's maximum gain. 0 is full volume; each 6 dB halves the
+            amplitude. The value is programmed into the AW88298 volume
+            register, so digital resolution is unaffected.
+
+
+
     config RENDEZVOUS_MODE
        int
        range 0 63

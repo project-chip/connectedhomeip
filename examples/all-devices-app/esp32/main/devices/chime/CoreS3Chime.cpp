@@ -1,0 +1,574 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "CoreS3Chime.h"
+
+#include "bsp/m5stack_core_s3.h"
+#include "driver/i2c_master.h"
+#include "driver/i2s_std.h"
+#include "sdkconfig.h"
+
+#include <cmath>
+#include <cstring>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+#include <freertos/task.h>
+#include <iterator>
+#include <lib/support/logging/CHIPLogging.h>
+
+namespace chip::app {
+
+namespace {
+
+// Audio output on the M5Stack CoreS3
+// ==================================
+//
+// Path: ESP32-S3 I2S -> AW88298 class-D amplifier -> onboard 1 W speaker.
+//
+//   BCLK  GPIO34   shared with ES7210 capture codec
+//   LRCK  GPIO33   shared with ES7210 capture codec
+//   DOUT  GPIO13   amplifier only
+//   MCLK  GPIO0    used by ES7210 only, unused here
+//
+// I2C, internal bus: AW88298 0x36, AW9523 IO expander 0x58, AXP2101 PMU 0x34.
+// AW9523 P0_2 enables the amplifier, P1_7 enables the SY7088 step-up converter.
+//
+// Required, each verified by reverting it alone on hardware:
+//
+//  1. AXP2101 register 0x90 with ALDO3, BLDO1, BLDO2 enabled (0xbf). ESP-BSP sets 0x8b.
+//     Without these rails the amplifier acknowledges I2C and locks its PLL, but latches
+//     under-voltage lockout and does not start its output stage. Set bits only: clearing
+//     a rail used by display, touch or storage resets those peripherals.
+//
+//  2. 48 kHz output rate. At 22050 Hz the PLL locks but the output stage does not start.
+//
+// Checked while debugging silent output and found to not affect audio: I2S peripheral
+// number (NUM_0 and NUM_1 both work) and MCLK output (works driven or undriven, left
+// undriven).
+//
+// SYSST, register 0x01:
+//   bit 0  PLLS   PLL locked to bit clock
+//   bit 4  CLKS   clock detected
+//   bit 9  BSTS   output stage running
+//   bit 14 UVLS   under-voltage lockout
+// PLLS and CLKS only indicate the digital input is clocked; sound requires BSTS. A
+// working reference reads 0x0211 during playback.
+//
+// ESP-BSP audio helpers are unused: bsp_audio_init() also allocates and enables an RX
+// channel on the same pins, and the esp_codec_dev AW88298 driver writes an I2SCTRL value
+// for 16-bit audio that contradicts its own frame setting.
+
+// Required by the amplifier, see above.
+constexpr uint32_t kSampleRateHz = 48000;
+constexpr float kPi              = 3.14159265358979323846f;
+constexpr size_t kChunkSamples   = 256;
+
+// Sine lookup table sized so that the top bits of a 32-bit phase accumulator index it
+// directly. 256 entries keep the table at 1 KB while staying well below the noise floor
+// of a chime.
+constexpr size_t kSineTableSize    = 256;
+constexpr uint32_t kSineTableShift = 24;
+
+constexpr uint8_t kAw88298Address = 0x36;
+constexpr uint8_t kAw9523Address  = 0x58;
+constexpr uint8_t kAxp2101Address = 0x34;
+
+constexpr uint16_t kAw88298ChipId = 0x1852;
+
+// AW9523 output ports; P0_2 is the AW88298 PA enable and P1_7 enables the SY7088 step-up
+// converter that feeds the amplifier power stage.
+constexpr uint8_t kAw9523OutputPort0 = 0x02;
+constexpr uint8_t kAw9523OutputPort1 = 0x03;
+constexpr uint8_t kAw88298PaEnable   = 0x04;
+constexpr uint8_t kSy7088BoostEnable = 0x80;
+
+// AXP2101 LDO enable register. ALDO3, BLDO1 and BLDO2 are left off by the BSP but are
+// enabled by the M5Unified board setup that the factory firmware uses.
+constexpr uint8_t kAxp2101LdoEnable         = 0x90;
+constexpr uint8_t kAxp2101AmplifierRailBits = 0x34;
+
+// Synthesis parameters for one chime. A chime with both frequencies equal is a single
+// note; otherwise the second note starts halfway through.
+struct ChimeTone
+{
+    float firstFrequencyHz;
+    float secondFrequencyHz;
+    float durationSec;
+    bool pulse;
+};
+
+// Chime ID is the index into both tables; keep them in sync.
+const Chime::Sound kCoreS3Sounds[] = {
+    { 0, "Ding Dong"_span },
+    { 1, "Ring Ring"_span },
+    { 2, "Alert Beep"_span },
+};
+
+constexpr ChimeTone kCoreS3Tones[] = {
+    { 880.0f, 660.0f, 1.0f, false },  // Ding Dong: two notes
+    { 1000.0f, 1000.0f, 1.0f, true }, // Ring Ring: pulsed single note
+    { 440.0f, 440.0f, 0.5f, false },  // Alert Beep: short single note
+};
+
+static_assert(std::size(kCoreS3Tones) == std::size(kCoreS3Sounds));
+
+i2s_chan_handle_t sTxChannel          = nullptr;
+i2c_master_dev_handle_t sAmplifierI2c = nullptr;
+SemaphoreHandle_t sPlayMutex          = nullptr;
+
+// Oscillator lookup table, and the staging buffer handed to the I2S driver. Both are file
+// scope because playback is serialised by sPlayMutex and the playback task stack is small.
+float sSineTable[kSineTableSize];
+bool sSineTableInitialized = false;
+int16_t sChunkBuffer[kChunkSamples * 2];
+
+esp_err_t WriteAmplifierRegister(uint8_t reg, uint16_t value)
+{
+    const uint8_t payload[3] = { reg, static_cast<uint8_t>(value >> 8), static_cast<uint8_t>(value & 0xFF) };
+    return i2c_master_transmit(sAmplifierI2c, payload, sizeof(payload), 100);
+}
+
+esp_err_t ReadAmplifierRegister(uint8_t reg, uint16_t & value)
+{
+    uint8_t raw[2] = { 0, 0 };
+    esp_err_t err  = i2c_master_transmit_receive(sAmplifierI2c, &reg, 1, raw, sizeof(raw), 100);
+    value          = static_cast<uint16_t>((static_cast<uint16_t>(raw[0]) << 8) | raw[1]);
+    return err;
+}
+
+esp_err_t ReadByteRegister(i2c_master_dev_handle_t device, uint8_t reg, uint8_t & value)
+{
+    return i2c_master_transmit_receive(device, &reg, 1, &value, 1, 100);
+}
+
+esp_err_t WriteByteRegister(i2c_master_dev_handle_t device, uint8_t reg, uint8_t value)
+{
+    const uint8_t payload[2] = { reg, value };
+    return i2c_master_transmit(device, payload, sizeof(payload), 100);
+}
+
+esp_err_t ConfigureExpanderOutputs()
+{
+    i2c_master_dev_handle_t expander = nullptr;
+    const i2c_device_config_t config = {
+        .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+        .device_address  = kAw9523Address,
+        .scl_speed_hz    = 400000,
+        .scl_wait_us     = 0,
+        .flags           = { .disable_ack_check = 0 },
+    };
+
+    esp_err_t addErr = i2c_master_bus_add_device(bsp_i2c_get_handle(), &config, &expander);
+    if (addErr != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to attach AW9523 to I2C bus");
+        return addErr;
+    }
+
+    // P1_7 must be a GPIO (LED-mode bit set) configured as an output (direction bit clear)
+    // before the output latch can drive the SY7088 enable line high.
+    uint8_t ledMode1 = 0;
+    if (ReadByteRegister(expander, 0x13, ledMode1) == ESP_OK && (ledMode1 & kSy7088BoostEnable) == 0)
+    {
+        WriteByteRegister(expander, 0x13, static_cast<uint8_t>(ledMode1 | kSy7088BoostEnable));
+    }
+
+    uint8_t direction1 = 0;
+    if (ReadByteRegister(expander, 0x05, direction1) == ESP_OK && (direction1 & kSy7088BoostEnable) != 0)
+    {
+        WriteByteRegister(expander, 0x05, static_cast<uint8_t>(direction1 & ~kSy7088BoostEnable));
+    }
+
+    uint8_t output1 = 0;
+    esp_err_t err   = ReadByteRegister(expander, kAw9523OutputPort1, output1);
+    if (err == ESP_OK && (output1 & kSy7088BoostEnable) == 0)
+    {
+        err = WriteByteRegister(expander, kAw9523OutputPort1, static_cast<uint8_t>(output1 | kSy7088BoostEnable));
+    }
+
+    // P0_2 is the AW88298 PA enable. It is driven here rather than through
+    // bsp_feature_enable(BSP_FEATURE_SPEAKER), which would also power the ES7210.
+    uint8_t ledMode0 = 0;
+    if (ReadByteRegister(expander, 0x12, ledMode0) == ESP_OK && (ledMode0 & kAw88298PaEnable) == 0)
+    {
+        WriteByteRegister(expander, 0x12, static_cast<uint8_t>(ledMode0 | kAw88298PaEnable));
+    }
+
+    uint8_t direction0 = 0;
+    if (ReadByteRegister(expander, 0x04, direction0) == ESP_OK && (direction0 & kAw88298PaEnable) != 0)
+    {
+        WriteByteRegister(expander, 0x04, static_cast<uint8_t>(direction0 & ~kAw88298PaEnable));
+    }
+
+    uint8_t output0 = 0;
+    if (ReadByteRegister(expander, kAw9523OutputPort0, output0) == ESP_OK && (output0 & kAw88298PaEnable) == 0)
+    {
+        WriteByteRegister(expander, kAw9523OutputPort0, static_cast<uint8_t>(output0 | kAw88298PaEnable));
+    }
+
+    i2c_master_bus_rm_device(expander);
+    return err;
+}
+
+// The BSP brings up only a subset of the AXP2101 rails (0x8b), while the M5Unified board
+// setup used by the factory firmware enables 0xbf. With ALDO3 / BLDO1 / BLDO2 off the
+// AW88298 reports under-voltage lockout and its boost stage never starts, so the amplifier
+// clocks correctly but produces no output. Only set bits here: clearing a rail that the
+// display, touch or storage drivers depend on browns those peripherals out.
+esp_err_t EnableAmplifierSupplyRails()
+{
+    i2c_master_dev_handle_t pmu      = nullptr;
+    const i2c_device_config_t config = {
+        .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+        .device_address  = kAxp2101Address,
+        .scl_speed_hz    = 400000,
+        .scl_wait_us     = 0,
+        .flags           = { .disable_ack_check = 0 },
+    };
+
+    esp_err_t err = i2c_master_bus_add_device(bsp_i2c_get_handle(), &config, &pmu);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to attach AXP2101 to I2C bus");
+        return err;
+    }
+
+    uint8_t enableBefore = 0;
+    err                  = ReadByteRegister(pmu, kAxp2101LdoEnable, enableBefore);
+    if (err == ESP_OK && (enableBefore & kAxp2101AmplifierRailBits) != kAxp2101AmplifierRailBits)
+    {
+        err = WriteByteRegister(pmu, kAxp2101LdoEnable, static_cast<uint8_t>(enableBefore | kAxp2101AmplifierRailBits));
+    }
+
+    i2c_master_bus_rm_device(pmu);
+    return err;
+}
+
+bool InitializeI2sTxChannel()
+{
+    i2s_chan_config_t channelConfig = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
+    channelConfig.auto_clear        = true;
+
+    if (i2s_new_channel(&channelConfig, &sTxChannel, nullptr) != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to allocate I2S TX channel");
+        return false;
+    }
+
+    const i2s_std_config_t standardConfig = {
+        .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(kSampleRateHz),
+        .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO),
+        .gpio_cfg = {
+            // Verified on hardware to work either way; left undriven so GPIO0 stays free,
+            // matching M5Unified. Only the (unused here) ES7210 capture codec needs MCLK.
+            .mclk = I2S_GPIO_UNUSED,
+            .bclk = BSP_I2S_SCLK,
+            .ws   = BSP_I2S_LCLK,
+            .dout = BSP_I2S_DOUT,
+            .din  = I2S_GPIO_UNUSED,
+            .invert_flags = {
+                .mclk_inv = false,
+                .bclk_inv = false,
+                .ws_inv   = false,
+            },
+        },
+    };
+
+    if (i2s_channel_init_std_mode(sTxChannel, &standardConfig) != ESP_OK || i2s_channel_enable(sTxChannel) != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to configure I2S TX channel");
+        i2s_del_channel(sTxChannel);
+        sTxChannel = nullptr;
+        return false;
+    }
+
+    return true;
+}
+
+// The AW88298 selects its sample rate from a fixed table, indexed by the low nibble of
+// register 0x06. Table entries are the rate in units of 2205 Hz, so 48000 Hz maps to
+// entry 22 at index 8.
+uint16_t AmplifierRateIndex()
+{
+    constexpr uint8_t kRateTable[] = { 4, 5, 6, 8, 10, 11, 15, 20, 22, 44 };
+    const uint32_t scaledRate      = (kSampleRateHz + 1102) / 2205;
+
+    uint16_t index = 0;
+    while (index < (sizeof(kRateTable) - 1) && scaledRate > kRateTable[index])
+    {
+        ++index;
+    }
+    return index;
+}
+
+// Register 0x0C holds the output attenuation in its high byte, 0x00 for 0 dB down to 0xC0
+// for -96 dB in 0.5 dB steps. The low byte is a fixed configuration field.
+uint16_t AmplifierVolumeRegister()
+{
+    constexpr uint16_t kMaxAttenuationSteps = 0xC0;
+    constexpr uint16_t kVolumeLowByte       = 0x64;
+
+    uint16_t steps = static_cast<uint16_t>(CONFIG_CHIME_ATTENUATION_DB * 2);
+    if (steps > kMaxAttenuationSteps)
+    {
+        steps = kMaxAttenuationSteps;
+    }
+    return static_cast<uint16_t>((steps << 8) | kVolumeLowByte);
+}
+
+bool InitializeAmplifier()
+{
+    const i2c_device_config_t config = {
+        .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+        .device_address  = kAw88298Address,
+        .scl_speed_hz    = 400000,
+        .scl_wait_us     = 0,
+        .flags           = { .disable_ack_check = 0 },
+    };
+
+    if (i2c_master_bus_add_device(bsp_i2c_get_handle(), &config, &sAmplifierI2c) != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to attach AW88298 to I2C bus");
+        return false;
+    }
+
+    // A soft reset clears any latched protection state (for example UVLS from a previous
+    // power-up attempt) that would otherwise keep the output stage disabled.
+    WriteAmplifierRegister(0x00, 0x55AA);
+    vTaskDelay(pdMS_TO_TICKS(10));
+
+    // Register values follow the M5Unified CoreS3 bring-up sequence, which programs the
+    // amplifier before any I2S clock is present. Register 0x06 encodes channel select
+    // (left), Philips I2S, 16-bit words and 32 BCK per frame in the upper bits, with the
+    // sample rate selected by the low nibble.
+    WriteAmplifierRegister(0x61, 0x0673); // Boost mode disabled
+    WriteAmplifierRegister(0x04, 0x4040); // I2SEN=1 AMPPD=0 PWDN=0
+    WriteAmplifierRegister(0x05, 0x0008); // RMSE=0 HAGCE=0 HDCCE=0 HMUTE=0
+    WriteAmplifierRegister(0x06, static_cast<uint16_t>(0x14C0 | AmplifierRateIndex()));
+    WriteAmplifierRegister(0x0C, AmplifierVolumeRegister());
+
+    uint16_t chipId = 0;
+    ReadAmplifierRegister(0x00, chipId);
+    if (chipId != kAw88298ChipId)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Unexpected amplifier id 0x%04x, expected 0x%04x", chipId, kAw88298ChipId);
+        return false;
+    }
+
+    return true;
+}
+
+// SYSST bit 0 reports PLL lock. The amplifier only starts switching once it has locked
+// onto the incoming bit clock, so retry the enable until it reports a locked PLL.
+void WaitForAmplifierLock()
+{
+    constexpr uint16_t kPllLocked = 0x0001;
+    constexpr int kMaxAttempts    = 10;
+
+    uint16_t status = 0;
+    for (int attempt = 0; attempt < kMaxAttempts; ++attempt)
+    {
+        vTaskDelay(pdMS_TO_TICKS(2));
+        ReadAmplifierRegister(0x01, status);
+        if ((status & kPllLocked) != 0)
+        {
+            return;
+        }
+        WriteAmplifierRegister(0x04, 0x4040);
+    }
+
+    ChipLogError(DeviceLayer, "CoreS3Chime: Amplifier PLL did not lock, sysst=0x%04x", status);
+}
+
+bool EnsureSpeakerInitialized()
+{
+    if (sPlayMutex == nullptr)
+    {
+        sPlayMutex = xSemaphoreCreateMutex();
+        if (sPlayMutex == nullptr)
+        {
+            return false;
+        }
+    }
+
+    if (sTxChannel != nullptr)
+    {
+        return true;
+    }
+
+    bsp_i2c_init();
+
+    EnableAmplifierSupplyRails();
+    vTaskDelay(pdMS_TO_TICKS(10));
+
+    ConfigureExpanderOutputs();
+    vTaskDelay(pdMS_TO_TICKS(20));
+
+    // M5Unified programs the amplifier while the I2S pins are still idle and only then
+    // starts the clock; configuring register 0x06 (PLL divider) against a running clock
+    // leaves the AW88298 state machine oscillating between locked and unlocked.
+    if (!InitializeAmplifier())
+    {
+        return false;
+    }
+
+    if (!InitializeI2sTxChannel())
+    {
+        return false;
+    }
+
+    WaitForAmplifierLock();
+    return true;
+}
+
+void EnsureSineTable()
+{
+    if (sSineTableInitialized)
+    {
+        return;
+    }
+
+    for (size_t i = 0; i < kSineTableSize; ++i)
+    {
+        sSineTable[i] = std::sin((2.0f * kPi * static_cast<float>(i)) / static_cast<float>(kSineTableSize));
+    }
+    sSineTableInitialized = true;
+}
+
+float SineAt(uint32_t phase)
+{
+    return sSineTable[phase >> kSineTableShift];
+}
+
+// Phase is a 32-bit fraction of a full cycle, so one sample advances by
+// frequency / sampleRate of 2^32.
+uint32_t FrequencyToPhaseIncrement(float frequency)
+{
+    constexpr float kPhaseRange = 4294967296.0f;
+    return static_cast<uint32_t>((frequency * kPhaseRange) / static_cast<float>(kSampleRateHz));
+}
+
+void SynthesizeAndPlay(uint8_t chimeID)
+{
+    if (chimeID >= std::size(kCoreS3Tones))
+    {
+        return;
+    }
+    const ChimeTone & tone = kCoreS3Tones[chimeID];
+
+    if (xSemaphoreTake(sPlayMutex, pdMS_TO_TICKS(2000)) != pdTRUE)
+    {
+        return;
+    }
+
+    EnsureSineTable();
+
+    const uint32_t totalSamples = static_cast<uint32_t>(tone.durationSec * kSampleRateHz);
+
+    // A two-tone chime switches to the second note halfway through; a single-tone chime
+    // never reaches the boundary.
+    const uint32_t noteBoundary       = (tone.firstFrequencyHz != tone.secondFrequencyHz) ? (totalSamples / 2) : totalSamples;
+    const uint32_t pulsePeriodSamples = kSampleRateHz / 20;
+
+    // exp(-4t) sampled at the output rate is a constant ratio between consecutive samples,
+    // so the envelope costs one multiply per sample rather than a call to expf.
+    const float envelopeDecay = std::exp(-4.0f / static_cast<float>(kSampleRateHz));
+
+    uint32_t phase          = 0;
+    uint32_t phaseIncrement = FrequencyToPhaseIncrement(tone.firstFrequencyHz);
+    float envelope          = 1.0f;
+    uint32_t produced       = 0;
+
+    while (produced < totalSamples)
+    {
+        uint32_t count = totalSamples - produced;
+        if (count > kChunkSamples)
+        {
+            count = kChunkSamples;
+        }
+
+        for (uint32_t i = 0; i < count; ++i)
+        {
+            const uint32_t index = produced + i;
+            if (index == noteBoundary)
+            {
+                phaseIncrement = FrequencyToPhaseIncrement(tone.secondFrequencyHz);
+                phase          = 0;
+                envelope       = 1.0f;
+            }
+
+            // Unsigned overflow wraps the phase, so multiplying it yields the harmonics.
+            float sample = 0.6f * SineAt(phase) + 0.3f * SineAt(phase * 2) + 0.1f * SineAt(phase * 3);
+            sample *= envelope;
+
+            if (tone.pulse && (((index / pulsePeriodSamples) & 1) != 0))
+            {
+                sample = 0.0f;
+            }
+
+            const int16_t value     = static_cast<int16_t>(sample * 28000.0f);
+            sChunkBuffer[2 * i]     = value;
+            sChunkBuffer[2 * i + 1] = value;
+
+            phase += phaseIncrement;
+            envelope *= envelopeDecay;
+        }
+
+        size_t written = 0;
+        i2s_channel_write(sTxChannel, sChunkBuffer, count * 2 * sizeof(int16_t), &written, 1000);
+        produced += count;
+    }
+
+    std::memset(sChunkBuffer, 0, sizeof(sChunkBuffer));
+    size_t written = 0;
+    i2s_channel_write(sTxChannel, sChunkBuffer, sizeof(sChunkBuffer), &written, 1000);
+
+    xSemaphoreGive(sPlayMutex);
+}
+
+void ChimePlaybackTask(void * arg)
+{
+    uint8_t chimeID = static_cast<uint8_t>(reinterpret_cast<uintptr_t>(arg));
+    SynthesizeAndPlay(chimeID);
+    vTaskDelete(nullptr);
+}
+
+} // namespace
+
+CoreS3Chime::CoreS3Chime(TimerDelegate & timerDelegate) : Chime(timerDelegate, Span<const Sound>(kCoreS3Sounds)) {}
+
+Protocols::InteractionModel::Status CoreS3Chime::PlayChimeSound(uint8_t chimeID)
+{
+    auto status = Chime::PlayChimeSound(chimeID);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        return status;
+    }
+
+    if (!EnsureSpeakerInitialized())
+    {
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
+    // Priority 2 sits above the CHIP event loop (priority 1) so playback is not delayed by
+    // Matter processing, but below the display task so it cannot stall the UI.
+    xTaskCreate(ChimePlaybackTask, "chime_play", 4096, reinterpret_cast<void *>(static_cast<uintptr_t>(chimeID)), 2, nullptr);
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace chip::app

@@ -18,17 +18,16 @@
 
 #pragma once
 
-#include "sdkconfig.h"
-#include <device-factory/DeviceFactory.h>
-
-#if CONFIG_DISPLAY_LVGL
-#include "DeviceScreenHook.h"
+#include <device/types/chime/Chime.h>
+#include <lvgl.h>
 
 namespace chip::app {
-using AppDeviceFactory = DeviceFactory<DeviceScreenHook>;
+
+/**
+ * Creates an interactive LVGL widget card for the Chime cluster.
+ * Provides Enable/Mute toggle, installed sound selector buttons, and a Play Chime test button.
+ * Must be called while holding the LVGL lock.
+ */
+lv_obj_t * CreateChimeClusterWidget(lv_obj_t * parent, Chime & device);
+
 } // namespace chip::app
-#else
-namespace chip::app {
-using AppDeviceFactory = NoHooksDeviceFactory;
-} // namespace chip::app
-#endif

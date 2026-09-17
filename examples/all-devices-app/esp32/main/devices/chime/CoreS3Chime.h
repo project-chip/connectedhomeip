@@ -18,17 +18,21 @@
 
 #pragma once
 
-#include "sdkconfig.h"
-#include <device-factory/DeviceFactory.h>
-
-#if CONFIG_DISPLAY_LVGL
-#include "DeviceScreenHook.h"
+#include <device/types/chime/Chime.h>
 
 namespace chip::app {
-using AppDeviceFactory = DeviceFactory<DeviceScreenHook>;
+
+/**
+ * Hardware-backed Chime implementation for M5Stack CoreS3.
+ * Synthesizes multi-harmonic chime tones through the onboard AW88298 I2S speaker amplifier.
+ */
+class CoreS3Chime : public Chime
+{
+public:
+    explicit CoreS3Chime(TimerDelegate & timerDelegate);
+    ~CoreS3Chime() override = default;
+
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
+};
+
 } // namespace chip::app
-#else
-namespace chip::app {
-using AppDeviceFactory = NoHooksDeviceFactory;
-} // namespace chip::app
-#endif

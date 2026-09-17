@@ -18,6 +18,7 @@
 
 #include "DeviceScreenRegistration.h"
 #include "devices/BooleanStateSensorScreen.h"
+#include "devices/ChimeScreen.h"
 #include "devices/DimmableLightScreen.h"
 #include "devices/FanLoadScreen.h"
 #include "devices/OccupancySensorScreen.h"
@@ -200,6 +201,16 @@ void RegisterDeviceScreen(ExtractorHood & device, DeviceScreenRegistry & registr
         .endpointId = device.GetEndpointId(),
         .deviceType = "extractor-hood",
         .renderFn   = [&device](lv_obj_t * parent) { ShowFanLoadScreen(parent, "Extractor Hood", device); },
+    });
+}
+
+void RegisterDeviceScreen(Chime & device, DeviceScreenRegistry & registry)
+{
+    registry.Register({
+        .title      = "Chime",
+        .endpointId = device.GetEndpointId(),
+        .deviceType = "chime",
+        .renderFn   = [&device](lv_obj_t * parent) { ShowChimeScreen(parent, device); },
     });
 }
 

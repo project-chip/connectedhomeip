@@ -93,6 +93,11 @@ if (CONFIG_HAVE_DISPLAY)
     endif()
 endif()
 
+if (CONFIG_HAVE_SPEAKER)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/devices/chime")
+    list(APPEND SRC_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/devices/chime")
+endif()
+
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST})
 

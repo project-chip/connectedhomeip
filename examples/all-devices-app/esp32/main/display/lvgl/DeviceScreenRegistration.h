@@ -21,6 +21,7 @@
 #include "DeviceScreenRegistry.h"
 #include <device/types/air-purifier/AirPurifier.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
+#include <device/types/chime/Chime.h>
 #include <device/types/dimmable-light/DimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
@@ -46,5 +47,6 @@ void RegisterDeviceScreen(TemperatureSensor & device, DeviceScreenRegistry & reg
 void RegisterDeviceScreen(Fan & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(AirPurifier & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(ExtractorHood & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(Chime & device, DeviceScreenRegistry & registry);
 
 } // namespace chip::app
