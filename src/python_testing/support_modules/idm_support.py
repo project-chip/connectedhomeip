@@ -429,7 +429,7 @@ class IDMBaseTest(BasicCompositionTests):
                              event: type[ClusterObjects.ClusterEvent]) -> list[tuple[str, list]]:
         """Build the six endpoint/cluster/event combinations an event request path can take.
 
-        Only the ``events`` argument is built here; the caller decides whether to issue a read
+        Only the events argument is built here; the caller decides whether to issue a read
         or a subscription with it. Event subscribe test cases cover the same six path shapes,
         so they can reuse these paths by passing them to ReadEvent with a reportInterval.
 
@@ -591,7 +591,7 @@ class IDMBaseTest(BasicCompositionTests):
     async def restricted_privilege_controller(self, cluster_id: int, privilege):
         """Yield a second controller holding one privilege on a single cluster.
 
-        The controller is granted access to ``cluster_id`` only, so reads of any other cluster
+        The controller is granted access to cluster_id only, so reads of any other cluster
         exercise the DUT's access checking. The commissioner keeps its own administer privilege
         throughout, so the original ACL is put back afterwards without needing a factory reset.
 
