@@ -81,3 +81,18 @@ class LibdatachannelWebRTCClient:
 
         self._on_state_change_cb = StateChangeCallback(c_callback)
         self._lib.pychip_webrtc_client_set_state_change_callback(self._handle, self._on_state_change_cb)
+
+    def get_video_frame_count(self) -> int:
+        return int(self._lib.pychip_webrtc_get_video_frame_count(self._handle))
+
+    def get_video_bytes_count(self) -> int:
+        return int(self._lib.pychip_webrtc_get_video_bytes_count(self._handle))
+
+    def get_audio_packet_count(self) -> int:
+        return int(self._lib.pychip_webrtc_get_audio_packet_count(self._handle))
+
+    def get_audio_bytes_count(self) -> int:
+        return int(self._lib.pychip_webrtc_get_audio_bytes_count(self._handle))
+
+    def reset_media_counters(self) -> None:
+        self._lib.pychip_webrtc_reset_media_counters(self._handle)

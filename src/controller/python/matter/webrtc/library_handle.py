@@ -64,6 +64,20 @@ def _GetWebRTCLibraryHandle() -> CDLL:
         lib.pychip_webrtc_client_set_gathering_complete_callback.argtypes = [WebRTCClientHandle, GatheringCompleteCallbackType]
         lib.pychip_webrtc_client_set_state_change_callback.argtypes = [WebRTCClientHandle, StateChangeCallback]
 
+        lib.pychip_webrtc_get_video_frame_count.argtypes = [WebRTCClientHandle]
+        lib.pychip_webrtc_get_video_frame_count.restype = c_uint32
+
+        lib.pychip_webrtc_get_video_bytes_count.argtypes = [WebRTCClientHandle]
+        lib.pychip_webrtc_get_video_bytes_count.restype = c_uint64
+
+        lib.pychip_webrtc_get_audio_packet_count.argtypes = [WebRTCClientHandle]
+        lib.pychip_webrtc_get_audio_packet_count.restype = c_uint32
+
+        lib.pychip_webrtc_get_audio_bytes_count.argtypes = [WebRTCClientHandle]
+        lib.pychip_webrtc_get_audio_bytes_count.restype = c_uint64
+
+        lib.pychip_webrtc_reset_media_counters.argtypes = [WebRTCClientHandle]
+
     return lib
 
 

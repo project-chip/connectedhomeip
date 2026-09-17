@@ -346,3 +346,41 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
     def on_remote_end(self, sessionId: int, reason: int) -> None:
         """Callback function called when a remote END session is received through a matter command."""
         self._remote_events[Events.END].put((sessionId, reason))
+
+    async def wait_for_media_delivery(
+        self,
+        expect_video: bool = True,
+        expect_audio: bool = True,
+        timeout_s: float = 5.0,
+        sample_duration_s: float = 1.5,
+    ) -> tuple[int, int, int, int]:
+        """Waits for RTP video frames and/or audio packets to be received by the native WebRTCClient.
+
+        Polls the per-PeerConnection native atomic counters directly, avoiding any UDP socket
+        binding or port conflict issues.
+
+        Returns:
+            tuple[video_frames, video_bytes, audio_packets, audio_bytes]
+        """
+        self.reset_media_counters()
+        poll_interval = 0.05
+        elapsed = 0.0
+        while elapsed < timeout_s:
+            v_frames = self.get_video_frame_count()
+            a_packets = self.get_audio_packet_count()
+            video_ok = (not expect_video) or (v_frames > 0)
+            audio_ok = (not expect_audio) or (a_packets > 0)
+            if video_ok and audio_ok:
+                break
+            await asyncio.sleep(poll_interval)
+            elapsed += poll_interval
+
+        if sample_duration_s > 0:
+            await asyncio.sleep(sample_duration_s)
+
+        return (
+            self.get_video_frame_count(),
+            self.get_video_bytes_count(),
+            self.get_audio_packet_count(),
+            self.get_audio_bytes_count(),
+        )
