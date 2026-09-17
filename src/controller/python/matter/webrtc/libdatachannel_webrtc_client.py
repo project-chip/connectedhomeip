@@ -83,16 +83,21 @@ class LibdatachannelWebRTCClient:
         self._lib.pychip_webrtc_client_set_state_change_callback(self._handle, self._on_state_change_cb)
 
     def get_video_frame_count(self) -> int:
+        """Returns the total number of video frames received by this WebRTC client (in frames)."""
         return int(self._lib.pychip_webrtc_get_video_frame_count(self._handle))
 
     def get_video_bytes_count(self) -> int:
+        """Returns the total volume of video media data received by this WebRTC client (in bytes)."""
         return int(self._lib.pychip_webrtc_get_video_bytes_count(self._handle))
 
     def get_audio_packet_count(self) -> int:
+        """Returns the total number of audio RTP packets received by this WebRTC client (in packets)."""
         return int(self._lib.pychip_webrtc_get_audio_packet_count(self._handle))
 
     def get_audio_bytes_count(self) -> int:
+        """Returns the total volume of audio media data received by this WebRTC client (in bytes)."""
         return int(self._lib.pychip_webrtc_get_audio_bytes_count(self._handle))
 
     def reset_media_counters(self) -> None:
+        """Resets all video and audio media counters (frames, packets, and bytes) for this WebRTC client to zero."""
         self._lib.pychip_webrtc_reset_media_counters(self._handle)
