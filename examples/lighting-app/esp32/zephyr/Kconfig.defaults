@@ -1,0 +1,88 @@
+#
+#    Copyright (c) 2026 Project CHIP Authors
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+# Matter build defaults for the ESP32 Zephyr samples. A trimmed copy of
+# config/zephyr/chip-module/Kconfig.defaults without the NXP defaults, whose
+# classic mbedTLS 3.x symbols do not exist in Zephyr 4.4's mbedTLS 4.x module.
+
+if CHIP
+
+config PRINTK_SYNC
+	bool
+	default n
+
+config ASSERT
+	bool
+	default y
+
+config INIT_STACKS
+	bool
+	default y
+
+config HWINFO
+	bool
+	default y
+
+config NET_IPV6_MLD
+	bool
+	default y
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+	int
+	default 14
+
+config MBEDTLS_ENABLE_HEAP
+	bool
+	default y
+
+config MBEDTLS_HEAP_SIZE
+	int
+	default 15360
+
+config NVS_LOOKUP_CACHE
+	bool
+	default y
+
+config CHIP_EXTENDED_DISCOVERY
+	bool
+	default y
+
+config NET_L2_OPENTHREAD
+	bool
+	default n
+
+# Disable unused shell modules
+config SENSOR_SHELL
+	bool
+	default n
+
+config DEVICE_SHELL
+	bool
+	default n
+
+config DATE_SHELL
+	bool
+	default n
+
+config DEVMEM_SHELL
+	bool
+	default n
+
+config FLASH_SHELL
+	bool
+	default n
+
+endif # CHIP
