@@ -18,6 +18,7 @@
 
 #include "DeviceDisplay.h"
 #include "CommissioningCodesScreen.h"
+#include "DisplayNotificationHub.h"
 #include "HomeScreen.h"
 #include "NavigationStack.h"
 #include "SystemMenuScreen.h"
@@ -167,4 +168,9 @@ void ShowRestartingMessage()
     lv_obj_center(label);
 
     bsp_display_unlock();
+}
+
+void InitDisplayDataModelListener()
+{
+    chip::app::DisplayNotificationHub::Instance().Init();
 }

@@ -22,7 +22,7 @@
 
 namespace chip::app {
 
-void RegisterDeviceScreen(OnOffLoad & device, DeviceScreenRegistry & registry)
+void RegisterDeviceScreen(OnOffLight & device, DeviceScreenRegistry & registry)
 {
     registry.Register({
         .title      = "On/Off Light",
@@ -32,7 +32,7 @@ void RegisterDeviceScreen(OnOffLoad & device, DeviceScreenRegistry & registry)
     });
 }
 
-void RegisterDeviceScreen(DimmableLoad & device, DeviceScreenRegistry & registry)
+void RegisterDeviceScreen(DimmableLight & device, DeviceScreenRegistry & registry)
 {
     registry.Register({
         .title      = "Dimmable Light",

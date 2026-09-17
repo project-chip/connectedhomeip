@@ -58,6 +58,7 @@ display/
 │
 └── lvgl/                           # Touch-driven renderer for ESP32-S3 (M5Stack CoreS3)
     ├── DeviceDisplay.cpp           # Display bring-up, lifecycle, and sleep
+    ├── DisplayNotificationHub.h/.cpp # Bridges Matter DataModel changes to LVGL widgets
     ├── NavigationStack.h/.cpp      # Push/pop screen navigation and breadcrumbs
     ├── DeviceScreenRegistry.h/.cpp # Registry for dynamically hooked device screens
     ├── DeviceScreenHook.h          # DeviceFactory post-registration hook
@@ -163,6 +164,73 @@ if (bsp_display_lock(0))
 
 Callbacks dispatched from within the LVGL task (such as widget event handlers or
 timer callbacks) already execute with this lock held.
+
+### Data Model Notifications & Cross-Thread Synchronization
+
+UI widgets display dynamic device state that can be updated either locally via
+touch or remotely via Matter protocol commands (over Wi-Fi/Thread).
+
+#### 1. UI to Matter (Touch Interactions)
+
+Local touch handlers must **never** synchronously block on
+`chip::DeviceLayer::StackLock` while holding `bsp_display_lock` to avoid ABBA
+deadlocks with the CHIP thread. Instead, user touch callbacks asynchronously
+post cluster mutations using `DeviceLayer::SystemLayer().ScheduleLambda()`:
+
+```cpp
+lv_obj_add_event_cb(toggleBtn, [](lv_event_t * event) {
+    auto * cluster = static_cast<Clusters::OnOffCluster *>(lv_event_get_user_data(event));
+    DeviceLayer::SystemLayer().ScheduleLambda([cluster]() {
+        cluster->SetOnOff(!cluster->GetOnOff());
+    });
+}, LV_EVENT_CLICKED, &cluster);
+```
+
+#### 2. Matter to UI (`DisplayNotificationHub`)
+
+Dynamic updates from Matter protocol commands flow into
+`DisplayNotificationHub`, which implements
+`chip::app::DataModel::AttributeChangeListener`:
+
+```
+Matter Protocol Command (CHIP Thread)
+       │
+       ▼
+DataModel::AttributeChangeListener::OnAttributeChanged(path)
+       │
+       ▼
+bsp_display_lock(kWaitForever)
+       │
+       ▼
+DisplayNotificationHub dispatches to matching widget callbacks
+       │
+       ▼
+Widget lambda updates LVGL labels/sliders directly
+       │
+       ▼
+bsp_display_unlock()
+```
+
+#### 3. Automatic Lifecycle & RAII Unregistration
+
+To prevent dangling pointers when screens are popped from `NavigationStack`,
+widgets subscribe using their parent container (`card`):
+
+```cpp
+DisplayNotificationHub::Instance().Subscribe(
+    card, cluster.GetEndpointId(), Clusters::OnOff::Id,
+    [stateLabel, toggleBtn, btnLabel, &cluster](const ConcreteAttributePath & path) {
+        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id) {
+            UpdateOnOffDisplay(stateLabel, toggleBtn, btnLabel, cluster.GetOnOff());
+        }
+    });
+```
+
+`DisplayNotificationHub::Subscribe` automatically hooks the `LV_EVENT_DELETE`
+event on `card`. When the screen or card widget is destroyed, the hub
+immediately removes the subscription, ensuring no callback ever executes on a
+freed widget. Because both unregistration and event dispatch execute under
+`bsp_display_lock`, they are strictly serialized and cannot race.
 
 ### Auto-Sleep and Wake-on-Touch
 

@@ -23,11 +23,12 @@
 
 namespace chip::app {
 
-void ShowDimmableLightScreen(lv_obj_t * parent, DimmableLoad & device)
+void ShowDimmableLightScreen(lv_obj_t * parent, DimmableLight & device)
 {
     lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_all(parent, 10, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(parent, 8, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(parent, 8, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(parent, 4, LV_PART_MAIN);
+    lv_obj_set_style_pad_row(parent, 4, LV_PART_MAIN);
     lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     CreateDeviceHeader(parent, "Dimmable Light", device.GetEndpointId());

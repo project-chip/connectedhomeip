@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "AppDeviceFactory.h"
 #include "DeviceTypeSelection.h"
 #include <ESP32DimmableLight.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -27,7 +28,6 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include "AppDeviceFactory.h"
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
@@ -562,6 +562,10 @@ void InitServer(intptr_t context)
         ESP_LOGE(TAG, "Server init failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
+
+#if CONFIG_HAVE_DISPLAY
+    InitDisplayDataModelListener();
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CONFIG_ENABLE_CHIP_SHELL
     chip::Shell::SetWiFiDriver(&sWiFiDriver);

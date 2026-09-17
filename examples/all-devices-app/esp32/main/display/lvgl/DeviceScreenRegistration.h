@@ -19,12 +19,12 @@
 #pragma once
 
 #include "DeviceScreenRegistry.h"
-#include <device/capabilities/dimmable-load/DimmableLoad.h>
-#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <device/types/dimmable-light/DimmableLight.h>
+#include <device/types/on-off-light/OnOffLight.h>
 
 namespace chip::app {
 
-void RegisterDeviceScreen(OnOffLoad & device, DeviceScreenRegistry & registry);
-void RegisterDeviceScreen(DimmableLoad & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(OnOffLight & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(DimmableLight & device, DeviceScreenRegistry & registry);
 
 } // namespace chip::app

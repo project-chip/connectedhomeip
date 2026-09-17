@@ -29,3 +29,6 @@ void InitDeviceDisplay();
 
 /// Tells the user a restart is imminent.  Returns once the notice is visible.
 void ShowRestartingMessage();
+
+/// Connects data model change listeners once the Matter server is initialized.
+void InitDisplayDataModelListener();

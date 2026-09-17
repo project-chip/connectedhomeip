@@ -17,100 +17,79 @@
  */
 
 #include "OnOffClusterWidget.h"
+#include "DisplayNotificationHub.h"
 
-#include <platform/PlatformManager.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip::app {
 
 namespace {
 
-struct OnOffWidgetContext
+void UpdateOnOffDisplay(lv_obj_t * stateLabel, lv_obj_t * toggleBtn, lv_obj_t * btnLabel, bool isOn)
 {
-    Clusters::OnOffCluster & cluster;
-    lv_obj_t * stateLabel;
-    lv_obj_t * toggleBtn;
-    lv_obj_t * btnLabel;
-};
-
-void UpdateOnOffDisplay(OnOffWidgetContext * ctx)
-{
-    bool isOn = false;
-    {
-        chip::DeviceLayer::StackLock lock;
-        isOn = ctx->cluster.GetOnOff();
-    }
     if (isOn)
     {
-        lv_label_set_text_static(ctx->stateLabel, "Power: ON");
-        lv_obj_set_style_text_color(ctx->stateLabel, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
-        lv_label_set_text_static(ctx->btnLabel, "Turn OFF");
-        lv_obj_set_style_bg_color(ctx->toggleBtn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
+        lv_label_set_text_static(stateLabel, "Power: ON");
+        lv_obj_set_style_text_color(stateLabel, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
+        lv_label_set_text_static(btnLabel, "Turn OFF");
+        lv_obj_set_style_bg_color(toggleBtn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
     }
     else
     {
-        lv_label_set_text_static(ctx->stateLabel, "Power: OFF");
-        lv_obj_set_style_text_color(ctx->stateLabel, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
-        lv_label_set_text_static(ctx->btnLabel, "Turn ON");
-        lv_obj_set_style_bg_color(ctx->toggleBtn, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
+        lv_label_set_text_static(stateLabel, "Power: OFF");
+        lv_obj_set_style_text_color(stateLabel, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+        lv_label_set_text_static(btnLabel, "Turn ON");
+        lv_obj_set_style_bg_color(toggleBtn, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
     }
-}
-
-void OnToggleClicked(lv_event_t * event)
-{
-    auto * ctx = static_cast<OnOffWidgetContext *>(lv_event_get_user_data(event));
-    if (ctx == nullptr)
-    {
-        return;
-    }
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    {
-        chip::DeviceLayer::StackLock lock;
-        bool newState = !ctx->cluster.GetOnOff();
-        err           = ctx->cluster.SetOnOff(newState);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        UpdateOnOffDisplay(ctx);
-    }
-}
-
-void OnWidgetDeleted(lv_event_t * event)
-{
-    auto * ctx = static_cast<OnOffWidgetContext *>(lv_event_get_user_data(event));
-    delete ctx;
 }
 
 } // namespace
 
 lv_obj_t * CreateOnOffClusterWidget(lv_obj_t * parent, Clusters::OnOffCluster & cluster)
 {
-    auto * ctx = new OnOffWidgetContext{ cluster, nullptr, nullptr, nullptr };
-
     lv_obj_t * card = lv_obj_create(parent);
     lv_obj_set_width(card, LV_PCT(100));
-    lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(card, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(card, 12, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(card, 10, LV_PART_MAIN);
+    lv_obj_set_height(card, 44);
+    lv_obj_set_flex_flow(card, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(card, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_hor(card, 10, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(card, 4, LV_PART_MAIN);
     lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLLABLE);
 
-    ctx->stateLabel = lv_label_create(card);
-    lv_obj_set_style_text_align(ctx->stateLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_t * stateLabel = lv_label_create(card);
 
-    ctx->toggleBtn = lv_button_create(card);
-    lv_obj_set_width(ctx->toggleBtn, 160);
-    lv_obj_set_height(ctx->toggleBtn, 48);
-    lv_obj_set_flex_flow(ctx->toggleBtn, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(ctx->toggleBtn, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_t * toggleBtn = lv_button_create(card);
+    lv_obj_set_width(toggleBtn, 100);
+    lv_obj_set_height(toggleBtn, 34);
+    lv_obj_set_flex_flow(toggleBtn, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(toggleBtn, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_ver(toggleBtn, 2, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(toggleBtn, 6, LV_PART_MAIN);
 
-    ctx->btnLabel = lv_label_create(ctx->toggleBtn);
-    lv_obj_set_style_text_color(ctx->btnLabel, lv_color_white(), LV_PART_MAIN);
+    lv_obj_t * btnLabel = lv_label_create(toggleBtn);
+    lv_obj_set_style_text_color(btnLabel, lv_color_white(), LV_PART_MAIN);
 
-    lv_obj_add_event_cb(ctx->toggleBtn, OnToggleClicked, LV_EVENT_CLICKED, ctx);
-    lv_obj_add_event_cb(card, OnWidgetDeleted, LV_EVENT_DELETE, ctx);
+    // Initial render
+    UpdateOnOffDisplay(stateLabel, toggleBtn, btnLabel, cluster.GetOnOff());
 
-    UpdateOnOffDisplay(ctx);
+    // Local touch: schedule cluster toggle on Matter event loop asynchronously
+    lv_obj_add_event_cb(
+        toggleBtn,
+        [](lv_event_t * event) {
+            auto * clusterPtr = static_cast<Clusters::OnOffCluster *>(lv_event_get_user_data(event));
+            DeviceLayer::SystemLayer().ScheduleLambda([clusterPtr]() { clusterPtr->SetOnOff(!clusterPtr->GetOnOff()); });
+        },
+        LV_EVENT_CLICKED, &cluster);
+
+    // Data model notifications (from local touch or network): updates UI when OnOff attribute changes.
+    // Subscribing with 'card' automatically unregisters when 'card' is deleted.
+    DisplayNotificationHub::Instance().Subscribe(card, cluster.GetPaths()[0].mEndpointId, Clusters::OnOff::Id,
+                                                 [stateLabel, toggleBtn, btnLabel, &cluster](const ConcreteAttributePath & path) {
+                                                     if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id)
+                                                     {
+                                                         UpdateOnOffDisplay(stateLabel, toggleBtn, btnLabel, cluster.GetOnOff());
+                                                     }
+                                                 });
 
     return card;
 }

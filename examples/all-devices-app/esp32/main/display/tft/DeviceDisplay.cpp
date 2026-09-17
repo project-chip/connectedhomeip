@@ -137,3 +137,8 @@ void InitDeviceDisplay()
         ScreenManager::PushScreen(qrScreen);
     }
 }
+
+void InitDisplayDataModelListener()
+{
+    // TFT implementation does not subscribe to data model attribute changes.
+}

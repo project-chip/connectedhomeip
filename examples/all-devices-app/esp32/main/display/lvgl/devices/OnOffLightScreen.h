@@ -18,16 +18,16 @@
 
 #pragma once
 
-#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <device/types/on-off-light/OnOffLight.h>
 #include <lvgl.h>
 
 namespace chip::app {
 
 /**
- * Renders the device control screen for an OnOffLoad (e.g. OnOffLight).
+ * Renders the device control screen for an OnOffLight.
  * Composes device header and cluster control widgets.
  * Must be called while holding the LVGL lock.
  */
-void ShowOnOffLightScreen(lv_obj_t * parent, OnOffLoad & device);
+void ShowOnOffLightScreen(lv_obj_t * parent, OnOffLight & device);
 
 } // namespace chip::app

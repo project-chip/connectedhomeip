@@ -17,98 +17,88 @@
  */
 
 #include "LevelControlClusterWidget.h"
+#include "DisplayNotificationHub.h"
 
 #include <cstdio>
-#include <platform/PlatformManager.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip::app {
 
 namespace {
 
-struct LevelControlWidgetContext
-{
-    Clusters::LevelControlCluster & cluster;
-    lv_obj_t * valueLabel;
-    lv_obj_t * slider;
-    uint8_t minLevel;
-    uint8_t maxLevel;
-};
-
-void UpdateLevelLabel(LevelControlWidgetContext * ctx, uint8_t level)
+void UpdateLevelLabel(lv_obj_t * valueLabel, uint8_t level, uint8_t minLevel, uint8_t maxLevel)
 {
     unsigned int pct = 0;
-    if (ctx->maxLevel > ctx->minLevel)
+    if (maxLevel > minLevel)
     {
-        pct = static_cast<unsigned int>((static_cast<uint32_t>(level - ctx->minLevel) * 100) / (ctx->maxLevel - ctx->minLevel));
+        pct = static_cast<unsigned int>((static_cast<uint32_t>(level - minLevel) * 100) / (maxLevel - minLevel));
     }
     char buf[32];
     snprintf(buf, sizeof(buf), "Brightness: %u%% (%u)", pct, static_cast<unsigned int>(level));
-    lv_label_set_text(ctx->valueLabel, buf);
-}
-
-void OnSliderValueChanged(lv_event_t * event)
-{
-    auto * ctx = static_cast<LevelControlWidgetContext *>(lv_event_get_user_data(event));
-    if (ctx == nullptr)
-    {
-        return;
-    }
-
-    int32_t val   = lv_slider_get_value(ctx->slider);
-    uint8_t level = static_cast<uint8_t>(val);
-
-    {
-        chip::DeviceLayer::StackLock lock;
-        ctx->cluster.MoveToLevelWithOnOff(level, DataModel::Nullable<uint16_t>(), BitMask<Clusters::LevelControl::OptionsBitmap>(),
-                                          BitMask<Clusters::LevelControl::OptionsBitmap>());
-    }
-
-    UpdateLevelLabel(ctx, level);
-}
-
-void OnWidgetDeleted(lv_event_t * event)
-{
-    auto * ctx = static_cast<LevelControlWidgetContext *>(lv_event_get_user_data(event));
-    delete ctx;
+    lv_label_set_text(valueLabel, buf);
 }
 
 } // namespace
 
 lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelControlCluster & cluster)
 {
-    uint8_t minLevel = 1;
-    uint8_t maxLevel = 254;
-    uint8_t curLevel = 254;
-
-    {
-        chip::DeviceLayer::StackLock lock;
-        minLevel = cluster.GetMinLevel();
-        maxLevel = cluster.GetMaxLevel();
-        curLevel = cluster.GetCurrentLevel().ValueOr(maxLevel);
-    }
-
-    auto * ctx = new LevelControlWidgetContext{ cluster, nullptr, nullptr, minLevel, maxLevel };
+    uint8_t minLevel = cluster.GetMinLevel();
+    uint8_t maxLevel = cluster.GetMaxLevel();
+    uint8_t curLevel = cluster.GetCurrentLevel().ValueOr(maxLevel);
 
     lv_obj_t * card = lv_obj_create(parent);
     lv_obj_set_width(card, LV_PCT(100));
     lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(card, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(card, 12, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(card, 10, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(card, 10, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(card, 6, LV_PART_MAIN);
+    lv_obj_set_style_pad_row(card, 4, LV_PART_MAIN);
     lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLLABLE);
 
-    ctx->valueLabel = lv_label_create(card);
-    lv_obj_set_style_text_align(ctx->valueLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_t * valueLabel = lv_label_create(card);
+    lv_obj_set_style_text_align(valueLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
 
-    ctx->slider = lv_slider_create(card);
-    lv_obj_set_width(ctx->slider, LV_PCT(90));
-    lv_slider_set_range(ctx->slider, minLevel, maxLevel);
-    lv_slider_set_value(ctx->slider, curLevel, LV_ANIM_OFF);
+    lv_obj_t * slider = lv_slider_create(card);
+    lv_obj_set_width(slider, LV_PCT(96));
+    lv_slider_set_range(slider, minLevel, maxLevel);
+    lv_slider_set_value(slider, curLevel, LV_ANIM_OFF);
 
-    lv_obj_add_event_cb(ctx->slider, OnSliderValueChanged, LV_EVENT_VALUE_CHANGED, ctx);
-    lv_obj_add_event_cb(card, OnWidgetDeleted, LV_EVENT_DELETE, ctx);
+    // Initial label render
+    UpdateLevelLabel(valueLabel, curLevel, minLevel, maxLevel);
 
-    UpdateLevelLabel(ctx, curLevel);
+    // Local touch: update label immediately for smooth UI feedback and schedule Matter cluster command
+    lv_obj_add_event_cb(
+        slider,
+        [](lv_event_t * event) {
+            auto * clusterPtr = static_cast<Clusters::LevelControlCluster *>(lv_event_get_user_data(event));
+            auto * sliderObj  = static_cast<lv_obj_t *>(lv_event_get_target(event));
+            auto * labelObj   = lv_obj_get_child(lv_obj_get_parent(sliderObj), 0);
+            uint8_t level     = static_cast<uint8_t>(lv_slider_get_value(sliderObj));
+            uint8_t minVal    = static_cast<uint8_t>(lv_slider_get_min_value(sliderObj));
+            uint8_t maxVal    = static_cast<uint8_t>(lv_slider_get_max_value(sliderObj));
+
+            UpdateLevelLabel(labelObj, level, minVal, maxVal);
+
+            DeviceLayer::SystemLayer().ScheduleLambda(
+                [clusterPtr, level]() { clusterPtr->MoveToLevelWithOnOff(level, DataModel::Nullable<uint16_t>(), {}, {}); });
+        },
+        LV_EVENT_VALUE_CHANGED, &cluster);
+
+    // Data model notifications (from local touch or network): updates slider & label when CurrentLevel changes.
+    // Subscribing with 'card' automatically unregisters when 'card' is deleted.
+    DisplayNotificationHub::Instance().Subscribe(
+        card, cluster.GetPaths()[0].mEndpointId, Clusters::LevelControl::Id,
+        [slider, valueLabel, &cluster, minLevel, maxLevel](const ConcreteAttributePath & path) {
+            if (path.mAttributeId == Clusters::LevelControl::Attributes::CurrentLevel::Id)
+            {
+                uint8_t level = cluster.GetCurrentLevel().ValueOr(maxLevel);
+                if (!lv_slider_is_dragged(slider))
+                {
+                    lv_slider_set_value(slider, level, LV_ANIM_OFF);
+                    UpdateLevelLabel(valueLabel, level, minLevel, maxLevel);
+                }
+            }
+        });
 
     return card;
 }
