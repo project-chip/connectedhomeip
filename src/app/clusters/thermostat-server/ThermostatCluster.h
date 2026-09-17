@@ -462,8 +462,8 @@ public:
         case Attributes::ThermostatSuggestionNotFollowingReason::Id:
             return mFeatures.Has(Feature::kThermostatSuggestions);
         case Attributes::Sensors::Id:
-        case Attributes::AvailableSensors::Id:
-        case Attributes::EnabledSensors::Id:
+        case Attributes::AvailableSensorHandles::Id:
+        case Attributes::EnabledSensorHandles::Id:
         case Attributes::NumberOfSensorScheduleTransitions::Id:
         case Attributes::SensorSchedule::Id:
             return mFeatures.Has(Feature::kThermostatSensors);

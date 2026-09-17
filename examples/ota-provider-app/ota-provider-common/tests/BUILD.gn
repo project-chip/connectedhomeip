@@ -17,7 +17,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libOTAProviderExampleTests"
 
-  test_sources = [ "TestOTAProviderExample.cpp" ]
+  test_sources = [
+    "TestBdxOtaSenderPeerBinding.cpp",
+    "TestOTAProviderExample.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 
@@ -28,6 +31,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/clusters/ota-provider:user-consent",
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
+    "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols/bdx",
   ]
 }
