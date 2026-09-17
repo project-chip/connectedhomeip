@@ -142,7 +142,8 @@ classDiagram
 
 Because `impl/LoggingFoo` and platform subclasses derive from `Foo`, UI screens,
 Out-of-Band (OOB) CLI controls, and generic application logic bind to the base
-device type interface (`Foo`) without coupling to simulation or hardware details.
+device type interface (`Foo`) without coupling to simulation or hardware
+details.
 
 #### 2. Optional Clusters & Registration Hooks
 
