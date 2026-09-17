@@ -67,7 +67,7 @@ SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 
 
 class TC_ACS_2_1(MatterBaseTest):
-   
+
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
