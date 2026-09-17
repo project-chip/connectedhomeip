@@ -266,6 +266,7 @@ class WpaSupplicantMock(TerminableThread):
 
             await self.Scan({})
 
+            # WpaSupplicantClient derives NetworkInfo.connected from Network.Enabled.
             await self.network.Enabled.set_async(True)
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())

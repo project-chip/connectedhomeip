@@ -212,6 +212,16 @@ def run_timeout(run: Metadata) -> float:
     return TestingDefaults.DEFAULT_TIMEOUT_S
 
 
+def run_commissioning_method(run: Metadata) -> str | None:
+    """Return the commissioning method from a test run's script arguments."""
+    if run.script_args is None:
+        return None
+
+    parser = matter_test_args_parser()
+    args, _ = parser.parse_known_args(shlex.split(run.script_args))
+    return args.commissioning_method
+
+
 @contextlib.contextmanager
 def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tuple[str, ...]], None, None]:
     """Provide isolated Linux app/tool networks with Bluetooth and WPA mocks."""
@@ -268,26 +278,13 @@ def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tupl
 @click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
 @click.option("--pre-existing-fabric", is_flag=True, default=False,
               help="Commission app to a chip-tool fabric and open a commissioning window before running test script.")
-@click.option("--linux-commissioning-method", type=click.Choice([CommissioningMethod.BLE_WIFI.value]), default=None,
-              help="Run the app and test in isolated Linux namespaces with the required commissioning mocks.")
 @click.option("--internal-inside-unshare", hidden=True, is_flag=True, default=False,
               help="Internal flag for running inside a private mount namespace.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-         app_filter, pre_existing_fabric: bool, linux_commissioning_method: str | None,
-         internal_inside_unshare: bool) -> None:
+         app_filter, pre_existing_fabric: bool, internal_inside_unshare: bool) -> None:
     """Run the configured Matter Python test."""
-    if linux_commissioning_method:
-        if sys.platform != "linux":
-            raise click.ClickException("--linux-commissioning-method is only supported on Linux")
-        from matter.testing.linux import ensure_namespace_availability, ensure_private_state
-
-        if not internal_inside_unshare:
-            ensure_namespace_availability()
-        else:
-            ensure_private_state()
-
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -334,9 +331,24 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         if pre_existing_fabric:
             run.pre_existing_fabric = pre_existing_fabric
 
-    for run in runs:
+    runs_with_commissioning_method = [(run, run_commissioning_method(run)) for run in runs]
+    uses_linux_ble_wifi = any(method == CommissioningMethod.BLE_WIFI for _, method in runs_with_commissioning_method)
+    if uses_linux_ble_wifi:
+        if sys.platform != "linux":
+            raise click.ClickException("BLE-WiFi commissioning is only supported on Linux")
+        from matter.testing.linux import ensure_namespace_availability, ensure_private_state
+
+        if not internal_inside_unshare:
+            ensure_namespace_availability()
+        else:
+            ensure_private_state()
+
+    for run, commissioning_method in runs_with_commissioning_method:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
-        environment = linux_ble_wifi_environment() if linux_commissioning_method else contextlib.nullcontext(((), ()))
+        if commissioning_method == CommissioningMethod.BLE_WIFI:
+            environment = linux_ble_wifi_environment()
+        else:
+            environment = contextlib.nullcontext(((), ()))
         with environment as (app_command_prefix, test_command_prefix):
             main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                       run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
