@@ -27,6 +27,8 @@ source_set("named_pipe") {
     "translators/BasicInformationTranslator.h",
     "translators/BooleanStateTranslator.cpp",
     "translators/BooleanStateTranslator.h",
+    "translators/CreateAndRegisterTranslator.cpp",
+    "translators/CreateAndRegisterTranslator.h",
     "translators/ElectricalEnergyMeasurementTranslator.cpp",
     "translators/ElectricalEnergyMeasurementTranslator.h",
     "translators/ModeSelectTranslator.cpp",
@@ -37,6 +39,8 @@ source_set("named_pipe") {
     "translators/OnOffTranslator.h",
     "translators/RvcTranslator.cpp",
     "translators/RvcTranslator.h",
+    "translators/UnregisterAndDestroyTranslator.cpp",
+    "translators/UnregisterAndDestroyTranslator.h",
   ]
 
   public_deps = [

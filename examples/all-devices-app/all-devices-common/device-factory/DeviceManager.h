@@ -30,6 +30,7 @@
 #include <vector>
 namespace chip::app {
 
+template <typename DeviceFactoryT>
 class DeviceManager
 {
 public:
@@ -50,7 +51,7 @@ private:
     struct DeviceWithStateOwning
     {
         std::string name;
-        std::unique_ptr<DeviceInterface> device;
+        DeviceFactoryT::DeviceRegistrationEntry device;
         bool isRegistered;
     };
 
@@ -61,13 +62,13 @@ public:
         bool isRegistered;
     };
 
-    DeviceManager(DeviceFactory & deviceFactory, CodeDrivenDataModelProvider & provider) : mDeviceFactory(deviceFactory), mProvider(provider) {};
+    DeviceManager(DeviceFactoryT & deviceFactory, CodeDrivenDataModelProvider & provider) : mDeviceFactory(deviceFactory), mProvider(provider) {};
     void SetEndpointIdAllocator(EndpointIdAllocator * endpointIdAllocator) { mEndpointIdAllocator = endpointIdAllocator; }
     EndpointIdAllocator * GetEndpointIdAllocator() { return mEndpointIdAllocator; }
     std::optional<DeviceId> CreateDevice(const std::string & deviceName, const std::string & nodeLabel = "")
     {
         auto device = mDeviceFactory.Create(deviceName, nodeLabel);
-        if (device == nullptr)
+        if (device.device == nullptr)
         {
             return std::nullopt;
         }
@@ -77,11 +78,16 @@ public:
     };
     CHIP_ERROR RegisterDevice(DeviceId deviceId, EndpointIdAllocator & endpointIdAllocator, EndpointComposition composition = {})
     {
-        auto it = mConstructedDevices.find(deviceId);
-        VerifyOrReturnError(it != mConstructedDevices.end(), CHIP_ERROR_NOT_FOUND);
-        auto & deviceWithState = it->second;
-        VerifyOrReturnError(!deviceWithState.isRegistered, CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(deviceWithState.device->Register(endpointIdAllocator, mProvider, composition));
+        auto deviceWithState = GetDevice(deviceId);
+        VerifyOrReturnError(deviceWithState.has_value(), CHIP_ERROR_NOT_FOUND);
+        VerifyOrReturnError(!deviceWithState.value().isRegistered, CHIP_ERROR_INVALID_ARGUMENT);
+        auto & device = deviceWithState.value().device;
+        ReturnErrorOnFailure(device.Register(endpointIdAllocator, mProvider, composition));
+        auto onDeviceRegistered = GetOnDeviceRegisteredCallback(deviceId);
+        if (onDeviceRegistered)
+        {
+            onDeviceRegistered();
+        }
         deviceWithState.isRegistered = true;
         return CHIP_NO_ERROR;
     };
@@ -112,6 +118,15 @@ public:
             return DeviceWithState{ it->second.name, *it->second.device, it->second.isRegistered };
         }
         return std::nullopt;
+    };
+    std::function<void()> GetOnDeviceRegisteredCallback(DeviceId deviceId)
+    {
+        auto it = mConstructedDevices.find(deviceId);
+        if (it != mConstructedDevices.end())
+        {
+            return it->second.device.onDeviceRegistered;
+        }
+        return nullptr;
     };
     std::vector<DeviceInterface *> GetRegisteredDevices() const
     {
