@@ -936,7 +936,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                                            expected_previous_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery,
                                            expected_reason=Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kDelayByProvider)
-        logger.info("Event found for kDelayedOnQuery and ChangeReason kDelayByProvider")
+        logger.info("%s : Event found for kDelayedOnQuery and ChangeReason kDelayByProvider", step_number_s3)
         # [End Read Event]
         # [End of Step #2  from TC_SU_2_7 - Verification]
 
@@ -972,16 +972,28 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             tolerance_sec=tolerance_s3,
         )
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_3]: Phase C — wait for kDownloading to confirm the DUT re-queried after 180s.
-        # ------------------------------------------------------------------------------------
-        logger.info('%s: Phase C — waiting for kDownloading (DUT re-queried after 180s delay)', step_number_s3)
-        t_downloading_s3 = subscription_attr_state_busy_180s.await_first_value_asserting_no_forbidden(
-            target_value=kDownloading_s3,
-            forbidden_values=set(),
-            # Nominal reserve for the remaining steps; no spec guard windows left.
-            timeout_sec=self.remaining_test_budget_sec(reserve_sec=3 * STEP_RESERVE_SEC),
+        # Device might go to kDownloading to fast but if this is not catched here the subscription will 
+        # try to reach for kDownloading for too long and might never reach that value. Read first then check the time taken to make sure is correct.
+        current_update_state_s3 = update_state_progress = await self.read_single_attribute_check_success(
+            cluster=Clusters.OtaSoftwareUpdateRequestor,
+            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
         )
+        # Take the time, if is not kDownloading then the time will be the one recorder in the await_action
+        t_downloading_s3 = time.time()
+        if current_update_state_s3 != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:
+            # ------------------------------------------------------------------------------------
+            # [STEP_3]: Phase C — wait for kDownloading to confirm the DUT re-queried after 180s.
+            # ------------------------------------------------------------------------------------
+            logger.info('%s: Phase C — waiting for kDownloading (DUT re-queried after 180s delay)', step_number_s3)
+            t_downloading_s3 = subscription_attr_state_busy_180s.await_first_value_asserting_no_forbidden(
+                target_value=kDownloading_s3,
+                forbidden_values=set(),
+                # Nominal reserve for the remaining steps; no spec guard windows left.
+                timeout_sec=self.remaining_test_budget_sec(reserve_sec=3 * STEP_RESERVE_SEC),
+            )
 
         elapsed_s3 = t_downloading_s3 - t_delayed_on_query_s3
         logger.info('%s: Phase C complete — elapsed kDelayedOnQuery → kDownloading: %.2fs', step_number_s3, elapsed_s3)
@@ -1016,7 +1028,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 endpoint=0,
             )
             logger.info('%s: Step #4.1 - UpdateStateProgress is %s', step_number_s4, update_state_progress)
-            if isinstance(update_state_progress, int) and update_state_progress > 1:
+            if isinstance(update_state_progress, int) and update_state_progress >= 1:
                 logger.info('%s: Step #4.1 - UpdateStateProgress is greater than 1%% (%s)',
                             step_number_s4, update_state_progress)
                 break
