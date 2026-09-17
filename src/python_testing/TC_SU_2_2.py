@@ -999,14 +999,43 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Once the provider is killed while the download is visible, the DUT must take at least
         # 5 minutes to go back to kIdle, and only after that must DownloadError be triggered.
 
+        logger.info('%s: Step #4.1 - Let the Device download until 1%% to then kill the Provider', step_number_s4)
+        # Poll UpdateStateProgress so the kill happens after some BDX bytes have landed.
+        # Not a spec assertion: if 1% is never reported (quality Q, sparse updates), warn and
+        # continue so the Idle / DownloadError checks below still run.
+        progress_poll_interval_sec = 10.0
+        progress_poll_timeout_sec = 60.0
+        progress_deadline = time.time() + progress_poll_timeout_sec
+        update_state_progress = None
+        while True:
+            update_state_progress = await self.read_single_attribute_check_success(
+                cluster=Clusters.OtaSoftwareUpdateRequestor,
+                attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress,
+                dev_ctrl=controller,
+                node_id=requestor_node_id,
+                endpoint=0,
+            )
+            logger.info('%s: Step #4.1 - UpdateStateProgress is %s', step_number_s4, update_state_progress)
+            if isinstance(update_state_progress, int) and update_state_progress > 1:
+                logger.info('%s: Step #4.1 - UpdateStateProgress is greater than 1%% (%s)',
+                            step_number_s4, update_state_progress)
+                break
+            remaining = progress_deadline - time.time()
+            if remaining <= 0:
+                logger.warning(
+                    '%s: Step #4.1 - 1%% has not been reached after %.0fs (last UpdateStateProgress=%s); '
+                    'continuing to kill the provider.',
+                    step_number_s4, progress_poll_timeout_sec, update_state_progress)
+                break
+            await asyncio.sleep(min(progress_poll_interval_sec, remaining))
+
         # Create the subscription for DownloadError
         subscription_download_error = EventSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError.event_id
         )
 
-        logger.info('%s: Step #4.1 - Kill provider process (aborting the download) while the DUT is downloading', step_number_s4)
-        await asyncio.sleep(5)
+        logger.info('%s: Step #4.2 - Kill provider process (aborting the download) while the DUT is downloading', step_number_s4)
         # Kill (not terminate) the ProviderProcess
         self.current_provider_app_proc.kill()
         # Save the time after provider kill()
@@ -1019,11 +1048,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
         logger.info("DownloadError events after provider kill() %s", download_error_events_after_kill)
 
-        logger.info('%s: Step #4.2 - Wait for DUT to go back to kIdle after killing the provider, at termination time: %d',
+        logger.info('%s: Step #4.3 - Wait for DUT to go back to kIdle after killing the provider, at termination time: %d',
                     step_number_s4, provider_termination_time)
         # Wait for the report of the kIdle state after killing the provider.
         # The kIdle timeout must not be less than 5 minutes.
-        logger.info('%s: Step #4.3 - Waiting for kIdle state', step_number_s4)
+        logger.info('%s: Step #4.4 - Waiting for kIdle state', step_number_s4)
 
         # Check for the change to kIdle using previous subscription
         kidle_report_time = subscription_attr_state_busy_180s.await_first_value_asserting_no_forbidden(
@@ -1038,7 +1067,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         asserts.assert_greater_equal(total_time_to_kidle, 300, "Time to UpdateState kIdle was less than 5 minutes.")
         subscription_attr_state_busy_180s.cancel()
 
-        logger.info('%s: Step #4.4 - Once the DUT goes back to kIdle it should trigger the DownloadError', step_number_s4)
+        logger.info('%s: Step #4.5 - Once the DUT goes back to kIdle it should trigger the DownloadError', step_number_s4)
         # Once kIdle is received the script must wait for the DownloadError event.
 
         # Check whether a DownloadError was triggered here
