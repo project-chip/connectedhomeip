@@ -20,6 +20,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
+#include <app/server/Server.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 #include <clusters/CameraAvStreamManagement/Ids.h>
 #include <clusters/CameraAvStreamManagement/Structs.h>
@@ -28,6 +29,7 @@
 #include <clusters/shared/GlobalIds.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using chip::Protocols::InteractionModel::Status;
@@ -86,6 +88,27 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::StartRequest(Request::CommandType aCom
 
     mRequest.Begin(aCommandType, aVideoStreamId, aCallback);
 
+    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(aCameraNode.GetFabricIndex());
+    if (fabricInfo != nullptr && fabricInfo->GetNodeId() == aCameraNode.GetNodeId())
+    {
+        CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, aCommandType, aVideoStreamId]() {
+            static uint16_t sNextSelfAllocatedStreamId = 1;
+            uint16_t streamId =
+                (aCommandType == Request::CommandType::kVideoStreamAllocate) ? sNextSelfAllocatedStreamId++ : aVideoStreamId;
+            if (sNextSelfAllocatedStreamId == 0)
+            {
+                sNextSelfAllocatedStreamId = 1;
+            }
+            FinishRequest(Status::Success, streamId);
+        });
+        if (err != CHIP_NO_ERROR)
+        {
+            mRequest.Reset();
+            return err;
+        }
+        return CHIP_NO_ERROR;
+    }
+
     EstablishSession(aCameraNode);
     return CHIP_NO_ERROR;
 }
@@ -110,8 +133,8 @@ void DefaultAvAnalysisCameraClient::StartProfileDiscovery()
 CHIP_ERROR DefaultAvAnalysisCameraClient::SendDiscoveryRead(AttributePathParams * aPaths, size_t aPathCount)
 {
     VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
-    // A ReadClient may only be destroyed from its OnDone, so it must not be replaced while a
-    // previous one's callbacks can still fire.
+    // A ReadClient may be destroyed outside its callbacks and from its own OnDone, but not from any
+    // other one, so it must not be replaced while a previous one's callbacks can still fire.
     VerifyOrReturnError(!mReadClient, CHIP_ERROR_INCORRECT_STATE);
 
     ReadPrepareParams readParams(mRequest.Session().Value());
@@ -432,8 +455,8 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand()
 {
     VerifyOrReturnError(mRequest.HasSession(), CHIP_ERROR_INCORRECT_STATE);
 
-    // A CommandSender may only be destroyed from its own OnDone, so it must not be replaced while a
-    // previous one's callbacks can still fire.
+    // A CommandSender may be destroyed at any time except from its own OnResponse or OnError, so it
+    // must not be replaced while a previous one's callbacks can still fire.
     VerifyOrReturnError(!mCommandSender, CHIP_ERROR_INCORRECT_STATE);
 
     mCommandSender = Platform::MakeUnique<CommandSender>(this, &mRequest.ExchangeManager());

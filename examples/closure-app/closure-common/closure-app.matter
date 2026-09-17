@@ -103,6 +103,12 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -183,6 +189,11 @@ enum MeasurementTypeEnum : enum16 {
   kReactiveEnergy = 15;
   kApparentEnergy = 16;
   kSoilMoisture = 17;
+}
+
+enum MediumType : enum8 {
+  kAir = 0;
+  kWater = 1;
 }
 
 enum PositionTag : enum8 {
@@ -341,7 +352,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -577,7 +588,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 6;
+  revision 7;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -665,7 +676,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
   provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  provisional readonly attribute optional int32u configurationVersion = 24;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1674,6 +1685,7 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -2719,7 +2731,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_closure = 560, version 1;
+  device type ma_closure = 560, version 2;
 
 
   server cluster Identify {
@@ -2770,7 +2782,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_closure_panel = 561, version 1;
+  device type ma_closure_panel = 561, version 2;
 
 
   server cluster Descriptor {
@@ -2810,7 +2822,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type ma_closure_panel = 561, version 1;
+  device type ma_closure_panel = 561, version 2;
 
 
   server cluster Descriptor {

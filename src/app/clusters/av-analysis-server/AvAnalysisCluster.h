@@ -52,8 +52,6 @@ public:
      */
 
     /**
-     * The delegate realizing this method needs to ensure that, 1) the Zone ID is known, and 2) the zone is NOT a privacy zone.
-     *
      * @param  aZoneIDs  the set of ZoneIDs to be validated against what is defined in the Zone Management Cluster instance
      */
     virtual CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t> & aZoneIDs) = 0;
@@ -129,6 +127,8 @@ public:
 
     void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mLogic.SetCameraClient(aCameraClient); }
 
+    void SetWebRTCClient(AvAnalysisWebRTCClient * aWebRTCClient) { mLogic.SetWebRTCClient(aWebRTCClient); }
+
     CHIP_ERROR Init() { return mLogic.Init(); }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -158,7 +158,26 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    // Delegate interaction with server stored attributes
+    /**
+     * Invoked by the delegate when it needs to ensure that an application detected context has been enabled at the server
+     *
+     * @param aContext the context that has been detected, rendered as a Semantic Tag
+     * @param aZoneIds the zoneIds (one or more) in which context was detected, this can be null or absent.
+     *
+     * @return bool    true indicates that the context is active, note that a context with Null zones matches all triggering zones
+     */
+    bool IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext,
+                                   Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds);
+
     // Context detection and event generation
+    /**
+     * Records an active session without generating an AnalysisSessionStart event, for a delegate reporting
+     * contexts of a session it started itself. Source arguments as for AnalysisSessionStart.
+     */
+    CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId = kUndefinedNodeId,
+                                   uint64_t aSourceStartTimestampUs = 0, bool aUseSpecificSessionId = false);
+
     /**
      * Invoked by the delegate when a new analysis session is initiated based on its own detection metrics. The server will
      * provide the session ID to be used over the lifetime of the session.  The server will generate the AnalysisSessionStart event.
@@ -166,8 +185,14 @@ public:
      * @param aSessionId the server will manage all session Ids
      * @param aZoneList  the list of Zones that are relevant for the session, Null is used when this information is not available,
      * or all zones
+     * @param aSourceNodeId           With RemoteContextDetection: the camera node the analyzed stream comes from;
+     * every event of the session reports it. Not used with LocalContextDetection.
+     * @param aSourceStartTimestampUs With RemoteContextDetection: the start timestamp (epoch-us) of the analyzed stream,
+     * reported as given by the session's PerceivedContext events, where the field is mandatory. Not used with
+     * LocalContextDetection.
      */
-    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList);
+    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
+                                    NodeId aSourceNodeId = kUndefinedNodeId, uint64_t aSourceStartTimestampUs = 0);
 
     /**
      * Invoked by the delegate to furnish details of the event that triggered the session. The server will generate a

@@ -64,6 +64,8 @@ protected:
 
     // Counterpart to RegisterOptionalClusters(): a subclass that overrides one must override the
     // other, to tear down whatever optional clusters it added.
+    // Note: This hook is invoked from Unregister() AFTER UnregisterDescriptor() has already
+    // unregistered the endpoint, ensuring provider.RemoveCluster() calls can succeed.
     virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
 
 private:

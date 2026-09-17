@@ -45,7 +45,6 @@ source_set("logging") {
 
   public_deps = [
     ":dimmable-load",
-    "${chip_root}/src/app/clusters/groups-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/level-control",
     "${chip_root}/src/app/clusters/on-off-server",
