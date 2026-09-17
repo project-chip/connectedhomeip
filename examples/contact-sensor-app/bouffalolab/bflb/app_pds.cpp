@@ -88,6 +88,10 @@ static struct bflb_device_s * s_gpio_dev;
 static bl_lp_io_cfg_t s_io_wakeup_cfg;
 
 static void (*s_pin_handler)(int, bool) = NULL;
+#if CHIP_DETAIL_LOGGING
+static struct bflb_device_s * s_rtc_dev = NULL;
+static uint64_t s_sleep_enter_rtc       = 0;
+#endif
 static struct bflb_device_s * s_sha_dev = NULL;
 
 namespace {
@@ -454,6 +458,12 @@ extern "C" void vPortSetupTimerInterrupt(void);
 static int lp_enter(void * arg)
 {
     (void) arg;
+#if CHIP_DETAIL_LOGGING
+    if (s_rtc_dev)
+    {
+        s_sleep_enter_rtc = bflb_rtc_get_time(s_rtc_dev);
+    }
+#endif
     app_lp_config_wakup_gpio();
     return 0;
 }
@@ -486,16 +496,30 @@ static int lp_exit(void * arg)
     }
     app_lp_config_gpio();
 
+#if CHIP_DETAIL_LOGGING
+    if (s_rtc_dev)
+    {
+        uint64_t sleep_ticks = bflb_rtc_get_time(s_rtc_dev) - s_sleep_enter_rtc;
+        uint32_t rtc_hz      = bflb_clk_get_peripheral_clock(BFLB_DEVICE_TYPE_RTC, 0);
+        uint64_t sleep_ms    = (rtc_hz != 0) ? (sleep_ticks * 1000ULL / rtc_hz) : 0;
+        ChipLogDetail(NotSpecified, "[LP] wake reason=0x%x sleep=%llu ms", reason, (unsigned long long) sleep_ms);
+    }
+#endif
+
     return 0;
 }
 
 /* -------------------------------------------------------------------------- */
-/* PM framework hook – called by prebuilt LP library                          */
+/* PM sleep check – registered with pm_sleep_check_register(); the tickless    */
+/* accurate path invokes it before every PDS entry, which is where the DTIM    */
+/* selection must be refreshed (tickless_accurate.c reads dtim_origin when     */
+/* handing off to the LP firmware).                                            */
 /* -------------------------------------------------------------------------- */
 
-extern "C" int bflb_pm_app_check(void)
+extern "C" int app_dtim_sleep_check(void)
 {
-    return app_dtim_pm_check();
+    (void) app_dtim_pm_check();
+    return pm_pbufc_check();
 }
 
 extern "C" void app_pre_matter_init(void)
@@ -505,6 +529,7 @@ extern "C" void app_pre_matter_init(void)
     HBN_Enable_RTC_Counter();
     pm_rc32k_auto_cal_init();
     pm_sys_init();
+    pm_sleep_check_register("app_dtim", app_dtim_sleep_check, 10);
 
     bl_lp_init();
     bl_lp_sys_callback_register(lp_enter, NULL, lp_exit, NULL);
@@ -512,6 +537,9 @@ extern "C" void app_pre_matter_init(void)
     easyflash_init();
     app_set_clock_source(CLOCK_SOURCE_PASSIVE);
     s_gpio_dev = bflb_device_get_by_name("gpio");
+#if CHIP_DETAIL_LOGGING
+    s_rtc_dev  = bflb_device_get_by_name("rtc");
+#endif
     s_sha_dev  = bflb_device_get_by_name(BFLB_NAME_SEC_SHA);
 
     extern int enable_multicast_broadcast;
