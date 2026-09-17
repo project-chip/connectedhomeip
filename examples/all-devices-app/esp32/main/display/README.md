@@ -1,14 +1,22 @@
-# Display Subsystem Architecture & Design
+# Display Subsystem
 
-This directory implements the on-device display subsystem for `all-devices-app`
-on ESP32 targets.
+This directory contains the display implementations for `all-devices-app` on
+ESP32 targets.
 
 ---
 
-## 1. Architectural Boundary
+## Integration Boundary
 
-The application interacts with the display subsystem exclusively through a
-single minimal C-linkage header: [`DeviceDisplay.h`](DeviceDisplay.h).
+`main.cpp` interacts with the display subsystem through two functions declared
+in [`DeviceDisplay.h`](DeviceDisplay.h):
+
+```cpp
+void InitDeviceDisplay();
+void ShowRestartingMessage();
+```
+
+No graphics library or hardware driver headers are exposed outside the
+`display/` directory.
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -25,65 +33,59 @@ single minimal C-linkage header: [`DeviceDisplay.h`](DeviceDisplay.h).
                ▼                           ▼
 ┌───────────────────────────────┐ ┌──────────────────────┐
 │        tft/ Renderer          │ │    lvgl/ Renderer    │
-│  - Vendored TFT Driver        │ │  - LVGL 9 Graphics   │
+│  - Vendored SPI TFT driver    │ │  - LVGL 9            │
 │  - ScreenFramework (C++)      │ │  - CoreS3 BSP        │
-│  - Mechanical Buttons (A/B/C) │ │  - Capacitive Touch  │
+│  - Mechanical buttons (A/B/C) │ │  - Capacitive touch  │
 └───────────────────────────────┘ └──────────────────────┘
 ```
 
-`main.cpp` and Matter cluster server code have no dependencies on graphics
-libraries, widget hierarchies, or hardware drivers. Exactly one renderer
-implementation is compiled per build target.
-
 ---
 
-## 2. Directory & Source Layout
+## Directory Layout
 
 ```
 display/
-├── DeviceDisplay.h                 # Public display contract (InitDeviceDisplay, ShowRestartingMessage)
-├── README.md                       # This design document
+├── DeviceDisplay.h                 # Public interface (InitDeviceDisplay, ShowRestartingMessage)
+├── README.md                       # This document
 │
-├── tft/                            # Button-driven renderer for original ESP32 targets
-│   ├── DeviceDisplay.cpp           # TFT initialization and display task loop
-│   ├── Button.h / Button.cpp       # Mechanical button driver (BtnA, BtnB, BtnC polling)
+├── tft/                            # Button-driven renderer for ESP32
+│   ├── DeviceDisplay.cpp           # Display initialization and main task loop
+│   ├── Button.h / Button.cpp       # Polled mechanical buttons (BtnA, BtnB, BtnC)
 │   └── screens/                    # ScreenFramework subclasses (fixed tab views)
 │       ├── DeviceInfoScreen.h/.cpp
 │       ├── DeviceSelectionScreen.h/.cpp
 │       └── QRCodeScreen.h/.cpp
 │
-└── lvgl/                           # Touch-driven renderer for ESP32-S3 targets (M5Stack CoreS3)
-    ├── DeviceDisplay.cpp           # BSP bring-up, dark theme, auto-sleep & wake-on-touch
-    ├── NavigationStack.h/.cpp      # Hierarchical push/pop navigation with clickable breadcrumbs
+└── lvgl/                           # Touch-driven renderer for ESP32-S3 (M5Stack CoreS3)
+    ├── DeviceDisplay.cpp           # BSP bring-up, theme, auto-sleep, and wake-on-touch
+    ├── NavigationStack.h/.cpp      # Push/pop screen navigation and breadcrumbs
     └── screens/                    # Stateless screen render callbacks
         ├── HomeScreen.h/.cpp             # Root menu (Devices, Select Device, System)
         ├── SystemMenuScreen.h/.cpp       # Submenu (QR Code, Status, Operations)
         ├── CommissioningCodesScreen.h/.cpp # Matter onboarding QR code and manual setup code
         ├── DeviceInfoScreen.h/.cpp       # Diagnostics (fabrics, IP, memory, active device)
-        ├── DeviceSelectionScreen.h/.cpp  # Device type switching with confirmation dialog
-        ├── DeviceEndpointsScreen.h/.cpp  # Summary of bridged endpoints or active endpoint
-        └── DeviceOperationsScreen.h/.cpp # Reboot and factory reset triggers with confirmation dialogs
+        ├── DeviceSelectionScreen.h/.cpp  # Device type switching with confirmation modal
+        ├── DeviceEndpointsScreen.h/.cpp  # Bridged endpoints overview
+        └── DeviceOperationsScreen.h/.cpp # Reboot and factory reset triggers with confirmation modals
 ```
 
 ---
 
-## 3. Renderers & Build Configuration
+## Build Configuration
 
-Renderer selection is governed by board-specific Kconfig options in
+Exactly one renderer is compiled per target, controlled by Kconfig options in
 `main/CMakeLists.txt`:
 
-| Renderer | Supported Boards               | Framework & Dependencies                                           |
-| :------- | :----------------------------- | :----------------------------------------------------------------- |
-| `tft/`   | M5Stack Basic/Gray, WROVER-KIT | `screen-framework` + vendored TFT SPI driver (ESP32 only)          |
-| `lvgl/`  | M5Stack CoreS3                 | LVGL 9 + `espressif/m5stack_core_s3` BSP via IDF Component Manager |
+| Renderer | Supported Targets              | Framework & Dependencies                         |
+| :------- | :----------------------------- | :----------------------------------------------- |
+| `tft/`   | M5Stack Basic/Gray, WROVER-KIT | `screen-framework` + SPI TFT driver (ESP32 only) |
+| `lvgl/`  | M5Stack CoreS3                 | LVGL 9 + `espressif/m5stack_core_s3` BSP         |
 
-> **Note**: The legacy vendored TFT library relies on ESP32-specific register
-> definitions and cannot compile on ESP32-S3 or other Xtensa/RISC-V
-> architectures. Any new chip architecture must use `lvgl/` or provide its own
-> renderer directory.
+The legacy `tft/` driver accesses ESP32 hardware registers directly and does not
+compile for ESP32-S3. Targets using other chips must use `lvgl/` or add a
+dedicated renderer.
 
-In `main/CMakeLists.txt`, `PRIV_INCLUDE_DIRS_LIST` and `SRCS` conditionally add
-the appropriate subdirectory:
+`main/CMakeLists.txt` selectively includes the active renderer:
 
 ```cmake
 if(CONFIG_DEVICE_TYPE_M5STACK_CORES3)
@@ -91,16 +93,13 @@ if(CONFIG_DEVICE_TYPE_M5STACK_CORES3)
         "${CMAKE_CURRENT_LIST_DIR}/display/lvgl"
         "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/screens"
     )
-    # lvgl sources added to SRCS...
+    # Append lvgl sources to SRCS...
 endif()
 ```
 
 ---
 
-## 4. LVGL Renderer Lifecycle & Control Flow
-
-The `lvgl/` renderer manages the 320x240 ILI9342C panel and FT6336U capacitive
-touch screen through the following lifecycle:
+## LVGL Renderer Runtime Flow
 
 ```
                   ┌───────────────────────────────┐
@@ -131,7 +130,7 @@ touch screen through the following lifecycle:
     ┌────────────────────► Active State ◄────────────────────┐
     │                            │                           │
     │ (Touch anywhere on glass)  │ (30 seconds of            │
-    │                            │  no touch input)          │
+    │                            │  inactivity)              │
     │                            ▼                           │
     │                    ┌───────────────┐                   │
     │                    │ Display Sleep │                   │
@@ -141,10 +140,9 @@ touch screen through the following lifecycle:
     └────────────────────────────┘───────────────────────────┘
 ```
 
-### Thread Safety Contract
+### Thread Safety
 
-LVGL is not thread-safe. Any access to LVGL objects, timers, or displays must
-occur while holding the LVGL port mutex:
+LVGL operations must run under the LVGL port mutex:
 
 ```cpp
 if (bsp_display_lock(0))
@@ -154,120 +152,107 @@ if (bsp_display_lock(0))
 }
 ```
 
-Callbacks dispatched by LVGL (such as widget event handlers or timer callbacks)
-already execute within the LVGL task context with the lock held.
+Callbacks dispatched from within the LVGL task (such as widget event handlers or
+timer callbacks) already execute with this lock held.
 
 ### Auto-Sleep and Wake-on-Touch
 
 1. An LVGL timer checks `lv_display_get_inactive_time()` every second.
-2. If inactive for **30 seconds**, `bsp_display_backlight_off()` sets the
-   backlight brightness to 0%.
-3. While asleep, a transparent, full-screen hit-catcher widget is mounted on
-   `lv_layer_top()`.
-4. When touched, the wake overlay captures `LV_EVENT_PRESSED`, calls
-   `bsp_display_backlight_on()`, deletes itself, and resets the activity timer.
-   This prevents the initial wake tap from unintentionally clicking buttons
-   underneath.
+2. After 30 seconds of inactivity, `bsp_display_backlight_off()` sets backlight
+   brightness to 0%.
+3. A transparent full-screen overlay is added to `lv_layer_top()`.
+4. The first touch on the sleeping display triggers `LV_EVENT_PRESSED` on the
+   overlay, which calls `bsp_display_backlight_on()`, deletes the overlay, and
+   resets the inactivity timer. The wake touch is absorbed so underlying widgets
+   are not activated.
 
 ---
 
-## 5. Hierarchical Navigation (`NavigationStack`)
+## Hierarchical Navigation (`NavigationStack`)
 
-Rather than rigid horizontal tabs with cramped titles, the CoreS3 UI uses a
-push/pop stack model with dynamic breadcrumb navigation.
+The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
 
-### Architecture
+### Structure
 
--   **Stack Representation**: A vector of
+-   **Stack**: `std::vector<StackEntry>` where `StackEntry` contains
     `{ std::string title, RenderScreenFn renderFn }`.
--   **Top Bar (38px height)**:
-    -   Displays the hierarchical breadcrumb path (e.g.
-        `Home > System > QR Code`).
-    -   Ancestor levels are rendered as clickable button pills (`lv_button`)
-        with 6px extended touch padding (`lv_obj_set_ext_click_area(6)`).
+-   **Top Bar (38px)**:
+    -   Ancestor levels: `lv_button` pills with `lv_obj_set_ext_click_area(6)`.
         Tapping an ancestor pops directly to that level via
         `NavigationStack::PopTo(level)`.
-    -   The active leaf level is rendered as a clean, high-contrast label.
-    -   Horizontal scrolling (`LV_DIR_HOR`) is enabled on the breadcrumb
-        container to handle deep hierarchies without truncation.
+    -   Leaf level: Static text label showing the active view title.
+    -   Container: `sCrumbContainer` fills the top bar with horizontal scrolling
+        enabled (`LV_DIR_HOR`) without a scrollbar.
 -   **Content Area**:
-    -   Dynamically cleans and renders the top screen callback:
-        `sStack.back().renderFn(sContentContainer)`.
+    -   Takes remaining vertical height (202px).
+    -   Cleared on transition and repopulated by calling
+        `renderFn(sContentContainer)`.
     -   Configured with column flex layout and vertical scrolling
         (`LV_OBJ_FLAG_SCROLLABLE`).
 
 ---
 
-## 6. Developer Extension Guide
+## Adding New Components
 
-### Adding a New Screen
+### Adding a Screen to `lvgl/`
 
-To add a new screen to the LVGL interface:
-
-1. **Declare the screen renderer** in `display/lvgl/screens/MyFeatureScreen.h`:
+1. **Declare the entry point** in `display/lvgl/screens/<Name>Screen.h`:
 
     ```cpp
     #pragma once
     #include <lvgl.h>
 
-    void ShowMyFeatureScreen(lv_obj_t * parent);
+    void Show<Name>Screen(lv_obj_t * parent);
     ```
 
-2. **Implement the UI** in `display/lvgl/screens/MyFeatureScreen.cpp`:
+2. **Implement widgets** in `display/lvgl/screens/<Name>Screen.cpp`:
 
     ```cpp
-    #include "MyFeatureScreen.h"
+    #include "<Name>Screen.h"
 
-    void ShowMyFeatureScreen(lv_obj_t * parent)
+    void Show<Name>Screen(lv_obj_t * parent)
     {
         lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
         lv_obj_set_style_pad_all(parent, 10, LV_PART_MAIN);
 
         lv_obj_t * label = lv_label_create(parent);
-        lv_label_set_text(label, "My Feature Content");
+        lv_label_set_text(label, "Content");
     }
     ```
 
-3. **Navigate to the screen** from any existing screen or button handler:
+3. **Navigate from existing views**:
 
     ```cpp
-    #include "MyFeatureScreen.h"
+    #include "<Name>Screen.h"
     #include "NavigationStack.h"
 
     static void OnButtonClicked(lv_event_t * event)
     {
-        NavigationStack::Push("My Feature", ShowMyFeatureScreen);
+        NavigationStack::Push("<Title>", Show<Name>Screen);
     }
     ```
 
-4. **Add the file to CMake**: List `display/lvgl/screens/MyFeatureScreen.cpp` in
-   `examples/all-devices-app/esp32/main/CMakeLists.txt` under the
-   `CONFIG_DEVICE_TYPE_M5STACK_CORES3` block.
+4. **Register with build**: Add `display/lvgl/screens/<Name>Screen.cpp` to
+   `main/CMakeLists.txt` under `CONFIG_DEVICE_TYPE_M5STACK_CORES3`.
 
----
+### Adding Device Controls
 
-### Adding Device-Specific Controls (Phase 4 Extension Pattern)
-
-When single-device mode is active or when an endpoint is selected from
-`DeviceEndpointsScreen`, dedicated interactive widgets (sliders, toggles, color
-wheels) can be attached:
+Device-specific interactive screens (e.g. On/Off toggles, level sliders) can be
+linked from `DeviceEndpointsScreen` or `HomeScreen`:
 
 ```cpp
-void ShowOnOffPluginScreen(lv_obj_t * parent)
+void ShowOnOffControlScreen(lv_obj_t * parent)
 {
     lv_obj_t * toggleBtn = lv_button_create(parent);
-    // Wire toggle button to Matter OnOff cluster server commands...
+    // Wire toggle button to Matter OnOff cluster commands...
 }
 ```
 
----
+### Adding a New Target Board
 
-### Adding a New Target Board / Renderer
-
-1. Create a new directory under `display/<new_target>/`.
-2. Implement `void InitDeviceDisplay()` and `void ShowRestartingMessage()` in
-   `display/<new_target>/DeviceDisplay.cpp`.
-3. Add a Kconfig option in `main/Kconfig.projbuild` (e.g.
-   `CONFIG_DEVICE_TYPE_MY_BOARD`).
-4. Update `main/CMakeLists.txt` to conditionally compile `display/<new_target>/`
-   when that option is enabled.
+1. Create directory `display/<target>/`.
+2. Implement `InitDeviceDisplay()` and `ShowRestartingMessage()` in
+   `display/<target>/DeviceDisplay.cpp`.
+3. Add a Kconfig option in `main/Kconfig.projbuild`.
+4. Update `main/CMakeLists.txt` to conditionally compile `display/<target>/`
+   when that Kconfig option is set.
