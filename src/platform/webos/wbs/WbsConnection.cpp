@@ -324,9 +324,10 @@ CHIP_ERROR WbsConnection::UnsubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT co
     CHIP_ERROR result = CHIP_ERROR_INTERNAL;
 
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
-    VerifyOrExit(!connection->mIsServerRole,
-                 { result = CHIP_ERROR_NOT_IMPLEMENTED;
-                   ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() is not valid on a server-role connection"); });
+    VerifyOrExit(!connection->mIsServerRole, {
+        result = CHIP_ERROR_NOT_IMPLEMENTED;
+        ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() is not valid on a server-role connection");
+    });
 
     VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->mMonitorToken) == true,
                  ChipLogError(DeviceLayer, "lsCallCancel failed"));

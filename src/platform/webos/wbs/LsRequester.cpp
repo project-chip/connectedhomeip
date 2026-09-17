@@ -86,7 +86,7 @@ LsRequester * LsRequester::getInstance()
 // Assumes _mutex is held by the caller.
 void LsRequester::initLocked()
 {
-    m_state              = State::STARTING;
+    m_state             = State::STARTING;
     GMainContext * pCxt = g_main_context_new();
     m_mainLoop          = g_main_loop_new(pCxt, false);
     // g_main_loop_new takes its own reference on the context; drop ours so the
