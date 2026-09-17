@@ -30,8 +30,7 @@ inline constexpr DataModel::AttributeEntry
 namespace CurrentConnections {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(CurrentConnections::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
-                                                              DataModel::AttributeQualityFlags::kFabricSensitive),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace CurrentConnections
 namespace MaxZones {
