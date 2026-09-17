@@ -27,8 +27,7 @@ CHIP_ERROR CreateAndRegisterTranslator::TranslateAndExecute(EndpointId endpointI
     }
 
     const std::string device = json["device"].asString();
-    return DispatchStringAction(registry, "CreateAndRegister"_span, endpointId,
-                                CharSpan(device.data(), device.size()));
+    return DispatchStringAction(registry, "CreateAndRegister"_span, endpointId, CharSpan(device.data(), device.size()));
 }
 
 } // namespace chip::app::NamedPipe

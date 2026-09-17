@@ -46,9 +46,9 @@ public:
         EndpointId endpointId = kInvalidEndpointId;
         DeviceId deviceId;
         uint16_t deviceIdValue = 0;
-        bool hasEndpointId = false;
-        bool hasDeviceId   = false;
-        CHIP_ERROR err     = CHIP_NO_ERROR;
+        bool hasEndpointId     = false;
+        bool hasDeviceId       = false;
+        CHIP_ERROR err         = CHIP_NO_ERROR;
         while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
             TLV::Tag tag = reader.GetTag();
@@ -64,7 +64,7 @@ public:
                 break;
             case 2:
                 ReturnErrorOnFailure(reader.Get(deviceIdValue));
-                deviceId = DeviceId(deviceIdValue);
+                deviceId    = DeviceId(deviceIdValue);
                 hasDeviceId = true;
                 break;
             default:
@@ -81,8 +81,8 @@ public:
         const std::string deviceName = device->name;
         const bool wasRegistered     = device->isRegistered;
         mDeviceManager.UnregisterAndDestroyDevice(deviceId);
-        ChipLogProgress(AppServer, "UnregisterAndDestroy succeeded: deviceId=%u name='%s' wasRegistered=%s",
-                deviceId.value, deviceName.c_str(), wasRegistered ? "true" : "false");
+        ChipLogProgress(AppServer, "UnregisterAndDestroy succeeded: deviceId=%u name='%s' wasRegistered=%s", deviceId.value,
+                        deviceName.c_str(), wasRegistered ? "true" : "false");
         return CHIP_NO_ERROR;
     }
 

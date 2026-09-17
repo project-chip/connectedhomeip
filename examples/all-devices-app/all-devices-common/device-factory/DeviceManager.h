@@ -16,16 +16,16 @@
  */
 
 #pragma once
+#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
-#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 
-#include <string>
-#include <optional>
 #include <cstdint>
 #include <functional>
+#include <optional>
+#include <string>
 #include <unordered_map>
 #include <vector>
 namespace chip::app {
@@ -56,13 +56,15 @@ private:
     };
 
 public:
-    struct DeviceWithState {
+    struct DeviceWithState
+    {
         const std::string & name;
         DeviceInterface & device;
         bool isRegistered;
     };
 
-    DeviceManager(DeviceFactoryT & deviceFactory, CodeDrivenDataModelProvider & provider) : mDeviceFactory(deviceFactory), mProvider(provider) {};
+    DeviceManager(DeviceFactoryT & deviceFactory, CodeDrivenDataModelProvider & provider) :
+        mDeviceFactory(deviceFactory), mProvider(provider){};
     void SetEndpointIdAllocator(EndpointIdAllocator * endpointIdAllocator) { mEndpointIdAllocator = endpointIdAllocator; }
     EndpointIdAllocator * GetEndpointIdAllocator() { return mEndpointIdAllocator; }
     std::optional<DeviceId> CreateDevice(const std::string & deviceName, const std::string & nodeLabel = "")
@@ -129,7 +131,7 @@ public:
     };
     std::vector<DeviceInterface *> GetRegisteredDevices() const
     {
-        std::vector<DeviceInterface*> registeredDevices;
+        std::vector<DeviceInterface *> registeredDevices;
         for (auto & [deviceName, deviceWithState] : mConstructedDevices)
         {
             if (deviceWithState.isRegistered)

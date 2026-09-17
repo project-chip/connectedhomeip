@@ -174,7 +174,8 @@ public:
                 features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::GetConfig().enableWiFi);
 #endif
                 return features;
-            }()), mDeviceManager(PosixDeviceFactory::GetInstance(), mDataModelProvider)
+            }()),
+        mDeviceManager(PosixDeviceFactory::GetInstance(), mDataModelProvider)
     {}
 
     std::set<EndpointId> GetReservedEndpointIds() const
@@ -204,8 +205,8 @@ public:
 
         ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(
             std::make_unique<CreateAndRegisterOOBAccessor<PosixDeviceFactory>>(mDeviceManager, mEndpointIdAllocator.value())));
-        ReturnErrorOnFailure(
-            OOBAccessorRegistry::Instance().Register(std::make_unique<UnregisterAndDestroyOOBAccessor<PosixDeviceFactory>>(mDeviceManager)));
+        ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(
+            std::make_unique<UnregisterAndDestroyOOBAccessor<PosixDeviceFactory>>(mDeviceManager)));
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
@@ -213,8 +214,8 @@ public:
             {
                 mEndpointIdAllocator->ForceNext(entry.endpoint);
             }
-            ChipLogProgress(AppServer, "Creating and registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(), entry.endpoint,
-                            entry.parentId);
+            ChipLogProgress(AppServer, "Creating and registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
+                            entry.endpoint, entry.parentId);
             auto deviceId = mDeviceManager.CreateAndRegisterDevice(entry.type, mEndpointIdAllocator.value(), entry.label,
                                                                    EndpointComposition::WithParent(entry.parentId));
             VerifyOrReturnError(deviceId.has_value(), CHIP_ERROR_INCORRECT_STATE);
@@ -236,7 +237,7 @@ public:
 
     chip::app::DeviceManager<PosixDeviceFactory> & GetDeviceManager() { return mDeviceManager; }
 
-    std::vector<DeviceInterface*> GetConstructedDevices() const { return mDeviceManager.GetRegisteredDevices(); }
+    std::vector<DeviceInterface *> GetConstructedDevices() const { return mDeviceManager.GetRegisteredDevices(); }
 
 private:
     Context mContext;

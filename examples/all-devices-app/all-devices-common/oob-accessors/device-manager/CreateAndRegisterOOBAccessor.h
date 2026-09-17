@@ -94,15 +94,15 @@ public:
         }
         temporaryDeviceTypeParser.ExpandWildcards(supportedDeviceTypes);
 
-        auto & deviceTypeParser = DeviceTypeParser::GetInstance();
+        auto & deviceTypeParser                 = DeviceTypeParser::GetInstance();
         const auto & permanentDeviceTypeEntries = deviceTypeParser.GetDeviceTypeEntries();
         const auto & temporaryDeviceTypeEntries = temporaryDeviceTypeParser.GetDeviceTypeEntries();
         std::vector<DeviceTypeParser::Entry> combinedDeviceTypeEntries;
         combinedDeviceTypeEntries.reserve(permanentDeviceTypeEntries.size() + temporaryDeviceTypeEntries.size());
         combinedDeviceTypeEntries.insert(combinedDeviceTypeEntries.end(), permanentDeviceTypeEntries.begin(),
-                                          permanentDeviceTypeEntries.end());
+                                         permanentDeviceTypeEntries.end());
         combinedDeviceTypeEntries.insert(combinedDeviceTypeEntries.end(), temporaryDeviceTypeEntries.begin(),
-                                          temporaryDeviceTypeEntries.end());
+                                         temporaryDeviceTypeEntries.end());
         ReturnErrorOnFailure(DeviceTypeParser::ValidateConfig(combinedDeviceTypeEntries));
 
         for (const auto & deviceEntry : temporaryDeviceTypeEntries)
@@ -117,13 +117,12 @@ public:
                 auto * dynamicAllocator = static_cast<DynamicEndpointIdAllocator *>(&mEndpointIdAllocator);
                 dynamicAllocator->ForceNext(deviceEntry.endpoint);
             }
-            auto deviceId = mDeviceManager.CreateAndRegisterDevice(
-                deviceEntry.type, mEndpointIdAllocator, deviceEntry.label, EndpointComposition::WithParent(deviceEntry.parentId));
+            auto deviceId = mDeviceManager.CreateAndRegisterDevice(deviceEntry.type, mEndpointIdAllocator, deviceEntry.label,
+                                                                   EndpointComposition::WithParent(deviceEntry.parentId));
             VerifyOrReturnError(deviceId.has_value(), CHIP_ERROR_INTERNAL);
-            ChipLogProgress(AppServer,
-                            "CreateAndRegister succeeded: deviceId=%u type='%s' label='%s' requestedEndpoint=%u parent=0x%04X",
-                            deviceId->value, deviceEntry.type.c_str(), deviceEntry.label.c_str(), deviceEntry.endpoint,
-                            deviceEntry.parentId);
+            ChipLogProgress(
+                AppServer, "CreateAndRegister succeeded: deviceId=%u type='%s' label='%s' requestedEndpoint=%u parent=0x%04X",
+                deviceId->value, deviceEntry.type.c_str(), deviceEntry.label.c_str(), deviceEntry.endpoint, deviceEntry.parentId);
         }
 
         return CHIP_NO_ERROR;
