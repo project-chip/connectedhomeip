@@ -50,7 +50,6 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-
 class TC_AVANALY_2_11(MatterTestCommissionedDevice, AVANALYTestBase):
     # Step 4 reboots the DUT, which the background wildcard subscription does not survive.
     disable_wildcard_subscription = True
