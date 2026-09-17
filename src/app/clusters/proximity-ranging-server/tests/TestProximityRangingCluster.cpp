@@ -1236,7 +1236,7 @@ TEST_F(TestProximityRangingCluster, TestReadRangingConstraintsEmpty)
 
     size_t count = 0;
     EXPECT_EQ(list.ComputeSize(&count), CHIP_NO_ERROR);
-    EXPECT_EQ(count, 0);
+    EXPECT_EQ(count, 0u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1283,11 +1283,11 @@ TEST_F(TestProximityRangingCluster, TestReadRangingConstraintsAggregatesAdapters
     EXPECT_EQ(iter.GetValue().role, RangingRoleEnum::kBLTInitiatorRole);
     EXPECT_FALSE(iter.GetValue().enabled.HasValue());
     ASSERT_TRUE(iter.GetValue().minRangingInterval.HasValue());
-    EXPECT_EQ(iter.GetValue().minRangingInterval.Value(), 10);
+    EXPECT_EQ(iter.GetValue().minRangingInterval.Value(), 10u);
     ASSERT_TRUE(iter.GetValue().maxSessionDuration.HasValue());
-    EXPECT_EQ(iter.GetValue().maxSessionDuration.Value(), 60);
+    EXPECT_EQ(iter.GetValue().maxSessionDuration.Value(), 60u);
     ASSERT_TRUE(iter.GetValue().maxRangingInstances.HasValue());
-    EXPECT_EQ(iter.GetValue().maxRangingInstances.Value(), 5);
+    EXPECT_EQ(iter.GetValue().maxRangingInstances.Value(), 5u);
 
     EXPECT_FALSE(iter.Next());
 
