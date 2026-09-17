@@ -260,7 +260,7 @@ void LoggingFanDelegate::OnOnOffChanged(bool on)
     {
         ApplyOnOffToFan(mFanLoad->FanControlCluster(), on);
     }
-    ChipLogProgress(DeviceLayer, "LoggingFanDelegate::OnOffChanged() -> %s", on ? "ON" : "OFF");
+    ChipLogProgress(DeviceLayer, "LoggingFanDelegate::OnOnOffChanged() -> %s", on ? "ON" : "OFF");
 }
 
 } // namespace app
