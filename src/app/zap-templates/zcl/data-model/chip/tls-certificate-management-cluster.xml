@@ -47,9 +47,13 @@ Alchemy: v1.7.10
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <attribute code="0x0000" side="server" name="MaxRootCertificates" define="MAX_ROOT_CERTIFICATES" type="int8u" min="5" max="254"/>
-    <attribute code="0x0001" side="server" name="ProvisionedRootCertificates" define="PROVISIONED_ROOT_CERTIFICATES" type="array" entryType="TLSCertStruct" length="254" isFabricSensitive="true"/>
+    <attribute code="0x0001" side="server" name="ProvisionedRootCertificates" define="PROVISIONED_ROOT_CERTIFICATES" type="array" entryType="TLSCertStruct" length="254">
+      <access op="read" privilege="view" fabricSensitive="true"/>
+    </attribute>
     <attribute code="0x0002" side="server" name="MaxClientCertificates" define="MAX_CLIENT_CERTIFICATES" type="int8u" min="2" max="254"/>
-    <attribute code="0x0003" side="server" name="ProvisionedClientCertificates" define="PROVISIONED_CLIENT_CERTIFICATES" type="array" entryType="TLSClientCertificateDetailStruct" length="254" isFabricSensitive="true"/>
+    <attribute code="0x0003" side="server" name="ProvisionedClientCertificates" define="PROVISIONED_CLIENT_CERTIFICATES" type="array" entryType="TLSClientCertificateDetailStruct" length="254">
+      <access op="read" privilege="view" fabricSensitive="true"/>
+    </attribute>
     <command code="0x00" source="client" name="ProvisionRootCertificate" response="ProvisionRootCertificateResponse" isFabricScoped="true">
       <description>This command SHALL provision a newly provided certificate, or rotate an existing one, based on the contents of the CAID field.</description>
       <access op="invoke" privilege="administer"/>

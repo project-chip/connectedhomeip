@@ -47,8 +47,8 @@ Alchemy: v1.6.8+dirty
       </feature>
     </features>
     <globalAttribute code="0xFFFD" side="either" value="2"/>
-    <attribute code="0x0000" side="server" name="CurrentSessions" define="CURRENT_SESSIONS" type="array" entryType="WebRTCSessionStruct" isFabricSensitive="true">
-      <access op="read" privilege="manage"/>
+    <attribute code="0x0000" side="server" name="CurrentSessions" define="CURRENT_SESSIONS" type="array" entryType="WebRTCSessionStruct">
+      <access op="read" privilege="manage" fabricSensitive="true"/>
     </attribute>
     <command code="0x00" source="client" name="SolicitOffer" isFabricScoped="true" response="SolicitOfferResponse">
       <description>Requests that the Provider initiates a new session with the Offer / Answer flow in a way that allows for options to be passed and work with devices needing the standby flow.</description>

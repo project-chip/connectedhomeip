@@ -178,7 +178,9 @@ Alchemy: v1.7.10
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="3"/>
     <attribute code="0x0000" side="server" name="SupportedFormats" define="SUPPORTED_CONTAINER_FORMATS" type="array" entryType="SupportedFormatStruct" minLength="1"/>
-    <attribute code="0x0001" side="server" name="CurrentConnections" define="SUPPORTED_INGEST_METHODS" type="array" entryType="TransportConfigurationStruct" isFabricSensitive="true"/>
+    <attribute code="0x0001" side="server" name="CurrentConnections" define="SUPPORTED_INGEST_METHODS" type="array" entryType="TransportConfigurationStruct">
+      <access op="read" privilege="view" fabricSensitive="true"/>
+    </attribute>
     <attribute code="0x0002" side="server" name="MaxZones" define="MAX_ZONES" type="int8u" isNullable="true" min="1" max="254" optional="true" apiMaturity="provisional">
       <otherwiseConform>
         <provisionalConform/>

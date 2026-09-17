@@ -32,8 +32,8 @@ Alchemy: v1.6.8+dirty
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="2"/>
-    <attribute code="0x0000" side="server" name="CurrentSessions" define="CURRENT_SESSIONS" type="array" entryType="WebRTCSessionStruct" isFabricSensitive="true">
-      <access op="read" privilege="administer"/>
+    <attribute code="0x0000" side="server" name="CurrentSessions" define="CURRENT_SESSIONS" type="array" entryType="WebRTCSessionStruct">
+      <access op="read" privilege="administer" fabricSensitive="true"/>
     </attribute>
     <command code="0x00" source="client" name="Offer">
       <description>This command provides the stream requestor with WebRTC session details.</description>

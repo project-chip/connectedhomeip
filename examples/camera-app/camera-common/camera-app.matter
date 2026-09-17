@@ -2748,7 +2748,7 @@ cluster PushAvStreamTransport = 1365 {
   }
 
   readonly attribute SupportedFormatStruct supportedFormats[] = 0;
-  readonly attribute TransportConfigurationStruct currentConnections[] = 1;
+  readonly attribute fabric_sensitive TransportConfigurationStruct currentConnections[] = 1;
   provisional readonly attribute optional nullable int8u maxZones = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2864,9 +2864,9 @@ cluster TlsCertificateManagement = 2049 {
   }
 
   readonly attribute int8u maxRootCertificates = 0;
-  readonly attribute TLSCertStruct provisionedRootCertificates[] = 1;
+  readonly attribute fabric_sensitive TLSCertStruct provisionedRootCertificates[] = 1;
   readonly attribute int8u maxClientCertificates = 2;
-  readonly attribute TLSClientCertificateDetailStruct provisionedClientCertificates[] = 3;
+  readonly attribute fabric_sensitive TLSClientCertificateDetailStruct provisionedClientCertificates[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2982,7 +2982,7 @@ cluster TlsClientManagement = 2050 {
   }
 
   readonly attribute int8u maxProvisioned = 0;
-  readonly attribute TLSEndpointStruct provisionedEndpoints[] = 1;
+  readonly attribute fabric_sensitive TLSEndpointStruct provisionedEndpoints[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

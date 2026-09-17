@@ -52,7 +52,9 @@ Alchemy: v1.7.10
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <attribute code="0x0000" side="server" name="MaxProvisioned" define="MAX_PROVISIONED" type="int8u" min="5" max="254"/>
-    <attribute code="0x0001" side="server" name="ProvisionedEndpoints" define="PROVISIONED_ENDPOINTS" type="array" entryType="TLSEndpointStruct" isFabricSensitive="true"/>
+    <attribute code="0x0001" side="server" name="ProvisionedEndpoints" define="PROVISIONED_ENDPOINTS" type="array" entryType="TLSEndpointStruct">
+      <access op="read" privilege="view" fabricSensitive="true"/>
+    </attribute>
     <command code="0x00" source="client" name="ProvisionEndpoint" response="ProvisionEndpointResponse" isFabricScoped="true">
       <description>This command is used to provision a TLS Endpoint for the provided Hostname / Port combination.</description>
       <access op="invoke" privilege="administer"/>

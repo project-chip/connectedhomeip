@@ -134,6 +134,17 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     TLV::TLVWriter checkpoint;
     reportBuilder.Checkpoint(checkpoint);
 
+    DataModel::AttributeFinder finder(dataModel);
+    std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
+
+    // Fabric-sensitive attributes are always reported fabric-filtered, regardless of the
+    // FabricFiltered flag on the request.
+    if (entry.has_value() && entry->HasFlags(DataModel::AttributeQualityFlags::kFabricSensitive))
+    {
+        flags.Set(ReadFlags::kFabricFiltered);
+        readRequest.readFlags = flags;
+    }
+
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
     bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
@@ -147,9 +158,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
     // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
     // leak information if we do fail existence checks.
-
-    DataModel::AttributeFinder finder(dataModel);
-    std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
 
     if (auto access_status = ValidateReadAttributeACL(subjectDescriptor, path, Privilege::kView); access_status.has_value())
     {
