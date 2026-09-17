@@ -972,7 +972,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             tolerance_sec=tolerance_s3,
         )
 
-        # Device might go to kDownloading to fast but if this is not catched here the subscription will 
+        # Device might go to kDownloading to fast but if this is not catched here the subscription will
         # try to reach for kDownloading for too long and might never reach that value. Read first then check the time taken to make sure is correct.
         current_update_state_s3 = update_state_progress = await self.read_single_attribute_check_success(
             cluster=Clusters.OtaSoftwareUpdateRequestor,
