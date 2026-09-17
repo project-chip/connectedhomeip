@@ -81,7 +81,7 @@ bool SFrameFollowsSpecConstraints(const Globals::Structs::SFrameStruct::Decodabl
     {
         return false;
     }
-    
+
     // Spec constraint: BaseKey length <= 128
     if (sframeConfig.senderKey.baseKey.size() > 128)
     {
@@ -107,7 +107,7 @@ using SFrameKeyStructType = Globals::Structs::SFrameKeyStruct::Type;
  * `receiveKeysStorage`, which must outlive the returned value.
  */
 Globals::Structs::SFrameStruct::Type ConvertSFrameConfig(const Globals::Structs::SFrameStruct::DecodableType & in,
-                                                std::vector<SFrameKeyStructType> & receiveKeysStorage)
+                                                         std::vector<SFrameKeyStructType> & receiveKeysStorage)
 {
     Globals::Structs::SFrameStruct::Type out;
     out.audioCipherSuite = in.audioCipherSuite;
@@ -744,7 +744,7 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     if (req.SFrameConfig.HasValue())
     {
         const auto & sframeConfig = req.SFrameConfig.Value();
-        CHIP_ERROR err            = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
+        CHIP_ERROR err = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -995,7 +995,8 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         // Validate that the StreamUsage is in the StreamUsagePriorities list
         if (mDelegate.IsStreamUsageSupported(req.streamUsage.Value()) != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities", to_underlying(req.streamUsage.Value()));
+            ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities",
+                         to_underlying(req.streamUsage.Value()));
             return Status::DynamicConstraintError;
         }
 
@@ -1064,7 +1065,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         if (req.SFrameConfig.HasValue())
         {
             const auto & sframeConfig = req.SFrameConfig.Value();
-            err                       = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
+            err = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "HandleProvideOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
