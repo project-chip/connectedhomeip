@@ -57,7 +57,7 @@ display/
 │       └── QRCodeScreen.h/.cpp
 │
 └── lvgl/                           # Touch-driven renderer for ESP32-S3 (M5Stack CoreS3)
-    ├── DeviceDisplay.cpp           # BSP bring-up, theme, auto-sleep, and wake-on-touch
+    ├── DeviceDisplay.cpp           # Display bring-up, lifecycle, and sleep
     ├── NavigationStack.h/.cpp      # Push/pop screen navigation and breadcrumbs
     └── screens/                    # Stateless screen render callbacks
         ├── HomeScreen.h/.cpp             # Root menu (Devices, Select Device, System)
@@ -114,7 +114,6 @@ endif()
                                  ▼
                   ┌───────────────────────────────┐
                   │    bsp_display_lock(0)        │
-                  │  - Bind LVGL dark theme       │
                   │  - NavigationStack::Init()    │
                   │  - Push Home (and QR if new)  │
                   │  - Register Inactivity Timer  │
@@ -176,15 +175,14 @@ The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
 
 -   **Stack**: `std::vector<StackEntry>` where `StackEntry` contains
     `{ std::string title, RenderScreenFn renderFn }`.
--   **Top Bar (38px)**:
-    -   Ancestor levels: `lv_button` pills with `lv_obj_set_ext_click_area(6)`.
-        Tapping an ancestor pops directly to that level via
-        `NavigationStack::PopTo(level)`.
+-   **Top Bar**:
+    -   Ancestor levels: `lv_button` pills. Tapping an ancestor pops directly to
+        that level via `NavigationStack::PopTo(level)`.
     -   Leaf level: Static text label showing the active view title.
     -   Container: `sCrumbContainer` fills the top bar with horizontal scrolling
         enabled (`LV_DIR_HOR`) without a scrollbar.
 -   **Content Area**:
-    -   Takes remaining vertical height (202px).
+    -   Fills the remaining vertical height.
     -   Cleared on transition and repopulated by calling
         `renderFn(sContentContainer)`.
     -   Configured with column flex layout and vertical scrolling
