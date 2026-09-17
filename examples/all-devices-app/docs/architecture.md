@@ -106,8 +106,8 @@ classDiagram
         <<device/types/foo/Foo.h>>
         #MandatoryClusters
         +Foo(Delegates &)
-        #RegisterAdditionalClusters(EndpointId, CodeDrivenDataModelProvider &)* CHIP_ERROR
-        #UnregisterAdditionalClusters(CodeDrivenDataModelProvider &)* void
+        #RegisterAdditionalClusters(EndpointId, CodeDrivenDataModelProvider &) CHIP_ERROR
+        #UnregisterAdditionalClusters(CodeDrivenDataModelProvider &) void
     }
 
     class LoggingFoo {
@@ -142,7 +142,7 @@ classDiagram
 
 Because `impl/LoggingFoo` and platform subclasses derive from `Foo`, UI screens,
 Out-of-Band (OOB) CLI controls, and generic application logic bind to the base
-`Foo` interface without coupling to simulation or hardware details.
+device type interface (`Foo`) without coupling to simulation or hardware details.
 
 #### 2. Optional Clusters & Registration Hooks
 

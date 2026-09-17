@@ -38,5 +38,5 @@ impl/LoggingOnOffLight -> OnOffLight (Device Type) -> OnOffLoad (Capability) -> 
    `LoggingOnOffDelegate`, `LoggingDimmableDelegate`) and inherit/compose those
    delegates inside `device/types/<foo>/impl/LoggingFoo`.
 4. **No Sibling Dependencies**: Files in `device/capabilities/` must compile
-   independently of concrete device types in `device/types/` and depend only on
-   `device/api/`.
+   independently of concrete device types in `device/types/`. They may depend on
+   `device/api/` and shared Matter cluster or data-model APIs.

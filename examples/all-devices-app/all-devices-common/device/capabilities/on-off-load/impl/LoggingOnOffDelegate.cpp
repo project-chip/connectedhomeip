@@ -52,8 +52,8 @@ DataModel::ActionReturnStatus LoggingOnOffDelegate::TriggerDelayedAllOff(OnOff::
         ChipLogProgress(DeviceLayer, "DelayedAllOff: SlowFade");
         break;
     default:
-        ChipLogProgress(DeviceLayer, "DelayedAllOff: UNKNOWN/INVALID");
-        break;
+        ChipLogError(DeviceLayer, "DelayedAllOff: UNKNOWN/INVALID");
+        return Status::ConstraintError;
     }
     return Status::Success;
 }
@@ -66,8 +66,8 @@ DataModel::ActionReturnStatus LoggingOnOffDelegate::TriggerDyingLight(OnOff::Dyi
         ChipLogProgress(DeviceLayer, "DyingLight: FadeOff");
         break;
     default:
-        ChipLogProgress(DeviceLayer, "DyingLight: UNKNOWN/INVALID");
-        break;
+        ChipLogError(DeviceLayer, "DyingLight: UNKNOWN/INVALID");
+        return Status::ConstraintError;
     }
     return Status::Success;
 }
