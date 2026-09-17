@@ -28,7 +28,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --app-pipe /tmp/acs_fifo
+#       --app-pipe /tmp/acs_fifo_2_1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -72,6 +72,22 @@ class TC_ACS_2_1(MatterBaseTest):
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
+
+    # Sends and out-of-band command to the all-clusters-app
+    def write_to_app_pipe(self, command):
+        # CI app pipe id creation
+        # self.app_pipe = "/tmp/acs_fifo"
+        if self.is_ci:
+            # app_pid = self.matter_test_config.app_pid
+            # if app_pid == 0:
+            #     asserts.fail("The --app-pid flag must be set when using named pipe")
+            # self.app_pipe = self.app_pipe + str(app_pid)
+            self.app_pipe = "/tmp/acs_fifo_2_1"
+
+        with open(self.app_pipe, "w") as app_pipe:
+            app_pipe.write(command + "\n")
+        # Delay for pipe command to be processed (otherwise tests are flaky)
+        time.sleep(0.001)
 
     # @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     @pics('ACS.S')
