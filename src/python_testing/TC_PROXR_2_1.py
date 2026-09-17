@@ -38,7 +38,7 @@
 
 import test_plan_support
 from mobly import asserts
-from TC_PROXRTestBase import (DEVICE_IDENTITY_KEY_LEN, WIFI_TECHNOLOGIES, BLTCSModeEnum, BLTCSSecurityLevelEnum, Feature,
+from support_modules.proxr_testbase import (DEVICE_IDENTITY_KEY_LEN, WIFI_TECHNOLOGIES, BLTCSModeEnum, BLTCSSecurityLevelEnum, Feature,
                               ProximityRangingTestBase, RangingTechEnum)
 
 import matter.clusters as Clusters

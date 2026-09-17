@@ -37,7 +37,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import test_plan_support
-from TC_PROXRTestBase import (DEVICE_IDENTITY_KEY_LEN, LTK_LEN, PMK_LEN, SESSION_KEY_LEN, BLTCSModeEnum, BLTCSSecurityLevelEnum,
+from support_modules.proxr_testbase import (DEVICE_IDENTITY_KEY_LEN, LTK_LEN, PMK_LEN, SESSION_KEY_LEN, BLTCSModeEnum, BLTCSSecurityLevelEnum,
                               Feature, ProximityRangingTestBase, RangingRoleEnum, StatusCodeEnum)
 
 import matter.clusters as Clusters
