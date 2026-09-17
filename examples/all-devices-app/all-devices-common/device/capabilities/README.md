@@ -10,7 +10,9 @@ Unlike `device/types/`, which maps directly to spec-defined Matter Device Types
 (e.g., _Dimmable Light_ or _Extractor Hood_), capabilities are internal
 abstractions shared by a few closely related load families:
 
-$$\text{Impl (\texttt{impl/LoggingOnOffLight})} \longrightarrow \text{Device Type (\texttt{OnOffLight})} \longrightarrow \text{Capability (\texttt{OnOffLoad})} \longrightarrow \text{SingleEndpoint}$$
+```text
+impl/LoggingOnOffLight -> OnOffLight (Device Type) -> OnOffLoad (Capability) -> SingleEndpoint
+```
 
 -   **`on-off-load`** (`OnOffLoad`): Shared OnOff, Identify, Groups, and
     ScenesManagement wiring.

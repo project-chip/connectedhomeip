@@ -19,7 +19,9 @@ device/types/foo/
 
 ### Strict Inheritance Direction
 
-$$\text{Impl / Simulation (\texttt{impl/LoggingFoo})} \longrightarrow \text{Base Device Type (\texttt{Foo})} \longrightarrow \text{SingleEndpoint}$$
+```text
+impl/LoggingFoo (Simulation) -> Foo (Base Device Type) -> SingleEndpoint
+```
 
 1. **Base Device Type (`Foo.h`)**:
     - Inherits directly from `SingleEndpoint` (or a shared capability in special

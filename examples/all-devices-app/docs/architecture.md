@@ -84,7 +84,7 @@ All single-endpoint devices inherit from `DeviceInterface` and `SingleEndpoint`.
 Device types follow a strict inheritance direction separating generic spec
 definitions from concrete simulations or hardware drivers.
 
-#### 1. Default 2-Tier Hierarchy (`SingleEndpoint` $\leftarrow$ `Foo` $\leftarrow$ `LoggingFoo`)
+#### 1. Default 2-Tier Hierarchy (`SingleEndpoint <- Foo <- LoggingFoo`)
 
 ```mermaid
 classDiagram
@@ -191,8 +191,8 @@ classDiagram
 ```
 
 A small set of closely related device families (`OnOffLoad`, `DimmableLoad`,
-`FanLoad`) use a 3-tier hierarchy: `impl` $\rightarrow$ `device_type`
-$\rightarrow$ `capability` $\rightarrow$ `SingleEndpoint`.
+`FanLoad`) use a 3-tier hierarchy:
+`impl -> device_type -> capability -> SingleEndpoint`.
 
 -   **Capabilities are an exception, not the default**: Deep endpoint
     inheritance increases coupling, complicates constructor/context plumbing,
