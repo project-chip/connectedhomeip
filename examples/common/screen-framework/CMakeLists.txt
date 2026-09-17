@@ -29,3 +29,19 @@ if(CONFIG_HAVE_DISPLAY AND IDF_VERSION_MAJOR GREATER_EQUAL 6)
         "The display depends on the m5stack-tft library, which does not support ESP-IDF 6.x. "
         "Select a device type without a display, or use ESP-IDF 5.x.")
 endif()
+
+# m5stack-tft declares most of its font tables without `const`, so they land in .data and
+# cost DRAM (~11 kB for the three unused ones) rather than living in flash like
+# tft_Dejavu24 does.  The library is unmaintained, so rather than forking it, cut the only
+# reference: TFT_setFont() names every font, which is what keeps all of them alive through
+# --gc-sections. No application here selects COMIC24/MINYA24/TOONEY32, so point those
+# branches at tft_DefaultFont, which is what TFT_setFont() falls back to for an
+# unrecognized font anyway. The three tables become unreferenced and are dropped by the
+# linker.
+if(tft IN_LIST BUILD_COMPONENTS)
+    idf_component_get_property(tft_dir tft COMPONENT_DIR)
+    set_source_files_properties("${tft_dir}/tft.c"
+        TARGET_DIRECTORY idf::tft
+        PROPERTIES COMPILE_DEFINITIONS
+            "tft_Comic24=tft_DefaultFont;tft_minya24=tft_DefaultFont;tft_tooney32=tft_DefaultFont")
+endif()
