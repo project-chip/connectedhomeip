@@ -382,11 +382,11 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::BuildProvideOffer(WebRTCTransportProvi
     aVideoStream = mRequest.VideoStreamId();
 
     aRequest.webRTCSessionID.SetNull(); // a new session, to be assigned by the camera
-    aRequest.sdp         = CharSpan(mOfferSdp.data(), mOfferSdp.size());
+    aRequest.sdp = CharSpan(mOfferSdp.data(), mOfferSdp.size());
     aRequest.streamUsage.SetValue(Globals::StreamUsageEnum::kAnalysis);
     // The requestor cluster's registered path is where the camera's answering commands must land
     aRequest.originatingEndpointID.SetValue(mRequestorCluster->GetPaths().front().mEndpointId);
-    aRequest.videoStreams          = MakeOptional(DataModel::List<const uint16_t>(&aVideoStream, 1));
+    aRequest.videoStreams = MakeOptional(DataModel::List<const uint16_t>(&aVideoStream, 1));
     // No audio for analysis; ICE servers and transport policy are the camera's defaults
     return CHIP_NO_ERROR;
 }
