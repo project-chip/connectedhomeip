@@ -59,13 +59,6 @@ not_automated:
       reason: Test requires Thread MeshCoP hardware or simulation.
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
-<<<<<<< HEAD
-    - name: TC_AVSMTestBase.py
-      reason: Shared code for TC_AVSM, not a standalone test
-    - name: TC_PROXRTestBase.py
-      reason: Shared code for TC_PROXR, not a standalone test
-=======
->>>>>>> 9868a4c5294 ([Cleanup] Move python_testing support modules into support_modules folder)
     - name: TC_BRBINFO_3_1.py
       reason:
           Attribute is not implemented in the bridge app. Same code as
@@ -180,11 +173,6 @@ not_automated:
       reason:
           No existing app corresponding to the test content (NFC-based
           onboarding data security requirements)
-<<<<<<< HEAD
-    - name: TC_GC_common.py
-      reason: Shared code for TC_GC, not a standalone test.
-    - name: TC_S_common.py
-      reason: Shared helper code for TC_S, not a standalone test.
     - name: TC_NETIM_1_5.py
       reason:
           The DUT is a Matter commissioner that originates the commands under
@@ -195,8 +183,6 @@ not_automated:
           The DUT is a Matter commissioner that originates the commands under
           test, so the test is driven by an operator working the DUT's
           interface. It has no CI execution block.
-=======
->>>>>>> 9868a4c5294 ([Cleanup] Move python_testing support modules into support_modules folder)
     - name: TC_OPCREDS_3_9.py
       reason:
           Needs a DUT started with a PQC-capable DAC provider, which the generic
@@ -262,15 +248,10 @@ not_automated:
       reason:
           Very flaky in CI.
           https://github.com/project-chip/connectedhomeip/issues/71932
-<<<<<<< HEAD
-    - name: TC_AVANALYTestBase.py
-      reason: Shared helper methods for AV Analysis tests, not a standalone test
     - name: TC_SC_5_1.py
       reason:
           CI has been temporarily removed as it was blocking the roll to 1.7.
           https://github.com/project-chip/connectedhomeip/issues/74154
-=======
->>>>>>> 9868a4c5294 ([Cleanup] Move python_testing support modules into support_modules folder)
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
