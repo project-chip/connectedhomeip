@@ -15,18 +15,33 @@
  *    limitations under the License.
  */
 
-#ifndef _LWIP_DEFAULT_HOOKS_H_
-#define _LWIP_DEFAULT_HOOKS_H_
-#include "lwip/arch.h"
-#include "lwip/ip_addr.h"
-#include "lwip/netif.h"
+#pragma once
 
-#include "lwiphooks.h"
+#include <stdbool.h>
+#include <stdint.h>
 
-extern struct netif * lwip_hook_ip6_route(const ip6_addr_t * src, const ip6_addr_t * dest);
-#define LWIP_HOOK_IP6_ROUTE lwip_hook_ip6_route
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-extern const ip6_addr_t * lwip_hook_nd6_get_gw(struct netif * netif, const ip6_addr_t * dest);
-#define LWIP_HOOK_ND6_GET_GW lwip_hook_nd6_get_gw
+enum app_dtim_hold_reason
+{
+    APP_DTIM_HOLD_STARTUP       = 1U << 0,
+    APP_DTIM_HOLD_RECOVERY      = 1U << 1,
+    APP_DTIM_HOLD_COMMISSIONING = 1U << 2,
+    APP_DTIM_HOLD_BLE           = 1U << 3,
+};
 
-#endif /* _LWIP_DEFAULT_HOOKS_H_ */
+enum app_dtim_activity_kind
+{
+    APP_DTIM_ACTIVITY_UNICAST = 0,
+    APP_DTIM_ACTIVITY_MDNS    = 1,
+};
+
+void app_dtim_activity_notify(uint8_t kind);
+void app_dtim_set_hold(enum app_dtim_hold_reason reason, bool hold);
+int app_dtim_pm_check(void);
+
+#ifdef __cplusplus
+}
+#endif
