@@ -24,6 +24,8 @@ from matter.interaction_model import InteractionModelError, Status
 
 
 class AVANALYTestBase:
+    """Base class providing helper methods and constants for AVANALY tests."""
+
     SPEC_MAX_COUNT_SUPPORTEDAMBIENTCONTEXTS = 50
     SPEC_MAX_COUNT_ANALYSIS_STREAMS = 255
 
@@ -175,26 +177,95 @@ class AVANALYTestBase:
         self.has_feature_perzonedetect = (feature_map & cluster.Bitmaps.Feature.kPerZoneContextDetection) != 0
         return feature_map
 
-    async def send_establish_analysis_stream_cmd(self, endpoint, node_id):
-        """Send EstablishAnalysisStream command to the AvAnalysis cluster."""
+    async def send_establish_analysis_stream_cmd(
+        self, endpoint: int, node_id: int, expected_status: Status = Status.Success
+    ) -> Any:
+        """Send EstablishAnalysisStream command to the AvAnalysis cluster and assert expected status."""
         cmd = Clusters.Objects.AvAnalysis.Commands.EstablishAnalysisStream(nodeID=node_id)
-        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        try:
+            resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            asserts.assert_equal(
+                expected_status,
+                Status.Success,
+                f"Expected status {expected_status} on establishing analysis stream, but command succeeded",
+            )
+            return resp
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                expected_status,
+                f"Unexpected error returned on establishing analysis stream: expected {expected_status}, got {e.status}",
+            )
+            return None
 
-    async def send_activate_analysis_stream_cmd(self, endpoint, analysis_stream_id, webrtc_endpoint_id=None, pushav_endpoint_id=None):
-        """Send ActivateAnalysisStream command to the AvAnalysis cluster."""
+    async def send_activate_analysis_stream_cmd(
+        self,
+        endpoint: int,
+        analysis_stream_id: int,
+        webrtc_endpoint_id=None,
+        pushav_endpoint_id=None,
+        expected_status: Status = Status.Success,
+    ) -> Any:
+        """Send ActivateAnalysisStream command to the AvAnalysis cluster and assert expected status."""
         cmd = Clusters.Objects.AvAnalysis.Commands.ActivateAnalysisStream(
             analysisStreamID=analysis_stream_id,
             webRTCEndpointID=webrtc_endpoint_id,
-            pushAVEndpointID=pushav_endpoint_id
+            pushAVEndpointID=pushav_endpoint_id,
         )
-        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        try:
+            resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            asserts.assert_equal(
+                expected_status,
+                Status.Success,
+                f"Expected status {expected_status} on activating analysis stream, but command succeeded",
+            )
+            return resp
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                expected_status,
+                f"Unexpected error returned on activating analysis stream: expected {expected_status}, got {e.status}",
+            )
+            return None
 
-    async def send_deactivate_analysis_stream_cmd(self, endpoint, analysis_stream_id):
-        """Send DeactivateAnalysisStream command to the AvAnalysis cluster."""
+    async def send_deactivate_analysis_stream_cmd(
+        self, endpoint: int, analysis_stream_id: int, expected_status: Status = Status.Success
+    ) -> Any:
+        """Send DeactivateAnalysisStream command to the AvAnalysis cluster and assert expected status."""
         cmd = Clusters.Objects.AvAnalysis.Commands.DeactivateAnalysisStream(analysisStreamID=analysis_stream_id)
-        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        try:
+            resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            asserts.assert_equal(
+                expected_status,
+                Status.Success,
+                f"Expected status {expected_status} on deactivating analysis stream, but command succeeded",
+            )
+            return resp
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                expected_status,
+                f"Unexpected error returned on deactivating analysis stream: expected {expected_status}, got {e.status}",
+            )
+            return None
 
-    async def send_remove_analysis_stream_cmd(self, endpoint, analysis_stream_id):
-        """Send RemoveAnalysisStream command to the AvAnalysis cluster."""
+    async def send_remove_analysis_stream_cmd(
+        self, endpoint: int, analysis_stream_id: int, expected_status: Status = Status.Success
+    ) -> Any:
+        """Send RemoveAnalysisStream command to the AvAnalysis cluster and assert expected status."""
         cmd = Clusters.Objects.AvAnalysis.Commands.RemoveAnalysisStream(analysisStreamID=analysis_stream_id)
-        return await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        try:
+            resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+            asserts.assert_equal(
+                expected_status,
+                Status.Success,
+                f"Expected status {expected_status} on removing analysis stream, but command succeeded",
+            )
+            return resp
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                expected_status,
+                f"Unexpected error returned on removing analysis stream: expected {expected_status}, got {e.status}",
+            )
+            return None
