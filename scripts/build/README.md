@@ -77,9 +77,9 @@ requires `libssl.a` and `libcrypto.a`; it does not download or upgrade OpenSSL.
 Static OpenSSL symbols are hidden from shared system libraries, so dependencies
 such as libcurl can continue using their system OpenSSL. When the SDK uses
 OpenSSL, libdatachannel and its crypto dependencies use the same selected
-installation and linkage mode as the SDK.
-When deploying dynamic binaries outside the build image, also deploy the private
-shared libraries at the configured path.
+installation and linkage mode as the SDK. When deploying dynamic binaries
+outside the build image, also deploy the private shared libraries at the
+configured path.
 
 The `chip-build`, `chip-build-minimal`, and `chip-cert-bins` Dockerfiles also
 accept `--build-arg OPENSSL_STATIC=true` for static OpenSSL 3.5 or
