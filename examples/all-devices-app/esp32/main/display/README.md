@@ -59,13 +59,16 @@ display/
 └── lvgl/                           # Touch-driven renderer for ESP32-S3 (M5Stack CoreS3)
     ├── DeviceDisplay.cpp           # Display bring-up, lifecycle, and sleep
     ├── NavigationStack.h/.cpp      # Push/pop screen navigation and breadcrumbs
+    ├── DeviceScreenRegistry.h/.cpp # Registry for dynamically hooked device screens
+    ├── DeviceScreenHook.h          # DeviceFactory post-registration hook
+    ├── DeviceScreenRegistration.h  # Device screen registration declarations
     └── screens/                    # Stateless screen render callbacks
         ├── HomeScreen.h/.cpp             # Root menu (Devices, Select Device, System)
         ├── SystemMenuScreen.h/.cpp       # Submenu (QR Code, Status, Operations)
         ├── CommissioningCodesScreen.h/.cpp # Matter onboarding QR code and manual setup code
         ├── DeviceInfoScreen.h/.cpp       # Diagnostics (fabrics, IP, memory, active device)
         ├── DeviceSelectionScreen.h/.cpp  # Device type switching with confirmation modal
-        ├── DeviceEndpointsScreen.h/.cpp  # Placeholder view for dynamically registered device screens (TODO)
+        ├── DeviceEndpointsScreen.h/.cpp  # Dynamic list of registered device screens
         └── DeviceOperationsScreen.h/.cpp # Reboot and factory reset triggers with confirmation modals
 ```
 

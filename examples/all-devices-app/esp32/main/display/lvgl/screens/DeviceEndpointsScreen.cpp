@@ -17,14 +17,26 @@
  */
 
 #include "DeviceEndpointsScreen.h"
+#include "DeviceScreenRegistry.h"
 #include "DeviceTypeSelection.h"
+#include "NavigationStack.h"
 
-// TODO: Implement dynamic screen registration.
-// Devices (including composed devices like refrigerator or oven, which span
-// multiple endpoints) should dynamically register their UI screens/endpoints
-// with the display subsystem when constructed via DeviceFactory hooks,
-// rather than statically inspecting supported device types or assuming fixed
-// endpoint structures.
+#include <cstdio>
+#include <string>
+
+namespace {
+
+void OnDeviceCardClicked(lv_event_t * event)
+{
+    auto idx             = static_cast<size_t>(reinterpret_cast<uintptr_t>(lv_event_get_user_data(event)));
+    const auto & entries = chip::app::DeviceScreenRegistry::Instance().Entries();
+    if (idx < entries.size() && entries[idx].renderFn)
+    {
+        NavigationStack::Push(entries[idx].title, entries[idx].renderFn);
+    }
+}
+
+} // namespace
 
 void ShowDeviceEndpoints(lv_obj_t * parent)
 {
@@ -33,29 +45,64 @@ void ShowDeviceEndpoints(lv_obj_t * parent)
     lv_obj_set_style_pad_row(parent, 8, LV_PART_MAIN);
     lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    const std::string & activeDev = GetActiveDeviceType();
-    bool isAllBridged             = (activeDev == "*" || activeDev == "aggregator");
+    const auto & entries = chip::app::DeviceScreenRegistry::Instance().Entries();
 
-    lv_obj_t * card = lv_obj_create(parent);
-    lv_obj_set_width(card, LV_PCT(100));
-    lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(card, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_all(card, 12, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(card, 6, LV_PART_MAIN);
+    if (entries.empty())
+    {
+        const std::string & activeDev = GetActiveDeviceType();
+        bool isAllBridged             = (activeDev == "*" || activeDev == "aggregator");
 
-    lv_obj_t * header = lv_label_create(card);
-    lv_label_set_text_static(header, "Device Endpoints");
-    lv_obj_set_style_text_color(header, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_MAIN);
+        lv_obj_t * card = lv_obj_create(parent);
+        lv_obj_set_width(card, LV_PCT(100));
+        lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_flex_align(card, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+        lv_obj_set_style_pad_all(card, 12, LV_PART_MAIN);
+        lv_obj_set_style_pad_row(card, 6, LV_PART_MAIN);
 
-    lv_obj_t * configLabel = lv_label_create(card);
-    std::string configText = "Configured: " + (isAllBridged ? std::string("All Bridged (*)") : activeDev);
-    lv_label_set_text(configLabel, configText.c_str());
+        lv_obj_t * header = lv_label_create(card);
+        lv_label_set_text_static(header, "Device Screens");
+        lv_obj_set_style_text_color(header, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_MAIN);
 
-    lv_obj_t * todoNote = lv_label_create(parent);
-    lv_obj_set_width(todoNote, LV_PCT(100));
-    lv_label_set_text_static(
-        todoNote,
-        "Dynamic device endpoint registration is not yet implemented.\n\n"
-        "Screens will be dynamically registered during device construction via DeviceFactory hooks.");
-    lv_obj_set_style_text_color(todoNote, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+        lv_obj_t * configLabel = lv_label_create(card);
+        std::string configText = "Configured: " + (isAllBridged ? std::string("All Bridged (*)") : activeDev);
+        lv_label_set_text(configLabel, configText.c_str());
+
+        lv_obj_t * todoNote = lv_label_create(parent);
+        lv_obj_set_width(todoNote, LV_PCT(100));
+        lv_label_set_text_static(
+            todoNote,
+            "No interactive device screens are registered for the current configuration.\n\n"
+            "Screens register dynamically during device construction via DeviceFactory hooks.");
+        lv_obj_set_style_text_color(todoNote, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+        return;
+    }
+
+    for (size_t i = 0; i < entries.size(); ++i)
+    {
+        const auto & entry = entries[i];
+
+        lv_obj_t * btn = lv_button_create(parent);
+        lv_obj_set_width(btn, LV_PCT(100));
+        lv_obj_set_height(btn, 52);
+        lv_obj_set_flex_flow(btn, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_flex_align(btn, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+        lv_obj_set_style_pad_all(btn, 8, LV_PART_MAIN);
+        lv_obj_set_style_pad_row(btn, 2, LV_PART_MAIN);
+
+        lv_obj_t * titleLabel = lv_label_create(btn);
+        lv_label_set_text(titleLabel, entry.title.c_str());
+
+        char subBuf[48];
+        snprintf(subBuf, sizeof(subBuf), "Endpoint %u (%s)", static_cast<unsigned int>(entry.endpointId),
+                 entry.deviceType.c_str());
+        lv_obj_t * subLabel = lv_label_create(btn);
+        lv_label_set_text(subLabel, subBuf);
+        lv_obj_set_style_text_color(subLabel, lv_color_black(), LV_PART_MAIN);
+
+        if (entry.renderFn)
+        {
+            lv_obj_add_event_cb(btn, OnDeviceCardClicked, LV_EVENT_CLICKED,
+                                reinterpret_cast<void *>(static_cast<uintptr_t>(i)));
+        }
+    }
 }

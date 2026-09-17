@@ -18,10 +18,11 @@
 
 #pragma once
 
+#include <functional>
 #include <lvgl.h>
 #include <string>
 
-using RenderScreenFn = void (*)(lv_obj_t * parent);
+using RenderScreenFn = std::function<void(lv_obj_t * parent)>;
 
 namespace NavigationStack {
 

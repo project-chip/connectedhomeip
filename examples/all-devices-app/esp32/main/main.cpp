@@ -27,6 +27,7 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include "AppDeviceFactory.h"
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
@@ -292,7 +293,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    auto & deviceFactory = NoHooksDeviceFactory::GetInstance();
+    auto & deviceFactory = AppDeviceFactory::GetInstance();
     gConstructedDevices.clear();
 
     DynamicEndpointIdAllocator endpointIdAllocator;
@@ -499,7 +500,7 @@ void InitServer(intptr_t context)
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
+    AppDeviceFactory::GetInstance().Init(AppDeviceFactory::Context{
         .groupDataProvider        = gGroupDataProvider,                     //
         .fabricTable              = Server::GetInstance().GetFabricTable(), //
         .timerDelegate            = gTimerDelegate,                         //
@@ -515,8 +516,8 @@ void InitServer(intptr_t context)
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
-    NoHooksDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
-        return NoHooksDeviceFactory::MakeDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
+    AppDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return AppDeviceFactory::MakeDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,
