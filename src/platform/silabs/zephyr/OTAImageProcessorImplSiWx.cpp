@@ -131,7 +131,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     imageProcessor->mHeaderParser.Init();
 
     CHIP_ERROR error = imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
-    VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "OnPreparedForDownload() error: %" CHIP_ERROR_FORMAT, error.Format()));
+    VerifyOrReturn(error == CHIP_NO_ERROR,
+                   ChipLogError(SoftwareUpdate, "OnPreparedForDownload() error: %" CHIP_ERROR_FORMAT, error.Format()));
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
@@ -167,7 +168,8 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     {
         ChipLogError(SoftwareUpdate, "Firmware update did not reach completion");
         err = imageProcessor->ReleaseBlock();
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Release block failed: %" CHIP_ERROR_FORMAT, err.Format()));
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(SoftwareUpdate, "Release block failed: %" CHIP_ERROR_FORMAT, err.Format()));
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
     }
@@ -272,7 +274,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     CHIP_ERROR error = imageProcessor->mDownloader->FetchNextData();
-    VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "FetchNextData() error: %" CHIP_ERROR_FORMAT, error.Format()));
+    VerifyOrReturn(error == CHIP_NO_ERROR,
+                   ChipLogError(SoftwareUpdate, "FetchNextData() error: %" CHIP_ERROR_FORMAT, error.Format()));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
