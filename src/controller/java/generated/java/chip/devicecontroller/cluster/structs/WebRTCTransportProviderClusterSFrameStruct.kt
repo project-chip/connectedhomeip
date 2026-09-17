@@ -32,7 +32,7 @@ class WebRTCTransportProviderClusterSFrameStruct(
   val ratchetBits: UInt,
   val ratchetTime: Optional<UInt>
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterSFrameStruct {\n")
     append("\taudioCipherSuite : $audioCipherSuite\n")
     append("\tvideoCipherSuite : $videoCipherSuite\n")
@@ -83,7 +83,7 @@ class WebRTCTransportProviderClusterSFrameStruct(
       val receiveKeys =
         buildList<WebRTCTransportProviderClusterSFrameKeyStruct> {
           tlvReader.enterArray(ContextSpecificTag(TAG_RECEIVE_KEYS))
-          while(!tlvReader.isEndOfContainer()) {
+          while (!tlvReader.isEndOfContainer()) {
             add(WebRTCTransportProviderClusterSFrameKeyStruct.fromTlv(AnonymousTag, tlvReader))
           }
           tlvReader.exitContainer()
