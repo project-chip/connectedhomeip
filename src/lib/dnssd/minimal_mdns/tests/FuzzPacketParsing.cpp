@@ -59,7 +59,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
     BytesRange packet(data, data + len);
     FuzzDelegate delegate(packet);
 
-    chip::Dnssd::ParsePacket(packet, &delegate);
+    chip::Dnssd::ParseMdnsPacket(packet, &delegate);
 
     return 0;
 }

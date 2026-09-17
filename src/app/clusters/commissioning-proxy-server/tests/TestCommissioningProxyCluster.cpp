@@ -899,7 +899,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSu
     EXPECT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
 
     // Second connect is still below MaxSessions, so the gate passes and it succeeds.
-    // (The MaxSessions == 1 exhaustion case is covered by _ResourceExhaustedAtMaxSessions.)
+    // (Exhaustion at the limit is covered by _ResourceExhaustedAtMaxSessions.)
     EXPECT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -949,6 +949,40 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_StateTransition
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
 
     // State SHALL be Disconnected after a successful disconnect.
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A transport whose peer closed the connection reports through
+// SetDisconnectedIfLastSession() rather than deciding from its own sessions: with more
+// than one transport configured, the last session on one of them is not the last session
+// on the proxy. Here the BLE session is gone but a PAF connect is still in flight, so the
+// proxy SHALL NOT report itself disconnected. Runs at MaxSessions == 1, unlike the
+// multi-session case above, because a pending connect also counts as activity.
+TEST_F(TestCommissioningProxyCluster, TestSetDisconnectedIfLastSession_OtherTransportStillBusy)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    uint16_t sid = OpenSession(tester);
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
+
+    // The other transport starts connecting, then the BLE peer drops the link.
+    mockPaf.SetConnectPending(true);
+    cluster.Sessions().RemoveSession(sid);
+
+    cluster.SetDisconnectedIfLastSession();
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
+
+    // Once that connect finishes too, nothing is left and the proxy is disconnected.
+    mockPaf.SetConnectPending(false);
+    cluster.SetDisconnectedIfLastSession();
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);

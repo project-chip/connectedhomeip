@@ -36,6 +36,7 @@ declare_args() {
   chip_enable_wifi_diagnostics_trigger = false
   chip_enable_smoke_co_trigger = false
   chip_enable_boolean_state_configuration_trigger = false
+  chip_enable_electrical_alarm_trigger = false
   chip_enable_electrical_protection_alarm_trigger = false
   chip_enable_commodity_price_trigger = false
   chip_enable_commodity_tariff_trigger = false
@@ -46,6 +47,7 @@ declare_args() {
   chip_enable_water_heater_management_trigger = false
   chip_enable_device_energy_management_trigger = false
   chip_enable_commodity_metering_trigger = false
+  chip_enable_network_identity_management_trigger = false
 }
 
 config("app-main-config") {
@@ -72,6 +74,10 @@ source_set("smco-test-event-trigger") {
 
 source_set("boolean-state-configuration-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h" ]
+}
+
+source_set("electrical-alarm-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/electrical-alarm-server/ElectricalAlarmTestEventTriggerHandler.h" ]
 }
 
 source_set("electrical-protection-alarm-test-event-trigger") {
@@ -223,6 +229,7 @@ source_set("app-main") {
     ":commodity-price-test-event-trigger",
     ":commodity-tariff-test-event-trigger",
     ":device-energy-management-test-event-trigger",
+    ":electrical-alarm-test-event-trigger",
     ":electrical-grid-conditions-test-event-trigger",
     ":electrical-protection-alarm-test-event-trigger",
     ":energy-evse-test-event-trigger",
@@ -279,6 +286,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_DIAGNOSTIC_TRIGGER=${chip_enable_software_diagnostics_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=${chip_enable_smoke_co_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_ALARM_TRIGGER=${chip_enable_electrical_alarm_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_PROTECTION_ALARM_TRIGGER=${chip_enable_electrical_protection_alarm_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER=${chip_enable_commodity_price_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER=${chip_enable_electrical_grid_conditions_trigger}",
@@ -290,6 +298,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER=${chip_enable_wifi_diagnostics_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${chip_enable_device_energy_management_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER=${chip_enable_commodity_metering_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER=${chip_enable_network_identity_management_trigger}",
   ]
 
   if (chip_system_config_use_openthread_inet_endpoints) {
