@@ -181,7 +181,7 @@ To update or validate this list manually, follow these steps:
 | 135       | Temperature Measurement                                    | 1026 (0x0402) | Yes                | Yes                 |                                       |
 | 136       | Thermostat                                                 | 513 (0x0201)  | No                 | No                  |                                       |
 | 137       | Thermostat Mode                                            | 99 (0x0063)   | Yes                | No                  | Instance of Mode Base                 |
-| 138       | Thermostat User Interface Configuration                    | 516 (0x0204)  | No                 | No                  |                                       |
+| 138       | Thermostat User Interface Configuration                    | 516 (0x0204)  | Yes                | Yes                 | Temperature Sensor                    |
 | 139       | Thread Border Router Diagnostics                           | 1108 (0x0454) | No                 | No                  |                                       |
 | 140       | Thread Border Router Management                            | 1106 (0x0452) | Yes                | Yes                 |                                       |
 | 141       | Thread Network Diagnostics                                 | 53 (0x0035)   | Yes                | Yes                 |                                       |
@@ -204,4 +204,4 @@ To update or validate this list manually, follow these steps:
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
 | 160       | Smoke Concentration Measurement                            | 1076 (0x0434) | Yes                | Yes                 | Instance of Concentration Measurement |
-| **Total** | **160**                                                    |               | **105**            | **68**              |                                       |
+| **Total** | **160**                                                    |               | **106**            | **69**              |                                       |
