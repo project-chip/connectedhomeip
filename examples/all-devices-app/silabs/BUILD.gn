@@ -157,8 +157,7 @@ silabs_executable("all_devices_app") {
 
   # OTA Requestor is advertised on the silabs root endpoint regardless of the
   # network technology or of whether the OTA client state machine is compiled in.
-  deps +=
-      [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:ota" ]
+  deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:ota" ]
 
   # examples/platform/silabs/OTAConfig.cpp brings in the OTA requestor runtime.
   # Pull in exactly the requestor implementation files it needs. The singleton

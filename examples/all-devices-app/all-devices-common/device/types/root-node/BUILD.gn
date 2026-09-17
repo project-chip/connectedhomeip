@@ -74,9 +74,7 @@ source_set("thread") {
 }
 
 source_set("ota") {
-  sources = [
-    "features/OtaFeature.h",
-  ]
+  sources = [ "features/OtaFeature.h" ]
 
   public_deps = [
     ":root-node",
