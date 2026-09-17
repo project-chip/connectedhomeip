@@ -75,24 +75,37 @@ class WebRTCTransportRequestorClusterSFrameStruct(
       tlvReader.enterStructure(tlvTag)
       val audioCipherSuite = tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_CIPHER_SUITE))
       val videoCipherSuite = tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_CIPHER_SUITE))
-      val senderKey = WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(ContextSpecificTag(TAG_SENDER_KEY), tlvReader)
-      val receiveKeys = buildList<WebRTCTransportRequestorClusterSFrameKeyStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_RECEIVE_KEYS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
+      val senderKey =
+        WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(
+          ContextSpecificTag(TAG_SENDER_KEY),
+          tlvReader
+        )
+      val receiveKeys =
+        buildList<WebRTCTransportRequestorClusterSFrameKeyStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_RECEIVE_KEYS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
       val ratchetBits = tlvReader.getUByte(ContextSpecificTag(TAG_RATCHET_BITS))
-      val ratchetTime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATCHET_TIME))) {
-      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_RATCHET_TIME)))
-    } else {
-      Optional.empty()
-    }
-      
+      val ratchetTime =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATCHET_TIME))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_RATCHET_TIME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return WebRTCTransportRequestorClusterSFrameStruct(audioCipherSuite, videoCipherSuite, senderKey, receiveKeys, ratchetBits, ratchetTime)
+      return WebRTCTransportRequestorClusterSFrameStruct(
+        audioCipherSuite,
+        videoCipherSuite,
+        senderKey,
+        receiveKeys,
+        ratchetBits,
+        ratchetTime
+      )
     }
   }
 }

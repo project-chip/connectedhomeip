@@ -17,23 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class WebRTCTransportRequestorClusterSFrameStruct (
-    val audioCipherSuite: UInt,
-    val videoCipherSuite: UInt,
-    val senderKey: WebRTCTransportRequestorClusterSFrameKeyStruct,
-    val receiveKeys: List<WebRTCTransportRequestorClusterSFrameKeyStruct>,
-    val ratchetBits: UInt,
-    val ratchetTime: Optional<UInt>) {
-  override fun toString(): String  = buildString {
+class WebRTCTransportRequestorClusterSFrameStruct(
+  val audioCipherSuite: UInt,
+  val videoCipherSuite: UInt,
+  val senderKey: WebRTCTransportRequestorClusterSFrameKeyStruct,
+  val receiveKeys: List<WebRTCTransportRequestorClusterSFrameKeyStruct>,
+  val ratchetBits: UInt,
+  val ratchetTime: Optional<UInt>
+) {
+  override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterSFrameStruct {\n")
     append("\taudioCipherSuite : $audioCipherSuite\n")
     append("\tvideoCipherSuite : $videoCipherSuite\n")
@@ -57,9 +56,9 @@ class WebRTCTransportRequestorClusterSFrameStruct (
       endArray()
       put(ContextSpecificTag(TAG_RATCHET_BITS), ratchetBits)
       if (ratchetTime.isPresent) {
-      val optratchetTime = ratchetTime.get()
-      put(ContextSpecificTag(TAG_RATCHET_TIME), optratchetTime)
-    }
+        val optratchetTime = ratchetTime.get()
+        put(ContextSpecificTag(TAG_RATCHET_TIME), optratchetTime)
+      }
       endStructure()
     }
   }
@@ -72,28 +71,41 @@ class WebRTCTransportRequestorClusterSFrameStruct (
     private const val TAG_RATCHET_BITS = 4
     private const val TAG_RATCHET_TIME = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WebRTCTransportRequestorClusterSFrameStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WebRTCTransportRequestorClusterSFrameStruct {
       tlvReader.enterStructure(tlvTag)
       val audioCipherSuite = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_CIPHER_SUITE))
       val videoCipherSuite = tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_CIPHER_SUITE))
-      val senderKey = WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(ContextSpecificTag(TAG_SENDER_KEY), tlvReader)
-      val receiveKeys = buildList<WebRTCTransportRequestorClusterSFrameKeyStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_RECEIVE_KEYS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
+      val senderKey =
+        WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(
+          ContextSpecificTag(TAG_SENDER_KEY),
+          tlvReader
+        )
+      val receiveKeys =
+        buildList<WebRTCTransportRequestorClusterSFrameKeyStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_RECEIVE_KEYS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
       val ratchetBits = tlvReader.getUInt(ContextSpecificTag(TAG_RATCHET_BITS))
-      val ratchetTime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATCHET_TIME))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RATCHET_TIME)))
-    } else {
-      Optional.empty()
-    }
-      
+      val ratchetTime =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATCHET_TIME))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RATCHET_TIME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return WebRTCTransportRequestorClusterSFrameStruct(audioCipherSuite, videoCipherSuite, senderKey, receiveKeys, ratchetBits, ratchetTime)
+      return WebRTCTransportRequestorClusterSFrameStruct(
+        audioCipherSuite,
+        videoCipherSuite,
+        senderKey,
+        receiveKeys,
+        ratchetBits,
+        ratchetTime
+      )
     }
   }
 }

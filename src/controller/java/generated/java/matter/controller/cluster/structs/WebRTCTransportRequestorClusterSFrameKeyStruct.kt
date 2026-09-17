@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WebRTCTransportRequestorClusterSFrameKeyStruct(
-  val kid: ByteArray,
-  val baseKey: ByteArray
-) {
+class WebRTCTransportRequestorClusterSFrameKeyStruct(val kid: ByteArray, val baseKey: ByteArray) {
   override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterSFrameKeyStruct {\n")
     append("\tkid : $kid\n")
@@ -52,7 +47,7 @@ class WebRTCTransportRequestorClusterSFrameKeyStruct(
       tlvReader.enterStructure(tlvTag)
       val kid = tlvReader.getByteArray(ContextSpecificTag(TAG_KID))
       val baseKey = tlvReader.getByteArray(ContextSpecificTag(TAG_BASE_KEY))
-      
+
       tlvReader.exitContainer()
 
       return WebRTCTransportRequestorClusterSFrameKeyStruct(kid, baseKey)
