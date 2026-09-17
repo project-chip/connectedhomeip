@@ -32,9 +32,9 @@
  * components/os/power_mgmt/tickless.c (linked via _power_mgmt source_set).
  */
 
+#include <app/server/Server.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <app/server/Server.h>
 #include <platform/PlatformManager.h>
 
 #include <atomic>
@@ -91,13 +91,13 @@ static struct bflb_device_s * s_sha_dev = NULL;
 
 namespace {
 
-constexpr uint8_t kActiveDtim = 1;
-constexpr uint8_t kIdleDtim = 10;
+constexpr uint8_t kActiveDtim              = 1;
+constexpr uint8_t kIdleDtim                = 10;
 constexpr uint32_t kDtimActivityDurationMs = 3000;
-constexpr uint16_t kMdnsPort = 5353;
-constexpr ip_addr_t kMdnsIpv4Address = IPADDR4_INIT_BYTES(224, 0, 0, 251);
-constexpr ip_addr_t kMdnsIpv6Address = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0xFB);
-uint8_t sCurrentDtim = 0;
+constexpr uint16_t kMdnsPort               = 5353;
+constexpr ip_addr_t kMdnsIpv4Address       = IPADDR4_INIT_BYTES(224, 0, 0, 251);
+constexpr ip_addr_t kMdnsIpv6Address       = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0xFB);
+uint8_t sCurrentDtim                       = 0;
 std::atomic<uint32_t> sDtimHoldMask{ APP_DTIM_HOLD_STARTUP };
 std::atomic<uint32_t> sDtimUnicastDeadline{ 0 };
 std::atomic<uint32_t> sDtimMdnsDeadline{ 0 };
@@ -105,8 +105,14 @@ std::atomic<bool> sHasIpv4Address{ false };
 std::atomic<bool> sHasIpv6Address{ false };
 bool sNetworkHooksInstalled = false;
 
-uint32_t CurrentTick(void) { return static_cast<uint32_t>(xTaskGetTickCount()); }
-bool DeadlineActive(uint32_t now, uint32_t deadline) { return deadline != 0 && static_cast<int32_t>(deadline - now) > 0; }
+uint32_t CurrentTick(void)
+{
+    return static_cast<uint32_t>(xTaskGetTickCount());
+}
+bool DeadlineActive(uint32_t now, uint32_t deadline)
+{
+    return deadline != 0 && static_cast<int32_t>(deadline - now) > 0;
+}
 bool IsMdnsPacket(const struct pbuf * packet, uint16_t etherType)
 {
     constexpr u16_t kIpHeaderOffset = sizeof(struct eth_hdr);
@@ -115,8 +121,8 @@ bool IsMdnsPacket(const struct pbuf * packet, uint16_t etherType)
     if (etherType == ETHTYPE_IP)
     {
         struct ip_hdr ipHeader;
-        if (pbuf_copy_partial(packet, &ipHeader, sizeof(ipHeader), kIpHeaderOffset) != sizeof(ipHeader) ||
-            IPH_V(&ipHeader) != 4 || IPH_PROTO(&ipHeader) != IP_PROTO_UDP)
+        if (pbuf_copy_partial(packet, &ipHeader, sizeof(ipHeader), kIpHeaderOffset) != sizeof(ipHeader) || IPH_V(&ipHeader) != 4 ||
+            IPH_PROTO(&ipHeader) != IP_PROTO_UDP)
         {
             return false;
         }
@@ -134,8 +140,8 @@ bool IsMdnsPacket(const struct pbuf * packet, uint16_t etherType)
     if (etherType == ETHTYPE_IPV6)
     {
         struct ip6_hdr ipHeader;
-        if (pbuf_copy_partial(packet, &ipHeader, sizeof(ipHeader), kIpHeaderOffset) != sizeof(ipHeader) ||
-            IP6H_V(&ipHeader) != 6 || IP6H_NEXTH(&ipHeader) != IP6_NEXTH_UDP ||
+        if (pbuf_copy_partial(packet, &ipHeader, sizeof(ipHeader), kIpHeaderOffset) != sizeof(ipHeader) || IP6H_V(&ipHeader) != 6 ||
+            IP6H_NEXTH(&ipHeader) != IP6_NEXTH_UDP ||
             pbuf_copy_partial(packet, &udpHeader, sizeof(udpHeader), kIpHeaderOffset + sizeof(ipHeader)) != sizeof(udpHeader))
         {
             return false;
@@ -217,8 +223,7 @@ extern "C" void * app_dtim_wifi_output_hook(bool isSta, void * packet, void * ar
 
     const struct pbuf * packetBuffer = static_cast<const struct pbuf *>(packet);
     struct eth_hdr header;
-    if (packetBuffer == nullptr ||
-        pbuf_copy_partial(packetBuffer, &header, sizeof(header), 0) != sizeof(header))
+    if (packetBuffer == nullptr || pbuf_copy_partial(packetBuffer, &header, sizeof(header), 0) != sizeof(header))
     {
         return packet;
     }
@@ -266,7 +271,7 @@ extern "C" void app_dtim_activity_notify(uint8_t kind)
 extern "C" void app_dtim_set_hold(enum app_dtim_hold_reason reason, bool hold)
 {
     const uint32_t reasonMask = static_cast<uint32_t>(reason);
-    uint32_t oldMask = sDtimHoldMask.load(std::memory_order_acquire);
+    uint32_t oldMask          = sDtimHoldMask.load(std::memory_order_acquire);
     for (;;)
     {
         const uint32_t newMask = hold ? oldMask | reasonMask : oldMask & ~reasonMask;
@@ -283,11 +288,11 @@ extern "C" void app_dtim_set_hold(enum app_dtim_hold_reason reason, bool hold)
 
 extern "C" int app_dtim_pm_check(void)
 {
-    const uint32_t now = CurrentTick();
+    const uint32_t now       = CurrentTick();
     const bool unicastActive = ConsumeActiveDeadline(sDtimUnicastDeadline, now);
-    const bool mdnsActive = ConsumeActiveDeadline(sDtimMdnsDeadline, now);
-    const bool held = sDtimHoldMask.load(std::memory_order_acquire) != 0;
-    const bool active = unicastActive || mdnsActive;
+    const bool mdnsActive    = ConsumeActiveDeadline(sDtimMdnsDeadline, now);
+    const bool held          = sDtimHoldMask.load(std::memory_order_acquire) != 0;
+    const bool active        = unicastActive || mdnsActive;
     SetDtim(held || active ? kActiveDtim : kIdleDtim);
     return pm_pbufc_check();
 }
@@ -334,8 +339,7 @@ static void app_dtim_platform_event(const chip::DeviceLayer::ChipDeviceEvent * e
             sHasIpv6Address.store(false, std::memory_order_release);
         }
         app_dtim_set_hold(APP_DTIM_HOLD_RECOVERY,
-                           !(sHasIpv4Address.load(std::memory_order_acquire) ||
-                             sHasIpv6Address.load(std::memory_order_acquire)));
+                          !(sHasIpv4Address.load(std::memory_order_acquire) || sHasIpv6Address.load(std::memory_order_acquire)));
         break;
     case chip::DeviceLayer::DeviceEventType::kInterfaceIpAddressChanged:
         if (event->InterfaceIpAddressChanged.Type == chip::DeviceLayer::InterfaceIpChangeType::kIpV4_Assigned)
@@ -355,8 +359,7 @@ static void app_dtim_platform_event(const chip::DeviceLayer::ChipDeviceEvent * e
             sHasIpv6Address.store(false, std::memory_order_release);
         }
         app_dtim_set_hold(APP_DTIM_HOLD_RECOVERY,
-                           !(sHasIpv4Address.load(std::memory_order_acquire) ||
-                             sHasIpv6Address.load(std::memory_order_acquire)));
+                          !(sHasIpv4Address.load(std::memory_order_acquire) || sHasIpv6Address.load(std::memory_order_acquire)));
         break;
     case chip::DeviceLayer::DeviceEventType::kCHIPoBLEConnectionEstablished:
         app_dtim_set_hold(APP_DTIM_HOLD_BLE, true);
@@ -480,7 +483,6 @@ static int lp_exit(void * arg)
     }
     app_lp_config_gpio();
 
-
     return 0;
 }
 
@@ -579,7 +581,6 @@ void app_pds_init(void (*pinHandler)(int, bool))
     {
         ChipLogError(DeviceLayer, "[LP] Failed to register DTIM platform event handler");
     }
-
 
     app_clock_init();
 

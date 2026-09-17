@@ -68,7 +68,7 @@ extern "C" void vAssertCalled(void)
     else
     {
         TaskHandle_t currentTask = xTaskGetCurrentTaskHandle();
-        const char * taskName = currentTask != NULL ? pcTaskGetName(currentTask) : "<no current task>";
+        const char * taskName    = currentTask != NULL ? pcTaskGetName(currentTask) : "<no current task>";
         printf("vAssertCalled, ra = %p in task %s\r\n", (void *) ra, taskName);
     }
 

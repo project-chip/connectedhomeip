@@ -33,10 +33,9 @@ extern "C" {
 #include <bl_fw_api.h>
 #include <inet/UDPEndPointImplLwIP.h>
 
-namespace
-{
+namespace {
 constexpr uint8_t kDtimActivityUnicast = 0;
-constexpr uint8_t kDtimActivityMdns = 1;
+constexpr uint8_t kDtimActivityMdns    = 1;
 extern "C" void app_dtim_activity_notify(uint8_t kind) __attribute__((weak));
 
 class BflbEndpointQueueFilter final : public chip::Inet::EndpointQueueFilter
@@ -50,13 +49,12 @@ public:
         if (app_dtim_activity_notify != nullptr)
         {
             constexpr uint16_t kMatterPort = 5540;
-            constexpr uint16_t kMdnsPort = 5353;
+            constexpr uint16_t kMdnsPort   = 5353;
             if (pktInfo.DestPort == kMdnsPort && pktInfo.DestAddress.IsMulticast())
             {
                 app_dtim_activity_notify(kDtimActivityMdns);
             }
-            else if (!pktInfo.DestAddress.IsMulticast() &&
-                (pktInfo.DestPort == kMatterPort || pktInfo.SrcPort == kMatterPort))
+            else if (!pktInfo.DestAddress.IsMulticast() && (pktInfo.DestPort == kMatterPort || pktInfo.SrcPort == kMatterPort))
             {
                 app_dtim_activity_notify(kDtimActivityUnicast);
             }
@@ -66,7 +64,7 @@ public:
 };
 
 BflbEndpointQueueFilter sEndpointQueueFilter;
-}
+} // namespace
 
 extern "C" void bflb_connectivity_manager_set_endpoint_queue_filter(void)
 {
@@ -89,7 +87,7 @@ void ConnectivityManagerImpl::OnWiFiStationDisconnected()
     ChipLogError(DeviceLayer, "WiFi station disconnect, reason %d.", reason);
 
     ChipDeviceEvent event;
-    event.Type = DeviceEventType::kWiFiConnectivityChange;
+    event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     PlatformMgr().PostEventOrDie(&event);
 
