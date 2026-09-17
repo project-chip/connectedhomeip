@@ -27,6 +27,7 @@
 #include <posix/named_pipe/translators/ModeSelectTranslator.h>
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 #include <posix/named_pipe/translators/OnOffTranslator.h>
+#include <posix/named_pipe/translators/ProximityRangingTranslator.h>
 #include <posix/named_pipe/translators/RvcTranslator.h>
 
 #include <lib/core/CHIPError.h>
@@ -185,6 +186,41 @@ TEST_F(TestNamedPipeTranslators, OccupancyTranslator)
     // Unknown action
     Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");
     EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestNamedPipeTranslators, ProximityRangingTranslator)
+{
+    ProximityRangingTranslator translator;
+    auto names = translator.GetActionNames();
+    EXPECT_EQ(names.size(), 1U);
+
+    // SetRangingConstraints: one disabled entry and one Intervals entry
+    Json::Value json = ParseJson(R"({
+        "Name": "SetRangingConstraints",
+        "Constraints": [
+            {"Technology": 3, "Role": 3, "Enabled": false},
+            {"Technology": 3, "Role": 2, "MinRangingInterval": 10, "MaxSessionDuration": 60, "MaxRangingInstances": 5}
+        ]
+    })");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetRangingConstraints");
+
+    // Empty list
+    Json::Value empty = ParseJson(R"({"Name": "SetRangingConstraints", "Constraints": []})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, empty, mRegistry), CHIP_NO_ERROR);
+
+    // Missing list, missing role, out-of-range technology
+    Json::Value missingList = ParseJson(R"({"Name": "SetRangingConstraints"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, missingList, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
+    Json::Value missingRole = ParseJson(R"({"Name": "SetRangingConstraints", "Constraints": [{"Technology": 3, "Enabled": false}]})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, missingRole, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
+    Json::Value outofrangeTech =
+        ParseJson(R"({"Name": "SetRangingConstraints", "Constraints": [{"Technology": 9, "Role": 3, "Enabled": false}]})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, outofrangeTech, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Unknown action
+    Json::Value unknownAction = ParseJson(R"({"Name": "UnknownAction"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, unknownAction, mRegistry), CHIP_ERROR_NOT_FOUND);
 }
 
 TEST_F(TestNamedPipeTranslators, BooleanStateTranslator)
