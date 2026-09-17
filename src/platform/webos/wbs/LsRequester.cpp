@@ -39,7 +39,20 @@ struct SyncCallbackContext
 
 void * LsRequester::lsTask(void * arg)
 {
-    g_main_loop_run((GMainLoop *) arg);
+    auto * self = static_cast<LsRequester *>(arg);
+    {
+        // Signal readiness right before entering the loop so initLocked()'s wait below - and thus
+        // any later g_main_loop_is_running() check in getInstance() - never observes the transient
+        // "thread created but not yet scheduled" state as "not running".
+        std::lock_guard<std::mutex> lock(self->m_startMutex);
+        self->m_running = true;
+    }
+    self->m_startCv.notify_all();
+    g_main_loop_run(self->m_mainLoop);
+    {
+        std::lock_guard<std::mutex> lock(self->m_startMutex);
+        self->m_running = false;
+    }
     return NULL;
 }
 
@@ -61,9 +74,9 @@ LsRequester * LsRequester::getInstance()
     }
     {
         std::lock_guard<std::mutex> lock(_mutex);
-        if (!inst->m_mainLoop || !g_main_loop_is_running(inst->m_mainLoop))
+        if (inst->m_state != State::RUNNING)
         {
-            ChipLogError(DeviceLayer, "Main loop not running, restarting...");
+            ChipLogError(DeviceLayer, "LsRequester not running, restarting...");
             inst->restartLocked();
         }
     }
@@ -73,17 +86,36 @@ LsRequester * LsRequester::getInstance()
 // Assumes _mutex is held by the caller.
 void LsRequester::initLocked()
 {
+    m_state              = State::STARTING;
     GMainContext * pCxt = g_main_context_new();
     m_mainLoop          = g_main_loop_new(pCxt, false);
+    // g_main_loop_new takes its own reference on the context; drop ours so the
+    // context is released together with the loop in stopLocked() (avoids a leak per restart()).
     g_main_context_unref(pCxt);
     try
     {
         m_handle = LS::registerService(LS_REQ_SERVICE_NAME);
         m_handle.attachToLoop(m_mainLoop);
-        m_thread = g_thread_new("lsTask", lsTask, (GMainLoop *) m_mainLoop);
+        m_running = false;
+        m_thread  = g_thread_new("lsTask", lsTask, this);
+        {
+            // Block until lsTask() has actually entered g_main_loop_run(). Without this, a caller
+            // racing getInstance() right after construction/restart could see the loop as "not
+            // running" and trigger a spurious restart (see m_running's declaration for why).
+            std::unique_lock<std::mutex> startLock(m_startMutex);
+            if (!m_startCv.wait_for(startLock, std::chrono::seconds(2), [this] { return m_running; }))
+            {
+                ChipLogError(DeviceLayer, "LsRequester main loop did not start within timeout");
+            }
+        }
+        // Only claim RUNNING if the worker actually confirmed it; otherwise leave it as STARTING
+        // so a subsequent getInstance() health check still attempts a restart instead of trusting
+        // a loop that may never come up.
+        m_state = m_running ? State::RUNNING : State::STARTING;
         ChipLogDetail(DeviceLayer, "LsRequester initialized, m_mainLoop: %p, m_thread: %p", m_mainLoop, m_thread);
     } catch (const LS::Error & e)
     {
+        m_state = State::STOPPED;
         ChipLogError(DeviceLayer, "LsRequester init failed: %s", e.what());
     }
 }
@@ -122,12 +154,17 @@ void LsRequester::stopLocked()
 {
     try
     {
-        if (m_mainLoop && g_main_loop_is_running(m_mainLoop))
+        // m_state (not g_main_loop_is_running()) is the source of truth for whether the worker
+        // actually reached g_main_loop_run() and therefore needs to be told to quit.
+        if (m_mainLoop && m_state == State::RUNNING)
             g_main_loop_quit(m_mainLoop);
         m_handle.detach();
 
         if (m_thread)
         {
+            // Wait for lsTask() to actually return (g_main_loop_run() to unwind) before the
+            // GMainLoop is unreffed below - g_thread_join() also frees the GThread, so no separate
+            // g_thread_unref() is needed or safe to call afterwards.
             g_thread_join(m_thread);
             m_thread = nullptr;
         }
@@ -140,6 +177,7 @@ void LsRequester::stopLocked()
     {
         ChipLogError(DeviceLayer, "Exception: %s", e.what());
     }
+    m_state = State::STOPPED;
 }
 
 bool LsRequester::_callbackSync(LSHandle * sh, LSMessage * reply, void * ctx)
@@ -236,7 +274,7 @@ bool LsRequester::lsCallSync(const char * pAPI, const char * pParams, pbnjson::J
 bool LsRequester::lsCallCancel(LSMessageToken ulToken)
 {
     std::lock_guard<std::mutex> lock(_mutex);
-    if (!m_mainLoop || !g_main_loop_is_running(m_mainLoop))
+    if (!m_mainLoop || m_state != State::RUNNING)
     {
         ChipLogError(DeviceLayer, "LsRequester is not running");
         return false;
