@@ -69554,6 +69554,7 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 1363L;
 
     private static final long CURRENT_SESSIONS_ATTRIBUTE_ID = 0L;
+    private static final long SUPPORTED_S_FRAME_CIPHER_SUITES_ATTRIBUTE_ID = 1L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -69657,11 +69658,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, Optional<ArrayList<Integer>> videoStreams, Optional<ArrayList<Integer>> audioStreams) {
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Optional<Integer> streamUsage, Optional<Integer> originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, Optional<ArrayList<Integer>> videoStreams, Optional<ArrayList<Integer>> audioStreams) {
       provideOffer(callback, webRTCSessionID, sdp, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, SFrameConfig, videoStreams, audioStreams, 0);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, Optional<ArrayList<Integer>> videoStreams, Optional<ArrayList<Integer>> audioStreams, int timedInvokeTimeoutMs) {
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Optional<Integer> streamUsage, Optional<Integer> originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, Optional<ArrayList<Integer>> videoStreams, Optional<ArrayList<Integer>> audioStreams, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -69674,11 +69675,11 @@ public class ChipClusters {
       elements.add(new StructElement(sdpFieldID, sdptlvValue));
 
       final long streamUsageFieldID = 2L;
-      BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
+      BaseTLVType streamUsagetlvValue = streamUsage.<BaseTLVType>map((nonOptionalstreamUsage) -> new UIntType(nonOptionalstreamUsage)).orElse(new EmptyType());
       elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
       final long originatingEndpointIDFieldID = 3L;
-      BaseTLVType originatingEndpointIDtlvValue = new UIntType(originatingEndpointID);
+      BaseTLVType originatingEndpointIDtlvValue = originatingEndpointID.<BaseTLVType>map((nonOptionaloriginatingEndpointID) -> new UIntType(nonOptionaloriginatingEndpointID)).orElse(new EmptyType());
       elements.add(new StructElement(originatingEndpointIDFieldID, originatingEndpointIDtlvValue));
 
       final long videoStreamIDFieldID = 4L;
@@ -69817,6 +69818,38 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void updateSession(DefaultClusterCallback callback, Integer webRTCSessionID, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct> SFrameSenderKey, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct>> SFrameReceiveKeysToAdd, Optional<ArrayList<byte[]>> SFrameReceiveKIDsToRemove) {
+      updateSession(callback, webRTCSessionID, SFrameSenderKey, SFrameReceiveKeysToAdd, SFrameReceiveKIDsToRemove, 0);
+    }
+
+    public void updateSession(DefaultClusterCallback callback, Integer webRTCSessionID, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct> SFrameSenderKey, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct>> SFrameReceiveKeysToAdd, Optional<ArrayList<byte[]>> SFrameReceiveKIDsToRemove, int timedInvokeTimeoutMs) {
+      final long commandId = 7L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long webRTCSessionIDFieldID = 0L;
+      BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
+      elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
+
+      final long SFrameSenderKeyFieldID = 1L;
+      BaseTLVType SFrameSenderKeytlvValue = SFrameSenderKey.<BaseTLVType>map((nonOptionalSFrameSenderKey) -> nonOptionalSFrameSenderKey.encodeTlv()).orElse(new EmptyType());
+      elements.add(new StructElement(SFrameSenderKeyFieldID, SFrameSenderKeytlvValue));
+
+      final long SFrameReceiveKeysToAddFieldID = 2L;
+      BaseTLVType SFrameReceiveKeysToAddtlvValue = SFrameReceiveKeysToAdd.<BaseTLVType>map((nonOptionalSFrameReceiveKeysToAdd) -> ArrayType.generateArrayType(nonOptionalSFrameReceiveKeysToAdd, (elementnonOptionalSFrameReceiveKeysToAdd) -> elementnonOptionalSFrameReceiveKeysToAdd.encodeTlv())).orElse(new EmptyType());
+      elements.add(new StructElement(SFrameReceiveKeysToAddFieldID, SFrameReceiveKeysToAddtlvValue));
+
+      final long SFrameReceiveKIDsToRemoveFieldID = 3L;
+      BaseTLVType SFrameReceiveKIDsToRemovetlvValue = SFrameReceiveKIDsToRemove.<BaseTLVType>map((nonOptionalSFrameReceiveKIDsToRemove) -> ArrayType.generateArrayType(nonOptionalSFrameReceiveKIDsToRemove, (elementnonOptionalSFrameReceiveKIDsToRemove) -> new ByteArrayType(elementnonOptionalSFrameReceiveKIDsToRemove))).orElse(new EmptyType());
+      elements.add(new StructElement(SFrameReceiveKIDsToRemoveFieldID, SFrameReceiveKIDsToRemovetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface SolicitOfferResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer webRTCSessionID, Boolean deferredOffer, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID);
     }
@@ -69827,6 +69860,10 @@ public class ChipClusters {
 
     public interface CurrentSessionsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.WebRTCTransportProviderClusterWebRTCSessionStruct> value);
+    }
+
+    public interface SupportedSFrameCipherSuitesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -69870,6 +69907,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_SESSIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSupportedSFrameCipherSuitesAttribute(
+        SupportedSFrameCipherSuitesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_S_FRAME_CIPHER_SUITES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_S_FRAME_CIPHER_SUITES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedSFrameCipherSuitesAttribute(
+        SupportedSFrameCipherSuitesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_S_FRAME_CIPHER_SUITES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_S_FRAME_CIPHER_SUITES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
