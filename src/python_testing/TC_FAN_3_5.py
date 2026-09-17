@@ -208,7 +208,7 @@ class TC_FAN_3_5(MatterBaseTest):
                                         - Verify that the PercentSetting attribute value reaches the minimum PercentSetting attribute value above 0
                                     No Wrap Check
                                         - When the PercentSetting attribute value reaches the minimum PercentSetting attribute value above 0:
-                                            -Send an additional Step command to verify that PercentSetting stays at the minimum PercentSetting attribute value above 0"""),
+                                            - Send an additional Step command to verify that PercentSetting stays at the minimum PercentSetting attribute value above 0"""),
 
                 TestStep("12b", """Read the resulting attribute reports from each subscription""", """
                                     - Verify that the attribute report values from each subscription are in descending order
@@ -227,7 +227,7 @@ class TC_FAN_3_5(MatterBaseTest):
                                         - Verify that the SpeedSetting attribute value is set to 0 (if the SPD feature is supported)
                                         - Verify that the FanMode attribute value is set to Off
                                     - Subscribe to the PercentSetting, FanMode, and (if the SPD feature is supported) SpeedSetting attributes
-                                    - Step: LowestOff=True, Direction=Increase, Wrap=False"""),
+                                    - Step: LowestOff=False, Direction=Increase, Wrap=False"""),
 
                 TestStep("13a", """TH sends Step commands iteratively""", """
                                     Highest Step Check
