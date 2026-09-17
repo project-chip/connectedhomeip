@@ -282,8 +282,9 @@ def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tupl
               help="Internal flag for running inside a private mount namespace.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-         script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-         app_filter, pre_existing_fabric: bool, internal_inside_unshare: bool) -> None:
+         script_gdb: bool, quiet: bool, load_from_env: str | None, run: tuple[str, ...], ip_packet_capture: bool,
+         ip_packet_capture_dir: pathlib.Path, app_filter: str | None, pre_existing_fabric: bool,
+         internal_inside_unshare: bool) -> None:
     """Run the configured Matter Python test."""
     if load_from_env:
         reader = MetadataReader(load_from_env)
@@ -340,8 +341,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
 
         if not internal_inside_unshare:
             ensure_namespace_availability()
-        else:
-            ensure_private_state()
+        ensure_private_state()
 
     for run, commissioning_method in runs_with_commissioning_method:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
