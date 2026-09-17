@@ -80,13 +80,7 @@ source_set("public_headers") {
 
 if (chip_crypto == "openssl") {
   import("${build_root}/config/linux/pkg_config.gni")
-
-  openssl_root = chip_openssl_root
-  if (openssl_root == "" && current_os == "linux" && current_cpu == host_cpu &&
-      sysroot == "") {
-    # The image's private host installation must not override a cross sysroot.
-    openssl_root = getenv("CHIP_OPENSSL_ROOT")
-  }
+  import("openssl.gni")
 
   pkg_config("openssl_config") {
     packages = [ "openssl" ]
@@ -127,6 +121,11 @@ if (chip_crypto == "openssl") {
         "ssl",
         "crypto",
       ]
+
+      # System libraries such as libcurl must keep using their own OpenSSL.
+      # Exporting archive symbols can bind system libssl to our private crypto
+      # implementation, mixing incompatible internal objects at runtime.
+      ldflags = [ "-Wl,--exclude-libs,libssl.a:libcrypto.a" ]
     }
   }
 
@@ -149,7 +148,8 @@ if (chip_crypto == "openssl") {
   import("${chip_root}/build_overrides/boringssl.gni")
 
   source_set("cryptopal_boringssl") {
-    # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences
+    # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor
+    # #ifdef differences
     sources = [
       "CHIPCryptoPALOpenSSL.cpp",
       "CHIPCryptoPALOpenSSL.h",

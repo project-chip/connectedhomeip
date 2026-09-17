@@ -74,6 +74,10 @@ private installation prefix to select its matching headers and libraries for SDK
 targets only. Both `lib/pkgconfig` and `lib64/pkgconfig` layouts are accepted.
 Dynamic SDK consumers get a RUNPATH to that library directory. The static option
 requires `libssl.a` and `libcrypto.a`; it does not download or upgrade OpenSSL.
+Static OpenSSL symbols are hidden from shared system libraries, so dependencies
+such as libcurl can continue using their system OpenSSL. When the SDK uses
+OpenSSL, libdatachannel and its crypto dependencies use the same selected
+installation and linkage mode as the SDK.
 When deploying dynamic binaries outside the build image, also deploy the private
 shared libraries at the configured path.
 

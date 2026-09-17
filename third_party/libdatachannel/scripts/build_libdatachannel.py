@@ -18,8 +18,10 @@ repo_dir = Path(__file__).resolve().parents[1] / "repo"
 @click.option("--cross-compile-cpu-type", default=None, help="CPU type for cross compilation if needed")
 @click.option("--target-cc", default=None, help="C compiler for cross compilation (from args.gn)")
 @click.option("--target-cxx", default=None, help="C++ compiler for cross compilation (from args.gn)")
+@click.option("--openssl-root", default=None, help="OpenSSL installation selected by the SDK")
+@click.option("--openssl-static", is_flag=True, help="Use static OpenSSL libraries")
 def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
-         target_cc: str | None, target_cxx: str | None):
+         target_cc: str | None, target_cxx: str | None, openssl_root: str | None, openssl_static: bool):
 
     # Generate build files in build_dir
     cmake_cmd = [
@@ -34,7 +36,17 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_CXX_FLAGS=-Wno-shadow",
+        # CMake caches absolute library paths. Reconsider them when GN changes
+        # the root or linkage mode in an existing build directory.
+        "-UOPENSSL_INCLUDE_DIR",
+        "-UOPENSSL_CRYPTO_LIBRARY",
+        "-UOPENSSL_SSL_LIBRARY",
+        "-UOPENSSL_ROOT_DIR",
+        f"-DOPENSSL_USE_STATIC_LIBS={'TRUE' if openssl_static else 'FALSE'}",
     ]
+
+    if openssl_root is not None:
+        cmake_cmd.append(f"-DOPENSSL_ROOT_DIR={openssl_root}")
 
     # Default compilers
     c_compiler = 'gcc'
