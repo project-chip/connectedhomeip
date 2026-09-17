@@ -538,9 +538,9 @@ extern "C" void app_pre_matter_init(void)
     app_set_clock_source(CLOCK_SOURCE_PASSIVE);
     s_gpio_dev = bflb_device_get_by_name("gpio");
 #if CHIP_DETAIL_LOGGING
-    s_rtc_dev  = bflb_device_get_by_name("rtc");
+    s_rtc_dev = bflb_device_get_by_name("rtc");
 #endif
-    s_sha_dev  = bflb_device_get_by_name(BFLB_NAME_SEC_SHA);
+    s_sha_dev = bflb_device_get_by_name(BFLB_NAME_SEC_SHA);
 
     extern int enable_multicast_broadcast;
     enable_multicast_broadcast = true;
