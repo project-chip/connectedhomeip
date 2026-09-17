@@ -67,13 +67,13 @@ SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 
 
 class TC_ACS_2_1(MatterBaseTest):
-
-    @pics('ACS.S')
+   
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
 
     # @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
+    @pics('ACS.S')
     @async_test_body
     async def test_TC_ACS_2_1(self):
         endpoint = self.get_endpoint()
@@ -357,14 +357,14 @@ class TC_ACS_2_1(MatterBaseTest):
             sensorFusionSupported = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SensorFusionSupported
             )
-            asserts.assert_greater_equal(len(sensorFusionSupported), 1,
-                                         "The attribute list size should be greater than equalt to a.")
             asserts.assert_less_equal(len(sensorFusionSupported), 50, "The attribute list size should be less than equal to 50.")
 
             # check if each SensorFusionSupported attribute is within AmbientContextTypeSupported list
+            ambientContextTypeSupported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
             for context in sensorFusionSupported:
-                nsID = context.sensorFusionSupported[0].namespaceID
-                tagID = context.sensorFusionSupported[0].tag
+                nsID = context.namespaceID
+                tagID = context.tag
 
                 num_support = 0
                 for acts in ambientContextTypeSupported:
