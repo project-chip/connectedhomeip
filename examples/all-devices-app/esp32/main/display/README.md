@@ -65,7 +65,7 @@ display/
         ├── CommissioningCodesScreen.h/.cpp # Matter onboarding QR code and manual setup code
         ├── DeviceInfoScreen.h/.cpp       # Diagnostics (fabrics, IP, memory, active device)
         ├── DeviceSelectionScreen.h/.cpp  # Device type switching with confirmation modal
-        ├── DeviceEndpointsScreen.h/.cpp  # Bridged endpoints overview
+        ├── DeviceEndpointsScreen.h/.cpp  # Placeholder view for dynamically registered device screens (TODO)
         └── DeviceOperationsScreen.h/.cpp # Reboot and factory reset triggers with confirmation modals
 ```
 
@@ -235,16 +235,14 @@ The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
 
 ### Adding Device Controls
 
-Device-specific interactive screens (e.g. On/Off toggles, level sliders) can be
-linked from `DeviceEndpointsScreen` or `HomeScreen`:
+Device-specific interactive screens (e.g. On/Off toggles, level sliders) should
+be registered dynamically during device construction via `DeviceFactory` hooks:
 
-```cpp
-void ShowOnOffControlScreen(lv_obj_t * parent)
-{
-    lv_obj_t * toggleBtn = lv_button_create(parent);
-    // Wire toggle button to Matter OnOff cluster commands...
-}
-```
+1. Define a UI registration hook or callback invoked from `DeviceFactory::Create()`.
+2. As each device interface is registered to the data model, register its
+   endpoint control views with `NavigationStack` or a device screen registry.
+3. Composed devices (such as refrigerator or oven) register screens for each
+   of their composed endpoints.
 
 ### Adding a New Target Board
 

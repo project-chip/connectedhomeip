@@ -76,8 +76,8 @@ void ShowHome(lv_obj_t * parent)
     const std::string & activeDev = GetActiveDeviceType();
     bool isAllBridged             = (activeDev == "*" || activeDev == "aggregator");
 
-    std::string devSub = isAllBridged ? "All Bridged Endpoints" : "Active: " + activeDev;
-    CreateHomeButton(parent, "Device Endpoints >", devSub.c_str(), OnDevicesClicked);
+    std::string devSub = isAllBridged ? "Bridged mode (*)" : "Active: " + activeDev;
+    CreateHomeButton(parent, "Devices (Pending) >", devSub.c_str(), OnDevicesClicked);
 
     std::string selectSub = "Current: " + (isAllBridged ? "All Bridged (*)" : activeDev);
     CreateHomeButton(parent, "Switch Device Type >", selectSub.c_str(), OnSelectDeviceClicked);

@@ -21,9 +21,8 @@
 #include <lvgl.h>
 
 /**
- * Populates @a parent with the active device / endpoint view:
- * in '*' mode, displays the list of running bridged endpoints;
- * in single-device mode, displays the active device control summary.
+ * Populates @a parent with the device endpoints view (placeholder for dynamically
+ * registered device screens).
  *
  * The caller must hold the LVGL lock.
  */
