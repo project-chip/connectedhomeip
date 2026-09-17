@@ -49,9 +49,9 @@ set(APP_TOPLEVEL_EXTRA_SRCS
 )
 
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
-    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.cpp")
+    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/features/ThreadFeature.cpp")
 else()
-    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/WifiRootNode.cpp")
+    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/features/WifiFeature.cpp")
 endif()
 
 set(SRC_DIRS_LIST

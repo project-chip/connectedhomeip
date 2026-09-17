@@ -49,14 +49,16 @@
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/root-node/RootNode.h>
+#include <device/types/root-node/RootNodeWith.h>
+#include <device/types/root-node/features/OtaFeature.h>
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <device/types/root-node/ThreadRootNode.h>
+#include <device/types/root-node/features/ThreadFeature.h>
 #include <platform/NetworkCommissioning.h>
 #endif
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <device/types/root-node/WifiRootNode.h>            // nogncheck
+#include <device/types/root-node/features/WifiFeature.h>    // nogncheck
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h> // nogncheck
 #endif
 
@@ -189,19 +191,21 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
             chip::app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
+    // OTA Requestor is always advertised on the silabs root endpoint.
 #if CHIP_ENABLE_OPENTHREAD
-    sRootNode = std::make_unique<chip::app::ThreadRootNode>(rootNodeContext,
-                                                            chip::app::ThreadRootNode::ThreadContext{
-                                                                .threadDriver = sThreadDriver,
-                                                            });
+    using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::OtaFeature>;
+    sRootNode          = std::make_unique<RootNodeType>(rootNodeContext,
+                                                        chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver },
+                                                        chip::app::OtaFeature::Context{});
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sRootNode = std::make_unique<chip::app::WifiRootNode>(
+    using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature, chip::app::OtaFeature>;
+    sRootNode          = std::make_unique<RootNodeType>(
         rootNodeContext,
-        chip::app::WifiRootNode::WifiContext{
-            .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance(),
-        });
+        chip::app::WifiFeature::Context{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() },
+        chip::app::OtaFeature::Context{});
 #else
-    sRootNode = std::make_unique<chip::app::RootNode>(rootNodeContext);
+    using RootNodeType = chip::app::RootNodeWith<chip::app::OtaFeature>;
+    sRootNode          = std::make_unique<RootNodeType>(rootNodeContext, chip::app::OtaFeature::Context{});
 #endif
 
     VerifyOrReturnError(sRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
