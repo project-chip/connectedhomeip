@@ -25,13 +25,16 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 
-// Passing *this as every delegate is safe: ColorLight only stores the references, and nothing calls
-// through them before Register() runs.
-LoggingLightDriver::LoggingLightDriver(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                                       const Conformance & conformance) :
-    ColorLight(deviceTypes, context,
-               Delegates{ .onOff = *this, .levelControl = *this, .effect = *this, .color = *this, .identify = *this }, conformance)
-{}
+ColorLight::Delegates LoggingLightDriver::GetDelegates()
+{
+    return ColorLight::Delegates{
+        .onOff        = *this,
+        .levelControl = *this,
+        .effect       = *this,
+        .color        = *this,
+        .identify     = *this,
+    };
+}
 
 // OnOffDelegate
 

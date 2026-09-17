@@ -31,17 +31,17 @@ namespace app {
  * channels and hands them to ColorLight, which is why ColorLight itself knows nothing about this
  * class.
  */
-class LoggingLightDriver : public ColorLight,
-                           public Clusters::OnOffDelegate,
+class LoggingLightDriver : public Clusters::OnOffDelegate,
                            public Clusters::LevelControlDelegate,
                            public Clusters::OnOffEffectDelegate,
                            public ColorConverter,
                            public Clusters::IdentifyDelegate
 {
 public:
-    LoggingLightDriver(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                       const Conformance & conformance);
+    LoggingLightDriver()           = default;
     ~LoggingLightDriver() override = default;
+
+    ColorLight::Delegates GetDelegates();
 
 protected:
     // OnOffDelegate

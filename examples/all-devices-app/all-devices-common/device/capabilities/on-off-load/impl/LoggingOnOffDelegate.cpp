@@ -15,9 +15,7 @@
  *    limitations under the License.
  */
 
-#include <device/capabilities/on-off-load/impl/LoggingOnOffLoad.h>
-#include <devices/Types.h>
-#include <lib/support/StringBuilder.h>
+#include <device/capabilities/on-off-load/impl/LoggingOnOffDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -26,29 +24,21 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 
-LoggingOnOffLoad::LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                                   Clusters::OnOffDelegate * customOnOff, Clusters::OnOffEffectDelegate * customEffect,
-                                   Clusters::IdentifyDelegate * customIdentify) :
-    OnOffLoad(deviceTypes, customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
-              customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),
-              customIdentify ? *customIdentify : context.identifyDelegate, context)
-{}
-
 // OnOffDelegate
 
-void LoggingOnOffLoad::OnOffStartup(bool on)
+void LoggingOnOffDelegate::OnOffStartup(bool on)
 {
-    ChipLogProgress(DeviceLayer, "LoggingOnOffLoad::OnOffStartup() -> %s", on ? "ON" : "OFF");
+    ChipLogProgress(DeviceLayer, "LoggingOnOffDelegate::OnOffStartup() -> %s", on ? "ON" : "OFF");
 }
 
-void LoggingOnOffLoad::OnOnOffChanged(bool on)
+void LoggingOnOffDelegate::OnOnOffChanged(bool on)
 {
-    ChipLogProgress(DeviceLayer, "LoggingOnOffLoad::OnOnOffChanged() -> %s", on ? "ON" : "OFF");
+    ChipLogProgress(DeviceLayer, "LoggingOnOffDelegate::OnOnOffChanged() -> %s", on ? "ON" : "OFF");
 }
 
 // OnOffEffectDelegate
 
-DataModel::ActionReturnStatus LoggingOnOffLoad::TriggerDelayedAllOff(OnOff::DelayedAllOffEffectVariantEnum e)
+DataModel::ActionReturnStatus LoggingOnOffDelegate::TriggerDelayedAllOff(OnOff::DelayedAllOffEffectVariantEnum e)
 {
     switch (e)
     {
@@ -68,7 +58,7 @@ DataModel::ActionReturnStatus LoggingOnOffLoad::TriggerDelayedAllOff(OnOff::Dela
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus LoggingOnOffLoad::TriggerDyingLight(OnOff::DyingLightEffectVariantEnum e)
+DataModel::ActionReturnStatus LoggingOnOffDelegate::TriggerDyingLight(OnOff::DyingLightEffectVariantEnum e)
 {
     switch (e)
     {

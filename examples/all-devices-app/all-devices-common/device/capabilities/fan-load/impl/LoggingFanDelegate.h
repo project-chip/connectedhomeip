@@ -18,24 +18,24 @@
 
 #include <app/clusters/fan-control-server/fan-control-delegate.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
-#include <device/capabilities/fan-load/FanLoad.h>
 
 namespace chip {
 namespace app {
 
+class FanLoad;
+
 /**
- * Concrete implementation of FanLoad that logs all fan and power state
- * transitions, with support for custom delegate injection.
+ * Reusable logging delegate providing terminal logging and default state synchronization
+ * for fan control and on/off power transitions.
  */
-class LoggingFanLoad : public FanLoad, public Clusters::OnOffDelegate, public Clusters::FanControl::Delegate
+class LoggingFanDelegate : public Clusters::OnOffDelegate, public Clusters::FanControl::Delegate
 {
 public:
-    LoggingFanLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                   Clusters::FanControl::Delegate * customFan = nullptr, Clusters::OnOffDelegate * customOnOff = nullptr);
+    explicit LoggingFanDelegate(FanLoad * fanLoad = nullptr) : mFanLoad(fanLoad) {}
+    ~LoggingFanDelegate() override = default;
 
-    ~LoggingFanLoad() override = default;
+    void SetFanLoad(FanLoad * fanLoad) { mFanLoad = fanLoad; }
 
-protected:
     // FanControl::Delegate
     Protocols::InteractionModel::Status HandleStep(Clusters::FanControl::StepDirectionEnum aDirection, bool aWrap,
                                                    bool aLowestOff) override;
@@ -47,6 +47,9 @@ protected:
     // OnOffDelegate
     void OnOffStartup(bool on) override;
     void OnOnOffChanged(bool on) override;
+
+private:
+    FanLoad * mFanLoad = nullptr;
 };
 
 } // namespace app
