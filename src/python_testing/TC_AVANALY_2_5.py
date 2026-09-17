@@ -177,7 +177,7 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
                 endpoint, node_id=int(invalid_camera_node_id), expected_status=Status.NotFound
             )
         elif self.is_ci:
-            self.step(4)
+            self.skip_step(4)
             log.info("CI mode: skipping invalid NodeID check (use --user-params invalid_camera_node_id:<id> to execute)")
         else:
             self.skip_step(4)
@@ -211,7 +211,7 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
         self.step(9)
         # Activate with unknown stream ID -> expect NOT_FOUND
         existing_stream_ids = {s.analysisStreamID for s in analysis_streams}
-        unknown_stream_id = next((i for i in range(0xFFEE, 0xFFFF) if i not in existing_stream_ids), 0xFFFE)
+        unknown_stream_id = next(i for i in range(0xFFFF) if i not in existing_stream_ids)
         await self.send_activate_analysis_stream_cmd(
             endpoint, analysis_stream_id=unknown_stream_id, expected_status=Status.NotFound
         )
