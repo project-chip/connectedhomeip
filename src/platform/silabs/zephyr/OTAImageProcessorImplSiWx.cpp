@@ -130,11 +130,13 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mHeaderParser.Init();
 
-    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    CHIP_ERROR error = imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "OnPreparedForDownload() error: %" CHIP_ERROR_FORMAT, error.Format()));
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     sl_status_t status    = SL_STATUS_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
@@ -164,12 +166,14 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     if (!mReset)
     {
         ChipLogError(SoftwareUpdate, "Firmware update did not reach completion");
-        TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
+        err = imageProcessor->ReleaseBlock();
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Release block failed: %" CHIP_ERROR_FORMAT, err.Format()));
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
     }
 
-    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
+    err = imageProcessor->ReleaseBlock();
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Release block failed: %" CHIP_ERROR_FORMAT, err.Format()));
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
 
@@ -201,7 +205,8 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     writeBufOffset = 0;
     mReset         = false;
 
-    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
+    CHIP_ERROR err = imageProcessor->ReleaseBlock();
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Release block failed: %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
@@ -266,7 +271,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         }
     }
 
-    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
+    CHIP_ERROR error = imageProcessor->mDownloader->FetchNextData();
+    VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "FetchNextData() error: %" CHIP_ERROR_FORMAT, error.Format()));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
@@ -296,7 +302,9 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 
     if (mBlock.size() < block.size())
     {
-        TEMPORARY_RETURN_IGNORED ReleaseBlock();
+        CHIP_ERROR error = ReleaseBlock();
+        VerifyOrReturnError(error == CHIP_NO_ERROR, error,
+                            ChipLogError(SoftwareUpdate, "Release block failed: %" CHIP_ERROR_FORMAT, error.Format()));
 
         mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
         VerifyOrReturnError(mBlock.data() != nullptr, CHIP_ERROR_NO_MEMORY);
