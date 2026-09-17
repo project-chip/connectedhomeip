@@ -15465,12 +15465,28 @@ class ChipClusters:
                     "reason": "int",
                 },
             },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "UpdateSession",
+                "args": {
+                    "webRTCSessionID": "int",
+                    "SFrameSenderKey": "SFrameKeyStruct",
+                    "SFrameReceiveKeysToAdd": "SFrameKeyStruct",
+                    "SFrameReceiveKIDsToRemove": "bytes",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
                 "attributeName": "CurrentSessions",
                 "attributeId": 0x00000000,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SupportedSFrameCipherSuites",
+                "attributeId": 0x00000001,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {

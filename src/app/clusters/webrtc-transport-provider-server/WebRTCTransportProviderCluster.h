@@ -53,7 +53,7 @@ public:
         StreamUsageEnum streamUsage;
         Optional<std::vector<uint16_t>> videoStreams;
         Optional<std::vector<uint16_t>> audioStreams;
-        Optional<Structs::SFrameStruct::Type> sFrameConfig;
+        Optional<Globals::Structs::SFrameStruct::Type> sFrameConfig;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
         NodeId peerNodeId;
