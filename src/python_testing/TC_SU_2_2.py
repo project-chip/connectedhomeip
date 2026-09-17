@@ -974,7 +974,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # Device might go to kDownloading to fast but if this is not catched here the subscription will
         # try to reach for kDownloading for too long and might never reach that value. Read first then check the time taken to make sure is correct.
-        current_update_state_s3  = await self.read_single_attribute_check_success(
+        current_update_state_s3 = await self.read_single_attribute_check_success(
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
             dev_ctrl=controller,
@@ -1121,11 +1121,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         asserts.assert_greater(event_download_error.bytesDownloaded, 0, "Download was 0 bytes")
         asserts.assert_equal(event_download_error.platformCode, NullValue,
                              f"Expected NullValue for platformCode, found {event_download_error.platformCode}")
-        logger.info("%s : DownloadError Event found: %s", step_number_s4, event_download_error) 
+        logger.info("%s : DownloadError Event found: %s", step_number_s4, event_download_error)
         asserts.assert_greater_equal(event_download_error.progressPercent, 0, "Download progress was 0")
         if update_state_progress is NullValue:
             # If the UpdateState is Unknow the value can be Null
-            asserts.assert_equal(event_download_error.progressPercent, NullValue, "Recorded Null value on UpdateStateProgress but a non NullValue was reported on DownloadError Event")
+            asserts.assert_equal(event_download_error.progressPercent, NullValue,
+                                 "Recorded Null value on UpdateStateProgress but a non NullValue was reported on DownloadError Event")
         # [End of Step #6 TC_SU_2_7]
 
         self.step(5)
