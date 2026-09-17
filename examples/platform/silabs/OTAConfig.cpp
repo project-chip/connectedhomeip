@@ -22,7 +22,7 @@
 
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h> // nogncheck
-#include <app/clusters/ota-requestor/OTARequestorAttributes.h> // nogncheck
+#include <app/clusters/ota-requestor/OTARequestorAttributes.h>            // nogncheck
 #include <lib/core/CHIPError.h>
 #endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 

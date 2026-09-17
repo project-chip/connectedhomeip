@@ -194,9 +194,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     // OTA Requestor is always advertised on the silabs root endpoint.
 #if CHIP_ENABLE_OPENTHREAD
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::OtaFeature>;
-    sRootNode          = std::make_unique<RootNodeType>(rootNodeContext,
-                                                        chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver },
-                                                        chip::app::OtaFeature::Context{});
+    sRootNode = std::make_unique<RootNodeType>(rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver },
+                                               chip::app::OtaFeature::Context{});
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
     using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature, chip::app::OtaFeature>;
     sRootNode          = std::make_unique<RootNodeType>(

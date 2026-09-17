@@ -22,8 +22,8 @@
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <clusters/Descriptor/ClusterId.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/Types.h>
 #include <device/types/root-node/RootNode.h>
+#include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 

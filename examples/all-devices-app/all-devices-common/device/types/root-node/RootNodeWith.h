@@ -76,8 +76,7 @@ public:
         }
         else
         {
-            return out.ReferenceExisting(
-                Span<const ClusterId>(kClientClustersStorage.data(), kClientClustersStorage.size()));
+            return out.ReferenceExisting(Span<const ClusterId>(kClientClustersStorage.data(), kClientClustersStorage.size()));
         }
     }
 

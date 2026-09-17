@@ -40,7 +40,8 @@ class OtaFeature
 {
 public:
     struct Context
-    {};
+    {
+    };
 
     OtaFeature() = default;
     explicit OtaFeature(const Context &) {}
