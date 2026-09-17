@@ -18,7 +18,6 @@ name: connectedhomeip
 build:
     cmake: .
     kconfig: Kconfig
-    sysbuild-cmake: sysbuild
     depends:
         - mbedtls
         - cmsis_6
