@@ -121,7 +121,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("7a", """TH sends Step commands iteratively""", """
                                         Highest Step Check
-                                            - Verify that the PercentSetting attribute value reaches the highest step value: the value an additional Step command no longer changes (100 when the DUT's highest step is SpeedMax). Store value for future reference.
+                                            - Verify that the PercentSetting attribute value reaches the highest step value: the value an additional Step command no longer changes (100 when the DUT's highest step is SpeedMax). Store that value, and the FanMode value reported at it, for future reference.
                                         No Wrap Check
                                             - When the PercentSetting attribute value reaches the highest step value:
                                                 - Send an additional Step command to verify that PercentSetting stays at the highest step value"""),
@@ -129,7 +129,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 TestStep("7b", """Read the resulting attribute reports from each subscription""", """
                                         - Verify that the attribute report values from each subscription are in ascending order
                                         - If the number of PercentSetting reports is greater than the number of FanMode reports:
-                                            - Verify that all the expected FanMode values are present in the reports in accordance with the FanModeSequence attribute value
+                                            - Verify that all the expected FanMode values are present in the reports in accordance with the FanModeSequence attribute value, up to the FanMode value recorded at the highest step value
                                         - If the SPD feature is supported and the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports:
                                             - Verify that all the expected SpeedSetting values are present in the reports in accordance with the SpeedMax attribute value.
                                         [Save the resulting ascending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
@@ -239,7 +239,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 TestStep("13b", """Read the resulting attribute reports from each subscription""", """
                                     - Verify that the attribute report values from each subscription are in ascending order
                                     - If the number of PercentSetting reports is greater than the number of FanMode reports:
-                                        - Verify that all the expected FanMode values are present in the reports in accordance with the FanModeSequence attribute value
+                                        - Verify that all the expected FanMode values are present in the reports in accordance with the FanModeSequence attribute value, up to the FanMode value recorded at the highest step value
                                     - If the SPD feature is supported and the number of PercentSetting reports is greater or equal than the number of SpeedSetting reports:
                                         - Verify that all the expected SpeedSetting values are present in the reports in accordance with the SpeedMax attribute value.
                                     [Save the resulting ascending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
@@ -312,7 +312,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("18a", """TH sends Step commands with the requested parameters""", """
                                     - Verify that the attribute values reach the Off values (PercentSetting=0, FanMode=Off, SpeedSetting=0 if the SPD feature is supported)
-                                    - Send an additional Step command and verify that the values wrap to the highest step values (PercentSetting=highest step value from step 7a, FanMode=High, SpeedSetting=ceil(SpeedMax * PercentSetting / 100) if the SPD feature is supported)"""),
+                                    - Send an additional Step command and verify that the values wrap to the highest step values (PercentSetting=highest step value from step 7a, FanMode=the FanMode value recorded in step 7a, SpeedSetting=ceil(SpeedMax * PercentSetting / 100) if the SPD feature is supported)"""),
 
                 TestStep("19", """Wrap field test
                                         Verify Step command wrap behavior with LowestOff=False, Direction=Decrease, Wrap=True.
@@ -323,7 +323,7 @@ class TC_FAN_3_5(MatterBaseTest):
                                     - Step: LowestOff=False, Direction=Decrease, Wrap=True"""),
 
                 TestStep("19a", """TH sends a Step command with the requested parameters""", """
-                                    - Verify that the attribute values wrap to the highest step values (PercentSetting=highest step value from step 7a, FanMode=High, SpeedSetting=ceil(SpeedMax * PercentSetting / 100) if the SPD feature is supported)"""),
+                                    - Verify that the attribute values wrap to the highest step values (PercentSetting=highest step value from step 7a, FanMode=the FanMode value recorded in step 7a, SpeedSetting=ceil(SpeedMax * PercentSetting / 100) if the SPD feature is supported)"""),
 
                 TestStep("20", """Wrap field test
                                         Verify Step command wrap behavior with LowestOff=True, Direction=Increase, Wrap=True.
@@ -345,7 +345,8 @@ class TC_FAN_3_5(MatterBaseTest):
                                     - Step: LowestOff=False, Direction=Increase, Wrap=True"""),
 
                 TestStep("21a", """TH sends a Step command with the requested parameters""", """
-                                    - Verify that the PercentSetting attribute value wraps to the minimum PercentSetting value above 0"""),
+                                    - Verify that the PercentSetting attribute value wraps to the minimum PercentSetting value above 0, and that
+                                      SpeedSetting=ceil(SpeedMax * PercentSetting / 100) if the SPD feature is supported"""),
 
                 TestStep("22", """Wrap field test
                                         Verify Step command wrap behavior with LowestOff=True, Direction=Decrease, Wrap=True.
@@ -383,14 +384,15 @@ class TC_FAN_3_5(MatterBaseTest):
 
                 TestStep("25", """Wrap field test
                                         Verify Step command wrap behavior with LowestOff=False, Direction=Increase, Wrap=True.
-                                        Monitoring the Current attribute values (PercentCurrent).""", """
+                                        Monitoring the Current attribute values (PercentCurrent, SpeedCurrent).""", """
                                     SETUP
                                     - Initialize the PercentSetting attribute to 100
                                     - Subscribe to the PercentSetting, PercentCurrent, and (if the SPD feature is supported) SpeedCurrent attributes
                                     - Step: LowestOff=False, Direction=Increase, Wrap=True"""),
 
                 TestStep("25a", """TH sends a Step command with the requested parameters""", """
-                                    - Verify that the PercentCurrent attribute value wraps to the minimum PercentSetting value above 0"""),
+                                    - Verify that the PercentCurrent attribute value wraps to the minimum PercentSetting value above 0, and that
+                                      SpeedCurrent=ceil(SpeedMax * PercentCurrent / 100) if the SPD feature is supported"""),
 
 
 
@@ -656,13 +658,16 @@ class TC_FAN_3_5(MatterBaseTest):
 
             # Highest step value not yet known: it is reached when a Step command no longer changes
             # PercentSetting. A missing report alone is not taken as proof (it could still be in
-            # flight), so the attribute is read to confirm the value held before recording it.
+            # flight), so the attribute is read to confirm the value held before recording it
+            # together with the FanMode it maps to.
             if percent_setting_expected is None and percent_setting_report is None and percent_setting_last is not None:
                 percent_setting_read = await self.read_setting(attr.PercentSetting)
                 if percent_setting_read == percent_setting_last:
                     self.percent_setting_top = percent_setting_last
                     percent_setting_expected = percent_setting_last
-                    log.info("[FC] Highest step value (PercentSetting) reached: %s", percent_setting_expected)
+                    self.fan_mode_top = await self.read_setting(attr.FanMode)
+                    log.info("[FC] Highest step value (PercentSetting) reached: %s, FanMode: %s",
+                             percent_setting_expected, self.fan_mode_top)
                 else:
                     log.info("[FC] PercentSetting report pending (read %s, last report %s), continuing",
                              percent_setting_read, percent_setting_last)
@@ -718,8 +723,9 @@ class TC_FAN_3_5(MatterBaseTest):
         sd_enum = cluster.Enums.StepDirectionEnum
 
         # *** NEXT STEP (SETUP) ***
-        # Initialize the PercentSetting attribute in accordance with the Step command
-        # parameters, then subscribe to the requested attributes.
+        # Initialize the PercentSetting attribute in accordance with the Step command parameters,
+        # verify the attribute values that initialization is required to set, then subscribe to
+        # the requested attributes.
         self.next_step()
         percent_setting_init = 0 if step.direction == sd_enum.kIncrease else self.percent_setting_max
         if step.wrap:
@@ -738,6 +744,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #    - If the expected PercentSetting attribute report value is reached, send
         #      an additional Step command to verify that the PercentSetting attribute
         #      report value stays at the expected value.
+        #    - On an Increase run, record the highest step value reached and its FanMode.
         self.next_step()
         await self.lowest_off_field_conditions_test(step)
 
@@ -855,8 +862,14 @@ class TC_FAN_3_5(MatterBaseTest):
 
         # Determine the final expected attribute values lists for comparison with the produced values
         if not handle_current_values:
-            fan_modes_expected = fan_modes_init_removed[trim] if step.direction == sd_enum.kIncrease else list(
-                reversed(fan_modes_init_removed))[trim]
+            if step.direction == sd_enum.kIncrease:
+                # The ascending run stops at the highest step value, so the expected values end at the
+                # FanMode recorded there. Any higher mode is never reached and must not be expected.
+                asserts.assert_in(self.fan_mode_top, fan_modes_init_removed,
+                                  f"[FC] FanMode recorded at the highest step value ({self.fan_mode_top}) is not one of the supported values ({fan_modes_init_removed}).")
+                fan_modes_expected = fan_modes_init_removed[:fan_modes_init_removed.index(self.fan_mode_top) + 1]
+            else:
+                fan_modes_expected = list(reversed(fan_modes_init_removed))[trim]
             speed_setting_expected = speed_expected
         else:
             # PercentCurrent tracks PercentSetting, so the expected values are the PercentSetting
@@ -1033,10 +1046,15 @@ class TC_FAN_3_5(MatterBaseTest):
         # Increase run (100 when the DUT's highest step is SpeedMax), with the speed derived from it.
         asserts.assert_is_not_none(self.percent_setting_top,
                                    "[FC] The highest step value must be recorded (Step Increase run) before the Wrap tests")
+        asserts.assert_is_not_none(self.fan_mode_top,
+                                   "[FC] The FanMode at the highest step value must be recorded (Step Increase run) before the Wrap tests")
         percent_setting_top = self.percent_setting_top
         # Speed expectations are None (not verified) without the SPD feature
         speed_setting_top = self.get_expected_speed_setting(percent_setting_top) if self.supports_multispeed else None
         speed_off = 0 if self.supports_multispeed else None
+        # Wrapping from the highest step with LowestOff clear lands on the lowest step above 0
+        speed_setting_lowest = self.get_expected_speed_setting(
+            self.percent_setting_per_step) if self.supports_multispeed else None
 
         if step.direction == sd_enum.kDecrease and step.lowestOff:
             if not handle_current_values:
@@ -1044,7 +1062,7 @@ class TC_FAN_3_5(MatterBaseTest):
                 await self.wrap_verify(step, percent_setting_expected=0, fan_mode_expected=fm_enum.kOff, speed_setting_expected=speed_off)
                 # - Verify that the attribute values all go to the highest step values
                 await self.wrap_verify(step, percent_setting_expected=percent_setting_top,
-                                       fan_mode_expected=fm_enum.kHigh, speed_setting_expected=speed_setting_top)
+                                       fan_mode_expected=self.fan_mode_top, speed_setting_expected=speed_setting_top)
             else:
                 # - Verify that the attribute values all go to Off values
                 await self.wrap_verify(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=speed_off)
@@ -1055,7 +1073,7 @@ class TC_FAN_3_5(MatterBaseTest):
             # - Verify that the attribute values all go to the highest step values
             if not handle_current_values:
                 await self.wrap_verify(step, percent_setting_expected=percent_setting_top,
-                                       fan_mode_expected=fm_enum.kHigh, speed_setting_expected=speed_setting_top)
+                                       fan_mode_expected=self.fan_mode_top, speed_setting_expected=speed_setting_top)
             else:
                 await self.wrap_verify(step, percent_setting_expected=percent_setting_top,
                                        percent_current_expected=percent_setting_top, speed_current_expected=speed_setting_top)
@@ -1066,11 +1084,16 @@ class TC_FAN_3_5(MatterBaseTest):
             else:
                 await self.wrap_verify(step, percent_setting_expected=0, percent_current_expected=0, speed_current_expected=speed_off)
         elif step.direction == sd_enum.kIncrease and not step.lowestOff:
-            # - Verify that the PercentSetting attribute value goes to the minimum Step value above 0
+            # - Verify that the attribute values go to the lowest step value above 0. FanMode is not
+            #   verified here: the percent-to-FanMode ranges are implementation specific, so the mode
+            #   the lowest step above 0 falls in cannot be derived (unlike 0, which maps to Off).
             if not handle_current_values:
-                await self.wrap_verify(step, percent_setting_expected=self.percent_setting_per_step)
+                await self.wrap_verify(step, percent_setting_expected=self.percent_setting_per_step,
+                                       speed_setting_expected=speed_setting_lowest)
             else:
-                await self.wrap_verify(step, percent_setting_expected=self.percent_setting_per_step, percent_current_expected=self.percent_setting_per_step)
+                await self.wrap_verify(step, percent_setting_expected=self.percent_setting_per_step,
+                                       percent_current_expected=self.percent_setting_per_step,
+                                       speed_current_expected=speed_setting_lowest)
 
     async def wrap_verify(
         self,
@@ -1150,6 +1173,9 @@ class TC_FAN_3_5(MatterBaseTest):
         # Highest step value (PercentSetting) observed on the first Step Increase run. The spec pins
         # only the lowest step (LowestOff), so the highest one is discovered rather than assumed to be 100.
         self.percent_setting_top: int | None = None
+        # FanMode at the highest step value. The Percent Rules leave the percent-to-FanMode ranges to
+        # the implementation, so the mode the highest step falls in is recorded, not assumed to be High.
+        self.fan_mode_top: Any | None = None
         self.supports_multispeed: bool = False
 
         # *** STEP 1 ***
@@ -1165,8 +1191,9 @@ class TC_FAN_3_5(MatterBaseTest):
             await self.send_on_off_command(Clusters.OnOff.Commands.On())
 
         # *** STEP 3 ***
-        # TH reads from the DUT the SpeedMax attribute
-        #  - Store value for future reference
+        # TH reads from the DUT the FeatureMap attribute, and the SpeedMax attribute
+        # if the SPD (MultiSpeed) feature is supported
+        #  - Store values for future reference
         self.step("3")
         feature_map = await self.read_setting(attr.FeatureMap)
         self.supports_multispeed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
@@ -1203,6 +1230,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH tests Step command behavior of the LowestOff field
         #  - Step command: Direction=Increase, Wrap=False, LowestOff=True
         #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        #  - Record the highest step value and the FanMode it maps to, used by the steps that follow
         await self.lowest_off_test(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True), handle_current_values=False)
 
         # *** STEP 8 ***
@@ -1288,7 +1316,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** STEPS 21, 21a ***
         # TH tests Step command behavior of the Wrap field
         #  - Step command: Direction=Increase, Wrap=True, LowestOff=False
-        #  - Verify Attributes PercentSetting, FanMode, and SpeedSetting
+        #  - Verify Attributes PercentSetting and SpeedSetting (the FanMode of the lowest step above 0 is implementation specific)
         await self.wrap_test(cmd.Step(direction=sd_enum.kIncrease, wrap=True, lowestOff=False), handle_current_values=False)
 
         # *** STEPS 22, 22a ***
