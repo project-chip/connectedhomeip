@@ -865,8 +865,10 @@ libavahi
 libc
 libcairo
 libCHIP
+libcurl
 libdbus
 LIBDIR
+libdatachannel
 libegl
 libffi
 libfuzzer
