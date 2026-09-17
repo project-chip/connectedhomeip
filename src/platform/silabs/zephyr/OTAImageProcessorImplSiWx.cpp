@@ -55,26 +55,22 @@ CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
@@ -89,8 +85,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    return PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
 }
 
 bool OTAImageProcessorImpl::IsFirstImageRun()
@@ -107,11 +102,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if (requestor == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "OTARequestorInterface is null");
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(SoftwareUpdate, "OTARequestorInterface is null"));
 
     uint32_t currentVersion;
     uint32_t targetVersion = requestor->GetTargetVersion();
@@ -168,6 +159,14 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
                 return;
             }
         }
+    }
+
+    if (!mReset)
+    {
+        ChipLogError(SoftwareUpdate, "Firmware update did not reach completion");
+        TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        return;
     }
 
     TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
