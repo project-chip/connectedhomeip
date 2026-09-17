@@ -156,7 +156,7 @@ void LsRequester::stopLocked()
     {
         // m_state (not g_main_loop_is_running()) is the source of truth for whether the worker
         // actually reached g_main_loop_run() and therefore needs to be told to quit.
-        if (m_mainLoop && m_state == State::RUNNING)
+        if (m_mainLoop)
             g_main_loop_quit(m_mainLoop);
         m_handle.detach();
 
