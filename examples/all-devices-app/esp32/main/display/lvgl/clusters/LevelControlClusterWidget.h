@@ -18,13 +18,15 @@
 
 #pragma once
 
-#include "DeviceScreenRegistry.h"
-#include <device/capabilities/dimmable-load/DimmableLoad.h>
-#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <app/clusters/level-control/LevelControlCluster.h>
+#include <lvgl.h>
 
 namespace chip::app {
 
-void RegisterDeviceScreen(OnOffLoad & device, DeviceScreenRegistry & registry);
-void RegisterDeviceScreen(DimmableLoad & device, DeviceScreenRegistry & registry);
+/**
+ * Creates an interactive LevelControl cluster widget displaying level slider and percentage.
+ * Must be called while holding the LVGL lock.
+ */
+lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelControlCluster & cluster);
 
 } // namespace chip::app

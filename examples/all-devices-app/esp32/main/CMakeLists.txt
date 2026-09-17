@@ -40,6 +40,8 @@ if (CONFIG_HAVE_DISPLAY)
         list(APPEND PRIV_INCLUDE_DIRS_LIST
             "${CMAKE_CURRENT_LIST_DIR}/display/lvgl"
             "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/screens"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/clusters"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/devices"
         )
     else()
         list(APPEND PRIV_INCLUDE_DIRS_LIST
@@ -80,6 +82,8 @@ if (CONFIG_HAVE_DISPLAY)
         list(APPEND SRC_DIRS_LIST
             "${CMAKE_CURRENT_LIST_DIR}/display/lvgl"
             "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/screens"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/clusters"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/devices"
         )
     else()
         list(APPEND SRC_DIRS_LIST

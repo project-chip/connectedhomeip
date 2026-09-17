@@ -18,13 +18,15 @@
 
 #pragma once
 
-#include "DeviceScreenRegistry.h"
-#include <device/capabilities/dimmable-load/DimmableLoad.h>
-#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <app/clusters/on-off-server/OnOffCluster.h>
+#include <lvgl.h>
 
 namespace chip::app {
 
-void RegisterDeviceScreen(OnOffLoad & device, DeviceScreenRegistry & registry);
-void RegisterDeviceScreen(DimmableLoad & device, DeviceScreenRegistry & registry);
+/**
+ * Creates an interactive OnOff cluster widget displaying state and a toggle button.
+ * Must be called while holding the LVGL lock.
+ */
+lv_obj_t * CreateOnOffClusterWidget(lv_obj_t * parent, Clusters::OnOffCluster & cluster);
 
 } // namespace chip::app

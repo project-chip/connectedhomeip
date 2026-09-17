@@ -61,7 +61,14 @@ display/
     ├── NavigationStack.h/.cpp      # Push/pop screen navigation and breadcrumbs
     ├── DeviceScreenRegistry.h/.cpp # Registry for dynamically hooked device screens
     ├── DeviceScreenHook.h          # DeviceFactory post-registration hook
-    ├── DeviceScreenRegistration.h  # Device screen registration declarations
+    ├── DeviceScreenRegistration.h/.cpp # Device screen registration implementations
+    ├── clusters/                   # Reusable cluster-specific widgets
+    │   ├── OnOffClusterWidget.h/.cpp     # Power status and toggle control
+    │   └── LevelControlClusterWidget.h/.cpp # Level slider and percentage control
+    ├── devices/                    # Matter device type screens (composed from cluster widgets)
+    │   ├── DeviceHeader.h/.cpp           # Standard device metadata header card
+    │   ├── OnOffLightScreen.h/.cpp       # On/Off Light device screen
+    │   └── DimmableLightScreen.h/.cpp    # Dimmable Light device screen
     └── screens/                    # Stateless screen render callbacks
         ├── HomeScreen.h/.cpp             # Root menu (Devices, Select Device, System)
         ├── SystemMenuScreen.h/.cpp       # Submenu (QR Code, Status, Operations)
@@ -241,11 +248,12 @@ The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
 Device-specific interactive screens (e.g. On/Off toggles, level sliders) should
 be registered dynamically during device construction via `DeviceFactory` hooks:
 
-1. Define a UI registration hook or callback invoked from `DeviceFactory::Create()`.
+1. Define a UI registration hook or callback invoked from
+   `DeviceFactory::Create()`.
 2. As each device interface is registered to the data model, register its
    endpoint control views with `NavigationStack` or a device screen registry.
-3. Composed devices (such as refrigerator or oven) register screens for each
-   of their composed endpoints.
+3. Composed devices (such as refrigerator or oven) register screens for each of
+   their composed endpoints.
 
 ### Adding a New Target Board
 

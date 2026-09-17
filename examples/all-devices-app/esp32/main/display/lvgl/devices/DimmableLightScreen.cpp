@@ -16,15 +16,23 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include "DeviceScreenRegistry.h"
-#include <device/capabilities/dimmable-load/DimmableLoad.h>
-#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include "DimmableLightScreen.h"
+#include "DeviceHeader.h"
+#include "clusters/LevelControlClusterWidget.h"
+#include "clusters/OnOffClusterWidget.h"
 
 namespace chip::app {
 
-void RegisterDeviceScreen(OnOffLoad & device, DeviceScreenRegistry & registry);
-void RegisterDeviceScreen(DimmableLoad & device, DeviceScreenRegistry & registry);
+void ShowDimmableLightScreen(lv_obj_t * parent, DimmableLoad & device)
+{
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_all(parent, 10, LV_PART_MAIN);
+    lv_obj_set_style_pad_row(parent, 8, LV_PART_MAIN);
+    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    CreateDeviceHeader(parent, "Dimmable Light", device.GetEndpointId());
+    CreateOnOffClusterWidget(parent, device.OnOffCluster());
+    CreateLevelControlClusterWidget(parent, device.LevelControlCluster());
+}
 
 } // namespace chip::app

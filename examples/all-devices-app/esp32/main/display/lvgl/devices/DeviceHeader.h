@@ -18,13 +18,15 @@
 
 #pragma once
 
-#include "DeviceScreenRegistry.h"
-#include <device/capabilities/dimmable-load/DimmableLoad.h>
-#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <lib/core/DataModelTypes.h>
+#include <lvgl.h>
 
 namespace chip::app {
 
-void RegisterDeviceScreen(OnOffLoad & device, DeviceScreenRegistry & registry);
-void RegisterDeviceScreen(DimmableLoad & device, DeviceScreenRegistry & registry);
+/**
+ * Creates a standard header card displaying the device type and endpoint number.
+ * Must be called while holding the LVGL lock.
+ */
+lv_obj_t * CreateDeviceHeader(lv_obj_t * parent, const char * title, EndpointId endpointId);
 
 } // namespace chip::app
