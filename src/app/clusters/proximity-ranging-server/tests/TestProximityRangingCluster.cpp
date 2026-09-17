@@ -1167,7 +1167,6 @@ TEST_F(TestProximityRangingCluster, TestStartRangingReportingMaxDistanceZero)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-
 TEST_F(TestProximityRangingCluster, TestAttributeListWithRangingConstraints)
 {
     TimerDelegateMock timer;

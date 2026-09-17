@@ -212,7 +212,8 @@ TEST_F(TestNamedPipeTranslators, ProximityRangingTranslator)
     // Missing list, missing role, out-of-range technology
     Json::Value missingList = ParseJson(R"({"Name": "SetRangingConstraints"})");
     EXPECT_EQ(translator.TranslateAndExecute(1, missingList, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
-    Json::Value missingRole = ParseJson(R"({"Name": "SetRangingConstraints", "Constraints": [{"Technology": 3, "Enabled": false}]})");
+    Json::Value missingRole =
+        ParseJson(R"({"Name": "SetRangingConstraints", "Constraints": [{"Technology": 3, "Enabled": false}]})");
     EXPECT_EQ(translator.TranslateAndExecute(1, missingRole, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
     Json::Value outofrangeTech =
         ParseJson(R"({"Name": "SetRangingConstraints", "Constraints": [{"Technology": 9, "Role": 3, "Enabled": false}]})");
