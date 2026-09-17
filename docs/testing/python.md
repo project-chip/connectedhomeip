@@ -519,7 +519,9 @@ See
 
 ## Support functionality
 
-Shared helpers and test bases belong in src/python_testing/support_modules/ and are imported as from support_modules.x import Y, enforced currently by TestSupportModuleLocation.py 
+Shared helpers and test bases belong in src/python_testing/support_modules/ and
+are imported as from support_modules.x import Y, enforced currently by
+TestSupportModuleLocation.py
 
 To create a controller on a new fabric:
 
