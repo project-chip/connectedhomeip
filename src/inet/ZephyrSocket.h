@@ -34,6 +34,15 @@
 #include <sys/select.h>
 #endif
 
+#include <zephyr/version.h>
+
+// Zephyr 4.4 declares recvmsg() in <zephyr/posix/sys/socket.h>. Defining a static
+// inline of the same name after that declaration is rejected by GCC ("declared
+// 'extern' and later 'static'"). Whether it is even seen depends on include order,
+// so this only surfaces in some translation units. Provide the shim only for the
+// older versions that genuinely lack recvmsg.
+#if ZEPHYR_VERSION_CODE < ZEPHYR_VERSION(4, 4, 0)
+
 static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 {
     // Older Zephyr version doesn't implement recvmsg at all, but if the message vector size is > 0 we can simply
@@ -54,6 +63,8 @@ static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 
     return ret;
 }
+
+#endif // ZEPHYR_VERSION_CODE < ZEPHYR_VERSION(4, 4, 0)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 
