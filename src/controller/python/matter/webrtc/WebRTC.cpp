@@ -168,6 +168,60 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
     }
 }
 
+uint32_t webrtc_get_video_frame_count(WebRTCClientHandle handle)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        return it->second->GetVideoFrameCount();
+    }
+    return 0;
+}
+
+uint64_t webrtc_get_video_bytes_count(WebRTCClientHandle handle)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        return it->second->GetVideoBytesCount();
+    }
+    return 0;
+}
+
+uint32_t webrtc_get_audio_packet_count(WebRTCClientHandle handle)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        return it->second->GetAudioPacketCount();
+    }
+    return 0;
+}
+
+uint64_t webrtc_get_audio_bytes_count(WebRTCClientHandle handle)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        return it->second->GetAudioBytesCount();
+    }
+    return 0;
+}
+
+void webrtc_reset_media_counters(WebRTCClientHandle handle)
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        it->second->ResetMediaCounters();
+    }
+}
+
 WebRTCClientHandle webrtc_provider_client_create()
 {
     auto client               = std::make_unique<WebRTCTransportProviderClient>();
