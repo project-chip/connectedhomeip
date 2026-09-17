@@ -21,7 +21,8 @@ namespace chip {
 namespace app {
 
 LoggingAirPurifier::LoggingAirPurifier(const Context & context) :
-    AirPurifier(static_cast<Clusters::FanControl::Delegate &>(*this), static_cast<Clusters::OnOffDelegate *>(this), context)
+    AirPurifier(static_cast<Clusters::FanControl::Delegate &>(*this),
+                context.includeOnOffCluster ? static_cast<Clusters::OnOffDelegate *>(this) : nullptr, context)
 {
     SetFanLoad(this);
 }

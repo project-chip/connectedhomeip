@@ -82,6 +82,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OccupancySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/impl/LoggingOccupancySensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/OnOffLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/impl/LoggingOnOffLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light-switch/OnOffLightSwitch.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OnOffPlugInUnit.cpp"
