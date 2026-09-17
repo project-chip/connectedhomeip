@@ -44,6 +44,7 @@
 #include <task.h>
 
 #include "app_pds.h"
+#include <plat.h>
 extern "C" {
 #include <lwip/def.h>
 #include <lwip/ip_addr.h>
@@ -312,7 +313,9 @@ static void app_dtim_platform_event(const chip::DeviceLayer::ChipDeviceEvent * e
         {
             InstallNetworkActivityHooks();
             app_dtim_set_hold(APP_DTIM_HOLD_STARTUP, false);
-            app_dtim_set_hold(APP_DTIM_HOLD_RECOVERY, false);
+            // Keep APP_DTIM_HOLD_RECOVERY held here; the station is associated but may not yet
+            // have an IP address. The IPv4/IPv6 address events below release it once an address
+            // is actually assigned.
         }
         else
         {
@@ -577,9 +580,13 @@ void app_pds_init(void (*pinHandler)(int, bool))
 {
     s_pin_handler = pinHandler;
 
-    if (chip::DeviceLayer::PlatformMgr().AddEventHandler(app_dtim_platform_event) != CHIP_NO_ERROR)
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().AddEventHandler(app_dtim_platform_event);
+    if (err != CHIP_NO_ERROR)
     {
+        // Without this handler, APP_DTIM_HOLD_STARTUP is never released and the network
+        // activity hooks are never installed, so DTIM management is permanently broken.
         ChipLogError(DeviceLayer, "[LP] Failed to register DTIM platform event handler");
+        appError(err);
     }
 
     app_clock_init();
