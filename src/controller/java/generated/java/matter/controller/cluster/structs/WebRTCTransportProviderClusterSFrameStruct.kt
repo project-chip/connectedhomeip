@@ -75,11 +75,15 @@ class WebRTCTransportProviderClusterSFrameStruct(
       tlvReader.enterStructure(tlvTag)
       val audioCipherSuite = tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_CIPHER_SUITE))
       val videoCipherSuite = tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_CIPHER_SUITE))
-      val senderKey = WebRTCTransportProviderClusterSFrameKeyStruct.fromTlv(ContextSpecificTag(TAG_SENDER_KEY), tlvReader)
+      val senderKey =
+        WebRTCTransportProviderClusterSFrameKeyStruct.fromTlv(
+          ContextSpecificTag(TAG_SENDER_KEY),
+          tlvReader,
+        )
       val receiveKeys =
         buildList<WebRTCTransportProviderClusterSFrameKeyStruct> {
           tlvReader.enterArray(ContextSpecificTag(TAG_RECEIVE_KEYS))
-          while(!tlvReader.isEndOfContainer()) {
+          while (!tlvReader.isEndOfContainer()) {
             add(WebRTCTransportProviderClusterSFrameKeyStruct.fromTlv(AnonymousTag, tlvReader))
           }
           tlvReader.exitContainer()

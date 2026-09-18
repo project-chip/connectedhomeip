@@ -80,18 +80,18 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       if (videoStreams.isPresent) {
         val optvideoStreams = videoStreams.get()
         startArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-      for (item in optvideoStreams.iterator()) {
-        put(AnonymousTag, item)
-      }
-      endArray()
+        for (item in optvideoStreams.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
       }
       if (audioStreams.isPresent) {
         val optaudioStreams = audioStreams.get()
         startArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-      for (item in optaudioStreams.iterator()) {
-        put(AnonymousTag, item)
-      }
-      endArray()
+        for (item in optaudioStreams.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
       }
       if (SFrameConfig != null) {
         if (SFrameConfig.isPresent) {
@@ -119,7 +119,10 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
     private const val TAG_S_FRAME_CONFIG = 9
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WebRTCTransportProviderClusterWebRTCSessionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): WebRTCTransportProviderClusterWebRTCSessionStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getUShort(ContextSpecificTag(TAG_ID))
       val peerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PEER_NODE_ID))
@@ -153,7 +156,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UShort> {
               tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUShort(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -167,7 +170,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UShort> {
               tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUShort(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -181,7 +184,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_S_FRAME_CONFIG))) {
             Optional.of(
               WebRTCTransportProviderClusterSFrameStruct.fromTlv(
-                ContextSpecificTag(TAG_S_FRAME_CONFIG), 
+                ContextSpecificTag(TAG_S_FRAME_CONFIG),
                 tlvReader,
               )
             )
