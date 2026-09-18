@@ -315,8 +315,7 @@ Status MediaFileManagementManager::HandleAddFile(ScopedNodeId peer, const CharSp
 void MediaFileManagementManager::NotifyStoredFilesChanged()
 {
     VerifyOrReturn(mCluster != nullptr);
-    mCluster->NotifyAttributeChanged(Attributes::AvailableFiles::Id);
-    mCluster->NotifyAttributeChanged(Attributes::AvailableStorage::Id);
+    mCluster->MarkStoredFilesDirty();
 }
 
 Status MediaFileManagementManager::HandleDeleteFile(uint64_t fileID)
