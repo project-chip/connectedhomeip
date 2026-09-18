@@ -30,7 +30,10 @@ set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/platform/esp32/led_widget"
 )
 
-if(${IDF_TARGET} STREQUAL "esp32")
+# The m5stack-tft library builds only against the legacy `driver` component, which
+# ESP-IDF 6.0 dissolved into per-peripheral components. Leaving it out of the build also
+# rules out CONFIG_HAVE_DISPLAY; screen-framework enforces that.
+if(${IDF_TARGET} STREQUAL "esp32" AND IDF_VERSION_MAJOR LESS 6)
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
 endif()
 
