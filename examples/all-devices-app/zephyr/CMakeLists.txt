@@ -137,6 +137,14 @@ target_sources(app PRIVATE
 # Included by AppTaskBase.h; listed above only so it shows up in IDEs.
 set_source_files_properties(include/AppTaskBase.ipp PROPERTIES HEADER_FILE_ONLY TRUE)
 
+# Board-specific device implementation; AppTaskBase substitutes it into the factory.
+if(ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
+    target_sources(app PRIVATE
+        include/ZephyrOnOffLight.h
+        src/ZephyrOnOffLight.cpp
+    )
+endif()
+
 # Matches CHIP_DEVICE_CONFIG_ENABLE_THREAD, which AppTaskBase.ipp gates on.
 if(CONFIG_OPENTHREAD)
     target_sources(app PRIVATE

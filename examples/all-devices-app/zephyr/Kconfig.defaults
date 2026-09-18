@@ -85,6 +85,25 @@ config THREAD_LOCAL_STORAGE
 config MAIN_STACK_SIZE
 	default 12288
 
+config CHIP_TASK_STACK_SIZE
+	default 10240
+
+config HW_STACK_PROTECTION
+	default y
+
+config ASSERT
+	default y
+
+if NET_L2_OPENTHREAD
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+	default 14
+
+config OPENTHREAD_THREAD_STACK_SIZE
+	default 6144
+
+endif # NET_L2_OPENTHREAD
+
 choice POSIX_AEP_CHOICE
 	default POSIX_AEP_CHOICE_NONE
 endchoice
@@ -97,7 +116,15 @@ choice CHIP_CRYPTO
 endchoice
 
 config MBEDTLS_HEAP_SIZE
-	default 16384
+	default 8192
+
+# Extend the maximum number of PSA key slots to fit Matter requirements
+config MBEDTLS_PSA_KEY_SLOT_COUNT
+	default 64
+
+config CHIP_FACTORY_DATA
+	bool "Use provisioned factory data for credentials and commissionable data"
+	default n
 
 config SHELL
 	default y
