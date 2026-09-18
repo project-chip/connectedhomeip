@@ -28,7 +28,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --app-pipe /tmp/acs_fifo_2_1
+#       --app-pipe /tmp/acs_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -83,7 +83,7 @@ class TC_ACS_2_1(MatterBaseTest):
             # if app_pid == 0:
             #     asserts.fail("The --app-pid flag must be set when using named pipe")
             # self.app_pipe = self.app_pipe + str(app_pid)
-            self.app_pipe = "/tmp/acs_fifo_2_1"
+            self.app_pipe = "/tmp/acs_fifo"
 
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
