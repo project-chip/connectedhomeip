@@ -38,7 +38,7 @@
 import logging
 
 from mobly import asserts
-from TC_AVSMTestBase import AVSMTestBase
+from support_modules.avsm_testbase import AVSMTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

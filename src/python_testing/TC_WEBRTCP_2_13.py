@@ -41,7 +41,7 @@
 #
 
 from mobly import asserts
-from TC_WEBRTCPTestBase import WEBRTCPTestBase
+from support_modules.webrtcp_testbase import WEBRTCPTestBase
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl

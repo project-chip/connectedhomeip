@@ -35,7 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from drlk_2_x_common import DRLK_COMMON
+from support_modules.drlk_2_x_common import DRLK_COMMON
 
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest

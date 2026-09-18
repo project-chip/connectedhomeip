@@ -27,7 +27,7 @@ import psutil
 import requests
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
-from TC_TLS_Utils import TLSUtils
+from support_modules.tls_utils import TLSUtils
 
 from matter.interaction_model import Status
 from matter.testing.tasks import Subprocess

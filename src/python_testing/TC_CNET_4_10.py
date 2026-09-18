@@ -17,8 +17,8 @@
 
 import logging
 
-import test_plan_support
 from mobly import asserts
+from support_modules import test_plan_support
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

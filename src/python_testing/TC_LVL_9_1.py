@@ -37,7 +37,7 @@
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
-from TC_GC_common import is_groupcast_on_root_node
+from support_modules.gc_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
