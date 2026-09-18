@@ -441,11 +441,6 @@ class ResultProcessingThread(TerminableThread):
             # Close the result queue to unblock the thread if it's waiting for results.
             self.result_queue.close()
 
-            if isinstance(self.exception, KeyboardInterrupt):
-                raise self.exception
-            if self.exception is not None:
-                raise ResultError("Result processing thread terminated with an exception") from self.exception
-
             if not self.resource_thread_join():
                 raise RuntimeError("Result processing thread is still alive, it might be stuck on processing results")
         except Exception as e:
@@ -456,3 +451,9 @@ class ResultProcessingThread(TerminableThread):
             if not self.resource_thread_join():
                 raise RuntimeError(
                     "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e
+            raise
+        finally:
+            if isinstance(self.exception, KeyboardInterrupt):
+                raise self.exception
+            if self.exception is not None:
+                raise ResultError("Result processing thread terminated with an exception") from self.exception
