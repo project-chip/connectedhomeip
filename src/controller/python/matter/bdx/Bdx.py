@@ -20,7 +20,7 @@ import builtins
 import ctypes
 from asyncio.futures import Future
 from collections.abc import Callable
-from ctypes import CFUNCTYPE, POINTER, c_char_p, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
+from ctypes import CFUNCTYPE, POINTER, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
 
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 from . import BdxTransfer
@@ -210,12 +210,13 @@ def AcceptTransferAndSendData(transfer: c_void_p, data: bytes | bytearray, trans
     handle = GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(complete_transaction))
-    # c_char_p only accepts bytes or an integer address, so a bytearray (which is what
-    # BdxTransfer holds) has to be converted first. The result is bound to a local so it
-    # outlives the c_char_p for the duration of the call.
-    payload = bytes(data)
+    # The native function is declared as taking a c_uint8_p, and ctypes rejects a c_char_p
+    # there, so the payload goes across as a c_uint8 array. BdxTransfer holds a bytearray,
+    # which from_buffer_copy accepts directly. The array is bound to a local so it outlives
+    # the call.
+    payload = (c_uint8 * len(data)).from_buffer_copy(data)
     res = builtins.chipStack.Call(
-        lambda: handle.pychip_Bdx_AcceptTransferAndSendData(transfer, c_char_p(payload), len(payload), complete_transaction)
+        lambda: handle.pychip_Bdx_AcceptTransferAndSendData(transfer, payload, len(payload), complete_transaction)
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(complete_transaction))

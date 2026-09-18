@@ -23,10 +23,13 @@ the MessageQueued / MessagePresented / MessageComplete / MessageNotPresented eve
 import logging
 import queue
 import time
+from collections.abc import Sequence
+from typing import Any
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters import ClusterObjects
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import EndpointCheckFunction, has_feature
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
@@ -102,8 +105,10 @@ class MESSTestBase:
                 return data
             log.info("Ignoring %s for unrelated MessageID %s", event.__name__, data.messageID.hex())
 
-    def wait_for_one_of_message_events(self, handler: EventSubscriptionHandler, event_types, message_id: bytes,
-                                       timeout_sec: float = 30.0):
+    def wait_for_one_of_message_events(self, handler: EventSubscriptionHandler,
+                                       event_types: Sequence[type[ClusterObjects.ClusterEvent]],
+                                       message_id: bytes,
+                                       timeout_sec: float = 30.0) -> tuple[type[ClusterObjects.ClusterEvent], Any]:
         """Wait for whichever of ``event_types`` arrives first for ``message_id``.
 
         ``wait_for_message_event`` discards every event that is not the one type it wants, so a

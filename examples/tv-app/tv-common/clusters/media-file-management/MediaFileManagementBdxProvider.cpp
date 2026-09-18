@@ -212,9 +212,15 @@ void MediaFileManagementBdxProvider::HandleTransferSessionOutput(TransferSession
         ChipLogProgress(BDX, "MediaFileManagementBdxProvider: transfer complete");
         // Report before Reset(), which clears the active designator.
         const auto grant = mGrants.find(mFileDesignator);
-        if (mRetrievalObserver != nullptr && grant != mGrants.end())
+        if (grant != mGrants.end())
         {
-            mRetrievalObserver->OnSharedFileRetrieved(grant->second.peer, mFileDesignator);
+            if (mRetrievalObserver != nullptr)
+            {
+                mRetrievalObserver->OnSharedFileRetrieved(grant->second.peer, mFileDesignator);
+            }
+            // The bytes are delivered, so this grant has served its purpose. Grants for failed
+            // and timed out transfers are left in place so the client can retry.
+            mGrants.erase(grant);
         }
         Reset();
         break;

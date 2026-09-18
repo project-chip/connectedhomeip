@@ -19,6 +19,7 @@
 
 #include <app/clusters/messages-server/messages-server.h>
 
+#include <array>
 #include <iostream>
 #include <list>
 #include <memory>
@@ -212,6 +213,8 @@ private:
 
     // Present the messages that were held back while the device was muted.
     void PresentQueuedMessages();
+
+    using MessageIdBuffer = std::array<uint8_t, chip::app::Clusters::Messages::kMessageIdLength>;
     void CompleteMessage(chip::ByteSpan messageId);
 
     void StartMessageTimer(chip::ByteSpan messageId, MessageTimerType type, uint32_t delayMs);

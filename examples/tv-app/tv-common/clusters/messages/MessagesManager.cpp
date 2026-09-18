@@ -249,12 +249,28 @@ void MessagesManager::SetDoNotDisturb(bool enabled)
 
 void MessagesManager::PresentQueuedMessages()
 {
+    // Copy the ids out first: releasing a message can erase it from the list, which would
+    // invalidate both the loop and any span pointing into the element being removed.
+    std::vector<MessageIdBuffer> queued;
     for (CachedMessage & message : mCachedMessages)
     {
         if (message.GetState() == MessageState::kQueued)
         {
-            PresentMessage(message);
+            MessageIdBuffer id;
+            memcpy(id.data(), message.GetMessageId().data(), id.size());
+            queued.push_back(id);
         }
+    }
+
+    for (const MessageIdBuffer & id : queued)
+    {
+        // A message whose StartTime has not arrived yet is also queued, with a timer already
+        // pending for it. Going back through ScheduleOrPresentMessage re-checks StartTime so
+        // such a message is not presented early, and cancelling first leaves it with a single
+        // armed timer rather than two.
+        const ByteSpan messageId(id.data(), id.size());
+        CancelMessageTimers(messageId);
+        ScheduleOrPresentMessage(messageId);
     }
 }
 
