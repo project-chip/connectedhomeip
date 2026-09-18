@@ -44,69 +44,15 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
 class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
-    def desc_TC_WEBRTCP_2_33(self) -> str:
-        """Returns a description of this test"""
-        return "[TC-WEBRTCP-2.33] Validate WebRTC video and audio stream reuse and media delivery across consecutive sessions (referenceCount 0 -> 1 -> 0 -> 1)"
-
-    def steps_TC_WEBRTCP_2_33(self) -> list[TestStep]:
-        return [
-            TestStep("precondition", "DUT commissioned", is_commissioning=True),
-            TestStep(
-                1,
-                "TH allocates both Audio and Video streams via CameraAVStreamManagement",
-                "Valid stream IDs are obtained with initial referenceCount == 0",
-            ),
-            TestStep(
-                2,
-                "TH establishes first WebRTC session (Session 1) using the allocated streams",
-                "Valid WebRTCSessionID is obtained, referenceCounts increment to 1, and WebRTC session reaches Connected state",
-            ),
-            TestStep(
-                3,
-                "TH verifies active RTP video and audio media reception during Session 1",
-                "Non-zero RTP video frames and audio packets are received by the native WebRTC peer connection",
-            ),
-            TestStep(
-                4,
-                "TH sends EndSession for Session 1 and reads AllocatedVideoStreams / AllocatedAudioStreams",
-                "DUT responds with SUCCESS; referenceCounts decrement back to 0 while streams remain allocated",
-            ),
-            TestStep(
-                5,
-                "TH establishes second WebRTC session (Session 2) reusing the SAME allocated VideoStreamID and AudioStreamID without deallocating",
-                "DUT responds with ProvideOfferResponse, referenceCounts increment from 0 to 1, and Session 2 reaches Connected state",
-            ),
-            TestStep(
-                6,
-                "TH verifies active RTP video and audio media reception during Session 2 (stream reuse)",
-                "Non-zero RTP video frames and audio packets are received by the native WebRTC peer connection during the reused stream session",
-            ),
-            TestStep(
-                7,
-                "TH terminates Session 2 via EndSession and deallocates the Audio and Video streams",
-                "DUT responds with SUCCESS and streams are removed from AllocatedAudioStreams / AllocatedVideoStreams",
-            ),
-        ]
-
-    def pics_TC_WEBRTCP_2_33(self) -> list[str]:
-        return [
-            "WEBRTCP.S",
-            "WEBRTCP.S.A0000",     # CurrentSessions attribute
-            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
-            "WEBRTCP.S.C06.Rsp",   # EndSession command
-            "AVSM.S",
-            "AVSM.S.F00",          # Audio Data Output feature
-            "AVSM.S.F01",          # Video Data Output feature
-        ]
 
     async def _get_stream_ref_count(self, stream_id: int, attribute, endpoint: int) -> int:
         streams = await self.read_single_attribute_check_success(
@@ -221,9 +167,19 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
     def default_endpoint(self) -> int:
         return 1
 
+    @pics(
+        "WEBRTCP.S",
+        "WEBRTCP.S.A0000",     # CurrentSessions attribute
+        "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
+        "WEBRTCP.S.C06.Rsp",   # EndSession command
+        "AVSM.S",
+        "AVSM.S.F00",          # Audio Data Output feature
+        "AVSM.S.F01",          # Video Data Output feature
+    )
     @async_test_body
     async def test_TC_WEBRTCP_2_33(self):
-        self.step("precondition")
+        """[TC-WEBRTCP-2.33] Validate WebRTC video and audio stream reuse and media delivery across consecutive sessions (referenceCount 0 -> 1 -> 0 -> 1)"""
+        self.step("precondition", "DUT commissioned", is_commissioning=True)
         endpoint = self.get_endpoint()
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,
@@ -252,7 +208,11 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
         active_session_id = None
 
         try:
-            self.step(1)
+            self.step(
+                1,
+                "TH allocates both Audio and Video streams via CameraAVStreamManagement",
+                expectation="Valid stream IDs are obtained with initial referenceCount == 0",
+            )
             audio_stream_id = await self.allocate_one_audio_stream()
             video_stream_id = await self.allocate_one_video_stream()
             await self.validate_allocated_audio_stream(audio_stream_id)
@@ -267,7 +227,11 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(initial_audio_ref, 0, "Initial audio referenceCount must be 0")
             asserts.assert_equal(initial_video_ref, 0, "Initial video referenceCount must be 0")
 
-            self.step(2)
+            self.step(
+                2,
+                "TH establishes first WebRTC session (Session 1) using the allocated streams",
+                expectation="Valid WebRTCSessionID is obtained, referenceCounts increment to 1, and WebRTC session reaches Connected state",
+            )
             log.info("Starting Session 1 with freshly allocated streams (video=%s, audio=%s)", video_stream_id, audio_stream_id)
             session1_id, peer1 = await self._establish_session(webrtc_manager, endpoint, video_stream_id, audio_stream_id)
             active_session_id = session1_id
@@ -289,10 +253,18 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(s1_audio_ref, 1, "Session 1 audio referenceCount must be 1")
             asserts.assert_equal(s1_video_ref, 1, "Session 1 video referenceCount must be 1")
 
-            self.step(3)
+            self.step(
+                3,
+                "TH verifies active RTP video and audio media reception during Session 1",
+                expectation="Non-zero RTP video frames and audio packets are received by the native WebRTC peer connection",
+            )
             await self._verify_media_delivery(peer1, "Session 1 (Fresh Stream)")
 
-            self.step(4)
+            self.step(
+                4,
+                "TH sends EndSession for Session 1 and reads AllocatedVideoStreams / AllocatedAudioStreams",
+                expectation="DUT responds with SUCCESS; referenceCounts decrement back to 0 while streams remain allocated",
+            )
             log.info("Ending Session 1 (session_id=%s) WITHOUT deallocating streams", session1_id)
             await self.send_single_cmd(
                 cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
@@ -321,7 +293,11 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(between_audio_ref, 0, "Audio referenceCount must decrement back to 0 after EndSession")
             asserts.assert_equal(between_video_ref, 0, "Video referenceCount must decrement back to 0 after EndSession")
 
-            self.step(5)
+            self.step(
+                5,
+                "TH establishes second WebRTC session (Session 2) reusing the SAME allocated VideoStreamID and AudioStreamID without deallocating",
+                expectation="DUT responds with ProvideOfferResponse, referenceCounts increment from 0 to 1, and Session 2 reaches Connected state",
+            )
             log.info(
                 "Starting Session 2 REUSING existing allocated streams (video=%s, audio=%s) with referenceCount == 0",
                 video_stream_id,
@@ -347,10 +323,18 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(s2_audio_ref, 1, "Session 2 audio referenceCount must increment back to 1")
             asserts.assert_equal(s2_video_ref, 1, "Session 2 video referenceCount must increment back to 1")
 
-            self.step(6)
+            self.step(
+                6,
+                "TH verifies active RTP video and audio media reception during Session 2 (stream reuse)",
+                expectation="Non-zero RTP video frames and audio packets are received by the native WebRTC peer connection during the reused stream session",
+            )
             await self._verify_media_delivery(peer2, "Session 2 (Reused Stream)")
 
-            self.step(7)
+            self.step(
+                7,
+                "TH terminates Session 2 via EndSession and deallocates the Audio and Video streams",
+                expectation="DUT responds with SUCCESS and streams are removed from AllocatedAudioStreams / AllocatedVideoStreams",
+            )
             log.info("Ending Session 2 and deallocating streams")
             await self.send_single_cmd(
                 cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
