@@ -21,6 +21,17 @@
 #include <algorithm>
 #include <lib/support/logging/CHIPLogging.h>
 
+DefaultMediaController::~DefaultMediaController()
+{
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    for (auto & entry : mSinkMap)
+    {
+        mPreRollBuffer.DeregisterTransportFromBuffer(entry.second.get());
+    }
+    mSinkMap.clear();
+    mConnections.clear();
+}
+
 void DefaultMediaController::SetCameraDevice(Camera::CameraDevice * device)
 {
     mCameraDevice = device;
@@ -45,9 +56,19 @@ void DefaultMediaController::RegisterTransport(Transport * transport, const std:
                     static_cast<unsigned>(videoStreams.size()), static_cast<unsigned>(audioStreams.size()));
 
     std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    mConnections.erase(std::remove_if(mConnections.begin(), mConnections.end(),
+                                      [transport](const Connection & c) { return c.transport == transport; }),
+                       mConnections.end());
+    auto existingIt = mSinkMap.find(transport);
+    if (existingIt != mSinkMap.end())
+    {
+        mPreRollBuffer.DeregisterTransportFromBuffer(existingIt->second.get());
+        mSinkMap.erase(existingIt);
+    }
+
     mConnections.push_back({ transport, videoStreams, audioStreams });
 
-    auto * bufferSink     = new BufferSink();
+    auto bufferSink       = std::make_unique<BufferSink>();
     bufferSink->transport = transport;
     // 0: Deliver with the minimum I-frame duration
     // 1: Deliver with a delay of up to 1 ms (default)
@@ -81,8 +102,8 @@ void DefaultMediaController::RegisterTransport(Transport * transport, const std:
         ChipLogProgress(Camera, "  Registered videoStream=%u", videoStream);
     }
 
-    mPreRollBuffer.RegisterTransportToBuffer(bufferSink, streamKeys);
-    mSinkMap[transport] = bufferSink;
+    mPreRollBuffer.RegisterTransportToBuffer(bufferSink.get(), streamKeys);
+    mSinkMap[transport] = std::move(bufferSink);
     ChipLogProgress(Camera, "Transport registered successfully. Total connections: %u", (unsigned) mConnections.size());
 }
 
@@ -95,8 +116,7 @@ void DefaultMediaController::UnregisterTransport(Transport * transport)
     auto it = mSinkMap.find(transport);
     if (it != mSinkMap.end())
     {
-        mPreRollBuffer.DeregisterTransportFromBuffer(it->second);
-        delete it->second;
+        mPreRollBuffer.DeregisterTransportFromBuffer(it->second.get());
         mSinkMap.erase(it);
         ChipLogProgress(Camera, "Sink deregistered for transport.");
     }
