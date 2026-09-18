@@ -282,7 +282,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
-        WifiRootNode::WifiContext{
+        WifiFeature::Context{
             .wifiDriver = sWiFiDriver,
         });
 

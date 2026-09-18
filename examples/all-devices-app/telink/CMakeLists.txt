@@ -73,12 +73,14 @@ target_sources(app PRIVATE
 
 if(CONFIG_NET_L2_OPENTHREAD)
   target_sources(app PRIVATE
-    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/ThreadRootNode.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/ThreadFeature.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/ThreadFeature.h
     ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/ThreadRootNode.h
   )
 elseif(CONFIG_CHIP_WIFI)
   target_sources(app PRIVATE
-    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/WifiRootNode.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/WifiFeature.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/WifiFeature.h
     ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/WifiRootNode.h
   )
 endif()
