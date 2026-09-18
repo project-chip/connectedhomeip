@@ -133,10 +133,9 @@ TEST_F(TestWebRTCTransportProviderCluster, TestAttributes)
     MockWebRTCTransportProviderDelegate mockDelegate;
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
 
-    ASSERT_TRUE(IsAttributesListEqualTo(server, 
+    ASSERT_TRUE(IsAttributesListEqualTo(server,
                                         { WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry,
-                                          WebRTCTransportProvider::Attributes::SupportedSFrameCipherSuites::kMetadataEntry 
-                                        }));
+                                          WebRTCTransportProvider::Attributes::SupportedSFrameCipherSuites::kMetadataEntry }));
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestCommands)
