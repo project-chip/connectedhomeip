@@ -36,6 +36,7 @@
 
 #include "ConnectivityManagerImpl.h"
 #include "WpaSupplicantClient.h"
+#include <wifipaf/WiFiPAFProtocol.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 using namespace ::chip::WiFiPAF;
@@ -51,22 +52,12 @@ static const char srv_name[] = "_matterc._udp";
 */
 #define NAN_PUBLISH_SSI_TAG " ssi="
 
-#pragma pack(push, 1)
-struct PAFPublishSSI
-{
-    uint8_t DevOpCode;
-    uint16_t DevInfo;
-    uint16_t ProductId;
-    uint16_t VendorId;
-};
-
 enum nan_service_protocol_type
 {
     NAN_SRV_PROTO_BONJOUR    = 1,
     NAN_SRV_PROTO_GENERIC    = 2,
     NAN_SRV_PROTO_CSA_MATTER = 3,
 };
-#pragma pack(pop)
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParam & InArgs)
 {
