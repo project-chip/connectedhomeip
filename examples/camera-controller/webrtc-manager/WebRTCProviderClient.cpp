@@ -430,8 +430,10 @@ void WebRTCProviderClient::HandleSolicitOfferResponse(TLV::TLVReader & data)
     mCurrentSessionId = value.webRTCSessionID;
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
-    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
+    session.videoStreamID =
+        value.videoStreamID.HasValue() ? value.videoStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
+    session.audioStreamID =
+        value.audioStreamID.HasValue() ? value.audioStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
 
     // If DeferredOffer == FALSE these fields MUST be valid
     if (!value.deferredOffer)
@@ -486,8 +488,10 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
     mCurrentSessionId = value.webRTCSessionID;
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
-    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
+    session.videoStreamID =
+        value.videoStreamID.HasValue() ? value.videoStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
+    session.audioStreamID =
+        value.audioStreamID.HasValue() ? value.audioStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
 
     if (mRequestorServer == nullptr)
     {
