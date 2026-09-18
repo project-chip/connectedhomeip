@@ -34,6 +34,15 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
+CHIP_ERROR DeviceControlServer::PostCommissioningWindowChangedEvent(
+    app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum status)
+{
+    const ChipDeviceEvent event{ .Type                             = DeviceEventType::kCommissioningWindowStatusChanged,
+                                 .CommissioningWindowStatusChanged = { .status = status } };
+
+    return PlatformMgr().PostEvent(&event);
+}
+
 CHIP_ERROR DeviceControlServer::PostCommissioningCompleteEvent(NodeId peerNodeId, FabricIndex accessingFabricIndex)
 {
     ChipDeviceEvent event{
