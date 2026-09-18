@@ -40,6 +40,7 @@ source_set("camera-lib") {
     "include/camera-avstream-controller/camera-avstream-controller.h",
     "include/camera-device-interface.h",
     "include/media-controller/media-controller.h",
+    "include/simulated-av-analysis-webrtc-client.h",
     "include/transport/transport.h",
     "src/camera-app.cpp",
   ]

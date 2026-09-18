@@ -42,6 +42,18 @@ SmokeCoAlarm::ConcentrationCluster::Config DefaultCoConfig()
     };
 }
 
+// Smoke concentration: numeric + level indication, measured in air as percent obscuration per foot.
+SmokeCoAlarm::ConcentrationCluster::Config DefaultSmokeConcentrationConfig()
+{
+    return SmokeCoAlarm::ConcentrationCluster::Config{
+        .clusterId = SmokeConcentrationMeasurement::Id,
+        .features  = BitFlags<ConcentrationMeasurement::Feature>(ConcentrationMeasurement::Feature::kNumericMeasurement,
+                                                                ConcentrationMeasurement::Feature::kLevelIndication),
+        .medium    = ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+        .unit      = ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
+    };
+}
+
 // Combined smoke + CO alarm exposing every optional attribute, to showcase the cluster's full surface.
 SmokeCoAlarmCluster::Config DefaultSmokeConfig()
 {
@@ -55,7 +67,8 @@ SmokeCoAlarmCluster::Config DefaultSmokeConfig()
 
 SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()), mSmokeConfig(DefaultSmokeConfig())
+    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
+    mSmokeConcentrationConfig(DefaultSmokeConcentrationConfig()), mSmokeConfig(DefaultSmokeConfig())
 {}
 
 CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -73,12 +86,20 @@ CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModel
     mCoMeasurementCluster.Create(endpoint, mCoConfig);
     ReturnErrorOnFailure(provider.AddCluster(mCoMeasurementCluster.Registration()));
 
+    mSmokeConcentrationCluster.Create(endpoint, mSmokeConcentrationConfig);
+    ReturnErrorOnFailure(provider.AddCluster(mSmokeConcentrationCluster.Registration()));
+
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
 void SmokeCoAlarm::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    if (mSmokeConcentrationCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mSmokeConcentrationCluster.Cluster()));
+        mSmokeConcentrationCluster.Destroy();
+    }
     if (mCoMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mCoMeasurementCluster.Cluster()));
@@ -100,6 +121,12 @@ SmokeCoAlarm::ConcentrationCluster & SmokeCoAlarm::GetCoConcentrationCluster()
 {
     VerifyOrDie(mCoMeasurementCluster.IsConstructed());
     return mCoMeasurementCluster.Cluster();
+}
+
+SmokeCoAlarm::ConcentrationCluster & SmokeCoAlarm::GetSmokeConcentrationCluster()
+{
+    VerifyOrDie(mSmokeConcentrationCluster.IsConstructed());
+    return mSmokeConcentrationCluster.Cluster();
 }
 Clusters::SmokeCoAlarmCluster & SmokeCoAlarm::GetSmokeCoAlarmCluster()
 {

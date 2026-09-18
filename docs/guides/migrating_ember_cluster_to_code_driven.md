@@ -100,12 +100,36 @@ project's Slack channel.
             implementation.
         -   If the value was `persist`, the new cluster should handle
             persistence (load in `Startup` and store during writes).
-        -   If the value was `ram` and loaded from the ZAP UI,
-            `CodegenIntegration.cpp` should load the value from ZAP via the
-            generated `Accessors.h`. A common example is the `FeatureMap`.
-        -   If the value is internal to the cluster (e.g., `ClusterRevision`),
-            it should be marked as `External` by adding it to
-            `attributeAccessInterfaceAttributes` in `zcl.json`.
+        -   If the value is owned by the cluster (the usual case for a
+            code-driven implementation), mark it as external by adding it to
+            `attributeAccessInterfaceAttributes` in `zcl.json` and
+            `zcl-with-test-extensions.json`. No RAM is then reserved for it.
+        -   If the cluster still needs the value configured in the ZAP UI (a
+            `FeatureMap` or a startup value such as `MinMeasuredValue`), add
+            `"keepDefault": true` to that entry so ZAP keeps the default in
+            flash metadata, and read it in `CodegenIntegration.cpp` through the
+            generated accessors in `Accessors.h`:
+            -   `Attributes::<Name>::GetDefault(endpoint, value)` reports why no
+                value is available (`NotFound` when no default is configured,
+                `UnsupportedCluster` or `UnsupportedAttribute` when the
+                attribute is not part of the endpoint configuration). Use it
+                with `VerifyOrDie` when the cluster requires a configured
+                default.
+            -   `Attributes::<Name>::GetDefaultOr(endpoint, value, fallback)`
+                substitutes `fallback` whenever no value can be read. Use it
+                when the cluster can operate without a configured default.
+            -   Dynamic endpoints (bridges) carry no ZAP configuration, so the
+                application is the only source: scalars come from
+                `emberAfExternalAttributeReadCallback`, and if the application
+                does not serve the attribute the value falls back to the
+                `DECLARE_DYNAMIC_ATTRIBUTE*` declaration. Strings are never read
+                from the callback and need
+                `DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT`. Weigh this
+                before choosing `VerifyOrDie`: it turns a bridge that omits the
+                attribute into a boot failure. Fan Control does exactly that for
+                `RockSupport` and `WindSupport`, which the specification
+                requires to have at least one bit set whenever `RCK` or `WND` is
+                advertised.
 
 -   [ ] **1.2: Choose an Implementation Pattern:**
 

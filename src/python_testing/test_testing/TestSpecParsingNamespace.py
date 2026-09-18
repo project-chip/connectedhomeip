@@ -230,6 +230,8 @@ class TestSpecParsingNamespace(CertificationUnitTestNoDevice):
         one_four_two, one_four_two_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_4_2)
         one_five, one_five_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
         one_six, one_six_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_6)
+        one_six_one, one_six_one_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_6_1)
+        one_seven, one_seven_problems = build_xml_namespaces(PrebuiltDataModelDirectory.k1_7)
 
         asserts.assert_equal(len(one_three_problems), 0, "Problems found when parsing 1.3 spec")
         asserts.assert_equal(len(one_four_problems), 0, "Problems found when parsing 1.4 spec")
@@ -237,6 +239,8 @@ class TestSpecParsingNamespace(CertificationUnitTestNoDevice):
         asserts.assert_equal(len(one_four_two_problems), 0, "Problems found when parsing 1.4.2 spec")
         asserts.assert_equal(len(one_five_problems), 0, "Problems found when parsing 1.5 spec")
         asserts.assert_equal(len(one_six_problems), 0, "Problems found when parsing 1.6 spec")
+        asserts.assert_equal(len(one_six_one_problems), 0, "Problems found when parsing 1.6.1 spec")
+        asserts.assert_equal(len(one_seven_problems), 0, "Problems found when parsing 1.7 spec")
 
         # Check version relationships
         asserts.assert_greater(len(set(one_five.keys()) - set(one_three.keys())),
@@ -249,6 +253,10 @@ class TestSpecParsingNamespace(CertificationUnitTestNoDevice):
                                0, "1.5 dir contains less namespaces than 1.4.2")
         asserts.assert_greater(len(set(one_six.keys()) - set(one_five.keys())),
                                0, "1.6 dir contains less namespaces than 1.5")
+        asserts.assert_greater_equal(len(set(one_six_one.keys()) - set(one_six.keys())),
+                                     0, "1.6.1 dir contains less namespaces than 1.6")
+        asserts.assert_greater_equal(len(set(one_seven.keys()) - set(one_six_one.keys())),
+                                     0, "1.7 dir contains less namespaces than 1.6.1")
 
         # Complete namespace version checks for 1.3, 1.4, 1.4.1, 1.4.2, 1.5, known differences and relationships:
         # 1.3: has Common Position
