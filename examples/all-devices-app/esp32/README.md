@@ -11,6 +11,19 @@ This application supports **WiFi-based ESP32 SoCs only**
 
 > **Note:** Thread devices are not supported by this example.
 
+### Boards with a dedicated build target
+
+| Board                | Build target                       | Notes                               |
+| -------------------- | ---------------------------------- | ----------------------------------- |
+| ESP32-DevKitC        | `esp32-devkitc-all-devices`        | headless                            |
+| M5Stack Basic / Gray | `esp32-m5stack-all-devices`        | LCD UI with the three front buttons |
+| M5Stack CoreS3       | `esp32-m5stack-cores3-all-devices` | ESP32-S3, 16MB flash, 8MB PSRAM     |
+
+> **Note:** The CoreS3 has no physical buttons, and its touch panel is not wired
+> up yet, so its LCD only displays the commissioning codes. Use the serial shell
+> to change the active device type. The other M5Stack boards keep their
+> button-driven menus.
+
 ## Building the Example
 
 Please
@@ -18,6 +31,10 @@ Please
 and refer
 [building and commissioning](../../../docs/platforms/esp32/build_app_and_commission.md)
 guides to get started.
+
+```
+./scripts/build/build_examples.py --target esp32-m5stack-cores3-all-devices build
+```
 
 ## Usage
 

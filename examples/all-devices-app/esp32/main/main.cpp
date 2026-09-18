@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "AppDeviceFactory.h"
 #include "DeviceTypeSelection.h"
 #include <ESP32DimmableLight.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -54,9 +55,11 @@
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceDisplay.h"
-#include "Display.h"
-#include "ScreenManager.h"
 #endif // CONFIG_HAVE_DISPLAY
+
+#if CONFIG_DISPLAY_LVGL
+#include "DeviceScreenRegistry.h"
+#endif // CONFIG_DISPLAY_LVGL
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <DeviceShellCommands.h>
@@ -249,6 +252,12 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gDataModelProvider = &dataModelProvider;
 
+#if CONFIG_DISPLAY_LVGL
+    // Device screens record where each endpoint sits in the endpoint tree; give them the
+    // provider before the first device registers.
+    chip::app::DeviceScreenRegistry::Instance().SetEndpointSource(&dataModelProvider);
+#endif
+
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
     if (provider == nullptr)
     {
@@ -294,7 +303,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    auto & deviceFactory = NoHooksDeviceFactory::GetInstance();
+    auto & deviceFactory = AppDeviceFactory::GetInstance();
     gConstructedDevices.clear();
 
     DynamicEndpointIdAllocator endpointIdAllocator;
@@ -501,7 +510,7 @@ void InitServer(intptr_t context)
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
+    AppDeviceFactory::GetInstance().Init(AppDeviceFactory::Context{
         .groupDataProvider        = gGroupDataProvider,                     //
         .fabricTable              = Server::GetInstance().GetFabricTable(), //
         .timerDelegate            = gTimerDelegate,                         //
@@ -517,8 +526,8 @@ void InitServer(intptr_t context)
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
-    NoHooksDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
-        return NoHooksDeviceFactory::MakeDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
+    AppDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return AppDeviceFactory::MakeDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,
@@ -564,6 +573,10 @@ void InitServer(intptr_t context)
         return;
     }
 
+#if CONFIG_HAVE_DISPLAY
+    InitDisplayDataModelListener();
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CONFIG_ENABLE_CHIP_SHELL
     chip::Shell::SetWiFiDriver(&sWiFiDriver);
 #endif
@@ -596,10 +609,7 @@ CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType)
     }
 
 #if CONFIG_HAVE_DISPLAY
-    TFT_fillScreen(TFT_BLACK);
-    TFT_setFont(DEJAVU24_FONT, nullptr);
-    tft_fg = ScreenNormalColor;
-    TFT_print("Restarting...", 40, DisplayHeight / 2 - 20);
+    ShowRestartingMessage();
 #endif
 
     vTaskDelay(pdMS_TO_TICKS(300));
