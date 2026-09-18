@@ -21,14 +21,15 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo
+#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo_2_1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --app-pipe /tmp/acs_fifo
+#       --app-pipe /tmp/acs_fifo_2_1
+#       --bool-arg simulate_ambientsensing:True
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -41,7 +42,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import async_test_body, pics
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -64,35 +65,27 @@ SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 
 # Script Function Call Example
 # python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices-clang/all-devices-app --factory-reset
-# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo"
-# --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1"
+# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_2_1"
+# --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --app-pipe /tmp/acs_fifo_2_1 --bool-arg simulate_ambientsensing:True"
 
 
 class TC_ACS_2_1(MatterBaseTest):
 
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
     # Sends and out-of-band command to the all-clusters-app
     def write_to_app_pipe(self, command):
-        # CI app pipe id creation
-        # self.app_pipe = "/tmp/acs_fifo"
-        if self.is_ci:
-            # app_pid = self.matter_test_config.app_pid
-            # if app_pid == 0:
-            #     asserts.fail("The --app-pid flag must be set when using named pipe")
-            # self.app_pipe = self.app_pipe + str(app_pid)
-            self.app_pipe = "/tmp/acs_fifo"
+        self.app_pipe = self.matter_test_config.global_test_params.get('app_pipe', "/tmp/acs_fifo_2_1")
 
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
         # Delay for pipe command to be processed (otherwise tests are flaky)
         time.sleep(0.001)
 
-    # @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     @pics('ACS.S')
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     async def test_TC_ACS_2_1(self):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
@@ -120,9 +113,6 @@ class TC_ACS_2_1(MatterBaseTest):
         # Add AmbientContextSupported elements for CI purpose
         # Human activity walking, Object identification person, Audio identification barking are default
         if self.is_ci:
-            # self.write_to_app_pipe(
-            #    f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}},{{"TypeId":75,"TagId":3}}]}}')
-            # await asyncio.sleep(1)
             if self.SensorFusionDetected:
                 # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
                 self.write_to_app_pipe(
