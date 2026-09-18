@@ -328,7 +328,19 @@ void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
         return;
     }
 
-    // If the active preset handle changed, notify the attribute changed.
+    // The active preset handle changed (e.g. a suggestion was accepted). Keep OccupiedHeatingSetpoint/
+    // OccupiedCoolingSetpoint in sync with the newly-active preset, the same way SetActivePreset does when the
+    // ActivePresetHandle command changes it, then notify the attribute changed.
+    DataModel::Nullable<ByteSpan> newActivePresetHandle = afterReevaluationHandle.IsNull()
+        ? DataModel::NullNullable
+        : DataModel::MakeNullable(ByteSpan(afterReevaluationHandle.Value()));
+    Status status                                       = mPresets.ApplyActivePresetSetpoints(newActivePresetHandle);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "ReEvaluateCurrentSuggestion: failed to apply active preset setpoints with status 0x%02x",
+                     to_underlying(status));
+    }
+
     mCluster.NotifyAttributeChanged(ActivePresetHandle::Id);
 }
 
