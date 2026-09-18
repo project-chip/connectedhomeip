@@ -170,10 +170,9 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
         # FileNotAvailable covers a ResponseID the DUT issued whose file can no longer be
         # shared. Making that happen is manufacturer specific, so the operator drives it; a
         # DUT that cannot be placed in the state is not a failure of what this step verifies.
-        self.wait_for_user_input(
-            prompt_msg=f"Make the file shared as '{response.fileDescription.name}' unavailable on the DUT "
-                       f"(delete it, or revoke the share) per the manufacturer's documentation, then press "
-                       f"Enter.\n")
+        self.wait_for_user_input(prompt_msg=(
+            f"Make the file shared as '{response.fileDescription.name}' unavailable on the DUT "
+            f"(delete it, or revoke the share) per the manufacturer's documentation, then press Enter.\n"))
         response = await self.send_get_shared_file(endpoint, shared_response_id)
         if response.status == cluster.Enums.FileStatusEnum.kSuccess:
             log.info("The DUT still resolves ResponseID %d, so its shared file could not be made "
