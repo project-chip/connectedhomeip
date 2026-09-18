@@ -189,6 +189,18 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # wire the code-driven version into ember apps), so the ember code needs the
     # direct fix tracked in the issue above.
     (Clusters.LevelControl.id, Clusters.LevelControl.Commands.MoveToLevel.command_id),
+    # Move starts a continuous transition rather than applying one bounded change. The
+    # code-driven LevelControlCluster derives direction as
+    # `increasing = (moveMode == MoveModeEnum::kUp)`, so a DUT that fails to enforce the
+    # constraint reads an undefined MoveMode as kDown and keeps driving CurrentLevel
+    # toward the minimum after the invoke has been answered, leaving later tests looking
+    # at a device that is still moving. Step is deliberately left in: it applies a single
+    # bounded decrement, and it is worth keeping constraint coverage on this cluster.
+    # OnOff is not at risk from either: both SetOnOff call sites on these paths are
+    # guarded by IsWithOnOffCommand, and MoveWithOnOff/StepWithOnOff carry no fields of
+    # their own in the data model (the spec defines them by reference to Move/Step), so
+    # they are never discovered as constrained command fields in the first place.
+    (Clusters.LevelControl.id, Clusters.LevelControl.Commands.Move.command_id),
     # TODO: Remove once https://github.com/project-chip/connectedhomeip/issues/73090
     # is fixed. The ember implementation (codegen/on-off-server.cpp) does not
     # validate OnTime/OffWaitTime <= 0xFFFE; the code-driven OnOffLightingCluster
