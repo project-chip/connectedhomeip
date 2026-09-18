@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --camera-test-videosrc --camera-test-audiosrc
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
@@ -386,7 +386,6 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
             )
 
         finally:
-            await webrtc_manager.close_all()
             if active_session_id is not None:
                 try:
                     await self.send_single_cmd(
@@ -415,6 +414,7 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                     )
                 except Exception as e:
                     log.warning("Failed to deallocate video stream %s during cleanup: %s", video_stream_id, e)
+            await webrtc_manager.close_all()
 
 
 if __name__ == "__main__":
