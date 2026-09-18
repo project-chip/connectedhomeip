@@ -603,6 +603,7 @@ class WebRTCTransportProviderCluster(
         }
         tlvReader.exitContainer()
       }
+
     return CurrentSessionsAttribute(decodedValue)
   }
 
@@ -701,6 +702,7 @@ class WebRTCTransportProviderCluster(
         }
         tlvReader.exitContainer()
       }
+
     return SupportedSFrameCipherSuitesAttribute(decodedValue)
   }
 
@@ -797,6 +799,7 @@ class WebRTCTransportProviderCluster(
         }
         tlvReader.exitContainer()
       }
+
     return GeneratedCommandListAttribute(decodedValue)
   }
 
@@ -990,6 +993,7 @@ class WebRTCTransportProviderCluster(
         }
         tlvReader.exitContainer()
       }
+
     return AttributeListAttribute(decodedValue)
   }
 
