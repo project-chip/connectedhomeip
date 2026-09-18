@@ -304,6 +304,39 @@
     <string name="mode_select_change_to_mode_text">Change</string>
     <string name="mode_select_write_text">Write</string>
 
+    <string name="camera_btn_text">Camera</string>
+
+    <string name="camera_radio_liveview_local">Liveview (Local)</string>
+    <string name="camera_radio_liveview_remote">Liveview (Remote)</string>
+    <string name="camera_radio_snapshot">Snapshot</string>
+
+    <string name="camera_liveview_local_video_stream_id">Video Stream ID : </string>
+    <string name="camera_liveview_local_webRTC_session_id">webRTC Session ID : </string>
+    <string name="camera_liveview_local_width_hint">Video Stream Width (Default : 1920)</string>
+    <string name="camera_liveview_local_width">1920</string>
+    <string name="camera_liveview_local_height_hint">Video Stream Height (Default : 1080)</string>
+    <string name="camera_liveview_local_height">1080</string>
+    <string name="camera_liveview_local_btn_allocate_video_stream">Allocate Video Stream</string>
+    <string name="camera_liveview_local_btn_start_liveview">Start LiveView</string>
+    <string name="camera_liveview_local_btn_stop_liveview">Stop LiveView</string>
+    <string name="camera_liveview_local_btn_deallocate_video_stream">Deallocate Video Stream</string>
+
+    <string name="camera_liveview_remote_title_session_state">[Session &amp; Connection State]</string>
+    <string name="camera_liveview_remote_title_ice_gathering">[ICE Gathering State]</string>
+    <string name="camera_liveview_remote_title_complete_offer_sdp">[Complete Offer SDP (with ICE)]</string>
+    <string name="camera_liveview_remote_text_waiting">Waiting...</string>
+    <string name="camera_liveview_remote_text_waiting_ice">Waiting for ICE gathering...</string>
+    <string name="camera_liveview_remote_text_no_sdp_info">No SDP Info</string>
+    <string name="camera_liveview_remote_btn_create_offer">1. Create Offer SDP</string>
+    <string name="camera_liveview_remote_hint_paste_answer_sdp">Paste Answer SDP (with ICE)</string>
+    <string name="camera_liveview_remote_btn_set_answer">2. Set Answer SDP &amp; Connect</string>
+
+    <string name="camera_snapshot_stream_id">Snapshot Stream ID : </string>
+    <string name="camera_snapshot_btn_allocate_stream">Allocate Stream</string>
+    <string name="camera_snapshot_btn_capture_snapshot">Capture Snapshot</string>
+    <string name="camera_snapshot_btn_deallocate_stream">Deallocate Stream</string>
+    <string name="camera_cannot_write_storage">Cannot write to external storage.</string>
+
     <string name="icd_btn_text">Intermittently Connected Device</string>
     <string name="icd_registration_completed">ICD device registration completed, How to trigger to switch to Active Mode : %1$s</string>
 </resources>
