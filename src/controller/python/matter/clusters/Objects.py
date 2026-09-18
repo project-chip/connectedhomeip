@@ -461,6 +461,20 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
+        class ServerAttributionContextInformation(MatterIntEnum):
+            kServerAutomationRule = 0x0B
+            kServerSchedule = 0x0C
+            kServerTimer = 0x0D
+            kSecurityEvent = 0x0E
+            kDemandResponseEvent = 0x0F
+            kPhysicalInteraction = 0x10
+            kExternalProtocol = 0x11
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
         class SoftwareVersionCertificationStatusEnum(MatterIntEnum):
             kDevTest = 0x00
             kProvisional = 0x01
@@ -482,6 +496,18 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
+
+        class SuppliedAttributionContextInformation(MatterIntEnum):
+            kDefaultClientAction = 0x00
+            kUserInteraction = 0x01
+            kClientAutomationRule = 0x02
+            kClientSchedule = 0x03
+            kClientTimer = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
 
         class TariffPriceTypeEnum(MatterIntEnum):
             kStandard = 0x00
@@ -551,6 +577,71 @@ class Globals:
             kSecondBit = 0x2
 
     class Structs:
+        @dataclass
+        class SFrameKeyStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="kid", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="baseKey", Tag=1, Type=bytes),
+                    ])
+
+            kid: 'bytes' = b""
+            baseKey: 'bytes' = b""
+
+        @dataclass
+        class SFrameStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioCipherSuite", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="videoCipherSuite", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="senderKey", Tag=2, Type=Globals.Structs.SFrameKeyStruct),
+                        ClusterObjectFieldDescriptor(Label="receiveKeys", Tag=3, Type=typing.List[Globals.Structs.SFrameKeyStruct]),
+                        ClusterObjectFieldDescriptor(Label="ratchetBits", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ratchetTime", Tag=5, Type=typing.Optional[uint]),
+                    ])
+
+            audioCipherSuite: 'uint' = 0
+            videoCipherSuite: 'uint' = 0
+            senderKey: 'Globals.Structs.SFrameKeyStruct' = field(default_factory=lambda: Globals.Structs.SFrameKeyStruct())
+            receiveKeys: 'typing.List[Globals.Structs.SFrameKeyStruct]' = field(default_factory=lambda: [])
+            ratchetBits: 'uint' = 0
+            ratchetTime: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class WebRTCSessionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="id", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=Globals.Enums.StreamUsageEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=7, Type=typing.Optional[typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=8, Type=typing.Optional[typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=9, Type=typing.Union[None, Nullable, Globals.Structs.SFrameStruct]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            id: 'uint' = 0
+            peerNodeID: 'uint' = 0
+            peerEndpointID: 'uint' = 0
+            streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
+            videoStreamID: 'typing.Union[None, Nullable, uint]' = None
+            audioStreamID: 'typing.Union[None, Nullable, uint]' = None
+            metadataEnabled: 'bool' = False
+            videoStreams: 'typing.Optional[typing.List[uint]]' = None
+            audioStreams: 'typing.Optional[typing.List[uint]]' = None
+            SFrameConfig: 'typing.Union[None, Nullable, Globals.Structs.SFrameStruct]' = None
+            fabricIndex: 'uint' = 0
+
         @dataclass
         class CurrencyStruct(ClusterObject):
             @ChipUtility.classproperty
@@ -635,6 +726,29 @@ class Globals:
             statusCode: 'uint' = 0
 
         @dataclass
+        class AttributionData(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contextInformation", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sourceContext", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="nodeID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="systemTimeStamp", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="epochTimeStamp", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=6, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            contextInformation: 'uint' = 0
+            sourceContext: 'typing.Optional[uint]' = None
+            nodeID: 'typing.Optional[uint]' = None
+            groupID: 'typing.Optional[uint]' = None
+            systemTimeStamp: 'typing.Optional[uint]' = None
+            epochTimeStamp: 'typing.Optional[uint]' = None
+            fabricIndex: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
         class ICECandidateStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -714,6 +828,21 @@ class Globals:
             label: 'typing.Union[None, Nullable, str]' = None
 
         @dataclass
+        class SuppliedAttributionData(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contextInformation", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sourceContext", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            contextInformation: 'uint' = 0
+            sourceContext: 'typing.Optional[uint]' = None
+            fabricIndex: 'uint' = 0
+
+        @dataclass
         class TestGlobalStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -744,35 +873,6 @@ class Globals:
             y1: 'uint' = 0
             x2: 'uint' = 0
             y2: 'uint' = 0
-
-        @dataclass
-        class WebRTCSessionStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="id", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=Globals.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=7, Type=typing.Optional[typing.List[uint]]),
-                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=8, Type=typing.Optional[typing.List[uint]]),
-                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
-                    ])
-
-            id: 'uint' = 0
-            peerNodeID: 'uint' = 0
-            peerEndpointID: 'uint' = 0
-            streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
-            videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            metadataEnabled: 'bool' = False
-            videoStreams: 'typing.Optional[typing.List[uint]]' = None
-            audioStreams: 'typing.Optional[typing.List[uint]]' = None
-            fabricIndex: 'uint' = 0
 
 
 
@@ -56436,6 +56536,7 @@ class WebRTCTransportProvider(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="currentSessions", Tag=0x00000000, Type=typing.List[Globals.Structs.WebRTCSessionStruct]),
+                ClusterObjectFieldDescriptor(Label="supportedSFrameCipherSuites", Tag=0x00000001, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -56444,6 +56545,7 @@ class WebRTCTransportProvider(Cluster):
             ])
 
     currentSessions: typing.List[Globals.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
+    supportedSFrameCipherSuites: typing.List[uint] = field(default_factory=lambda: [])
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -56453,22 +56555,6 @@ class WebRTCTransportProvider(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kMetadata = 0x1
-
-    class Structs:
-        @dataclass
-        class SFrameStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="cipherSuite", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="baseKey", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="kid", Tag=2, Type=bytes),
-                    ])
-
-            cipherSuite: 'uint' = 0
-            baseKey: 'bytes' = b""
-            kid: 'bytes' = b""
 
     class Commands:
         @dataclass
@@ -56489,7 +56575,7 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="ICEServers", Tag=4, Type=typing.Optional[typing.List[Globals.Structs.ICEServerStruct]]),
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=5, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=7, Type=typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct]),
+                        ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=7, Type=typing.Optional[Globals.Structs.SFrameStruct]),
                         ClusterObjectFieldDescriptor(Label="videoStreams", Tag=8, Type=typing.Optional[typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="audioStreams", Tag=9, Type=typing.Optional[typing.List[uint]]),
                     ])
@@ -56501,7 +56587,7 @@ class WebRTCTransportProvider(Cluster):
             ICEServers: typing.Optional[typing.List[Globals.Structs.ICEServerStruct]] = None
             ICETransportPolicy: typing.Optional[str] = None
             metadataEnabled: typing.Optional[bool] = None
-            SFrameConfig: typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct] = None
+            SFrameConfig: typing.Optional[Globals.Structs.SFrameStruct] = None
             videoStreams: typing.Optional[typing.List[uint]] = None
             audioStreams: typing.Optional[typing.List[uint]] = None
 
@@ -56540,28 +56626,28 @@ class WebRTCTransportProvider(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=2, Type=Globals.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="originatingEndpointID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=2, Type=typing.Optional[Globals.Enums.StreamUsageEnum]),
+                        ClusterObjectFieldDescriptor(Label="originatingEndpointID", Tag=3, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="ICEServers", Tag=6, Type=typing.Optional[typing.List[Globals.Structs.ICEServerStruct]]),
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=7, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=8, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=9, Type=typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct]),
+                        ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=9, Type=typing.Optional[Globals.Structs.SFrameStruct]),
                         ClusterObjectFieldDescriptor(Label="videoStreams", Tag=10, Type=typing.Optional[typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="audioStreams", Tag=11, Type=typing.Optional[typing.List[uint]]),
                     ])
 
             webRTCSessionID: typing.Union[Nullable, uint] = NullValue
             sdp: str = ""
-            streamUsage: Globals.Enums.StreamUsageEnum = 0
-            originatingEndpointID: uint = 0
+            streamUsage: typing.Optional[Globals.Enums.StreamUsageEnum] = None
+            originatingEndpointID: typing.Optional[uint] = None
             videoStreamID: typing.Union[None, Nullable, uint] = None
             audioStreamID: typing.Union[None, Nullable, uint] = None
             ICEServers: typing.Optional[typing.List[Globals.Structs.ICEServerStruct]] = None
             ICETransportPolicy: typing.Optional[str] = None
             metadataEnabled: typing.Optional[bool] = None
-            SFrameConfig: typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct] = None
+            SFrameConfig: typing.Optional[Globals.Structs.SFrameStruct] = None
             videoStreams: typing.Optional[typing.List[uint]] = None
             audioStreams: typing.Optional[typing.List[uint]] = None
 
@@ -56639,6 +56725,28 @@ class WebRTCTransportProvider(Cluster):
             webRTCSessionID: uint = 0
             reason: Globals.Enums.WebRTCEndReasonEnum = 0
 
+        @dataclass
+        class UpdateSession(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000553
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="SFrameSenderKey", Tag=1, Type=typing.Optional[Globals.Structs.SFrameKeyStruct]),
+                        ClusterObjectFieldDescriptor(Label="SFrameReceiveKeysToAdd", Tag=2, Type=typing.Optional[typing.List[Globals.Structs.SFrameKeyStruct]]),
+                        ClusterObjectFieldDescriptor(Label="SFrameReceiveKIDsToRemove", Tag=3, Type=typing.Optional[typing.List[bytes]]),
+                    ])
+
+            webRTCSessionID: uint = 0
+            SFrameSenderKey: typing.Optional[Globals.Structs.SFrameKeyStruct] = None
+            SFrameReceiveKeysToAdd: typing.Optional[typing.List[Globals.Structs.SFrameKeyStruct]] = None
+            SFrameReceiveKIDsToRemove: typing.Optional[typing.List[bytes]] = None
+
     class Attributes:
         @dataclass
         class CurrentSessions(ClusterAttributeDescriptor):
@@ -56655,6 +56763,22 @@ class WebRTCTransportProvider(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[Globals.Structs.WebRTCSessionStruct])
 
             value: typing.List[Globals.Structs.WebRTCSessionStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class SupportedSFrameCipherSuites(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000553
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
