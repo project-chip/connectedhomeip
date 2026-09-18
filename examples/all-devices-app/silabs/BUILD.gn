@@ -136,6 +136,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/room-air-conditioner",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor",
