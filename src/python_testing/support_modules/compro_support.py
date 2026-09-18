@@ -249,12 +249,10 @@ the controller between iterations, so the ED always begins uncommissioned — no
 to clean by hand.)
 
 * **TH commissioner storage** — the file passed as ``--storage-path`` (e.g.
-  ``/tmp/compro_admin_storage.json``).  It holds the TH's fabric and a record of the
-  proxy (the DUT) it commissioned, so a later run can reconnect to the proxy without
-  commissioning it again.  ``commission_if_needed()`` (in this module) reads this
-  file and, if the proxy node is already present, drops the
-  ``--commissioning-method`` / ``--discriminator`` / ``--passcode`` arguments and
-  connects to the stored node instead of re-commissioning.
+  ``/tmp/compro_admin_storage.json``).  It holds the TH's fabric.  When it is kept,
+  the test framework probes the proxy (the DUT) before commissioning and skips the
+  commissioning step if the proxy still answers over CASE on that fabric; pass
+  ``--force-commissioning`` to commission anyway.
 * **Proxy (CP) KVS** — the proxy app's own persistent store (``/tmp/chip_*`` for the
   app's default ``--KVS``).  It holds the proxy's membership in the TH's fabric; keep
   it and the proxy stays paired to the TH.
@@ -262,9 +260,9 @@ to clean by hand.)
 Two ways to start the next run:
 
 * **Quick restart (reuse the commissioned proxy).**  Leave the TH storage file and
-  the proxy KVS in place.  ``commission_if_needed()`` skips the initial commissioning
-  and connects to the already-commissioned proxy — fastest while iterating on the
-  cluster steps with an unchanged proxy binary.
+  the proxy KVS in place.  The framework detects the commissioned proxy and skips the
+  initial commissioning — fastest while iterating on the cluster steps with an
+  unchanged proxy binary.
 * **Full clean (re-commission the proxy).**  Remove the TH storage file (on the TH)
   *and* the proxy KVS (``/tmp/chip_*`` on the proxy).  Use this when the proxy binary
   changed, when you want a pristine fabric, or when storage got into a bad state; the
@@ -307,8 +305,6 @@ For physical hardware that communicates only via WiFiPAF (not Ethernet), omit
 """
 
 import asyncio
-import contextlib
-import json
 import logging
 import os
 import sys
@@ -327,86 +323,6 @@ logger = logging.getLogger(__name__)
 # The all-devices-app exposes the Commissioning Proxy cluster on endpoint 5
 # (launched as "--device commissioning-proxy:5").  Overridable via --endpoint.
 COMPRO_ENDPOINT = 5
-
-# Default node ID assigned by the Matter test framework (TestingDefaults.DUT_NODE_ID).
-_DEFAULT_DUT_NODE_ID = 0x12344321
-
-
-def commission_if_needed() -> None:
-    """Adjust sys.argv so commissioning is skipped if the DUT is already in storage.
-
-    Call this from each test's ``if __name__ == "__main__":`` block **before**
-    ``default_matter_test_main()``.  It inspects the storage file nominated by
-    ``--storage-path`` and, if the DUT node is already present, strips the
-    commissioning arguments (``--commissioning-method``, ``--discriminator``,
-    ``--passcode``) and injects ``--nodeId`` so the framework connects to the
-    existing session instead of re-commissioning.
-
-    If the storage file does not exist, or the node is not yet present, the
-    original argv is left untouched and a fresh commission is performed.
-    """
-    args = sys.argv[1:]
-
-    # Extract --storage-path and --nodeId values from argv.
-    storage_path = None
-    node_id = _DEFAULT_DUT_NODE_ID
-    i = 0
-    while i < len(args):
-        if args[i] == "--storage-path" and i + 1 < len(args):
-            storage_path = args[i + 1]
-        elif args[i] == "--nodeId" and i + 1 < len(args):
-            with contextlib.suppress(ValueError):
-                node_id = int(args[i + 1], 0)
-        i += 1
-
-    if not storage_path or not os.path.exists(storage_path):
-        return  # No storage yet — commission normally.
-
-    try:
-        with open(storage_path) as f:
-            data = json.load(f)
-    except (json.JSONDecodeError, OSError):
-        return  # Unreadable — commission normally.
-
-    # The SDK stores commissioned nodes under keys like "f/<fabric>/s/<nodeId-hex>".
-    sdk_config = data.get("sdk-config", {})
-    node_hex = f"{node_id:016X}".lower()
-    already_commissioned = any(
-        k.split("/")[-1] == node_hex
-        for k in sdk_config
-        if k.startswith("f/") and "/s/" in k
-    )
-
-    if not already_commissioned:
-        return  # Node not in storage — commission normally.
-
-    print(f"[commission_if_needed] DUT node 0x{node_id:016X} already commissioned — skipping commissioning step.")
-
-    # Strip commissioning-only args and ensure --nodeId is present.
-    _COMMISSION_FLAGS = {"--commissioning-method", "--discriminator", "--passcode"}
-    filtered = []
-    skip_next = False
-    has_node_id = False
-    i = 0
-    while i < len(args):
-        if skip_next:
-            skip_next = False
-            i += 1
-            continue
-        if args[i] in _COMMISSION_FLAGS:
-            skip_next = True  # skip this flag and its value
-            i += 1
-            continue
-        if args[i] == "--nodeId":
-            has_node_id = True
-        filtered.append(args[i])
-        i += 1
-
-    if not has_node_id:
-        filtered += ["--nodeId", hex(node_id)]
-
-    sys.argv[1:] = filtered
-
 
 # Path to the serial-console CLI used to drive the ED in standalone-serial mode
 # (eth0 physically disconnected, ED reachable only over its UART login console).
@@ -957,8 +873,7 @@ class COMPROBaseTest(MatterBaseTest):
     # Run it with --in-test-commissioning-method (NOT --commissioning-method);
     # the latter makes the harness auto-commission the DUT before the test body
     # runs, which defeats the PASE-first premise.  The DUT MUST start
-    # factory-reset / uncommissioned on every run, so 2.6 does not call
-    # commission_if_needed().
+    # factory-reset / uncommissioned on every run.
     # ------------------------------------------------------------------
 
     async def establish_pase_to_dut(self, node_id: int | None = None) -> int:
