@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -27,8 +27,15 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kManage, std::nullopt);
 } // namespace CurrentSessions
-constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+namespace SupportedSFrameCipherSuites {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedSFrameCipherSuites::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SupportedSFrameCipherSuites
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     CurrentSessions::kMetadataEntry,
+    SupportedSFrameCipherSuites::kMetadataEntry,
 
 };
 
@@ -62,6 +69,11 @@ inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(EndSession::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kOperate);
 } // namespace EndSession
+namespace UpdateSession {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(UpdateSession::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kOperate);
+} // namespace UpdateSession
 
 } // namespace Commands
 
