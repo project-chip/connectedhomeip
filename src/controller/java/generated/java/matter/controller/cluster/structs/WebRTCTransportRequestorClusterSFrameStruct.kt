@@ -30,7 +30,7 @@ class WebRTCTransportRequestorClusterSFrameStruct(
   val senderKey: WebRTCTransportRequestorClusterSFrameKeyStruct,
   val receiveKeys: List<WebRTCTransportRequestorClusterSFrameKeyStruct>,
   val ratchetBits: UByte,
-  val ratchetTime: Optional<UByte>
+  val ratchetTime: Optional<UByte>,
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterSFrameStruct {\n")
@@ -78,7 +78,7 @@ class WebRTCTransportRequestorClusterSFrameStruct(
       val senderKey =
         WebRTCTransportRequestorClusterSFrameKeyStruct.fromTlv(
           ContextSpecificTag(TAG_SENDER_KEY),
-          tlvReader
+          tlvReader,
         )
       val receiveKeys =
         buildList<WebRTCTransportRequestorClusterSFrameKeyStruct> {
@@ -104,7 +104,7 @@ class WebRTCTransportRequestorClusterSFrameStruct(
         senderKey,
         receiveKeys,
         ratchetBits,
-        ratchetTime
+        ratchetTime,
       )
     }
   }
