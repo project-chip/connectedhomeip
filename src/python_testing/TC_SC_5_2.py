@@ -73,7 +73,7 @@ from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcas
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
-from matter.testing.decorators import _has_feature, async_test_body
+from matter.testing.decorators import async_test_body, has_feature
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -178,12 +178,10 @@ class TC_SC_5_2(MatterBaseTest):
             logger.info("CI detected, no PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided, defaulting to 1 second")
         else:
             is_thread_device = any(
-                _has_feature(
-                    self.stored_global_wildcard,
-                    ep,
+                has_feature(
                     Clusters.NetworkCommissioning,
                     Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface,
-                )
+                )(self.stored_global_wildcard, ep)
                 for ep in self.stored_global_wildcard.attributes
             )
             if is_thread_device:
