@@ -1046,17 +1046,29 @@ class IDMBaseTest(BasicCompositionTests):
             )
             result_status = write_result[0].Status
 
+            # Status is an IntEnum, which formats as a bare number under Python 3.11; log
+            # the name alongside it so the result reads as SUCCESS rather than as "got 0".
+            status_name = getattr(result_status, 'name', result_status)
+
             # Read back to distinguish a DUT that stored the out-of-bounds value (and is
             # now holding an illegal one) from one that ignored or clamped the write.
             # Restore the original value whenever it changed so later probes see the device
             # as we found it; an accepted violation no longer ends the test, so an illegal
             # value left in place would corrupt every subsequent check.
-            stored_value = await self.read_single_attribute_check_success(
+            #
+            # read_single_attribute rather than read_single_attribute_check_success: a
+            # read-back that no longer decodes is evidence about the DUT, not a reason to
+            # abandon the probe, so it has to come back as a value this loop can classify
+            # instead of as an assertion. Reads that did decode still go through the
+            # wildcard-subscription cross-check inside the helper.
+            stored_value = await self.read_single_attribute(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
                 endpoint=attr_info.endpoint_id,
-                cluster=attr_info.cluster_class,
                 attribute=attr_info.attribute
             )
-            if stored_value != original_value:
+            read_back_failed = isinstance(stored_value, ValueDecodeFailure)
+            if read_back_failed or stored_value != original_value:
                 restore_result = await self.default_controller.WriteAttribute(
                     nodeId=self.dut_node_id,
                     attributes=[(attr_info.endpoint_id, attr_info.attribute(original_value))],
@@ -1065,6 +1077,23 @@ class IDMBaseTest(BasicCompositionTests):
                 if restore_result[0].Status != Status.Success:
                     log.warning("Failed to restore %s to %s: %s", attribute_path, original_value,
                                 restore_result[0].Status)
+
+            if read_back_failed:
+                # The baseline read above proved this attribute readable, so a read-back
+                # that no longer decodes is a state change this write caused: the DUT
+                # stored a value its own encoder refuses to send. The constraint was not
+                # enforced whatever status the write carried, so this is classified with
+                # the other accepted violations. Reachable on any enum-typed attribute
+                # whose cluster decodes an unknown value without an EnsureKnownEnumValue
+                # guard.
+                self.record_warning(
+                    test_name=self.current_test_info.name,
+                    location=location,
+                    problem=(f"{attribute_path} answered {status_name} for out-of-bounds value "
+                             f"{test_value} and then could not be read back ({stored_value.Reason}), "
+                             f"so it stored a value it cannot encode"))
+                result.accepted += 1
+                continue
 
             if result_status == Status.ConstraintError:
                 if stored_value != test_value:
@@ -1083,10 +1112,6 @@ class IDMBaseTest(BasicCompositionTests):
                              f"despite returning CONSTRAINT_ERROR"))
                 result.accepted += 1
                 continue
-
-            # Status is an IntEnum, which formats as a bare number under Python 3.11; log
-            # the name alongside it so the result reads as SUCCESS rather than as "got 0".
-            status_name = getattr(result_status, 'name', result_status)
 
             if result_status != Status.Success:
                 # Rejected, but not with CONSTRAINT_ERROR. The write never took effect, so
