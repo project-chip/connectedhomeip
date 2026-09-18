@@ -26,12 +26,14 @@ class OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
   val PAASupportedProfiles: UShort,
   val PAISupportedProfiles: UShort,
   val DACSupportedProfiles: UShort,
+  val CDSupportedProfiles: UShort,
 ) {
   override fun toString(): String = buildString {
     append("OperationalCredentialsClusterPQCDeviceAttestationProfileStruct {\n")
     append("\tPAASupportedProfiles : $PAASupportedProfiles\n")
     append("\tPAISupportedProfiles : $PAISupportedProfiles\n")
     append("\tDACSupportedProfiles : $DACSupportedProfiles\n")
+    append("\tCDSupportedProfiles : $CDSupportedProfiles\n")
     append("}\n")
   }
 
@@ -41,6 +43,7 @@ class OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
       put(ContextSpecificTag(TAG_PAA_SUPPORTED_PROFILES), PAASupportedProfiles)
       put(ContextSpecificTag(TAG_PAI_SUPPORTED_PROFILES), PAISupportedProfiles)
       put(ContextSpecificTag(TAG_DAC_SUPPORTED_PROFILES), DACSupportedProfiles)
+      put(ContextSpecificTag(TAG_CD_SUPPORTED_PROFILES), CDSupportedProfiles)
       endStructure()
     }
   }
@@ -49,6 +52,7 @@ class OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
     private const val TAG_PAA_SUPPORTED_PROFILES = 0
     private const val TAG_PAI_SUPPORTED_PROFILES = 1
     private const val TAG_DAC_SUPPORTED_PROFILES = 2
+    private const val TAG_CD_SUPPORTED_PROFILES = 3
 
     fun fromTlv(
       tlvTag: Tag,
@@ -58,6 +62,7 @@ class OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
       val PAASupportedProfiles = tlvReader.getUShort(ContextSpecificTag(TAG_PAA_SUPPORTED_PROFILES))
       val PAISupportedProfiles = tlvReader.getUShort(ContextSpecificTag(TAG_PAI_SUPPORTED_PROFILES))
       val DACSupportedProfiles = tlvReader.getUShort(ContextSpecificTag(TAG_DAC_SUPPORTED_PROFILES))
+      val CDSupportedProfiles = tlvReader.getUShort(ContextSpecificTag(TAG_CD_SUPPORTED_PROFILES))
 
       tlvReader.exitContainer()
 
@@ -65,6 +70,7 @@ class OperationalCredentialsClusterPQCDeviceAttestationProfileStruct(
         PAASupportedProfiles,
         PAISupportedProfiles,
         DACSupportedProfiles,
+        CDSupportedProfiles,
       )
     }
   }

@@ -303,7 +303,7 @@ private:
         {
             RegisterCreator("air-purifier", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingAirPurifier>(FanLoad::Context{
+                return MakeDevice<LoggingAirPurifier>(LoggingAirPurifier::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -429,13 +429,13 @@ private:
             RegisterCreator("dimmable-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<DimmablePlugInUnit>(
-                    LoggingDimmableLight::Context{
+                    DimmablePlugInUnit::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    DimmablePlugInUnit::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
@@ -464,20 +464,20 @@ private:
             RegisterCreator("mounted-dimmable-load-control", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<MountedDimmableLoadControl>(
-                    LoggingDimmableLight::Context{
+                    MountedDimmableLoadControl::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    MountedDimmableLoadControl::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
         {
             RegisterCreator("mounted-on-off-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<MountedOnOffControl>(LoggingOnOffLight::Context{
+                return MakeDevice<MountedOnOffControl>(MountedOnOffControl::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -517,7 +517,7 @@ private:
         {
             RegisterCreator("on-off-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<OnOffPlugInUnit>(LoggingOnOffLight::Context{
+                return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -536,7 +536,31 @@ private:
         {
             RegisterCreator("oven", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingOven>(mContext->timerDelegate);
+                // Tagged with PositionTag::kTop to disambiguate from oven-2 under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kOvenTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingOven>(mContext->timerDelegate,
+                                               LoggingOven::Config{
+                                                   .cavityCount = 1,
+                                                   .tagList     = Span(&kOvenTag, 1),
+                                               });
+            });
+            RegisterCreator("oven-2", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from oven (see comment above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kOven2Tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingOven>(mContext->timerDelegate,
+                                               LoggingOven::Config{
+                                                   .cavityCount = 2,
+                                                   .tagList     = Span(&kOven2Tag, 1),
+                                               });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_REFRIGERATOR)
@@ -588,7 +612,7 @@ private:
         {
             RegisterCreator("extractor-hood", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<ExtractorHood>(FanLoad::Context{
+                return MakeDevice<ExtractorHood>(ExtractorHood::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,

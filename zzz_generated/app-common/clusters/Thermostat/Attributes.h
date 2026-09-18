@@ -828,6 +828,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ThermostatSuggestionNotFollowingReason
+namespace CriticalFreezeProtection {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CriticalFreezeProtection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CriticalFreezeProtection
+namespace CriticalOverheatProtection {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CriticalOverheatProtection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CriticalOverheatProtection
 namespace Sensors {
 struct TypeInfo
 {
@@ -842,7 +866,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Sensors
-namespace AvailableSensors {
+namespace AvailableSensorHandles {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
@@ -850,11 +874,11 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AvailableSensors::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AvailableSensorHandles::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AvailableSensors
-namespace EnabledSensors {
+} // namespace AvailableSensorHandles
+namespace EnabledSensorHandles {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
@@ -862,10 +886,10 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::EnabledSensors::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnabledSensorHandles::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace EnabledSensors
+} // namespace EnabledSensorHandles
 namespace NumberOfSensorScheduleTransitions {
 struct TypeInfo
 {
@@ -1011,9 +1035,11 @@ struct TypeInfo
         Attributes::ThermostatSuggestions::TypeInfo::DecodableType thermostatSuggestions;
         Attributes::CurrentThermostatSuggestion::TypeInfo::DecodableType currentThermostatSuggestion;
         Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo::DecodableType thermostatSuggestionNotFollowingReason;
+        Attributes::CriticalFreezeProtection::TypeInfo::DecodableType criticalFreezeProtection     = static_cast<bool>(0);
+        Attributes::CriticalOverheatProtection::TypeInfo::DecodableType criticalOverheatProtection = static_cast<bool>(0);
         Attributes::Sensors::TypeInfo::DecodableType sensors;
-        Attributes::AvailableSensors::TypeInfo::DecodableType availableSensors;
-        Attributes::EnabledSensors::TypeInfo::DecodableType enabledSensors;
+        Attributes::AvailableSensorHandles::TypeInfo::DecodableType availableSensorHandles;
+        Attributes::EnabledSensorHandles::TypeInfo::DecodableType enabledSensorHandles;
         Attributes::NumberOfSensorScheduleTransitions::TypeInfo::DecodableType numberOfSensorScheduleTransitions =
             static_cast<uint8_t>(0);
         Attributes::SensorSchedule::TypeInfo::DecodableType sensorSchedule;

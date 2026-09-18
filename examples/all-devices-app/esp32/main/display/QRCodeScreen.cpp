@@ -1,0 +1,81 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "QRCodeScreen.h"
+#include "Display.h"
+#include "ScreenManager.h"
+#include "esp_log.h"
+#include "qrcodegen.h"
+
+#include <utility>
+#include <vector>
+
+static constexpr char TAG[] = "QRCodeScreen";
+
+namespace {
+
+constexpr int kVersion    = 4;
+constexpr int kModuleSize = 4;
+constexpr int kBorderSize = 1;
+
+color_t qrCodeColor = TFT_LIGHTGREY;
+
+} // namespace
+
+QRCodeScreen::QRCodeScreen(std::string text, std::string title) : title(std::move(title))
+{
+    constexpr int qrCodeSize = qrcodegen_BUFFER_LEN_FOR_VERSION(kVersion);
+
+    std::vector<uint8_t> temp(qrCodeSize);
+    qrCode.resize(qrCodeSize);
+
+    if (!qrcodegen_encodeText(text.c_str(), temp.data(), qrCode.data(), qrcodegen_Ecc_LOW, kVersion, kVersion, qrcodegen_Mask_AUTO,
+                              true))
+    {
+        ESP_LOGE(TAG, "qrcodegen_encodeText() failed");
+        qrCode.clear();
+    }
+}
+
+void QRCodeScreen::Display()
+{
+    if (qrCode.empty())
+    {
+        return;
+    }
+
+    const uint8_t * data  = qrCode.data();
+    const int size        = qrcodegen_getSize(data);
+    const int displaySize = (2 * kBorderSize + size) * kModuleSize;
+    const int displayX    = (DisplayWidth - displaySize) / 2;
+    const int displayY    = ScreenTitleSafeTop + ((DisplayHeight - ScreenTitleSafeTop - ScreenTitleSafeBottom) - displaySize) / 2;
+
+    TFT_fillRect(displayX, displayY, displaySize, displaySize, qrCodeColor);
+
+    for (int y = 0; y < size; ++y)
+    {
+        for (int x = 0; x < size; ++x)
+        {
+            if (qrcodegen_getModule(data, x, y))
+            {
+                TFT_fillRect(displayX + (kBorderSize + x) * kModuleSize, displayY + (kBorderSize + y) * kModuleSize, kModuleSize,
+                             kModuleSize, TFT_BLACK);
+            }
+        }
+    }
+}

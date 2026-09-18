@@ -886,6 +886,7 @@ libTransportLayer
 libudev
 libwebkitgtk
 lifecycle
+lifecycles
 lightbulb
 lightin
 LightingApp
@@ -1488,6 +1489,7 @@ subfolders
 submodule
 submodules
 subnet
+subobject
 subprocess
 SubscribeResponse
 SubscriptionId
@@ -1646,6 +1648,7 @@ unpair
 unprovisioned
 unreferenced
 unregister
+unregisters
 unregistration
 Unsecure
 Unselect
