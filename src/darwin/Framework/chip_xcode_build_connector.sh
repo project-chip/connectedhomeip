@@ -62,6 +62,7 @@ for define in "${xcode_defines[@]}"; do
     # skip over those that GN does for us
     case "$define" in
         CHIP_HAVE_CONFIG_H) continue ;;
+        CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS=*) continue ;;
     esac
     target_defines+=("$define")
 done
@@ -87,7 +88,7 @@ fi
 
 read -r -a archs <<<"$ARCHS"
 for arch in "${archs[@]}"; do
-    if [ -z "$target_arch" ] || [ "$arch" = "$current_arch" ]; then
+    if [ "$target_arch" = "" ] || [ "$arch" = "$current_arch" ]; then
         target_arch="$arch"
         case "$arch" in
             x86_64) target_cpu="x64" ;;
