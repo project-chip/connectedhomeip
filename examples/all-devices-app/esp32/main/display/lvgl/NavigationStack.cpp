@@ -18,14 +18,11 @@
 
 #include "NavigationStack.h"
 
-#include <esp_log.h>
 #include <vector>
 
 namespace NavigationStack {
 
 namespace {
-
-const char TAG[] = "NavStack";
 
 struct StackEntry
 {
@@ -51,9 +48,12 @@ void RefreshView()
         return;
     }
 
-    // Refresh breadcrumbs
+    // Refresh breadcrumbs. The current page is not shown: its name is already in the page
+    // header and long names push the clickable ancestors off screen. At the root there is no
+    // ancestor, so that single entry is shown instead.
     lv_obj_clean(sCrumbContainer);
-    for (size_t i = 0; i < sStack.size(); ++i)
+    const size_t crumbCount = (sStack.size() == 1) ? 1 : sStack.size() - 1;
+    for (size_t i = 0; i < crumbCount; ++i)
     {
         if (i > 0)
         {
@@ -62,15 +62,14 @@ void RefreshView()
             lv_obj_set_style_text_color(sep, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
         }
 
-        if (i == sStack.size() - 1)
+        if (sStack.size() == 1)
         {
-            // Current active leaf: styled static label
-            lv_obj_t * leafLabel = lv_label_create(sCrumbContainer);
-            lv_label_set_text(leafLabel, sStack[i].title.c_str());
-            lv_obj_set_style_text_color(leafLabel, lv_color_white(), LV_PART_MAIN);
-            lv_obj_set_style_pad_left(leafLabel, 4, LV_PART_MAIN);
-            lv_obj_set_style_pad_right(leafLabel, 4, LV_PART_MAIN);
-            lv_obj_scroll_to_view(leafLabel, LV_ANIM_OFF);
+            // Root: nothing to navigate back to, so a static label rather than a pill.
+            lv_obj_t * rootLabel = lv_label_create(sCrumbContainer);
+            lv_label_set_text(rootLabel, sStack[i].title.c_str());
+            lv_obj_set_style_text_color(rootLabel, lv_color_white(), LV_PART_MAIN);
+            lv_obj_set_style_pad_left(rootLabel, 4, LV_PART_MAIN);
+            lv_obj_set_style_pad_right(rootLabel, 4, LV_PART_MAIN);
         }
         else
         {
@@ -91,6 +90,12 @@ void RefreshView()
             lv_obj_center(crumbLabel);
 
             lv_obj_add_event_cb(crumbBtn, OnCrumbClicked, LV_EVENT_CLICKED, reinterpret_cast<void *>(static_cast<uintptr_t>(i)));
+
+            // Keep the deepest crumb visible when the chain is wider than the bar.
+            if (i == crumbCount - 1)
+            {
+                lv_obj_scroll_to_view(crumbBtn, LV_ANIM_OFF);
+            }
         }
     }
 

@@ -17,14 +17,18 @@
  */
 
 #include "DeviceScreenRegistration.h"
+#include "devices/AggregatorScreen.h"
 #include "devices/BooleanStateSensorScreen.h"
+#include "devices/BridgedNodeScreen.h"
 #include "devices/ChimeScreen.h"
+#include "devices/ColorLightScreen.h"
 #include "devices/DimmableLightScreen.h"
 #include "devices/FanLoadScreen.h"
 #include "devices/OccupancySensorScreen.h"
 #include "devices/OnOffLightScreen.h"
 #include "devices/TemperatureSensorScreen.h"
 
+#include <cstdio>
 #include <devices/Ids.h>
 
 namespace chip::app {
@@ -37,17 +41,16 @@ struct BooleanSensorDescriptor
 {
     DeviceTypeId id;
     const char * title;
-    const char * deviceTypeKey;
     const char * trueLabel;
     const char * falseLabel;
 };
 
 constexpr BooleanSensorDescriptor kBooleanSensorDescriptors[] = {
-    { kInvalidDeviceTypeId, "Boolean Sensor", "boolean-state-sensor", "Active (True)", "Inactive (False)" },
-    { Device::kContactSensorDeviceTypeId, "Contact Sensor", "contact-sensor", "Closed (True)", "Open (False)" },
-    { Device::kWaterLeakDetectorDeviceTypeId, "Water Leak Detector", "water-leak-detector", "Leak Detected", "Dry (Normal)" },
-    { Device::kWaterFreezeDetectorDeviceTypeId, "Freeze Detector", "water-freeze-detector", "Freeze Detected", "Normal" },
-    { Device::kRainSensorDeviceTypeId, "Rain Sensor", "rain-sensor", "Raining", "Dry" },
+    { kInvalidDeviceTypeId, "Boolean Sensor", "Active (True)", "Inactive (False)" },
+    { Device::kContactSensorDeviceTypeId, "Contact Sensor", "Closed (True)", "Open (False)" },
+    { Device::kWaterLeakDetectorDeviceTypeId, "Water Leak Detector", "Leak Detected", "Dry (Normal)" },
+    { Device::kWaterFreezeDetectorDeviceTypeId, "Freeze Detector", "Freeze Detected", "Normal" },
+    { Device::kRainSensorDeviceTypeId, "Rain Sensor", "Raining", "Dry" },
 };
 
 DeviceTypeId GetDeviceType(const DeviceInterface & device)
@@ -81,7 +84,6 @@ void RegisterDeviceScreen(OnOffLight & device, DeviceScreenRegistry & registry)
     registry.Register({
         .title      = "On/Off Light",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "on-off-light",
         .renderFn   = [&device](lv_obj_t * parent) { ShowOnOffLoadScreen(parent, "On/Off Light", device); },
     });
 }
@@ -91,8 +93,25 @@ void RegisterDeviceScreen(DimmableLight & device, DeviceScreenRegistry & registr
     registry.Register({
         .title      = "Dimmable Light",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "dimmable-light",
         .renderFn   = [&device](lv_obj_t * parent) { ShowDimmableLoadScreen(parent, "Dimmable Light", device); },
+    });
+}
+
+void RegisterDeviceScreen(ColorTemperatureLight & device, DeviceScreenRegistry & registry)
+{
+    registry.Register({
+        .title      = "Color Temperature Light",
+        .endpointId = device.GetEndpointId(),
+        .renderFn   = [&device](lv_obj_t * parent) { ShowColorTemperatureLightScreen(parent, device); },
+    });
+}
+
+void RegisterDeviceScreen(ExtendedColorLight & device, DeviceScreenRegistry & registry)
+{
+    registry.Register({
+        .title      = "Extended Color Light",
+        .endpointId = device.GetEndpointId(),
+        .renderFn   = [&device](lv_obj_t * parent) { ShowExtendedColorLightScreen(parent, device); },
     });
 }
 
@@ -101,7 +120,6 @@ void RegisterDeviceScreen(OnOffPlugInUnit & device, DeviceScreenRegistry & regis
     registry.Register({
         .title      = "On/Off Plug-In Unit",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "on-off-plug-in-unit",
         .renderFn   = [&device](lv_obj_t * parent) { ShowOnOffLoadScreen(parent, "On/Off Plug-In Unit", device); },
     });
 }
@@ -111,7 +129,6 @@ void RegisterDeviceScreen(DimmablePlugInUnit & device, DeviceScreenRegistry & re
     registry.Register({
         .title      = "Dimmable Plug-In Unit",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "dimmable-plug-in-unit",
         .renderFn   = [&device](lv_obj_t * parent) { ShowDimmableLoadScreen(parent, "Dimmable Plug-In Unit", device); },
     });
 }
@@ -121,7 +138,6 @@ void RegisterDeviceScreen(MountedOnOffControl & device, DeviceScreenRegistry & r
     registry.Register({
         .title      = "Mounted On/Off",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "mounted-on-off-control",
         .renderFn   = [&device](lv_obj_t * parent) { ShowOnOffLoadScreen(parent, "Mounted On/Off", device); },
     });
 }
@@ -131,7 +147,6 @@ void RegisterDeviceScreen(MountedDimmableLoadControl & device, DeviceScreenRegis
     registry.Register({
         .title      = "Mounted Dimmable",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "mounted-dimmable-load-control",
         .renderFn   = [&device](lv_obj_t * parent) { ShowDimmableLoadScreen(parent, "Mounted Dimmable", device); },
     });
 }
@@ -142,7 +157,6 @@ void RegisterDeviceScreen(BooleanStateSensor & device, DeviceScreenRegistry & re
     registry.Register({
         .title      = desc.title,
         .endpointId = device.GetEndpointId(),
-        .deviceType = desc.deviceTypeKey,
         .renderFn =
             [&device, &desc](lv_obj_t * parent) {
                 ShowBooleanStateSensorScreen(parent, desc.title, device, desc.trueLabel, desc.falseLabel);
@@ -155,7 +169,6 @@ void RegisterDeviceScreen(OccupancySensor & device, DeviceScreenRegistry & regis
     registry.Register({
         .title      = "Occupancy Sensor",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "occupancy-sensor",
         .renderFn   = [&device](lv_obj_t * parent) { ShowOccupancySensorScreen(parent, device); },
     });
 }
@@ -165,21 +178,18 @@ void RegisterDeviceScreen(TemperatureSensor & device, DeviceScreenRegistry & reg
     registry.Register({
         .title      = "Temperature Sensor",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "temperature-sensor",
         .renderFn   = [&device](lv_obj_t * parent) { ShowTemperatureSensorScreen(parent, device); },
     });
 }
 
 void RegisterDeviceScreen(Fan & device, DeviceScreenRegistry & registry)
 {
-    const bool hasOnOff     = (device.OnOffCluster() != nullptr);
-    const char * title      = hasOnOff ? "Fan" : "Fan (No On/Off)";
-    const char * deviceType = hasOnOff ? "fan" : "fan-no-onoff";
+    const bool hasOnOff = (device.OnOffCluster() != nullptr);
+    const char * title  = hasOnOff ? "Fan" : "Fan (No On/Off)";
 
     registry.Register({
         .title      = title,
         .endpointId = device.GetEndpointId(),
-        .deviceType = deviceType,
         .renderFn   = [&device, title](lv_obj_t * parent) { ShowFanLoadScreen(parent, title, device); },
     });
 }
@@ -189,7 +199,6 @@ void RegisterDeviceScreen(AirPurifier & device, DeviceScreenRegistry & registry)
     registry.Register({
         .title      = "Air Purifier",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "air-purifier",
         .renderFn   = [&device](lv_obj_t * parent) { ShowFanLoadScreen(parent, "Air Purifier", device); },
     });
 }
@@ -199,7 +208,6 @@ void RegisterDeviceScreen(ExtractorHood & device, DeviceScreenRegistry & registr
     registry.Register({
         .title      = "Extractor Hood",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "extractor-hood",
         .renderFn   = [&device](lv_obj_t * parent) { ShowFanLoadScreen(parent, "Extractor Hood", device); },
     });
 }
@@ -209,8 +217,50 @@ void RegisterDeviceScreen(Chime & device, DeviceScreenRegistry & registry)
     registry.Register({
         .title      = "Chime",
         .endpointId = device.GetEndpointId(),
-        .deviceType = "chime",
         .renderFn   = [&device](lv_obj_t * parent) { ShowChimeScreen(parent, device); },
+    });
+}
+
+void RegisterDeviceScreen(BridgedNode & device, DeviceScreenRegistry & registry)
+{
+    // The node label identifies which bridged device this node carries; all bridged nodes
+    // would otherwise show the same title.
+    std::string title = "Bridged: " + device.BridgedDeviceBasicInformationCluster().GetNodeLabel();
+
+    registry.Register({
+        .title      = std::move(title),
+        .endpointId = device.GetEndpointId(),
+        .renderFn   = [&device](lv_obj_t * parent) { ShowBridgedNodeScreen(parent, device); },
+    });
+}
+
+void RegisterDeviceScreen(Aggregator & device, DeviceScreenRegistry & registry)
+{
+    registry.Register({
+        .title      = "Aggregator",
+        .endpointId = device.GetEndpointId(),
+        .renderFn   = [&device](lv_obj_t * parent) { ShowAggregatorScreen(parent, device); },
+    });
+}
+
+void RegisterMissingDeviceScreen(DeviceInterface & device, EndpointId endpointId, DeviceScreenRegistry & registry)
+{
+    DeviceTypeId id = GetDeviceType(device);
+
+    char title[40];
+    if (id <= 0xFFFF)
+    {
+        snprintf(title, sizeof(title), "No UI - device type 0x%04X", static_cast<unsigned int>(id));
+    }
+    else
+    {
+        snprintf(title, sizeof(title), "No UI - device type 0x%08X", static_cast<unsigned int>(id));
+    }
+
+    registry.Register({
+        .title      = title,
+        .endpointId = endpointId,
+        .renderFn   = nullptr,
     });
 }
 

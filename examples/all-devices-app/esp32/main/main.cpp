@@ -57,6 +57,10 @@
 #include "DeviceDisplay.h"
 #endif // CONFIG_HAVE_DISPLAY
 
+#if CONFIG_DISPLAY_LVGL
+#include "DeviceScreenRegistry.h"
+#endif // CONFIG_DISPLAY_LVGL
+
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <DeviceShellCommands.h>
 #include <lib/shell/commands/WiFi.h>
@@ -247,6 +251,12 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         chip::app::CodeDrivenDataModelProvider(*delegate, gAttributePersistenceProvider);
 
     gDataModelProvider = &dataModelProvider;
+
+#if CONFIG_DISPLAY_LVGL
+    // Device screens record where each endpoint sits in the endpoint tree; give them the
+    // provider before the first device registers.
+    chip::app::DeviceScreenRegistry::Instance().SetEndpointSource(&dataModelProvider);
+#endif
 
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
     if (provider == nullptr)

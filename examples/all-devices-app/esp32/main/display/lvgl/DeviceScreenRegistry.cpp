@@ -18,7 +18,35 @@
 
 #include "DeviceScreenRegistry.h"
 
+#include <app/data-model-provider/MetadataTypes.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
+
 namespace chip::app {
+
+namespace {
+
+// Called from the device factory hook, which runs on the CHIP thread, so the endpoint source
+// may be queried here. The display task must not do this.
+EndpointId ParentOf(DataModel::ProviderMetadataTree * endpointSource, EndpointId endpoint)
+{
+    VerifyOrReturnValue(endpointSource != nullptr, kInvalidEndpointId);
+    VerifyOrReturnValue(endpoint != kInvalidEndpointId, kInvalidEndpointId);
+
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> builder;
+    VerifyOrReturnValue(endpointSource->Endpoints(builder) == CHIP_NO_ERROR, kInvalidEndpointId);
+
+    for (const auto & entry : builder.TakeBuffer())
+    {
+        if (entry.id == endpoint)
+        {
+            return entry.parentId;
+        }
+    }
+    return kInvalidEndpointId;
+}
+
+} // namespace
 
 DeviceScreenRegistry & DeviceScreenRegistry::Instance()
 {
@@ -28,6 +56,7 @@ DeviceScreenRegistry & DeviceScreenRegistry::Instance()
 
 void DeviceScreenRegistry::Register(DeviceScreenEntry entry)
 {
+    entry.parentEndpointId = ParentOf(mEndpointSource, entry.endpointId);
     mEntries.push_back(std::move(entry));
 }
 

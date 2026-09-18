@@ -19,11 +19,15 @@
 #pragma once
 
 #include "DeviceScreenRegistry.h"
+#include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/AirPurifier.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
+#include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/color-temperature-light/ColorTemperatureLight.h>
 #include <device/types/dimmable-light/DimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
+#include <device/types/extended-color-light/ExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/Fan.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
@@ -37,6 +41,9 @@ namespace chip::app {
 
 void RegisterDeviceScreen(OnOffLight & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(DimmableLight & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(ColorTemperatureLight & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(ExtendedColorLight & device, DeviceScreenRegistry & registry);
+
 void RegisterDeviceScreen(OnOffPlugInUnit & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(DimmablePlugInUnit & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(MountedOnOffControl & device, DeviceScreenRegistry & registry);
@@ -48,5 +55,12 @@ void RegisterDeviceScreen(Fan & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(AirPurifier & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(ExtractorHood & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(Chime & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(BridgedNode & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(Aggregator & device, DeviceScreenRegistry & registry);
+
+// Fallback for device types that have no screen. Registers an entry without a render
+// function so the device still shows up in the list, marked as having no UI. The endpoint
+// is passed in because multi-endpoint devices do not expose a single endpoint id.
+void RegisterMissingDeviceScreen(DeviceInterface & device, EndpointId endpointId, DeviceScreenRegistry & registry);
 
 } // namespace chip::app

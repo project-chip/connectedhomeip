@@ -51,6 +51,10 @@ public:
         {
             RegisterDeviceScreen(device, DeviceScreenRegistry::Instance());
         }
+        else
+        {
+            RegisterMissingDeviceScreen(device, device.GetEndpointId(), DeviceScreenRegistry::Instance());
+        }
     }
 };
 
