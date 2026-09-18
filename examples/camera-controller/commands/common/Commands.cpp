@@ -61,14 +61,14 @@ public:
 
 // Template so we can do conditional enabling
 template <typename T, std::enable_if_t<HasInitWithString<T>::value, int> = 0>
-static CHIP_ERROR UseStorageDirectory(T & storageManagerImpl, const char * storageDirectory)
+[[maybe_unused]] static CHIP_ERROR UseStorageDirectory(T & storageManagerImpl, const char * storageDirectory)
 {
     std::string platformKVS = std::string(storageDirectory) + "/chip_tool_kvs";
     return storageManagerImpl.Init(platformKVS.c_str());
 }
 
 template <typename T, std::enable_if_t<!HasInitWithString<T>::value, int> = 0>
-static CHIP_ERROR UseStorageDirectory(T & storageManagerImpl, const char * storageDirectory)
+[[maybe_unused]] static CHIP_ERROR UseStorageDirectory(T & storageManagerImpl, const char * storageDirectory)
 {
     return CHIP_NO_ERROR;
 }
