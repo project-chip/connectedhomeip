@@ -193,7 +193,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
 
     ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(mRootNode->Register(rootAllocator, *mDataModelProvider));
-    
+
     NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
         .groupDataProvider        = mGroupDataProvider,
         .fabricTable              = Server::GetInstance().GetFabricTable(),
