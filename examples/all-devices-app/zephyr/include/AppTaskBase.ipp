@@ -193,8 +193,8 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
 
     ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(mRootNode->Register(rootAllocator, *mDataModelProvider));
-
-    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
+    
+    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
         .groupDataProvider        = mGroupDataProvider,
         .fabricTable              = Server::GetInstance().GetFabricTable(),
         .timerDelegate            = mTimerDelegate,
@@ -236,14 +236,15 @@ CHIP_ERROR AppTaskBase<Derived>::RegisterAppDevices()
 
     ConsecutiveEndpointIdAllocator deviceAllocator(kFirstDeviceEndpointId);
 
-    for (const std::string & deviceType : DeviceFactory::GetInstance().SupportedDeviceTypes())
+    for (const std::string & deviceType : NoHooksDeviceFactory::GetInstance().SupportedDeviceTypes())
     {
         VerifyOrReturnError(mDeviceCount < ALL_DEVICES_ENABLED_DEVICE_COUNT, CHIP_ERROR_NO_MEMORY);
 
-        std::unique_ptr<DeviceInterface> device = DeviceFactory::GetInstance().Create(deviceType);
-        VerifyOrReturnError(device != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(device->Register(deviceAllocator, *mDataModelProvider));
-        mDevices[mDeviceCount++] = std::move(device);
+        auto created = NoHooksDeviceFactory::GetInstance().Create(deviceType);
+        VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(created.device->Register(deviceAllocator, *mDataModelProvider));
+        VerifyOrDo(!created.onDeviceRegistered, created.onDeviceRegistered());
+        mDevices[mDeviceCount++] = std::move(created.device);
     }
 
     VerifyOrReturnError(mDeviceCount > 0, CHIP_ERROR_INCORRECT_STATE);
