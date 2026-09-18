@@ -100,6 +100,7 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
         )
         session_id = provide_offer_response.webRTCSessionID
         asserts.assert_true(session_id >= 0, f"Invalid WebRTC session ID: {session_id}")
+        self._active_session_id = session_id
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
         answer_session_id, answer = await peer.get_remote_answer()
@@ -177,7 +178,7 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
         "AVSM.S.F01",          # Video Data Output feature
     )
     @async_test_body
-    async def test_TC_WEBRTCP_2_33(self):
+    async def test_TC_WEBRTCP_2_33(self) -> None:
         """[TC-WEBRTCP-2.33] Validate WebRTC video and audio stream reuse and media delivery across consecutive sessions (referenceCount 0 -> 1 -> 0 -> 1)"""
         self.step("precondition", "DUT commissioned", is_commissioning=True)
         endpoint = self.get_endpoint()
@@ -205,7 +206,7 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         audio_stream_id = None
         video_stream_id = None
-        active_session_id = None
+        self._active_session_id = None
 
         try:
             self.step(
@@ -234,7 +235,6 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
             )
             log.info("Starting Session 1 with freshly allocated streams (video=%s, audio=%s)", video_stream_id, audio_stream_id)
             session1_id, peer1 = await self._establish_session(webrtc_manager, endpoint, video_stream_id, audio_stream_id)
-            active_session_id = session1_id
 
             current_sessions = await self.read_single_attribute_check_success(
                 endpoint=endpoint,
@@ -274,7 +274,7 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                 endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
-            active_session_id = None
+            self._active_session_id = None
             await webrtc_manager.remove_peer(session1_id)
 
             current_sessions = await self.read_single_attribute_check_success(
@@ -304,7 +304,6 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                 audio_stream_id,
             )
             session2_id, peer2 = await self._establish_session(webrtc_manager, endpoint, video_stream_id, audio_stream_id)
-            active_session_id = session2_id
 
             current_sessions = await self.read_single_attribute_check_success(
                 endpoint=endpoint,
@@ -344,7 +343,7 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                 endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
-            active_session_id = None
+            self._active_session_id = None
             await webrtc_manager.remove_peer(session2_id)
 
             await self.send_single_cmd(
@@ -384,18 +383,18 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
             )
 
         finally:
-            if active_session_id is not None:
+            if self._active_session_id is not None:
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
-                            webRTCSessionID=active_session_id,
+                            webRTCSessionID=self._active_session_id,
                             reason=Clusters.Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup,
                         ),
                         endpoint=endpoint,
                         payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
                     )
                 except Exception as e:
-                    log.warning("Failed to end active WebRTC session %s during cleanup: %s", active_session_id, e)
+                    log.warning("Failed to end active WebRTC session %s during cleanup: %s", self._active_session_id, e)
             if audio_stream_id is not None:
                 try:
                     await self.send_single_cmd(
