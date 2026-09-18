@@ -120,9 +120,9 @@ class TC_ACS_2_1(MatterBaseTest):
         # Add AmbientContextSupported elements for CI purpose
         # Human activity walking, Object identification person, Audio identification barking are default
         if self.is_ci:
-            self.write_to_app_pipe(
-                f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}},{{"TypeId":75,"TagId":3}}]}}')
-            await asyncio.sleep(1)
+            #self.write_to_app_pipe(
+            #    f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}},{{"TypeId":75,"TagId":3}}]}}')
+            #await asyncio.sleep(1)
             if self.SensorFusionDetected:
                 # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
                 self.write_to_app_pipe(
