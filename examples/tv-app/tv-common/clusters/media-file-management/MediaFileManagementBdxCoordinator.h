@@ -51,7 +51,8 @@ class MediaFileManagementBdxCoordinator : public BdxCoordinator, public MediaFil
 public:
     MediaFileManagementBdxCoordinator(MediaFileManagementManager & manager, MediaFileManagementBdxProvider & provider,
                                       MediaFileManagementBdxRequestor & requestor, MediaFileManagementCluster & cluster) :
-        mManager(manager), mProvider(provider), mRequestor(requestor), mCluster(cluster)
+        mManager(manager),
+        mProvider(provider), mRequestor(requestor), mCluster(cluster)
     {}
 
     CHIP_ERROR StartIncomingFileTransfer(ScopedNodeId peer, uint64_t fileID, CharSpan fileName, uint64_t size,
