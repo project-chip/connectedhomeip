@@ -151,6 +151,11 @@ public:
     std::optional<WiFiUsdConfig> GetWiFiUsdConfig() override { return mWiFiUsdConfig; }
     std::optional<BltcsConfig> GetBltcsConfig() override { return mBltcsConfig; }
 
+    Span<const Structs::RangingConstraintStruct::Type> GetConstraints() const override
+    {
+        return Span<const Structs::RangingConstraintStruct::Type>(mConstraints.data(), mConstraints.size());
+    }
+
     Callback * GetCallback() const { return mCallback; }
 
     // Test control
@@ -169,10 +174,23 @@ public:
     std::optional<uint64_t> mDeviceId;
     std::optional<WiFiUsdConfig> mWiFiUsdConfig;
     std::optional<BltcsConfig> mBltcsConfig;
+    std::vector<Structs::RangingConstraintStruct::Type> mConstraints;
 
 private:
     RangingTechEnum mTechnology;
 };
+
+Structs::RangingConstraintStruct::Type DisabledConstraintHelper(RangingTechEnum technology, RangingRoleEnum role)
+{
+    Structs::RangingConstraintStruct::Type entry;
+    entry.technology = technology;
+    entry.role       = role;
+    entry.enabled.SetValue(false);
+    return entry;
+}
+
+const ProximityRangingCluster::OptionalAttributeSet kRangingConstraintsOptionalAttributes =
+    ProximityRangingCluster::OptionalAttributeSet().Set<Attributes::RangingConstraints::Id>();
 
 struct TestProximityRangingCluster : public ::testing::Test
 {
@@ -1145,6 +1163,156 @@ TEST_F(TestProximityRangingCluster, TestStartRangingReportingMaxDistanceZero)
     auto result = tester.Invoke(request);
     ExpectStartRejected(result, StatusCodeEnum::kRejectedInfeasibleRanging);
     EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestAttributeListWithRangingConstraints)
+{
+    TimerDelegateMock timer;
+    ProximityRangingCluster cluster(
+        kTestEndpointId, ProximityRangingCluster::Config(timer).WithOptionalAttributes(kRangingConstraintsOptionalAttributes));
+
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::RangingCapabilities::kMetadataEntry,
+                                            Attributes::SessionIDList::kMetadataEntry,
+                                            Attributes::RangingConstraints::kMetadataEntry,
+                                        }));
+}
+
+TEST_F(TestProximityRangingCluster, TestReadRangingConstraintsNotEnabled)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+
+    ProximityRangingCluster cluster(kTestEndpointId, ProximityRangingCluster::Config(timer));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Attributes::RangingConstraints::TypeInfo::DecodableType list;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::RangingConstraints::Id, list), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestReadRangingConstraintsNoAdapter)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+
+    ProximityRangingCluster cluster(
+        kTestEndpointId, ProximityRangingCluster::Config(timer).WithOptionalAttributes(kRangingConstraintsOptionalAttributes));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Attributes::RangingConstraints::TypeInfo::DecodableType list;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::RangingConstraints::Id, list), CHIP_NO_ERROR);
+
+    size_t count = 0;
+    EXPECT_EQ(list.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestReadRangingConstraintsEmpty)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithOptionalAttributes(kRangingConstraintsOptionalAttributes)
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Attributes::RangingConstraints::TypeInfo::DecodableType list;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::RangingConstraints::Id, list), CHIP_NO_ERROR);
+
+    size_t count = 0;
+    EXPECT_EQ(list.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestReadRangingConstraintsAggregatesAdapters)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    MockRangingAdapter btcsAdapter(RangingTechEnum::kBluetoothChannelSounding);
+    RangingAdapter * adapters[] = { &bleAdapter, &btcsAdapter };
+
+    bleAdapter.mConstraints.push_back(
+        DisabledConstraintHelper(RangingTechEnum::kBLEBeaconRSSIRanging, RangingRoleEnum::kBLEBeaconRole));
+
+    Structs::RangingConstraintStruct::Type intervalConstraint;
+    intervalConstraint.technology = RangingTechEnum::kBluetoothChannelSounding;
+    intervalConstraint.role       = RangingRoleEnum::kBLTInitiatorRole;
+    intervalConstraint.minRangingInterval.SetValue(10);
+    intervalConstraint.maxSessionDuration.SetValue(60);
+    intervalConstraint.maxRangingInstances.SetValue(5);
+    btcsAdapter.mConstraints.push_back(intervalConstraint);
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithOptionalAttributes(kRangingConstraintsOptionalAttributes)
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Attributes::RangingConstraints::TypeInfo::DecodableType list;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::RangingConstraints::Id, list), CHIP_NO_ERROR);
+
+    auto iter = list.begin();
+    ASSERT_TRUE(iter.Next());
+    EXPECT_EQ(iter.GetValue().technology, RangingTechEnum::kBLEBeaconRSSIRanging);
+    EXPECT_EQ(iter.GetValue().role, RangingRoleEnum::kBLEBeaconRole);
+    ASSERT_TRUE(iter.GetValue().enabled.HasValue());
+    EXPECT_FALSE(iter.GetValue().enabled.Value());
+    EXPECT_FALSE(iter.GetValue().minRangingInterval.HasValue());
+
+    ASSERT_TRUE(iter.Next());
+    EXPECT_EQ(iter.GetValue().technology, RangingTechEnum::kBluetoothChannelSounding);
+    EXPECT_EQ(iter.GetValue().role, RangingRoleEnum::kBLTInitiatorRole);
+    EXPECT_FALSE(iter.GetValue().enabled.HasValue());
+    ASSERT_TRUE(iter.GetValue().minRangingInterval.HasValue());
+    EXPECT_EQ(iter.GetValue().minRangingInterval.Value(), 10u);
+    ASSERT_TRUE(iter.GetValue().maxSessionDuration.HasValue());
+    EXPECT_EQ(iter.GetValue().maxSessionDuration.Value(), 60u);
+    ASSERT_TRUE(iter.GetValue().maxRangingInstances.HasValue());
+    EXPECT_EQ(iter.GetValue().maxRangingInstances.Value(), 5u);
+
+    EXPECT_FALSE(iter.Next());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestRangingConstraintsChangeCallback)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithOptionalAttributes(kRangingConstraintsOptionalAttributes)
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    const size_t dirtyBefore = tester.GetDirtyList().size();
+    ASSERT_NE(bleAdapter.GetCallback(), nullptr);
+    bleAdapter.GetCallback()->OnAttributeChanged(Attributes::RangingConstraints::Id);
+
+    const auto & dirty = tester.GetDirtyList();
+    ASSERT_EQ(dirty.size(), dirtyBefore + 1);
+    EXPECT_EQ(dirty.back(), ConcreteAttributePath(kTestEndpointId, ProximityRanging::Id, Attributes::RangingConstraints::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

@@ -121,6 +121,10 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
     case Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatureMap);
 
+    case Attributes::RangingConstraints::Id:
+        VerifyOrReturnError(mOptionalAttributeSet.IsSet(Attributes::RangingConstraints::Id), Status::UnsupportedAttribute);
+        return mDriver.GetRangingConstraints(encoder);
+
     case Attributes::ClusterRevision::Id:
         return encoder.Encode(ProximityRanging::kRevision);
 
@@ -139,6 +143,7 @@ CHIP_ERROR ProximityRangingCluster::Attributes(const ConcreteClusterPath & path,
         { mFeatureMap.Has(Feature::kBluetoothChannelSounding), Attributes::BLTDevIK::kMetadataEntry },
         { mFeatureMap.Has(Feature::kBluetoothChannelSounding), Attributes::BLTCSSecurityLevel::kMetadataEntry },
         { mFeatureMap.Has(Feature::kBluetoothChannelSounding), Attributes::BLTCSModeCapability::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(Attributes::RangingConstraints::Id), Attributes::RangingConstraints::kMetadataEntry },
     };
 
     AttributeListBuilder listBuilder(builder);

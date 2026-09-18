@@ -34,11 +34,28 @@ source_set("proximity-ranger") {
 
 source_set("logging") {
   sources = [
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
     "impl/LoggingProximityRanger.cpp",
     "impl/LoggingProximityRanger.h",
     "impl/LoggingRangingAdapter.cpp",
     "impl/LoggingRangingAdapter.h",
   ]
 
-  public_deps = [ ":proximity-ranger" ]
+  public_deps = [
+    ":proximity-ranger",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+  ]
+}
+
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":logging",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
 }
