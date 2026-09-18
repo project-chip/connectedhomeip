@@ -45,7 +45,7 @@ from mobly import asserts
 
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestUncommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ TH_SERVER_DISCRIMINATOR = 3840
 TH_SERVER_PASSCODE = 20202021
 
 
-class TC_SC_4_7(MatterBaseTest):
+class TC_SC_4_7(MatterTestUncommissionedDevice):
     # The DUT is never commissioned in this test (the TH-side commissioner app
     # advertises, the DUT only scans DNS-SD), so there is no DUT fabric state
     # to capture or clean up.

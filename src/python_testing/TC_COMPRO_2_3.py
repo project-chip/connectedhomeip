@@ -79,6 +79,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -94,7 +95,7 @@ FIXED_WAITS_S = 140          # step 7 (40 s), steps 9/14 polls (40 s each), step
 FRAMEWORK_OVERHEAD_S = 90    # commissioning, the remaining reads and framework overhead
 
 
-class TC_COMPRO_2_3(COMPROBaseTest):
+class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:

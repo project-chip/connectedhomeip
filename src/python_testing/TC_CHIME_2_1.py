@@ -54,11 +54,11 @@ from TC_CHIMETestBase import CHIMETestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_CHIME_2_1(MatterBaseTest, CHIMETestBase):
+class TC_CHIME_2_1(MatterTestCommissionedDevice, CHIMETestBase):
 
     def desc_TC_CHIME_2_1(self) -> str:
         return "[TC-CHIME-2.1] Attributes with DUT as Server"

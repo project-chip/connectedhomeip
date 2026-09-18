@@ -42,7 +42,7 @@ from TC_MEDIAFILEMANAGEMENTTestBase import (MAX_AVAILABLE_FILES, MAX_MIME_TYPE_L
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ log = logging.getLogger(__name__)
 _MIME_TYPE_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*/[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*$"
 
 
-class TC_MEDIAFILEMANAGEMENT_1_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
+class TC_MEDIAFILEMANAGEMENT_1_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEMENTTestBase):
 
     def desc_TC_MEDIAFILEMANAGEMENT_1_1(self) -> str:
         return "[TC-MEDIAFILEMANAGEMENT-1.1] Read Media File Management Attributes - PROVISIONAL"

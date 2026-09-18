@@ -44,14 +44,14 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_20(MatterTestCommissionedDevice, WEBRTCPTestBase):
     def desc_TC_WEBRTCP_2_20(self) -> str:
         """Returns a description of this test"""
         return "[TC-WEBRTCP-2.20] Validate ProvideICECandidates command processing - PROVISIONAL"

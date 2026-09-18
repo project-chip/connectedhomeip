@@ -87,6 +87,7 @@ from support_modules.compro_support import COMPROBaseTest, EDFixture, commission
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -100,7 +101,7 @@ CONNECT_MARGIN_S = 10       # IM round trip on top of each ProxyConnect timeout
 SESSIONS_TESTABLE_DEFAULT = 5
 
 
-class TC_COMPRO_2_7(COMPROBaseTest):
+class TC_COMPRO_2_7(MatterTestCommissionedDevice, COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:

@@ -44,15 +44,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
-    """Implementation of test case TC-AVANALY-2.5."""
-
+class TC_AVANALY_2_5(MatterTestCommissionedDevice, AVANALYTestBase):
     def desc_TC_AVANALY_2_5(self) -> str:
         """Returns the description of TC-AVANALY-2.5."""
         return "[TC-AVANALY-2.5] Validate EstablishAnalysisStream functionality with Server as DUT"

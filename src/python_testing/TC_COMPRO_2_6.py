@@ -98,6 +98,7 @@ from support_modules.compro_support import COMPROBaseTest
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -115,7 +116,7 @@ REMAINING_STEPS_BUDGET_S = 120
 _MINIMAL_MATTER_MSG = bytes(8)
 
 
-class TC_COMPRO_2_6(COMPROBaseTest):
+class TC_COMPRO_2_6(MatterTestCommissioner, COMPROBaseTest):
 
     # The DUT starts UNCOMMISSIONED (PASE-first): there is no operational node to
     # subscribe to at setup_test time, so opt out of the framework's background

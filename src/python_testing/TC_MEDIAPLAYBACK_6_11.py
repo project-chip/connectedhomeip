@@ -40,7 +40,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ _PLAYBACK_COMMAND_IDS = {
 }
 
 
-class TC_MEDIAPLAYBACK_6_11(MatterBaseTest, MEDIAPLAYBACKTestBase):
+class TC_MEDIAPLAYBACK_6_11(MatterTestCommissionedDevice, MEDIAPLAYBACKTestBase):
 
     def desc_TC_MEDIAPLAYBACK_6_11(self) -> str:
         return "[TC-MEDIAPLAYBACK-6.11] Available Commands Verification"

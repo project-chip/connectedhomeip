@@ -44,13 +44,13 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_LTIME_3_1(MatterBaseTest):
+class TC_LTIME_3_1(MatterTestCommissionedDevice):
 
     def desc_TC_LTIME_3_1(self) -> str:
         return "4.1.1. [TC-LTIME-3.1] Read and Write Time Format Localization Cluster Attributes [DUT as Server]"

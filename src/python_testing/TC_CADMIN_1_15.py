@@ -42,13 +42,13 @@ from matter import ChipDeviceCtrl
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_15(MatterBaseTest):
+class TC_CADMIN_1_15(MatterTestCommissionedDevice):
     async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Clusters.AdministratorCommissioning.Enums.StatusCode | None = None) -> CommissioningParameters:
         if expectedErrCode == 0x00:
             return await th.OpenCommissioningWindow(

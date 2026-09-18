@@ -50,7 +50,7 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.PowerTopology
 
 
-class TC_PWRTL_2_2(MatterBaseTest):
+class TC_PWRTL_2_2(MatterTestCommissionedDevice):
 
     def _assert_nodes_equal(self, actual, expected, what: str) -> None:
         """Compare every field of every CircuitNodeStruct, not just the list length.

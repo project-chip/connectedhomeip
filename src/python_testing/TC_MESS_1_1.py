@@ -38,7 +38,7 @@ from TC_MESSTestBase import has_spoken_or_audio_messages
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ _MIME_TOKEN = r"[A-Za-z0-9!#$%&'*+^_`{|}~.-]+"
 _MIME_TYPE_PATTERN = rf"^{_MIME_TOKEN}/{_MIME_TOKEN}$"
 
 
-class TC_MESS_1_1(MatterBaseTest):
+class TC_MESS_1_1(MatterTestCommissionedDevice):
 
     def desc_TC_MESS_1_1(self) -> str:
         return "[TC-MESS-1.1] Read Audio and Speech Attributes Verification (DUT as Server)"

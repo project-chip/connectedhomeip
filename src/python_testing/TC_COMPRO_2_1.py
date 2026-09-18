@@ -65,12 +65,13 @@ from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_COMPRO_2_1(COMPROBaseTest):
+class TC_COMPRO_2_1(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def desc_TC_COMPRO_2_1(self) -> str:
         return "[TC-COMPRO-2.1] Attributes with DUT as Server"
