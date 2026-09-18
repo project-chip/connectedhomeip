@@ -14,6 +14,7 @@
 #ifndef LSREQUESTER_H_
 #define LSREQUESTER_H_
 
+#include <condition_variable>
 #include <luna-service2/lunaservice.hpp>
 #include <mutex>
 #include <pbnjson.hpp>
@@ -37,13 +38,29 @@ private:
     LsRequester();
     virtual ~LsRequester();
 
+    // *Locked() helpers assume the caller already holds _mutex.
+    void stopLocked();
+    void initLocked();
+    void restartLocked();
     static void * lsTask(void * arg);
-    GMainLoop * m_mainLoop;
+    GMainLoop * m_mainLoop = nullptr;
     LS::Handle m_handle;
 
     static std::atomic<LsRequester *> _singleton;
     static std::mutex _mutex;
-    GThread * m_thread;
+    GThread * m_thread = nullptr;
+
+    std::mutex m_startMutex;
+    std::condition_variable m_startCv;
+    bool m_running = false;
+
+    enum class State
+    {
+        STOPPED,
+        STARTING,
+        RUNNING,
+    };
+    State m_state = State::STOPPED;
 };
 
 #endif /* LSREQUESTER_H_ */

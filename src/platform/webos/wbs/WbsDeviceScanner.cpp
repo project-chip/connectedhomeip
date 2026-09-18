@@ -195,8 +195,8 @@ CHIP_ERROR WbsDeviceScanner::StopScanImpl()
         ChipLogError(Ble, "ChipDeviceScanner StopScanImpl lsCallCancel Error");
         return CHIP_ERROR_INTERNAL;
     }
-    lsRequester->restart();
-    ChipLogError(Ble, "ChipDeviceScanner StopScanImpl Success");
+    mLeInternalStartScanToken = LSMESSAGE_TOKEN_INVALID;
+    ChipLogDetail(Ble, "ChipDeviceScanner StopScanImpl Success");
     return CHIP_NO_ERROR;
 }
 
