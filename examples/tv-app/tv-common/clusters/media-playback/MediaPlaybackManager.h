@@ -86,9 +86,9 @@ protected:
         chip::CharSpan("activeAudioTrackId_0", 20),
         chip::app::DataModel::Nullable<TrackAttributesType>(
             { chip::CharSpan("languageCode1", 13),
-                         chip::Optional<chip::app::DataModel::Nullable<
+              chip::Optional<chip::app::DataModel::Nullable<
                   chip::app::DataModel::List<const chip::app::Clusters::MediaPlayback::CharacteristicEnum>>>(),
-                         chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
+              chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                   { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName1", 12)) }) })
     };
     std::vector<TrackType> mAvailableAudioTracks = {

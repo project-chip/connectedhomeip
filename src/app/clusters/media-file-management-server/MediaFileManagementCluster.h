@@ -34,8 +34,7 @@ class MediaFileManagementCluster : public DefaultServerCluster
 public:
     MediaFileManagementCluster(EndpointId endpointId, MediaFileManagement::Delegate & delegate,
                                BitFlags<MediaFileManagement::Feature> features) :
-        DefaultServerCluster({ endpointId, MediaFileManagement::Id }),
-        mDelegate(delegate), mFeatures(features)
+        DefaultServerCluster({ endpointId, MediaFileManagement::Id }), mDelegate(delegate), mFeatures(features)
     {}
 
     // --- ServerClusterInterface overrides ---

@@ -46,7 +46,7 @@ public:
 class ContentLauncherManager : public ContentLauncherDelegate
 {
 public:
-    ContentLauncherManager() : ContentLauncherManager({ "example", "example" }, 0){};
+    ContentLauncherManager() : ContentLauncherManager({ "example", "example" }, 0) {};
     ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols);
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,

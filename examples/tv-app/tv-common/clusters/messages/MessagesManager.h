@@ -78,8 +78,7 @@ struct CachedMessage
                   const chip::app::DataModel::Nullable<uint32_t> & startTime,
                   const chip::app::DataModel::Nullable<uint64_t> & duration, std::string messageText, std::string languageCode,
                   std::string messageUri, chip::FabricIndex fabricIndex) :
-        mPriority(priority),
-        mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText),
+        mPriority(priority), mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText),
         mLanguageCode(languageCode), mMessageUri(messageUri), mFabricIndex(fabricIndex)
     {
         memcpy(mMessageIdBuffer, messageId.data(), sizeof(mMessageIdBuffer));
