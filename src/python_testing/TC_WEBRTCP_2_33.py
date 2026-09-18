@@ -147,7 +147,7 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                 streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
                 videoStreamID=video_stream_id,
                 audioStreamID=audio_stream_id,
-                originatingEndpointID=1,
+                originatingEndpointID=endpoint,
             ),
             endpoint=endpoint,
             payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
@@ -209,7 +209,7 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_greater(
             video_frames,
             0,
-            f"[{session_label}] Expected > 0 RTP video frames, got {video_frames} (0 video packets received over {timeout_sec}s)",
+            f"[{session_label}] Expected > 0 RTP video frames, got {video_frames} (0 video frames received over {timeout_sec}s)",
         )
         asserts.assert_greater(
             audio_packets,
@@ -225,7 +225,17 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
     async def test_TC_WEBRTCP_2_33(self):
         self.step("precondition")
         endpoint = self.get_endpoint()
+        current_sessions = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=Clusters.WebRTCTransportProvider,
+            attribute=Clusters.WebRTCTransportProvider.Attributes.CurrentSessions,
+        )
+        asserts.assert_equal(len(current_sessions), 0, "CurrentSessions must be empty in precondition")
+
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
+        audio_stream_id = None
+        video_stream_id = None
+        active_session_id = None
 
         try:
             self.step(1)
@@ -246,6 +256,15 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
             self.step(2)
             log.info("Starting Session 1 with freshly allocated streams (video=%s, audio=%s)", video_stream_id, audio_stream_id)
             session1_id, peer1 = await self._establish_session(webrtc_manager, endpoint, video_stream_id, audio_stream_id)
+            active_session_id = session1_id
+
+            current_sessions = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.WebRTCTransportProvider,
+                attribute=Clusters.WebRTCTransportProvider.Attributes.CurrentSessions,
+            )
+            asserts.assert_equal(len(current_sessions), 1, "Expected CurrentSessions to contain Session 1")
+            asserts.assert_equal(current_sessions[0].id, session1_id, "Session ID in CurrentSessions does not match Session 1")
 
             s1_audio_ref = await self._get_stream_ref_count(
                 audio_stream_id, Clusters.CameraAvStreamManagement.Attributes.AllocatedAudioStreams, endpoint
@@ -269,7 +288,15 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                 endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
+            active_session_id = None
             await webrtc_manager.remove_peer(session1_id)
+
+            current_sessions = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.WebRTCTransportProvider,
+                attribute=Clusters.WebRTCTransportProvider.Attributes.CurrentSessions,
+            )
+            asserts.assert_equal(len(current_sessions), 0, "CurrentSessions must be empty after ending Session 1")
 
             between_audio_ref = await self._get_stream_ref_count(
                 audio_stream_id, Clusters.CameraAvStreamManagement.Attributes.AllocatedAudioStreams, endpoint
@@ -287,6 +314,15 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                 audio_stream_id,
             )
             session2_id, peer2 = await self._establish_session(webrtc_manager, endpoint, video_stream_id, audio_stream_id)
+            active_session_id = session2_id
+
+            current_sessions = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.WebRTCTransportProvider,
+                attribute=Clusters.WebRTCTransportProvider.Attributes.CurrentSessions,
+            )
+            asserts.assert_equal(len(current_sessions), 1, "Expected CurrentSessions to contain Session 2")
+            asserts.assert_equal(current_sessions[0].id, session2_id, "Session ID in CurrentSessions does not match Session 2")
 
             s2_audio_ref = await self._get_stream_ref_count(
                 audio_stream_id, Clusters.CameraAvStreamManagement.Attributes.AllocatedAudioStreams, endpoint
@@ -310,19 +346,75 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                 endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
+            active_session_id = None
             await webrtc_manager.remove_peer(session2_id)
 
             await self.send_single_cmd(
                 cmd=Clusters.CameraAvStreamManagement.Commands.AudioStreamDeallocate(audioStreamID=audio_stream_id),
                 endpoint=endpoint,
             )
+            deallocated_audio_id = audio_stream_id
+            audio_stream_id = None
+
             await self.send_single_cmd(
                 cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamDeallocate(videoStreamID=video_stream_id),
                 endpoint=endpoint,
             )
+            deallocated_video_id = video_stream_id
+            video_stream_id = None
+
+            allocated_audio_streams = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.CameraAvStreamManagement,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.AllocatedAudioStreams,
+            )
+            asserts.assert_not_in(
+                deallocated_audio_id,
+                [stream.audioStreamID for stream in allocated_audio_streams],
+                f"Audio stream {deallocated_audio_id} should have been deallocated",
+            )
+
+            allocated_video_streams = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.CameraAvStreamManagement,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.AllocatedVideoStreams,
+            )
+            asserts.assert_not_in(
+                deallocated_video_id,
+                [stream.videoStreamID for stream in allocated_video_streams],
+                f"Video stream {deallocated_video_id} should have been deallocated",
+            )
 
         finally:
             await webrtc_manager.close_all()
+            if active_session_id is not None:
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
+                            webRTCSessionID=active_session_id,
+                            reason=Clusters.Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup,
+                        ),
+                        endpoint=endpoint,
+                        payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+                    )
+                except Exception as e:
+                    log.warning("Failed to end active WebRTC session %s during cleanup: %s", active_session_id, e)
+            if audio_stream_id is not None:
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.CameraAvStreamManagement.Commands.AudioStreamDeallocate(audioStreamID=audio_stream_id),
+                        endpoint=endpoint,
+                    )
+                except Exception as e:
+                    log.warning("Failed to deallocate audio stream %s during cleanup: %s", audio_stream_id, e)
+            if video_stream_id is not None:
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamDeallocate(videoStreamID=video_stream_id),
+                        endpoint=endpoint,
+                    )
+                except Exception as e:
+                    log.warning("Failed to deallocate video stream %s during cleanup: %s", video_stream_id, e)
 
 
 if __name__ == "__main__":
