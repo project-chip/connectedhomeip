@@ -193,6 +193,14 @@ public:
     void SetLastDisconnectReason(uint16_t reason);
     uint16_t GetLastDisconnectReason();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Wi-Fi PAF station-join hooks, invoked on the CHIP thread.
+    using OnConnectStartedCallback = void (*)();
+    using OnConnectFailedCallback  = void (*)();
+    void SetOnConnectStartedCallback(OnConnectStartedCallback cb) { mOnConnectStartedCallback = cb; }
+    void SetOnConnectFailedCallback(OnConnectFailedCallback cb) { mOnConnectFailedCallback = cb; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 private:
     using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>, size_t);
 
@@ -263,6 +271,10 @@ private:
     uint32_t mConnectionRecoveryTimeMs{ kConnectionRecoveryMinIntervalMs };
     bool mApplicationDisconnectRequested{ false };
     uint16_t mLastDisconnectedReason;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    OnConnectStartedCallback mOnConnectStartedCallback{ nullptr };
+    OnConnectFailedCallback mOnConnectFailedCallback{ nullptr };
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mHasGlobalIPv6Address{ false };
 
     static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;

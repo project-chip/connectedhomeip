@@ -174,6 +174,16 @@ public:
     CommissioningProxyCluster::State GetCPState();
 
     /**
+     * @brief Report the proxy disconnected once no session remains, anywhere.
+     *
+     * For a transport whose peer closed the connection: the ProxyDisconnectRequest path
+     * sets the state itself. A transport must not decide this from its own sessions --
+     * with more than one transport configured, the last session on one of them is not the
+     * last session on the proxy.
+     */
+    void SetDisconnectedIfLastSession();
+
+    /**
      * @brief Current ScanMaxTime / CacheTimeout attribute values.
      *
      * These writable attributes are stored and change-reported by the cluster.
