@@ -191,11 +191,11 @@ TEST_F(TestFabricSensitiveAttributeRead, UnfilteredReadIsStillFilteredForFabricS
 
     // The plain fabric-scoped list honors the request flag and returns every row.
     ASSERT_TRUE(callback.ListSize(kFabricScopedList).has_value());
-    EXPECT_EQ(*callback.ListSize(kFabricScopedList), kRowCount);
+    EXPECT_EQ(callback.ListSize(kFabricScopedList).value_or(0), kRowCount);
 
     // The fabric-sensitive list is filtered to the accessing fabric regardless of the flag.
     ASSERT_TRUE(callback.ListSize(kFabricSensitiveList).has_value());
-    EXPECT_EQ(*callback.ListSize(kFabricSensitiveList), 1u);
+    EXPECT_EQ(callback.ListSize(kFabricSensitiveList).value_or(0), 1u);
 }
 
 TEST_F(TestFabricSensitiveAttributeRead, FilteredReadFiltersBothLists)
@@ -204,9 +204,9 @@ TEST_F(TestFabricSensitiveAttributeRead, FilteredReadFiltersBothLists)
     ReadBothLists(/* fabricFiltered = */ true, callback);
 
     ASSERT_TRUE(callback.ListSize(kFabricScopedList).has_value());
-    EXPECT_EQ(*callback.ListSize(kFabricScopedList), 1u);
+    EXPECT_EQ(callback.ListSize(kFabricScopedList).value_or(0), 1u);
     ASSERT_TRUE(callback.ListSize(kFabricSensitiveList).has_value());
-    EXPECT_EQ(*callback.ListSize(kFabricSensitiveList), 1u);
+    EXPECT_EQ(callback.ListSize(kFabricSensitiveList).value_or(0), 1u);
 }
 
 // Every attribute the data model marks fabric-sensitive must carry the quality in

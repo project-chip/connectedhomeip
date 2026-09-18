@@ -139,14 +139,11 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
     // Fabric-sensitive attributes are always reported fabric-filtered, regardless of the
     // FabricFiltered flag on the request.
-    if (entry.has_value() && entry->HasFlags(DataModel::AttributeQualityFlags::kFabricSensitive))
-    {
-        flags.Set(ReadFlags::kFabricFiltered);
-        readRequest.readFlags = flags;
-    }
+    const bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered) ||
+        (entry.has_value() && entry->HasFlags(DataModel::AttributeQualityFlags::kFabricSensitive));
+    readRequest.readFlags.Set(ReadFlags::kFabricFiltered, isFabricFiltered);
 
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
-    bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
