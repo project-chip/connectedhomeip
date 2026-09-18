@@ -478,7 +478,7 @@ private:
         {
             RegisterCreator("doorbell", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<Doorbell>(Doorbell::Config{
+                return MakeDevice<Doorbell>(Doorbell::Config{
                     .timerDelegate     = mContext->timerDelegate,
                     .platformManager   = mContext->platformManager,
                     .bindingTable      = mContext->bindingTable,
