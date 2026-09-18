@@ -84,6 +84,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'soil-sensor',
     'speaker',
     'temperature-sensor',
+    'thermostat',
     'water-freeze-detector',
     'water-leak-detector',
     'water-valve',

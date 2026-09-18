@@ -27,7 +27,9 @@ namespace app {
 /**
  * Simulated temperature sensor that increases the reported temperature over time.
  */
-class IncreasingTemperatureSensor : public TemperatureSensor, public TimerContext
+class IncreasingTemperatureSensor : public TemperatureSensor,
+                                    public TimerContext,
+                                    public Clusters::ThermostatUserInterfaceConfiguration::Delegate
 {
 public:
     IncreasingTemperatureSensor();
@@ -38,6 +40,10 @@ public:
 
     // TimerContext
     void TimerFired() override;
+
+    // ThermostatUserInterfaceConfiguration::Delegate
+    void OnTemperatureDisplayModeChanged(Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value) override;
+    void OnKeypadLockoutChanged(Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value) override;
 
 private:
     DefaultTimerDelegate mTimerDelegate;
