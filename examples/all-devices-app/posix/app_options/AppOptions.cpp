@@ -65,7 +65,6 @@ constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 #endif
 constexpr uint16_t kOptionRpcServerPort = 0xffe0;
 
-DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
 bool AppOptions::sIsConfigValidated = false;
 
@@ -163,8 +162,8 @@ CHIP_ERROR AppOptions::ValidateConfig()
             }
         }
 
-        sParser.ExpandWildcards(supportedTypes);
-        mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
+        DeviceTypeParser::GetInstance().ExpandWildcards(supportedTypes);
+        mConfig.deviceTypeEntries = DeviceTypeParser::GetInstance().GetDeviceTypeEntries();
     }
 
     ReturnErrorOnFailure(DeviceTypeParser::ValidateConfig(mConfig.deviceTypeEntries));
@@ -179,11 +178,11 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     {
     case kOptionDeviceType: {
         sIsConfigValidated = false;
-        if (sParser.ParseSingleDeviceString(value) != CHIP_NO_ERROR)
+        if (DeviceTypeParser::GetInstance().ParseSingleDeviceString(value) != CHIP_NO_ERROR)
         {
             return false;
         }
-        mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
+        mConfig.deviceTypeEntries = DeviceTypeParser::GetInstance().GetDeviceTypeEntries();
         return true;
     }
     case kOptionBLE:

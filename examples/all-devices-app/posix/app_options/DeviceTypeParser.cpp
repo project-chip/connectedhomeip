@@ -47,6 +47,12 @@ std::string KebabCaseToTitleCase(const std::string & input)
 }
 } // namespace
 
+DeviceTypeParser & DeviceTypeParser::GetInstance()
+{
+    static DeviceTypeParser instance;
+    return instance;
+}
+
 bool DeviceTypeParser::ParseEndpointId(const char * str, chip::EndpointId & endpoint)
 {
     char * endptr;
@@ -151,11 +157,7 @@ bool DeviceTypeParser::ParseDeviceTypeEntry(const char * value, Entry & entry)
 CHIP_ERROR DeviceTypeParser::ParseSingleDeviceString(const char * value)
 {
     Entry entry;
-    if (!ParseDeviceTypeEntry(value, entry))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
+    VerifyOrReturnError(ParseDeviceTypeEntry(value, entry), CHIP_ERROR_INVALID_ARGUMENT);
     mDeviceTypeEntries.push_back(std::move(entry));
     return CHIP_NO_ERROR;
 }

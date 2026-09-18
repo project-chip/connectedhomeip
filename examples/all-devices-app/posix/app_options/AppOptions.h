@@ -89,7 +89,6 @@ private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
-    static DeviceTypeParser sParser;
     static AppConfig mConfig;
     static bool sIsConfigValidated;
 };
