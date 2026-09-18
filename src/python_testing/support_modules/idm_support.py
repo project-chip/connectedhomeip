@@ -189,13 +189,21 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # wire the code-driven version into ember apps), so the ember code needs the
     # direct fix tracked in the issue above.
     (Clusters.LevelControl.id, Clusters.LevelControl.Commands.MoveToLevel.command_id),
-    # Move starts a continuous transition rather than applying one bounded change. The
-    # code-driven LevelControlCluster derives direction as
-    # `increasing = (moveMode == MoveModeEnum::kUp)`, so a DUT that fails to enforce the
-    # constraint reads an undefined MoveMode as kDown and keeps driving CurrentLevel
-    # toward the minimum after the invoke has been answered, leaving later tests looking
-    # at a device that is still moving. Step is deliberately left in: it applies a single
-    # bounded decrement, and it is worth keeping constraint coverage on this cluster.
+    # Move's Rate is nullable and the harness leaves it null, which is a legal value
+    # meaning "use DefaultMoveRate". On a DUT that has a non-null DefaultMoveRate and
+    # fails to enforce the constraint, the command therefore runs: the code-driven
+    # LevelControlCluster derives direction as
+    # `increasing = (moveMode == MoveModeEnum::kUp)`, reads an undefined MoveMode as
+    # kDown, and keeps driving CurrentLevel toward the minimum after the invoke has been
+    # answered, leaving later tests looking at a device that is still moving.
+    #
+    # Step is deliberately left in, and not for a weaker version of the same reason: it
+    # cannot run at all. StepSize declares no constraint, so no value is generated for it
+    # and it stays at the generated dataclass default of 0, and the spec requires a Step
+    # carrying StepSize 0 to be answered with INVALID_COMMAND before it has any effect.
+    # No conformant implementation reaches the direction logic, so there is no state to
+    # protect and the constraint coverage is worth keeping.
+    #
     # OnOff is not at risk from either: both SetOnOff call sites on these paths are
     # guarded by IsWithOnOffCommand, and MoveWithOnOff/StepWithOnOff carry no fields of
     # their own in the data model (the spec defines them by reference to Move/Step), so
