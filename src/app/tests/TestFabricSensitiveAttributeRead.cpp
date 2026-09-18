@@ -112,11 +112,16 @@ class ListCountingCallback : public ReadClient::Callback
 public:
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override
     {
-        if (!aStatus.IsSuccess() || apData == nullptr)
+        if (!aStatus.IsSuccess())
         {
             mFailureStatus = aStatus.mStatus;
             ChipLogError(Test, "Attribute " ChipLogFormatMEI " status 0x%02x", ChipLogValueMEI(aPath.mAttributeId),
                          to_underlying(aStatus.mStatus));
+            return;
+        }
+        if (apData == nullptr)
+        {
+            mError = CHIP_ERROR_INVALID_ARGUMENT;
             return;
         }
         VerifyOrReturn(aPath.IsListOperation() && !aPath.IsListItemOperation());
@@ -213,19 +218,15 @@ TEST_F(TestFabricSensitiveAttributeRead, FilteredReadFiltersBothLists)
 // its generated metadata, otherwise the reporting engine cannot enforce it.
 // PushAvStreamTransport::CurrentConnections is not listed yet: its XML has not been
 // regenerated with an Alchemy release that emits the marker.
-TEST_F(TestFabricSensitiveAttributeRead, GeneratedMetadataCarriesFabricSensitiveQuality)
-{
-    using DataModel::AttributeQualityFlags;
-    EXPECT_TRUE(Clusters::WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry.HasFlags(
-        AttributeQualityFlags::kFabricSensitive));
-    EXPECT_TRUE(Clusters::WebRTCTransportRequestor::Attributes::CurrentSessions::kMetadataEntry.HasFlags(
-        AttributeQualityFlags::kFabricSensitive));
-    EXPECT_TRUE(Clusters::TlsCertificateManagement::Attributes::ProvisionedRootCertificates::kMetadataEntry.HasFlags(
-        AttributeQualityFlags::kFabricSensitive));
-    EXPECT_TRUE(Clusters::TlsCertificateManagement::Attributes::ProvisionedClientCertificates::kMetadataEntry.HasFlags(
-        AttributeQualityFlags::kFabricSensitive));
-    EXPECT_TRUE(Clusters::TlsClientManagement::Attributes::ProvisionedEndpoints::kMetadataEntry.HasFlags(
-        AttributeQualityFlags::kFabricSensitive));
-}
+static_assert(Clusters::WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry.HasFlags(
+    DataModel::AttributeQualityFlags::kFabricSensitive));
+static_assert(Clusters::WebRTCTransportRequestor::Attributes::CurrentSessions::kMetadataEntry.HasFlags(
+    DataModel::AttributeQualityFlags::kFabricSensitive));
+static_assert(Clusters::TlsCertificateManagement::Attributes::ProvisionedRootCertificates::kMetadataEntry.HasFlags(
+    DataModel::AttributeQualityFlags::kFabricSensitive));
+static_assert(Clusters::TlsCertificateManagement::Attributes::ProvisionedClientCertificates::kMetadataEntry.HasFlags(
+    DataModel::AttributeQualityFlags::kFabricSensitive));
+static_assert(Clusters::TlsClientManagement::Attributes::ProvisionedEndpoints::kMetadataEntry.HasFlags(
+    DataModel::AttributeQualityFlags::kFabricSensitive));
 
 } // namespace
