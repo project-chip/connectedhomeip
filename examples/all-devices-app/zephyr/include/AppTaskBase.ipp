@@ -38,6 +38,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include "Buttons.h"
+#include "ZephyrOnOffLight.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <platform/Zephyr/OTAImageProcessorImpl.h>
@@ -53,6 +54,7 @@ CHIP_ERROR AppTaskBase<Derived>::Run()
     ReturnErrorOnFailure(Self().InitNetwork());
     ReturnErrorOnFailure(Self().InitPersistence());
     ReturnErrorOnFailure(Self().InitRootNode());
+    ReturnErrorOnFailure(Self().RegisterDeviceCreators());
     ReturnErrorOnFailure(Self().RegisterOTACluster());
     ReturnErrorOnFailure(Self().RegisterAppDevices());
     ReturnErrorOnFailure(Self().InitServer());
@@ -73,9 +75,16 @@ CHIP_ERROR AppTaskBase<Derived>::InitPlatform()
 template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitCredentials()
 {
+#if CONFIG_CHIP_FACTORY_DATA
+    // Reaching this means no derived AppTask overrode InitCredentials. Fail rather than
+    // silently falling back to test credentials in a build that asked for factory data.
+    ChipLogError(AppServer, "CONFIG_CHIP_FACTORY_DATA is set but no AppTask provides it");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#else
     Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
     DeviceLayer::SetDeviceInstanceInfoProvider(&DeviceLayer::DeviceInstanceInfoProviderMgrImpl());
     return CHIP_NO_ERROR;
+#endif
 }
 
 template <class Derived>
@@ -207,6 +216,24 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
         .identifyDelegate         = Self().GetIdentifyDelegate(),
     });
+
+    return CHIP_NO_ERROR;
+}
+
+template <class Derived>
+CHIP_ERROR AppTaskBase<Derived>::RegisterDeviceCreators()
+{
+    if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
+    {
+        NoHooksDeviceFactory::GetInstance().RegisterCreator("on-off-light", [this]() {
+            return NoHooksDeviceFactory::MakeDevice<ZephyrOnOffLight>(LoggingOnOffLight::Context{
+                .groupDataProvider = mGroupDataProvider,
+                .fabricTable       = Server::GetInstance().GetFabricTable(),
+                .timerDelegate     = mTimerDelegate,
+                .identifyDelegate  = Self().GetIdentifyDelegate(),
+            });
+        });
+    }
 
     return CHIP_NO_ERROR;
 }

@@ -92,6 +92,9 @@ public:
 
     CHIP_ERROR InitRootNode();
 
+    /// Substitutes board-specific implementations
+    CHIP_ERROR RegisterDeviceCreators();
+
     /// OTA Requestor cluster on the root endpoint, if enabled.
     CHIP_ERROR RegisterOTACluster();
 
