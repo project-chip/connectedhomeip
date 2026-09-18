@@ -13,11 +13,11 @@ This application supports **WiFi-based ESP32 SoCs only**
 
 ### Boards with a dedicated build target
 
-| Board                | Build target                       | Notes                                 |
-| -------------------- | ---------------------------------- | ------------------------------------- |
-| ESP32-DevKitC        | `esp32-devkitc-all-devices`        | headless                              |
-| M5Stack Basic / Gray | `esp32-m5stack-all-devices`        | LCD UI with the three front buttons   |
-| M5Stack CoreS3       | `esp32-m5stack-cores3-all-devices` | ESP32-S3, 16MB flash, 8MB PSRAM       |
+| Board                | Build target                       | Notes                               |
+| -------------------- | ---------------------------------- | ----------------------------------- |
+| ESP32-DevKitC        | `esp32-devkitc-all-devices`        | headless                            |
+| M5Stack Basic / Gray | `esp32-m5stack-all-devices`        | LCD UI with the three front buttons |
+| M5Stack CoreS3       | `esp32-m5stack-cores3-all-devices` | ESP32-S3, 16MB flash, 8MB PSRAM     |
 
 > **Note:** The CoreS3 has no physical buttons, and its touch panel is not wired
 > up yet, so its LCD only displays the commissioning codes. Use the serial shell
