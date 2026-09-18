@@ -134,6 +134,16 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     TLV::TLVWriter checkpoint;
     reportBuilder.Checkpoint(checkpoint);
 
+    // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
+    //       explicitly ignores that case).
+    //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below
+    //
+    //       See https://github.com/project-chip/connectedhomeip/issues/37410
+
+    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
+    // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
+    // leak information if we do fail existence checks.
+
     DataModel::AttributeFinder finder(dataModel);
     std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
 
@@ -145,16 +155,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
-
-    // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
-    //       explicitly ignores that case).
-    //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below
-    //
-    //       See https://github.com/project-chip/connectedhomeip/issues/37410
-
-    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
-    // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
-    // leak information if we do fail existence checks.
 
     if (auto access_status = ValidateReadAttributeACL(subjectDescriptor, path, Privilege::kView); access_status.has_value())
     {
