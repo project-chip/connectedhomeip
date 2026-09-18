@@ -29,6 +29,7 @@
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
 #include "microwave-oven-mode.h"
+#include "occupancy-sensor-instance.h"
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
 #include "oven-operational-state-delegate.h"
@@ -57,6 +58,8 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
@@ -127,6 +130,8 @@ Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupporte
 Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
+
+Clusters::OccupancySensingDelegateImpl sOccupancySensingDelegate;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon   = 7;
@@ -224,6 +229,8 @@ void ApplicationInit()
 #endif
     Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+
+    Clusters::OccupancySensing::SetDefaultDelegate(chip::EndpointId(1), &sOccupancySensingDelegate);
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
