@@ -178,7 +178,8 @@ def PrepareToSendBdxData(future: Future, data: bytes) -> PyChipError:
     return _PrepareForBdxTransfer(future, data)
 
 
-def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callable[[bytes], None], transferComplete: Future):
+def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callable[[bytes], None],
+                                 transferComplete: Future) -> PyChipError:
     ''' Accepts a BDX transfer with the intent of receiving data.
 
     The data will be returned block-by-block in dataReceivedClosure.
@@ -199,7 +200,7 @@ def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callab
     return res
 
 
-def AcceptTransferAndSendData(transfer: c_void_p, data: bytes | bytearray, transferComplete: Future):
+def AcceptTransferAndSendData(transfer: c_void_p, data: bytes | bytearray, transferComplete: Future) -> PyChipError:
     ''' Accepts a BDX transfer with the intent of sending data.
 
     The data will be copied by C++.
