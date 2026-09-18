@@ -36,10 +36,12 @@
 #include <memory>
 
 #include "ConnectivityManagerImplWiFiPAF.h"
+#include <wifipaf/WiFiPAFProtocol.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
+using namespace ::chip::WiFiPAF;
 
 namespace chip {
 namespace DeviceLayer {
@@ -67,15 +69,6 @@ static constexpr uint8_t kNanServiceProtocolTypeMatter = 3;
 static constexpr uint32_t kDefaultPublishTtl = CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS;
 // Default frequency for 2.4GHz
 static constexpr uint16_t kDefault24GHzFreq = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL;
-
-// PAF Publish SSI structure
-struct PAFPublishSSI
-{
-    uint8_t DevOpCode;
-    uint16_t DevInfo; // Discriminator
-    uint16_t ProductId;
-    uint16_t VendorId;
-} __packed;
 
 CHIP_ERROR ConnectivityManagerImplWiFiPAF::InitWiFiPAF()
 {
