@@ -35,7 +35,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
   val videoStreams: Optional<List<UInt>>,
   val audioStreams: Optional<List<UInt>>,
   val SFrameConfig: Optional<WebRTCTransportRequestorClusterSFrameStruct>?,
-  val fabricIndex: UInt
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterWebRTCSessionStruct {\n")
@@ -184,7 +184,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_S_FRAME_CONFIG))) {
             Optional.of(
               WebRTCTransportRequestorClusterSFrameStruct.fromTlv(
-                ContextSpecificTag(TAG_S_FRAME_CONFIG), 
+                ContextSpecificTag(TAG_S_FRAME_CONFIG),
                 tlvReader,
               )
             )

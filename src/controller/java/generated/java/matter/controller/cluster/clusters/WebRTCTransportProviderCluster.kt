@@ -56,20 +56,20 @@ class WebRTCTransportProviderCluster(
     val audioStreamID: UShort?,
   )
 
-class CurrentSessionsAttribute(
+  class CurrentSessionsAttribute(
     val value: List<WebRTCTransportProviderClusterWebRTCSessionStruct>
   )
 
   sealed class CurrentSessionsAttributeSubscriptionState {
     data class Success(val value: List<WebRTCTransportProviderClusterWebRTCSessionStruct>) :
       CurrentSessionsAttributeSubscriptionState()
-    
-    data class Error(val exception: Exception) : CurrentSessionsAttributeSubscriptionState()
 
+    data class Error(val exception: Exception) : CurrentSessionsAttributeSubscriptionState()
+  
     object SubscriptionEstablished : CurrentSessionsAttributeSubscriptionState()
   }
-  
-class SupportedSFrameCipherSuitesAttribute(
+
+  class SupportedSFrameCipherSuitesAttribute(
     val value: List<UShort>
   )
 
@@ -83,7 +83,7 @@ class SupportedSFrameCipherSuitesAttribute(
     object SubscriptionEstablished : SupportedSFrameCipherSuitesAttributeSubscriptionState()
   }
 
-class GeneratedCommandListAttribute(
+  class GeneratedCommandListAttribute(
     val value: List<UInt>
   )
 
@@ -95,7 +95,7 @@ class GeneratedCommandListAttribute(
     object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
   }
 
-class AcceptedCommandListAttribute(val value: List<UInt>)
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
   sealed class AcceptedCommandListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : AcceptedCommandListAttributeSubscriptionState()
@@ -105,7 +105,7 @@ class AcceptedCommandListAttribute(val value: List<UInt>)
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
   }
 
-class AttributeListAttribute(
+  class AttributeListAttribute(
     val value: List<UInt>
   )
 
@@ -114,8 +114,8 @@ class AttributeListAttribute(
 
     data class Error(val exception: Exception) : AttributeListAttributeSubscriptionState()
 
-    object SubscriptionEstablished : AttributeListAttributeSubscriptionState()    
-  }  
+    object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
+  }
 
   suspend fun solicitOffer(
     streamUsage: UByte,
@@ -128,7 +128,7 @@ class AttributeListAttribute(
     SFrameConfig: WebRTCTransportProviderClusterSFrameStruct?,
     videoStreams: List<UShort>?,
     audioStreams: List<UShort>?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): SolicitOfferResponse {
     val commandId: UInt = 0u
 
@@ -192,7 +192,7 @@ class AttributeListAttribute(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -234,10 +234,10 @@ class AttributeListAttribute(
             } else {
               tlvReader.getNull(tag)
               null
-            }  
+            }
           }
       } else if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
-        audioStreamID_decoded = 
+        audioStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
             null
@@ -251,7 +251,7 @@ class AttributeListAttribute(
             } else {
               tlvReader.getNull(tag)
               null
-            }  
+            }
           }
       } else {
         tlvReader.skipElement()
@@ -363,7 +363,7 @@ class AttributeListAttribute(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -382,11 +382,11 @@ class AttributeListAttribute(
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
-      
+
       if (tag == ContextSpecificTag(TAG_WEB_RTC_SESSION_ID)) {
         webRTCSessionID_decoded = tlvReader.getUShort(tag)
       } else if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
-        videoStreamID_decoded = 
+        videoStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
             null
@@ -400,10 +400,10 @@ class AttributeListAttribute(
             } else {
               tlvReader.getNull(tag)
               null
-            }  
+            }
           }
       } else if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
-        audioStreamID_decoded = 
+        audioStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
             null
@@ -417,7 +417,7 @@ class AttributeListAttribute(
             } else {
               tlvReader.getNull(tag)
               null
-            }  
+            }
           }
       } else {
         tlvReader.skipElement()
@@ -458,7 +458,7 @@ class AttributeListAttribute(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -483,14 +483,14 @@ class AttributeListAttribute(
     for (item in ICECandidates.iterator()) {
       item.toTlv(AnonymousTag, tlvWriter)
     }
-    tlvWriter.endArray()    
+    tlvWriter.endArray()
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -518,7 +518,7 @@ class AttributeListAttribute(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -568,34 +568,35 @@ class AttributeListAttribute(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
-  
+
   suspend fun readCurrentSessionsAttribute(): CurrentSessionsAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
-    val attributePath = AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }    
+    }
 
     logger.log(Level.FINE, "Read command succeeded")
 
     val attributeData =
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
-      }        
-       
+      }
+
     requireNotNull(attributeData) { "Currentsessions attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
@@ -603,7 +604,7 @@ class AttributeListAttribute(
     val decodedValue: List<WebRTCTransportProviderClusterWebRTCSessionStruct> =
       buildList<WebRTCTransportProviderClusterWebRTCSessionStruct> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(WebRTCTransportProviderClusterWebRTCSessionStruct.fromTlv(AnonymousTag, tlvReader))
         }
         tlvReader.exitContainer()
@@ -623,23 +624,29 @@ class AttributeListAttribute(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
     return controller.subscribe(subscribeRequest).transform { subscriptionState ->
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(CurrentSessionsAttributeSubscriptionState.Error(Exception("Subscription terminated with error code: ${subscriptionState.terminationCause}")))
+          emit(
+            CurrentSessionsAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
-             
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID } 
+
           requireNotNull(attributeData) {
             "Currentsessions attribute not found in Node State update"
           }
@@ -650,7 +657,8 @@ class AttributeListAttribute(
             buildList<WebRTCTransportProviderClusterWebRTCSessionStruct> {
               tlvReader.enterArray(AnonymousTag)
               while(!tlvReader.isEndOfContainer()) {
-                add(WebRTCTransportProviderClusterWebRTCSessionStruct.fromTlv(AnonymousTag, tlvReader))
+                add(
+                  WebRTCTransportProviderClusterWebRTCSessionStruct.fromTlv(AnonymousTag, tlvReader))
               }
               tlvReader.exitContainer()
             }
@@ -663,7 +671,7 @@ class AttributeListAttribute(
       }
     }
   }
-  
+
   suspend fun readSupportedSFrameCipherSuitesAttribute(): SupportedSFrameCipherSuitesAttribute {
     val ATTRIBUTE_ID: UInt = 1u
 
@@ -693,7 +701,7 @@ class AttributeListAttribute(
     val decodedValue: List<UShort> =
       buildList<UShort> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUShort(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -703,7 +711,7 @@ class AttributeListAttribute(
 
   suspend fun subscribeSupportedSFrameCipherSuitesAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<SupportedSFrameCipherSuitesAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
@@ -713,9 +721,9 @@ class AttributeListAttribute(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
@@ -734,9 +742,9 @@ class AttributeListAttribute(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
-             
-          requireNotNull(attributeData) { 
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }    
+
+          requireNotNull(attributeData) {
             "Supportedsframeciphersuites attribute not found in Node State update"
           }
 
@@ -745,7 +753,7 @@ class AttributeListAttribute(
           val decodedValue: List<UShort> =
             buildList<UShort> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUShort(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -767,7 +775,7 @@ class AttributeListAttribute(
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
@@ -781,7 +789,7 @@ class AttributeListAttribute(
       response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
         it.path.attributeId == ATTRIBUTE_ID
       }
-       
+
     requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
@@ -789,7 +797,7 @@ class AttributeListAttribute(
     val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -799,7 +807,7 @@ class AttributeListAttribute(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -809,9 +817,9 @@ class AttributeListAttribute(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
@@ -828,9 +836,9 @@ class AttributeListAttribute(
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
-            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-              it.path.attributeId == ATTRIBUTE_ID
-            }   
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }   
 
           requireNotNull(attributeData) {
             "Generatedcommandlist attribute not found in Node State update"
@@ -841,7 +849,7 @@ class AttributeListAttribute(
           val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -863,7 +871,7 @@ class AttributeListAttribute(
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
@@ -878,16 +886,14 @@ class AttributeListAttribute(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Acceptedcommandlist attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -898,7 +904,7 @@ class AttributeListAttribute(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -908,9 +914,9 @@ class AttributeListAttribute(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
@@ -929,7 +935,7 @@ class AttributeListAttribute(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
             "Acceptedcommandlist attribute not found in Node State update"
@@ -940,7 +946,7 @@ class AttributeListAttribute(
           val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -962,7 +968,7 @@ class AttributeListAttribute(
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
@@ -977,16 +983,14 @@ class AttributeListAttribute(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Attributelist attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Attributelist attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<UInt> =
       buildList<UInt> {
         tlvReader.enterArray(AnonymousTag)
-        while(!tlvReader.isEndOfContainer()) {
+        while (!tlvReader.isEndOfContainer()) {
           add(tlvReader.getUInt(AnonymousTag))
         }
         tlvReader.exitContainer()
@@ -1006,9 +1010,9 @@ class AttributeListAttribute(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
@@ -1027,18 +1031,16 @@ class AttributeListAttribute(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID } 
 
-          requireNotNull(attributeData) {
-            "Attributelist attribute not found in Node State update"
-          }
+          requireNotNull(attributeData) { "Attributelist attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: List<UInt> =
             buildList<UInt> {
               tlvReader.enterArray(AnonymousTag)
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -1060,7 +1062,7 @@ class AttributeListAttribute(
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-    
+
     val response = controller.read(readRequest)
 
     if (response.successes.isEmpty()) {
@@ -1075,9 +1077,7 @@ class AttributeListAttribute(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Featuremap attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Featuremap attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1098,9 +1098,9 @@ class AttributeListAttribute(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
@@ -1117,13 +1117,11 @@ class AttributeListAttribute(
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
-            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-              it.path.attributeId == ATTRIBUTE_ID
-            }
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) {
-            "Featuremap attribute not found in Node State update"
-          }
+          requireNotNull(attributeData) { "Featuremap attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -1160,9 +1158,7 @@ class AttributeListAttribute(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) {
-      "Clusterrevision attribute not found in response"
-    }
+    requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -1173,7 +1169,7 @@ class AttributeListAttribute(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =
@@ -1183,9 +1179,9 @@ class AttributeListAttribute(
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
-        eventPaths = emptyList(), 
-        attributePaths = attributePaths, 
-        minInterval = Duration.ofSeconds(minInterval.toLong()), 
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
         maxInterval = Duration.ofSeconds(maxInterval.toLong()),
       )
 
@@ -1202,9 +1198,9 @@ class AttributeListAttribute(
         }
         is SubscriptionState.NodeStateUpdate -> {
           val attributeData =
-            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-              it.path.attributeId == ATTRIBUTE_ID
-            }
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
             "Clusterrevision attribute not found in Node State update"
