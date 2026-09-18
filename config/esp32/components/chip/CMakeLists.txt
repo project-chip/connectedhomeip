@@ -285,6 +285,12 @@ endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
+    if (CONFIG_ENABLE_MULTI_IMAGE_OTA)
+        chip_gn_arg_append("chip_enable_multi_ota_requestor"           "true")
+        if (CONFIG_ENABLE_ENCRYPTED_OTA)
+            chip_gn_arg_append("chip_enable_encrypted_ota"            "true")
+        endif()
+    endif()
 endif()
 
 if (CONFIG_ENABLE_ACCESS_RESTRICTIONS)
