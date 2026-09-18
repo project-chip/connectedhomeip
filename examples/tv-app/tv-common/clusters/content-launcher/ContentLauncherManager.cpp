@@ -17,10 +17,15 @@
  */
 
 #include "ContentLauncherManager.h"
+#include "MediaContentCatalog.h"
+#include "media-playback/MediaPlaybackManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <clusters/ContentLauncher/Metadata.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <list>
 #include <string>
@@ -30,6 +35,12 @@ using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
 using namespace chip::literals;
+
+namespace {
+
+bool gMovable = true;
+
+} // namespace
 
 ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
 {
@@ -184,7 +195,28 @@ void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelp
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleContentReplicationRequest");
     ContentReplicationResponseType response;
-    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
+
+    // Content that is not movable cannot be handed to another device, and the response
+    // carries no replication information in that case.
+    if (!HandleGetMovable())
+    {
+        response.status = ContentLauncher::StatusEnum::kReplicationNotAllowed;
+        LogErrorOnFailure(helper.Success(response));
+        return;
+    }
+
+    // Describe the content that is playing so another device can pick it up. The spans
+    // point at the catalog, which has static storage, so they outlive the encode below.
+    const MediaContentCatalog::Entry & entry = MediaContentCatalog::kEntries[MediaPlaybackManager::GetCurrentContentIndex()];
+
+    LaunchUrlInfoType launchUrlInfo;
+    launchUrlInfo.url = entry.replicationUrl;
+
+    ReplicationInfoType replicationInfo;
+    replicationInfo.launchUrlInfo.SetValue(chip::app::DataModel::MakeNullable(launchUrlInfo));
+
+    response.status = ContentLauncher::StatusEnum::kSuccess;
+    response.replicationInfo.SetValue(chip::app::DataModel::MakeNullable(replicationInfo));
     LogErrorOnFailure(helper.Success(response));
 }
 
@@ -192,7 +224,19 @@ void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * comman
                                               const chip::app::ConcreteCommandPath & commandPath, uint16_t presetID)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandlePlayPreset presetID=%u", presetID);
-    commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
+
+    for (size_t index = 0; index < MATTER_ARRAY_SIZE(MediaContentCatalog::kEntries); index++)
+    {
+        if (MediaContentCatalog::kEntries[index].presetID == presetID)
+        {
+            MediaPlaybackManager::SetCurrentContent(commandPath.mEndpointId, index);
+            commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
+            return;
+        }
+    }
+
+    commandObj->AddStatus(
+        commandPath, chip::Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusEnum::kPresetNotFound));
 }
 
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
@@ -217,24 +261,32 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 bool ContentLauncherManager::HandleGetMovable()
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetMovable");
-    return true;
+    return IsMovable();
+}
+
+bool ContentLauncherManager::IsMovable()
+{
+    return gMovable;
+}
+
+void ContentLauncherManager::SetMovable(chip::EndpointId endpoint, bool movable)
+{
+    VerifyOrReturn(movable != gMovable);
+    gMovable = movable;
+    MatterReportingAttributeChangeCallback(endpoint, Id, Attributes::Movable::Id);
 }
 
 CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
 {
-    using namespace chip::literals;
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetPresets");
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        ContentPresetStructType preset1;
-        preset1.presetID   = 1;
-        preset1.presetName = "Morning News"_span;
-        ReturnErrorOnFailure(encoder.Encode(preset1));
-
-        ContentPresetStructType preset2;
-        preset2.presetID   = 2;
-        preset2.presetName = "Evening Playlist"_span;
-        ReturnErrorOnFailure(encoder.Encode(preset2));
-
+        for (const MediaContentCatalog::Entry & entry : MediaContentCatalog::kEntries)
+        {
+            ContentPresetStructType preset;
+            preset.presetID   = entry.presetID;
+            preset.presetName = entry.name;
+            ReturnErrorOnFailure(encoder.Encode(preset));
+        }
         return CHIP_NO_ERROR;
     });
 }
