@@ -143,7 +143,7 @@ void ShowDeviceSelection(lv_obj_t * parent)
         if (opt.isActive)
         {
             lv_obj_set_style_bg_color(btn, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
-            std::string activeLabel = "✓  " + opt.label;
+            std::string activeLabel = LV_SYMBOL_OK "  " + opt.label;
             lv_label_set_text(label, activeLabel.c_str());
         }
         else
