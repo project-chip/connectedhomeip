@@ -21,6 +21,7 @@ the MessageQueued / MessagePresented / MessageComplete / MessageNotPresented eve
 """
 
 import logging
+import queue
 import time
 
 from mobly import asserts
@@ -100,6 +101,36 @@ class MESSTestBase:
             if data.messageID == message_id:
                 return data
             log.info("Ignoring %s for unrelated MessageID %s", event.__name__, data.messageID.hex())
+
+    def wait_for_one_of_message_events(self, handler: EventSubscriptionHandler, event_types, message_id: bytes,
+                                       timeout_sec: float = 30.0):
+        """Wait for whichever of ``event_types`` arrives first for ``message_id``.
+
+        ``wait_for_message_event`` discards every event that is not the one type it wants, so a
+        test that waits for the wrong outcome only learns that it timed out. Waiting on several
+        types at once lets the caller report which outcome the DUT actually produced.
+
+        Returns a ``(event_type, data)`` tuple.
+        """
+        wanted = {event.event_id: event for event in event_types}
+        deadline = time.monotonic() + timeout_sec
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                names = ", ".join(event.__name__ for event in event_types)
+                asserts.fail(f"Timed out waiting for one of [{names}] with MessageID {message_id.hex()}")
+            try:
+                event = handler.get_event_from_queue(block=True, timeout=remaining)
+            except queue.Empty:
+                continue
+            event_type = wanted.get(event.Header.EventId)
+            if event_type is None:
+                log.info("Ignoring event %s while waiting for a decision on MessageID %s",
+                         event.Header.EventId, message_id.hex())
+                continue
+            if event.Data.messageID == message_id:
+                return event_type, event.Data
+            log.info("Ignoring %s for unrelated MessageID %s", event_type.__name__, event.Data.messageID.hex())
 
     async def read_messages_attribute(self, endpoint):
         return await self.read_single_attribute_check_success(

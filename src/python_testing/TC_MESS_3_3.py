@@ -20,7 +20,7 @@ from mobly import asserts
 from TC_MESSTestBase import MESSAGE_ID_1, MESSAGE_ID_2, MESSTestBase
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.pixit import pixit
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -77,6 +77,7 @@ class TC_MESS_3_3(MatterBaseTest, MESSTestBase):
         has_feature(Clusters.Messages, Clusters.Messages.Bitmaps.Feature.kAudioMessages))
     async def test_TC_MESS_3_3(self):
         cluster = Clusters.Messages
+        self._muted = False
         events = cluster.Events
         endpoint = self.get_endpoint()
 
@@ -88,9 +89,20 @@ class TC_MESS_3_3(MatterBaseTest, MESSTestBase):
         event_handler = await self.start_message_event_subscription(endpoint)
 
         self.step(1)
-        self.wait_for_user_input(
-            prompt_msg="Place the DUT in a muted or do-not-disturb state, per the manufacturer's documentation, "
-                       "then press Enter.\n")
+        # Nothing in the Messages cluster exposes the muted state, so the operator is the only
+        # way to establish it and the only way to confirm it. A closed stdin makes
+        # wait_for_user_input return None, and continuing from there would send the messages to
+        # an unmuted DUT and fail step 3 with a timeout that looks like a missing event.
+        confirmation = self.wait_for_user_input(
+            prompt_msg="Place the DUT in a muted or do-not-disturb state, per the manufacturer's documentation "
+                       "(tv-app: `messages do-not-disturb on`), then press Enter.\n")
+        if confirmation is None:
+            log.info("No operator input is available, so the DUT cannot be placed in a muted state")
+            self.mark_current_step_skipped()
+            self.mark_all_remaining_steps_skipped(2)
+            event_handler.cancel()
+            return
+        self._muted = True
 
         # Both messages are sent with a null Duration, meaning "until changed". Unlike TC-MESS-3.1
         # and 3.2, nothing here waits for a message to complete: the High priority message has to
@@ -103,8 +115,16 @@ class TC_MESS_3_3(MatterBaseTest, MESSTestBase):
             priority=cluster.Enums.MessagePriorityEnum.kLow, message_uri=audio_uri)
 
         self.step(3)
-        event_data = self.wait_for_message_event(
-            event_handler, events.MessageNotPresented, MESSAGE_ID_1, timeout_sec=timeout_sec)
+        # A DUT that was never muted presents the message instead of dropping it. Waiting for
+        # both outcomes tells those two failures apart, rather than reporting the timeout that
+        # an unmuted DUT would otherwise produce.
+        event_type, event_data = self.wait_for_one_of_message_events(
+            event_handler, (events.MessageNotPresented, events.MessagePresented), MESSAGE_ID_1,
+            timeout_sec=timeout_sec)
+        asserts.assert_equal(
+            event_type, events.MessageNotPresented,
+            "The DUT presented the Low priority message rather than dropping it, so it was not in a "
+            "muted or do-not-disturb state when step 2 ran")
         asserts.assert_true(
             event_data.removedFromQueue,
             "RemovedFromQueue should be true for a dropped Low priority message")
@@ -119,8 +139,13 @@ class TC_MESS_3_3(MatterBaseTest, MESSTestBase):
             priority=cluster.Enums.MessagePriorityEnum.kHigh, message_uri=audio_uri)
 
         self.step(6)
-        event_data = self.wait_for_message_event(
-            event_handler, events.MessageNotPresented, MESSAGE_ID_2, timeout_sec=timeout_sec)
+        event_type, event_data = self.wait_for_one_of_message_events(
+            event_handler, (events.MessageNotPresented, events.MessagePresented), MESSAGE_ID_2,
+            timeout_sec=timeout_sec)
+        asserts.assert_equal(
+            event_type, events.MessageNotPresented,
+            "The DUT presented the High priority message rather than deferring it, so it was not in a "
+            "muted or do-not-disturb state when step 5 ran")
         asserts.assert_false(
             event_data.removedFromQueue,
             "RemovedFromQueue should be false for a deferred High priority message")
@@ -132,6 +157,17 @@ class TC_MESS_3_3(MatterBaseTest, MESSTestBase):
         await self.send_cancel_message(endpoint, [MESSAGE_ID_2])
 
         event_handler.cancel()
+
+    @async_test_body
+    async def teardown_test(self):
+        # Leave the DUT unmuted, so a rerun starts from the same state. A muted DUT drops the
+        # Low priority messages that TC-MESS-3.1 and TC-MESS-3.2 present, so leaving it muted
+        # would fail whichever of those runs next.
+        if getattr(self, "_muted", False):
+            self.wait_for_user_input(
+                prompt_msg="Take the DUT out of the muted or do-not-disturb state (tv-app: "
+                           "`messages do-not-disturb off`), then press Enter.\n")
+        super().teardown_test()
 
 
 if __name__ == "__main__":
