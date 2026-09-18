@@ -14,6 +14,27 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# Throwaway probe (matter-test-scripts#609): does --thread alone work in REPL CI?
+# No radio needed to observe app init vs test-body failure. --PICS omitted (same as 4_15).
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --thread --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --endpoint 0
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+# === END CI TEST ARGUMENTS ===
 
 import logging
 
