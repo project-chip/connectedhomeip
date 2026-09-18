@@ -24,7 +24,6 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-
 class WebRTCTransportRequestorClusterWebRTCSessionStruct(
   val id: UInt,
   val peerNodeID: ULong,
@@ -38,7 +37,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
   val SFrameConfig: Optional<WebRTCTransportRequestorClusterSFrameStruct>?,
   val fabricIndex: UInt
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterWebRTCSessionStruct {\n")
     append("\tid : $id\n")
     append("\tpeerNodeID : $peerNodeID\n")
@@ -120,7 +119,10 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
     private const val TAG_S_FRAME_CONFIG = 9
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WebRTCTransportRequestorClusterWebRTCSessionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): WebRTCTransportRequestorClusterWebRTCSessionStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getUInt(ContextSpecificTag(TAG_ID))
       val peerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PEER_NODE_ID))
@@ -154,7 +156,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UInt> {
               tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -168,7 +170,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UInt> {
               tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -207,7 +209,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
         metadataEnabled,
         videoStreams,
         audioStreams,
-        SFrameConfig, 
+        SFrameConfig,
         fabricIndex,
       )
     }
