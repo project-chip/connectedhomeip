@@ -111,55 +111,55 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <bitmap name="UserActiveModeTriggerBitmap">
-      <bitfield name="PowerCycle" bit="0" summary="Power Cycle to transition the device to ActiveMode">
+      <bitfield name="PowerCycle" bit="0" summary="Power Cycle to transition the device to ActiveMode" instructionDependency="no">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="SettingsMenu" bit="1" summary="Settings menu on the device informs how to transition the device to ActiveMode">
+      <bitfield name="SettingsMenu" bit="1" summary="Settings menu on the device informs how to transition the device to ActiveMode" instructionDependency="no">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="CustomInstruction" bit="2" summary="Custom Instruction on how to transition the device to ActiveMode">
+      <bitfield name="CustomInstruction" bit="2" summary="Custom Instruction on how to transition the device to ActiveMode" instructionDependency="M">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="DeviceManual" bit="3" summary="Device Manual informs how to transition the device to ActiveMode">
+      <bitfield name="DeviceManual" bit="3" summary="Device Manual informs how to transition the device to ActiveMode" instructionDependency="no">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="ActuateSensor" bit="4" summary="Actuate Sensor to transition the device to ActiveMode">
+      <bitfield name="ActuateSensor" bit="4" summary="Actuate Sensor to transition the device to ActiveMode" instructionDependency="no">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="ActuateSensorSeconds" bit="5" summary="Actuate Sensor for N seconds to transition the device to ActiveMode">
+      <bitfield name="ActuateSensorSeconds" bit="5" summary="Actuate Sensor for N seconds to transition the device to ActiveMode" instructionDependency="M">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="ActuateSensorTimes" bit="6" summary="Actuate Sensor N times to transition the device to ActiveMode">
+      <bitfield name="ActuateSensorTimes" bit="6" summary="Actuate Sensor N times to transition the device to ActiveMode" instructionDependency="M">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="ActuateSensorLightsBlink" bit="7" summary="Actuate Sensor until light blinks to transition the device to ActiveMode">
+      <bitfield name="ActuateSensorLightsBlink" bit="7" summary="Actuate Sensor until light blinks to transition the device to ActiveMode" instructionDependency="O">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="ResetButton" bit="8" summary="Press Reset Button to transition the device to ActiveMode">
+      <bitfield name="ResetButton" bit="8" summary="Press Reset Button to transition the device to ActiveMode" instructionDependency="no">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="ResetButtonLightsBlink" bit="9" summary="Press Reset Button until light blinks to transition the device to ActiveMode">
+      <bitfield name="ResetButtonLightsBlink" bit="9" summary="Press Reset Button until light blinks to transition the device to ActiveMode" instructionDependency="O">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="ResetButtonSeconds" bit="10" summary="Press Reset Button for N seconds to transition the device to ActiveMode">
+      <bitfield name="ResetButtonSeconds" bit="10" summary="Press Reset Button for N seconds to transition the device to ActiveMode" instructionDependency="M">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="ResetButtonTimes" bit="11" summary="Press Reset Button N times to transition the device to ActiveMode">
+      <bitfield name="ResetButtonTimes" bit="11" summary="Press Reset Button N times to transition the device to ActiveMode" instructionDependency="M">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="SetupButton" bit="12" summary="Press Setup Button to transition the device to ActiveMode">
+      <bitfield name="SetupButton" bit="12" summary="Press Setup Button to transition the device to ActiveMode" instructionDependency="no">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="SetupButtonSeconds" bit="13" summary="Press Setup Button for N seconds to transition the device to ActiveMode">
+      <bitfield name="SetupButtonSeconds" bit="13" summary="Press Setup Button for N seconds to transition the device to ActiveMode" instructionDependency="M">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="SetupButtonLightsBlink" bit="14" summary="Press Setup Button until light blinks to transition the device to ActiveMode">
+      <bitfield name="SetupButtonLightsBlink" bit="14" summary="Press Setup Button until light blinks to transition the device to ActiveMode" instructionDependency="O">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="SetupButtonTimes" bit="15" summary="Press Setup Button N times to transition the device to ActiveMode">
+      <bitfield name="SetupButtonTimes" bit="15" summary="Press Setup Button N times to transition the device to ActiveMode" instructionDependency="M">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="AppDefinedButton" bit="16" summary="Press the N Button to transition the device to ActiveMode">
+      <bitfield name="AppDefinedButton" bit="16" summary="Press the N Button to transition the device to ActiveMode" instructionDependency="M">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
