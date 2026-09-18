@@ -13016,6 +13016,56 @@ class ChipClusters:
             },
         },
     }
+    _THREAD_BORDER_ROUTER_DIAGNOSTICS_CLUSTER_INFO = {
+        "clusterName": "ThreadBorderRouterDiagnostics",
+        "clusterId": 0x00000454,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Status",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "ActiveFaultsList",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _COMMISSIONING_PROXY_CLUSTER_INFO = {
         "clusterName": "CommissioningProxy",
         "clusterId": 0x00000455,
@@ -18035,6 +18085,7 @@ class ChipClusters:
         0x00000451: _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         0x00000452: _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         0x00000453: _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,
+        0x00000454: _THREAD_BORDER_ROUTER_DIAGNOSTICS_CLUSTER_INFO,
         0x00000455: _COMMISSIONING_PROXY_CLUSTER_INFO,
         0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
         0x00000504: _CHANNEL_CLUSTER_INFO,
@@ -18196,6 +18247,7 @@ class ChipClusters:
         "WiFiNetworkManagement": _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         "ThreadBorderRouterManagement": _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         "ThreadNetworkDirectory": _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,
+        "ThreadBorderRouterDiagnostics": _THREAD_BORDER_ROUTER_DIAGNOSTICS_CLUSTER_INFO,
         "CommissioningProxy": _COMMISSIONING_PROXY_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "Channel": _CHANNEL_CLUSTER_INFO,

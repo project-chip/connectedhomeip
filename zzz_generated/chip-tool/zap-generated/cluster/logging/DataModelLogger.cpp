@@ -24681,6 +24681,48 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case ThreadBorderRouterDiagnostics::Id: {
+        switch (path.mAttributeId)
+        {
+        case ThreadBorderRouterDiagnostics::Attributes::Status::Id: {
+            chip::app::Clusters::ThreadBorderRouterDiagnostics::BorderRouterOperationalStatusEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Status", 1, value);
+        }
+        case ThreadBorderRouterDiagnostics::Attributes::ActiveFaultsList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadBorderRouterDiagnostics::ThreadBorderRouterFaultEnum>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveFaultsList", 1, value);
+        }
+        case ThreadBorderRouterDiagnostics::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, ThreadBorderRouterDiagnostics::Id);
+        }
+        case ThreadBorderRouterDiagnostics::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, ThreadBorderRouterDiagnostics::Id);
+        }
+        case ThreadBorderRouterDiagnostics::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, ThreadBorderRouterDiagnostics::Id);
+        }
+        case ThreadBorderRouterDiagnostics::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ThreadBorderRouterDiagnostics::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case CommissioningProxy::Id: {
         switch (path.mAttributeId)
         {

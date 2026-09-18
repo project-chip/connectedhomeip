@@ -265,6 +265,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ThreadBorderRouterManagement";
     case chip::app::Clusters::ThreadNetworkDirectory::Id:
         return "ThreadNetworkDirectory";
+    case chip::app::Clusters::ThreadBorderRouterDiagnostics::Id:
+        return "ThreadBorderRouterDiagnostics";
     case chip::app::Clusters::CommissioningProxy::Id:
         return "CommissioningProxy";
     case chip::app::Clusters::WakeOnLan::Id:
@@ -4465,6 +4467,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ThreadNetworkDirectory::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ThreadNetworkDirectory::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ThreadBorderRouterDiagnostics::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ThreadBorderRouterDiagnostics::Attributes::Status::Id:
+            return "Status";
+        case chip::app::Clusters::ThreadBorderRouterDiagnostics::Attributes::ActiveFaultsList::Id:
+            return "ActiveFaultsList";
+        case chip::app::Clusters::ThreadBorderRouterDiagnostics::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ThreadBorderRouterDiagnostics::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ThreadBorderRouterDiagnostics::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ThreadBorderRouterDiagnostics::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ThreadBorderRouterDiagnostics::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
