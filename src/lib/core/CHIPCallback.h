@@ -522,6 +522,10 @@ public:
 private:
     static void _Dequeue(Cancelable * ca)
     {
+        // The static analyzer does not model the circular list invariant (ca->mPrev->mNext == ca),
+        // so the store below appears not to update the head of the containing deque. On a drain
+        // loop it therefore believes First() can return a node that Invalidate() already nulled out.
+        // NOLINTNEXTLINE(clang-analyzer-core.NullDereference)
         ca->mNext->mPrev = ca->mPrev;
         ca->mPrev->mNext = ca->mNext;
     }

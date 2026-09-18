@@ -358,7 +358,7 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
     mCurrentTxtRecordHasDiscriminator = false;
     mDnsPacket                        = chip::Dnssd::BytesRange(payload.data(), payload.data() + payload.size());
 
-    if (!chip::Dnssd::ParsePacket(mDnsPacket, this))
+    if (!chip::Dnssd::ParseMdnsPacket(mDnsPacket, this))
     {
         ChipLogError(Controller, "Failed to parse joiner mDNS announcement");
         return;
