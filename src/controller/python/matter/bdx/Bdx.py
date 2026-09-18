@@ -248,7 +248,7 @@ def Init():
         setter.Set('pychip_Bdx_AcceptTransferAndReceiveData',
                    PyChipError, [c_void_p, py_object, py_object])
         setter.Set('pychip_Bdx_AcceptTransferAndSendData',
-                   PyChipError, [c_void_p, c_uint8_p, c_size_t])
+                   PyChipError, [c_void_p, c_uint8_p, c_size_t, py_object])
         setter.Set('pychip_Bdx_RejectTransfer',
                    PyChipError, [c_void_p])
         setter.Set('pychip_Bdx_InitCallbacks', None, [
