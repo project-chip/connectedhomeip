@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,15 @@
 # limitations under the License.
 #
 
-if(NOT TARGET gnu17)
-	add_library(gnu17 INTERFACE)
-	target_compile_options(gnu17 INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
-endif()
-target_compile_options(gnu17 INTERFACE -Wno-stringop-truncation)
-target_link_libraries(app PRIVATE gnu17)
+mainmenu "Matter All-Devices Zephyr"
+
+rsource "Kconfig.defaults"
+rsource "Kconfig.devices"
+
+if NET_L2_OPENTHREAD
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_FTD
+endchoice
+endif # NET_L2_OPENTHREAD
+
+source "Kconfig.zephyr"
