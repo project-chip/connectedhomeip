@@ -34,11 +34,15 @@ jobs:
     linux_standalone:
         name: Linux Standalone
 
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
+
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
 
         steps:
             - name: Checkout
@@ -47,6 +51,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
+                bootstrap-log-name: bootstrap-logs-${{ github.job }}
 
             - name: Build standalone tools
               run: |

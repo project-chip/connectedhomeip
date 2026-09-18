@@ -12,8 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/toolchain/custom/custom.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+
+if (chip_crypto == "openssl") {
+  import("${chip_root}/src/crypto/openssl.gni")
+}
 
 _compiler_subdir = "gcc"
 if (is_clang) {
@@ -39,6 +45,15 @@ action("build_libdatachannel") {
     args += [ "--clang" ]
   }
 
+  if (chip_crypto == "openssl") {
+    if (openssl_root != "") {
+      args += [ "--openssl-root=$openssl_root" ]
+    }
+    if (chip_openssl_static) {
+      args += [ "--openssl-static" ]
+    }
+  }
+
   # check for cross compilation - use target_cc/target_cxx from args.gn if set
   if (host_cpu != current_cpu) {
     args += [ "--cross-compile-cpu-type=${current_cpu}" ]
@@ -58,12 +73,14 @@ config("datachannel_config") {
     "usrsctp",
     "srtp2",
     "juice-static",
-
-    # We build static libraries and srtp2 depends on openssl
-    # TODO: can we somehow query this dynamically?
-    "ssl",
-    "crypto",
   ]
+
+  if (chip_crypto != "openssl") {
+    libs += [
+      "ssl",
+      "crypto",
+    ]
+  }
 
   cflags_cc = [ "-Wno-shadow" ]
   if (is_clang) {
@@ -82,4 +99,9 @@ config("datachannel_config") {
 group("libdatachannel") {
   deps = [ ":build_libdatachannel" ]
   public_configs = [ ":datachannel_config" ]
+  if (chip_crypto == "openssl") {
+    # libdatachannel and libsrtp share OpenSSL objects. Use the SDK's complete
+    # selection instead of adding shared libssl alongside static libcrypto.
+    public_configs += [ "${chip_root}/src/crypto:openssl_config" ]
+  }
 }

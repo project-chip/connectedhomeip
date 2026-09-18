@@ -52,6 +52,8 @@ jobs:
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             LSAN_OPTIONS: detect_leaks=1
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
@@ -61,7 +63,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -789,6 +791,8 @@ jobs:
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
@@ -797,7 +801,7 @@ jobs:
         runs-on: namespace-profile-16x32
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -1101,7 +1105,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:

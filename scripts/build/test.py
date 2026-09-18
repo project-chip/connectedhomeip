@@ -129,6 +129,20 @@ class TestBuilder(unittest.TestCase):
             expected = os.path.join('testdata', f'dry_run_{target}.txt')
             self.assertCommandOutput(expected, f'--target {target} --dry-run build'.split(' '))
 
+    @unittest.skipUnless(sys.platform == 'linux', 'Build on linux test')
+    @unittest.skipUnless(os.uname().machine == 'x86_64', 'Validation x64, requires linux x64')
+    def test_openssl_static_dry_runs(self) -> None:
+        """Verify that the static target suffix selects OpenSSL and static linkage."""
+        for app in ('network-manager', 'all-clusters', 'chip-tool', 'chip-cert', 'python-bindings'):
+            with self.subTest(app=app):
+                target = f'linux-x64-{app}'
+                default = ''.join(build_actual_output('/TEST/BUILD/ROOT', '/OUTPUT/DIR', ['--target', target, 'gen']))
+                self.assertNotIn('chip_openssl_static=true', default)
+                static = ''.join(build_actual_output(
+                    '/TEST/BUILD/ROOT', '/OUTPUT/DIR', ['--target', target + '-openssl-static', 'gen']))
+                self.assertIn('chip_crypto="openssl"', static)
+                self.assertIn('chip_openssl_static=true', static)
+
 
 if __name__ == '__main__':
     unittest.main()
