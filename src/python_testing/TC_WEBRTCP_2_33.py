@@ -232,6 +232,20 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
         )
         asserts.assert_equal(len(current_sessions), 0, "CurrentSessions must be empty in precondition")
 
+        allocated_audio_streams = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=Clusters.CameraAvStreamManagement,
+            attribute=Clusters.CameraAvStreamManagement.Attributes.AllocatedAudioStreams,
+        )
+        asserts.assert_equal(len(allocated_audio_streams), 0, "AllocatedAudioStreams must be empty in precondition")
+
+        allocated_video_streams = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=Clusters.CameraAvStreamManagement,
+            attribute=Clusters.CameraAvStreamManagement.Attributes.AllocatedVideoStreams,
+        )
+        asserts.assert_equal(len(allocated_video_streams), 0, "AllocatedVideoStreams must be empty in precondition")
+
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         audio_stream_id = None
         video_stream_id = None
