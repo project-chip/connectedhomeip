@@ -18,13 +18,21 @@
 #include <pw_unit_test/framework.h>
 
 #include <controller/CertificateChainRequestTracker.h>
+#include <lib/support/CHIPMem.h>
 
 using namespace chip;
 using namespace chip::Controller;
 
 namespace {
 
-TEST(CertificateChainRequestTracker, HandlesSingleResponse)
+class CertificateChainRequestTrackerTest : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(CertificateChainRequestTrackerTest, HandlesSingleResponse)
 {
     CertificateChainRequestTracker tracker;
 
@@ -35,7 +43,7 @@ TEST(CertificateChainRequestTracker, HandlesSingleResponse)
     EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(certificateBytes)));
 }
 
-TEST(CertificateChainRequestTracker, ReassemblesSegmentedResponse)
+TEST_F(CertificateChainRequestTrackerTest, ReassemblesSegmentedResponse)
 {
     CertificateChainRequestTracker tracker;
 
@@ -58,7 +66,7 @@ TEST(CertificateChainRequestTracker, ReassemblesSegmentedResponse)
     EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(expected)));
 }
 
-TEST(CertificateChainRequestTracker, ReassemblesCertificateLargerThanLegacyLimit)
+TEST_F(CertificateChainRequestTrackerTest, ReassemblesCertificateLargerThanLegacyLimit)
 {
     // A legacy PAI subject key may have an ML-DSA issuer signature. Response metadata,
     // rather than the request profile, determines how many segments to assemble.
@@ -83,7 +91,7 @@ TEST(CertificateChainRequestTracker, ReassemblesCertificateLargerThanLegacyLimit
     EXPECT_TRUE(tracker.GetCertificate().data_equal(document));
 }
 
-TEST(CertificateChainRequestTracker, RejectsEmptyFirstSegmentWithoutChangingState)
+TEST_F(CertificateChainRequestTrackerTest, RejectsEmptyFirstSegmentWithoutChangingState)
 {
     CertificateChainRequestTracker tracker;
     const auto totalSize = MakeOptional<uint16_t>(static_cast<uint16_t>(2));
@@ -102,7 +110,7 @@ TEST(CertificateChainRequestTracker, RejectsEmptyFirstSegmentWithoutChangingStat
     EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(certificate)));
 }
 
-TEST(CertificateChainRequestTracker, RejectsEmptyContinuationWithoutChangingState)
+TEST_F(CertificateChainRequestTrackerTest, RejectsEmptyContinuationWithoutChangingState)
 {
     CertificateChainRequestTracker tracker;
     const auto totalSize         = MakeOptional<uint16_t>(static_cast<uint16_t>(3));
@@ -130,7 +138,7 @@ TEST(CertificateChainRequestTracker, RejectsEmptyContinuationWithoutChangingStat
     EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(expected)));
 }
 
-TEST(CertificateChainRequestTracker, RejectsInconsistentSegmentedResponse)
+TEST_F(CertificateChainRequestTrackerTest, RejectsInconsistentSegmentedResponse)
 {
     CertificateChainRequestTracker tracker;
 
@@ -144,7 +152,7 @@ TEST(CertificateChainRequestTracker, RejectsInconsistentSegmentedResponse)
               CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-TEST(CertificateChainRequestTracker, AcceptsMaximumSupportedCertificateSize)
+TEST_F(CertificateChainRequestTrackerTest, AcceptsMaximumSupportedCertificateSize)
 {
     CertificateChainRequestTracker tracker;
     uint8_t certificate[Credentials::kMaxDERCertLengthMlDsa65] = {};
@@ -155,7 +163,7 @@ TEST(CertificateChainRequestTracker, AcceptsMaximumSupportedCertificateSize)
     EXPECT_TRUE(tracker.GetCertificate().data_equal(ByteSpan(certificate)));
 }
 
-TEST(CertificateChainRequestTracker, EnforcesSubjectAndIssuerBoundsBeforeAcceptingResponse)
+TEST_F(CertificateChainRequestTrackerTest, EnforcesSubjectAndIssuerBoundsBeforeAcceptingResponse)
 {
     using Profile = CertificateChainRequestTracker::CryptoProfile;
     struct TestCase
@@ -200,7 +208,7 @@ TEST(CertificateChainRequestTracker, EnforcesSubjectAndIssuerBoundsBeforeAccepti
     }
 }
 
-TEST(CertificateChainRequestTracker, ResetRestoresDefaultBound)
+TEST_F(CertificateChainRequestTrackerTest, ResetRestoresDefaultBound)
 {
     using Profile = CertificateChainRequestTracker::CryptoProfile;
     CertificateChainRequestTracker tracker;
@@ -212,7 +220,7 @@ TEST(CertificateChainRequestTracker, ResetRestoresDefaultBound)
               CHIP_NO_ERROR);
 }
 
-TEST(CertificateChainRequestTracker, RejectsOversizedDocument)
+TEST_F(CertificateChainRequestTrackerTest, RejectsOversizedDocument)
 {
     CertificateChainRequestTracker tracker;
 
@@ -224,7 +232,7 @@ TEST(CertificateChainRequestTracker, RejectsOversizedDocument)
               CHIP_ERROR_MESSAGE_TOO_LONG);
 }
 
-TEST(CertificateChainRequestTracker, RejectsOversizedSingleResponse)
+TEST_F(CertificateChainRequestTrackerTest, RejectsOversizedSingleResponse)
 {
     CertificateChainRequestTracker tracker;
     uint8_t oversizedCertificate[CertificateChainRequestTracker::kMaxCertificateDocumentSize + 1] = {};
