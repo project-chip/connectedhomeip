@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <openthread/instance.h>
 #include <openthread/ip6.h>
 #include <openthread/link.h>
@@ -187,6 +189,20 @@ private:
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+
+    struct PendingAttach
+    {
+        uint32_t attachId = 0;
+        Thread::OperationalDataset dataset;
+        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback = nullptr;
+    };
+    std::optional<PendingAttach> mPendingAttach;
+    uint32_t mAttachId = 0;
+
+    static constexpr uint32_t kGracefulDetachTimeoutMs = 1500;
+
+    void _FinishGracefulDetach(uint32_t attachId);
+    static void _OnGracefulDetachTimeout(System::Layer * aLayer, void * aAppState);
 
     void TryNextNetwork();
 
