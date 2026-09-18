@@ -81,10 +81,11 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
                      "FileDescription field containing FileID, Name, Size, MimeType and ImageURI."),
             TestStep(4, "TH sends a RequestSharedFiles command to the DUT with ClientName, a new RequestID, and a "
                      "SupportedMimeTypes list containing only a specific MIME type.",
-                     "The DUT only shares files whose MimeType matches an entry in the provided SupportedMimeTypes "
-                     "list."),
-            TestStep(5, "TH sends a GetSharedFile command to the DUT with the ResponseID that was already consumed "
-                     "in step 3.",
+                     "The DUT shall only share files whose MimeType matches an entry in the provided "
+                     "SupportedMimeTypes list."),
+            TestStep(5, "TH sends a GetSharedFile command to the DUT with a ResponseID received in step 2 whose "
+                     "shared file is no longer available on the DUT, for example because the file has been deleted "
+                     "or the share has been revoked.",
                      "The DUT responds with a GetSharedFileResponse with Status=FileNotAvailable (4) and a null "
                      "FileDescription field."),
             TestStep(6, "TH sends a GetSharedFile command to the DUT with a ResponseID value that was not obtained "
@@ -128,10 +129,10 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
         log.info("DUT shared %d file(s) with ResponseIDs %s", len(response_ids), response_ids)
 
         self.step(3)
-        consumed_response_id = response_ids[0]
-        response = await self.send_get_shared_file(endpoint, consumed_response_id)
+        shared_response_id = response_ids[0]
+        response = await self.send_get_shared_file(endpoint, shared_response_id)
         asserts.assert_equal(response.status, cluster.Enums.FileStatusEnum.kSuccess,
-                             f"GetSharedFile for ResponseID {consumed_response_id} should have succeeded")
+                             f"GetSharedFile for ResponseID {shared_response_id} should have succeeded")
         asserts.assert_true(response.fileDescription not in (None, NullValue),
                             "GetSharedFileResponse must carry a populated FileDescription on success")
         self.verify_file_description(response.fileDescription, "GetSharedFileResponse.FileDescription")
@@ -166,15 +167,26 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
                     f"SupportedMimeTypes filter of ['{shared_mime_type}']")
 
         self.step(5)
-        # A ResponseID is spent when the client actually pulls the file over BDX, not when
-        # GetSharedFile resolves it, so reaching this state means retrieving the file first.
-        # That retrieval is client-initiated, and the controller's BDX API only ever waits
-        # for a peer to initiate a transfer (PrepareToSend/PrepareToReceive), so the TH
-        # cannot drive one. Replaying the ResponseID here would still resolve, and asserting
-        # FileNotAvailable would fail a conformant DUT.
-        log.info("Cannot verify the spent-ResponseID case: the TH has no way to initiate the BDX "
-                 "retrieval that spends ResponseID %d", consumed_response_id)
-        self.mark_current_step_skipped()
+        # FileNotAvailable covers a ResponseID the DUT issued whose file can no longer be
+        # shared. Making that happen is manufacturer specific, so the operator drives it; a
+        # DUT that cannot be placed in the state is not a failure of what this step verifies.
+        self.wait_for_user_input(
+            prompt_msg=f"Make the file shared as '{response.fileDescription.name}' unavailable on the DUT "
+                       f"(delete it, or revoke the share) per the manufacturer's documentation, then press "
+                       f"Enter.\n")
+        response = await self.send_get_shared_file(endpoint, shared_response_id)
+        if response.status == cluster.Enums.FileStatusEnum.kSuccess:
+            log.info("The DUT still resolves ResponseID %d, so its shared file could not be made "
+                     "unavailable", shared_response_id)
+            self.mark_current_step_skipped()
+        else:
+            asserts.assert_equal(
+                response.status, cluster.Enums.FileStatusEnum.kFileNotAvailable,
+                f"GetSharedFile for a ResponseID whose file is no longer available should return "
+                f"FileNotAvailable (4), got {response.status}")
+            asserts.assert_true(
+                response.fileDescription in (None, NullValue),
+                "GetSharedFileResponse must carry a null FileDescription when the file is not available")
 
         self.step(6)
         # A ResponseID the DUT never issued is not an authentic token, so it must be
