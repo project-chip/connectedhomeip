@@ -32,8 +32,7 @@ public:
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 
 private:
-    std::optional<CHIP_ERROR> HandleSetOccupancy(ByteSpan tlvData) const;
-    std::optional<CHIP_ERROR> HandleSetHoldTime(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleSetAttribute(ByteSpan tlvData) const;
 
     Clusters::OccupancySensingCluster & mCluster;
     EndpointId mEndpointId;
