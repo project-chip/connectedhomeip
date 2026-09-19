@@ -1,0 +1,142 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "webrtc-requestor-delegate.h"
+
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <system/SystemLayer.h>
+
+namespace chip {
+namespace app {
+
+CHIP_ERROR WebRTCRequestorDelegate::HandleOffer(const Clusters::WebRTCTransportRequestor::WebRTCSessionStruct & aSession,
+                                                const OfferArgs & aArgs)
+{
+    // Offers arrive only in the SolicitOffer flow, which this example does not use yet
+    ChipLogError(AppServer, "AvAnalysisNode: unexpected Offer for WebRTC session %u", aSession.id);
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(const Clusters::WebRTCTransportRequestor::WebRTCSessionStruct & aSession,
+                                                 const std::string & aSdpAnswer)
+{
+    VerifyOrReturnError(mPeerController != nullptr && mWebRTCClient != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(AppServer, "AvAnalysisNode: Answer received for WebRTC session %u", aSession.id);
+
+    const ScopedNodeId cameraNode = CameraOf(aSession);
+    ReturnErrorOnFailure(mPeerController->ApplyAnswer(cameraNode, aSession.id, aSdpAnswer));
+
+    // Our candidates go out on the next event-loop turn, so this command's status response reaches
+    // the camera before the ProvideICECandidates that follows it
+    const uint16_t sessionId = aSession.id;
+    CHIP_ERROR err =
+        DeviceLayer::SystemLayer().ScheduleLambda([this, cameraNode, sessionId]() { SendLocalCandidates(cameraNode, sessionId); });
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "AvAnalysisNode: ICE candidate send not scheduled for WebRTC session %u: %" CHIP_ERROR_FORMAT,
+                     sessionId, err.Format());
+    }
+    return CHIP_NO_ERROR;
+}
+
+void WebRTCRequestorDelegate::SendLocalCandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
+{
+    std::vector<WebRTCPeerController::LocalICECandidate> localCandidates =
+        mPeerController->TakeLocalCandidates(aCameraNode, aWebRTCSessionId);
+    VerifyOrReturn(!localCandidates.empty(),
+                   ChipLogError(AppServer, "AvAnalysisNode: no ICE candidates gathered for WebRTC session %u", aWebRTCSessionId));
+
+    // The structs reference the strings above, which outlive the send: the client copies them
+    std::vector<Clusters::Globals::Structs::ICECandidateStruct::Type> candidates;
+    candidates.reserve(localCandidates.size());
+    for (const auto & local : localCandidates)
+    {
+        auto & candidate    = candidates.emplace_back();
+        candidate.candidate = CharSpan(local.candidate.data(), local.candidate.size());
+        if (!local.sdpMid.empty())
+        {
+            candidate.SDPMid.SetNonNull(CharSpan(local.sdpMid.data(), local.sdpMid.size()));
+        }
+        // libdatachannel does not report the m-line index
+    }
+
+    ChipLogProgress(AppServer, "AvAnalysisNode: sending %u ICE candidates for WebRTC session %u",
+                    static_cast<unsigned>(candidates.size()), aWebRTCSessionId);
+    CHIP_ERROR err = mWebRTCClient->SendICECandidates(
+        aCameraNode, aWebRTCSessionId,
+        Span<const Clusters::Globals::Structs::ICECandidateStruct::Type>(candidates.data(), candidates.size()));
+    if (err != CHIP_NO_ERROR)
+    {
+        // Without our candidates the camera cannot connect; the failure surfaces through the media layer
+        ChipLogError(AppServer, "AvAnalysisNode: ICE candidates not sent for WebRTC session %u: %" CHIP_ERROR_FORMAT,
+                     aWebRTCSessionId, err.Format());
+    }
+}
+
+CHIP_ERROR
+WebRTCRequestorDelegate::HandleICECandidates(
+    const Clusters::WebRTCTransportRequestor::WebRTCSessionStruct & aSession,
+    const std::vector<Clusters::WebRTCTransportRequestor::ICECandidateStruct> & aCandidates)
+{
+    VerifyOrReturnError(mPeerController != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(AppServer, "AvAnalysisNode: %u ICE candidates received for WebRTC session %u",
+                    static_cast<unsigned>(aCandidates.size()), aSession.id);
+    for (const auto & candidate : aCandidates)
+    {
+        ReturnErrorOnFailure(mPeerController->AddRemoteCandidate(
+            CameraOf(aSession), aSession.id, std::string(candidate.candidate.data(), candidate.candidate.size())));
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WebRTCRequestorDelegate::HandleEnd(const Clusters::WebRTCTransportRequestor::WebRTCSessionStruct & aSession,
+                                              Clusters::WebRTCTransportRequestor::WebRTCEndReasonEnum aReason)
+{
+    VerifyOrReturnError(mWebRTCClient != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(AppServer, "AvAnalysisNode: End received for WebRTC session %u (reason %u)", aSession.id,
+                    static_cast<unsigned>(aReason));
+    // The client settles the stream state and releases the peer connection through OnSessionClosed.
+    // Read from aSession before this call: removing the record invalidates it.
+    mWebRTCClient->NotifyEnded(CameraOf(aSession), aSession.id);
+    return CHIP_NO_ERROR;
+}
+
+void WebRTCRequestorDelegate::OnPeerConnectionConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
+{
+    VerifyOrReturn(mWebRTCClient != nullptr);
+
+    ChipLogProgress(AppServer, "AvAnalysisNode: peer connection of WebRTC session %u established", aWebRTCSessionId);
+    // The signaling flow is complete: the client marks the stream WebRTCActive
+    mWebRTCClient->NotifyConnected(aCameraNode, aWebRTCSessionId);
+}
+
+void WebRTCRequestorDelegate::OnPeerConnectionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
+{
+    VerifyOrReturn(mWebRTCClient != nullptr);
+
+    ChipLogError(AppServer, "AvAnalysisNode: peer connection of WebRTC session %u failed", aWebRTCSessionId);
+    // The client marks the stream Failure and releases the session, closing the peer connection
+    mWebRTCClient->NotifyFailed(aCameraNode, aWebRTCSessionId);
+}
+
+} // namespace app
+} // namespace chip

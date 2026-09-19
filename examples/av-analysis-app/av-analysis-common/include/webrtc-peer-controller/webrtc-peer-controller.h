@@ -1,0 +1,88 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <string>
+#include <vector>
+
+#include <app/clusters/av-analysis-server/DefaultAvAnalysisWebRTCClient.h>
+
+namespace chip {
+namespace app {
+
+/**
+ * Platform-supplied WebRTC peer connections: the SDK client's peer delegate and signaling for established sessions.
+ *
+ * A session is identified by its camera together with its id: the camera assigns the id, and it is
+ * unique only within that camera.
+ */
+class WebRTCPeerController : public Clusters::AvAnalysisWebRTCPeerDelegate
+{
+public:
+    // An ICE candidate this node gathered, with the media section it belongs to
+    struct LocalICECandidate
+    {
+        std::string candidate;
+        std::string sdpMid;
+    };
+
+    /**
+     * Learns the status of peer connections after their session was assigned
+     */
+    class PeerConnectionObserver
+    {
+    public:
+        virtual ~PeerConnectionObserver() = default;
+
+        /**
+         * The session's peer connection reached the Connected state
+         */
+        virtual void OnPeerConnectionConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
+
+        /**
+         * The session's peer connection reached the Failed or Closed state
+         */
+        virtual void OnPeerConnectionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
+    };
+
+    void SetPeerConnectionObserver(PeerConnectionObserver * aObserver) { mPeerConnectionObserver = aObserver; }
+
+    /**
+     * Applies the camera's SDP answer to the session's peer connection.
+     */
+    virtual CHIP_ERROR ApplyAnswer(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId, const std::string & aSdp) = 0;
+
+    /**
+     * Adds a remote ICE candidate trickled by the camera to the session's peer connection.
+     */
+    virtual CHIP_ERROR AddRemoteCandidate(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId,
+                                          const std::string & aCandidate) = 0;
+
+    /**
+     * Hands over the candidates the session's peer connection has gathered so far and forgets them,
+     * so each is sent to the camera once.
+     */
+    virtual std::vector<LocalICECandidate> TakeLocalCandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
+
+protected:
+    PeerConnectionObserver * mPeerConnectionObserver = nullptr;
+};
+
+} // namespace app
+} // namespace chip

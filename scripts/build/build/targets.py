@@ -208,6 +208,7 @@ def BuildHostTarget():
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
         TargetPart('camera', app=HostApp.CAMERA),
+        TargetPart('av-analysis', app=HostApp.AV_ANALYSIS_APP),
         TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
         TargetPart('jf-control-app', app=HostApp.JF_CONTROL),
         TargetPart('jf-admin-app', app=HostApp.JF_ADMIN),
