@@ -91,9 +91,15 @@ namespace {
 {
     SuccessOrDie(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
     // Handle boost
-    if (mBoostState == BoostStateEnum::kActive) {
-        mBoostRemainingTime -= kStepDurationSeconds;
-        if (mBoostRemainingTime <= 0) {
+    if (mBoostState == BoostStateEnum::kActive)
+    {
+        if (mBoostRemainingTime > kStepDurationSeconds)
+        {
+            mBoostRemainingTime -= kStepDurationSeconds;
+        }
+        else
+        {
+            mBoostRemainingTime = 0;
             ChipLogProgress(AppServer, "WaterHeater: Boost duration elapsed");
             EndBoost();
         }
@@ -129,8 +135,9 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
 {
     ChipLogProgress(AppServer, "WaterHeater: Boost duration=%" PRIu32 "s", duration);
 
-    mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kActive;
-    mHeatDemand = mHeaterTypes;
+    mBoostState         = Clusters::WaterHeaterManagement::BoostStateEnum::kActive;
+    mBoostRemainingTime = duration;
+    mHeatDemand         = mHeaterTypes;
 
     CHIP_ERROR err =
         GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
@@ -188,7 +195,8 @@ BoostStateEnum SimulatedWaterHeater::GetBoostState()
 
 void SimulatedWaterHeater::EndBoost()
 {
-    mBoostState = BoostStateEnum::kInactive;
+    mBoostState         = BoostStateEnum::kInactive;
+    mBoostRemainingTime = 0;
     mHeatDemand.ClearAll();
 
     CHIP_ERROR err = GenerateBoostEndedEvent();
