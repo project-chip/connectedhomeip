@@ -214,7 +214,7 @@ public:
      */
     struct CurrentTariffAttrsCtx
     {
-        Delegate * mTariffProvider;
+        Delegate * mTariffProvider = nullptr;
         EndpointId mEndpointId;
     };
 
