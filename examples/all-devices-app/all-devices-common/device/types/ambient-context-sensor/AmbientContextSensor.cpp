@@ -43,8 +43,9 @@ CHIP_ERROR AmbientContextSensor::Register(chip::EndpointId endpoint, CodeDrivenD
     ReturnErrorOnFailure(provider.AddCluster(mAmbientContextSensingCluster.Registration()));
 
     // Create the ambient sensing union cluster
-    mAmbientSensingUnionCluster.Create(
-        AmbientSensingUnionCluster::Config(endpoint).WithUnionName("all-devices-sensing-union"_span));
+    mAmbientSensingUnionCluster.Create(AmbientSensingUnionCluster::Config(endpoint)
+                                           .WithUnionName("all-devices-sensing-union"_span)
+                                           .WithUnionHealth(Clusters::AmbientSensingUnion::UnionHealthEnum::kFullyFunctional));
     ReturnErrorOnFailure(mAmbientSensingUnionCluster.Cluster().AddMatterContributor(
         /* nodeId= */ 1,
         /* endpointId= */ 1, Clusters::AmbientSensingUnion::UnionContributorStatusEnum::kUnionContributorOnline,

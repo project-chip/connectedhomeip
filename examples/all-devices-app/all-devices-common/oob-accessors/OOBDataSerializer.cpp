@@ -72,7 +72,7 @@ std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuf
     return request;
 }
 
-std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> BuildSetAttributeRequest(const ConcreteDataAttributePath & path,
+std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> BuildSetAttributeRequest(const ConcreteAttributePath & path,
                                                                            const chip::TLV::TLVReader & attributeValueReader)
 {
     // Create a copy of the reader and skip the element to calculate its EXACT byte size

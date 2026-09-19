@@ -21,12 +21,14 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
-#include <lib/support/ReadOnlyBuffer.h>
-
 namespace chip::app::OOBDataSerializer {
+
+inline constexpr CharSpan kSetAttributeAction = "SetAttribute"_span;
 
 static constexpr uint8_t kTagEndpointId  = 1;
 static constexpr uint8_t kTagClusterId   = 2;
@@ -66,13 +68,37 @@ std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuf
  * ├── Context Tag 3: AttributeId (uint32_t)
  * └── Context Tag 4: Attribute Value (any valid TLV element/container representing the new value)
  *
- * @param[in]     path                  The concrete data attribute path containing Endpoint, Cluster, and Attribute IDs.
+ * @param[in]     path                  The concrete attribute path containing Endpoint, Cluster, and Attribute IDs.
  * @param[in]     attributeValueReader  A TLVReader that MUST be positioned exactly on the data element of the attribute's value
  *                                      to be copied.
  *
  * @return        A variant containing either a CHIP_ERROR on failure or the finalized ReadOnlyBuffer on success.
  */
-std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> BuildSetAttributeRequest(const ConcreteDataAttributePath & path,
+std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> BuildSetAttributeRequest(const ConcreteAttributePath & path,
                                                                            const chip::TLV::TLVReader & attributeValueReader);
+
+/**
+ * @brief Dynamically allocates and builds a unified, out-of-band "SetAttribute" request TLV buffer from a typed value.
+ *
+ * @param[in]     path   The concrete attribute path containing Endpoint, Cluster, and Attribute IDs.
+ * @param[in]     value  The value to encode as the attribute value element.
+ *
+ * @return        A variant containing either a CHIP_ERROR on failure or the finalized ReadOnlyBuffer on success.
+ */
+template <typename T>
+std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> BuildSetAttributeRequest(const ConcreteAttributePath & path, const T & value)
+{
+    uint8_t valueBuffer[128];
+    chip::TLV::TLVWriter writer;
+    writer.Init(valueBuffer);
+    ReturnErrorOnFailure(writer.Put(chip::TLV::AnonymousTag(), value));
+    ReturnErrorOnFailure(writer.Finalize());
+
+    chip::TLV::TLVReader reader;
+    reader.Init(valueBuffer, writer.GetLengthWritten());
+    ReturnErrorOnFailure(reader.Next());
+
+    return BuildSetAttributeRequest(path, reader);
+}
 
 } // namespace chip::app::OOBDataSerializer

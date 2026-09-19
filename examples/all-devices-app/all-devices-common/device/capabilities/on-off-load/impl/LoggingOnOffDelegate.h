@@ -17,38 +17,24 @@
 
 #pragma once
 
-#include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/clusters/level-control/LevelControlDelegate.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/on-off-server/OnOffEffectDelegate.h>
-#include <device/capabilities/dimmable-load/DimmableLoad.h>
 
 namespace chip {
 namespace app {
 
 /**
- * Concrete implementation of DimmableLoad that logs all cluster state transitions
- * and operations, with support for custom delegate injection.
+ * Reusable logging delegate providing terminal logging for OnOff and OnOffEffect transitions.
  */
-class LoggingDimmableLoad : public DimmableLoad,
-                            public Clusters::OnOffDelegate,
-                            public Clusters::LevelControlDelegate,
-                            public Clusters::OnOffEffectDelegate
+class LoggingOnOffDelegate : public Clusters::OnOffDelegate, public Clusters::OnOffEffectDelegate
 {
 public:
-    LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Config & config = {});
-    ~LoggingDimmableLoad() override = default;
+    LoggingOnOffDelegate()           = default;
+    ~LoggingOnOffDelegate() override = default;
 
-protected:
     // OnOffDelegate
     void OnOffStartup(bool on) override;
     void OnOnOffChanged(bool on) override;
-
-    // LevelControlDelegate
-    void OnLevelChanged(uint8_t level) override;
-    void OnOptionsChanged(BitMask<Clusters::LevelControl::OptionsBitmap> options) override;
-    void OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel) override;
-    void OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate) override;
 
     // OnOffEffectDelegate
     DataModel::ActionReturnStatus TriggerDelayedAllOff(Clusters::OnOff::DelayedAllOffEffectVariantEnum e) override;
