@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,19 +15,21 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  output_name = "libEndpointProviderTests"
+  output_name = "libOTAProviderExampleTests"
 
-  test_sources = [
-    "TestEndpointProviderRegistry.cpp",
-    "TestSpanEndpointProvider.cpp",
-  ]
+  test_sources = [ "TestBdxOtaSenderPeerBinding.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
+  # BdxOtaSender.cpp is compiled as part of ota-provider-common and pulls in the
+  # app server (Server::GetInstance) and BDX at link time, so mirror the app's
+  # link deps.
   public_deps = [
-    "${chip_root}/src/app/clusters/descriptor",
-    "${chip_root}/src/app/data-model-provider:string-builder-adapters",
-    "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/data-model-providers/endpoint",
+    "${chip_root}/examples/ota-provider-app/ota-provider-common",
+    "${chip_root}/src/app/clusters/ota-provider:user-consent",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/protocols/bdx",
   ]
 }

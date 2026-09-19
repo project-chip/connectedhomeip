@@ -66,7 +66,7 @@ public:
     using BdxOtaSender::PollForOutput;
 };
 
-class TestBdxOtaSenderPeerBinding : public chip::Testing::LoopbackMessagingContext
+class TestBdxOtaSenderPeerBinding : public chip::Test::LoopbackMessagingContext
 {
 public:
     void SetUp() override
