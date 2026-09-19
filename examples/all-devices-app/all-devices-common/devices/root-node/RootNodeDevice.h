@@ -68,29 +68,21 @@ public:
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     };
 
-<<<<<<< HEAD:examples/all-devices-app/all-devices-common/devices/root-node/RootNodeDevice.h
     RootNodeDevice(const Context & context) :
-        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)), mContext(context)
+        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(kDeviceTypes)), mContext(context)
     {}
     ~RootNodeDevice() override = default;
-=======
-    RootNode(const Context & context) : SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(kDeviceTypes)), mContext(context) {}
-    ~RootNode() override = default;
->>>>>>> d07927e ([all-device-app] Add OTA Requestor device type to RootNode (#73879)):examples/all-devices-app/all-devices-common/device/types/root-node/RootNode.h
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-<<<<<<< HEAD:examples/all-devices-app/all-devices-common/devices/root-node/RootNodeDevice.h
-=======
-    Clusters::BasicInformationCluster & BasicInformation() { return mBasicInformationCluster.Cluster(); }
-
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 
-    >>>>>>> d07927e ([all-device-app] Add OTA Requestor device type to RootNode (#73879)):examples/all-devices-app/all-devices-common/device/types/root-node/RootNode.h protected : Context mContext;
+protected:
+    Context mContext;
 
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
