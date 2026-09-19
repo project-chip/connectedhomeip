@@ -29,6 +29,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/clusters/ota-provider:user-consent",
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols/bdx",
   ]
