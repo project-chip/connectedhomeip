@@ -110,7 +110,7 @@ namespace {
     {
         uint8_t temperatureStep = mBoostState == BoostStateEnum::kActive ? 2 : 1;
         mTemperature += temperatureStep;
-        ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRIu8 "°C", mTemperature);
+        ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRIu32 "°C", mTemperature);
         ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100));
         if (mTemperature >= kFinalTemperature)
         {
@@ -121,7 +121,7 @@ namespace {
     else
     {
         mTemperature -= 1;
-        ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRIu8 "°C", mTemperature);
+        ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRIu32 "°C", mTemperature);
         ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100));
         if (mTemperature <= kInitialTemperature)
         {

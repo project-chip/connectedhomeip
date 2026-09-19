@@ -44,7 +44,7 @@
 
  private: 
      // Mandatory attributes
-     temperature mOccupiedHeatingSetpoint;
+     temperature mOccupiedHeatingSetpoint = 2000;
  };
  
  } // namespace Thermostat
