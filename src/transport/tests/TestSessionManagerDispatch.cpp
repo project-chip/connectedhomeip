@@ -22,6 +22,7 @@
  */
 
 #include <errno.h>
+#include <memory>
 
 #include <pw_unit_test/framework.h>
 
@@ -497,17 +498,27 @@ PeerAddress AddressFromString(const char * str)
     return PeerAddress::UDP(addr);
 }
 
-void TestSessionManagerInit(TestContext & ctx, SessionManager & sessionManager)
+/**
+ * Holds resources needed by SessionManager tests.
+ * Managed via std::unique_ptr in the test fixture to ensure they are destroyed
+ * before Platform::MemoryShutdown() is called in TearDown.
+ */
+struct SessionManagerTestResources
 {
-    static FabricTableHolder fabricTableHolder;
-    static secure_channel::MessageCounterManager gMessageCounterManager;
-    static chip::TestPersistentStorageDelegate deviceStorage;
-    static chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
 
-    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    CHIP_ERROR Init() { return fabricTableHolder.Init(); }
+};
+
+void TestSessionManagerInit(TestContext & ctx, SessionManager & sessionManager, SessionManagerTestResources & resources)
+{
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &resources.messageCounterManager,
+                                  &resources.deviceStorage, &resources.fabricTableHolder.GetFabricTable(),
+                                  resources.sessionKeystore));
 }
 
 // constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
@@ -546,10 +557,22 @@ CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageT
 class TestSessionManagerDispatch : public ::testing::Test
 {
 protected:
-    void SetUp() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
-    void TearDown() { mContext.Shutdown(); }
+    void SetUp() override
+    {
+        ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR);
+        mResources = std::make_unique<SessionManagerTestResources>();
+        ASSERT_EQ(mResources->Init(), CHIP_NO_ERROR);
+    }
+    void TearDown() override
+    {
+        // Force cleanup of resources (which may release platform memory)
+        // before mContext.Shutdown() calls Platform::MemoryShutdown().
+        mResources.reset();
+        mContext.Shutdown();
+    }
 
     TestContext mContext;
+    std::unique_ptr<SessionManagerTestResources> mResources;
 };
 
 TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
@@ -559,7 +582,7 @@ TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
     SessionManager sessionManager;
     TestSessionManagerCallback callback;
 
-    TestSessionManagerInit(mContext, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
     sessionManager.SetMessageDelegate(&callback);
 
     IPAddress addr;
@@ -612,7 +635,7 @@ TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
 TEST_F(TestSessionManagerDispatch, TestUndecryptableMessageDoesNotRebindPeerAddress)
 {
     SessionManager sessionManager;
-    TestSessionManagerInit(mContext, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
 
     constexpr uint16_t kLocalSessionId   = 0x1234;
     constexpr NodeId kSessionPeerNodeId  = 0x0000000000000002ULL;
@@ -686,7 +709,7 @@ CHIP_ERROR PrepareTestMessage(SessionManager & sessionManager, const SessionHand
 TEST_F(TestSessionManagerDispatch, TestReplayedMessageDoesNotRebindPeerAddress)
 {
     SessionManager sessionManager;
-    TestSessionManagerInit(mContext, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
 
     const PeerAddress establishedAddress = AddressFromString("fe80::1");
     const PeerAddress replayAddress      = AddressFromString("fe80::2");
@@ -719,7 +742,7 @@ TEST_F(TestSessionManagerDispatch, TestReplayedMessageDoesNotRebindPeerAddress)
 TEST_F(TestSessionManagerDispatch, TestAcceptedMessageFromNewAddressRebindsPeerAddress)
 {
     SessionManager sessionManager;
-    TestSessionManagerInit(mContext, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
 
     const PeerAddress establishedAddress = AddressFromString("fe80::1");
     const PeerAddress newAddress         = AddressFromString("fe80::2");
