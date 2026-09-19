@@ -71,10 +71,10 @@ namespace {
     mBoostRemainingTime = 0;
     mHeatDemand.ClearAll();
 
+    ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100));
+    ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
+    ThermostatCluster().SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
     bool changed = false;
-    GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100), changed);
-    GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetSystemMode(SystemModeEnum::kHeat, changed);
-    GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly, changed);
     GetDelegate<Clusters::Thermostat::ThermostatSetpointsDelegate>()->SetOccupiedHeatingSetpoint(kFinalTemperature * 100, changed);
 
     SuccessOrDie(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
@@ -106,24 +106,26 @@ namespace {
     }
 
     // Handle heating
-    bool changed = false;
-    if (mHeatingEnabled) {
+    if (mHeatingEnabled)
+    {
         uint8_t temperatureStep = mBoostState == BoostStateEnum::kActive ? 2 : 1;
         mTemperature += temperatureStep;
         ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRIu8 "°C", mTemperature);
-        GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100), changed);
-        if (mTemperature >= kFinalTemperature) {
-            GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetSystemMode(SystemModeEnum::kOff, changed);
-
+        ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100));
+        if (mTemperature >= kFinalTemperature)
+        {
+            ThermostatCluster().SetSystemMode(SystemModeEnum::kOff);
             mHeatingEnabled = false;
         }
     }
-    else {
+    else
+    {
         mTemperature -= 1;
         ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRIu8 "°C", mTemperature);
-        GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100), changed);
-        if (mTemperature <= kInitialTemperature) {
-            GetDelegate<Clusters::Thermostat::ThermostatDelegate>()->SetSystemMode(SystemModeEnum::kHeat, changed);
+        ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100));
+        if (mTemperature <= kInitialTemperature)
+        {
+            ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
             mHeatingEnabled = true;
         }
     }
