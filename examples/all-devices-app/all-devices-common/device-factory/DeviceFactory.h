@@ -703,11 +703,11 @@ private:
         {
             RegisterCreator("water-heater", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<SimulatedWaterHeater>(SimulatedWaterHeater::Config{
+                return MakeDevice<SimulatedWaterHeater>(SimulatedWaterHeater::Config{
                     .timerDelegate = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                     .whmFeatures = BitMask<Clusters::WaterHeaterManagement::Feature>(),
-                    .thermostatFeatures = BitMask<Clusters::Thermostat::Feature>(),
+                    .thermostatFeatures = BitMask<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating),
                 });
             });
         }

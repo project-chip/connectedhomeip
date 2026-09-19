@@ -24,11 +24,13 @@ source_set("water-heater") {
     "ThermostatSetpointsDelegate.cpp",
     "ThermostatSetpointsDelegate.h",
     "impl/SimulatedWaterHeater.cpp",
-    "impl/SimulatedWaterHeater.h"
+    "impl/SimulatedWaterHeater.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/src/app/clusters/mode-base-server",
+    "${chip_root}/src/app/clusters/thermostat-server",
     "${chip_root}/src/app/clusters/water-heater-management-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
