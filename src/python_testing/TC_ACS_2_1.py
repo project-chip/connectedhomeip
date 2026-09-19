@@ -21,25 +21,28 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo
+#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo_2_1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --app-pipe /tmp/acs_fifo
+#       --app-pipe /tmp/acs_fifo_2_1
+#       --bool-arg simulate_ambientsensing:True
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
+import time
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
@@ -62,22 +65,27 @@ SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 
 # Script Function Call Example
 # python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices-clang/all-devices-app --factory-reset
-# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo"
-# --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1"
+# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_2_1"
+# --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --app-pipe /tmp/acs_fifo_2_1 --bool-arg simulate_ambientsensing:True"
 
 
 class TC_ACS_2_1(MatterBaseTest):
 
-    # @pics('ACS.S')
-    # @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
-    def pics_TC_ACS_2_1(self):
-        return ['ACS.S']
-
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
-    @async_test_body
+    # Sends and out-of-band command to the all-clusters-app
+    def write_to_app_pipe(self, command):
+        self.app_pipe = self.matter_test_config.global_test_params.get('app_pipe', "/tmp/acs_fifo_2_1")
+
+        with open(self.app_pipe, "w") as app_pipe:
+            app_pipe.write(command + "\n")
+        # Delay for pipe command to be processed (otherwise tests are flaky)
+        time.sleep(0.001)
+
+    @pics('ACS.S')
+    @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     async def test_TC_ACS_2_1(self):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
@@ -99,6 +107,17 @@ class TC_ACS_2_1(MatterBaseTest):
         log.info("Rx'd SoundIdentificationSupported: %s", {self.SoundIdentificationSupported})
         self.PredictedActivitySupported = ((aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity) != 0)
         log.info("Rx'd PredictedActivitySupported: %s", {self.PredictedActivitySupported})
+        self.SensorFusionDetected = ((aFeatureMap & cluster.Bitmaps.Feature.kSensorFusion) != 0)
+        log.info("Rx'd SensorFusionDetected: %s", {self.SensorFusionDetected})
+
+        # Add AmbientContextSupported elements for CI purpose
+        # Human activity walking, Object identification person, Audio identification barking are default
+        if self.is_ci:
+            if self.SensorFusionDetected:
+                # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
+                self.write_to_app_pipe(
+                    f'{{"Name":"SetSensorFusionSupported", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}]}}')
+                await asyncio.sleep(1)
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
@@ -190,8 +209,13 @@ class TC_ACS_2_1(MatterBaseTest):
                         if (nsID == nsID_support) and (tagID == tagID_support):
                             num_support = num_support + 1
 
-                    asserts.assert_greater(num_support, 0, "Ambient Context is not scoped within AmbientContextSupport list.")
+                    asserts.assert_greater(num_support, 0, "Some Ambient Context is not scoped within AmbientContextSupport list.")
 
+                    # If SensorFusion feature supported
+                    if self.SensorFusionDetected:
+                        detectionConfidence = context.detectionConfidence
+                        if detectionConfidence != NullValue:
+                            asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("5")
@@ -347,6 +371,34 @@ class TC_ACS_2_1(MatterBaseTest):
             log.info("PredictedActivity Feature not supported. Test steps skipped")
             self.skip_step("13a")
             self.skip_step("13b")
+
+        if self.SensorFusionDetected:
+            self.step("14", "If DUT supports feature SensorFusion, when reading the SensorFusionSupported attribute, verify that the list size is less than equal to 50 and the attribute contains SemanticTagStruct data type containing namespace ID and tag ID available from the AmbientContextTypeSupported attribute.")
+            sensorFusionSupported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SensorFusionSupported
+            )
+            asserts.assert_less_equal(len(sensorFusionSupported), 50, "The attribute list size should be less than equal to 50.")
+
+            # check if each SensorFusionSupported attribute is within AmbientContextTypeSupported list
+            ambientContextTypeSupported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
+            for context in sensorFusionSupported:
+                nsID = context.namespaceID
+                tagID = context.tag
+
+                num_support = 0
+                for acts in ambientContextTypeSupported:
+                    nsID_support = acts.namespaceID
+                    tagID_support = acts.tag
+
+                    if (nsID == nsID_support) and (tagID == tagID_support):
+                        num_support = num_support + 1
+
+                asserts.assert_greater(
+                    num_support, 0, "Some SensorFusionSupported context is not scoped within AmbientContextSupport list.")
+
+        else:
+            self.skip_step("14")
 
 
 if __name__ == "__main__":
