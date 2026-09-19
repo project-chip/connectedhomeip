@@ -40,7 +40,7 @@
 =======
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
->>>>>>> 06e1ff5 (Update secure session peer address only after the message authenticates (#73747))
+    >>>>>>> 06e1ff5 (Update secure session peer address only after the message authenticates (#73747))
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -48,903 +48,909 @@
 
 #undef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
 
-namespace {
-
-using namespace chip;
-using namespace chip::Inet;
-using namespace chip::Transport;
-using namespace chip::Testing;
-using namespace chip::Credentials;
-
-using GroupInfo      = GroupDataProvider::GroupInfo;
-using GroupKey       = GroupDataProvider::GroupKey;
-using KeySet         = GroupDataProvider::KeySet;
-using SecurityPolicy = GroupDataProvider::SecurityPolicy;
-
-using TestContext = LoopbackTransportManager;
-
-struct MessageTestEntry
+    namespace
 {
-    const char * name;
 
-    const char * peerAddr;
+    using namespace chip;
+    using namespace chip::Inet;
+    using namespace chip::Transport;
+    using namespace chip::Testing;
+    using namespace chip::Credentials;
 
-    const char * payload;
-    const char * plain;
-    const char * encrypted;
-    const char * privacy;
+    using GroupInfo      = GroupDataProvider::GroupInfo;
+    using GroupKey       = GroupDataProvider::GroupKey;
+    using KeySet         = GroupDataProvider::KeySet;
+    using SecurityPolicy = GroupDataProvider::SecurityPolicy;
 
-    size_t payloadLength;
-    size_t plainLength;
-    size_t encryptedLength;
-    size_t privacyLength;
+    using TestContext = LoopbackTransportManager;
 
-    const char * encryptKey;
-    const char * privacyKey;
-    const char * epochKey;
-
-    const char * nonce;
-    const char * privacyNonce;
-    const char * compressedFabricId;
-
-    const char * mic;
-
-    uint16_t sessionId;
-    NodeId peerNodeId;
-    GroupId groupId;
-    NodeId sourceNodeId;
-
-    uint8_t expectedMessageCount;
-};
-
-struct MessageTestEntry theMessageTestVector[] = {
-    // =======================================
-    // PASE positive test cases
-    // =======================================
+    struct MessageTestEntry
     {
-        .name     = "secure pase message (no payload)",
-        .peerAddr = "::1",
+        const char * name;
 
-        .payload   = "",
-        .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
-        .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
-                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
-        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
-                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
+        const char * peerAddr;
 
-        .payloadLength   = 0,
-        .plainLength     = 14,
-        .encryptedLength = 30,
-        .privacyLength   = 30,
+        const char * payload;
+        const char * plain;
+        const char * encrypted;
+        const char * privacy;
 
-        // TODO(#22830): unicast message tests must use test key currently
-        .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+        size_t payloadLength;
+        size_t plainLength;
+        size_t encryptedLength;
+        size_t privacyLength;
 
-        .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+        const char * encryptKey;
+        const char * privacyKey;
+        const char * epochKey;
 
-        .sessionId  = 0x0bb8, // 3000
-        .peerNodeId = 0x0000000000000000ULL,
+        const char * nonce;
+        const char * privacyNonce;
+        const char * compressedFabricId;
 
-        .expectedMessageCount = 1,
-    },
+        const char * mic;
+
+        uint16_t sessionId;
+        NodeId peerNodeId;
+        GroupId groupId;
+        NodeId sourceNodeId;
+
+        uint8_t expectedMessageCount;
+    };
+
+    struct MessageTestEntry theMessageTestVector[] =
     {
-        .name     = "secure pase message (short payload)",
-        .peerAddr = "::1",
+        // =======================================
+        // PASE positive test cases
+        // =======================================
+        {
+            .name     = "secure pase message (no payload)",
+            .peerAddr = "::1",
 
-        .payload   = "\x11\x22\x33\x44\x55",
-        .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
-        .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
-                     "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
-        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
-                     "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
+            .payload   = "",
+            .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
+            .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                         "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
+            .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                         "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
 
-        .payloadLength   = 5,
-        .plainLength     = 19,
-        .encryptedLength = 35,
-        .privacyLength   = 35,
+            .payloadLength   = 0,
+            .plainLength     = 14,
+            .encryptedLength = 30,
+            .privacyLength   = 30,
 
-        // TODO(#22830): unicast message tests must use test key currently
-        .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+            // TODO(#22830): unicast message tests must use test key currently
+            .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
 
-        .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+            .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 
-        .sessionId  = 0x0bb8, // 3000
-        .peerNodeId = 0x0000000000000000ULL,
+            .sessionId  = 0x0bb8, // 3000
+            .peerNodeId = 0x0000000000000000ULL,
 
-        .expectedMessageCount = 1,
-    },
-    // =======================================
-    // PASE negative test cases
-    // =======================================
-    {
-        .name     = "secure pase message (no payload / wrong MIC)",
-        .peerAddr = "::1",
+            .expectedMessageCount = 1,
+        },
+        {
+            .name     = "secure pase message (short payload)",
+            .peerAddr = "::1",
 
-        .payload   = "",
-        .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
-        .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
-                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdd", // Includes wrong MIC
-        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
-                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdd", // Includes wrong MIC
+            .payload   = "\x11\x22\x33\x44\x55",
+            .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
+            .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
+                         "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
+            .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
+                         "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
 
-        .payloadLength   = 0,
-        .plainLength     = 14,
-        .encryptedLength = 30,
-        .privacyLength   = 30,
+            .payloadLength   = 5,
+            .plainLength     = 19,
+            .encryptedLength = 35,
+            .privacyLength   = 35,
 
-        // TODO(#22830): unicast message tests must use test key currently
-        .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+            // TODO(#22830): unicast message tests must use test key currently
+            .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
 
-        .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+            .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 
-        .sessionId  = 0x0bb8, // 3000
-        .peerNodeId = 0x0000000000000000ULL,
+            .sessionId  = 0x0bb8, // 3000
+            .peerNodeId = 0x0000000000000000ULL,
 
-        .expectedMessageCount = 0,
-    },
-    {
-        .name     = "secure pase message (short payload / wrong MIC)",
-        .peerAddr = "::1",
+            .expectedMessageCount = 1,
+        },
+        // =======================================
+        // PASE negative test cases
+        // =======================================
+        {
+            .name     = "secure pase message (no payload / wrong MIC)",
+            .peerAddr = "::1",
 
-        .payload   = "\x11\x22\x33\x44\x55",
-        .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
-        .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
-                     "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xaa", // Includes wrong MIC
-        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
-                     "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xaa", // Includes wrong MIC
+            .payload   = "",
+            .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
+            .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                         "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdd", // Includes wrong MIC
+            .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                         "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdd", // Includes wrong MIC
 
-        .payloadLength   = 5,
-        .plainLength     = 19,
-        .encryptedLength = 35,
-        .privacyLength   = 35,
+            .payloadLength   = 0,
+            .plainLength     = 14,
+            .encryptedLength = 30,
+            .privacyLength   = 30,
 
-        // TODO(#22830): unicast message tests must use test key currently
-        .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+            // TODO(#22830): unicast message tests must use test key currently
+            .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
 
-        .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+            .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 
-        .sessionId  = 0x0bb8, // 3000
-        .peerNodeId = 0x0000000000000000ULL,
+            .sessionId  = 0x0bb8, // 3000
+            .peerNodeId = 0x0000000000000000ULL,
 
-        .expectedMessageCount = 0,
-    },
-    {
-        .name     = "secure pase message (short payload / drop when privacy enabled)",
-        .peerAddr = "::1",
+            .expectedMessageCount = 0,
+        },
+        {
+            .name     = "secure pase message (short payload / wrong MIC)",
+            .peerAddr = "::1",
 
-        .payload   = "\x11\x22\x33\x44\x55",
-        .plain     = "\x00\xb8\x0b\x80\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
-        .encrypted = "\x00\xb8\x0b\x80\x39\x30\x00\x00\xaa\x26\xa0\xf9\x01\xef\xce\x9f\x9a\x67\xc8"
-                     "\x13\x79\x17\xd1\x5b\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f", // Includes MIC
-        .privacy   = "\x00\xb8\x0b\x80\x87\xbe\xef\x06\xaa\x26\xa0\xf9\x01\xef\xce\x9f\x9a\x67\xc8"
-                     "\x13\x79\x17\xd1\x5b\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f", // Includes MIC
+            .payload   = "\x11\x22\x33\x44\x55",
+            .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
+            .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
+                         "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xaa", // Includes wrong MIC
+            .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
+                         "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xaa", // Includes wrong MIC
 
-        .payloadLength   = 5,
-        .plainLength     = 19,
-        .encryptedLength = 35,
-        .privacyLength   = 35,
+            .payloadLength   = 5,
+            .plainLength     = 19,
+            .encryptedLength = 35,
+            .privacyLength   = 35,
 
-        // TODO(#22830): unicast message tests must use test key currently
-        .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+            // TODO(#22830): unicast message tests must use test key currently
+            .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
 
-        .nonce        = "\x80\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
-        .privacyNonce = "\x0b\xb8\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f",
+            .nonce = "\x00\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 
-        .sessionId  = 0x0bb8, // 3000
-        .peerNodeId = 0x0000000000000000ULL,
+            .sessionId  = 0x0bb8, // 3000
+            .peerNodeId = 0x0000000000000000ULL,
 
-        .expectedMessageCount = 0,
-    },
+            .expectedMessageCount = 0,
+        },
+        {
+            .name     = "secure pase message (short payload / drop when privacy enabled)",
+            .peerAddr = "::1",
+
+            .payload   = "\x11\x22\x33\x44\x55",
+            .plain     = "\x00\xb8\x0b\x80\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
+            .encrypted = "\x00\xb8\x0b\x80\x39\x30\x00\x00\xaa\x26\xa0\xf9\x01\xef\xce\x9f\x9a\x67\xc8"
+                         "\x13\x79\x17\xd1\x5b\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f", // Includes MIC
+            .privacy   = "\x00\xb8\x0b\x80\x87\xbe\xef\x06\xaa\x26\xa0\xf9\x01\xef\xce\x9f\x9a\x67\xc8"
+                         "\x13\x79\x17\xd1\x5b\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f", // Includes MIC
+
+            .payloadLength   = 5,
+            .plainLength     = 19,
+            .encryptedLength = 35,
+            .privacyLength   = 35,
+
+            // TODO(#22830): unicast message tests must use test key currently
+            .encryptKey = "\x5e\xde\xd2\x44\xe5\x53\x2b\x3c\xdc\x23\x40\x9d\xba\xd0\x52\xd2",
+
+            .nonce        = "\x80\x39\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+            .privacyNonce = "\x0b\xb8\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f",
+
+            .sessionId  = 0x0bb8, // 3000
+            .peerNodeId = 0x0000000000000000ULL,
+
+            .expectedMessageCount = 0,
+        },
 #if !CHIP_CONFIG_SECURITY_TEST_MODE
-    // =======================================
-    // GROUP positive test cases
-    // =======================================
-    {
-        .name     = "secure group message (no privacy)",
-        .peerAddr = "::1",
+        // =======================================
+        // GROUP positive test cases
+        // =======================================
+        {
+            .name     = "secure group message (no privacy)",
+            .peerAddr = "::1",
 
-        .payload = "",
+            .payload = "",
 
-        // messageCounter = 0x12345678 // each group use case must increment this to pass replay.
-        .plain     = "\06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
-        .encrypted = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
-                     "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
-        .privacy   = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
-                     "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
+            // messageCounter = 0x12345678 // each group use case must increment this to pass replay.
+            .plain     = "\06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
+            .encrypted = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
+                         "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
+            .privacy   = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
+                         "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
 
-        .payloadLength   = 0,
-        .plainLength     = 24,
-        .encryptedLength = 40,
-        .privacyLength   = 40,
+            .payloadLength   = 0,
+            .plainLength     = 24,
+            .encryptedLength = 40,
+            .privacyLength   = 40,
 
-        .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
-        .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
-        .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+            .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
+            .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
+            .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
 
-        .nonce        = "\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
-        .privacyNonce = "\xdb\x7d\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6",
+            .nonce        = "\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
+            .privacyNonce = "\xdb\x7d\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6",
 
-        .sessionId    = 0xdb7d, // 56189
-        .peerNodeId   = 0x0000000000000000ULL,
-        .groupId      = 2,
-        .sourceNodeId = 0x0000000000000002ULL,
+            .sessionId    = 0xdb7d, // 56189
+            .peerNodeId   = 0x0000000000000000ULL,
+            .groupId      = 2,
+            .sourceNodeId = 0x0000000000000002ULL,
 
-        .expectedMessageCount = 1,
-    },
-    {
-        .name     = "secure group message (no privacy, drop replay)",
-        .peerAddr = "::1",
+            .expectedMessageCount = 1,
+        },
+        {
+            .name     = "secure group message (no privacy, drop replay)",
+            .peerAddr = "::1",
 
-        .payload = "",
+            .payload = "",
 
-        // messageCounter = 0x12345678 // each group use case must increment this to pass replay.
-        .plain     = "\06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
-        .encrypted = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
-                     "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
-        .privacy   = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
-                     "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
+            // messageCounter = 0x12345678 // each group use case must increment this to pass replay.
+            .plain     = "\06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
+            .encrypted = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
+                         "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
+            .privacy   = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
+                         "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
 
-        .payloadLength   = 0,
-        .plainLength     = 24,
-        .encryptedLength = 40,
-        .privacyLength   = 40,
+            .payloadLength   = 0,
+            .plainLength     = 24,
+            .encryptedLength = 40,
+            .privacyLength   = 40,
 
-        .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
-        .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
-        .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+            .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
+            .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
+            .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
 
-        .nonce        = "\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
-        .privacyNonce = "\xdb\x7d\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6",
+            .nonce        = "\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
+            .privacyNonce = "\xdb\x7d\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6",
 
-        .sessionId    = 0xdb7d, // 56189
-        .peerNodeId   = 0x0000000000000000ULL,
-        .groupId      = 2,
-        .sourceNodeId = 0x0000000000000002ULL,
+            .sessionId    = 0xdb7d, // 56189
+            .peerNodeId   = 0x0000000000000000ULL,
+            .groupId      = 2,
+            .sourceNodeId = 0x0000000000000002ULL,
 
-        .expectedMessageCount = 0, ///< same test vector as above, but drops due to replay protection
-    },
-    {
-        .name     = "private group message",
-        .peerAddr = "::1",
+            .expectedMessageCount = 0, ///< same test vector as above, but drops due to replay protection
+        },
+        {
+            .name     = "private group message",
+            .peerAddr = "::1",
 
-        .payload = "",
+            .payload = "",
 
-        // messageCounter = 0x12345679
-        .plain     = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
-        .encrypted = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2b\x2f\x91\x5a\x66\xc9"
-                     "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
-        .privacy   = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
-                     "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
+            // messageCounter = 0x12345679
+            .plain     = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
+            .encrypted = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2b\x2f\x91\x5a\x66\xc9"
+                         "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
+            .privacy   = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
+                         "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
 
-        .payloadLength   = 0,
-        .plainLength     = 24,
-        .encryptedLength = 40,
-        .privacyLength   = 40,
+            .payloadLength   = 0,
+            .plainLength     = 24,
+            .encryptedLength = 40,
+            .privacyLength   = 40,
 
-        .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
-        .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
-        .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+            .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
+            .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
+            .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
 
-        .nonce        = "\x01\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
-        .privacyNonce = "\xdb\x7d\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
+            .nonce        = "\x01\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
+            .privacyNonce = "\xdb\x7d\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
 
-        .sessionId    = 0xdb7d, // 56189
-        .peerNodeId   = 0x0000000000000000ULL,
-        .groupId      = 2,
-        .sourceNodeId = 0x0000000000000002ULL,
+            .sessionId    = 0xdb7d, // 56189
+            .peerNodeId   = 0x0000000000000000ULL,
+            .groupId      = 2,
+            .sourceNodeId = 0x0000000000000002ULL,
 
-        .expectedMessageCount = 1,
-    },
-    // =======================================
-    // GROUP negative test cases
-    // =======================================
-    {
-        .name     = "private group message (wrong MIC)",
-        .peerAddr = "::1",
+            .expectedMessageCount = 1,
+        },
+        // =======================================
+        // GROUP negative test cases
+        // =======================================
+        {
+            .name     = "private group message (wrong MIC)",
+            .peerAddr = "::1",
 
-        .payload = "",
+            .payload = "",
 
-        // messageCounter = 0x12345679
-        .plain     = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
-        .encrypted = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2b\x2f\x91\x5a\x66\xc9"
-                     "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xee",
-        .privacy   = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
-                     "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xee",
+            // messageCounter = 0x12345679
+            .plain     = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
+            .encrypted = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2b\x2f\x91\x5a\x66\xc9"
+                         "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xee",
+            .privacy   = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
+                         "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xee",
 
-        .payloadLength   = 0,
-        .plainLength     = 24,
-        .encryptedLength = 40,
-        .privacyLength   = 40,
+            .payloadLength   = 0,
+            .plainLength     = 24,
+            .encryptedLength = 40,
+            .privacyLength   = 40,
 
-        .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
-        .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
-        .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+            .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
+            .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
+            .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
 
-        .nonce        = "\x01\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
-        .privacyNonce = "\xdb\x7d\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
+            .nonce        = "\x01\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
+            .privacyNonce = "\xdb\x7d\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
 
-        .sessionId    = 0xdb7d, // 56189
-        .peerNodeId   = 0x0000000000000000ULL,
-        .groupId      = 2,
-        .sourceNodeId = 0x0000000000000002ULL,
+            .sessionId    = 0xdb7d, // 56189
+            .peerNodeId   = 0x0000000000000000ULL,
+            .groupId      = 2,
+            .sourceNodeId = 0x0000000000000002ULL,
 
-        .expectedMessageCount = 0,
-    },
-    {
-        // Buffer is truncated to exactly 16 bytes (the MIC size), so it passes
-        // the MIC extraction check but is far too short to hold the privacy header.
-        //
-        // msgFlags  = 0x06: version=0, kSourceNodeIdPresent (0x04), kDestinationGroupIdPresent (0x02)
-        // sessionId = 0xdb7d (matches the group key set up by the epoch key below)
-        // secFlags  = 0x81: kPrivacyFlag (0x80) | kGroupSession (0x01)
-        //
-        // PrivacyHeaderLength() = 4 (min) + 8 (source NodeId) + 2 (dest GroupId) = 14
-        // Required buffer for privacy region: offset 4 + length 14 = 18 bytes > 16 bytes → OOB
-        .name     = "private group message (privacy header exceeds buffer length)",
-        .peerAddr = "::1",
+            .expectedMessageCount = 0,
+        },
+        {
+            // Buffer is truncated to exactly 16 bytes (the MIC size), so it passes
+            // the MIC extraction check but is far too short to hold the privacy header.
+            //
+            // msgFlags  = 0x06: version=0, kSourceNodeIdPresent (0x04), kDestinationGroupIdPresent (0x02)
+            // sessionId = 0xdb7d (matches the group key set up by the epoch key below)
+            // secFlags  = 0x81: kPrivacyFlag (0x80) | kGroupSession (0x01)
+            //
+            // PrivacyHeaderLength() = 4 (min) + 8 (source NodeId) + 2 (dest GroupId) = 14
+            // Required buffer for privacy region: offset 4 + length 14 = 18 bytes > 16 bytes → OOB
+            .name     = "private group message (privacy header exceeds buffer length)",
+            .peerAddr = "::1",
 
-        .payload = "",
-        .plain   = "",
-        .privacy = "\x06\x7d\xdb\x81\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+            .payload = "",
+            .plain   = "",
+            .privacy = "\x06\x7d\xdb\x81\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 
-        .payloadLength = 0,
-        .plainLength   = 0,
-        .privacyLength = 16,
+            .payloadLength = 0,
+            .plainLength   = 0,
+            .privacyLength = 16,
 
-        .epochKey = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+            .epochKey = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
 
-        .sessionId    = 0xdb7d, // 56189
-        .peerNodeId   = 0x0000000000000000ULL,
-        .groupId      = 2,
-        .sourceNodeId = 0x0000000000000002ULL,
+            .sessionId    = 0xdb7d, // 56189
+            .peerNodeId   = 0x0000000000000000ULL,
+            .groupId      = 2,
+            .sourceNodeId = 0x0000000000000002ULL,
 
-        .expectedMessageCount = 0,
-    },
+            .expectedMessageCount = 0,
+        },
 
 #endif // !CHIP_CONFIG_SECURITY_TEST_MODE
-};
+    };
 
-const uint16_t theMessageTestVectorLength = sizeof(theMessageTestVector) / sizeof(theMessageTestVector[0]);
+    const uint16_t theMessageTestVectorLength = sizeof(theMessageTestVector) / sizeof(theMessageTestVector[0]);
 
-// Just enough init to replace a ton of boilerplate
-constexpr FabricIndex kFabricIndex = kMinValidFabricIndex;
-constexpr size_t kGroupIndex       = 0;
+    // Just enough init to replace a ton of boilerplate
+    constexpr FabricIndex kFabricIndex = kMinValidFabricIndex;
+    constexpr size_t kGroupIndex       = 0;
 
-constexpr uint16_t kMaxGroupsPerFabric    = 5;
-constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+    constexpr uint16_t kMaxGroupsPerFabric    = 5;
+    constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
-static chip::TestPersistentStorageDelegate sStorageDelegate;
-static chip::Crypto::DefaultSessionKeystore sSessionKeystore;
-static GroupDataProviderImpl sProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
-class FabricTableHolder
-{
-public:
-    FabricTableHolder() {}
-    ~FabricTableHolder()
+    static chip::TestPersistentStorageDelegate sStorageDelegate;
+    static chip::Crypto::DefaultSessionKeystore sSessionKeystore;
+    static GroupDataProviderImpl sProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+    class FabricTableHolder
     {
-        mFabricTable.Shutdown();
-        mOpKeyStore.Finish();
-        mOpCertStore.Finish();
-    }
-
-    CHIP_ERROR Init()
-    {
-        ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
-        ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
-
-        // Initialize Group Data Provider
-        sProvider.SetStorageDelegate(&sStorageDelegate);
-        sProvider.SetSessionKeystore(&sSessionKeystore);
-        // sProvider.SetListener(&chip::app::TestGroups::sListener);
-        ReturnErrorOnFailure(sProvider.Init());
-        Credentials::SetGroupDataProvider(&sProvider);
-
-        // Initialize Fabric Table
-        chip::FabricTable::InitParams initParams;
-        initParams.storage             = &mStorage;
-        initParams.operationalKeystore = &mOpKeyStore;
-        initParams.opCertStore         = &mOpCertStore;
-
-        return mFabricTable.Init(initParams);
-    }
-
-    FabricTable & GetFabricTable() { return mFabricTable; }
-
-private:
-    chip::FabricTable mFabricTable;
-    chip::TestPersistentStorageDelegate mStorage;
-    chip::PersistentStorageOperationalKeystore mOpKeyStore;
-    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
-};
-
-class TestSessionManagerCallback : public SessionMessageDelegate
-{
-public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const SessionHandle & session,
-                           DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override
-    {
-        mReceivedCount++;
-
-        MessageTestEntry & testEntry = theMessageTestVector[mTestVectorIndex];
-
-        ChipLogProgress(Test, "OnMessageReceived: sessionId=0x%04x", testEntry.sessionId);
-        EXPECT_EQ(header.GetSessionId(), testEntry.sessionId);
-
-        size_t dataLength   = msgBuf->DataLength();
-        size_t expectLength = testEntry.payloadLength;
-
-        EXPECT_EQ(dataLength, expectLength);
-        EXPECT_EQ(memcmp(msgBuf->Start(), testEntry.payload, dataLength), 0);
-
-        ChipLogProgress(Test, "::: TestSessionManagerDispatch[%d] PASS", mTestVectorIndex);
-    }
-
-    void ResetTest(unsigned testVectorIndex)
-    {
-        mTestVectorIndex = testVectorIndex;
-        mReceivedCount   = 0;
-    }
-
-    unsigned NumMessagesReceived() { return mReceivedCount; }
-
-    unsigned mTestVectorIndex = 0;
-    unsigned mReceivedCount   = 0;
-};
-
-PeerAddress AddressFromString(const char * str)
-{
-    Inet::IPAddress addr;
-
-    VerifyOrDie(Inet::IPAddress::FromString(str, addr));
-
-    return PeerAddress::UDP(addr);
-}
-
-void TestSessionManagerInit(TestContext & ctx, SessionManager & sessionManager)
-{
-    static FabricTableHolder fabricTableHolder;
-    static secure_channel::MessageCounterManager gMessageCounterManager;
-    static chip::TestPersistentStorageDelegate deviceStorage;
-    static chip::Crypto::DefaultSessionKeystore sessionKeystore;
-
-    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
-    EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
-}
-
-// constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
-static const uint8_t kCompressedFabricIdBuffer1[] = { 0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30 };
-constexpr ByteSpan kCompressedFabricId1(kCompressedFabricIdBuffer1);
-
-CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageTestEntry & testEntry)
-{
-    constexpr uint16_t kKeySetIndex = 0x0;
-
-    GroupId groupId              = testEntry.groupId;
-    GroupDataProvider * provider = GetGroupDataProvider();
-
-    static KeySet sKeySet(kKeySetIndex, SecurityPolicy::kTrustFirst, 1);
-    static GroupKey sGroupKeySet(groupId, kKeySetIndex);
-    static GroupInfo sGroupInfo(groupId, "Name Matter Not");
-    static Transport::IncomingGroupSession sSessionBobToFriends(groupId, kFabricIndex, testEntry.sourceNodeId);
-
-    if (testEntry.epochKey)
-    {
-        memcpy(sKeySet.epoch_keys[0].key, testEntry.epochKey, 16);
-        sKeySet.epoch_keys[0].start_time = 0;
-        sGroupInfo.group_id              = groupId;
-        sGroupKeySet.group_id            = groupId;
-
-        ReturnErrorOnFailure(provider->SetKeySet(kFabricIndex, kCompressedFabricId1, sKeySet));
-        ReturnErrorOnFailure(provider->SetGroupKeyAt(kFabricIndex, kGroupIndex, sGroupKeySet));
-        ReturnErrorOnFailure(provider->SetGroupInfoAt(kFabricIndex, kGroupIndex, sGroupInfo));
-    }
-
-    sessionHolder = SessionHandle(sSessionBobToFriends);
-
-    return CHIP_NO_ERROR;
-}
-
-class TestSessionManagerDispatch : public ::testing::Test
-{
-protected:
-    void SetUp() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
-    void TearDown() { mContext.Shutdown(); }
-
-    TestContext mContext;
-};
-
-TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    SessionManager sessionManager;
-    TestSessionManagerCallback callback;
-
-    TestSessionManagerInit(mContext, sessionManager);
-    sessionManager.SetMessageDelegate(&callback);
-
-    IPAddress addr;
-    IPAddress::FromString("::1", addr);
-    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
-
-    SessionHolder aliceToBobSession;
-    SessionHolder testGroupSession;
-
-    for (unsigned i = 0; i < theMessageTestVectorLength; i++)
-    {
-        MessageTestEntry & testEntry = theMessageTestVector[i];
-        callback.ResetTest(i);
-
-        ChipLogProgress(Test, "===> TestSessionManagerDispatch[%d] '%s': sessionId=0x%04x", i, testEntry.name, testEntry.sessionId);
-
-        // TODO(#22830): inject raw keys rather than always defaulting to test key
-        // TODO: switch on session type
-
-        // Inject Sessions
-        err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, testEntry.sessionId, testEntry.peerNodeId,
-                                                          testEntry.sessionId, kFabricIndex, peer,
-                                                          CryptoContext::SessionRole::kResponder);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        err = InjectGroupSessionWithTestKey(testGroupSession, testEntry);
-        EXPECT_EQ(CHIP_NO_ERROR, err);
-
-        const char * plain = testEntry.plain;
-        const ByteSpan expectedPlain(reinterpret_cast<const uint8_t *>(plain), testEntry.plainLength);
-        const char * privacy = testEntry.privacy;
-        chip::System::PacketBufferHandle msg =
-            chip::MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(privacy), testEntry.privacyLength);
-
-        const PeerAddress peerAddress = AddressFromString(testEntry.peerAddr);
-        sessionManager.OnMessageReceived(peerAddress, std::move(msg));
-        EXPECT_EQ(callback.NumMessagesReceived(), testEntry.expectedMessageCount);
-
-        if ((testEntry.expectedMessageCount == 0) && (callback.NumMessagesReceived() == 0))
+    public:
+        FabricTableHolder() {}
+        ~FabricTableHolder()
         {
-            ChipLogProgress(Test, "::: TestSessionManagerDispatch[%d] PASS (negative test case)", i);
+            mFabricTable.Shutdown();
+            mOpKeyStore.Finish();
+            mOpCertStore.Finish();
         }
+
+        CHIP_ERROR Init()
+        {
+            ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
+            ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
+
+            // Initialize Group Data Provider
+            sProvider.SetStorageDelegate(&sStorageDelegate);
+            sProvider.SetSessionKeystore(&sSessionKeystore);
+            // sProvider.SetListener(&chip::app::TestGroups::sListener);
+            ReturnErrorOnFailure(sProvider.Init());
+            Credentials::SetGroupDataProvider(&sProvider);
+
+            // Initialize Fabric Table
+            chip::FabricTable::InitParams initParams;
+            initParams.storage             = &mStorage;
+            initParams.operationalKeystore = &mOpKeyStore;
+            initParams.opCertStore         = &mOpCertStore;
+
+            return mFabricTable.Init(initParams);
+        }
+
+        FabricTable & GetFabricTable() { return mFabricTable; }
+
+    private:
+        chip::FabricTable mFabricTable;
+        chip::TestPersistentStorageDelegate mStorage;
+        chip::PersistentStorageOperationalKeystore mOpKeyStore;
+        chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+    };
+
+    class TestSessionManagerCallback : public SessionMessageDelegate
+    {
+    public:
+        void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const SessionHandle & session,
+                               DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override
+        {
+            mReceivedCount++;
+
+            MessageTestEntry & testEntry = theMessageTestVector[mTestVectorIndex];
+
+            ChipLogProgress(Test, "OnMessageReceived: sessionId=0x%04x", testEntry.sessionId);
+            EXPECT_EQ(header.GetSessionId(), testEntry.sessionId);
+
+            size_t dataLength   = msgBuf->DataLength();
+            size_t expectLength = testEntry.payloadLength;
+
+            EXPECT_EQ(dataLength, expectLength);
+            EXPECT_EQ(memcmp(msgBuf->Start(), testEntry.payload, dataLength), 0);
+
+            ChipLogProgress(Test, "::: TestSessionManagerDispatch[%d] PASS", mTestVectorIndex);
+        }
+
+        void ResetTest(unsigned testVectorIndex)
+        {
+            mTestVectorIndex = testVectorIndex;
+            mReceivedCount   = 0;
+        }
+
+        unsigned NumMessagesReceived() { return mReceivedCount; }
+
+        unsigned mTestVectorIndex = 0;
+        unsigned mReceivedCount   = 0;
+    };
+
+    PeerAddress AddressFromString(const char * str)
+    {
+        Inet::IPAddress addr;
+
+        VerifyOrDie(Inet::IPAddress::FromString(str, addr));
+
+        return PeerAddress::UDP(addr);
     }
 
-    sessionManager.Shutdown();
-}
+    void TestSessionManagerInit(TestContext & ctx, SessionManager & sessionManager)
+    {
+        static FabricTableHolder fabricTableHolder;
+        static secure_channel::MessageCounterManager gMessageCounterManager;
+        static chip::TestPersistentStorageDelegate deviceStorage;
+        static chip::Crypto::DefaultSessionKeystore sessionKeystore;
+
+        EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+        EXPECT_EQ(CHIP_NO_ERROR,
+                  sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                      &fabricTableHolder.GetFabricTable(), sessionKeystore));
+    }
+
+    // constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
+    static const uint8_t kCompressedFabricIdBuffer1[] = { 0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30 };
+    constexpr ByteSpan kCompressedFabricId1(kCompressedFabricIdBuffer1);
+
+    CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageTestEntry & testEntry)
+    {
+        constexpr uint16_t kKeySetIndex = 0x0;
+
+        GroupId groupId              = testEntry.groupId;
+        GroupDataProvider * provider = GetGroupDataProvider();
+
+        static KeySet sKeySet(kKeySetIndex, SecurityPolicy::kTrustFirst, 1);
+        static GroupKey sGroupKeySet(groupId, kKeySetIndex);
+        static GroupInfo sGroupInfo(groupId, "Name Matter Not");
+        static Transport::IncomingGroupSession sSessionBobToFriends(groupId, kFabricIndex, testEntry.sourceNodeId);
+
+        if (testEntry.epochKey)
+        {
+            memcpy(sKeySet.epoch_keys[0].key, testEntry.epochKey, 16);
+            sKeySet.epoch_keys[0].start_time = 0;
+            sGroupInfo.group_id              = groupId;
+            sGroupKeySet.group_id            = groupId;
+
+            ReturnErrorOnFailure(provider->SetKeySet(kFabricIndex, kCompressedFabricId1, sKeySet));
+            ReturnErrorOnFailure(provider->SetGroupKeyAt(kFabricIndex, kGroupIndex, sGroupKeySet));
+            ReturnErrorOnFailure(provider->SetGroupInfoAt(kFabricIndex, kGroupIndex, sGroupInfo));
+        }
+
+        sessionHolder = SessionHandle(sSessionBobToFriends);
+
+        return CHIP_NO_ERROR;
+    }
+
+    class TestSessionManagerDispatch : public ::testing::Test
+    {
+    protected:
+        void SetUp() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
+        void TearDown() { mContext.Shutdown(); }
+
+        TestContext mContext;
+    };
+
+    TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        SessionManager sessionManager;
+        TestSessionManagerCallback callback;
+
+        TestSessionManagerInit(mContext, sessionManager);
+        sessionManager.SetMessageDelegate(&callback);
+
+        IPAddress addr;
+        IPAddress::FromString("::1", addr);
+        Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+        SessionHolder aliceToBobSession;
+        SessionHolder testGroupSession;
+
+        for (unsigned i = 0; i < theMessageTestVectorLength; i++)
+        {
+            MessageTestEntry & testEntry = theMessageTestVector[i];
+            callback.ResetTest(i);
+
+            ChipLogProgress(Test, "===> TestSessionManagerDispatch[%d] '%s': sessionId=0x%04x", i, testEntry.name,
+                            testEntry.sessionId);
+
+            // TODO(#22830): inject raw keys rather than always defaulting to test key
+            // TODO: switch on session type
+
+            // Inject Sessions
+            err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, testEntry.sessionId, testEntry.peerNodeId,
+                                                              testEntry.sessionId, kFabricIndex, peer,
+                                                              CryptoContext::SessionRole::kResponder);
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+
+            err = InjectGroupSessionWithTestKey(testGroupSession, testEntry);
+            EXPECT_EQ(CHIP_NO_ERROR, err);
+
+            const char * plain = testEntry.plain;
+            const ByteSpan expectedPlain(reinterpret_cast<const uint8_t *>(plain), testEntry.plainLength);
+            const char * privacy = testEntry.privacy;
+            chip::System::PacketBufferHandle msg =
+                chip::MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(privacy), testEntry.privacyLength);
+
+            const PeerAddress peerAddress = AddressFromString(testEntry.peerAddr);
+            sessionManager.OnMessageReceived(peerAddress, std::move(msg));
+            EXPECT_EQ(callback.NumMessagesReceived(), testEntry.expectedMessageCount);
+
+            if ((testEntry.expectedMessageCount == 0) && (callback.NumMessagesReceived() == 0))
+            {
+                ChipLogProgress(Test, "::: TestSessionManagerDispatch[%d] PASS (negative test case)", i);
+            }
+        }
+
+        sessionManager.Shutdown();
+    }
 
 <<<<<<< HEAD
 =======
 #if !CHIP_CONFIG_SECURITY_TEST_MODE
-class TestGroupPrivacyMessageDelegate : public SessionMessageDelegate
-{
-public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const SessionHandle & session,
-                           DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override
+    class TestGroupPrivacyMessageDelegate : public SessionMessageDelegate
     {
-        mMessageReceived = true;
-        mHeader          = header;
+    public:
+        void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const SessionHandle & session,
+                               DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override
+        {
+            mMessageReceived = true;
+            mHeader          = header;
+        }
+
+        bool mMessageReceived = false;
+        PacketHeader mHeader;
+    };
+
+    static void SetupGroupKeys(SessionManager & sessionManager, FabricIndex & fabricIndex, GroupId groupId, const char * epochKey)
+    {
+        using namespace chip::TestCerts;
+
+        // Injects a test fabric
+        FabricTable * fabricTable = sessionManager.GetFabricTable();
+        ASSERT_NE(nullptr, fabricTable);
+        CHIP_ERROR err =
+            fabricTable->AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                               GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &fabricIndex);
+        EXPECT_EQ(CHIP_NO_ERROR, err);
+
+        // Extracts assigned 64-bit compressed fabric ID span.
+        uint8_t compressedFabricBuf[sizeof(uint64_t)];
+        MutableByteSpan compressedFabricSpan(compressedFabricBuf);
+        EXPECT_EQ(CHIP_NO_ERROR, fabricTable->FindFabricWithIndex(fabricIndex)->GetCompressedFabricIdBytes(compressedFabricSpan));
+
+        // Get pointer to active group data provider
+        GroupDataProvider * provider = GetGroupDataProvider();
+        ASSERT_NE(nullptr, provider);
+
+        // registers symmetric keys under non-zero KeySetID 0x0123.
+        constexpr uint16_t kTestKeysetId = 0x0123;
+        KeySet keySet(kTestKeysetId, GroupDataProvider::SecurityPolicy::kTrustFirst, 1);
+        memcpy(keySet.epoch_keys[0].key, epochKey, 16);
+        keySet.epoch_keys[0].start_time = 0;
+        GroupKey groupKey(groupId, kTestKeysetId);
+        GroupInfo groupInfo(groupId, "Privacy Group");
+
+        // Setup Group key sets, group key maps, and group info
+        EXPECT_EQ(CHIP_NO_ERROR, provider->SetKeySet(fabricIndex, compressedFabricSpan, keySet));
+        EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupKeyAt(fabricIndex, 0, groupKey));
+        EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupInfoAt(fabricIndex, 0, groupInfo));
     }
 
-    bool mMessageReceived = false;
-    PacketHeader mHeader;
-};
+    TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
+    {
+        using namespace chip::TestCerts;
 
-static void SetupGroupKeys(SessionManager & sessionManager, FabricIndex & fabricIndex, GroupId groupId, const char * epochKey)
-{
-    using namespace chip::TestCerts;
+        SessionManager sessionManager;
+        TestGroupPrivacyMessageDelegate delegate;
+        TestSessionManagerInit(mContext, sessionManager, *mResources);
+        sessionManager.SetMessageDelegate(&delegate);
 
-    // Injects a test fabric
-    FabricTable * fabricTable = sessionManager.GetFabricTable();
-    ASSERT_NE(nullptr, fabricTable);
-    CHIP_ERROR err = fabricTable->AddNewFabricForTestIgnoringCollisions(
-        GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &fabricIndex);
-    EXPECT_EQ(CHIP_NO_ERROR, err);
+        // Loads test parameters for GroupId 2
+        const MessageTestEntry & testEntry = theMessageTestVector[7];
 
-    // Extracts assigned 64-bit compressed fabric ID span.
-    uint8_t compressedFabricBuf[sizeof(uint64_t)];
-    MutableByteSpan compressedFabricSpan(compressedFabricBuf);
-    EXPECT_EQ(CHIP_NO_ERROR, fabricTable->FindFabricWithIndex(fabricIndex)->GetCompressedFabricIdBytes(compressedFabricSpan));
+        FabricIndex fabricIndex = kUndefinedFabricIndex;
+        SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
 
-    // Get pointer to active group data provider
-    GroupDataProvider * provider = GetGroupDataProvider();
-    ASSERT_NE(nullptr, provider);
+        // Instantiates outgoing (for PrepareMessage) session.
+        Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
+        SessionHandle outgoingHandle(outgoingSession);
+        SessionHolder outgoingHolder(outgoingHandle);
 
-    // registers symmetric keys under non-zero KeySetID 0x0123.
-    constexpr uint16_t kTestKeysetId = 0x0123;
-    KeySet keySet(kTestKeysetId, GroupDataProvider::SecurityPolicy::kTrustFirst, 1);
-    memcpy(keySet.epoch_keys[0].key, epochKey, 16);
-    keySet.epoch_keys[0].start_time = 0;
-    GroupKey groupKey(groupId, kTestKeysetId);
-    GroupInfo groupInfo(groupId, "Privacy Group");
+        // Create the test payload header, data, and buffer
+        PayloadHeader payloadHeader;
+        payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+        const char testPayload[] = "PrivacyTest";
+        System::PacketBufferHandle payloadBuf =
+            MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
+        ASSERT_FALSE(payloadBuf.IsNull());
 
-    // Setup Group key sets, group key maps, and group info
-    EXPECT_EQ(CHIP_NO_ERROR, provider->SetKeySet(fabricIndex, compressedFabricSpan, keySet));
-    EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupKeyAt(fabricIndex, 0, groupKey));
-    EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupInfoAt(fabricIndex, 0, groupInfo));
-}
+        // Prepare the group message
+        EncryptedPacketBufferHandle preparedMessage;
+        CHIP_ERROR err =
+            sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
+        EXPECT_EQ(CHIP_NO_ERROR, err);
 
-TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
-{
-    using namespace chip::TestCerts;
+        // Unwraps the buffer and verifies PrepareMessage set the privacy flag bit high and set the group session type.
+        PacketHeader decodedHeader;
+        uint16_t headerSize                    = 0;
+        System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
+        ASSERT_FALSE(writableMsg.IsNull());
+        EXPECT_EQ(CHIP_NO_ERROR, decodedHeader.Decode(writableMsg->Start(), writableMsg->DataLength(), &headerSize));
+        EXPECT_TRUE(decodedHeader.IsGroupSession());
+        EXPECT_TRUE(decodedHeader.HasPrivacyFlag());
 
-    SessionManager sessionManager;
-    TestGroupPrivacyMessageDelegate delegate;
-    TestSessionManagerInit(mContext, sessionManager, *mResources);
-    sessionManager.SetMessageDelegate(&delegate);
+        // Feeds ciphertext back into transport dispatch to verify PrivacyDecrypt and MIC authentication.
+        IPAddress loopbackAddress;
+        IPAddress::FromString("::1", loopbackAddress);
+        const PeerAddress peerAddress = PeerAddress::UDP(loopbackAddress, CHIP_PORT);
+        sessionManager.OnMessageReceived(peerAddress, std::move(writableMsg));
+        EXPECT_TRUE(delegate.mMessageReceived);
 
-    // Loads test parameters for GroupId 2
-    const MessageTestEntry & testEntry = theMessageTestVector[7];
+        // Verify decrypted fields match expectations
+        EXPECT_EQ(delegate.mHeader.GetSessionId(), decodedHeader.GetSessionId());
+        EXPECT_EQ(delegate.mHeader.GetDestinationGroupId().Value(), testEntry.groupId);
 
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
+        FabricTable * fabricTable = sessionManager.GetFabricTable();
+        ASSERT_NE(nullptr, fabricTable);
+        NodeId expectedSourceNodeId = fabricTable->FindFabricWithIndex(fabricIndex)->GetNodeId();
+        EXPECT_TRUE(delegate.mHeader.GetSourceNodeId().HasValue());
+        EXPECT_EQ(delegate.mHeader.GetSourceNodeId().Value(), expectedSourceNodeId);
 
-    // Instantiates outgoing (for PrepareMessage) session.
-    Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
-    SessionHandle outgoingHandle(outgoingSession);
-    SessionHolder outgoingHolder(outgoingHandle);
+        sessionManager.Shutdown();
+    }
 
-    // Create the test payload header, data, and buffer
-    PayloadHeader payloadHeader;
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
-    const char testPayload[] = "PrivacyTest";
-    System::PacketBufferHandle payloadBuf =
-        MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
-    ASSERT_FALSE(payloadBuf.IsNull());
+    TEST_F(TestSessionManagerDispatch, TestGroupIncomingPrivacyBoundsCheck)
+    {
+        using namespace chip::TestCerts;
 
-    // Prepare the group message
-    EncryptedPacketBufferHandle preparedMessage;
-    CHIP_ERROR err =
-        sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
-    EXPECT_EQ(CHIP_NO_ERROR, err);
+        SessionManager sessionManager;
+        TestGroupPrivacyMessageDelegate delegate;
+        TestSessionManagerInit(mContext, sessionManager, *mResources);
+        sessionManager.SetMessageDelegate(&delegate);
 
-    // Unwraps the buffer and verifies PrepareMessage set the privacy flag bit high and set the group session type.
-    PacketHeader decodedHeader;
-    uint16_t headerSize                    = 0;
-    System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
-    ASSERT_FALSE(writableMsg.IsNull());
-    EXPECT_EQ(CHIP_NO_ERROR, decodedHeader.Decode(writableMsg->Start(), writableMsg->DataLength(), &headerSize));
-    EXPECT_TRUE(decodedHeader.IsGroupSession());
-    EXPECT_TRUE(decodedHeader.HasPrivacyFlag());
+        // Loads test parameters for GroupId 2
+        const MessageTestEntry & testEntry = theMessageTestVector[7];
 
-    // Feeds ciphertext back into transport dispatch to verify PrivacyDecrypt and MIC authentication.
-    IPAddress loopbackAddress;
-    IPAddress::FromString("::1", loopbackAddress);
-    const PeerAddress peerAddress = PeerAddress::UDP(loopbackAddress, CHIP_PORT);
-    sessionManager.OnMessageReceived(peerAddress, std::move(writableMsg));
-    EXPECT_TRUE(delegate.mMessageReceived);
+        FabricIndex fabricIndex = kUndefinedFabricIndex;
+        SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
 
-    // Verify decrypted fields match expectations
-    EXPECT_EQ(delegate.mHeader.GetSessionId(), decodedHeader.GetSessionId());
-    EXPECT_EQ(delegate.mHeader.GetDestinationGroupId().Value(), testEntry.groupId);
+        // Instantiates outgoing (for PrepareMessage) session.
+        Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
+        SessionHandle outgoingHandle(outgoingSession);
+        SessionHolder outgoingHolder(outgoingHandle);
 
-    FabricTable * fabricTable = sessionManager.GetFabricTable();
-    ASSERT_NE(nullptr, fabricTable);
-    NodeId expectedSourceNodeId = fabricTable->FindFabricWithIndex(fabricIndex)->GetNodeId();
-    EXPECT_TRUE(delegate.mHeader.GetSourceNodeId().HasValue());
-    EXPECT_EQ(delegate.mHeader.GetSourceNodeId().Value(), expectedSourceNodeId);
+        // Create the test payload header, data, and buffer
+        PayloadHeader payloadHeader;
+        payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+        const char testPayload[] = "PrivacyTest";
+        System::PacketBufferHandle payloadBuf =
+            MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
+        ASSERT_FALSE(payloadBuf.IsNull());
 
-    sessionManager.Shutdown();
-}
+        // Prepare the group message
+        EncryptedPacketBufferHandle preparedMessage;
+        CHIP_ERROR err =
+            sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
+        EXPECT_EQ(CHIP_NO_ERROR, err);
 
-TEST_F(TestSessionManagerDispatch, TestGroupIncomingPrivacyBoundsCheck)
-{
-    using namespace chip::TestCerts;
+        System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
+        ASSERT_FALSE(writableMsg.IsNull());
 
-    SessionManager sessionManager;
-    TestGroupPrivacyMessageDelegate delegate;
-    TestSessionManagerInit(mContext, sessionManager, *mResources);
-    sessionManager.SetMessageDelegate(&delegate);
+        // Shrink the buffer to trigger the bounds check failure in GroupKeyDecryptAttempt.
+        writableMsg->SetDataLength(1);
 
-    // Loads test parameters for GroupId 2
-    const MessageTestEntry & testEntry = theMessageTestVector[7];
+        IPAddress loopbackAddress;
+        IPAddress::FromString("::1", loopbackAddress);
+        const PeerAddress peerAddress = PeerAddress::UDP(loopbackAddress, CHIP_PORT);
+        sessionManager.OnMessageReceived(peerAddress, std::move(writableMsg));
 
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
+        // The message should be discarded and NOT received by the delegate.
+        EXPECT_FALSE(delegate.mMessageReceived);
 
-    // Instantiates outgoing (for PrepareMessage) session.
-    Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
-    SessionHandle outgoingHandle(outgoingSession);
-    SessionHolder outgoingHolder(outgoingHandle);
+        sessionManager.Shutdown();
+    }
 
-    // Create the test payload header, data, and buffer
-    PayloadHeader payloadHeader;
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
-    const char testPayload[] = "PrivacyTest";
-    System::PacketBufferHandle payloadBuf =
-        MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
-    ASSERT_FALSE(payloadBuf.IsNull());
+    TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessageChainedBufferFailure)
+    {
+        using namespace chip::TestCerts;
 
-    // Prepare the group message
-    EncryptedPacketBufferHandle preparedMessage;
-    CHIP_ERROR err =
-        sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
-    EXPECT_EQ(CHIP_NO_ERROR, err);
+        SessionManager sessionManager;
+        TestSessionManagerInit(mContext, sessionManager, *mResources);
 
-    System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
-    ASSERT_FALSE(writableMsg.IsNull());
+        // Loads test parameters for GroupId 2
+        const MessageTestEntry & testEntry = theMessageTestVector[7];
 
-    // Shrink the buffer to trigger the bounds check failure in GroupKeyDecryptAttempt.
-    writableMsg->SetDataLength(1);
+        FabricIndex fabricIndex = kUndefinedFabricIndex;
+        SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
 
-    IPAddress loopbackAddress;
-    IPAddress::FromString("::1", loopbackAddress);
-    const PeerAddress peerAddress = PeerAddress::UDP(loopbackAddress, CHIP_PORT);
-    sessionManager.OnMessageReceived(peerAddress, std::move(writableMsg));
+        // Instantiates outgoing (for PrepareMessage) session.
+        Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
+        SessionHandle outgoingHandle(outgoingSession);
+        SessionHolder outgoingHolder(outgoingHandle);
 
-    // The message should be discarded and NOT received by the delegate.
-    EXPECT_FALSE(delegate.mMessageReceived);
+        PayloadHeader payloadHeader;
+        payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
 
-    sessionManager.Shutdown();
-}
+        // Create a chained buffer
+        System::PacketBufferHandle buf1 = MessagePacketBuffer::New(0);
+        System::PacketBufferHandle buf2 = MessagePacketBuffer::New(0);
+        ASSERT_FALSE(buf1.IsNull());
+        ASSERT_FALSE(buf2.IsNull());
+        buf1.AddToEnd(std::move(buf2));
 
-TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessageChainedBufferFailure)
-{
-    using namespace chip::TestCerts;
+        EXPECT_TRUE(buf1->HasChainedBuffer());
 
-    SessionManager sessionManager;
-    TestSessionManagerInit(mContext, sessionManager, *mResources);
+        EncryptedPacketBufferHandle preparedMessage;
+        CHIP_ERROR err =
+            sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(buf1), preparedMessage);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    // Loads test parameters for GroupId 2
-    const MessageTestEntry & testEntry = theMessageTestVector[7];
-
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
-
-    // Instantiates outgoing (for PrepareMessage) session.
-    Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
-    SessionHandle outgoingHandle(outgoingSession);
-    SessionHolder outgoingHolder(outgoingHandle);
-
-    PayloadHeader payloadHeader;
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
-
-    // Create a chained buffer
-    System::PacketBufferHandle buf1 = MessagePacketBuffer::New(0);
-    System::PacketBufferHandle buf2 = MessagePacketBuffer::New(0);
-    ASSERT_FALSE(buf1.IsNull());
-    ASSERT_FALSE(buf2.IsNull());
-    buf1.AddToEnd(std::move(buf2));
-
-    EXPECT_TRUE(buf1->HasChainedBuffer());
-
-    EncryptedPacketBufferHandle preparedMessage;
-    CHIP_ERROR err = sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(buf1), preparedMessage);
-    EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    sessionManager.Shutdown();
-}
+        sessionManager.Shutdown();
+    }
 #endif // !CHIP_CONFIG_SECURITY_TEST_MODE
 
-// A message that fails to decrypt must not update the cached peer address of the
-// session it names.
-TEST_F(TestSessionManagerDispatch, TestUndecryptableMessageDoesNotRebindPeerAddress)
-{
-    SessionManager sessionManager;
-    TestSessionManagerInit(mContext, sessionManager, *mResources);
+    // A message that fails to decrypt must not update the cached peer address of the
+    // session it names.
+    TEST_F(TestSessionManagerDispatch, TestUndecryptableMessageDoesNotRebindPeerAddress)
+    {
+        SessionManager sessionManager;
+        TestSessionManagerInit(mContext, sessionManager, *mResources);
 
-    constexpr uint16_t kLocalSessionId   = 0x1234;
-    constexpr NodeId kSessionPeerNodeId  = 0x0000000000000002ULL;
-    const PeerAddress establishedAddress = AddressFromString("fe80::1");
-    const PeerAddress spoofedAddress     = AddressFromString("fe80::2");
+        constexpr uint16_t kLocalSessionId   = 0x1234;
+        constexpr NodeId kSessionPeerNodeId  = 0x0000000000000002ULL;
+        const PeerAddress establishedAddress = AddressFromString("fe80::1");
+        const PeerAddress spoofedAddress     = AddressFromString("fe80::2");
 
-    SessionHolder sessionHolder;
-    ASSERT_SUCCESS(sessionManager.InjectPaseSessionWithTestKey(sessionHolder, kLocalSessionId, kSessionPeerNodeId, kLocalSessionId,
-                                                               kFabricIndex, establishedAddress,
-                                                               CryptoContext::SessionRole::kResponder));
+        SessionHolder sessionHolder;
+        ASSERT_SUCCESS(sessionManager.InjectPaseSessionWithTestKey(sessionHolder, kLocalSessionId, kSessionPeerNodeId,
+                                                                   kLocalSessionId, kFabricIndex, establishedAddress,
+                                                                   CryptoContext::SessionRole::kResponder));
 
-    SecureSession * secureSession = sessionHolder.Get().Value()->AsSecureSession();
-    ASSERT_EQ(secureSession->GetPeerAddress(), establishedAddress);
+        SecureSession * secureSession = sessionHolder.Get().Value()->AsSecureSession();
+        ASSERT_EQ(secureSession->GetPeerAddress(), establishedAddress);
 
-    PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(0);
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+        PayloadHeader payloadHeader;
+        payloadHeader.SetExchangeID(0);
+        payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
 
-    const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
-    System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
-    ASSERT_FALSE(payload.IsNull());
+        const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
+        System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
+        ASSERT_FALSE(payload.IsNull());
 
-    EncryptedPacketBufferHandle preparedMessage;
-    ASSERT_SUCCESS(sessionManager.PrepareMessage(sessionHolder.Get().Value(), payloadHeader, std::move(payload), preparedMessage));
+        EncryptedPacketBufferHandle preparedMessage;
+        ASSERT_SUCCESS(
+            sessionManager.PrepareMessage(sessionHolder.Get().Value(), payloadHeader, std::move(payload), preparedMessage));
 
-    // Corrupt the trailing integrity check so the message parses but cannot be
-    // authenticated.
-    System::PacketBufferHandle msg = preparedMessage.CastToWritable();
-    ASSERT_FALSE(msg.IsNull());
-    ASSERT_GT(msg->DataLength(), 0u);
-    msg->Start()[msg->DataLength() - 1] = static_cast<uint8_t>(msg->Start()[msg->DataLength() - 1] ^ 0xff);
+        // Corrupt the trailing integrity check so the message parses but cannot be
+        // authenticated.
+        System::PacketBufferHandle msg = preparedMessage.CastToWritable();
+        ASSERT_FALSE(msg.IsNull());
+        ASSERT_GT(msg->DataLength(), 0u);
+        msg->Start()[msg->DataLength() - 1] = static_cast<uint8_t>(msg->Start()[msg->DataLength() - 1] ^ 0xff);
 
-    sessionManager.OnMessageReceived(spoofedAddress, std::move(msg));
+        sessionManager.OnMessageReceived(spoofedAddress, std::move(msg));
 
-    EXPECT_EQ(secureSession->GetPeerAddress(), establishedAddress);
+        EXPECT_EQ(secureSession->GetPeerAddress(), establishedAddress);
 
-    sessionManager.Shutdown();
-}
+        sessionManager.Shutdown();
+    }
 
-// Injects the two halves of a PASE session pair so that a message prepared on
-// `initiator` decrypts on `responder`.
-CHIP_ERROR InjectSessionPair(SessionManager & sessionManager, SessionHolder & initiator, SessionHolder & responder,
-                             const PeerAddress & peerAddress)
-{
-    ReturnErrorOnFailure(sessionManager.InjectPaseSessionWithTestKey(initiator, 2, 0x0000000000000002ULL, 1, kFabricIndex,
-                                                                     peerAddress, CryptoContext::SessionRole::kInitiator));
-    return sessionManager.InjectPaseSessionWithTestKey(responder, 1, 0x0000000000000001ULL, 2, kFabricIndex, peerAddress,
-                                                       CryptoContext::SessionRole::kResponder);
-}
+    // Injects the two halves of a PASE session pair so that a message prepared on
+    // `initiator` decrypts on `responder`.
+    CHIP_ERROR InjectSessionPair(SessionManager & sessionManager, SessionHolder & initiator, SessionHolder & responder,
+                                 const PeerAddress & peerAddress)
+    {
+        ReturnErrorOnFailure(sessionManager.InjectPaseSessionWithTestKey(initiator, 2, 0x0000000000000002ULL, 1, kFabricIndex,
+                                                                         peerAddress, CryptoContext::SessionRole::kInitiator));
+        return sessionManager.InjectPaseSessionWithTestKey(responder, 1, 0x0000000000000001ULL, 2, kFabricIndex, peerAddress,
+                                                           CryptoContext::SessionRole::kResponder);
+    }
 
-// Prepares an encrypted message on `session` carrying a fixed payload.
-CHIP_ERROR PrepareTestMessage(SessionManager & sessionManager, const SessionHandle & session,
-                              EncryptedPacketBufferHandle & prepared)
-{
-    PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(0);
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
-    payloadHeader.SetInitiator(true);
-    // Reliable, so a duplicate is not dropped at the no-ack fast path and reaches
-    // the peer address update.
-    payloadHeader.SetNeedsAck(true);
+    // Prepares an encrypted message on `session` carrying a fixed payload.
+    CHIP_ERROR PrepareTestMessage(SessionManager & sessionManager, const SessionHandle & session,
+                                  EncryptedPacketBufferHandle & prepared)
+    {
+        PayloadHeader payloadHeader;
+        payloadHeader.SetExchangeID(0);
+        payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+        payloadHeader.SetInitiator(true);
+        // Reliable, so a duplicate is not dropped at the no-ack fast path and reaches
+        // the peer address update.
+        payloadHeader.SetNeedsAck(true);
 
-    const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
-    System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
-    VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_NO_MEMORY);
-    return sessionManager.PrepareMessage(session, payloadHeader, std::move(payload), prepared);
-}
+        const uint8_t kPayload[]           = { 0x11, 0x22, 0x33, 0x44 };
+        System::PacketBufferHandle payload = MessagePacketBuffer::NewWithData(kPayload, sizeof(kPayload));
+        VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_NO_MEMORY);
+        return sessionManager.PrepareMessage(session, payloadHeader, std::move(payload), prepared);
+    }
 
-// A replay of an already accepted message is authentic, so it must not be able to
-// update the session's cached peer address.
-TEST_F(TestSessionManagerDispatch, TestReplayedMessageDoesNotRebindPeerAddress)
-{
-    SessionManager sessionManager;
-    TestSessionManagerInit(mContext, sessionManager, *mResources);
+    // A replay of an already accepted message is authentic, so it must not be able to
+    // update the session's cached peer address.
+    TEST_F(TestSessionManagerDispatch, TestReplayedMessageDoesNotRebindPeerAddress)
+    {
+        SessionManager sessionManager;
+        TestSessionManagerInit(mContext, sessionManager, *mResources);
 
-    const PeerAddress establishedAddress = AddressFromString("fe80::1");
-    const PeerAddress replayAddress      = AddressFromString("fe80::2");
+        const PeerAddress establishedAddress = AddressFromString("fe80::1");
+        const PeerAddress replayAddress      = AddressFromString("fe80::2");
 
-    SessionHolder initiator;
-    SessionHolder responder;
-    ASSERT_SUCCESS(InjectSessionPair(sessionManager, initiator, responder, establishedAddress));
-    SecureSession * receiver = responder.Get().Value()->AsSecureSession();
+        SessionHolder initiator;
+        SessionHolder responder;
+        ASSERT_SUCCESS(InjectSessionPair(sessionManager, initiator, responder, establishedAddress));
+        SecureSession * receiver = responder.Get().Value()->AsSecureSession();
 
-    EncryptedPacketBufferHandle prepared;
-    ASSERT_SUCCESS(PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared));
-    ASSERT_FALSE(prepared.IsNull());
+        EncryptedPacketBufferHandle prepared;
+        ASSERT_SUCCESS(PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared));
+        ASSERT_FALSE(prepared.IsNull());
 
-    EncryptedPacketBufferHandle firstDelivery = prepared.CloneData();
-    ASSERT_FALSE(firstDelivery.IsNull());
-    sessionManager.OnMessageReceived(establishedAddress, firstDelivery.CastToWritable());
-    ASSERT_EQ(receiver->GetPeerAddress(), establishedAddress);
+        EncryptedPacketBufferHandle firstDelivery = prepared.CloneData();
+        ASSERT_FALSE(firstDelivery.IsNull());
+        sessionManager.OnMessageReceived(establishedAddress, firstDelivery.CastToWritable());
+        ASSERT_EQ(receiver->GetPeerAddress(), establishedAddress);
 
-    EncryptedPacketBufferHandle replay = prepared.CloneData();
-    ASSERT_FALSE(replay.IsNull());
-    sessionManager.OnMessageReceived(replayAddress, replay.CastToWritable());
+        EncryptedPacketBufferHandle replay = prepared.CloneData();
+        ASSERT_FALSE(replay.IsNull());
+        sessionManager.OnMessageReceived(replayAddress, replay.CastToWritable());
 
-    EXPECT_EQ(receiver->GetPeerAddress(), establishedAddress);
+        EXPECT_EQ(receiver->GetPeerAddress(), establishedAddress);
 
-    sessionManager.Shutdown();
-}
+        sessionManager.Shutdown();
+    }
 
-// A peer that moves to a new address is still tracked: the first message that is
-// authentic and not a replay updates the cached address.
-TEST_F(TestSessionManagerDispatch, TestAcceptedMessageFromNewAddressRebindsPeerAddress)
-{
-    SessionManager sessionManager;
-    TestSessionManagerInit(mContext, sessionManager, *mResources);
+    // A peer that moves to a new address is still tracked: the first message that is
+    // authentic and not a replay updates the cached address.
+    TEST_F(TestSessionManagerDispatch, TestAcceptedMessageFromNewAddressRebindsPeerAddress)
+    {
+        SessionManager sessionManager;
+        TestSessionManagerInit(mContext, sessionManager, *mResources);
 
-    const PeerAddress establishedAddress = AddressFromString("fe80::1");
-    const PeerAddress newAddress         = AddressFromString("fe80::2");
+        const PeerAddress establishedAddress = AddressFromString("fe80::1");
+        const PeerAddress newAddress         = AddressFromString("fe80::2");
 
-    SessionHolder initiator;
-    SessionHolder responder;
-    ASSERT_SUCCESS(InjectSessionPair(sessionManager, initiator, responder, establishedAddress));
-    SecureSession * receiver = responder.Get().Value()->AsSecureSession();
+        SessionHolder initiator;
+        SessionHolder responder;
+        ASSERT_SUCCESS(InjectSessionPair(sessionManager, initiator, responder, establishedAddress));
+        SecureSession * receiver = responder.Get().Value()->AsSecureSession();
 
-    EncryptedPacketBufferHandle prepared;
-    ASSERT_SUCCESS(PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared));
-    ASSERT_FALSE(prepared.IsNull());
+        EncryptedPacketBufferHandle prepared;
+        ASSERT_SUCCESS(PrepareTestMessage(sessionManager, initiator.Get().Value(), prepared));
+        ASSERT_FALSE(prepared.IsNull());
 
-    sessionManager.OnMessageReceived(newAddress, prepared.CastToWritable());
+        sessionManager.OnMessageReceived(newAddress, prepared.CastToWritable());
 
-    EXPECT_EQ(receiver->GetPeerAddress(), newAddress);
+        EXPECT_EQ(receiver->GetPeerAddress(), newAddress);
 
-    sessionManager.Shutdown();
-}
+        sessionManager.Shutdown();
+    }
 
 >>>>>>> 06e1ff5 (Update secure session peer address only after the message authenticates (#73747))
 } // namespace
