@@ -233,28 +233,33 @@ class TC_AVSM_2_5(MatterTestCommissionedDevice):
 
         self.step(9)
         notSupportedStreamUsage = next(
-            (e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities and e != Globals.Enums.StreamUsageEnum.kInternal),
-            Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
-        )
-
-        try:
-            adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=notSupportedStreamUsage,
-                audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
-                channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
-                sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
-                bitRate=aBitRate,
-                bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
-            )
-            await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            asserts.fail("Unexpected success when expecting INVALID_IN_STATE due to unsupported StreamUsage")
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.InvalidInState,
-                "Unexpected status returned when expecting INVALID_IN_STATE due to unsupported StreamUsage",
-            )
-            pass
+            (e for e in Globals.Enums.StreamUsageEnum
+             if e not in aStreamUsagePriorities
+             and e not in (Globals.Enums.StreamUsageEnum.kInternal, Globals.Enums.StreamUsageEnum.kUnknownEnumValue)),
+            None)
+        if notSupportedStreamUsage is None:
+            # A DUT whose StreamUsagePriorities holds every StreamUsage leaves no valid
+            # unsupported value to send; the INVALID_IN_STATE path cannot be exercised on it.
+            log.info("StreamUsagePriorities holds every StreamUsage; no unsupported value exists to send, skipping step 9")
+            self.mark_current_step_skipped()
+        else:
+            try:
+                adoStreamAllocateCmd = commands.AudioStreamAllocate(
+                    streamUsage=notSupportedStreamUsage,
+                    audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
+                    channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
+                    sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
+                    bitRate=aBitRate,
+                    bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
+                )
+                await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
+                asserts.fail("Unexpected success when expecting INVALID_IN_STATE due to unsupported StreamUsage")
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.InvalidInState,
+                    "Unexpected status returned when expecting INVALID_IN_STATE due to unsupported StreamUsage",
+                )
 
         self.step(10)
         try:
