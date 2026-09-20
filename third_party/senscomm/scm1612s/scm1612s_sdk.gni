@@ -31,6 +31,15 @@ template("scm1612s_sdk_sources") {
     scm1612s_project_dir = invoker.scm1612s_project_dir
   }
 
+  wise_sdk_regen = false
+  if (defined(invoker.regen_wise_sdk)) {
+    wise_sdk_regen = invoker.regen_wise_sdk
+  }
+  wise_sdk_regen_str = "false"
+  if (wise_sdk_regen) {
+    wise_sdk_regen_str = "true"
+  }
+
 #  if (defined(invoker.chip_enable_ota_requestor)) {
 #    if (invoker.chip_enable_ota_requestor) {
 #      chip_enable_ota_requestor = true
@@ -71,6 +80,7 @@ template("scm1612s_sdk_sources") {
     exec_script("${scm1612s_sdk_build_root}/build-wise-sdk.py",
             [ rebase_path("${scm1612s_sdk_build_root}", root_build_dir),
               "scm1612s_matter_defconfig",
+              wise_sdk_regen_str,
             ])
 
     public_deps = []

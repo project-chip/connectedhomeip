@@ -50,10 +50,6 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
-#include "ada/err.h"
-#include "ayla/utypes.h"
-#include "adb/adb.h"
-
 extern "C" int ble_hs_conn_can_alloc(void);
 
 /**
@@ -232,7 +228,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
     /* Note: This workaround may be removed. */
-    StartBleAdvWatchTimer(6000);
+    // StartBleAdvWatchTimer(6000);
 exit:
     return err;
 }
@@ -771,15 +767,6 @@ void BLEManagerImpl::DriveBLEState(void)
             vTaskDelay(500 / portTICK_PERIOD_MS);
         }
     }
-
-    // /* Scanning always ON */
-    // if (!fBleScanOn)
-    // {
-    //     if (!adb_bt_scan_start_wrap())
-    //     {
-    //         fBleScanOn = 1;
-    //     }
-    // }
 
     // If the application has enabled CHIPoBLE and BLE advertising...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled &&
@@ -1591,7 +1578,7 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
     }
 
     // send to al_bt module to process again
-    adb_process_gap_event_wrap(event);
+    // adb_process_gap_event_wrap(event);
 exit:
     if (err != CHIP_NO_ERROR)
     {

@@ -21,9 +21,6 @@
 #include <platform/senscomm/scm1612s/SCM1612SConfig.h>
 #include <platform/senscomm/scm1612s/NetworkCommissioningWiFiDriver.h>
 
-#include "ada/err.h"
-#include "ayla/utypes.h"
-#include "adb/adb.h"
 
 #include "wise_event_loop.h"
 #include "wise_wifi_types.h"
@@ -291,7 +288,6 @@ void WiseWiFiDriver::ClearInitialScanState()
     InitialScanTriggered  = true;
     InitialScanInProgress = false;
     InitialScanCnt        = 0;
-    adb_bt_scan_start_wrap();
 }
 
 bool WiseWiFiDriver::StartNextInitialScanRound()

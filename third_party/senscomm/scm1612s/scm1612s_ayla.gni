@@ -40,8 +40,6 @@ template("scm1612s_ayla_sources") {
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main",
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/${product_class}",
       "${scm1612s_sdk_root}/app/ayla/common/host_prop_mgr",
-      # wlt 
-      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/wlt",
       "${scm1612s_sdk_root}/api/include",
       "${scm1612s_sdk_root}/include/FreeRTOS",
       "${scm1612s_sdk_root}/include/freebsd",
@@ -196,10 +194,10 @@ template("scm1612s_ayla_sources") {
       "${scm1612s_sdk_root}/app/ayla/components/ada/certs/ca_certs_pem_txt.c",
       # adb
       "${scm1612s_sdk_root}/app/ayla/components/adb/adb.c",
-      "${scm1612s_sdk_root}/app/ayla/components/adb/adb_ayla_svc.c",
-      "${scm1612s_sdk_root}/app/ayla/components/adb/adb_conn_svc.c",
-      "${scm1612s_sdk_root}/app/ayla/components/adb/adb_wifi_cfg_svc.c",
-      "${scm1612s_sdk_root}/app/ayla/components/adb/adb_ota_svc.c",
+      #"${scm1612s_sdk_root}/app/ayla/components/adb/adb_ayla_svc.c",
+      #"${scm1612s_sdk_root}/app/ayla/components/adb/adb_conn_svc.c",
+      #"${scm1612s_sdk_root}/app/ayla/components/adb/adb_wifi_cfg_svc.c",
+      #"${scm1612s_sdk_root}/app/ayla/components/adb/adb_ota_svc.c",
       #adm
       "${scm1612s_sdk_root}/app/ayla/components/adm/adm.cpp", 
       "${scm1612s_sdk_root}/app/ayla/components/adm/adm_cli.cpp",
@@ -268,7 +266,7 @@ template("scm1612s_ayla_sources") {
       "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_os_mem.c",
       "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_persist.c",
       "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_bt.c",
-      "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_bt_cli.c",
+      #"${scm1612s_sdk_root}/app/ayla/components/al/wise/al_bt_cli.c",
       "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_wifi.c",
       "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_net_if.c",
       "${scm1612s_sdk_root}/app/ayla/components/al/wise/al_net_dns.c",
@@ -287,12 +285,6 @@ template("scm1612s_ayla_sources") {
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/demo_ota.c",
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/main/sched_conf.c",
       "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/${product_class}/demo_matter.c",
-      # wlt
-      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/wlt/wlt_ws2812_spi.c",
-      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/wlt/iotalink_ws2812.c",
-      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/wlt/iotalink_button.c",
-      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/wlt/iotalink_music.c",
-      "${scm1612s_sdk_root}/app/ayla/ayla_matter_demo/wlt/iotalink_control.c",
       #entry
       "${scm1612s_sdk_root}/app/ayla/main.c",
     ]
