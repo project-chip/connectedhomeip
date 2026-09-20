@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2024-2025 Project CHIP Authors
+# Copyright (c) 2024-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -93,7 +93,12 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
 )
 
-if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
+if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD AND CONFIG_CHIP_APP_JF_ADMIN)
+    chip_configure_data_model(app
+        INCLUDE_SERVER
+        ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/thermostat_matter_admin.zap
+    )
+elseif(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
     chip_configure_data_model(app
         INCLUDE_SERVER
         ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/thermostat_matter_br.zap

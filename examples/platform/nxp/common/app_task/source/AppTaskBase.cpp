@@ -76,6 +76,14 @@
 #include <OTAProvider.h>
 #endif
 
+#if CONFIG_ENABLE_PW_RPC
+#include "AppRpc.h"
+#endif
+
+#if CONFIG_CHIP_APP_JF_ADMIN
+#include "JFAInit.h"
+#endif
+
 #if CONFIG_DIAG_LOGS_DEMO
 #include "DiagnosticLogsDemo.h"
 #endif
@@ -290,6 +298,30 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
 #if CONFIG_CHIP_OTA_PROVIDER
     InitOTAServer();
+#endif
+
+#if CONFIG_CHIP_APP_JF_ADMIN
+    /* JFA::Init() registers the JointFabricAdministrator / JointFabricDatastore
+     * delegates, so it must run after the Matter Server has been initialized.
+     * It must also run before the RPC server is started: the JointFabric RPC
+     * TransferOwnership schedules JFAMgr().FinalizeCommissioning(), which returns
+     * CHIP_ERROR_INCORRECT_STATE until JFA is initialized while the RPC has
+     * already reported success to the caller. Initializing JFA first closes that
+     * window so JointFabric RPCs are only dispatched once they can be handled. */
+    if (chip::NXP::App::JFA::Init() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize Joint Fabric Administrator");
+    }
+#endif
+
+#if CONFIG_ENABLE_PW_RPC
+    /* Start the RPC server after JFA initialization. The RPC task blocks on the
+     * socket, so it only serves requests once the network interface is up and a
+     * client connects. */
+    if (chip::NXP::App::Rpc::Init() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize RPC server");
+    }
 #endif
 
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
