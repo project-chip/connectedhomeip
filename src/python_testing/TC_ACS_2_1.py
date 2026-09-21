@@ -21,14 +21,14 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo_2_1
+#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --app-pipe /tmp/acs_fifo_2_1
+#       --app-pipe /tmp/acs_fifo
 #       --bool-arg simulate_ambientsensing:True
 #     factory-reset: true
 #     quiet: true
@@ -75,21 +75,13 @@ class TC_ACS_2_1(MatterBaseTest):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
-    # Sends and out-of-band command to the all-clusters-app
-    def write_to_app_pipe(self, command):
-        self.app_pipe = self.matter_test_config.global_test_params.get('app_pipe', "/tmp/acs_fifo_2_1")
-
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        time.sleep(0.001)
-
     @pics('ACS.S')
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     async def test_TC_ACS_2_1(self):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
         attr = Clusters.AmbientContextSensing.Attributes
+        ci_wait_time = 1.0
 
         """[TC-ACS-2.1] Cluster endpoint"""
         self.step("1", "Commissioning, already done", is_commissioning=True)
@@ -115,9 +107,14 @@ class TC_ACS_2_1(MatterBaseTest):
         if self.is_ci:
             if self.SensorFusionDetected:
                 # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
-                self.write_to_app_pipe(
-                    f'{{"Name":"SetSensorFusionSupported", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}]}}')
-                await asyncio.sleep(1)
+                #self.write_to_app_pipe(
+                #    f'{{"Name":"SetSensorFusionSupported", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}]}}')
+                self.write_to_app_pipe({
+                    "Name": "SetSensorFusionSupported",
+                    "EndpointId": self.endpoint,
+                    "AmbientContextType": [{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}],
+                })
+                await asyncio.sleep(ci_wait_time)
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
