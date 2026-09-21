@@ -14,6 +14,11 @@
  *    limitations under the License.
  */
 #pragma once
+<<<<<<< HEAD
+=======
+#include <device/api/Interface.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
+>>>>>>> 8fd95842fc2 (Restyled by whitespace)
 #include <app/clusters/closure-control-server/ClosureControlCluster.h>
 #include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
@@ -72,5 +77,10 @@ private:
     LazyRegisteredServerCluster<Clusters::ClosureControl::ClosureControlCluster> mClosureControlCluster;
 };
 
+<<<<<<< HEAD
 } // namespace app
 } // namespace chip
+=======
+} //
+} //
+>>>>>>> 8fd95842fc2 (Restyled by whitespace)
