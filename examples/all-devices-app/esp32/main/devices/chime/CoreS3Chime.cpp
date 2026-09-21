@@ -30,6 +30,7 @@
 #include <freertos/task.h>
 #include <iterator>
 #include <lib/support/logging/CHIPLogging.h>
+#include <utility>
 
 namespace chip::app {
 
@@ -165,6 +166,42 @@ esp_err_t WriteByteRegister(i2c_master_dev_handle_t device, uint8_t reg, uint8_t
     return i2c_master_transmit(device, payload, sizeof(payload), 100);
 }
 
+// Read-modify-write of a single register, leaving the bits the caller did not name alone.
+// The register number is logged on failure: the caller only sees an esp_err_t.
+esp_err_t SetRegisterBits(i2c_master_dev_handle_t device, uint8_t reg, uint8_t bits)
+{
+    uint8_t value = 0;
+    esp_err_t err = ReadByteRegister(device, reg, value);
+    if (err == ESP_OK && (value & bits) != bits)
+    {
+        err = WriteByteRegister(device, reg, static_cast<uint8_t>(value | bits));
+    }
+
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to set 0x%02x bits in AW9523 register 0x%02x: %s", bits, reg,
+                     esp_err_to_name(err));
+    }
+    return err;
+}
+
+esp_err_t ClearRegisterBits(i2c_master_dev_handle_t device, uint8_t reg, uint8_t bits)
+{
+    uint8_t value = 0;
+    esp_err_t err = ReadByteRegister(device, reg, value);
+    if (err == ESP_OK && (value & bits) != 0)
+    {
+        err = WriteByteRegister(device, reg, static_cast<uint8_t>(value & ~bits));
+    }
+
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to clear 0x%02x bits in AW9523 register 0x%02x: %s", bits, reg,
+                     esp_err_to_name(err));
+    }
+    return err;
+}
+
 esp_err_t ConfigureExpanderOutputs()
 {
     i2c_master_dev_handle_t expander = nullptr;
@@ -185,43 +222,29 @@ esp_err_t ConfigureExpanderOutputs()
 
     // P1_7 must be a GPIO (LED-mode bit set) configured as an output (direction bit clear)
     // before the output latch can drive the SY7088 enable line high.
-    uint8_t ledMode1 = 0;
-    if (ReadByteRegister(expander, 0x13, ledMode1) == ESP_OK && (ledMode1 & kSy7088BoostEnable) == 0)
+    esp_err_t err = SetRegisterBits(expander, 0x13, kSy7088BoostEnable);
+    if (err == ESP_OK)
     {
-        WriteByteRegister(expander, 0x13, static_cast<uint8_t>(ledMode1 | kSy7088BoostEnable));
+        err = ClearRegisterBits(expander, 0x05, kSy7088BoostEnable);
     }
-
-    uint8_t direction1 = 0;
-    if (ReadByteRegister(expander, 0x05, direction1) == ESP_OK && (direction1 & kSy7088BoostEnable) != 0)
+    if (err == ESP_OK)
     {
-        WriteByteRegister(expander, 0x05, static_cast<uint8_t>(direction1 & ~kSy7088BoostEnable));
-    }
-
-    uint8_t output1 = 0;
-    esp_err_t err   = ReadByteRegister(expander, kAw9523OutputPort1, output1);
-    if (err == ESP_OK && (output1 & kSy7088BoostEnable) == 0)
-    {
-        err = WriteByteRegister(expander, kAw9523OutputPort1, static_cast<uint8_t>(output1 | kSy7088BoostEnable));
+        err = SetRegisterBits(expander, kAw9523OutputPort1, kSy7088BoostEnable);
     }
 
     // P0_2 is the AW88298 PA enable. It is driven here rather than through
     // bsp_feature_enable(BSP_FEATURE_SPEAKER), which would also power the ES7210.
-    uint8_t ledMode0 = 0;
-    if (ReadByteRegister(expander, 0x12, ledMode0) == ESP_OK && (ledMode0 & kAw88298PaEnable) == 0)
+    if (err == ESP_OK)
     {
-        WriteByteRegister(expander, 0x12, static_cast<uint8_t>(ledMode0 | kAw88298PaEnable));
+        err = SetRegisterBits(expander, 0x12, kAw88298PaEnable);
     }
-
-    uint8_t direction0 = 0;
-    if (ReadByteRegister(expander, 0x04, direction0) == ESP_OK && (direction0 & kAw88298PaEnable) != 0)
+    if (err == ESP_OK)
     {
-        WriteByteRegister(expander, 0x04, static_cast<uint8_t>(direction0 & ~kAw88298PaEnable));
+        err = ClearRegisterBits(expander, 0x04, kAw88298PaEnable);
     }
-
-    uint8_t output0 = 0;
-    if (ReadByteRegister(expander, kAw9523OutputPort0, output0) == ESP_OK && (output0 & kAw88298PaEnable) == 0)
+    if (err == ESP_OK)
     {
-        WriteByteRegister(expander, kAw9523OutputPort0, static_cast<uint8_t>(output0 | kAw88298PaEnable));
+        err = SetRegisterBits(expander, kAw9523OutputPort0, kAw88298PaEnable);
     }
 
     i2c_master_bus_rm_device(expander);
@@ -361,21 +384,46 @@ bool InitializeAmplifier()
 
     // A soft reset clears any latched protection state (for example UVLS from a previous
     // power-up attempt) that would otherwise keep the output stage disabled.
-    WriteAmplifierRegister(0x00, 0x55AA);
+    esp_err_t err = WriteAmplifierRegister(0x00, 0x55AA);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to reset the amplifier: %s", esp_err_to_name(err));
+        ReleaseAmplifierI2c();
+        return false;
+    }
     vTaskDelay(pdMS_TO_TICKS(10));
 
     // Register values follow the M5Unified CoreS3 bring-up sequence, which programs the
     // amplifier before any I2S clock is present. Register 0x06 encodes channel select
     // (left), Philips I2S, 16-bit words and 32 BCK per frame in the upper bits, with the
     // sample rate selected by the low nibble.
-    WriteAmplifierRegister(0x61, 0x0673); // Boost mode disabled
-    WriteAmplifierRegister(0x04, 0x4040); // I2SEN=1 AMPPD=0 PWDN=0
-    WriteAmplifierRegister(0x05, 0x0008); // RMSE=0 HAGCE=0 HDCCE=0 HMUTE=0
-    WriteAmplifierRegister(0x06, static_cast<uint16_t>(0x14C0 | AmplifierRateIndex()));
-    WriteAmplifierRegister(0x0C, AmplifierVolumeRegister());
+    const std::pair<uint8_t, uint16_t> kSetupRegisters[] = {
+        { 0x61, 0x0673 },                                               // Boost mode disabled
+        { 0x04, 0x4040 },                                               // I2SEN=1 AMPPD=0 PWDN=0
+        { 0x05, 0x0008 },                                               // RMSE=0 HAGCE=0 HDCCE=0 HMUTE=0
+        { 0x06, static_cast<uint16_t>(0x14C0 | AmplifierRateIndex()) }, // Format and sample rate
+        { 0x0C, AmplifierVolumeRegister() },                            // Volume
+    };
+
+    for (const auto & [reg, value] : kSetupRegisters)
+    {
+        err = WriteAmplifierRegister(reg, value);
+        if (err != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to write amplifier register 0x%02x: %s", reg, esp_err_to_name(err));
+            ReleaseAmplifierI2c();
+            return false;
+        }
+    }
 
     uint16_t chipId = 0;
-    ReadAmplifierRegister(0x00, chipId);
+    err             = ReadAmplifierRegister(0x00, chipId);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to read the amplifier id: %s", esp_err_to_name(err));
+        ReleaseAmplifierI2c();
+        return false;
+    }
     if (chipId != kAw88298ChipId)
     {
         ChipLogError(DeviceLayer, "CoreS3Chime: Unexpected amplifier id 0x%04x, expected 0x%04x", chipId, kAw88298ChipId);
