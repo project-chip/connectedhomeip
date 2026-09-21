@@ -19,6 +19,7 @@
 #pragma once
 
 #include <functional>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -30,9 +31,11 @@ namespace chip::app {
 
 struct DeviceScreenEntry
 {
+    using RenderFn = std::function<void(lv_obj_t * parent)>;
+
     std::string title;
     EndpointId endpointId;
-    std::function<void(lv_obj_t * parent)> renderFn;
+    RenderFn renderFn;
 
     // Parent in the endpoint tree, kInvalidEndpointId at the root. Filled in by
     // DeviceScreenRegistry::Register; callers leave it unset. Stored rather than a depth so
@@ -51,10 +54,26 @@ public:
     void SetEndpointSource(DataModel::ProviderMetadataTree * source) { mEndpointSource = source; }
 
     void Register(DeviceScreenEntry entry);
-    const std::vector<DeviceScreenEntry> & Entries() const { return mEntries; }
-    void Clear() { mEntries.clear(); }
+
+    /// Runs `visitor` against the entry list with the registry locked. Devices register from
+    /// the CHIP thread while the display task renders, so the list must not be read without
+    /// this: appending an entry can reallocate it. The reference passed to the visitor must
+    /// not outlive the call.
+    template <typename Visitor>
+    void WithEntries(Visitor && visitor) const
+    {
+        std::lock_guard<std::mutex> guard(mEntriesMutex);
+        visitor(static_cast<const std::vector<DeviceScreenEntry> &>(mEntries));
+    }
 
 private:
+    // Guards mEntries, and only mEntries: it is the one member written from the CHIP thread
+    // (Register) while the display task reads it. mEndpointSource is set once during startup,
+    // before the first registration, and is only ever read on the CHIP thread.
+    //
+    // Leaf lock: nothing is acquired while it is held, so it cannot deadlock against the
+    // display or stack locks. Callers must not re-enter the registry from a visitor.
+    mutable std::mutex mEntriesMutex;
     std::vector<DeviceScreenEntry> mEntries;
     DataModel::ProviderMetadataTree * mEndpointSource = nullptr;
 };

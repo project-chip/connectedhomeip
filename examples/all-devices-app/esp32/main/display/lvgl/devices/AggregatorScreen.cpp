@@ -30,13 +30,15 @@ namespace {
 size_t CountBridgedNodes(EndpointId aggregatorEndpoint)
 {
     size_t count = 0;
-    for (const auto & entry : DeviceScreenRegistry::Instance().Entries())
-    {
-        if (entry.parentEndpointId == aggregatorEndpoint)
+    DeviceScreenRegistry::Instance().WithEntries([&](const auto & entries) {
+        for (const auto & entry : entries)
         {
-            count++;
+            if (entry.parentEndpointId == aggregatorEndpoint)
+            {
+                count++;
+            }
         }
-    }
+    });
     return count;
 }
 

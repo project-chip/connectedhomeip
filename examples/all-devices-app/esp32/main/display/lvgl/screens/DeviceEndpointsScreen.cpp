@@ -69,10 +69,22 @@ void OnCellSelected(lv_event_t * event)
         return;
     }
 
-    const auto & entries = chip::app::DeviceScreenRegistry::Instance().Entries();
-    if (row < entries.size() && entries[row].renderFn)
+    // Copied out rather than pushed from inside the visitor: rendering the target screen can
+    // read the registry again (AggregatorScreen does), which would re-enter the lock.
+    std::string title;
+    chip::app::DeviceScreenEntry::RenderFn renderFn;
+
+    chip::app::DeviceScreenRegistry::Instance().WithEntries([&](const auto & entries) {
+        if (row < entries.size())
+        {
+            title    = entries[row].title;
+            renderFn = entries[row].renderFn;
+        }
+    });
+
+    if (renderFn)
     {
-        NavigationStack::Push(entries[row].title, entries[row].renderFn);
+        NavigationStack::Push(title, renderFn);
     }
 }
 
@@ -127,46 +139,36 @@ uint8_t EntryDepth(const std::vector<chip::app::DeviceScreenEntry> & entries, co
     return depth;
 }
 
-} // namespace
-
-void ShowDeviceEndpoints(lv_obj_t * parent)
+void ShowNoEntriesPlaceholder(lv_obj_t * parent)
 {
-    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_all(parent, 10, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(parent, 8, LV_PART_MAIN);
-    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    const std::string & activeDev = GetActiveDeviceType();
+    bool isAllBridged             = (activeDev == "*" || activeDev == "aggregator");
 
-    const auto & entries = chip::app::DeviceScreenRegistry::Instance().Entries();
+    lv_obj_t * card = lv_obj_create(parent);
+    lv_obj_set_width(card, LV_PCT(100));
+    lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(card, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_set_style_pad_all(card, 12, LV_PART_MAIN);
+    lv_obj_set_style_pad_row(card, 6, LV_PART_MAIN);
 
-    if (entries.empty())
-    {
-        const std::string & activeDev = GetActiveDeviceType();
-        bool isAllBridged             = (activeDev == "*" || activeDev == "aggregator");
+    lv_obj_t * header = lv_label_create(card);
+    lv_label_set_text_static(header, "Device Screens");
+    lv_obj_set_style_text_color(header, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_MAIN);
 
-        lv_obj_t * card = lv_obj_create(parent);
-        lv_obj_set_width(card, LV_PCT(100));
-        lv_obj_set_flex_flow(card, LV_FLEX_FLOW_COLUMN);
-        lv_obj_set_flex_align(card, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-        lv_obj_set_style_pad_all(card, 12, LV_PART_MAIN);
-        lv_obj_set_style_pad_row(card, 6, LV_PART_MAIN);
+    lv_obj_t * configLabel = lv_label_create(card);
+    std::string configText = "Configured: " + (isAllBridged ? std::string("All Bridged (*)") : activeDev);
+    lv_label_set_text(configLabel, configText.c_str());
 
-        lv_obj_t * header = lv_label_create(card);
-        lv_label_set_text_static(header, "Device Screens");
-        lv_obj_set_style_text_color(header, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_MAIN);
+    lv_obj_t * todoNote = lv_label_create(parent);
+    lv_obj_set_width(todoNote, LV_PCT(100));
+    lv_label_set_text_static(todoNote,
+                             "No interactive device screens are registered for the current configuration.\n\n"
+                             "Screens register dynamically during device construction via DeviceFactory hooks.");
+    lv_obj_set_style_text_color(todoNote, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+}
 
-        lv_obj_t * configLabel = lv_label_create(card);
-        std::string configText = "Configured: " + (isAllBridged ? std::string("All Bridged (*)") : activeDev);
-        lv_label_set_text(configLabel, configText.c_str());
-
-        lv_obj_t * todoNote = lv_label_create(parent);
-        lv_obj_set_width(todoNote, LV_PCT(100));
-        lv_label_set_text_static(todoNote,
-                                 "No interactive device screens are registered for the current configuration.\n\n"
-                                 "Screens register dynamically during device construction via DeviceFactory hooks.");
-        lv_obj_set_style_text_color(todoNote, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
-        return;
-    }
-
+void BuildEntryTable(lv_obj_t * parent, const std::vector<chip::app::DeviceScreenEntry> & entries)
+{
     lv_obj_update_layout(parent);
     const int32_t listWidth = lv_obj_get_content_width(parent);
 
@@ -209,4 +211,25 @@ void ShowDeviceEndpoints(lv_obj_t * parent)
     // LVGL clamps the offset if the list got shorter.
     lv_obj_update_layout(parent);
     lv_obj_scroll_to_y(table, sSavedScrollY, LV_ANIM_OFF);
+}
+
+} // namespace
+
+void ShowDeviceEndpoints(lv_obj_t * parent)
+{
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_all(parent, 10, LV_PART_MAIN);
+    lv_obj_set_style_pad_row(parent, 8, LV_PART_MAIN);
+    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    // The whole build runs inside the visitor: nothing below reads the registry again, so the
+    // lock is held once and no entry reference outlives it.
+    chip::app::DeviceScreenRegistry::Instance().WithEntries([parent](const auto & entries) {
+        if (entries.empty())
+        {
+            ShowNoEntriesPlaceholder(parent);
+            return;
+        }
+        BuildEntryTable(parent, entries);
+    });
 }

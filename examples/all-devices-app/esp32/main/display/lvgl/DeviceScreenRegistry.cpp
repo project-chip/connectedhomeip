@@ -57,6 +57,8 @@ DeviceScreenRegistry & DeviceScreenRegistry::Instance()
 void DeviceScreenRegistry::Register(DeviceScreenEntry entry)
 {
     entry.parentEndpointId = ParentOf(mEndpointSource, entry.endpointId);
+
+    std::lock_guard<std::mutex> guard(mEntriesMutex);
     mEntries.push_back(std::move(entry));
 }
 
