@@ -41,8 +41,9 @@ public:
         Clusters::Binding::Manager & bindingManager;
         Clusters::IdentifyDelegate & identifyDelegate;
         // Switch cluster configuration
-        uint8_t numberOfSwitchPositions              = 2;
-        BitFlags<Clusters::Switch::Feature> features = BitFlags<Clusters::Switch::Feature>(Clusters::Switch::Feature::kMomentarySwitch);
+        uint8_t numberOfSwitchPositions = 2;
+        BitFlags<Clusters::Switch::Feature> features =
+            BitFlags<Clusters::Switch::Feature>(Clusters::Switch::Feature::kMomentarySwitch);
     };
 
     Doorbell(const Config & config);
