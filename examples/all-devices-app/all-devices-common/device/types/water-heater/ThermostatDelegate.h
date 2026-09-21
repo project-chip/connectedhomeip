@@ -39,7 +39,12 @@
  public:
      ThermostatDelegate(EndpointId endpoint = kInvalidEndpointId) : mFabricTable(nullptr)
      {}
- 
+     explicit ThermostatDelegate(FabricTable & fabricTable, EndpointId endpoint = kInvalidEndpointId) :
+         mFabricTable(&fabricTable)
+     {}
+
+     void SetFabricTable(FabricTable & fabricTable) { mFabricTable = &fabricTable; }
+
      FabricTable & GetFabricTable() const override;
   
      SystemModeEnum GetSystemMode() const override;

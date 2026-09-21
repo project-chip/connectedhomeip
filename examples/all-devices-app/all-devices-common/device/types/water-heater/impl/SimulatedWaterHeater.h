@@ -29,6 +29,8 @@
 
  struct SimulatedWaterHeaterDelegates
  {
+     explicit SimulatedWaterHeaterDelegates(FabricTable & fabricTable) : thermostatDelegate(fabricTable) {}
+
      Clusters::Thermostat::ThermostatDelegate thermostatDelegate;
      Clusters::Thermostat::ThermostatSetpointsDelegate thermostatSetpointsDelegate;
  };

@@ -54,6 +54,7 @@ namespace {
 }
 
  SimulatedWaterHeater::SimulatedWaterHeater(const Config & config) :
+     SimulatedWaterHeaterDelegates(config.fabricTable),
      WaterHeater(config, *this, *this, thermostatDelegate, thermostatSetpointsDelegate) 
  { }
 

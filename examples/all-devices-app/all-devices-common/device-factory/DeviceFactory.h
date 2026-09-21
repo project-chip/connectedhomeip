@@ -704,10 +704,11 @@ private:
             RegisterCreator("water-heater", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedWaterHeater>(SimulatedWaterHeater::Config{
-                    .timerDelegate = mContext->timerDelegate,
+                    .fabricTable            = mContext->fabricTable,
+                    .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
-                    .whmFeatures = BitMask<Clusters::WaterHeaterManagement::Feature>(),
-                    .thermostatFeatures = BitMask<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating),
+                    .whmFeatures            = BitMask<Clusters::WaterHeaterManagement::Feature>(),
+                    .thermostatFeatures     = BitMask<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating),
                 });
             });
         }

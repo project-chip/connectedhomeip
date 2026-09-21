@@ -34,13 +34,13 @@ public:
 
     struct Config
     {
+        FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         // WaterHeaterManagement cluster
         BitMask<Clusters::WaterHeaterManagement::Feature> whmFeatures;
         // Thermostat cluster
         BitMask<Clusters::Thermostat::Feature> thermostatFeatures;
-
     };
 
     explicit WaterHeater(const Config & config, Clusters::WaterHeaterManagement::Delegate & whmDelegate,
