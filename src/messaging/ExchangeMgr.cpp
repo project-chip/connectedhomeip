@@ -207,6 +207,17 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
 }
 
+static bool ShouldSendUnsolicitedSigma2Abort(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                            const SessionHandle & session, MessageFlags msgFlags)
+{
+    // Filter duplicates so legitimate in-flight retransmissions of a previously processed Sigma2
+    // arriving after exchange closure fall through to SendStandaloneAckIfNeeded rather than aborting.
+    return !msgFlags.Has(MessageFlagValues::kDuplicateMessage) && session->IsUnauthenticatedSession() &&
+        payloadHeader.IsResponder(Protocols::SecureChannel::MsgType::CASE_Sigma2,
+                                  Protocols::SecureChannel::MsgType::CASE_Sigma2Resume) &&
+        packetHeader.GetDestinationNodeId().HasValue();
+}
+
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         const SessionHandle & session, DuplicateMessage isDuplicate,
                                         System::PacketBufferHandle && msgBuf)
@@ -312,25 +323,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && session->IsUnauthenticatedSession() &&
-            IsUnsolicitedCaseSigma2(payloadHeader))
+        if (mSessionManager != nullptr && ShouldSendUnsolicitedSigma2Abort(packetHeader, payloadHeader, session, msgFlags))
         {
-            // Filter duplicates so legitimate retransmissions of a previously processed Sigma2
-            // fall through to SendStandaloneAckIfNeeded without triggering an unauthenticated failure StatusReport.
-            if (packetHeader.GetDestinationNodeId().HasValue() && mSessionManager != nullptr)
-            {
-                // The StatusReport carries the piggybacked ack so no
-                // StandaloneAck is needed on success.
-                auto * unauthSession = session->AsUnauthenticatedSession();
-                CHIP_ERROR err       = mSessionManager->SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader,
-                                                                                             unauthSession->GetPeerAddress());
-                if (err == CHIP_NO_ERROR)
-                {
-                    return;
-                }
-                LogErrorOnFailure(err);
-            }
-            // Otherwise we fall through so MRP still acks as before.
+            auto * unauthSession = session->AsUnauthenticatedSession();
+            CHIP_ERROR err       = mSessionManager->SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader,
+                                                                                         unauthSession->GetPeerAddress());
+            LogErrorOnFailure(err);
+            return;
         }
     }
     else

@@ -144,17 +144,6 @@ private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 };
 
-/**
- * @brief
- *   Check if the given payload header indicates an unsolicited CASE Sigma2 or Sigma2Resume message.
- */
-inline bool IsUnsolicitedCaseSigma2(const PayloadHeader & payloadHeader)
-{
-    return !payloadHeader.IsInitiator() && payloadHeader.HasProtocol(Protocols::SecureChannel::Id) &&
-        (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2) ||
-         payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume));
-}
-
 class DLL_EXPORT SessionManager : public TransportMgrDelegate, public FabricTable::Delegate
 {
 public:
