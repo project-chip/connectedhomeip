@@ -831,6 +831,11 @@ jobs:
                 build-variant: ${{ matrix.build_variant }}
                 disable: ${{ env.DISABLE_CCACHE }}
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+                use-cache-volume: 'true'
+                # TEST SCAFFOLDING - REMOVE BEFORE MERGE. Lets this branch write the
+                # volume so the restore path can be exercised before the change lands;
+                # the merged default is master-writes-only.
+                volume-allow-write: 'true'
 
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
@@ -1042,13 +1047,13 @@ jobs:
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               run: ccache --evict-older-than 1d || true
             - name: Delete existing ccache before save
-              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true' && steps.ccache.outputs.using-volume != 'true'
               uses: ./.github/actions/delete-cache
               with:
                   cache-key: ${{ env.CCACHE_KEY }}
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
-              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true' && steps.ccache.outputs.using-volume != 'true'
               uses: actions/cache/save@v6
               with:
                   path: .ccache

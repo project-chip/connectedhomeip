@@ -12,6 +12,14 @@ inputs:
     required: false
     default: ''
     description: 'Optional suffix appended to the cache key to force rotation (e.g., a short hash).'
+  use-cache-volume:
+    required: false
+    default: 'false'
+    description: 'Back .ccache with the Namespace cache volume attached to the runner instead of actions/cache. The volume identity comes from the runs-on label, not from here.'
+  volume-allow-write:
+    required: false
+    default: 'false'
+    description: 'Allow a non-master ref to write the volume-backed ccache. For validation runs only; master writes regardless.'
 outputs:
   cache-primary-key:
     description: "The primary key used for the cache"
@@ -19,6 +27,9 @@ outputs:
   cache-hit:
     description: "A boolean value to indicate an exact match was found for the primary key"
     value: ${{ steps.ccache-restore.outputs.cache-hit }}
+  using-volume:
+    description: "True when .ccache is backed by a Namespace cache volume rather than actions/cache"
+    value: ${{ inputs.use-cache-volume }}
 runs:
   using: "composite"
   steps:
@@ -65,8 +76,21 @@ runs:
 
         CCACHE_RESTORE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-"
         echo "CCACHE_RESTORE_KEY=${CCACHE_RESTORE_KEY}" >> "$GITHUB_ENV"
+    # Must run after checkout: checkout wipes the workspace and would remove the link.
+    - name: Link .ccache onto the attached cache volume
+      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
+      uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
+      with:
+        path: ${{ github.workspace }}/.ccache
+    # A cache volume is shared across refs and has no save step to gate, unlike the
+    # actions/cache entry it replaces. Keep the same write policy: master writes,
+    # everything else reads.
+    - name: Restrict volume-backed ccache to reads off master
+      if: ${{ inputs.use-cache-volume == 'true' && github.ref != 'refs/heads/master' && inputs.volume-allow-write != 'true' }}
+      shell: bash
+      run: echo "CCACHE_READONLY=1" >> $GITHUB_ENV
     - name: Restore ccache
-      if: ${{ inputs.disable != 'true' }}
+      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume != 'true' }}
       id: ccache-restore
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
