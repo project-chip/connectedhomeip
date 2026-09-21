@@ -1,7 +1,10 @@
 mobly
 pyasn1
 pyasn1_modules
-zeroconf
+# Pinned below 0.151: that release renamed the AAAA record type string
+# ("quada" -> "aaaa") and changed DNSRecord.__repr__, which TC_SC_4_3
+# parses. Unpin once TC_SC_4_3 reads record fields instead of repr().
+zeroconf<0.151
 ifaddr
 langcodes
 nest-asyncio
