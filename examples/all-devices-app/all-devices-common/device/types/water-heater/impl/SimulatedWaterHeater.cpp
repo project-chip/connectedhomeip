@@ -30,7 +30,6 @@ namespace chip::app {
 namespace {
 
     constexpr uint32_t kStepDurationSeconds = 3;
-    ;
     using ModeTagStructType = Clusters::detail::Structs::ModeTagStruct::Type;
 
     constexpr uint8_t kWaterHeaterModeOff = 0;
@@ -59,9 +58,10 @@ namespace {
      WaterHeater(config, *this, *this, thermostatDelegate, thermostatSetpointsDelegate) 
  { }
 
- SimulatedWaterHeater::~SimulatedWaterHeater() {
+SimulatedWaterHeater::~SimulatedWaterHeater()
+{
     mConfig.timerDelegate.CancelTimer(this);
- }
+}
 
  CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, 
     EndpointComposition composition)
@@ -74,11 +74,11 @@ namespace {
     mBoostRemainingTime = 0;
     mHeatDemand.ClearAll();
 
-    ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100));
+    ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature));
     ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
     ThermostatCluster().SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
     bool changed = false;
-    GetDelegate<ThermostatSetpointsDelegate>().SetOccupiedHeatingSetpoint(kFinalTemperature * 100, changed);
+    GetDelegate<ThermostatSetpointsDelegate>().SetOccupiedHeatingSetpoint(kFinalTemperature, changed);
 
     ReturnErrorOnFailure(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
     return CHIP_NO_ERROR;
@@ -110,10 +110,10 @@ void SimulatedWaterHeater::TimerFired()
     // Handle heating
     if (mHeatingEnabled)
     {
-        uint8_t temperatureStep = mBoostState == BoostStateEnum::kActive ? 2 : 1;
-        mTemperature += temperatureStep;
-        ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRIu32 "°C", mTemperature);
-        ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100));
+        temperature temperatureStep = mBoostState == BoostStateEnum::kActive ? 200 : 100;
+        mTemperature                = static_cast<temperature>(mTemperature + temperatureStep);
+        ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRId16 "°C", static_cast<int16_t>(mTemperature / 100));
+        ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature));
         if (mTemperature >= kFinalTemperature)
         {
             ThermostatCluster().SetSystemMode(SystemModeEnum::kOff);
@@ -122,9 +122,9 @@ void SimulatedWaterHeater::TimerFired()
     }
     else
     {
-        mTemperature -= 1;
-        ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRIu32 "°C", mTemperature);
-        ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature * 100));
+        mTemperature = static_cast<temperature>(mTemperature - 100);
+        ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRId16 "°C", static_cast<int16_t>(mTemperature / 100));
+        ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature));
         if (mTemperature <= kInitialTemperature)
         {
             ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
@@ -252,7 +252,7 @@ CHIP_ERROR SimulatedWaterHeater::GetModeTagsByIndex(uint8_t modeIndex, DataModel
     return CHIP_NO_ERROR;
 }
 
-void SimulatedWaterHeater::HandleChangeToMode(uint8_t NewMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response)
+void SimulatedWaterHeater::HandleChangeToMode(uint8_t newMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }

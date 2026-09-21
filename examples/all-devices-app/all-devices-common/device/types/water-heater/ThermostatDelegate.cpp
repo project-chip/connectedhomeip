@@ -105,26 +105,6 @@ Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperature(Data
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ThermostatDelegate::GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const
-{
-    return Status::UnsupportedAttribute;
-}
-
-int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
-{
-    return 0;
-}
-
-Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperatureCalibration(int8_t temp, bool & changed)
-{
-    return Status::UnsupportedAttribute;
-}
-
-Protocols::InteractionModel::Status ThermostatDelegate::GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const
-{
-    return Status::UnsupportedAttribute;
-}
-
 Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed)
 {
     return Status::UnsupportedAttribute;

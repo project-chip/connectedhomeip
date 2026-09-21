@@ -36,11 +36,8 @@ public:
     using RemoteSensingBitmap = Clusters::Thermostat::RemoteSensingBitmap;
     using temperature = Clusters::Thermostat::temperature;
 
-    ThermostatDelegate(EndpointId endpoint = kInvalidEndpointId) : mFabricTable(nullptr)
-    {}
-    explicit ThermostatDelegate(FabricTable & fabricTable, EndpointId endpoint = kInvalidEndpointId) :
-        mFabricTable(&fabricTable)
-    {}
+    ThermostatDelegate() = default;
+    explicit ThermostatDelegate(FabricTable & fabricTable) : mFabricTable(&fabricTable) {}
 
     void SetFabricTable(FabricTable & fabricTable) { mFabricTable = &fabricTable; }
 
@@ -61,12 +58,6 @@ public:
     DataModel::Nullable<temperature> GetLocalTemperature() const override;
     Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed) override;
 
-    Protocols::InteractionModel::Status GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const override;
-
-    int8_t GetLocalTemperatureCalibration() const override;
-    Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t temp, bool & changed) override;
-
-    Protocols::InteractionModel::Status GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const override;
     Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
 
 private:

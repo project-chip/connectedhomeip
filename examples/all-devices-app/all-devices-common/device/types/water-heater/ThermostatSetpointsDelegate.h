@@ -29,8 +29,7 @@ class ThermostatSetpointsDelegate : public Clusters::Thermostat::ThermostatHeati
 public:
     using temperature = Clusters::Thermostat::temperature;
 
-    ThermostatSetpointsDelegate(EndpointId endpoint = kInvalidEndpointId)
-    {}
+    ThermostatSetpointsDelegate() = default;
 
     Protocols::InteractionModel::Status GetOccupiedHeatingSetpoint(temperature & occupiedHeatingSetpoint) const override;
     Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(temperature occupiedHeatingSetpoint, bool & changed) override;

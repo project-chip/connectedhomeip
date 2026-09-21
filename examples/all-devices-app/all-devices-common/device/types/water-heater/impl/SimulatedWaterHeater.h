@@ -24,8 +24,8 @@
 
  namespace chip::app {
 
- constexpr uint32_t kInitialTemperature = 20;
- constexpr uint32_t kFinalTemperature = 30;
+ constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
+ constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
 
  struct SimulatedWaterHeaterDelegates
  {
@@ -70,7 +70,7 @@
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override;
-    void HandleChangeToMode(uint8_t NewMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override;
+    void HandleChangeToMode(uint8_t newMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
 
 private:
@@ -90,7 +90,7 @@ private:
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeatDemand;
     Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
     uint32_t mBoostRemainingTime = 0;
-    uint32_t mTemperature = kInitialTemperature;
+    Clusters::Thermostat::temperature mTemperature = kInitialTemperature;
     bool mHeatingEnabled = false;
  };
 
