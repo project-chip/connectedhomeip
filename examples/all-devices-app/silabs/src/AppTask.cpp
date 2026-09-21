@@ -40,6 +40,8 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -50,7 +52,10 @@
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/root-node/RootNode.h>
 #include <device/types/root-node/RootNodeWith.h>
+
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 #include <device/types/root-node/features/OtaFeature.h>
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <device/types/root-node/features/ThreadFeature.h>
@@ -63,6 +68,12 @@
 #endif
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
+// gRequestorCore is defined in examples/platform/silabs/OTAConfig.cpp and drives the
+// OTA state machine that the OTARequestorCluster (composed by OtaFeature) forwards to.
+extern chip::DefaultOTARequestor gRequestorCore;
+#endif
 
 #define APP_FUNCTION_BUTTON 0
 
@@ -191,21 +202,40 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
             chip::app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
-    // OTA Requestor is always advertised on the silabs root endpoint.
+    // OTA Requestor is advertised on the silabs root endpoint when the OTA runtime is compiled in.
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
+    chip::app::OtaFeature::Context otaContext{
+        .otaCommands = gRequestorCore,
+        .attributes  = chip::GetOTARequestorAttributes(),
+    };
 #if CHIP_ENABLE_OPENTHREAD
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::OtaFeature>;
     sRootNode = std::make_unique<RootNodeType>(rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver },
-                                               chip::app::OtaFeature::Context{});
+                                               otaContext);
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
     using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature, chip::app::OtaFeature>;
     sRootNode          = std::make_unique<RootNodeType>(
         rootNodeContext,
         chip::app::WifiFeature::Context{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() },
-        chip::app::OtaFeature::Context{});
+        otaContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::OtaFeature>;
-    sRootNode          = std::make_unique<RootNodeType>(rootNodeContext, chip::app::OtaFeature::Context{});
+    sRootNode          = std::make_unique<RootNodeType>(rootNodeContext, otaContext);
 #endif
+#else // SILABS_OTA_ENABLED
+#if CHIP_ENABLE_OPENTHREAD
+    using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature>;
+    sRootNode          = std::make_unique<RootNodeType>(rootNodeContext,
+                                                        chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver });
+#elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature>;
+    sRootNode          = std::make_unique<RootNodeType>(
+        rootNodeContext,
+        chip::app::WifiFeature::Context{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() });
+#else
+    sRootNode = std::make_unique<chip::app::RootNode>(rootNodeContext);
+#endif
+#endif // SILABS_OTA_ENABLED
 
     VerifyOrReturnError(sRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 

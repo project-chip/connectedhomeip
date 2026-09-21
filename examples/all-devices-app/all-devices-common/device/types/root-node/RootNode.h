@@ -104,6 +104,12 @@ protected:
     /// a `BreadCrumbTracker`, which is provided by GeneralCommissioning).
     Clusters::GeneralCommissioningCluster & GeneralCommissioning() { return mGeneralCommissioningCluster.Cluster(); }
 
+    /// Registers the base root-node clusters on the provider without adding the endpoint itself.
+    /// `RootNodeWith` uses this so feature clusters can be added before AddEndpoint runs, which
+    /// CodeDrivenDataModelProvider requires once it has been started.
+    CHIP_ERROR RegisterRootClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                    EndpointComposition composition = {});
+
     Context mContext;
 
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;

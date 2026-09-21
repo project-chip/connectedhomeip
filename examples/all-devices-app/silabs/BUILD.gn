@@ -155,9 +155,13 @@ silabs_executable("all_devices_app") {
     deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:thread" ]
   }
 
-  # OTA Requestor is advertised on the silabs root endpoint regardless of the
-  # network technology or of whether the OTA client state machine is compiled in.
-  deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:ota" ]
+  # OTA Requestor is advertised on the silabs root endpoint when the OTA client
+  # state machine is compiled in. The composed OTARequestorCluster wires directly
+  # into gRequestorCore from OTAConfig.cpp, so the feature and the runtime are
+  # gated by the same flag.
+  if (chip_enable_ota_requestor) {
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:ota" ]
+  }
 
   # examples/platform/silabs/OTAConfig.cpp brings in the OTA requestor runtime.
   # Pull in exactly the requestor implementation files it needs. The singleton

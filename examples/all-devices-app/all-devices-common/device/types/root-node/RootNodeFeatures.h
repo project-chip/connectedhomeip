@@ -52,9 +52,9 @@ namespace app {
 /// clusters, like OTA Requestor), its Register/Unregister methods are no-ops.
 ///
 /// The composite device-type array and client-cluster array are assembled by
-/// `RootNodeWith` at compile time via `detail::ConcatArrays`.
+/// `RootNodeWith` at compile time via `aggregate::ConcatArrays`.
 
-namespace detail {
+namespace aggregate {
 
 /// Concatenate two `std::array` instances of the same element type.
 template <typename T, std::size_t N1, std::size_t N2>
@@ -85,6 +85,6 @@ constexpr auto ConcatArrays(const std::array<T, N> & a, const Rest &... rest)
     return ConcatArrays(a, ConcatArrays(rest...));
 }
 
-} // namespace detail
+} // namespace aggregate
 } // namespace app
 } // namespace chip

@@ -98,18 +98,17 @@ public:
     CHIP_ERROR GenerateDownloadErrorEvent(const DownloadErrorEvent &) override { return CHIP_NO_ERROR; }
 };
 
-OTARequestorAttributes gOtaRequestorAttributes;
-NoOpOtaRequestorEventGenerator gOtaRequestorEventGenerator;
-
 } // namespace
 
 OTARequestorAttributes & GetOTARequestorAttributes()
 {
+    static OTARequestorAttributes gOtaRequestorAttributes;
     return gOtaRequestorAttributes;
 }
 
 DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator()
 {
+    static NoOpOtaRequestorEventGenerator gOtaRequestorEventGenerator;
     return gOtaRequestorEventGenerator;
 }
 

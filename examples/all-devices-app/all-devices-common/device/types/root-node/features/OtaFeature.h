@@ -18,6 +18,10 @@
 
 #include <array>
 
+#include <app/clusters/ota-requestor/OTARequestorAttributes.h>
+#include <app/clusters/ota-requestor/OTARequestorCluster.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <clusters/OtaSoftwareUpdateProvider/ClusterId.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/types/root-node/RootNode.h>
@@ -28,34 +32,37 @@
 namespace chip {
 namespace app {
 
-/// Feature policy that declares OTA Requestor support on the root endpoint.
+/// Feature policy that adds OTA Requestor support to the root endpoint.
 ///
-/// The requestor state machine is provided by the platform stack; from the
-/// data-model side this feature only advertises:
-///   - the `OtaRequestor` device type on the root endpoint, and
-///   - the `OtaSoftwareUpdateProvider` client cluster (for outgoing bindings).
-///
-/// It owns no server clusters and does no work at register/unregister time.
+/// Advertises the `OtaRequestor` device type and the `OtaSoftwareUpdateProvider`
+/// client cluster (for outgoing bindings), and composes an `OTARequestorCluster`
+/// server so attribute reads/writes, commands, and events actually have an
+/// implementation on the endpoint. The requestor state machine (and the
+/// attributes storage it shares with the cluster) is owned by the platform
+/// stack and passed in via `Context`.
 class OtaFeature
 {
 public:
     struct Context
     {
+        OTARequestorCommandInterface & otaCommands;
+        OTARequestorAttributes & attributes;
     };
 
-    OtaFeature() = default;
-    explicit OtaFeature(const Context &) {}
+    explicit OtaFeature(const Context & context) : mContext(context) {}
 
     static constexpr std::array<DataModel::DeviceTypeEntry, 1> kExtraDeviceTypes{ Device::Type::kOtaRequestor };
     static constexpr std::array<ClusterId, 1> kExtraClientClusters{ Clusters::OtaSoftwareUpdateProvider::Id };
 
-    CHIP_ERROR RegisterFeatureClusters(EndpointId, CodeDrivenDataModelProvider &, RootNode::Context &,
-                                       Clusters::GeneralCommissioningCluster &)
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR RegisterFeatureClusters(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
+                                       RootNode::Context & rootContext,
+                                       Clusters::GeneralCommissioningCluster & generalCommissioning);
 
-    void UnregisterFeatureClusters(CodeDrivenDataModelProvider &) {}
+    void UnregisterFeatureClusters(CodeDrivenDataModelProvider & provider);
+
+private:
+    Context mContext;
+    LazyRegisteredServerCluster<Clusters::OTARequestorCluster> mOtaRequestorCluster;
 };
 
 } // namespace app

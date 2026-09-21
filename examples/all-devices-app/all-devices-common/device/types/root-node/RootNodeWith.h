@@ -37,9 +37,9 @@ namespace app {
 /// compile time so no runtime allocation is needed.
 ///
 /// Feature registration runs in declaration order after the base clusters have
-/// been registered; unregistration runs in reverse. The composed endpoint is
-/// finalized by the base class before any feature clusters are added, matching
-/// the pre-refactor behavior of `WifiRootNode` / `ThreadRootNode`.
+/// been registered but before the endpoint is added to the provider, so
+/// AddCluster never targets an already-registered endpoint. Unregistration
+/// runs in reverse.
 ///
 /// Example:
 /// @code
@@ -58,8 +58,12 @@ public:
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override
     {
-        ReturnErrorOnFailure(RootNode::Register(endpoint, provider, composition));
-        return RegisterFeaturesImpl(endpoint, provider, std::index_sequence_for<Features...>{});
+        DeviceRegistrationTransaction transaction(*this, provider);
+        ReturnErrorOnFailure(RootNode::RegisterRootClusters(endpoint, provider, composition));
+        ReturnErrorOnFailure(RegisterFeaturesImpl(endpoint, provider, std::index_sequence_for<Features...>{}));
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+        transaction.Commit();
+        return CHIP_NO_ERROR;
     }
 
     void Unregister(CodeDrivenDataModelProvider & provider) override
@@ -84,11 +88,11 @@ private:
     /// Composite device-type list: the root-node entry followed by each
     /// feature's extra device types, in declaration order.
     static constexpr auto kDeviceTypesStorage =
-        detail::ConcatArrays(std::array<DataModel::DeviceTypeEntry, 1>{ Device::Type::kRootNode }, Features::kExtraDeviceTypes...);
+        aggregate::ConcatArrays(std::array<DataModel::DeviceTypeEntry, 1>{ Device::Type::kRootNode }, Features::kExtraDeviceTypes...);
 
     /// Composite client-cluster list contributed by features.
     static constexpr auto kClientClustersStorage =
-        detail::ConcatArrays(std::array<ClusterId, 0>{}, Features::kExtraClientClusters...);
+        aggregate::ConcatArrays(std::array<ClusterId, 0>{}, Features::kExtraClientClusters...);
 
     template <std::size_t... I>
     CHIP_ERROR RegisterFeaturesImpl(EndpointId endpoint, CodeDrivenDataModelProvider & provider, std::index_sequence<I...>)
