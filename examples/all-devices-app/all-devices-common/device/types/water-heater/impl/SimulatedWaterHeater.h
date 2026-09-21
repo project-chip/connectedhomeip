@@ -17,9 +17,9 @@
 #pragma once
 
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
-#include <device/types/water-heater/ThermostatDelegate.h>
-#include <device/types/water-heater/ThermostatSetpointsDelegate.h>
 #include <device/types/water-heater/WaterHeater.h>
+#include <device/types/water-heater/impl/ThermostatDelegate.h>
+#include <device/types/water-heater/impl/ThermostatSetpointsDelegate.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {

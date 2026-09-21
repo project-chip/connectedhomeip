@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "ThermostatDelegate.h"
+#include <device/types/water-heater/impl/ThermostatDelegate.h>
 
 #include <lib/support/CodeUtils.h>
 

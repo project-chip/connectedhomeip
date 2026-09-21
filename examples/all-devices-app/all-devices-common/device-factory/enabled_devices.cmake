@@ -112,6 +112,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/TemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/impl/IncreasingTemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-heater/impl/SimulatedWaterHeater.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/water-heater/impl/ThermostatDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/water-heater/impl/ThermostatSetpointsDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
     # keep-sorted: end
 

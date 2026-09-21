@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "ThermostatSetpointsDelegate.h"
+#include <device/types/water-heater/impl/ThermostatSetpointsDelegate.h>
 
 using chip::Protocols::InteractionModel::Status;
 
