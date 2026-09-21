@@ -499,7 +499,13 @@ lv_obj_t * CreateColorControlClusterWidget(lv_obj_t * parent, Clusters::ColorCon
         lv_obj_move_to_index(context->selector, 0);
     }
 
-    ShowMode(context, active);
+    // The reported mode can name controls that were never built, because a cluster may report
+    // a mode outside the set its feature map advertises. Falling back to the first mode that
+    // was built keeps the card from rendering empty. Buttons are added alongside groups, so
+    // buttonMode[0] is that mode.
+    const ColorMode initial = (buttonCount != 0 && context->group[Index(active)] == nullptr) ? context->buttonMode[0] : active;
+
+    ShowMode(context, initial);
 
     // Subscribing with 'card' automatically unregisters when 'card' is deleted. Every colour
     // attribute is of interest: the cluster never reports ColorMode itself, so a mode switch is
