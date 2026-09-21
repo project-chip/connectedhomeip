@@ -415,7 +415,7 @@ private:
                     .withSpeed             = true,
                     .withPedestrian        = true,
                     .withCalibration       = true,
-                    .withManuallyOperable  = false,
+                    .withManuallyOperable  = true,
                     .withAccess            = true,
                     .initialOverallCurrentState = DataModel::MakeNullable(Clusters::ClosureControl::GenericOverallCurrentState(
                                                     MakeOptional(DataModel::MakeNullable(Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed)),
@@ -425,7 +425,7 @@ private:
                 };
 
 
-                return MakeDevice<LoggingClosure>(mContext->timerDelegate,mContext->identifyDelegate,CCconfig,mContext->groupDataProvider,mContext->fabricTable,std::move(panels));
+                return MakeDevice<LoggingClosure>(mContext->timerDelegate,mContext->identifyDelegate,CCconfig,mContext->groupDataProvider,mContext->fabricTable,std::move(panels),mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)

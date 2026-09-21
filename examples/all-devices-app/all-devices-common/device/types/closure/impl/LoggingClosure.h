@@ -19,6 +19,7 @@
 #include <device/types/closure-panel/impl/LoggingClosurePanel.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <lib/support/TimerDelegate.h>
+#include <app/TestEventTriggerDelegate.h>
 namespace chip{
 namespace app {
 
@@ -31,13 +32,15 @@ struct PanelList
 
 class LoggingClosure : public Closure,
                        public Clusters::ClosureControl::ClosureControlClusterDelegate,
-                       public TimerContext
+                       public TimerContext,
+                       public TestEventTriggerHandler
 {
 public:
 
     LoggingClosure(TimerDelegate & Tdelegate,
                     Clusters::IdentifyDelegate& Idelegate, Closure::Config CConfig,
-    Credentials::GroupDataProvider & groupDataProvider,FabricTable & fabricTable, std::vector<PanelList> panels);
+    Credentials::GroupDataProvider & groupDataProvider,FabricTable & fabricTable, std::vector<PanelList> panels,
+    TestEventTriggerDelegate & testEventTriggerDelegate);
     ~LoggingClosure() override;
     Protocols::InteractionModel::Status HandleStopCommand() override;
 
@@ -55,10 +58,11 @@ public:
 
     // -- TimerContext Interface --
     void TimerFired() override;
+
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
+
 private:
-    // Simulated duration a Calibrate command takes to complete. Kept well under the
-    // test suite's default --timeout (30s) so the resulting MainState report arrives in time.
-    static constexpr uint32_t kTimeoutnDurationSec = 3;
+    static constexpr uint32_t kTimeoutnDurationSec = 1;
     bool RegistersAccessDevicePanel() const override;
     void CancelTimer();
     LoggingOnOffLight::Context OnOffContext;
@@ -69,7 +73,15 @@ private:
     std::unique_ptr<LoggingOnOffLight> mLoggingOnOffLights;
     std::vector<PanelList> mPanelList;
     TimerDelegate & mTimerDelegate;
+    TestEventTriggerDelegate & mTestEventTriggerDelegate;
     std::optional<Clusters::ClosureControl::GenericOverallCurrentState> mPendingCurrentState;
+
+    static constexpr uint64_t kTriggerError      = 0x0104000000000000;
+    static constexpr uint64_t kTriggerSetupRequired      = 0x0104000000000003;
+    static constexpr uint64_t kTriggerDisengaged = 0x0104000000000002;
+    static constexpr uint64_t kTriggerClear      = 0x0104000000000004;
+    static constexpr uint64_t kTriggerProtected      = 0x0104000000000001;
+
 };
 
 }
