@@ -17,6 +17,7 @@
  */
 
 #include "ColorControlClusterWidget.h"
+#include "CommandStatusLog.h"
 #include "DisplayNotificationHub.h"
 
 #include <cstdio>
@@ -219,19 +220,22 @@ void SendMode(ColorControlContext * context, ColorMode mode)
     case ColorMode::kHueSaturation: {
         const auto hue        = static_cast<uint16_t>(lv_slider_get_value(context->hueSlider));
         const auto saturation = static_cast<uint8_t>(lv_slider_get_value(context->saturationSlider));
-        DeviceLayer::SystemLayer().ScheduleLambda(
-            [cluster, hue, saturation]() { cluster->MoveToHueAndSaturation(hue, saturation, 0, /*isEnhanced=*/false); });
+        DeviceLayer::SystemLayer().ScheduleLambda([cluster, hue, saturation]() {
+            LogCommandFailure("MoveToHueAndSaturation", cluster->MoveToHueAndSaturation(hue, saturation, 0, /*isEnhanced=*/false));
+        });
         break;
     }
     case ColorMode::kXy: {
         const auto x = static_cast<uint16_t>(lv_slider_get_value(context->xSlider));
         const auto y = static_cast<uint16_t>(lv_slider_get_value(context->ySlider));
-        DeviceLayer::SystemLayer().ScheduleLambda([cluster, x, y]() { cluster->MoveToColor(x, y, 0); });
+        DeviceLayer::SystemLayer().ScheduleLambda(
+            [cluster, x, y]() { LogCommandFailure("MoveToColor", cluster->MoveToColor(x, y, 0)); });
         break;
     }
     case ColorMode::kTemperature: {
         const auto mireds = static_cast<uint16_t>(lv_slider_get_value(context->temperatureSlider));
-        DeviceLayer::SystemLayer().ScheduleLambda([cluster, mireds]() { cluster->MoveToColorTemp(mireds, 0); });
+        DeviceLayer::SystemLayer().ScheduleLambda(
+            [cluster, mireds]() { LogCommandFailure("MoveToColorTemp", cluster->MoveToColorTemp(mireds, 0)); });
         break;
     }
     }

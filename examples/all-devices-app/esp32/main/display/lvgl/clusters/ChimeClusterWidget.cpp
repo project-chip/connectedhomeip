@@ -17,6 +17,7 @@
  */
 
 #include "ChimeClusterWidget.h"
+#include "CommandStatusLog.h"
 #include "DisplayNotificationHub.h"
 
 #include <clusters/Chime/Attributes.h>
@@ -109,8 +110,9 @@ lv_obj_t * CreateChimeClusterWidget(lv_obj_t * parent, Chime & device)
         toggleBtn,
         [](lv_event_t * event) {
             auto * devPtr = static_cast<Chime *>(lv_event_get_user_data(event));
-            DeviceLayer::SystemLayer().ScheduleLambda(
-                [devPtr]() { devPtr->ChimeCluster().SetEnabled(!devPtr->ChimeCluster().GetEnabled()); });
+            DeviceLayer::SystemLayer().ScheduleLambda([devPtr]() {
+                LogCommandFailure("SetEnabled", devPtr->ChimeCluster().SetEnabled(!devPtr->ChimeCluster().GetEnabled()));
+            });
         },
         LV_EVENT_CLICKED, &device);
 
@@ -154,7 +156,8 @@ lv_obj_t * CreateChimeClusterWidget(lv_obj_t * parent, Chime & device)
                 auto * devPtr = static_cast<Chime *>(lv_event_get_user_data(event));
                 auto * btnObj = static_cast<lv_obj_t *>(lv_event_get_target(event));
                 auto id       = static_cast<uint8_t>(reinterpret_cast<uintptr_t>(lv_obj_get_user_data(btnObj)));
-                DeviceLayer::SystemLayer().ScheduleLambda([devPtr, id]() { devPtr->ChimeCluster().SetSelectedChime(id); });
+                DeviceLayer::SystemLayer().ScheduleLambda(
+                    [devPtr, id]() { LogCommandFailure("SetSelectedChime", devPtr->ChimeCluster().SetSelectedChime(id)); });
             },
             LV_EVENT_CLICKED, &device);
     }
@@ -177,7 +180,7 @@ lv_obj_t * CreateChimeClusterWidget(lv_obj_t * parent, Chime & device)
             DeviceLayer::SystemLayer().ScheduleLambda([devPtr]() {
                 if (devPtr->ChimeCluster().GetEnabled())
                 {
-                    devPtr->PlayChimeSound(devPtr->ChimeCluster().GetSelectedChime());
+                    LogCommandFailure("PlayChimeSound", devPtr->PlayChimeSound(devPtr->ChimeCluster().GetSelectedChime()));
                 }
             });
         },

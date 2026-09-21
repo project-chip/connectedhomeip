@@ -70,21 +70,29 @@ lv_obj_t * CreateTemperatureMeasurementClusterWidget(lv_obj_t * parent, Clusters
 
     UpdateTemperatureLabel(valueLabel, curTenths);
 
+    // Local touch: the label follows the knob, while the attribute is written once the finger
+    // lifts. Writing on every value change turns a single drag into a burst of reports.
+    lv_obj_add_event_cb(
+        slider,
+        [](lv_event_t * event) {
+            auto * sliderObj = static_cast<lv_obj_t *>(lv_event_get_target(event));
+            auto * labelObj  = lv_obj_get_child(lv_obj_get_parent(sliderObj), 0);
+
+            UpdateTemperatureLabel(labelObj, lv_slider_get_value(sliderObj));
+        },
+        LV_EVENT_VALUE_CHANGED, nullptr);
+
     lv_obj_add_event_cb(
         slider,
         [](lv_event_t * event) {
             auto * clusterPtr = static_cast<Clusters::TemperatureMeasurementCluster *>(lv_event_get_user_data(event));
             auto * sliderObj  = static_cast<lv_obj_t *>(lv_event_get_target(event));
-            auto * labelObj   = lv_obj_get_child(lv_obj_get_parent(sliderObj), 0);
-            int32_t tenthsC   = lv_slider_get_value(sliderObj);
 
-            UpdateTemperatureLabel(labelObj, tenthsC);
-
-            int16_t measuredVal = static_cast<int16_t>(tenthsC * 10);
+            int16_t measuredVal = static_cast<int16_t>(lv_slider_get_value(sliderObj) * 10);
             DeviceLayer::SystemLayer().ScheduleLambda(
                 [clusterPtr, measuredVal]() { LogErrorOnFailure(clusterPtr->SetMeasuredValue(measuredVal)); });
         },
-        LV_EVENT_VALUE_CHANGED, &cluster);
+        LV_EVENT_RELEASED, &cluster);
 
     DisplayNotificationHub::Instance().Subscribe(card, cluster.GetPaths()[0].mEndpointId, Clusters::TemperatureMeasurement::Id,
                                                  [slider, valueLabel, &cluster](const ConcreteAttributePath & path) {

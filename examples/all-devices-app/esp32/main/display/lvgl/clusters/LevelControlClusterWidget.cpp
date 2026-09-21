@@ -17,6 +17,7 @@
  */
 
 #include "LevelControlClusterWidget.h"
+#include "CommandStatusLog.h"
 #include "DisplayNotificationHub.h"
 
 #include <algorithm>
@@ -92,8 +93,10 @@ lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelCon
             auto * sliderObj  = static_cast<lv_obj_t *>(lv_event_get_target(event));
             uint8_t level     = static_cast<uint8_t>(lv_slider_get_value(sliderObj));
 
-            DeviceLayer::SystemLayer().ScheduleLambda(
-                [clusterPtr, level]() { clusterPtr->MoveToLevelWithOnOff(level, DataModel::Nullable<uint16_t>(), {}, {}); });
+            DeviceLayer::SystemLayer().ScheduleLambda([clusterPtr, level]() {
+                LogCommandFailure("MoveToLevelWithOnOff",
+                                  clusterPtr->MoveToLevelWithOnOff(level, DataModel::Nullable<uint16_t>(), {}, {}));
+            });
         },
         LV_EVENT_RELEASED, &cluster);
 

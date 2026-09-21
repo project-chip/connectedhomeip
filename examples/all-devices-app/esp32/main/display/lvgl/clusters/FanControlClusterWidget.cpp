@@ -17,6 +17,7 @@
  */
 
 #include "FanControlClusterWidget.h"
+#include "CommandStatusLog.h"
 #include "DisplayNotificationHub.h"
 
 #include <clusters/FanControl/Attributes.h>
@@ -143,7 +144,8 @@ lv_obj_t * CreateFanControlClusterWidget(lv_obj_t * parent, Clusters::FanControl
                 auto * clusterPtr = static_cast<Clusters::FanControlCluster *>(lv_event_get_user_data(event));
                 auto * btnObj     = static_cast<lv_obj_t *>(lv_event_get_target(event));
                 auto mode         = static_cast<FanModeEnum>(reinterpret_cast<uintptr_t>(lv_obj_get_user_data(btnObj)));
-                DeviceLayer::SystemLayer().ScheduleLambda([clusterPtr, mode]() { clusterPtr->SetFanMode(mode); });
+                DeviceLayer::SystemLayer().ScheduleLambda(
+                    [clusterPtr, mode]() { LogCommandFailure("SetFanMode", clusterPtr->SetFanMode(mode)); });
             },
             LV_EVENT_CLICKED, &cluster);
     }
@@ -183,8 +185,9 @@ lv_obj_t * CreateFanControlClusterWidget(lv_obj_t * parent, Clusters::FanControl
             auto * sliderObj  = static_cast<lv_obj_t *>(lv_event_get_target(event));
             uint8_t pct       = static_cast<uint8_t>(lv_slider_get_value(sliderObj));
 
-            DeviceLayer::SystemLayer().ScheduleLambda(
-                [clusterPtr, pct]() { clusterPtr->SetPercentSetting(DataModel::MakeNullable<chip::Percent>(pct)); });
+            DeviceLayer::SystemLayer().ScheduleLambda([clusterPtr, pct]() {
+                LogCommandFailure("SetPercentSetting", clusterPtr->SetPercentSetting(DataModel::MakeNullable<chip::Percent>(pct)));
+            });
         },
         LV_EVENT_RELEASED, &cluster);
 
