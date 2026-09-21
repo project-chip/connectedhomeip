@@ -2674,7 +2674,7 @@ cluster WebRTCTransportProvider = 1363 {
     octet_string<8> kid = 2;
   }
 
-  readonly attribute access(read: manage) WebRTCSessionStruct currentSessions[] = 0;
+  readonly attribute access(read: manage) fabric_sensitive WebRTCSessionStruct currentSessions[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
