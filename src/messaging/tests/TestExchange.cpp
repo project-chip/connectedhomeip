@@ -224,6 +224,74 @@ TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
     }
 }
 
+// A responder exchange that has latched WillSendMessage() and then fails to send its
+// reply must still be released when its owner walks away.  CASESession::HandleSigma3a
+// latches WillSendMessage() and the reply goes out later from HandleSigma3c; if the link
+// drops in between, that send fails, and PairingSession::DiscardExchange() then drops
+// its handle.  The exchange was left still expecting to send, so it never closed
+// itself: it held its SessionHolder ref for good and pinned an
+// UnauthenticatedSessionTable entry, which FindLeastRecentUsedEntry() only reclaims
+// once the refcount is 0.  With every entry in the pool pinned, SessionManager dropped
+// each inbound Sigma1 with "UnauthenticatedSession exhausted" and the node could not
+// establish CASE again short of a reboot.
+TEST_F(TestExchange, CheckResponderExchangeReleasedWhenReplySendFails)
+{
+    MockExchangeDelegate delegate1;
+    MockExchangeDelegate delegate2;
+
+    ExchangeContext * ec1 = NewExchangeToBob(&delegate1);
+    ASSERT_NE(ec1, nullptr);
+
+    ASSERT_EQ(
+        GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id, kMsgType_TEST1, &delegate2),
+        CHIP_NO_ERROR);
+
+    constexpr auto sendFlags =
+        SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck, Messaging::SendMessageFlags::kExpectResponse);
+
+    ASSERT_EQ(ec1->SendMessage(Protocols::SecureChannel::Id, kMsgType_TEST1,
+                               System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize), sendFlags),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    // The responder kept the exchange alive to reply later, as HandleSigma3a does.
+    ExchangeContext * ec2 = delegate2.mExchange;
+    ASSERT_NE(ec2, nullptr);
+    EXPECT_TRUE(ec2->IsSendExpected());
+
+    // Its reply now fails to go out, as SendStatusReport does over a dropped link.
+    ec2->InjectFailure(ExchangeContext::InjectedFailureType::kFailOnSend);
+    EXPECT_NE(ec2->SendMessage(Protocols::SecureChannel::Id, kMsgType_TEST2,
+                               System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                               SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck)),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    // A failed send leaves the exchange still expecting to send, so it cannot close
+    // itself: this is what used to make it outlive its owner.
+    ASSERT_NE(delegate2.mExchange, nullptr);
+    EXPECT_TRUE(ec2->IsSendExpected());
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 2u);
+
+    // The owner walks away, as PairingSession::DiscardExchange() does.
+    ec2->SetDelegate(nullptr);
+    ec2->AbandonPendingSend();
+
+    // ec2 has been released by now, so it must not be touched again here.
+    ec1->Close();
+    DrainAndServiceIO();
+
+    // Nothing was pending on the responder exchange, so it must be back in the pool
+    // rather than holding its session open forever.
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    EXPECT_EQ(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id, kMsgType_TEST1,
+                                                                              &removedHandler),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &delegate2);
+}
+
 // A crude test to exercise VerifyOrDieWithObject() in ObjectPool and
 // the resulting DumpToLog() call on the ExchangeContext.
 // TODO: Find a way to automate this test without killing the process.

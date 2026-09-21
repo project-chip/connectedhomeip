@@ -112,6 +112,14 @@ void PairingSession::DiscardExchange()
         // since we might be dead by then.
         mExchangeCtxt.Value()->SetDelegate(nullptr);
 
+        // If we told the exchange we would send a message and never managed to (a
+        // status report whose send failed, say), it cannot close itself, so dropping
+        // our handle below would leave it holding its session -- and, for a responder
+        // still on an unauthenticated session, one of the few UnauthenticatedSessionTable
+        // entries, which are only reclaimed once their refcount drops to zero.  Enough
+        // of those and the node can no longer establish CASE at all until it reboots.
+        mExchangeCtxt.Value()->AbandonPendingSend();
+
         // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
         // exchange will handle that.
         mExchangeCtxt.ClearValue();

@@ -176,6 +176,14 @@ public:
     void Close();
     void Abort();
 
+    // Give up on a message this exchange was told to expect via WillSendMessage() but
+    // that is never going to be sent (a reply whose send failed, for example).  Such an
+    // exchange never closes itself, so an owner that walks away from it without calling
+    // Close() or Abort() would leave it holding its session for good.  Safe to call
+    // when no send is pending or when the exchange has already been closed: it does
+    // nothing in those cases, so it cannot double-release.
+    void AbandonPendingSend();
+
     // Applies a suggested response timeout value based on the session type and the given upper layer processing time for
     // the next message to the exchange.
     //

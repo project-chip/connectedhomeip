@@ -286,6 +286,20 @@ void ExchangeContext::Abort()
     Release();
 }
 
+void ExchangeContext::AbandonPendingSend()
+{
+    // An already-closed exchange is on its owner's Release() path (see
+    // OnSessionReleased), which relies on kFlagWillSendMessage staying set; leave it
+    // alone rather than releasing it a second time.
+    if (mFlags.Has(Flags::kFlagClosed) || !IsSendExpected())
+    {
+        return;
+    }
+
+    mFlags.Clear(Flags::kFlagWillSendMessage);
+    MessageHandled();
+}
+
 void ExchangeContextDeletor::Release(ExchangeContext * ec)
 {
     ec->mExchangeMgr->ReleaseContext(ec);
