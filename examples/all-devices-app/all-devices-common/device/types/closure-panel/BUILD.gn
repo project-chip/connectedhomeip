@@ -21,7 +21,7 @@ source_set("closure-panel") {
   sources = [
     "ClosurePanel.cpp",
     "ClosurePanel.h",
-    "ClosureSematicTags.h"
+    "ClosureSematicTags.h",
   ]
 
   public_deps = [
@@ -37,7 +37,5 @@ source_set("logging") {
     "impl/LoggingClosurePanel.h",
   ]
 
-  public_deps = [
-    ":closure-panel",
-  ]
+  public_deps = [ ":closure-panel" ]
 }
