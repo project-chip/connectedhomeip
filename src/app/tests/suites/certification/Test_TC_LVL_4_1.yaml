@@ -250,8 +250,8 @@ tests:
       response:
           value: 254
 
-    - label: "Step 4f: TH reads the MinLevel attribute from the DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0002 && LVL.S.F01
+    - label: "Step 4f: TH reads the MinLevel attribute from the DUT (Lighting)"
+      PICS: LVL.S.A0002 && LVL.S.F01
       command: "readAttribute"
       attribute: "MinLevel"
       response:
@@ -261,8 +261,9 @@ tests:
               type: int8u
 
     #MinLevel is only fixed to 1 when the Lighting feature is supported
-    - label: "Step 4f: TH reads the MinLevel attribute from the DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0002 && !LVL.S.F01
+    - label:
+          "Step 4f: TH reads the MinLevel attribute from the DUT (no Lighting)"
+      PICS: LVL.S.A0002 && !LVL.S.F01
       command: "readAttribute"
       attribute: "MinLevel"
       response:
@@ -271,8 +272,10 @@ tests:
               type: int8u
               maxValue: 254
 
-    - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.A0002
+    - label:
+          "Step 4g: TH sends a MoveToLevel to set the level to MinLevel
+          (MinLevel implemented)"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.A0002
       command: "MoveToLevel"
       arguments:
           values:
@@ -287,8 +290,10 @@ tests:
 
     #Using hard coded fallback value when MinLevel is not implemented (it is
     #optional before cluster revision 7): 1 with Lighting, 0 without it
-    - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.F01
+    - label:
+          "Step 4g: TH sends a MoveToLevel to set the level to MinLevel
+          (MinLevel not implemented, Lighting)"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.F01
       command: "MoveToLevel"
       arguments:
           values:
@@ -301,8 +306,10 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.F01
+    - label:
+          "Step 4g: TH sends a MoveToLevel to set the level to MinLevel
+          (MinLevel not implemented, no Lighting)"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.F01
       command: "MoveToLevel"
       arguments:
           values:
@@ -343,8 +350,8 @@ tests:
 
     - label:
           "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
-          from DUT, expects mininum level."
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.A0002
+          from DUT, expects mininum level. (MinLevel implemented)"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.A0002
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
@@ -354,8 +361,8 @@ tests:
     #optional before cluster revision 7): 1 with Lighting, 0 without it
     - label:
           "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
-          from DUT, expects mininum level."
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.F01
+          from DUT, expects mininum level. (MinLevel not implemented, Lighting)"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.F01
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
@@ -363,8 +370,8 @@ tests:
 
     - label:
           "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
-          from DUT, expects mininum level."
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.F01
+          from DUT, expects mininum level. (MinLevel not implemented, no Lighting)"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.F01
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
