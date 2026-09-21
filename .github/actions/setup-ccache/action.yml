@@ -76,6 +76,15 @@ runs:
 
         CCACHE_RESTORE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-"
         echo "CCACHE_RESTORE_KEY=${CCACHE_RESTORE_KEY}" >> "$GITHUB_ENV"
+    # nscloud-cache-action shells out to sudo to bind-mount the volume, and the
+    # chip-build image does not ship it. The job already runs as root.
+    - name: Ensure sudo is available for the cache mount
+      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
+      shell: bash
+      run: |
+        if ! command -v sudo >/dev/null 2>&1; then
+          apt-get update -qq && apt-get install -y -qq --no-install-recommends sudo
+        fi
     # Must run after checkout: checkout wipes the workspace and would remove the link.
     - name: Link .ccache onto the attached cache volume
       if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
