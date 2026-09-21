@@ -1408,6 +1408,7 @@ SetOTADownloader
 SetOtaRequestorDriver
 setpin
 setpoint
+setpoints
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
