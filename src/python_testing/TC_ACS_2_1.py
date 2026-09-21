@@ -34,7 +34,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import time
 
@@ -104,7 +103,7 @@ class TC_ACS_2_1(MatterBaseTest):
         # Add AmbientContextSupported elements for CI purpose
         # Human activity walking, Object identification person, Audio identification barking are default
         if self.is_ci:
-            
+
             if self.SensorFusionDetected:
                 # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
                 # self.write_to_app_pipe(
@@ -124,10 +123,10 @@ class TC_ACS_2_1(MatterBaseTest):
                 end_time = start_time
                 while (end_time-start_time) < ci_wait_time:
                     sensorFusionSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SensorFusionSupported)
-                    if sensorFusionSupported is sensorFusionSupported_input:          
+                    if sensorFusionSupported is sensorFusionSupported_input:
                         break
                     end_time = time.perf_counter()
-                log.info("SensorFusionSupported detected after %s seconds", end_time-start_time)                  
+                log.info("SensorFusionSupported detected after %s seconds", end_time-start_time)
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
