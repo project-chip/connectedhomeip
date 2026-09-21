@@ -29,8 +29,21 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <iterator>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <utility>
+
+// esp_err_t counterpart of ReturnErrorOnFailure. The helpers used here log the failing
+// register themselves, so the macro only carries the error out.
+#define EspReturnErrorOnFailure(expr)                                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        esp_err_t __err = (expr);                                                                                                  \
+        if (__err != ESP_OK)                                                                                                       \
+        {                                                                                                                          \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
 
 namespace chip::app {
 
@@ -141,6 +154,122 @@ float sSineTable[kSineTableSize];
 bool sSineTableInitialized = false;
 int16_t sChunkBuffer[kChunkSamples * 2];
 
+// A device attached to the internal I2C bus, detached again when it goes out of scope.
+// Register accesses go through this object so that bring-up code can return early without
+// leaking the handle.
+class ScopedI2cDevice
+{
+public:
+    ScopedI2cDevice() = default;
+
+    // Every chime peripheral sits on the internal bus at 400 kHz with a 7-bit address, so
+    // the address is the only thing callers choose. Invalid if the bus rejects the device.
+    explicit ScopedI2cDevice(uint8_t address)
+    {
+        const i2c_device_config_t config = {
+            .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+            .device_address  = address,
+            .scl_speed_hz    = 400000,
+            .scl_wait_us     = 0,
+            .flags           = { .disable_ack_check = 0 },
+        };
+
+        esp_err_t err = i2c_master_bus_add_device(bsp_i2c_get_handle(), &config, &mDevice);
+        if (err != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to attach 0x%02x to the I2C bus: %s", address, esp_err_to_name(err));
+            mDevice = nullptr;
+        }
+    }
+
+    ScopedI2cDevice(ScopedI2cDevice && other) : mDevice(other.mDevice) { other.mDevice = nullptr; }
+    ScopedI2cDevice & operator=(ScopedI2cDevice && other)
+    {
+        if (this != &other)
+        {
+            Reset();
+            mDevice       = other.mDevice;
+            other.mDevice = nullptr;
+        }
+        return *this;
+    }
+
+    ScopedI2cDevice(const ScopedI2cDevice &)             = delete;
+    ScopedI2cDevice & operator=(const ScopedI2cDevice &) = delete;
+
+    ~ScopedI2cDevice() { Reset(); }
+
+    bool IsValid() const { return mDevice != nullptr; }
+    i2c_master_dev_handle_t Handle() const { return mDevice; }
+
+    // Hands ownership to the caller, which keeps the device attached to the bus.
+    i2c_master_dev_handle_t Take()
+    {
+        i2c_master_dev_handle_t device = mDevice;
+        mDevice                        = nullptr;
+        return device;
+    }
+
+    void Reset()
+    {
+        if (mDevice != nullptr)
+        {
+            i2c_master_bus_rm_device(mDevice);
+            mDevice = nullptr;
+        }
+    }
+
+    esp_err_t ReadRegister(uint8_t reg, uint8_t & value) const
+    {
+        return i2c_master_transmit_receive(mDevice, &reg, 1, &value, 1, 100);
+    }
+
+    esp_err_t WriteRegister(uint8_t reg, uint8_t value) const
+    {
+        const uint8_t payload[2] = { reg, value };
+        return i2c_master_transmit(mDevice, payload, sizeof(payload), 100);
+    }
+
+    // Read-modify-write of a single register, leaving the bits the caller did not name
+    // alone. The register is named in the log: the caller only sees an esp_err_t.
+    esp_err_t SetRegisterBits(uint8_t reg, uint8_t bits) const
+    {
+        uint8_t value = 0;
+        esp_err_t err = ReadRegister(reg, value);
+        if (err == ESP_OK && (value & bits) != bits)
+        {
+            err = WriteRegister(reg, static_cast<uint8_t>(value | bits));
+        }
+
+        if (err != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to set 0x%02x bits in register 0x%02x: %s", bits, reg,
+                         esp_err_to_name(err));
+        }
+        return err;
+    }
+
+    esp_err_t ClearRegisterBits(uint8_t reg, uint8_t bits) const
+    {
+        uint8_t value = 0;
+        esp_err_t err = ReadRegister(reg, value);
+        if (err == ESP_OK && (value & bits) != 0)
+        {
+            err = WriteRegister(reg, static_cast<uint8_t>(value & ~bits));
+        }
+
+        if (err != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to clear 0x%02x bits in register 0x%02x: %s", bits, reg,
+                         esp_err_to_name(err));
+        }
+        return err;
+    }
+
+private:
+    i2c_master_dev_handle_t mDevice = nullptr;
+};
+
 esp_err_t WriteAmplifierRegister(uint8_t reg, uint16_t value)
 {
     const uint8_t payload[3] = { reg, static_cast<uint8_t>(value >> 8), static_cast<uint8_t>(value & 0xFF) };
@@ -155,100 +284,24 @@ esp_err_t ReadAmplifierRegister(uint8_t reg, uint16_t & value)
     return err;
 }
 
-esp_err_t ReadByteRegister(i2c_master_dev_handle_t device, uint8_t reg, uint8_t & value)
-{
-    return i2c_master_transmit_receive(device, &reg, 1, &value, 1, 100);
-}
-
-esp_err_t WriteByteRegister(i2c_master_dev_handle_t device, uint8_t reg, uint8_t value)
-{
-    const uint8_t payload[2] = { reg, value };
-    return i2c_master_transmit(device, payload, sizeof(payload), 100);
-}
-
-// Read-modify-write of a single register, leaving the bits the caller did not name alone.
-// The register number is logged on failure: the caller only sees an esp_err_t.
-esp_err_t SetRegisterBits(i2c_master_dev_handle_t device, uint8_t reg, uint8_t bits)
-{
-    uint8_t value = 0;
-    esp_err_t err = ReadByteRegister(device, reg, value);
-    if (err == ESP_OK && (value & bits) != bits)
-    {
-        err = WriteByteRegister(device, reg, static_cast<uint8_t>(value | bits));
-    }
-
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to set 0x%02x bits in AW9523 register 0x%02x: %s", bits, reg,
-                     esp_err_to_name(err));
-    }
-    return err;
-}
-
-esp_err_t ClearRegisterBits(i2c_master_dev_handle_t device, uint8_t reg, uint8_t bits)
-{
-    uint8_t value = 0;
-    esp_err_t err = ReadByteRegister(device, reg, value);
-    if (err == ESP_OK && (value & bits) != 0)
-    {
-        err = WriteByteRegister(device, reg, static_cast<uint8_t>(value & ~bits));
-    }
-
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to clear 0x%02x bits in AW9523 register 0x%02x: %s", bits, reg,
-                     esp_err_to_name(err));
-    }
-    return err;
-}
-
 esp_err_t ConfigureExpanderOutputs()
 {
-    i2c_master_dev_handle_t expander = nullptr;
-    const i2c_device_config_t config = {
-        .dev_addr_length = I2C_ADDR_BIT_LEN_7,
-        .device_address  = kAw9523Address,
-        .scl_speed_hz    = 400000,
-        .scl_wait_us     = 0,
-        .flags           = { .disable_ack_check = 0 },
-    };
-
-    esp_err_t addErr = i2c_master_bus_add_device(bsp_i2c_get_handle(), &config, &expander);
-    if (addErr != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to attach AW9523 to I2C bus");
-        return addErr;
-    }
+    ScopedI2cDevice expander(kAw9523Address);
+    VerifyOrReturnError(expander.IsValid(), ESP_FAIL);
 
     // P1_7 must be a GPIO (LED-mode bit set) configured as an output (direction bit clear)
     // before the output latch can drive the SY7088 enable line high.
-    esp_err_t err = SetRegisterBits(expander, 0x13, kSy7088BoostEnable);
-    if (err == ESP_OK)
-    {
-        err = ClearRegisterBits(expander, 0x05, kSy7088BoostEnable);
-    }
-    if (err == ESP_OK)
-    {
-        err = SetRegisterBits(expander, kAw9523OutputPort1, kSy7088BoostEnable);
-    }
+    EspReturnErrorOnFailure(expander.SetRegisterBits(0x13, kSy7088BoostEnable));
+    EspReturnErrorOnFailure(expander.ClearRegisterBits(0x05, kSy7088BoostEnable));
+    EspReturnErrorOnFailure(expander.SetRegisterBits(kAw9523OutputPort1, kSy7088BoostEnable));
 
     // P0_2 is the AW88298 PA enable. It is driven here rather than through
     // bsp_feature_enable(BSP_FEATURE_SPEAKER), which would also power the ES7210.
-    if (err == ESP_OK)
-    {
-        err = SetRegisterBits(expander, 0x12, kAw88298PaEnable);
-    }
-    if (err == ESP_OK)
-    {
-        err = ClearRegisterBits(expander, 0x04, kAw88298PaEnable);
-    }
-    if (err == ESP_OK)
-    {
-        err = SetRegisterBits(expander, kAw9523OutputPort0, kAw88298PaEnable);
-    }
+    EspReturnErrorOnFailure(expander.SetRegisterBits(0x12, kAw88298PaEnable));
+    EspReturnErrorOnFailure(expander.ClearRegisterBits(0x04, kAw88298PaEnable));
+    EspReturnErrorOnFailure(expander.SetRegisterBits(kAw9523OutputPort0, kAw88298PaEnable));
 
-    i2c_master_bus_rm_device(expander);
-    return err;
+    return ESP_OK;
 }
 
 // The BSP brings up only a subset of the AXP2101 rails (0x8b), while the M5Unified board
@@ -258,31 +311,10 @@ esp_err_t ConfigureExpanderOutputs()
 // display, touch or storage drivers depend on browns those peripherals out.
 esp_err_t EnableAmplifierSupplyRails()
 {
-    i2c_master_dev_handle_t pmu      = nullptr;
-    const i2c_device_config_t config = {
-        .dev_addr_length = I2C_ADDR_BIT_LEN_7,
-        .device_address  = kAxp2101Address,
-        .scl_speed_hz    = 400000,
-        .scl_wait_us     = 0,
-        .flags           = { .disable_ack_check = 0 },
-    };
+    ScopedI2cDevice pmu(kAxp2101Address);
+    VerifyOrReturnError(pmu.IsValid(), ESP_FAIL);
 
-    esp_err_t err = i2c_master_bus_add_device(bsp_i2c_get_handle(), &config, &pmu);
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to attach AXP2101 to I2C bus");
-        return err;
-    }
-
-    uint8_t enableBefore = 0;
-    err                  = ReadByteRegister(pmu, kAxp2101LdoEnable, enableBefore);
-    if (err == ESP_OK && (enableBefore & kAxp2101AmplifierRailBits) != kAxp2101AmplifierRailBits)
-    {
-        err = WriteByteRegister(pmu, kAxp2101LdoEnable, static_cast<uint8_t>(enableBefore | kAxp2101AmplifierRailBits));
-    }
-
-    i2c_master_bus_rm_device(pmu);
-    return err;
+    return pmu.SetRegisterBits(kAxp2101LdoEnable, kAxp2101AmplifierRailBits);
 }
 
 bool InitializeI2sTxChannel()
