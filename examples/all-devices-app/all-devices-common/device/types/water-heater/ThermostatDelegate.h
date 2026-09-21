@@ -25,19 +25,22 @@
  #include <app/clusters/thermostat-server/ThermostatDelegate.h>
  #include <credentials/FabricTable.h>
  
- namespace chip {
- 
- namespace app {
- namespace Clusters {
- namespace Thermostat {
- 
- /*
-  * A simple implementation of ThermostatDelegate.
-  */
- class ThermostatDelegate : public Delegate
- {
- public:
-     ThermostatDelegate(EndpointId endpoint = kInvalidEndpointId) : mFabricTable(nullptr)
+namespace chip::app {
+
+/*
+ * A simple implementation of ThermostatDelegate.
+ */
+class ThermostatDelegate : public Clusters::Thermostat::Delegate
+{
+public:
+    using SystemModeEnum = Clusters::Thermostat::SystemModeEnum;
+    using ThermostatRunningModeEnum = Clusters::Thermostat::ThermostatRunningModeEnum;
+    using RelayStateBitmap = Clusters::Thermostat::RelayStateBitmap;
+    using ControlSequenceOfOperationEnum = Clusters::Thermostat::ControlSequenceOfOperationEnum;
+    using RemoteSensingBitmap = Clusters::Thermostat::RemoteSensingBitmap;
+    using temperature = Clusters::Thermostat::temperature;
+public:
+    ThermostatDelegate(EndpointId endpoint = kInvalidEndpointId) : mFabricTable(nullptr)
      {}
      explicit ThermostatDelegate(FabricTable & fabricTable, EndpointId endpoint = kInvalidEndpointId) :
          mFabricTable(&fabricTable)
@@ -77,10 +80,7 @@
      ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
      SystemModeEnum mSystemMode                         = SystemModeEnum::kOff;
      DataModel::Nullable<temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
-  };
- 
- } // namespace Thermostat
- } // namespace Clusters
- } // namespace app
- } // namespace chip
+ };
+
+} // namespace chip::app
  

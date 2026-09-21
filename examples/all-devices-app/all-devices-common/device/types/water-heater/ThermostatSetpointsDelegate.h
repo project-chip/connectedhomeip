@@ -15,40 +15,35 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
- #include <app/clusters/thermostat-server/ThermostatClusterCoolingSetpoints.h>
- #include <app/clusters/thermostat-server/ThermostatClusterHeatingSetpoints.h>
- #include <app/clusters/thermostat-server/ThermostatClusterSetpoints.h>
- #include <app/clusters/thermostat-server/ThermostatDelegate.h>
- 
- #include <app/persistence/AttributePersistenceProvider.h>
- #include <app/persistence/AttributePersistenceProviderInstance.h>
- 
- namespace chip {
- namespace app {
- namespace Clusters {
- namespace Thermostat {
- 
- /*
-  * A simple implementation of ThermostatHeatingSetpoints::Delegate,
-  */
- class ThermostatSetpointsDelegate : public ThermostatHeatingSetpoints::Delegate
- {
- public:
-     ThermostatSetpointsDelegate(EndpointId endpoint = kInvalidEndpointId)
-     {}
-  
-     Protocols::InteractionModel::Status GetOccupiedHeatingSetpoint(temperature & occupiedHeatingSetpoint) const override;
-     Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(temperature occupiedHeatingSetpoint, bool & changed) override;
+#include <app/clusters/thermostat-server/ThermostatClusterCoolingSetpoints.h>
+#include <app/clusters/thermostat-server/ThermostatClusterHeatingSetpoints.h>
+#include <app/clusters/thermostat-server/ThermostatClusterSetpoints.h>
+#include <app/clusters/thermostat-server/ThermostatDelegate.h>
 
- private: 
-     // Mandatory attributes
-     temperature mOccupiedHeatingSetpoint = 2000;
- };
- 
- } // namespace Thermostat
- } // namespace Clusters
- } // namespace app
- } // namespace chip
- 
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+
+namespace chip::app {
+
+/*
+ * A simple implementation of ThermostatHeatingSetpoints::Delegate.
+ */
+class ThermostatSetpointsDelegate : public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate
+{
+public:
+    using temperature = Clusters::Thermostat::temperature;
+
+    ThermostatSetpointsDelegate(EndpointId endpoint = kInvalidEndpointId)
+    {}
+
+    Protocols::InteractionModel::Status GetOccupiedHeatingSetpoint(temperature & occupiedHeatingSetpoint) const override;
+    Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(temperature occupiedHeatingSetpoint, bool & changed) override;
+
+private:
+    // Mandatory attributes
+    temperature mOccupiedHeatingSetpoint = 2000;
+};
+
+} // namespace chip::app

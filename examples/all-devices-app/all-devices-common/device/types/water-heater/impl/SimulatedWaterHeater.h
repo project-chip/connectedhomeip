@@ -31,12 +31,12 @@
  {
      explicit SimulatedWaterHeaterDelegates(FabricTable & fabricTable) : thermostatDelegate(fabricTable) {}
 
-     Clusters::Thermostat::ThermostatDelegate thermostatDelegate;
-     Clusters::Thermostat::ThermostatSetpointsDelegate thermostatSetpointsDelegate;
+     ThermostatDelegate thermostatDelegate;
+     ThermostatSetpointsDelegate thermostatSetpointsDelegate;
  };
 
  class SimulatedWaterHeater : private SimulatedWaterHeaterDelegates,
-        public WaterHeater<Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate>,
+        public WaterHeater<ThermostatDelegate, ThermostatSetpointsDelegate>,
         public Clusters::WaterHeaterManagement::Delegate, public TimerContext, public Clusters::ModeBase::AppDelegate
  {
  public:

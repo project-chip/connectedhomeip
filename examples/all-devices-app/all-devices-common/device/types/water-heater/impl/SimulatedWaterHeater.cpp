@@ -77,7 +77,7 @@ namespace {
     ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
     ThermostatCluster().SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
     bool changed = false;
-    GetDelegate<Clusters::Thermostat::ThermostatSetpointsDelegate>().SetOccupiedHeatingSetpoint(kFinalTemperature * 100, changed);
+    GetDelegate<ThermostatSetpointsDelegate>().SetOccupiedHeatingSetpoint(kFinalTemperature * 100, changed);
 
     SuccessOrDie(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
     return CHIP_NO_ERROR;

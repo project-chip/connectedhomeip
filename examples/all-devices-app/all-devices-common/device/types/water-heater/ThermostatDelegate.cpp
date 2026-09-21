@@ -26,16 +26,17 @@
  #include <platform/internal/CHIPDeviceLayerInternal.h>
  
  #include <app/clusters/thermostat-server/Temperature.h>
- 
- using namespace chip;
- using namespace chip::app;
- using namespace chip::app::Clusters::Thermostat;
- using namespace chip::app::Clusters::Thermostat::Attributes;
- using namespace chip::app::Clusters::Thermostat::Structs;
- using namespace Protocols::InteractionModel;
- using namespace System::Clock;
- 
- FabricTable & ThermostatDelegate::GetFabricTable() const
+
+using namespace chip;
+using namespace chip::app::Clusters::Thermostat;
+using namespace chip::app::Clusters::Thermostat::Attributes;
+using namespace chip::app::Clusters::Thermostat::Structs;
+using namespace Protocols::InteractionModel;
+using namespace System::Clock;
+
+namespace chip::app {
+
+FabricTable & ThermostatDelegate::GetFabricTable() const
  {
      VerifyOrDie(mFabricTable != nullptr);
      return *mFabricTable;
@@ -140,4 +141,6 @@
  {
      return Status::UnsupportedAttribute;
  }
+
+} // namespace chip::app
  
