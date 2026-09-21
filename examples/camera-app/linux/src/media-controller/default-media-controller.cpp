@@ -135,8 +135,8 @@ void DefaultMediaController::DistributeAudio(const uint8_t * data, size_t size, 
 }
 
 void DefaultMediaController::SetPreRollLength(Transport * transport, uint16_t preRollBufferLength)
-
 {
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
     auto it = mSinkMap.find(transport);
     if (it != mSinkMap.end() && it->second != nullptr)
     {
@@ -183,6 +183,7 @@ Transport * DefaultMediaController::GetTransportForAudioStream(uint16_t audioStr
 
 void DefaultMediaController::ResetTransportSinkState(Transport * transport)
 {
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
     auto it = mSinkMap.find(transport);
     if (it != mSinkMap.end() && it->second != nullptr)
     {

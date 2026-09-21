@@ -57,5 +57,5 @@ private:
     PreRollBuffer mPreRollBuffer;
     std::vector<Connection> mConnections;
     std::mutex mConnectionsMutex;
-    Camera::CameraDevice * mCameraDevice = nullptr;                        // pointer to parent camera device
+    Camera::CameraDevice * mCameraDevice = nullptr; // pointer to parent camera device
 };
