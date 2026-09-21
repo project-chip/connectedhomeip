@@ -800,8 +800,12 @@ jobs:
             image: ghcr.io/project-chip/chip-build:211
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
+                # The runner's cache volume is not visible inside a container job
+                # unless it is mounted and NSC_CACHE_PATH is forwarded.
+                - /cache:/cache
             env:
                 NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NSC_CACHE_PATH: ${{ env.NSC_CACHE_PATH }}
                 NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
                 NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
                 NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
