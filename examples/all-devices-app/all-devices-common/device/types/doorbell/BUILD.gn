@@ -32,17 +32,9 @@ source_set("doorbell") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/Chime:ids",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
-}
-
-source_set("logging") {
-  sources = [
-    "impl/LoggingDoorbell.cpp",
-    "impl/LoggingDoorbell.h",
-  ]
-
-  public_deps = [ ":doorbell" ]
 }
 
 source_set("posix") {

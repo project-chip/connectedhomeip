@@ -385,8 +385,7 @@ TEST_F(TestNamedPipeTranslators, SwitchTranslator)
     EXPECT_EQ(translator.TranslateAndExecute(1, json1, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
 
-    // SetCurrentPosition with SwitchState alias
-    Json::Value json2 = ParseJson(R"({"Name": "SetCurrentPosition", "SwitchState": 0})");
+    Json::Value json2 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 0})");
     EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
 
@@ -399,6 +398,7 @@ TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
 {
     Dispatcher dispatcher(mRegistry);
     EXPECT_EQ(dispatcher.EnsureTranslatorRegistered<OnOffTranslator>(), CHIP_NO_ERROR);
+    EXPECT_EQ(dispatcher.EnsureTranslatorRegistered<SwitchTranslator>(), CHIP_NO_ERROR);
 
     // Valid action on explicit endpoint
     Json::Value valid = ParseJson(R"({"Name": "SetOnOff", "EndpointId": 1, "OnOff": true})");
@@ -408,6 +408,11 @@ TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
     // Valid action with default endpoint (0)
     Json::Value defEp = ParseJson(R"({"Name": "SetOnOff", "OnOff": false})");
     EXPECT_EQ(dispatcher.DispatchJson(defEp), CHIP_NO_ERROR);
+
+    // Valid SwitchTranslator action
+    Json::Value switchCmd = ParseJson(R"({"Name": "SetCurrentPosition", "EndpointId": 1, "CurrentPosition": 2})");
+    EXPECT_EQ(dispatcher.DispatchJson(switchCmd), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
 
     // Invalid JSON structure (not object)
     Json::Value arrayVal(Json::arrayValue);

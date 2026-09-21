@@ -22,10 +22,6 @@ CHIP_ERROR SwitchTranslator::TranslateAndExecute(EndpointId endpointId, const Js
                                                  OOBAccessorRegistry & registry) const
 {
     auto currentPosition = ExtractUInt<uint8_t>(json, "CurrentPosition");
-    if (!currentPosition.has_value())
-    {
-        currentPosition = ExtractUInt<uint8_t>(json, "SwitchState");
-    }
     VerifyOrReturnError(currentPosition.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
     return DispatchAction(registry, "SetCurrentPosition"_span, endpointId, *currentPosition);
 }

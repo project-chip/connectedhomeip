@@ -28,7 +28,7 @@ class SwitchTranslator : public CommandTranslator
 public:
     static Span<const CharSpan> GetActionNames()
     {
-        static constexpr CharSpan kNames[] = { "SetCurrentPosition"_span, "SetSwitchState"_span };
+        static constexpr CharSpan kNames[] = { "SetCurrentPosition"_span };
         return Span<const CharSpan>(kNames);
     }
 
