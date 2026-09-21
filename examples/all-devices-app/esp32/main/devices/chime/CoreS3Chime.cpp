@@ -23,10 +23,10 @@
 #include "driver/i2s_std.h"
 #include "sdkconfig.h"
 
+#include <atomic>
 #include <cmath>
 #include <cstring>
 #include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
 #include <freertos/task.h>
 #include <iterator>
 #include <lib/support/logging/CHIPLogging.h>
@@ -129,10 +129,13 @@ static_assert(std::size(kCoreS3Tones) == std::size(kCoreS3Sounds));
 
 i2s_chan_handle_t sTxChannel          = nullptr;
 i2c_master_dev_handle_t sAmplifierI2c = nullptr;
-SemaphoreHandle_t sPlayMutex          = nullptr;
+
+// Claimed by PlayChimeSound before it starts the playback task and released by that task
+// when it finishes, so at most one playback task exists at a time.
+std::atomic<bool> sPlaybackActive{ false };
 
 // Oscillator lookup table, and the staging buffer handed to the I2S driver. Both are file
-// scope because playback is serialised by sPlayMutex and the playback task stack is small.
+// scope because only the single playback task touches them and its stack is small.
 float sSineTable[kSineTableSize];
 bool sSineTableInitialized = false;
 int16_t sChunkBuffer[kChunkSamples * 2];
@@ -407,15 +410,6 @@ void WaitForAmplifierLock()
 
 bool EnsureSpeakerInitialized()
 {
-    if (sPlayMutex == nullptr)
-    {
-        sPlayMutex = xSemaphoreCreateMutex();
-        if (sPlayMutex == nullptr)
-        {
-            return false;
-        }
-    }
-
     if (sTxChannel != nullptr)
     {
         return true;
@@ -492,11 +486,6 @@ void SynthesizeAndPlay(uint8_t chimeID)
     }
     const ChimeTone & tone = kCoreS3Tones[chimeID];
 
-    if (xSemaphoreTake(sPlayMutex, pdMS_TO_TICKS(2000)) != pdTRUE)
-    {
-        return;
-    }
-
     EnsureSineTable();
 
     const uint32_t totalSamples = static_cast<uint32_t>(tone.durationSec * kSampleRateHz);
@@ -558,14 +547,13 @@ void SynthesizeAndPlay(uint8_t chimeID)
     std::memset(sChunkBuffer, 0, sizeof(sChunkBuffer));
     size_t written = 0;
     i2s_channel_write(sTxChannel, sChunkBuffer, sizeof(sChunkBuffer), &written, 1000);
-
-    xSemaphoreGive(sPlayMutex);
 }
 
 void ChimePlaybackTask(void * arg)
 {
     uint8_t chimeID = static_cast<uint8_t>(reinterpret_cast<uintptr_t>(arg));
     SynthesizeAndPlay(chimeID);
+    sPlaybackActive.store(false, std::memory_order_release);
     vTaskDelete(nullptr);
 }
 
@@ -586,12 +574,22 @@ Protocols::InteractionModel::Status CoreS3Chime::PlayChimeSound(uint8_t chimeID)
         return Protocols::InteractionModel::Status::Failure;
     }
 
+    // The audio path has a single I2S channel and one staging buffer, so a second chime
+    // cannot run alongside the first. Refuse it rather than queueing a task that would sit
+    // idle for the length of the current sound.
+    bool expected = false;
+    if (!sPlaybackActive.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
+    {
+        return Protocols::InteractionModel::Status::Busy;
+    }
+
     // Priority 2 sits above the CHIP event loop (priority 1) so playback is not delayed by
     // Matter processing, but below the display task so it cannot stall the UI.
     if (xTaskCreate(ChimePlaybackTask, "chime_play", 4096, reinterpret_cast<void *>(static_cast<uintptr_t>(chimeID)), 2, nullptr) !=
         pdPASS)
     {
         ChipLogError(DeviceLayer, "CoreS3Chime: Failed to start the playback task");
+        sPlaybackActive.store(false, std::memory_order_release);
         return Protocols::InteractionModel::Status::Failure;
     }
     return Protocols::InteractionModel::Status::Success;
