@@ -370,7 +370,8 @@ tests:
 
     - label:
           "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
-          from DUT, expects mininum level. (MinLevel not implemented, no Lighting)"
+          from DUT, expects mininum level. (MinLevel not implemented, no
+          Lighting)"
       PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.F01
       command: "readAttribute"
       attribute: "CurrentLevel"
