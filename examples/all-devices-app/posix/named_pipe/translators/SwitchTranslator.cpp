@@ -14,17 +14,16 @@
  *    limitations under the License.
  */
 
- #include <posix/named_pipe/translators/SwitchTranslator.h>
+#include <posix/named_pipe/translators/SwitchTranslator.h>
 
- namespace chip::app::NamedPipe {
- 
- CHIP_ERROR SwitchTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
+namespace chip::app::NamedPipe {
+
+CHIP_ERROR SwitchTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
                                                  OOBAccessorRegistry & registry) const
- {
-     auto switchState = ExtractUInt<uint8_t>(json, "SwitchState");
-     VerifyOrReturnError(switchState.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-     return DispatchAction(registry, "SetSwitchState"_span, endpointId, *switchState);
- }
- 
- } // namespace chip::app::NamedPipe
- 
+{
+    auto switchState = ExtractUInt<uint8_t>(json, "SwitchState");
+    VerifyOrReturnError(switchState.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+    return DispatchAction(registry, "SetSwitchState"_span, endpointId, *switchState);
+}
+
+} // namespace chip::app::NamedPipe

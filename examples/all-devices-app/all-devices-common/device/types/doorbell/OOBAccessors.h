@@ -14,13 +14,13 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
- #include <device/types/doorbell/Doorbell.h>
- #include <oob-accessors/OOBAccessorRegistry.h>
- 
- namespace chip::app {
- 
- void RegisterOOBAccessors(Doorbell & device, OOBAccessorRegistry & registry);
- 
- } // namespace chip::app
+#include <device/types/doorbell/Doorbell.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
+
+namespace chip::app {
+
+void RegisterOOBAccessors(Doorbell & device, OOBAccessorRegistry & registry);
+
+} // namespace chip::app

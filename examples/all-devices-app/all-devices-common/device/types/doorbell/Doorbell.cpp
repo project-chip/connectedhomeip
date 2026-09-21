@@ -29,8 +29,7 @@ const ClusterId kClientClusters[] = { Chime::Id };
 } // namespace
 
 Doorbell::Doorbell(const Config & config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1)),
-    mConfig(config)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1)), mConfig(config)
 {
     // The Feature MomentarySwitch is required for a doorbell.
     VerifyOrDie(mConfig.features.Has(Clusters::Switch::Feature::kMomentarySwitch));

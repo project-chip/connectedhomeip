@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- #include <device/types/doorbell/impl/LoggingDoorbell.h>
+#include <device/types/doorbell/impl/LoggingDoorbell.h>
 
- namespace chip::app {
+namespace chip::app {
 
- LoggingDoorbell::LoggingDoorbell(const Config & config) : Doorbell(config) {}
+LoggingDoorbell::LoggingDoorbell(const Config & config) : Doorbell(config) {}
 
- } // namespace chip::app
+} // namespace chip::app

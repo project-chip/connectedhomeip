@@ -14,14 +14,13 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
- #include <device/types/doorbell/Doorbell.h>
- #include <posix/named_pipe/Dispatcher.h>
- 
- namespace chip::app {
- 
- void RegisterNamedPipeTranslators(Doorbell & device, NamedPipe::Dispatcher & dispatcher);
- 
- } // namespace chip::app
- 
+#include <device/types/doorbell/Doorbell.h>
+#include <posix/named_pipe/Dispatcher.h>
+
+namespace chip::app {
+
+void RegisterNamedPipeTranslators(Doorbell & device, NamedPipe::Dispatcher & dispatcher);
+
+} // namespace chip::app

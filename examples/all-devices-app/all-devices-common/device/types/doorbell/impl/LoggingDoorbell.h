@@ -14,16 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- #pragma once
+#pragma once
 
- #include <device/types/doorbell/Doorbell.h>
+#include <device/types/doorbell/Doorbell.h>
 
- namespace chip::app {
+namespace chip::app {
 
- class LoggingDoorbell : public Doorbell {
-    public:
+class LoggingDoorbell : public Doorbell
+{
+public:
     LoggingDoorbell(const Config & config);
     ~LoggingDoorbell() override = default;
- };
+};
 
- } // namespace chip::app
+} // namespace chip::app

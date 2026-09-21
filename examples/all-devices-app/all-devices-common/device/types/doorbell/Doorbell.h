@@ -33,7 +33,6 @@ namespace app {
 class Doorbell : public SingleEndpoint
 {
 public:
-
     struct Config
     {
         TimerDelegate & timerDelegate;
@@ -42,7 +41,7 @@ public:
         Clusters::Binding::Manager & bindingManager;
         Clusters::IdentifyDelegate & identifyDelegate;
         // Switch cluster configuration
-        uint8_t numberOfSwitchPositions = 2;
+        uint8_t numberOfSwitchPositions              = 2;
         BitFlags<Clusters::Switch::Feature> features = Clusters::Switch::Feature::kMomentarySwitch;
     };
 

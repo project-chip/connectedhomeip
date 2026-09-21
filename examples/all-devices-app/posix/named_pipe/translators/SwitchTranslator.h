@@ -14,26 +14,25 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
- #include <string>
- #include <vector>
- 
- #include <posix/named_pipe/CommandTranslator.h>
- 
- namespace chip::app::NamedPipe {
- 
- class SwitchTranslator : public CommandTranslator
- {
- public:
-     static Span<const CharSpan> GetActionNames()
-     {
-         static constexpr CharSpan kNames[] = { "SetSwitchState"_span };
-         return Span<const CharSpan>(kNames);
-     }
- 
-     CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const override;
- };
- 
- } // namespace chip::app::NamedPipe
- 
+#include <string>
+#include <vector>
+
+#include <posix/named_pipe/CommandTranslator.h>
+
+namespace chip::app::NamedPipe {
+
+class SwitchTranslator : public CommandTranslator
+{
+public:
+    static Span<const CharSpan> GetActionNames()
+    {
+        static constexpr CharSpan kNames[] = { "SetSwitchState"_span };
+        return Span<const CharSpan>(kNames);
+    }
+
+    CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const override;
+};
+
+} // namespace chip::app::NamedPipe

@@ -479,13 +479,13 @@ private:
             RegisterCreator("doorbell", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<Doorbell>(Doorbell::Config{
-                    .timerDelegate     = mContext->timerDelegate,
-                    .platformManager   = mContext->platformManager,
-                    .bindingTable      = mContext->bindingTable,
-                    .bindingManager    = mContext->bindingManager,
-                    .identifyDelegate  = mContext->identifyDelegate,
+                    .timerDelegate           = mContext->timerDelegate,
+                    .platformManager         = mContext->platformManager,
+                    .bindingTable            = mContext->bindingTable,
+                    .bindingManager          = mContext->bindingManager,
+                    .identifyDelegate        = mContext->identifyDelegate,
                     .numberOfSwitchPositions = 2,
-                    .features          = Clusters::Switch::Feature::kMomentarySwitch,
+                    .features                = Clusters::Switch::Feature::kMomentarySwitch,
                 });
             });
         }

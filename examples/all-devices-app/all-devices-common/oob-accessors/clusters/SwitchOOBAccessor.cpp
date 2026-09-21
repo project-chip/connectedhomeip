@@ -14,66 +14,65 @@
  *    limitations under the License.
  */
 
- #include <oob-accessors/clusters/SwitchOOBAccessor.h>
+#include <oob-accessors/clusters/SwitchOOBAccessor.h>
 
- #include <lib/core/TLV.h>
- #include <lib/support/CodeUtils.h>
- 
- namespace chip::app {
- 
- std::optional<CHIP_ERROR> SwitchOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
- {
-     if (!action.data_equal("SetCurrentPosition"_span))
-     {
-         return std::nullopt;
-     }
- 
-     TLV::TLVReader reader;
-     reader.Init(tlvData);
-     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
- 
-     TLV::TLVType outerType;
-     ReturnErrorOnFailure(reader.EnterContainer(outerType));
- 
-     EndpointId endpointId = kInvalidEndpointId;
-     uint8_t currentPosition            = 0;
-     bool hasEndpointId    = false;
-     bool hasCurrentPosition         = false;
- 
-     CHIP_ERROR err = CHIP_NO_ERROR;
-     while ((err = reader.Next()) == CHIP_NO_ERROR)
-     {
-         TLV::Tag tag = reader.GetTag();
-         if (!TLV::IsContextTag(tag))
-         {
-             continue;
-         }
-         switch (TLV::TagNumFromTag(tag))
-         {
-         case 1:
-             ReturnErrorOnFailure(reader.Get(endpointId));
-             hasEndpointId = true;
-             break;
-         case 2:
-             ReturnErrorOnFailure(reader.Get(currentPosition));
-             hasCurrentPosition = true;
-             break;
-         default:
-             break;
-         }
-     }
-     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-     ReturnErrorOnFailure(reader.ExitContainer(outerType));
- 
-     VerifyOrReturnError(hasEndpointId && hasCurrentPosition, CHIP_ERROR_INVALID_ARGUMENT);
- 
-     if (endpointId != mEndpointId)
-     {
-         return std::nullopt;
-     }
- 
-     return mCluster.SetCurrentPosition(currentPosition);
- }
- 
- } // namespace chip::app
- 
+#include <lib/core/TLV.h>
+#include <lib/support/CodeUtils.h>
+
+namespace chip::app {
+
+std::optional<CHIP_ERROR> SwitchOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
+{
+    if (!action.data_equal("SetCurrentPosition"_span))
+    {
+        return std::nullopt;
+    }
+
+    TLV::TLVReader reader;
+    reader.Init(tlvData);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    EndpointId endpointId   = kInvalidEndpointId;
+    uint8_t currentPosition = 0;
+    bool hasEndpointId      = false;
+    bool hasCurrentPosition = false;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = reader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(tag))
+        {
+        case 1:
+            ReturnErrorOnFailure(reader.Get(endpointId));
+            hasEndpointId = true;
+            break;
+        case 2:
+            ReturnErrorOnFailure(reader.Get(currentPosition));
+            hasCurrentPosition = true;
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+    VerifyOrReturnError(hasEndpointId && hasCurrentPosition, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (endpointId != mEndpointId)
+    {
+        return std::nullopt;
+    }
+
+    return mCluster.SetCurrentPosition(currentPosition);
+}
+
+} // namespace chip::app

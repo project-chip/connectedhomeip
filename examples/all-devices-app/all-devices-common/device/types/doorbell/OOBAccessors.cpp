@@ -14,16 +14,15 @@
  *    limitations under the License.
  */
 
- #include "OOBAccessors.h"
- #include <lib/support/CodeUtils.h>
- #include <oob-accessors/clusters/SwitchOOBAccessor.h>
- 
- namespace chip::app {
- 
- void RegisterOOBAccessors(Doorbell & device, OOBAccessorRegistry & registry)
- {
-     LogErrorOnFailure(registry.Register(std::make_unique<SwitchOOBAccessor>(device.SwitchCluster(), device.GetEndpointId())));
- }
- 
- } // namespace chip::app
- 
+#include "OOBAccessors.h"
+#include <lib/support/CodeUtils.h>
+#include <oob-accessors/clusters/SwitchOOBAccessor.h>
+
+namespace chip::app {
+
+void RegisterOOBAccessors(Doorbell & device, OOBAccessorRegistry & registry)
+{
+    LogErrorOnFailure(registry.Register(std::make_unique<SwitchOOBAccessor>(device.SwitchCluster(), device.GetEndpointId())));
+}
+
+} // namespace chip::app

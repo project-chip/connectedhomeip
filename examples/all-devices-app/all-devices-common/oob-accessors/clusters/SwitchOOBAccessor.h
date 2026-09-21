@@ -14,25 +14,24 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
- #include <app/clusters/switch-server/SwitchCluster.h>
- #include <lib/core/DataModelTypes.h>
- #include <oob-accessors/OOBAccessor.h>
- 
- namespace chip::app {
- 
- class SwitchOOBAccessor : public OOBAccessor
- {
- public:
-     SwitchOOBAccessor(Clusters::SwitchCluster & cluster, EndpointId endpointId) : mCluster(cluster), mEndpointId(endpointId) {}
- 
-     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
- 
- private:
-     Clusters::SwitchCluster & mCluster;
-     EndpointId mEndpointId;
- };
- 
- } // namespace chip::app
- 
+#include <app/clusters/switch-server/SwitchCluster.h>
+#include <lib/core/DataModelTypes.h>
+#include <oob-accessors/OOBAccessor.h>
+
+namespace chip::app {
+
+class SwitchOOBAccessor : public OOBAccessor
+{
+public:
+    SwitchOOBAccessor(Clusters::SwitchCluster & cluster, EndpointId endpointId) : mCluster(cluster), mEndpointId(endpointId) {}
+
+    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
+
+private:
+    Clusters::SwitchCluster & mCluster;
+    EndpointId mEndpointId;
+};
+
+} // namespace chip::app
