@@ -14,8 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- #include <clusters/WaterHeaterMode/Enums.h>
- #include <device/types/water-heater/impl/SimulatedWaterHeater.h>
+#include <clusters/WaterHeaterMode/Enums.h>
+#include <device/types/water-heater/impl/SimulatedWaterHeater.h>
+#include <lib/support/CodeUtils.h>
 
  using chip::Protocols::InteractionModel::Status;
  using namespace chip::app::Clusters;
@@ -79,7 +80,7 @@ namespace {
     bool changed = false;
     GetDelegate<ThermostatSetpointsDelegate>().SetOccupiedHeatingSetpoint(kFinalTemperature * 100, changed);
 
-    SuccessOrDie(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
+    ReturnErrorOnFailure(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
     return CHIP_NO_ERROR;
  }
 
@@ -89,9 +90,8 @@ namespace {
     WaterHeater::Unregister(provider);
  }
 
- void SimulatedWaterHeater::TimerFired()
+void SimulatedWaterHeater::TimerFired()
 {
-    SuccessOrDie(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
     // Handle boost
     if (mBoostState == BoostStateEnum::kActive)
     {
@@ -131,6 +131,8 @@ namespace {
             mHeatingEnabled = true;
         }
     }
+
+    LogErrorOnFailure(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
 }
 
 Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
