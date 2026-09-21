@@ -141,8 +141,8 @@ uint8_t EntryDepth(const std::vector<chip::app::DeviceScreenEntry> & entries, co
 
 void ShowNoEntriesPlaceholder(lv_obj_t * parent)
 {
-    const std::string & activeDev = GetActiveDeviceType();
-    bool isAllBridged             = (activeDev == "*" || activeDev == "aggregator");
+    const std::string activeDev = GetActiveDeviceType();
+    bool isAllBridged           = (activeDev == "*" || activeDev == "aggregator");
 
     lv_obj_t * card = lv_obj_create(parent);
     lv_obj_set_width(card, LV_PCT(100));

@@ -50,6 +50,7 @@
 
 #include <cctype>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -95,8 +96,19 @@ static const char TAG[] = "all-devices-app";
 
 // NVS key for storing the device type across reboots
 static const ESP32Config::Key kConfigKey_DeviceType{ ESP32Config::kConfigNamespace_ChipConfig, "dev-type" };
+// The device type this boot runs as. Written on the CHIP thread (the stored type, then any
+// fallback InitServer settles on) and read by the display task, so every write goes through
+// SetActiveDeviceType and every cross-thread read through GetActiveDeviceType.
+// gDeviceTypeMutex guards gDeviceType alone and is a leaf lock: nothing is acquired under it.
+static std::mutex gDeviceTypeMutex;
 static std::string gDeviceType;
 static const size_t kMaxDeviceTypeLength = 64;
+
+static void SetActiveDeviceType(std::string deviceType)
+{
+    std::lock_guard<std::mutex> guard(gDeviceTypeMutex);
+    gDeviceType = std::move(deviceType);
+}
 
 #include "DeviceFactoryPlatformOverride.h"
 
@@ -428,7 +440,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             {
                 defaultDevName = deviceFactory.GetDefaultDevice();
             }
-            gDeviceType        = defaultDevName;
+            SetActiveDeviceType(defaultDevName);
             auto defaultDevice = deviceFactory.Create(defaultDevName);
             if (defaultDevice.device == nullptr)
             {
@@ -455,19 +467,20 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     {
         if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
         {
-            gDeviceType.clear();
+            std::string fallback;
             for (const auto & dev : deviceFactory.SupportedDeviceTypes())
             {
                 if (dev != "aggregator" && dev != "bridged-node")
                 {
-                    gDeviceType = dev;
+                    fallback = dev;
                     break;
                 }
             }
-            if (gDeviceType.empty())
+            if (fallback.empty())
             {
-                gDeviceType = deviceFactory.GetDefaultDevice();
+                fallback = deviceFactory.GetDefaultDevice();
             }
+            SetActiveDeviceType(std::move(fallback));
         }
         auto device = deviceFactory.Create(gDeviceType);
         if (device.device == nullptr)
@@ -586,15 +599,15 @@ void InitServer(intptr_t context)
 
 void InitServerWithDeviceType(std::string deviceType)
 {
-    // Set the device type (store the actual string, not a pointer to temporary)
-    gDeviceType = std::move(deviceType);
+    SetActiveDeviceType(std::move(deviceType));
 
     // Init the server
     SuccessOrDie(PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr)));
 }
 
-const std::string & GetActiveDeviceType()
+std::string GetActiveDeviceType()
 {
+    std::lock_guard<std::mutex> guard(gDeviceTypeMutex);
     return gDeviceType;
 }
 

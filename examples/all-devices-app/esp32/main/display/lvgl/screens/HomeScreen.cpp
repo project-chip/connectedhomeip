@@ -73,8 +73,8 @@ void ShowHome(lv_obj_t * parent)
     lv_obj_set_style_pad_row(parent, 8, LV_PART_MAIN);
     lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    const std::string & activeDev = GetActiveDeviceType();
-    bool isAllBridged             = (activeDev == "*" || activeDev == "aggregator");
+    const std::string activeDev = GetActiveDeviceType();
+    bool isAllBridged           = (activeDev == "*" || activeDev == "aggregator");
 
     CreateHomeButton(parent, "Devices >", "View & Control Endpoints", OnDevicesClicked);
 
