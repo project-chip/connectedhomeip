@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "DimmableLightScreen.h"
+#include "DimmableLoadScreen.h"
 #include "DeviceHeader.h"
 #include "clusters/LevelControlClusterWidget.h"
 #include "clusters/OnOffClusterWidget.h"

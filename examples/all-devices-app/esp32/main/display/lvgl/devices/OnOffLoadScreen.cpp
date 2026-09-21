@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "OnOffLightScreen.h"
+#include "OnOffLoadScreen.h"
 #include "DeviceHeader.h"
 #include "clusters/OnOffClusterWidget.h"
 

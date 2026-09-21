@@ -22,10 +22,10 @@
 #include "devices/BridgedNodeScreen.h"
 #include "devices/ChimeScreen.h"
 #include "devices/ColorLightScreen.h"
-#include "devices/DimmableLightScreen.h"
+#include "devices/DimmableLoadScreen.h"
 #include "devices/FanLoadScreen.h"
 #include "devices/OccupancySensorScreen.h"
-#include "devices/OnOffLightScreen.h"
+#include "devices/OnOffLoadScreen.h"
 #include "devices/TemperatureSensorScreen.h"
 
 #include <cstdio>

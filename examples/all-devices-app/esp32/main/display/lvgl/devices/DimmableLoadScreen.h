@@ -18,21 +18,15 @@
 
 #pragma once
 
-#include <device/capabilities/on-off-load/OnOffLoad.h>
-#include <device/types/on-off-light/OnOffLight.h>
+#include <device/capabilities/dimmable-load/DimmableLoad.h>
 #include <lvgl.h>
 
 namespace chip::app {
 
 /**
- * Renders the device control screen for any OnOffLoad-based device (light, plug-in unit, mounted control).
+ * Renders the device control screen for any DimmableLoad-based device (light, plug-in unit, mounted control).
  * Must be called while holding the LVGL lock.
  */
-void ShowOnOffLoadScreen(lv_obj_t * parent, const char * title, OnOffLoad & device);
-
-inline void ShowOnOffLightScreen(lv_obj_t * parent, OnOffLight & device)
-{
-    ShowOnOffLoadScreen(parent, "On/Off Light", device);
-}
+void ShowDimmableLoadScreen(lv_obj_t * parent, const char * title, DimmableLoad & device);
 
 } // namespace chip::app

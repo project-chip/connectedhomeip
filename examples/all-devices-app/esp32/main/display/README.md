@@ -77,8 +77,8 @@ display/
     │   └── BridgedDeviceBasicInformationClusterWidget # Node label and reachability
     ├── devices/                    # Matter device type screens (composed from cluster widgets)
     │   ├── DeviceHeader.h/.cpp           # Standard device metadata header card
-    │   ├── OnOffLightScreen             # Any OnOffLoad device (light, plug-in unit, mounted control)
-    │   ├── DimmableLightScreen          # Any DimmableLoad device
+    │   ├── OnOffLoadScreen              # Any OnOffLoad device (light, plug-in unit, mounted control)
+    │   ├── DimmableLoadScreen           # Any DimmableLoad device
     │   ├── ColorLightScreen             # Color temperature and extended color lights
     │   ├── FanLoadScreen                # Fan, air purifier, extractor hood
     │   ├── BooleanStateSensorScreen     # Contact, water leak, freeze and rain sensors
