@@ -87,28 +87,27 @@ LoggingClosure::HandleMoveToCommand(const Optional<Clusters::ClosureControl::Tar
     bool isSecure                                                = true;
     if (featureMap.Has(Clusters::ClosureControl::Feature::kPositioning))
 =======
-        // A closure is secure only when every supported securing mechanism is engaged.
-        const BitFlags<Clusters::ClosureControl::Feature> featureMap = ClosureControlCluster().GetFeatureMap();
-        bool isSecure                                                = true;
-        if (featureMap.Has(Clusters::ClosureControl::Feature::kPositioning))
-        {
-            isSecure &= newPosition.HasValue() && !newPosition.Value().IsNull() &&
-                newPosition.Value().Value() == Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed;
-        }
-        if (featureMap.Has(Clusters::ClosureControl::Feature::kMotionLatching))
-        {
-            isSecure &= newLatch.HasValue() && !newLatch.Value().IsNull() && newLatch.Value().Value();
-        }
-
-        mPendingCurrentState = Clusters::ClosureControl::GenericOverallCurrentState(
-            newPosition, newLatch, speed.HasValue() ? MakeOptional(speed.Value()) : fallback.speed,
-            DataModel::MakeNullable(isSecure));
-
-        mTimerDelegate.StartTimer(this,System::Clock::Seconds32(kTimeoutnDurationSec));
-        return Protocols::InteractionModel::Status::Success;
+    // A closure is secure only when every supported securing mechanism is engaged.
+    const BitFlags<Clusters::ClosureControl::Feature> featureMap = ClosureControlCluster().GetFeatureMap();
+    bool isSecure                                                = true;
+    if (featureMap.Has(Clusters::ClosureControl::Feature::kPositioning))
+    {
+        isSecure &= newPosition.HasValue() && !newPosition.Value().IsNull() &&
+            newPosition.Value().Value() == Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed;
+    }
+    if (featureMap.Has(Clusters::ClosureControl::Feature::kMotionLatching))
+    {
+        isSecure &= newLatch.HasValue() && !newLatch.Value().IsNull() && newLatch.Value().Value();
     }
 
-    Protocols::InteractionModel::Status LoggingClosure::HandleCalibrateCommand()
+    mPendingCurrentState = Clusters::ClosureControl::GenericOverallCurrentState(
+        newPosition, newLatch, speed.HasValue() ? MakeOptional(speed.Value()) : fallback.speed, DataModel::MakeNullable(isSecure));
+
+    mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kTimeoutnDurationSec));
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status LoggingClosure::HandleCalibrateCommand()
 >>>>>>> 8fd95842fc2 (Restyled by whitespace)
     {
         isSecure &= newPosition.HasValue() && !newPosition.Value().IsNull() &&
@@ -175,7 +174,7 @@ void LoggingClosure::TimerFired()
         mPendingCurrentState.reset();
 <<<<<<< HEAD
 =======
-        mTimerDelegate.StartTimer(this,System::Clock::Seconds32(kTimeoutnDurationSec));
+        mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kTimeoutnDurationSec));
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -201,9 +200,9 @@ void LoggingClosure::TimerFired()
     }
     bool LoggingClosure::RegistersAccessDevicePanel() const
     {
-        for(const auto & panel : mPanelList)
+        for (const auto & panel : mPanelList)
         {
-            if(panel.config.withAccess)
+            if (panel.config.withAccess)
             {
                 return true;
             }
@@ -230,8 +229,7 @@ void LoggingClosure::TimerFired()
         case kTriggerError:
             ChipLogProgress(DeviceLayer, "LoggingClosure::HandleEventTrigger() -> Error");
             ReturnErrorOnFailure(ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kError));
-            return ClosureControlCluster().AddErrorToCurrentErrorList(
-        Clusters::ClosureControl::ClosureErrorEnum::kBlockedBySensor);
+            return ClosureControlCluster().AddErrorToCurrentErrorList(Clusters::ClosureControl::ClosureErrorEnum::kBlockedBySensor);
         case kTriggerProtected:
             ChipLogProgress(DeviceLayer, "LoggingClosure::HandleEventTrigger() -> Protected");
             return Closure::ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kProtected);
@@ -247,7 +245,7 @@ void LoggingClosure::TimerFired()
             ChipLogProgress(DeviceLayer, "LoggingClosure::HandleEventTrigger() -> SetupRequired");
             return ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kSetupRequired);
         default:
-            return CHIP_ERROR_INVALID_ARGUMENT;   // not ours — lets any other registered handler try instead
+            return CHIP_ERROR_INVALID_ARGUMENT; // not ours — lets any other registered handler try instead
 >>>>>>> 8fd95842fc2 (Restyled by whitespace)
     }
     LogErrorOnFailure(ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kStopped));
@@ -274,24 +272,26 @@ CHIP_ERROR LoggingClosure::HandleEventTrigger(uint64_t eventTrigger)
         ReturnErrorOnFailure(ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kStopped));
         ClosureControlCluster().ClearCurrentErrorList();
 =======
-        mTimerDelegate.CancelTimer(this);
-    }
-    CHIP_ERROR LoggingClosure::RegisterParts(EndpointIdAllocator &allocator, CodeDrivenDataModelProvider &provider,EndpointComposition composition)
-    {
-
-        for (const auto& panel : mPanelList)
-        {
-            auto ClosurePanel = std::make_unique<LoggingClosurePanel>(panel.config);
-            // the tag list will be provided in the devicefactory.h
-            composition.tagList = panel.tags;
-            ReturnErrorOnFailure(ClosurePanel->Register(allocator, provider, composition));
-            mLoggingClosurePanel.push_back(std::move(ClosurePanel));
+            mTimerDelegate.CancelTimer(this);
         }
+        CHIP_ERROR LoggingClosure::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                                 EndpointComposition composition)
+        {
 
-        mLoggingOnOffLights = std::make_unique<LoggingOnOffLight>(OnOffContext);
-        ReturnErrorOnFailure(mLoggingOnOffLights->Register(allocator.Allocate(), provider, EndpointComposition::WithParent(GetEndpointId())));
+            for (const auto & panel : mPanelList)
+            {
+                auto ClosurePanel = std::make_unique<LoggingClosurePanel>(panel.config);
+                // the tag list will be provided in the devicefactory.h
+                composition.tagList = panel.tags;
+                ReturnErrorOnFailure(ClosurePanel->Register(allocator, provider, composition));
+                mLoggingClosurePanel.push_back(std::move(ClosurePanel));
+            }
 
-        ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(this));
+            mLoggingOnOffLights = std::make_unique<LoggingOnOffLight>(OnOffContext);
+            ReturnErrorOnFailure(
+                mLoggingOnOffLights->Register(allocator.Allocate(), provider, EndpointComposition::WithParent(GetEndpointId())));
+
+            ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(this));
 >>>>>>> 8fd95842fc2 (Restyled by whitespace)
         return CHIP_NO_ERROR;
     case kTriggerSetupRequired:
@@ -346,20 +346,19 @@ void LoggingClosure::UnregisterParts(CodeDrivenDataModelProvider & provider)
 } // namespace chip
 =======
 
-    void LoggingClosure::UnregisterParts(CodeDrivenDataModelProvider &provider)
-    {
-        mTestEventTriggerDelegate.RemoveHandler(this);
+        void LoggingClosure::UnregisterParts(CodeDrivenDataModelProvider & provider)
+        {
+            mTestEventTriggerDelegate.RemoveHandler(this);
 
-        for (size_t i = 0; i < mLoggingClosurePanel.size(); i++)
-        {
-            mLoggingClosurePanel[i]->Unregister(provider);
-        }
-        if (mLoggingOnOffLights)
-        {
-            mLoggingOnOffLights->Unregister(provider);
+            for (size_t i = 0; i < mLoggingClosurePanel.size(); i++)
+            {
+                mLoggingClosurePanel[i]->Unregister(provider);
+            }
+            if (mLoggingOnOffLights)
+            {
+                mLoggingOnOffLights->Unregister(provider);
+            }
         }
     }
-
-}
 }
 >>>>>>> 8fd95842fc2 (Restyled by whitespace)
