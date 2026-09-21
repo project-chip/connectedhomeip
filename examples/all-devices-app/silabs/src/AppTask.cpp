@@ -225,8 +225,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #else // SILABS_OTA_ENABLED
 #if CHIP_ENABLE_OPENTHREAD
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature>;
-    sRootNode          = std::make_unique<RootNodeType>(rootNodeContext,
-                                                        chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver });
+    sRootNode = std::make_unique<RootNodeType>(rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver });
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
     using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature>;
     sRootNode          = std::make_unique<RootNodeType>(

@@ -87,8 +87,8 @@ public:
 private:
     /// Composite device-type list: the root-node entry followed by each
     /// feature's extra device types, in declaration order.
-    static constexpr auto kDeviceTypesStorage =
-        aggregate::ConcatArrays(std::array<DataModel::DeviceTypeEntry, 1>{ Device::Type::kRootNode }, Features::kExtraDeviceTypes...);
+    static constexpr auto kDeviceTypesStorage = aggregate::ConcatArrays(
+        std::array<DataModel::DeviceTypeEntry, 1>{ Device::Type::kRootNode }, Features::kExtraDeviceTypes...);
 
     /// Composite client-cluster list contributed by features.
     static constexpr auto kClientClustersStorage =
