@@ -103,6 +103,8 @@ not_automated:
       reason:
           Requires a DUT supporting the Wi-Fi PDC feature, which CI does not
           provide
+    - name: TC_CNET_4_29.py
+      reason: Can not run WiFi connection CNET tests in CI
     - name: TC_DGGEN_3_2.py
       reason:
           src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test
@@ -274,20 +276,6 @@ not_automated:
       reason: Shared code for TC_MESS, not a standalone test.
     - name: TC_MEDIAFILEMANAGEMENTTestBase.py
       reason: Shared code for TC_MEDIAFILEMANAGEMENT, not a standalone test.
-    - name: TC_AUDIOCONTROL_2_1.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_2.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_3.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_4.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_5.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_6.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_7.py
-      reason: Pending tv-app in CI
     - name: TC_AUDIOCONTROL_2_8.py
       reason: Pending tv-app in CI
     - name: TC_MEDIAPLAYBACK_6_11.py
