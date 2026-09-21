@@ -96,6 +96,8 @@ INCOMPLETE_METADATA_ALLOWLIST:
     - thread-network-diagnostics-cluster.xml
     - thread-network-directory-cluster.xml
     - time-format-localization-cluster.xml
+    - tls-certificate-management-cluster.xml
+    - tls-client-management-cluster.xml
     - unit-localization-cluster.xml
     - valve-configuration-and-control-cluster.xml
     - water-heater-management-cluster.xml

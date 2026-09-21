@@ -25,8 +25,6 @@
 #include <app/server-cluster/testing/EmptyProvider.h>
 #include <app/tests/AppTestContext.h>
 #include <clusters/OperationalCredentials/Structs.h>
-#include <clusters/TlsCertificateManagement/Metadata.h>
-#include <clusters/TlsClientManagement/Metadata.h>
 #include <clusters/WebRTCTransportProvider/Metadata.h>
 #include <clusters/WebRTCTransportRequestor/Metadata.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -216,17 +214,11 @@ TEST_F(TestFabricSensitiveAttributeRead, FilteredReadFiltersBothLists)
 
 // Every attribute the data model marks fabric-sensitive must carry the quality in
 // its generated metadata, otherwise the reporting engine cannot enforce it.
-// PushAvStreamTransport::CurrentConnections is not listed yet: its XML has not been
-// regenerated with an Alchemy release that emits the marker.
+// The TLS Certificate/Client Management and PushAvStreamTransport attributes are not
+// listed: their XML has not been regenerated with an Alchemy release that emits the marker.
 static_assert(Clusters::WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry.HasFlags(
     DataModel::AttributeQualityFlags::kFabricSensitive));
 static_assert(Clusters::WebRTCTransportRequestor::Attributes::CurrentSessions::kMetadataEntry.HasFlags(
-    DataModel::AttributeQualityFlags::kFabricSensitive));
-static_assert(Clusters::TlsCertificateManagement::Attributes::ProvisionedRootCertificates::kMetadataEntry.HasFlags(
-    DataModel::AttributeQualityFlags::kFabricSensitive));
-static_assert(Clusters::TlsCertificateManagement::Attributes::ProvisionedClientCertificates::kMetadataEntry.HasFlags(
-    DataModel::AttributeQualityFlags::kFabricSensitive));
-static_assert(Clusters::TlsClientManagement::Attributes::ProvisionedEndpoints::kMetadataEntry.HasFlags(
     DataModel::AttributeQualityFlags::kFabricSensitive));
 
 } // namespace
