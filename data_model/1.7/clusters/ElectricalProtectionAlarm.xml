@@ -1,0 +1,513 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x00A3" name="Electrical Protection Alarm Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x00A3" name="Electrical Protection Alarm">
+      <provisionalConform/>
+    </clusterId>
+  </clusterIds>
+  <classification hierarchy="derived" baseCluster="Alarm Base" role="utility" picsCode="EPALM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="RESET" name="Reset" summary="Supports the ability to reset alarms">
+      <disallowConform/>
+    </feature>
+    <feature bit="20" code="SHORT" name="ShortCircuit" summary="Supports activating alarms when current exceeds a safe threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="21" code="OL" name="OverLoad" summary="Supports activating alarms when current exceeds a safe threshold for a period of time">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="22" code="OV" name="OverVoltage" summary="Supports activating alarms when voltage exceeds a safe threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="23" code="SP" name="SurgeProtection" summary="Supports activating alarms when voltage exceeds a safe threshold">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="24" code="RC" name="ResidualCurrent" summary="Supports activating alarms when a residual current is detected">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="25" code="ARC" name="ArcFault" summary="Supports activating alarms when an arc fault is detected">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="26" code="SELFTEST" name="SelfTest" summary="Supports activating alarms when a self test is performed">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="CurrentTripCurveEnum">
+      <item value="0" name="TypeZ" summary="Trips when operating current is 2 to 3 times rated current">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="TypeB" summary="Trips when operating current is 3 to 5 times rated current">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="TypeC" summary="Trips when operating current is 5 to 10 times rated current">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="TypeK" summary="Trips when operating current is 10 to 12 times rated current">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="TypeD" summary="Trips when operating current is 10 to 20 times rated current">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="CurrentWaveformEnum">
+      <item value="0" name="AC" summary="Alternating current only">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="A" summary="Alternating current and pulsating residual direct currents">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="F" summary="Alternating current and pulsating residual direct currents with mixed frequencies (e.g. Smart Inverters)">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="B" summary="Alternating current, smooth residual direct currents, and pulsating residual direct currents with mixed frequencies">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="GroundFaultClassEnum">
+      <item value="0" name="ClassA" summary="Trips when the residual current is 6mA or more">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="ClassB" summary="Trips when the residual current is 20mA or more">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="ClassC" summary="Trips when the residual current is 20mA or more, on circuits with no conductor having a voltage to ground greater than 300V">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="ClassD" summary="Trips when the residual current is 20mA or more, on circuits with one or more conductors having a voltage to ground greater than 300V and a touch voltage that does not exceed 150V">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="ClassE" summary="Trips when the residual current is 20mA or more, on circuits with one or more conductors having a voltage to ground greater than 300V and a touch voltage that may exceed 150V">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="UtilizationCategoryEnum">
+      <item value="0" name="CategoryA" summary="No short time-delay">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="CategoryB" summary="Intentional short time-delay">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="AlarmBitmap">
+      <bitfield name="ShortCircuitFault" bit="0" summary="A short circuit fault is detected">
+        <mandatoryConform>
+          <feature name="SHORT"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="OverLoadFault" bit="1" summary="An over load fault is detected">
+        <mandatoryConform>
+          <feature name="OL"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="OverVoltageFault" bit="2" summary="An over voltage fault is detected">
+        <mandatoryConform>
+          <feature name="OV"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="VoltageSurgeFault" bit="3" summary="A voltage surge fault is detected">
+        <mandatoryConform>
+          <feature name="SP"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="ResidualCurrentFault" bit="4" summary="A residual current is detected">
+        <mandatoryConform>
+          <feature name="RC"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="ArcFault" bit="5" summary="The Arc fault is detected">
+        <mandatoryConform>
+          <feature name="ARC"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="SelfTest" bit="6" summary="A self test has been performed">
+        <mandatoryConform>
+          <feature name="SELFTEST"/>
+        </mandatoryConform>
+      </bitfield>
+    </bitmap>
+    <bitmap name="ArcCauseBitmap">
+      <bitfield name="Series" bit="0" summary="An arc fault along a single conductor">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ParallelToNeutral" bit="1" summary="An arc fault between line and neutral">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ParallelToGround" bit="2" summary="An arc fault between line and ground">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="CurrentTripMechanismBitmap">
+      <bitfield name="Thermal" bit="0" summary="Over current is detected through thermal means">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Magnetic" bit="1" summary="Over current is detected via a magnetic field">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Electronic" bit="2" summary="Over current is detected electronically">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="SurgeProtectionClassBitmap">
+      <bitfield name="ClassI" bit="0" summary="Protection tested with a 10/350µs impulse waveform">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ClassII" bit="1" summary="Protection tested with a 8/20µs surge waveform">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ClassIII" bit="2" summary="Protection tested with a combination waveform (1.2/50µs voltage / 8/20µs current)">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="SurgeProtectionTypeBitmap">
+      <bitfield name="Type1" bit="0" summary="Protection installed before the main breaker">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Type2" bit="1" summary="Protection installed on the load side of the main breaker">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Type3" bit="2" summary="Protection installed at the point of use">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="TrippingCharacteristicsBitmap">
+      <bitfield name="ShortDelay" bit="0" summary="G Protection has a short delay before tripping">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Selective" bit="1" summary="S Protection has a longer delay before tripping">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="SuperImmune" bit="2" summary="SI Protection has active filtering to avoid nuisance tripping">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="VoltageTripMechanismBitmap">
+      <bitfield name="MOV" bit="0" summary="Metal oxide varistor">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="SAD" bit="1" summary="Silicon Avalanche Diode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="GDT" bit="2" summary="Gas discharge tube">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="ArcFaultRatingsStruct">
+      <field id="0" name="SeriesArcCurrentSensitivity" type="amperage-mA">
+        <optionalConform choice="a" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="ParallelArcCurrentSensitivity" type="amperage-mA">
+        <optionalConform choice="a" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="SupportedArcCauses" type="ArcCauseBitmap">
+        <optionalConform choice="a" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="OverLoadRatingsStruct">
+      <field id="0" name="TripCurrent" type="amperage-mA">
+        <optionalConform choice="c" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="TripCurve" type="CurrentTripCurveEnum">
+        <optionalConform choice="c" more="true" min="1"/>
+      </field>
+      <field id="2" name="TripMechanism" type="CurrentTripMechanismBitmap">
+        <optionalConform choice="c" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="UltimateMaxCurrent" type="amperage-mA">
+        <optionalConform choice="c" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="ServiceMaxCurrent" type="amperage-mA">
+        <optionalConform choice="c" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="OverVoltageRatingsStruct">
+      <field id="0" name="TripMechanism" type="VoltageTripMechanismBitmap">
+        <optionalConform choice="d" more="true" min="1">
+          <feature name="SP"/>
+        </optionalConform>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="TripVoltage" type="voltage-mV">
+        <optionalConform choice="d" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="MaxContinuousOperatingVoltage" type="voltage-mV">
+        <optionalConform choice="d" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="ResponseTime" type="uint64">
+        <optionalConform choice="d" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ResidualCurrentFaultRatingsStruct">
+      <field id="0" name="CurrentSensitivity" type="amperage-mA">
+        <optionalConform choice="b" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="TripMechanism" type="CurrentTripMechanismBitmap">
+        <optionalConform choice="b" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="2" name="VoltageDependent" type="bool">
+        <optionalConform choice="b" more="true" min="1"/>
+      </field>
+      <field id="3" name="GroundFaultClass" type="GroundFaultClassEnum">
+        <optionalConform choice="b" more="true" min="1"/>
+      </field>
+      <field id="4" name="Waveform" type="CurrentWaveformEnum">
+        <optionalConform choice="b" more="true" min="1"/>
+      </field>
+      <field id="5" name="TrippingCharacteristic" type="TrippingCharacteristicsBitmap">
+        <mandatoryConform>
+          <field name="Waveform"/>
+        </mandatoryConform>
+      </field>
+      <field id="6" name="UltimateMaxCurrent" type="amperage-mA">
+        <optionalConform choice="b" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="7" name="ServiceMaxCurrent" type="amperage-mA">
+        <optionalConform choice="b" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ShortCircuitRatingsStruct">
+      <field id="0" name="TripCurrent" type="amperage-mA">
+        <optionalConform choice="e" more="true" min="1"/>
+      </field>
+      <field id="1" name="TripMechanism" type="CurrentTripMechanismBitmap">
+        <optionalConform choice="e" more="true" min="1"/>
+      </field>
+      <field id="2" name="TripCurve" type="CurrentTripCurveEnum">
+        <optionalConform choice="e" more="true" min="1"/>
+      </field>
+      <field id="3" name="UltimateMaxCurrent" type="amperage-mA">
+        <optionalConform choice="e" more="true" min="1"/>
+      </field>
+      <field id="4" name="ServiceMaxCurrent" type="amperage-mA">
+        <optionalConform choice="e" more="true" min="1"/>
+      </field>
+      <field id="5" name="MaxCurrent" type="amperage-mA">
+        <optionalConform choice="e" more="true" min="1"/>
+      </field>
+    </struct>
+    <struct name="SurgeProtectionRatingsStruct">
+      <field id="0" name="TripMechanism" type="VoltageTripMechanismBitmap">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="ProtectionClass" type="SurgeProtectionClassBitmap">
+        <optionalConform choice="f" more="true" min="1"/>
+      </field>
+      <field id="2" name="ProtectionType" type="SurgeProtectionTypeBitmap">
+        <optionalConform choice="f" more="true" min="1"/>
+      </field>
+      <field id="3" name="MaxContinuousOperatingVoltage" type="voltage-mV">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="4" name="MaxVoltageProtection" type="voltage-mV">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="5" name="MaxTemporaryVoltage" type="voltage-mV">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="6" name="NominalDischargeCurrent" type="amperage-mA">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="7" name="MaximumDischargeCurrent" type="amperage-mA">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="8" name="RatedShortCircuitCurrent" type="amperage-mA">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="9" name="RatedShortTimeWithstandCurrent" type="amperage-mA">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="10" name="EnergyAbsorptionCapability" type="uint64">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="11" name="ResponseTime" type="uint64">
+        <optionalConform choice="f" more="true" min="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0080" name="ArcCause" type="ArcCauseBitmap">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="ARC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0081" name="OverLoadRating" type="OverLoadRatingsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="OL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0082" name="OverVoltageRating" type="OverVoltageRatingsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="OV"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0083" name="SurgeProtectionRating" type="SurgeProtectionRatingsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="SP"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0084" name="ShortCircuitRating" type="ShortCircuitRatingsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="SHORT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0085" name="ResidualCurrentRating" type="ResidualCurrentFaultRatingsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="RC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0086" name="ArcFaultRating" type="ArcFaultRatingsStruct">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="ARC"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+</cluster>

@@ -3258,6 +3258,8 @@ NS_ASSUME_NONNULL_BEGIN
         _paiSupportedProfiles = @(0);
 
         _dacSupportedProfiles = @(0);
+
+        _cdSupportedProfiles = @(0);
     }
     return self;
 }
@@ -3269,13 +3271,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.paaSupportedProfiles = self.paaSupportedProfiles;
     other.paiSupportedProfiles = self.paiSupportedProfiles;
     other.dacSupportedProfiles = self.dacSupportedProfiles;
+    other.cdSupportedProfiles = self.cdSupportedProfiles;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaSupportedProfiles:%@; paiSupportedProfiles:%@; dacSupportedProfiles:%@; >", NSStringFromClass([self class]), _paaSupportedProfiles, _paiSupportedProfiles, _dacSupportedProfiles];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaSupportedProfiles:%@; paiSupportedProfiles:%@; dacSupportedProfiles:%@; cdSupportedProfiles:%@; >", NSStringFromClass([self class]), _paaSupportedProfiles, _paiSupportedProfiles, _dacSupportedProfiles, _cdSupportedProfiles];
     return descriptionString;
 }
 
@@ -4892,6 +4895,69 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceneCount:%@; currentScene:%@; currentGroup:%@; sceneValid:%@; remainingCapacity:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _sceneCount, _currentScene, _currentGroup, _sceneValid, _remainingCapacity, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatModeClusterModeTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _value = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatModeClusterModeTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.value = self.value;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatModeClusterModeOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _mode = @(0);
+
+        _modeTags = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatModeClusterModeOptionStruct alloc] init];
+
+    other.label = self.label;
+    other.mode = self.mode;
+    other.modeTags = self.modeTags;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
     return descriptionString;
 }
 
@@ -8691,7 +8757,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _enabledSensors = [NSArray array];
+        _enabledSensorHandles = [NSArray array];
     }
     return self;
 }
@@ -8702,14 +8768,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.dayOfWeek = self.dayOfWeek;
     other.transitionTime = self.transitionTime;
-    other.enabledSensors = self.enabledSensors;
+    other.enabledSensorHandles = self.enabledSensorHandles;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; enabledSensors:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, _enabledSensors];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; enabledSensorHandles:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, _enabledSensorHandles];
     return descriptionString;
 }
 
@@ -9458,11 +9524,17 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _contributorIndex = @(0);
+        _contributorNodeID = nil;
+
+        _contributorEndpointID = nil;
+
+        _contributorName = nil;
 
         _previousContributorStatus = @(0);
 
         _currentContributorStatus = @(0);
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9471,16 +9543,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRAmbientSensingUnionClusterContributorStatusChangeStruct alloc] init];
 
-    other.contributorIndex = self.contributorIndex;
+    other.contributorNodeID = self.contributorNodeID;
+    other.contributorEndpointID = self.contributorEndpointID;
+    other.contributorName = self.contributorName;
     other.previousContributorStatus = self.previousContributorStatus;
     other.currentContributorStatus = self.currentContributorStatus;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorIndex:%@; previousContributorStatus:%@; currentContributorStatus:%@; >", NSStringFromClass([self class]), _contributorIndex, _previousContributorStatus, _currentContributorStatus];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorNodeID:%@; contributorEndpointID:%@; contributorName:%@; previousContributorStatus:%@; currentContributorStatus:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contributorNodeID, _contributorEndpointID, _contributorName, _previousContributorStatus, _currentContributorStatus, _fabricIndex];
     return descriptionString;
 }
 
@@ -9498,6 +9573,8 @@ NS_ASSUME_NONNULL_BEGIN
         _contributorName = nil;
 
         _contributorStatus = @(0);
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9510,13 +9587,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.contributorEndpointID = self.contributorEndpointID;
     other.contributorName = self.contributorName;
     other.contributorStatus = self.contributorStatus;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorNodeID:%@; contributorEndpointID:%@; contributorName:%@; contributorStatus:%@; >", NSStringFromClass([self class]), _contributorNodeID, _contributorEndpointID, _contributorName, _contributorStatus];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorNodeID:%@; contributorEndpointID:%@; contributorName:%@; contributorStatus:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contributorNodeID, _contributorEndpointID, _contributorName, _contributorStatus, _fabricIndex];
     return descriptionString;
 }
 
@@ -9528,6 +9606,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _addedContributor = [NSArray array];
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9537,13 +9617,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAmbientSensingUnionClusterUnionContributorAddedEvent alloc] init];
 
     other.addedContributor = self.addedContributor;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: addedContributor:%@; >", NSStringFromClass([self class]), _addedContributor];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: addedContributor:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _addedContributor, _fabricIndex];
     return descriptionString;
 }
 
@@ -9555,6 +9636,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _removedContributor = [NSArray array];
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9564,13 +9647,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAmbientSensingUnionClusterUnionContributorRemovedEvent alloc] init];
 
     other.removedContributor = self.removedContributor;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: removedContributor:%@; >", NSStringFromClass([self class]), _removedContributor];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: removedContributor:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _removedContributor, _fabricIndex];
     return descriptionString;
 }
 
@@ -9582,6 +9666,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _contributorStatusChange = [NSArray array];
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -9591,13 +9677,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAmbientSensingUnionClusterUnionContributorStatusChangedEvent alloc] init];
 
     other.contributorStatusChange = self.contributorStatusChange;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorStatusChange:%@; >", NSStringFromClass([self class]), _contributorStatusChange];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorStatusChange:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contributorStatusChange, _fabricIndex];
     return descriptionString;
 }
 
@@ -11892,6 +11979,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zoneSource = @(0);
 
         _twoDCartesianZone = nil;
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11904,13 +11995,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.zoneType = self.zoneType;
     other.zoneSource = self.zoneSource;
     other.twoDCartesianZone = self.twoDCartesianZone;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -11966,6 +12059,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zone = @(0);
 
         _reason = @(0);
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11976,13 +12073,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.zone = self.zone;
     other.reason = self.reason;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _reason, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -11996,6 +12095,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zone = @(0);
 
         _reason = @(0);
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -12006,13 +12109,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.zone = self.zone;
     other.reason = self.reason;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _reason, _nodeID, _endpointID];
     return descriptionString;
 }
 

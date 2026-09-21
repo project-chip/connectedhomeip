@@ -106,10 +106,16 @@ static_library("Zephyr") {
   }
 
   if (chip_enable_ota_requestor) {
-    sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
-    ]
+    if (chip_zephyr_ota_image_processor_sources != []) {
+      # Compile alternate processor into this library so CHIPDeviceLayer.h is
+      # allowed via //src/platform:platform allow_circular_includes_from.
+      sources += chip_zephyr_ota_image_processor_sources
+    } else {
+      sources += [
+        "OTAImageProcessorImpl.cpp",
+        "OTAImageProcessorImpl.h",
+      ]
+    }
     deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 

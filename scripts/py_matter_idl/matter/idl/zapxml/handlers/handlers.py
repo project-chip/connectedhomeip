@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 
 def _IsConformanceTagName(name: str) -> bool:
-    return name in {'mandatoryConform', 'optionalConform', 'otherwiseConform', 'provisionalConform', 'deprecateConform'}
+    return name in {'mandatoryConform', 'optionalConform', 'otherwiseConform', 'provisionalConform', 'deprecateConform', 'disallowConform', 'obsoleteConform', 'describedConform'}
 
 
 class ClusterNameHandler(BaseHandler):

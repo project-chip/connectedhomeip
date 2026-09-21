@@ -137,7 +137,7 @@ public:
         Report("QUERY: ", data);
 
         mCurrentSource = info;
-        if (!chip::Dnssd::ParsePacket(data, this))
+        if (!chip::Dnssd::ParseMdnsPacket(data, this))
         {
             printf("Parsing failure may result in reply failure!\n");
         }
@@ -171,7 +171,7 @@ private:
     void Report(const char * prefix, const chip::Dnssd::BytesRange & data)
     {
         MdnsExample::PacketReporter reporter(prefix, data);
-        if (!chip::Dnssd::ParsePacket(data, &reporter))
+        if (!chip::Dnssd::ParseMdnsPacket(data, &reporter))
         {
             printf("INVALID PACKET!!!!!!\n");
         }

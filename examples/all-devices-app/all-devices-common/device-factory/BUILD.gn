@@ -38,12 +38,14 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/color-temperature-light:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher:emulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extended-color-light:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor:increasing",
@@ -74,7 +76,6 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
-    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/boolean-state-sensor:boolean-state-sensor-accessor",
     "${chip_root}/src/lib/support",
   ]
 }

@@ -63,6 +63,7 @@ constexpr uint16_t kOptionEnableKey     = 0xffde;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 #endif
+constexpr uint16_t kOptionRpcServerPort = 0xffe0;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -112,6 +113,27 @@ std::vector<uint16_t> AppOptions::ParseWiFiPafFreqList(const std::string & extCm
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
+bool AppOptions::ParsePortNumber(const char * value, uint16_t & port)
+{
+    if (value == nullptr || *value == '\0')
+    {
+        return false;
+    }
+
+    char * endptr           = nullptr;
+    const unsigned long val = strtoul(value, &endptr, 0);
+
+    // `endptr == value` catches input with no digits at all; strtoul would otherwise
+    // report success with a value of 0.
+    if (endptr == value || *endptr != '\0' || val > UINT16_MAX)
+    {
+        return false;
+    }
+
+    port = static_cast<uint16_t>(val);
+    return true;
+}
+
 const AppOptions::AppConfig & AppOptions::GetConfig()
 {
     VerifyOrDie(sIsConfigValidated);
@@ -124,7 +146,7 @@ CHIP_ERROR AppOptions::ValidateConfig()
     if (mConfig.deviceTypeEntries.empty())
     {
         mConfig.deviceTypeEntries.push_back({
-            .type     = chip::app::DeviceFactory::GetInstance().GetDefaultDevice(),
+            .type     = chip::app::NoHooksDeviceFactory::GetInstance().GetDefaultDevice(),
             .endpoint = 1,
             .parentId = chip::kInvalidEndpointId,
         });
@@ -133,7 +155,7 @@ CHIP_ERROR AppOptions::ValidateConfig()
     {
         // Expand wildcards using the supported device types from DeviceFactory
         std::vector<std::string> supportedTypes;
-        for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+        for (const auto & deviceType : chip::app::NoHooksDeviceFactory::GetInstance().SupportedDeviceTypes())
         {
             if (!IsExcludedFromWildcard(deviceType))
             {
@@ -196,15 +218,33 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.productId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
         return true;
     case kOptionPort: {
-        char * endptr;
-        unsigned long val = strtoul(value, &endptr, 0);
-        if (*endptr != '\0' || val > 0xFFFF)
+        uint16_t port = 0;
+        if (!ParsePortNumber(value, port))
         {
             ChipLogError(Support, "Invalid port: %s", value);
             return false;
         }
-        mConfig.port = static_cast<uint16_t>(val);
-        ChipLogProgress(AppServer, "Port option set to %u", static_cast<uint16_t>(val));
+        mConfig.port = port;
+        ChipLogProgress(AppServer, "Port option set to %u", port);
+        return true;
+    }
+    case kOptionRpcServerPort: {
+        uint16_t port = 0;
+        if (!ParsePortNumber(value, port))
+        {
+            ChipLogError(Support, "Invalid RPC server port: %s", value);
+            return false;
+        }
+        // Port 0 would make the OS pick an ephemeral port. Unlike the Matter operational port,
+        // which is advertised over DNS-SD, the pw_rpc port is not discoverable and the app does
+        // not report the port it actually bound, so no client could ever reach the server.
+        if (port == 0)
+        {
+            ChipLogError(Support, "Invalid RPC server port: 0 is not a usable listen port");
+            return false;
+        }
+        mConfig.rpcServerPort = port;
+        ChipLogProgress(AppServer, "RPC server port option set to %u", port);
         return true;
     }
     case kOptionInterfaceId:
@@ -273,6 +313,7 @@ OptionSet * AppOptions::GetOptions()
         { "trace-to", kArgumentRequired, kOptionTraceTo },
         { "dac_provider", kArgumentRequired, kOptionDacProvider },
         { "enable-key", kArgumentRequired, kOptionEnableKey },
+        { "rpc-server-port", kArgumentRequired, kOptionRpcServerPort },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         { "wifipaf", kArgumentRequired, kOptionWiFiPAF },
 #endif
@@ -282,7 +323,7 @@ OptionSet * AppOptions::GetOptions()
     static const std::string gHelpText = []() {
         // Device option - this is dynamic
         std::string result = "  --device <";
-        for (auto & name : app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+        for (auto & name : app::NoHooksDeviceFactory::GetInstance().SupportedDeviceTypes())
         {
             result.append(name);
             result.append("|");
@@ -343,6 +384,11 @@ OptionSet * AppOptions::GetOptions()
 
         result += "  --enable-key <key>\n";
         result += "       A 16-byte, hex-encoded key, used to validate TestEventTrigger command of General Diagnostics cluster\n\n";
+
+        result += "  --rpc-server-port <number>\n";
+        result += "       Listen port for the Pigweed RPC server, 1-65535 (default: 33000). This is\n";
+        result += "       separate from --port, which sets the Matter operational port. Only has an\n";
+        result += "       effect in builds compiled with Pigweed RPC support (chip_enable_pw_rpc).\n\n";
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         result += "  --wifipaf freq_list=<freq_1>,<freq_2>...\n";
