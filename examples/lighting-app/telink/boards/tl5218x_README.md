@@ -4,18 +4,18 @@
 
 **Kconfig:** boards/tl5218x.conf (default)
 
--   CONFIG_CHIP_OTA_REQUESTOR=n
--   CONFIG_CHIP_DFU_OVER_BT_SMP=n, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=n,
--   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
--   CONFIG_DUAL_MODE=0
+- CONFIG_CHIP_OTA_REQUESTOR=n
+- CONFIG_CHIP_DFU_OVER_BT_SMP=n, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=n,
+- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+- CONFIG_DUAL_MODE=0
 
 **Note**: This configuration disables OTA, does not use MCUBoot, and cannot be
 upgraded
 
 **DTS Overlay:** src/platform/telink/tl5218x_2m_flash.overlay (default)
 
--   slot0: 0x15000, size 0xe7000 (924KB)
--   slot1: 0xfc000, size 0xe7000 (924KB)
+- slot0: 0x15000, size 0xe7000 (924KB)
+- slot1: 0xfc000, size 0xe7000 (924KB)
 
 **Build:**
 
@@ -38,15 +38,12 @@ build_tl5218x_default/zephyr/zephyr.bin          -> flash this
 
 **Kconfig:** boards/tl5218x_2m_flash_ota_lzma.conf (explicitly specified)
 
--   CONFIG_CHIP_OTA_REQUESTOR=y
--   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
--   CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
--   CONFIG_DUAL_MODE=0
+- CONFIG_CHIP_OTA_REQUESTOR=y
+- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+- CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
+- CONFIG_DUAL_MODE=0
 
 **DTS Overlay:** src/platform/telink/tl5218x_2m_flash_lzma.overlay (default)
-
--   slot0: 0x15000, size 0x120000 (1152KB)
--   slot1: 0x135000, size 0xAB000 (684KB)
 
 **Build Software Version 1:**
 
@@ -88,15 +85,15 @@ cp ${ZEPHYR_BASE}/TL323X_FW/ZB/dual_matter_sampleLight_bleAdv_tl323x.bin ${ZEPHY
 
 **Kconfig:** boards/tl5218x_4m_flash_dual_mode_ota.conf (explicitly specified)
 
--   CONFIG_CHIP_OTA_REQUESTOR=y
--   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
--   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
--   CONFIG_DUAL_MODE=2 (auto-switch mode)
+- CONFIG_CHIP_OTA_REQUESTOR=y
+- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+- CONFIG_DUAL_MODE=2 (auto-switch mode)
 
 **DTS Overlay:** src/platform/telink/tl5218x_4m_flash.overlay (default)
 
--   slot0: 0x16000, size 0x1E5000 (1940KB)
--   slot1: 0x1FB000, size 0x1E5000 (1940KB)
+- slot0: 0x16000, size 0x1E5000 (1940KB)
+- slot1: 0x1FB000, size 0x1E5000 (1940KB)
 
 **Build:**
 
@@ -123,10 +120,10 @@ time.**
 
 **Kconfig:** boards/tl5218x_ota.conf (explicitly specified)
 
--   CONFIG_CHIP_OTA_REQUESTOR=y
--   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
--   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
--   CONFIG_DUAL_MODE=0
+- CONFIG_CHIP_OTA_REQUESTOR=y
+- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+- CONFIG_DUAL_MODE=0
 
 **WARNING**: Building this configuration will show a warning:
 

@@ -4,18 +4,18 @@
 
 **Kconfig:** boards/tl3238x.conf (default)
 
--   CONFIG_CHIP_OTA_REQUESTOR=n
--   CONFIG_CHIP_DFU_OVER_BT_SMP=n, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=n,
--   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
--   CONFIG_DUAL_MODE=0
+- CONFIG_CHIP_OTA_REQUESTOR=n
+- CONFIG_CHIP_DFU_OVER_BT_SMP=n, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=n,
+- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+- CONFIG_DUAL_MODE=0
 
 **Note**: This configuration disables OTA, does not use MCUBoot, and cannot be
 upgraded
 
 **DTS Overlay:** src/platform/telink/tl3238x_2m_flash.overlay (default)
 
--   slot0: 0x15000, size 0xe5000 (916KB)
--   slot1: 0xfa000, size 0xe6000 (920KB)
+- slot0: 0x15000, size 0xe5000 (916KB)
+- slot1: 0xfa000, size 0xe6000 (920KB)
 
 **Build:**
 
@@ -38,15 +38,12 @@ build_tl3238x_default/zephyr/zephyr.bin          -> flash this
 
 **Kconfig:** boards/tl3238x_2m_flash_ota_lzma.conf (explicitly specified)
 
--   CONFIG_CHIP_OTA_REQUESTOR=y
--   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
--   CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
--   CONFIG_DUAL_MODE=0
+- CONFIG_CHIP_OTA_REQUESTOR=y
+- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+- CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
+- CONFIG_DUAL_MODE=0
 
 **DTS Overlay:** src/platform/telink/tl3238x_2m_flash_lzma.overlay (default)
-
--   slot0: 0x15000, size 0x120000 (1152KB)
--   slot1: 0x135000, size 0xAB000 (684KB)
 
 **Build Software Version 1:**
 
@@ -88,20 +85,20 @@ cp ${ZEPHYR_BASE}/TL323X_FW/ZB/dual_matter_sampleLight_bleAdv_tl323x.bin ${ZEPHY
 
 **Kconfig:** boards/tl3238x_4m_flash_dual_mode_ota.conf (explicitly specified)
 
--   CONFIG_CHIP_OTA_REQUESTOR=y
--   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
--   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
--   CONFIG_DUAL_MODE=2 (auto-switch mode)
+- CONFIG_CHIP_OTA_REQUESTOR=y
+- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+- CONFIG_DUAL_MODE=2 (auto-switch mode)
 
 **DTS Overlay:** src/platform/telink/tl3238x_4m_flash.overlay (default)
 
--   slot0: 0x16000, size 0x1E5000 (1940KB)
--   slot1: 0x1FB000, size 0x1E5000 (1940KB)
+- slot0: 0x16000, size 0x1E5000 (1940KB)
+- slot1: 0x1FB000, size 0x1E5000 (1940KB)
 
 **Board DTS Overlay:** boards/tl3238x_for_TL3238C-EVK40D.overlay (explicitly
 specified)
 
--   LED/Key definitions for TL3238C-EVK40D board
+- LED/Key definitions for TL3238C-EVK40D board
 
 **Build:**
 
@@ -129,10 +126,10 @@ time.**
 
 **Kconfig:** boards/tl3238x_ota.conf (explicitly specified)
 
--   CONFIG_CHIP_OTA_REQUESTOR=y
--   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
--   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
--   CONFIG_DUAL_MODE=0
+- CONFIG_CHIP_OTA_REQUESTOR=y
+- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+- CONFIG_DUAL_MODE=0
 
 **WARNING**: Building this configuration will show a warning:
 
@@ -149,10 +146,10 @@ partition limit.
 
 **Kconfig:** boards/tl3238x_concurrent.conf (explicitly specified)
 
--   CONFIG_CHIP_CONCURRENT_MODE=y
--   CONFIG_IEEE802154_TLX_BLE_COEXIST=y
--   CONFIG_CHIP_OTA_REQUESTOR=n
--   CONFIG_DUAL_MODE=0
+- CONFIG_CHIP_CONCURRENT_MODE=y
+- CONFIG_IEEE802154_TLX_BLE_COEXIST=y
+- CONFIG_CHIP_OTA_REQUESTOR=n
+- CONFIG_DUAL_MODE=0
 
 **Note**: This configuration enables BLE + 802.15.4 coexistence for Matter over
 Thread with BLE advertising. OTA is disabled.
@@ -181,12 +178,12 @@ mode + Channel Sounding (see boards/tl7218x_concurrent_cs.conf).
 
 **Kconfig:** boards/tl3238x_concurrent_ota_lzma.conf (explicitly specified)
 
--   CONFIG_CHIP_CONCURRENT_MODE=y
--   CONFIG_IEEE802154_TLX_BLE_COEXIST=y
--   CONFIG_CHIP_OTA_REQUESTOR=y
--   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
--   CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
--   CONFIG_DUAL_MODE=0
+- CONFIG_CHIP_CONCURRENT_MODE=y
+- CONFIG_IEEE802154_TLX_BLE_COEXIST=y
+- CONFIG_CHIP_OTA_REQUESTOR=y
+- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+- CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
+- CONFIG_DUAL_MODE=0
 
 **Note**: This configuration enables BLE + 802.15.4 coexistence for Matter over
 Thread with BLE advertising and OTA support. LZMA compression is required for

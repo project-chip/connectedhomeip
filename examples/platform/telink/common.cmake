@@ -100,6 +100,12 @@ else()
   unset(USB_CONF_OVERLAY_FILE)
 endif()
 
+set(LOCAL_BOARD_CONF_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf")
+if(NOT EXISTS "${LOCAL_BOARD_CONF_FILE}")
+  message(STATUS "${LOCAL_BOARD_CONF_FILE} doesn't exist")
+  unset(LOCAL_BOARD_CONF_FILE)
+endif()
+
 # Check if there is any lzma conf file in CONF_FILE，or check CONFIG_COMPRESS_LZMA
 if(("${CONF_FILE}" MATCHES "lzma") OR (${CONFIG_COMPRESS_LZMA} MATCHES y))
   set(BOOT_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader_compress_lzma.conf")
@@ -127,12 +133,6 @@ set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BASE_BOARD}.ove
 if(NOT EXISTS "${LOCAL_DTC_OVERLAY_FILE}")
   message(STATUS "${LOCAL_DTC_OVERLAY_FILE} doesn't exist")
   unset(LOCAL_DTC_OVERLAY_FILE)
-endif()
-
-set(LOCAL_BOARD_CONF_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf")
-if(NOT EXISTS "${LOCAL_BOARD_CONF_FILE}")
-  message(STATUS "${LOCAL_BOARD_CONF_FILE} doesn't exist")
-  unset(LOCAL_BOARD_CONF_FILE)
 endif()
 
 set(GLOBAL_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}.overlay")

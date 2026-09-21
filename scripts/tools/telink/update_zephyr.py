@@ -110,12 +110,12 @@ def update_zephyr(remote_url, commit_hash):
     # Update west modules
     print("Updating west modules...")
     command = ['west', 'update', '-n', '-f', 'smart']
-    subprocess.run(command, check=True)
+    subprocess.run(command, check=True, cwd=zephyr_base)
 
     # Fetch blobs
     print("Fetching hal_telink blobs...")
     command = ['west', 'blobs', 'fetch', 'hal_telink']
-    subprocess.run(command, check=True)
+    subprocess.run(command, check=True, cwd=zephyr_base)
 
 
 def main():

@@ -36,8 +36,6 @@ Kconfig: boards/tl5218x_retention_ota_lzma.conf (explicitly specified)
   - CONFIG_DUAL_MODE=0
 
 DTS Overlay: src/platform/telink/tl5218x_2m_flash_lzma.overlay (default)
-  - slot0: 0x15000, size 0x120000 (1152KB)
-  - slot1: 0x135000, size 0xAB000 (684KB)
 
 Build Software Version 1:
   west build -p -b tl5218x_retention -d build_tl5218x_retention_lzma_v1 -- \
@@ -75,8 +73,6 @@ Kconfig: boards/tl5218x_retention_dual_mode_ota_lzma.conf (explicitly specified)
   - CONFIG_DUAL_MODE=1 (action switch mode)
 
 DTS Overlay: src/platform/telink/tl5218x_2m_flash_lzma.overlay (default)
-  - slot0: 0x15000, size 0x120000 (1152KB)
-  - slot1: 0x135000, size 0xAB000 (684KB)
 
 Build:
   west build -p -b tl5218x_retention -d build_tl5218x_retention_dual_mode -- \

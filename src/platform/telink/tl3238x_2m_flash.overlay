@@ -9,7 +9,7 @@
 
 		boot_partition: partition@0 {
 			label = "mcuboot";
-			reg = <0x00000000 0xf000>;
+			reg = <0x00000000 0x15000>; 
 		};
 		slot0_partition: partition@15000 {
 			label = "image-0";
@@ -49,19 +49,11 @@
 		};
 		factory_partition: partition@1fd000 {
 			label = "factory-data";
-			reg = <0x100000 0x1000>;
-		};
-		storage_partition: partition@101000 {
-			label = "storage";
-			reg = <0x101000 0xc000>;
-		};
-		slot1_partition: partition@10d000 {
-			label = "image-1";
-			reg = <0x10d000 0xf1000>;
+			reg = <0x1fd000 0x1000>; // factory data info 
 		};
 		vendor_partition: partition@1fe000 {
 			label = "vendor-data";
-			reg = <0x1fe000 0x2000>;
+			reg = <0x1fe000 0x2000>; // mac and rf info.
 		};
 	};
 };
