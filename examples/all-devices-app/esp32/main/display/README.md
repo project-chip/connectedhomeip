@@ -335,8 +335,8 @@ The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
     -   Fills the remaining vertical height.
     -   Cleared on transition and repopulated by calling
         `renderFn(sContentContainer)`.
-    -   Scrollable (`LV_OBJ_FLAG_SCROLLABLE`) by default; each `renderFn`
-        configures its own flex layout on `parent`.
+    -   Vertical scrolling enabled (`LV_OBJ_FLAG_SCROLLABLE`) by default; each
+        `renderFn` configures its own flex layout on `parent`.
 
 ---
 
