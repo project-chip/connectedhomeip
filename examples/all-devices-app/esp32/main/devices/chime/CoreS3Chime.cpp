@@ -331,6 +331,15 @@ uint16_t AmplifierVolumeRegister()
     return static_cast<uint16_t>((steps << 8) | kVolumeLowByte);
 }
 
+void ReleaseAmplifierI2c()
+{
+    if (sAmplifierI2c != nullptr)
+    {
+        i2c_master_bus_rm_device(sAmplifierI2c);
+        sAmplifierI2c = nullptr;
+    }
+}
+
 bool InitializeAmplifier()
 {
     const i2c_device_config_t config = {
@@ -367,6 +376,7 @@ bool InitializeAmplifier()
     if (chipId != kAw88298ChipId)
     {
         ChipLogError(DeviceLayer, "CoreS3Chime: Unexpected amplifier id 0x%04x, expected 0x%04x", chipId, kAw88298ChipId);
+        ReleaseAmplifierI2c();
         return false;
     }
 
@@ -413,10 +423,20 @@ bool EnsureSpeakerInitialized()
 
     bsp_i2c_init();
 
-    EnableAmplifierSupplyRails();
+    esp_err_t err = EnableAmplifierSupplyRails();
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to enable the amplifier supply rails: %s", esp_err_to_name(err));
+        return false;
+    }
     vTaskDelay(pdMS_TO_TICKS(10));
 
-    ConfigureExpanderOutputs();
+    err = ConfigureExpanderOutputs();
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to configure the expander outputs: %s", esp_err_to_name(err));
+        return false;
+    }
     vTaskDelay(pdMS_TO_TICKS(20));
 
     // M5Unified programs the amplifier while the I2S pins are still idle and only then
@@ -429,6 +449,7 @@ bool EnsureSpeakerInitialized()
 
     if (!InitializeI2sTxChannel())
     {
+        ReleaseAmplifierI2c();
         return false;
     }
 
@@ -567,7 +588,12 @@ Protocols::InteractionModel::Status CoreS3Chime::PlayChimeSound(uint8_t chimeID)
 
     // Priority 2 sits above the CHIP event loop (priority 1) so playback is not delayed by
     // Matter processing, but below the display task so it cannot stall the UI.
-    xTaskCreate(ChimePlaybackTask, "chime_play", 4096, reinterpret_cast<void *>(static_cast<uintptr_t>(chimeID)), 2, nullptr);
+    if (xTaskCreate(ChimePlaybackTask, "chime_play", 4096, reinterpret_cast<void *>(static_cast<uintptr_t>(chimeID)), 2, nullptr) !=
+        pdPASS)
+    {
+        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to start the playback task");
+        return Protocols::InteractionModel::Status::Failure;
+    }
     return Protocols::InteractionModel::Status::Success;
 }
 
