@@ -39,7 +39,7 @@ void OnTriggerEffect(::Identify * identify)
         return;
     }
 }
- 
+
 Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
