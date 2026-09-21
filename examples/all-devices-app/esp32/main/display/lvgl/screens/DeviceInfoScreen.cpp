@@ -20,13 +20,63 @@
 #include "DeviceTypeSelection.h"
 
 #include <app/server/Server.h>
+#include <bsp/esp-bsp.h>
 #include <esp_heap_caps.h>
+#include <esp_log.h>
 #include <esp_netif.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <cstdio>
 #include <string>
 
 namespace {
+
+constexpr char TAG[]            = "DeviceInfoScreen";
+constexpr uint32_t kWaitForever = 0;
+
+// The commissioning label waiting for a fabric count, or null when no such label exists. The
+// screen is rebuilt on every refresh, so a reply can outlive the label it was asked for; the
+// label clears this on delete and a late reply then finds nothing to write to. Only touched
+// with the display lock held.
+lv_obj_t * sCommissioningLabel = nullptr;
+
+void OnCommissioningLabelDeleted(lv_event_t * event)
+{
+    if (sCommissioningLabel == lv_event_get_target(event))
+    {
+        sCommissioningLabel = nullptr;
+    }
+}
+
+// The fabric table belongs to the CHIP thread, so it is read there and the result is handed
+// back under the display lock. Taking the display lock from the CHIP thread is the direction
+// DisplayNotificationHub already uses; the reverse would deadlock.
+void RequestCommissioningStatus()
+{
+    chip::DeviceLayer::SystemLayer().ScheduleLambda([] {
+        const uint8_t fabricCount = chip::Server::GetInstance().GetFabricTable().FabricCount();
+
+        if (!bsp_display_lock(kWaitForever))
+        {
+            ESP_LOGE(TAG, "Could not acquire display lock for the commissioning status");
+            return;
+        }
+
+        if (sCommissioningLabel != nullptr)
+        {
+            if (fabricCount > 0)
+            {
+                lv_label_set_text_fmt(sCommissioningLabel, "Commissioned: Yes (%u fab)", fabricCount);
+            }
+            else
+            {
+                lv_label_set_text_static(sCommissioningLabel, "Commissioned: No");
+            }
+        }
+
+        bsp_display_unlock();
+    });
+}
 
 void OnRefreshClicked(lv_event_t * event)
 {
@@ -51,20 +101,12 @@ void ShowDeviceInfo(lv_obj_t * parent)
     lv_label_set_text_static(title, "Device Status");
     lv_obj_set_style_text_color(title, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_MAIN);
 
-    // Commissioning status
-    auto & fabricTable  = chip::Server::GetInstance().GetFabricTable();
-    uint8_t fabricCount = fabricTable.FabricCount();
-    char statusBuf[64];
-    if (fabricCount > 0)
-    {
-        snprintf(statusBuf, sizeof(statusBuf), "Commissioned: Yes (%u fab)", fabricCount);
-    }
-    else
-    {
-        snprintf(statusBuf, sizeof(statusBuf), "Commissioned: No");
-    }
+    // Commissioning status, filled in once the CHIP thread reports the fabric count
     lv_obj_t * commLabel = lv_label_create(parent);
-    lv_label_set_text(commLabel, statusBuf);
+    lv_label_set_text_static(commLabel, "Commissioned: ...");
+    lv_obj_add_event_cb(commLabel, OnCommissioningLabelDeleted, LV_EVENT_DELETE, nullptr);
+    sCommissioningLabel = commLabel;
+    RequestCommissioningStatus();
 
     // IP Address
     esp_netif_t * netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
