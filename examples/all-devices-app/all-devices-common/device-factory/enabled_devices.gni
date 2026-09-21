@@ -79,10 +79,6 @@ _available_devices = [
     "CLOSURE",
   ],
   [
-    "closure-panel",
-    "CLOSURE_PANEL",
-  ],
-  [
     "color-temperature-light",
     "COLOR_TEMPERATURE_LIGHT",
   ],

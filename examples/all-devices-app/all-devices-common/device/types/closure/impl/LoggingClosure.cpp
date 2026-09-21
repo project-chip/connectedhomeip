@@ -191,9 +191,9 @@ CHIP_ERROR LoggingClosure::RegisterParts(EndpointIdAllocator & allocator, CodeDr
     for (const auto & panel : mPanelList)
     {
         auto ClosurePanel = std::make_unique<LoggingClosurePanel>(panel.config);
-        // the tag list will be provided in the devicefactory.h
-        composition.tagList = panel.tags;
-        ReturnErrorOnFailure(ClosurePanel->Register(allocator, provider, composition));
+        // Each panel is a part of this closure endpoint and carries its own tags.
+        EndpointComposition panelComposition(GetEndpointId(), composition.pattern, panel.tags);
+        ReturnErrorOnFailure(ClosurePanel->Register(allocator, provider, panelComposition));
         mLoggingClosurePanel.push_back(std::move(ClosurePanel));
     }
 

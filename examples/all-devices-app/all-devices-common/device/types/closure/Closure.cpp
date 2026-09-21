@@ -44,9 +44,10 @@ bool IsAccsess(Span<const SemanticTag> tags)
 {
     for (const auto & tag : tags)
     {
-        if (to_underlying(ClosureTag::kWindow) == tag.tag || to_underlying(ClosureTag::kDoor) == tag.tag ||
-            to_underlying(ClosureTag::kBarrier) == tag.tag || to_underlying(ClosureTag::kGarageDoor) == tag.tag ||
-            to_underlying(ClosureTag::kGate) == tag.tag)
+        if (tag.namespaceID == chip::app::kClosureNamespaceId &&
+            (to_underlying(ClosureTag::kWindow) == tag.tag || to_underlying(ClosureTag::kDoor) == tag.tag ||
+             to_underlying(ClosureTag::kBarrier) == tag.tag || to_underlying(ClosureTag::kGarageDoor) == tag.tag ||
+             to_underlying(ClosureTag::kGate) == tag.tag))
         {
             return true;
         }
@@ -64,6 +65,7 @@ CHIP_ERROR Closure::Register(EndpointIdAllocator & allocator, CodeDrivenDataMode
                              EndpointComposition composition)
 {
     Span<const EndpointComposition::SemanticTag> tags = composition.tagList.empty() ? mConfig.tags : composition.tagList;
+    composition.tagList                               = tags;
     ReturnErrorOnFailure(ValidateClosureTagList(tags));
     DeviceRegistrationTransaction transaction(*this, provider);
     EndpointId endpointId = allocator.Allocate();

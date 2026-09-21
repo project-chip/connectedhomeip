@@ -26,9 +26,7 @@ class ClosurePanel : public SingleEndpoint
 {
 public:
     using SingleEndpoint::Register;
-
-    // A panel expresses at most one motion aspect. std::monostate means none of the three is
-    // configured, which is legal (e.g. a panel that only carries the Access feature).
+    // A panel expresses at least one motion aspect.
     struct TranslationParams
     {
         Clusters::ClosureDimension::TranslationDirectionEnum direction =
