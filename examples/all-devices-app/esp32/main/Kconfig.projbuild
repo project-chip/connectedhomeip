@@ -53,8 +53,9 @@ menu "Demo"
             help
                 M5Stack CoreS3 / CoreS3 SE (ESP32-S3, 16MB flash, 8MB quad PSRAM).
 
-                The LCD and capacitive touch panel are not driven yet: the vendored TFT
-                library used by the other M5Stack boards is ESP32-only.
+                The LCD and capacitive touch panel are driven by the LVGL renderer;
+                the vendored TFT library used by the other M5Stack boards is
+                ESP32-only.
         config DEVICE_TYPE_ESP32_C3_DEVKITM
             bool "ESP32C3-DevKitM"
             depends on IDF_TARGET_ESP32C3
