@@ -29,6 +29,7 @@ No graphics library or hardware driver headers are exposed outside the
 │                    DeviceDisplay.h                     │
 │  - InitDeviceDisplay()                                 │
 │  - ShowRestartingMessage()                             │
+│  - InitDisplayDataModelListener()                      │
 └──────────────┬───────────────────────────┬─────────────┘
                │ (ESP32)                   │ (ESP32-S3)
                ▼                           ▼
@@ -162,9 +163,9 @@ directory is scanned at configure time, so an existing build directory needs
                                  │
                                  ▼
                   ┌───────────────────────────────┐
-                  │    bsp_display_lock(0)        │
+                  │ bsp_display_lock(kWaitForever)│
                   │  - NavigationStack::Init()    │
-                  │  - Push Home (and QR if new)  │
+                  │  - Push Home                  │
                   │  - Register Inactivity Timer  │
                   │    bsp_display_unlock()       │
                   └──────────────┬────────────────┘
@@ -172,6 +173,14 @@ directory is scanned at configure time, so an existing build directory needs
                                  ▼
                   ┌───────────────────────────────┐
                   │ bsp_display_backlight_on()    │  (Delayed until first frame drawn)
+                  └──────────────┬────────────────┘
+                                 │
+                                 ▼
+                  ┌───────────────────────────────┐
+                  │ InitDisplayDataModelListener()│  (CHIP thread, after Server::Init:
+                  │  - Hub Init()                 │   the fabric table is only populated
+                  │  - Push System > QR Code      │   by then. Pushed only when
+                  │    when FabricCount() == 0    │   the device is not commissioned)
                   └──────────────┬────────────────┘
                                  │
                                  ▼
@@ -203,7 +212,7 @@ ordering between them is fixed:
 LVGL operations must run under the LVGL port mutex:
 
 ```cpp
-if (bsp_display_lock(0))
+if (bsp_display_lock(kWaitForever))
 {
     // LVGL operations...
     bsp_display_unlock();
@@ -335,13 +344,17 @@ The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
 
 ### Adding a Screen to `lvgl/`
 
+File names carry the `Screen` suffix; function names do not, except in
+`devices/`, where `Show<Name>Screen` keeps the per-device entry points apart
+from the fixed views.
+
 1. **Declare the entry point** in `display/lvgl/screens/<Name>Screen.h`:
 
     ```cpp
     #pragma once
     #include <lvgl.h>
 
-    void Show<Name>Screen(lv_obj_t * parent);
+    void Show<Name>(lv_obj_t * parent);
     ```
 
 2. **Implement widgets** in `display/lvgl/screens/<Name>Screen.cpp`:
@@ -349,7 +362,7 @@ The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
     ```cpp
     #include "<Name>Screen.h"
 
-    void Show<Name>Screen(lv_obj_t * parent)
+    void Show<Name>(lv_obj_t * parent)
     {
         lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
         lv_obj_set_style_pad_all(parent, 10, LV_PART_MAIN);
@@ -367,7 +380,7 @@ The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
 
     static void OnButtonClicked(lv_event_t * event)
     {
-        NavigationStack::Push("<Title>", Show<Name>Screen);
+        NavigationStack::Push("<Title>", Show<Name>);
     }
     ```
 
@@ -414,8 +427,11 @@ from the data model provider injected with `SetEndpointSource()`.
 ### Adding a New Target Board
 
 1. Create directory `display/<target>/`.
-2. Implement `InitDeviceDisplay()` and `ShowRestartingMessage()` in
-   `display/<target>/DeviceDisplay.cpp`.
+2. Implement all three entry points declared in `DeviceDisplay.h` in
+   `display/<target>/DeviceDisplay.cpp`: `InitDeviceDisplay()`,
+   `ShowRestartingMessage()` and `InitDisplayDataModelListener()`. `main.cpp`
+   calls all three, so omitting one fails the link; a renderer with no data
+   model listener can leave that one empty.
 3. Add a Kconfig option in `main/Kconfig.projbuild`.
 4. Update `main/CMakeLists.txt` to conditionally compile `display/<target>/`
    when that Kconfig option is set.

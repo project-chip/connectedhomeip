@@ -89,6 +89,42 @@ The available device types depend on what's registered in the `DeviceFactory`.
 Check `all-devices-common/device-factory/DeviceFactory.h` for the list of
 supported types.
 
+## Audio (Chime)
+
+The M5Stack CoreS3 is the only supported board with a speaker, so it is the only
+one that can act as a Chime device. Two switches gate it:
+
+| Switch                     | Where                                                       | Effect                                               |
+| -------------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
+| `CONFIG_HAVE_SPEAKER`      | `main/Kconfig.projbuild`, default `y` on CoreS3             | Compiles `main/devices/chime/` and the audio backend |
+| `ALL_DEVICES_ENABLE_CHIME` | device list passed to CMake (`enabled_devices_config.h.in`) | Registers the Chime device type in the factory       |
+
+The three installed sounds are synthesized at playback time, so the build
+carries no audio assets:
+
+| Chime ID | Name       | Waveform                      |
+| -------- | ---------- | ----------------------------- |
+| 0        | Ding Dong  | 880 Hz then 660 Hz, 1 s total |
+| 1        | Ring Ring  | 1 kHz, pulsed, 1 s            |
+| 2        | Alert Beep | 440 Hz, 0.5 s                 |
+
+Each tone is a decaying fundamental plus two harmonics, written to I2S as 16-bit
+stereo at 48 kHz.
+
+Audio hardware is brought up lazily, on the first `PlayChimeSound`: the AXP2101
+PMIC enables the amplifier rails, the AW9523 expander releases the amplifier
+reset, and the AW88298 amplifier is configured over I2C, after which the I2S
+channel is created. Everything stays initialized afterwards, so only the first
+chime pays that cost. The tone itself is rendered on a short-lived task so the
+CHIP event loop is not blocked for the duration of the sound.
+
+`CONFIG_CHIME_ATTENUATION_DB` (0-96, default 40) sets how far below the
+amplifier's maximum gain the output sits; each 6 dB halves the amplitude.
+
+`PlayChimeSound` returns `Failure` if audio bring-up fails, and `Busy` if a
+sound is already playing — the overlapping request is refused rather than queued
+or mixed.
+
 ## Changing Device Type (Factory Reset)
 
 To change the device type after it has been set, you need to perform a factory
