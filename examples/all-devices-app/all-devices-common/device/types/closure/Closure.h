@@ -37,6 +37,7 @@ public:
         bool withCalibration = false;
         bool withManuallyOperable = false;
         bool withAccess = false;
+        DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> initialOverallCurrentState;
      };
     Closure(Config config, TimerDelegate& Tdelegate, Clusters::IdentifyDelegate & Idelegate,
         Clusters::ClosureControl::ClosureControlClusterDelegate& CCdelegate);
@@ -49,7 +50,7 @@ public:
         VerifyOrDie(mIdentifyCluster.IsConstructed());
         return mIdentifyCluster.Cluster();
     }
-    Clusters::ClosureControl::ClosureControlCluster ClosureControlCluster()
+    Clusters::ClosureControl::ClosureControlCluster & ClosureControlCluster()
     {
         VerifyOrDie(mClosureControlCluster.IsConstructed());
         return mClosureControlCluster.Cluster();

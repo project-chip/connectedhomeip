@@ -415,8 +415,13 @@ private:
                     .withSpeed             = true,
                     .withPedestrian        = true,
                     .withCalibration       = true,
-                    .withManuallyOperable  = true,
+                    .withManuallyOperable  = false,
                     .withAccess            = true,
+                    .initialOverallCurrentState = DataModel::MakeNullable(Clusters::ClosureControl::GenericOverallCurrentState(
+                                                    MakeOptional(DataModel::MakeNullable(Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed)),
+                                                    MakeOptional(DataModel::MakeNullable(false)),
+                                                    MakeOptional(Clusters::Globals::ThreeLevelAutoEnum::kAuto))),
+
                 };
 
 

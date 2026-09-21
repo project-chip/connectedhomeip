@@ -74,6 +74,8 @@ bool IsAccsess(Span<const SemanticTag> tags)
 
         Clusters::ClosureControl::ClosureControlCluster::Config CCconfig(endpointId,mClosureControlClusterDelegate,mTimerDelegate);
 
+        CCconfig.WithInitialOverallCurrentState(mConfig.initialOverallCurrentState);
+
         if(mConfig.withAccess || IsAccsess(tags) || RegistersAccessDevicePanel() )
         {
             CCconfig.WithAccess();
@@ -106,6 +108,7 @@ bool IsAccsess(Span<const SemanticTag> tags)
         {
             CCconfig.WithPositioning();
         }
+
         mClosureControlCluster.Create(CCconfig);
 
         ReturnErrorOnFailure(provider.AddCluster(mClosureControlCluster.Registration()));
@@ -128,6 +131,7 @@ bool IsAccsess(Span<const SemanticTag> tags)
     void Closure::Unregister(CodeDrivenDataModelProvider & provider)
     {
         UnregisterParts(provider);
+        UnregisterDescriptor(GetEndpointId(), provider);
 
         if(mIdentifyCluster.IsConstructed())
         {
@@ -139,7 +143,6 @@ bool IsAccsess(Span<const SemanticTag> tags)
             LogErrorOnFailure(provider.RemoveCluster(&mClosureControlCluster.Cluster()));
             mClosureControlCluster.Destroy();
         }
-        UnregisterDescriptor(GetEndpointId(), provider);
     }
 
 } // namespace app

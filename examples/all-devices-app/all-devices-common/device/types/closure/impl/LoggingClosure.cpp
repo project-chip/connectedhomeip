@@ -17,6 +17,32 @@
 // helper to return tags for the closurepanel
 #include "LoggingClosure.h"
 
+namespace {
+
+// TargetPositionEnum (command input) and CurrentPositionEnum (state output) are separate,
+// independently-generated enums whose values do not line up numerically past the first two.
+chip::app::Clusters::ClosureControl::CurrentPositionEnum MapToCurrentPosition(
+    chip::app::Clusters::ClosureControl::TargetPositionEnum target)
+{
+    using namespace chip::app::Clusters::ClosureControl;
+    switch (target)
+    {
+    case TargetPositionEnum::kMoveToFullyClosed:
+        return CurrentPositionEnum::kFullyClosed;
+    case TargetPositionEnum::kMoveToFullyOpen:
+        return CurrentPositionEnum::kFullyOpened;
+    case TargetPositionEnum::kMoveToPedestrianPosition:
+        return CurrentPositionEnum::kOpenedForPedestrian;
+    case TargetPositionEnum::kMoveToVentilationPosition:
+        return CurrentPositionEnum::kOpenedForVentilation;
+    case TargetPositionEnum::kMoveToSignaturePosition:
+        return CurrentPositionEnum::kOpenedAtSignature;
+    default:
+        return CurrentPositionEnum::kUnknownEnumValue;
+    }
+}
+
+} // namespace
 
 namespace chip{
 namespace app {
@@ -25,9 +51,13 @@ namespace app {
                     Clusters::IdentifyDelegate& Idelegate, Closure::Config CConfig,
     Credentials::GroupDataProvider & groupDataProvider,FabricTable & fabricTable, std::vector<PanelList> panels) : 
                                     Closure(CConfig,Tdelegate,Idelegate,*this), OnOffContext({groupDataProvider,fabricTable,Tdelegate,Idelegate}), 
-                                    mPanelList(std::move(panels))
+                                    mPanelList(std::move(panels)), mTimerDelegate(Tdelegate)
     {}
     
+    LoggingClosure::~LoggingClosure()
+    {
+        CancelTimer();
+    }
     Protocols::InteractionModel::Status LoggingClosure::HandleStopCommand()
     {
         ChipLogProgress(DeviceLayer, "LoggingClosure::HandleStopCommand()");
@@ -41,12 +71,23 @@ namespace app {
         ChipLogProgress(DeviceLayer, "LoggingClosure::HandleMoveToCommand() -> position=%hhu latch=%d speed=%u",
                     position.ValueOr(Clusters::ClosureControl::TargetPositionEnum::kUnknownEnumValue), latch.ValueOr(false),
                     to_underlying(speed.ValueOr(Clusters::Globals::ThreeLevelAutoEnum::kAuto)));
+        DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> overallCurrentState = ClosureControlCluster().GetOverallCurrentState();
+        Clusters::ClosureControl::GenericOverallCurrentState fallback = overallCurrentState.IsNull() ? Clusters::ClosureControl::GenericOverallCurrentState() : overallCurrentState.Value();
+
+        mPendingCurrentState = Clusters::ClosureControl::GenericOverallCurrentState(
+            position.HasValue() ? MakeOptional(DataModel::MakeNullable(MapToCurrentPosition(position.Value()))) : fallback.position,
+            latch.HasValue() ? MakeOptional(DataModel::MakeNullable(latch.Value())) : fallback.latch,
+            speed.HasValue() ? MakeOptional(speed.Value()) : fallback.speed, fallback.secureState);
+
+        mTimerDelegate.StartTimer(this,System::Clock::Seconds32(kTimeoutnDurationSec));
         return Protocols::InteractionModel::Status::Success;
     }
     
     Protocols::InteractionModel::Status LoggingClosure::HandleCalibrateCommand()
     {
         ChipLogProgress(DeviceLayer, "LoggingClosure::HandleCalibrateCommand()");
+        mPendingCurrentState.reset();
+        mTimerDelegate.StartTimer(this,System::Clock::Seconds32(kTimeoutnDurationSec));
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -81,6 +122,22 @@ namespace app {
         }
         return false;
     }
+
+    void LoggingClosure::TimerFired() 
+    {
+        ChipLogProgress(DeviceLayer, "LoggingClosure::TimerFired()");
+        if (mPendingCurrentState.has_value())
+        {
+            LogErrorOnFailure(ClosureControlCluster().SetOverallCurrentState(DataModel::MakeNullable(*mPendingCurrentState)));
+            mPendingCurrentState.reset();
+        }
+        LogErrorOnFailure(ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kStopped));
+
+    }
+    void LoggingClosure::CancelTimer()
+    {
+        mTimerDelegate.CancelTimer(this);
+    }
     CHIP_ERROR LoggingClosure::RegisterParts(EndpointIdAllocator &allocator, CodeDrivenDataModelProvider &provider,EndpointComposition composition)
     {        
 
@@ -103,6 +160,10 @@ namespace app {
         for (size_t i = 0; i < mLoggingClosurePanel.size(); i++)
         {
             mLoggingClosurePanel[i]->Unregister(provider);
+        }
+        if (mLoggingOnOffLights)
+        {
+            mLoggingOnOffLights->Unregister(provider);
         }
     }
     

@@ -18,6 +18,7 @@
 #include <device/types/closure/Closure.h>
 #include <device/types/closure-panel/impl/LoggingClosurePanel.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
+#include <lib/support/TimerDelegate.h>
 namespace chip{
 namespace app {
 
@@ -29,14 +30,15 @@ struct PanelList
 };
 
 class LoggingClosure : public Closure,
-                       public Clusters::ClosureControl::ClosureControlClusterDelegate
+                       public Clusters::ClosureControl::ClosureControlClusterDelegate,
+                       public TimerContext
 {
 public:
 
     LoggingClosure(TimerDelegate & Tdelegate,
                     Clusters::IdentifyDelegate& Idelegate, Closure::Config CConfig,
     Credentials::GroupDataProvider & groupDataProvider,FabricTable & fabricTable, std::vector<PanelList> panels);
-    ~LoggingClosure() = default;
+    ~LoggingClosure() override;
     Protocols::InteractionModel::Status HandleStopCommand() override;
 
 
@@ -50,15 +52,24 @@ public:
     ElapsedS GetCalibrationCountdownTime() override;
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;
+
+    // -- TimerContext Interface --
+    void TimerFired() override;
 private:
+    // Simulated duration a Calibrate command takes to complete. Kept well under the
+    // test suite's default --timeout (30s) so the resulting MainState report arrives in time.
+    static constexpr uint32_t kTimeoutnDurationSec = 3;
     bool RegistersAccessDevicePanel() const override;
+    void CancelTimer();
     LoggingOnOffLight::Context OnOffContext;
     CHIP_ERROR RegisterParts(EndpointIdAllocator &allocator, CodeDrivenDataModelProvider &provider,EndpointComposition composition) override;
     void UnregisterParts(CodeDrivenDataModelProvider &provide) override;
-    // TODO add LoggingDoorLock after migration  
+    // TODO add LoggingDoorLock after migration
     std::vector<std::unique_ptr<LoggingClosurePanel>> mLoggingClosurePanel;
     std::unique_ptr<LoggingOnOffLight> mLoggingOnOffLights;
     std::vector<PanelList> mPanelList;
+    TimerDelegate & mTimerDelegate;
+    std::optional<Clusters::ClosureControl::GenericOverallCurrentState> mPendingCurrentState;
 };
 
 }
