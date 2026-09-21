@@ -17,10 +17,10 @@ import("//build_overrides/chip.gni")
 
 source_set("doorbell") {
   sources = [
-    "OOBAccessors.cpp",
-    "OOBAccessors.h",
     "Doorbell.cpp",
     "Doorbell.h",
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
   ]
 
   public_deps = [
@@ -42,9 +42,7 @@ source_set("logging") {
     "impl/LoggingDoorbell.h",
   ]
 
-  public_deps = [
-    ":doorbell",
-  ]
+  public_deps = [ ":doorbell" ]
 }
 
 source_set("posix") {
