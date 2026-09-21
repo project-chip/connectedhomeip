@@ -105,6 +105,10 @@ private:
 
 /**
  * Helper class that forwards memory management tasks to Platform::Memory* calls.
+ * When typed allocations are enabled, the MemoryAlloc and MemoryCalloc functions
+ * only take the number of elements, and the type is passed through a template
+ * parameter. When typed allocations are not enabled these functions also take
+ * the size of the type as an additional argument.
  */
 #if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
 template <typename T>
@@ -136,6 +140,11 @@ using PlatformMemoryManagement = SimplePlatformMemoryManagement;
  * Use for RAII to auto-free after use.
  *
  * For a single element RAII with dtor, use Platform::UniquePtr<>
+ *
+ * The MemoryManagement type may support MemoryAllocTyped/MemoryCallocTyped that
+ * only take the number of elements as an argument, in which case it needs to
+ * determine the size of T in some other way, and do the necessary multiplication
+ * itself.
  */
 template <typename T, typename MemoryManagement = Impl::PlatformMemoryManagement<T>>
 class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<MemoryManagement>
