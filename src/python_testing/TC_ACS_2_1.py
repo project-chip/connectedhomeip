@@ -36,7 +36,6 @@
 
 import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -107,12 +106,12 @@ class TC_ACS_2_1(MatterBaseTest):
         if self.is_ci:
             if self.SensorFusionDetected:
                 # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
-                #self.write_to_app_pipe(
+                # self.write_to_app_pipe(
                 #    f'{{"Name":"SetSensorFusionSupported", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}]}}')
                 self.write_to_app_pipe({
                     "Name": "SetSensorFusionSupported",
                     "EndpointId": self.endpoint,
-                    "AmbientContextType": [{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}],
+                    "AmbientContextType": [{{"TypeId": 73, "TagId": 4}}, {{"TypeId": 74, "TagId": 3}}],
                 })
                 await asyncio.sleep(ci_wait_time)
 
