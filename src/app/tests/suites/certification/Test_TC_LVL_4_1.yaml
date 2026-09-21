@@ -251,7 +251,7 @@ tests:
           value: 254
 
     - label: "Step 4f: TH reads the MinLevel attribute from the DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0002
+      PICS: LVL.S.C01.Rsp && LVL.S.A0002 && LVL.S.F01
       command: "readAttribute"
       attribute: "MinLevel"
       response:
@@ -259,6 +259,17 @@ tests:
           saveAs: MinLevelValue
           constraints:
               type: int8u
+
+    #MinLevel is only fixed to 1 when the Lighting feature is supported
+    - label: "Step 4f: TH reads the MinLevel attribute from the DUT"
+      PICS: LVL.S.C01.Rsp && LVL.S.A0002 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "MinLevel"
+      response:
+          saveAs: MinLevelValue
+          constraints:
+              type: int8u
+              maxValue: 254
 
     - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
       PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.A0002
@@ -274,14 +285,29 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    #Using hard coded value when optional attributes are not available
+    #Using hard coded fallback value when MinLevel is not implemented (it is
+    #optional before cluster revision 7): 1 with Lighting, 0 without it
     - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.F01
       command: "MoveToLevel"
       arguments:
           values:
               - name: "Level"
                 value: 1
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.F01
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "Level"
+                value: 0
               - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
@@ -324,15 +350,25 @@ tests:
       response:
           value: MinLevelValue
 
-    #Using hard coded value when optional attributes are not available
+    #Using hard coded fallback value when MinLevel is not implemented (it is
+    #optional before cluster revision 7): 1 with Lighting, 0 without it
     - label:
           "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
           from DUT, expects mininum level."
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.F01
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
           value: 1
+
+    - label:
+          "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
+          from DUT, expects mininum level."
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 0
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"
