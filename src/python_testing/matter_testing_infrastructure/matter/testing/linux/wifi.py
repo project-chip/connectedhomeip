@@ -354,6 +354,10 @@ class WpaSupplicantMock(TerminableThread):
             self.owner: str | None = None
             # Set when this interface brought the link up by associating.
             self.associated = False
+            # Serialises bringing the link up against taking it down. Both wait
+            # on the link off-loop, and each decides what to do from
+            # self.associated, so interleaving them would strand the flag.
+            self.link_lock = asyncio.Lock()
 
         @staticmethod
         def _current_sender() -> str | None:
@@ -429,8 +433,11 @@ class WpaSupplicantMock(TerminableThread):
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
                 if self.link is not None:
-                    self.link.up()
-                    self.associated = True
+                    # Bringing the link up waits on duplicate address detection,
+                    # which would block this loop and stall NAN discovery.
+                    async with self.link_lock:
+                        await asyncio.get_running_loop().run_in_executor(None, self.link.up)
+                        self.associated = True
                 await self.State.set_async("completed")
 
             await self.Scan({})
@@ -461,9 +468,10 @@ class WpaSupplicantMock(TerminableThread):
             Real wpa_supplicant loses the interface's addresses on leaving a network;
             keeping them would leave an unprovisioned device reachable over IP.
             """
-            if self.link is not None and self.associated:
-                self.link.down()
-                self.associated = False
+            async with self.link_lock:
+                if self.link is not None and self.associated:
+                    await asyncio.get_running_loop().run_in_executor(None, self.link.down)
+                    self.associated = False
             # Disconnect() runs before every SelectNetwork, and sdbus emits
             # PropertiesChanged whether or not the value changed, so reporting
             # unconditionally would have the platform record a disconnection
