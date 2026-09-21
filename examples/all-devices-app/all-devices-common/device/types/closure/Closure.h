@@ -14,74 +14,63 @@
  *    limitations under the License.
  */
 #pragma once
-<<<<<<< HEAD
-=======
-#include <app/clusters/identify-server/IdentifyCluster.h>
-#include <device/api/Interface.h>
-    >>>>>>> 8fd95842fc2 (Restyled by whitespace)
 #include <app/clusters/closure-control-server/ClosureControlCluster.h>
 #include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <device/api/Interface.h>
 #include <device/types/closure-panel/ClosureSematicTags.h>
-    namespace chip
+
+namespace chip {
+namespace app {
+
+class Closure : public DeviceInterface
 {
-    namespace app {
-
-    class Closure : public DeviceInterface
+public:
+    struct Config
     {
-    public:
-        struct Config
-        {
-            Span<const EndpointComposition::SemanticTag> tags = {};
-            bool withPositioning                              = false;
-            bool withMotionLatching                           = false;
-            std::optional<BitFlags<Clusters::ClosureControl::LatchControlModesBitmap>> latchControlModes;
-            bool withInstantaneous    = false;
-            bool withSpeed            = false;
-            bool withPedestrian       = false;
-            bool withCalibration      = false;
-            bool withManuallyOperable = false;
-            bool withAccess           = false;
-            DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> initialOverallCurrentState;
-        };
-        Closure(Config config, TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate,
-                Clusters::ClosureControl::ClosureControlClusterDelegate & CCdelegate);
-        ~Closure() = default;
-        CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                            EndpointComposition composition) override;
-        void Unregister(CodeDrivenDataModelProvider & provider) override;
-        Clusters::IdentifyCluster & IdentifyCluster()
-        {
-            VerifyOrDie(mIdentifyCluster.IsConstructed());
-            return mIdentifyCluster.Cluster();
-        }
-        Clusters::ClosureControl::ClosureControlCluster & ClosureControlCluster()
-        {
-            VerifyOrDie(mClosureControlCluster.IsConstructed());
-            return mClosureControlCluster.Cluster();
-        }
-
-        EndpointId GetEndpointId() { return mEndpointRegistration.endpointEntry.id; }
-
-    private:
-        virtual bool RegistersAccessDevicePanel() const                      = 0;
-        virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                         EndpointComposition composition)    = 0;
-        virtual void UnregisterParts(CodeDrivenDataModelProvider & provider) = 0;
-
-        const Config mConfig;
-        TimerDelegate & mTimerDelegate;
-        Clusters::IdentifyDelegate & mIdentifyDelegate;
-        Clusters::ClosureControl::ClosureControlClusterDelegate & mClosureControlClusterDelegate;
-        LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
-        LazyRegisteredServerCluster<Clusters::ClosureControl::ClosureControlCluster> mClosureControlCluster;
+        Span<const EndpointComposition::SemanticTag> tags = {};
+        bool withPositioning                              = false;
+        std::optional<BitFlags<Clusters::ClosureControl::LatchControlModesBitmap>> motionLatching;
+        bool withInstantaneous    = false;
+        bool withSpeed            = false;
+        bool withPedestrian       = false;
+        bool withCalibration      = false;
+        bool withManuallyOperable = false;
+        bool withAccess           = false;
+        DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> initialOverallCurrentState;
     };
+    Closure(Config config, TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate,
+            Clusters::ClosureControl::ClosureControlClusterDelegate & CCdelegate);
+    ~Closure() = default;
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
+    Clusters::IdentifyCluster & IdentifyCluster()
+    {
+        VerifyOrDie(mIdentifyCluster.IsConstructed());
+        return mIdentifyCluster.Cluster();
+    }
+    Clusters::ClosureControl::ClosureControlCluster & ClosureControlCluster()
+    {
+        VerifyOrDie(mClosureControlCluster.IsConstructed());
+        return mClosureControlCluster.Cluster();
+    }
 
-<<<<<<< HEAD
-    } // namespace app
+    EndpointId GetEndpointId() { return mEndpointRegistration.endpointEntry.id; }
+
+private:
+    virtual bool RegistersAccessDevicePanel() const                      = 0;
+    virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                     EndpointComposition composition)    = 0;
+    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider) = 0;
+
+    const Config mConfig;
+    TimerDelegate & mTimerDelegate;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
+    Clusters::ClosureControl::ClosureControlClusterDelegate & mClosureControlClusterDelegate;
+    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
+    LazyRegisteredServerCluster<Clusters::ClosureControl::ClosureControlCluster> mClosureControlCluster;
+};
+
+} // namespace app
 } // namespace chip
-=======
-    } //
-} //
->>>>>>> 8fd95842fc2 (Restyled by whitespace)

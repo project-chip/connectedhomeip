@@ -326,7 +326,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
@@ -398,10 +398,9 @@ private:
                                                   PanelList{ c2, Span<EndpointComposition::SemanticTag>(kRotateTag) },
                                                   PanelList{ c3, Span<EndpointComposition::SemanticTag>(kSlideTag) } };
                 Closure::Config CCconfig{
-                    .tags               = Span<EndpointComposition::SemanticTag>(kDoorTag),
-                    .withPositioning    = true,
-                    .withMotionLatching = true,
-                    .latchControlModes  = BitFlags<Clusters::ClosureControl::LatchControlModesBitmap>(
+                    .tags            = Span<EndpointComposition::SemanticTag>(kDoorTag),
+                    .withPositioning = true,
+                    .motionLatching  = BitFlags<Clusters::ClosureControl::LatchControlModesBitmap>(
                         Clusters::ClosureControl::LatchControlModesBitmap::kRemoteLatching,
                         Clusters::ClosureControl::LatchControlModesBitmap::kRemoteUnlatching),
                     .withInstantaneous          = false, // mutually exclusive with Speed below

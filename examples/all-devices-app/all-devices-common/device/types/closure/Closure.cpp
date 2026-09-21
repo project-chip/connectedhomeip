@@ -89,9 +89,9 @@ CHIP_ERROR Closure::Register(EndpointIdAllocator & allocator, CodeDrivenDataMode
     {
         CCconfig.WithManuallyOperable();
     }
-    if (mConfig.withMotionLatching)
+    if (mConfig.motionLatching.has_value())
     {
-        CCconfig.WithMotionLatching(mConfig.latchControlModes.value());
+        CCconfig.WithMotionLatching(mConfig.motionLatching.value());
     }
     if (mConfig.withPedestrian)
     {
