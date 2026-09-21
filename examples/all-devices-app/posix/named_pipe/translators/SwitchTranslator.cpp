@@ -21,9 +21,13 @@ namespace chip::app::NamedPipe {
 CHIP_ERROR SwitchTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
                                                  OOBAccessorRegistry & registry) const
 {
-    auto switchState = ExtractUInt<uint8_t>(json, "SwitchState");
-    VerifyOrReturnError(switchState.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-    return DispatchAction(registry, "SetSwitchState"_span, endpointId, *switchState);
+    auto currentPosition = ExtractUInt<uint8_t>(json, "CurrentPosition");
+    if (!currentPosition.has_value())
+    {
+        currentPosition = ExtractUInt<uint8_t>(json, "SwitchState");
+    }
+    VerifyOrReturnError(currentPosition.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+    return DispatchAction(registry, "SetCurrentPosition"_span, endpointId, *currentPosition);
 }
 
 } // namespace chip::app::NamedPipe

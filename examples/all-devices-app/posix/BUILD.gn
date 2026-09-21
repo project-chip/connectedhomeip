@@ -58,6 +58,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extended-color-light",

@@ -485,7 +485,7 @@ private:
                     .bindingManager          = mContext->bindingManager,
                     .identifyDelegate        = mContext->identifyDelegate,
                     .numberOfSwitchPositions = 2,
-                    .features                = Clusters::Switch::Feature::kMomentarySwitch,
+                    .features                = BitFlags<Clusters::Switch::Feature>(Clusters::Switch::Feature::kMomentarySwitch),
                 });
             });
         }

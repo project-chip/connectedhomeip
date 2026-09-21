@@ -23,6 +23,7 @@
 #include <app/clusters/mode-select-server/ModeSelectCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/clusters/switch-server/SwitchCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
@@ -35,6 +36,7 @@
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
 #include <oob-accessors/clusters/RvcOOBAccessor.h>
+#include <oob-accessors/clusters/SwitchOOBAccessor.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -115,6 +117,48 @@ TEST_F(TestOOBAccessors, OnOffOOBAccessor)
 
     EXPECT_EQ(registry.HandleAction("SetOnOff"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
     EXPECT_TRUE(cluster.GetOnOff());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestOOBAccessors, SwitchOOBAccessor)
+{
+    InMemoryOOBAccessorRegistry registry;
+    Clusters::SwitchCluster cluster(1, BitFlags<Clusters::Switch::Feature>(Clusters::Switch::Feature::kMomentarySwitch),
+                                    Clusters::SwitchCluster::StartupConfiguration{ .numberOfPositions = 2 });
+    EXPECT_EQ(cluster.Startup(mClusterContext.Get()), CHIP_NO_ERROR);
+
+    auto accessor = std::make_unique<SwitchOOBAccessor>(cluster, 1);
+    EXPECT_EQ(registry.Register(std::move(accessor)), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Size(), 1U);
+
+    // Initial position is 0
+    EXPECT_EQ(cluster.GetCurrentPosition(), 0);
+
+    // Encode TLV payload: Tag 1 = Endpoint 1, Tag 2 = 1 (position)
+    uint8_t buffer[64];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType outer;
+    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint8_t>(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(registry.HandleAction("SetCurrentPosition"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetCurrentPosition(), 1);
+
+    // Send SetCurrentPosition for Endpoint 2 (should return CHIP_ERROR_NOT_FOUND as not handled)
+    writer.Init(buffer);
+    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(2)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint8_t>(0)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(registry.HandleAction("SetCurrentPosition"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(cluster.GetCurrentPosition(), 1);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

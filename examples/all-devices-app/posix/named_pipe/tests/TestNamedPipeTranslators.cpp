@@ -28,6 +28,7 @@
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 #include <posix/named_pipe/translators/RvcTranslator.h>
+#include <posix/named_pipe/translators/SwitchTranslator.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
@@ -373,6 +374,25 @@ TEST_F(TestNamedPipeTranslators, RvcTranslator)
     // Unknown action
     Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");
     EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestNamedPipeTranslators, SwitchTranslator)
+{
+    SwitchTranslator translator;
+
+    // SetCurrentPosition with CurrentPosition
+    Json::Value json1 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 1})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json1, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
+
+    // SetCurrentPosition with SwitchState alias
+    Json::Value json2 = ParseJson(R"({"Name": "SetCurrentPosition", "SwitchState": 0})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
+
+    // Missing field
+    Json::Value invalid = ParseJson(R"({"Name": "SetCurrentPosition"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, invalid, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)

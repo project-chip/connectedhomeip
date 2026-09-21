@@ -15,13 +15,13 @@
  */
 
 #include "NamedPipeTranslators.h"
-#include <posix/named_pipe/translators/OnOffTranslator.h>
+#include <posix/named_pipe/translators/SwitchTranslator.h>
 
 namespace chip::app {
 
 void RegisterNamedPipeTranslators(Doorbell & device, NamedPipe::Dispatcher & dispatcher)
 {
-    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::DoorbellTranslator>());
+    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::SwitchTranslator>());
 }
 
 } // namespace chip::app
