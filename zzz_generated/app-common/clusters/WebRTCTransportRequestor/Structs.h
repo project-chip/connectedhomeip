@@ -36,7 +36,10 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WebRTCTransportRequestor {
-namespace Structs {} // namespace Structs
+namespace Structs {
+namespace SFrameKeyStruct = Clusters::detail::Structs::SFrameKeyStruct;
+namespace SFrameStruct    = Clusters::detail::Structs::SFrameStruct;
+} // namespace Structs
 } // namespace WebRTCTransportRequestor
 } // namespace Clusters
 } // namespace app

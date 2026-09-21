@@ -222,6 +222,16 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum ServerAttributionContextInformation : enum8 {
+  kServerAutomationRule = 11;
+  kServerSchedule = 12;
+  kServerTimer = 13;
+  kSecurityEvent = 14;
+  kDemandResponseEvent = 15;
+  kPhysicalInteraction = 16;
+  kExternalProtocol = 17;
+}
+
 enum SoftwareVersionCertificationStatusEnum : enum8 {
   kDevTest = 0;
   kProvisional = 1;
@@ -234,6 +244,14 @@ enum StreamUsageEnum : enum8 {
   kRecording = 1;
   kAnalysis = 2;
   kLiveView = 3;
+}
+
+enum SuppliedAttributionContextInformation : enum8 {
+  kDefaultClientAction = 0;
+  kUserInteraction = 1;
+  kClientAutomationRule = 2;
+  kClientSchedule = 3;
+  kClientTimer = 4;
 }
 
 enum TariffPriceTypeEnum : enum8 {
@@ -317,6 +335,16 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
+struct AttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  optional node_id nodeID = 2;
+  optional group_id groupID = 3;
+  optional systime_ms systemTimeStamp = 4;
+  optional posix_ms epochTimeStamp = 5;
+  nullable fabric_idx fabricIndex = 6;
+}
+
 struct ICECandidateStruct {
   char_string candidate = 0;
   nullable char_string SDPMid = 1;
@@ -349,6 +377,12 @@ struct SemanticTagStruct {
   optional nullable char_string<64> label = 3;
 }
 
+fabric_scoped struct SuppliedAttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  fabric_idx fabricIndex = 254;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -367,11 +401,12 @@ fabric_scoped struct WebRTCSessionStruct {
   node_id peerNodeID = 1;
   endpoint_no peerEndpointID = 2;
   StreamUsageEnum streamUsage = 3;
-  nullable int16u videoStreamID = 4;
-  nullable int16u audioStreamID = 5;
+  optional nullable int16u videoStreamID = 4;
+  optional nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
   optional int16u videoStreams[] = 7;
   optional int16u audioStreams[] = 8;
+  optional nullable SFrameStruct SFrameConfig = 9;
   fabric_idx fabricIndex = 254;
 }
 
@@ -12079,19 +12114,28 @@ cluster CameraAvSettingsUserLevelManagement = 1362 {
 
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
 cluster WebRTCTransportProvider = 1363 {
-  revision 2;
+  revision 3;
 
   bitmap Feature : bitmap32 {
     kMetadata = 0x1;
   }
 
-  struct SFrameStruct {
-    int16u cipherSuite = 0;
+  shared struct SFrameKeyStruct {
+    octet_string<8> kid = 0;
     octet_string<128> baseKey = 1;
-    octet_string<8> kid = 2;
+  }
+
+  shared struct SFrameStruct {
+    int16u audioCipherSuite = 0;
+    int16u videoCipherSuite = 1;
+    SFrameKeyStruct senderKey = 2;
+    SFrameKeyStruct receiveKeys[] = 3;
+    int8u ratchetBits = 4;
+    optional int8u ratchetTime = 5;
   }
 
   readonly attribute access(read: manage) WebRTCSessionStruct currentSessions[] = 0;
+  provisional readonly attribute int16u supportedSFrameCipherSuites[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -12121,8 +12165,8 @@ cluster WebRTCTransportProvider = 1363 {
   request struct ProvideOfferRequest {
     nullable int16u webRTCSessionID = 0;
     char_string sdp = 1;
-    StreamUsageEnum streamUsage = 2;
-    endpoint_no originatingEndpointID = 3;
+    optional StreamUsageEnum streamUsage = 2;
+    optional endpoint_no originatingEndpointID = 3;
     optional nullable int16u videoStreamID = 4;
     optional nullable int16u audioStreamID = 5;
     optional ICEServerStruct ICEServers[] = 6;
@@ -12154,21 +12198,44 @@ cluster WebRTCTransportProvider = 1363 {
     WebRTCEndReasonEnum reason = 1;
   }
 
+  request struct UpdateSessionRequest {
+    int16u webRTCSessionID = 0;
+    optional SFrameKeyStruct SFrameSenderKey = 1;
+    optional SFrameKeyStruct SFrameReceiveKeysToAdd[] = 2;
+    optional octet_string SFrameReceiveKIDsToRemove[] = 3;
+  }
+
   /** Requests that the Provider initiates a new session with the Offer / Answer flow in a way that allows for options to be passed and work with devices needing the standby flow. */
   fabric command SolicitOffer(SolicitOfferRequest): SolicitOfferResponse = 0;
   /** This command allows an SDP Offer to be set and start a new session. */
   fabric command ProvideOffer(ProvideOfferRequest): ProvideOfferResponse = 2;
   /** This command SHALL be initiated from a Node in response to an Offer that was previously received from a remote peer. */
   fabric command ProvideAnswer(ProvideAnswerRequest): DefaultSuccess = 4;
-  /** This command allows for string based ICE candidates generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  /** This command allows for string based ICE candidates Rfc8839, Section 5.1, generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event Rfc9429, Section 4.1.20, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
   fabric command ProvideICECandidates(ProvideICECandidatesRequest): DefaultSuccess = 5;
   /** This command instructs the stream provider to end the WebRTC session. */
   fabric command EndSession(EndSessionRequest): DefaultSuccess = 6;
+  /** This command allows for updating the SFrame configuration for a session and can be used to perform a sender side key roll, add additional far-end keys, or remove far-end keys. */
+  fabric command UpdateSession(UpdateSessionRequest): DefaultSuccess = 7;
 }
 
 /** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
 cluster WebRTCTransportRequestor = 1364 {
   revision 2;
+
+  shared struct SFrameKeyStruct {
+    octet_string<8> kid = 0;
+    octet_string<128> baseKey = 1;
+  }
+
+  shared struct SFrameStruct {
+    int16u audioCipherSuite = 0;
+    int16u videoCipherSuite = 1;
+    SFrameKeyStruct senderKey = 2;
+    SFrameKeyStruct receiveKeys[] = 3;
+    int8u ratchetBits = 4;
+    optional int8u ratchetTime = 5;
+  }
 
   readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;

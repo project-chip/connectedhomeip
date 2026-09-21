@@ -20628,6 +20628,17 @@ public class ClusterReadMapping {
           readWebRTCTransportProviderCurrentSessionsCommandParams
         );
         result.put("readCurrentSessionsAttribute", readWebRTCTransportProviderCurrentSessionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWebRTCTransportProviderSupportedSFrameCipherSuitesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWebRTCTransportProviderSupportedSFrameCipherSuitesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WebRTCTransportProviderCluster) cluster).readSupportedSFrameCipherSuitesAttribute(
+              (ChipClusters.WebRTCTransportProviderCluster.SupportedSFrameCipherSuitesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWebRTCTransportProviderClusterSupportedSFrameCipherSuitesAttributeCallback(),
+          readWebRTCTransportProviderSupportedSFrameCipherSuitesCommandParams
+        );
+        result.put("readSupportedSFrameCipherSuitesAttribute", readWebRTCTransportProviderSupportedSFrameCipherSuitesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readWebRTCTransportProviderGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWebRTCTransportProviderGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

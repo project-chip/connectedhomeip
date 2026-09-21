@@ -1521,6 +1521,8 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
             return true;
+        case Clusters::WebRTCTransportProvider::Commands::UpdateSession::Id:
+            return true;
         default:
             return false;
         }
@@ -1749,6 +1751,11 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::WebRTCTransportProvider::Id) &&
         (aCommand == Clusters::WebRTCTransportProvider::Commands::EndSession::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::WebRTCTransportProvider::Id) &&
+        (aCommand == Clusters::WebRTCTransportProvider::Commands::UpdateSession::Id))
     {
         return true;
     }
