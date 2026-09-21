@@ -66,23 +66,31 @@ lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelCon
     // Initial label render
     UpdateLevelLabel(valueLabel, curLevel, minLevel, maxLevel);
 
-    // Local touch: update label immediately for smooth UI feedback and schedule Matter cluster command
+    // Local touch: the label follows the knob, while the command is sent once the finger lifts.
+    // Commanding on every value change turns a single drag into a burst of MoveToLevel commands.
+    lv_obj_add_event_cb(
+        slider,
+        [](lv_event_t * event) {
+            auto * sliderObj = static_cast<lv_obj_t *>(lv_event_get_target(event));
+            auto * labelObj  = lv_obj_get_child(lv_obj_get_parent(sliderObj), 0);
+
+            UpdateLevelLabel(labelObj, static_cast<uint8_t>(lv_slider_get_value(sliderObj)),
+                             static_cast<uint8_t>(lv_slider_get_min_value(sliderObj)),
+                             static_cast<uint8_t>(lv_slider_get_max_value(sliderObj)));
+        },
+        LV_EVENT_VALUE_CHANGED, nullptr);
+
     lv_obj_add_event_cb(
         slider,
         [](lv_event_t * event) {
             auto * clusterPtr = static_cast<Clusters::LevelControlCluster *>(lv_event_get_user_data(event));
             auto * sliderObj  = static_cast<lv_obj_t *>(lv_event_get_target(event));
-            auto * labelObj   = lv_obj_get_child(lv_obj_get_parent(sliderObj), 0);
             uint8_t level     = static_cast<uint8_t>(lv_slider_get_value(sliderObj));
-            uint8_t minVal    = static_cast<uint8_t>(lv_slider_get_min_value(sliderObj));
-            uint8_t maxVal    = static_cast<uint8_t>(lv_slider_get_max_value(sliderObj));
-
-            UpdateLevelLabel(labelObj, level, minVal, maxVal);
 
             DeviceLayer::SystemLayer().ScheduleLambda(
                 [clusterPtr, level]() { clusterPtr->MoveToLevelWithOnOff(level, DataModel::Nullable<uint16_t>(), {}, {}); });
         },
-        LV_EVENT_VALUE_CHANGED, &cluster);
+        LV_EVENT_RELEASED, &cluster);
 
     // Data model notifications (from local touch or network): updates slider & label when CurrentLevel changes.
     // Subscribing with 'card' automatically unregisters when 'card' is deleted.

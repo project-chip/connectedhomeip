@@ -163,21 +163,30 @@ lv_obj_t * CreateFanControlClusterWidget(lv_obj_t * parent, Clusters::FanControl
     UpdateSpeedLabel(speedLabel, curPct, curMode);
     UpdateModeButtons(modeRow, curMode);
 
+    // The label follows the knob, while the write is sent once the finger lifts: writing on every
+    // value change turns a single drag into a burst of PercentSetting writes.
     lv_obj_add_event_cb(
         slider,
         [](lv_event_t * event) {
             auto * clusterPtr = static_cast<Clusters::FanControlCluster *>(lv_event_get_user_data(event));
             auto * sliderObj  = static_cast<lv_obj_t *>(lv_event_get_target(event));
-            auto * cardObj    = lv_obj_get_parent(sliderObj);
-            auto * labelObj   = lv_obj_get_child(cardObj, 1);
-            uint8_t pct       = static_cast<uint8_t>(lv_slider_get_value(sliderObj));
+            auto * labelObj   = lv_obj_get_child(lv_obj_get_parent(sliderObj), 1);
 
-            UpdateSpeedLabel(labelObj, pct, clusterPtr->GetFanMode());
+            UpdateSpeedLabel(labelObj, static_cast<uint8_t>(lv_slider_get_value(sliderObj)), clusterPtr->GetFanMode());
+        },
+        LV_EVENT_VALUE_CHANGED, &cluster);
+
+    lv_obj_add_event_cb(
+        slider,
+        [](lv_event_t * event) {
+            auto * clusterPtr = static_cast<Clusters::FanControlCluster *>(lv_event_get_user_data(event));
+            auto * sliderObj  = static_cast<lv_obj_t *>(lv_event_get_target(event));
+            uint8_t pct       = static_cast<uint8_t>(lv_slider_get_value(sliderObj));
 
             DeviceLayer::SystemLayer().ScheduleLambda(
                 [clusterPtr, pct]() { clusterPtr->SetPercentSetting(DataModel::MakeNullable<chip::Percent>(pct)); });
         },
-        LV_EVENT_VALUE_CHANGED, &cluster);
+        LV_EVENT_RELEASED, &cluster);
 
     DisplayNotificationHub::Instance().Subscribe(
         card, cluster.GetPaths()[0].mEndpointId, Clusters::FanControl::Id,

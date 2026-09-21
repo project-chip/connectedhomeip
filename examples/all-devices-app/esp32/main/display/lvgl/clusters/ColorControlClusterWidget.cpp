@@ -237,6 +237,28 @@ void SendMode(ColorControlContext * context, ColorMode mode)
     }
 }
 
+// Label-only updates, driven either by a finger on a slider or by a report from the cluster.
+void UpdateHueSaturationLabels(ColorControlContext * context)
+{
+    const auto hue        = static_cast<uint8_t>(lv_slider_get_value(context->hueSlider));
+    const auto saturation = static_cast<uint8_t>(lv_slider_get_value(context->saturationSlider));
+
+    SetHueLabel(context->hueLabel, hue);
+    SetSaturationLabel(context->saturationLabel, saturation);
+    SetSwatch(context->swatch, hue, saturation);
+}
+
+void UpdateXyLabels(ColorControlContext * context)
+{
+    SetXyLabel(context->xLabel, 'x', static_cast<uint16_t>(lv_slider_get_value(context->xSlider)));
+    SetXyLabel(context->yLabel, 'y', static_cast<uint16_t>(lv_slider_get_value(context->ySlider)));
+}
+
+void UpdateTemperatureLabel(ColorControlContext * context)
+{
+    SetTemperatureLabel(context->temperatureLabel, static_cast<uint16_t>(lv_slider_get_value(context->temperatureSlider)));
+}
+
 // Pulls the active mode's values back out of the cluster. Sliders being dragged keep the value the
 // finger is on; their labels follow the slider so the two never disagree.
 void RefreshFromCluster(ColorControlContext * context)
@@ -260,12 +282,7 @@ void RefreshFromCluster(ColorControlContext * context)
             lv_slider_set_value(context->saturationSlider, context->cluster->Saturation(), LV_ANIM_OFF);
         }
 
-        const auto hue        = static_cast<uint8_t>(lv_slider_get_value(context->hueSlider));
-        const auto saturation = static_cast<uint8_t>(lv_slider_get_value(context->saturationSlider));
-
-        SetHueLabel(context->hueLabel, hue);
-        SetSaturationLabel(context->saturationLabel, saturation);
-        SetSwatch(context->swatch, hue, saturation);
+        UpdateHueSaturationLabels(context);
         break;
     }
     case ColorMode::kXy: {
@@ -278,8 +295,7 @@ void RefreshFromCluster(ColorControlContext * context)
             lv_slider_set_value(context->ySlider, context->cluster->CurrentY(), LV_ANIM_OFF);
         }
 
-        SetXyLabel(context->xLabel, 'x', static_cast<uint16_t>(lv_slider_get_value(context->xSlider)));
-        SetXyLabel(context->yLabel, 'y', static_cast<uint16_t>(lv_slider_get_value(context->ySlider)));
+        UpdateXyLabels(context);
         break;
     }
     case ColorMode::kTemperature: {
@@ -288,43 +304,42 @@ void RefreshFromCluster(ColorControlContext * context)
             lv_slider_set_value(context->temperatureSlider, context->cluster->ColorTempMireds(), LV_ANIM_OFF);
         }
 
-        SetTemperatureLabel(context->temperatureLabel, static_cast<uint16_t>(lv_slider_get_value(context->temperatureSlider)));
+        UpdateTemperatureLabel(context);
         break;
     }
     }
 }
 
+// Dragging a slider only moves its labels. The command is sent when the finger lifts, so a drag
+// across the track costs one command instead of one per pixel.
 void OnHueSaturationChanged(lv_event_t * event)
 {
-    auto * context = static_cast<ColorControlContext *>(lv_event_get_user_data(event));
+    UpdateHueSaturationLabels(static_cast<ColorControlContext *>(lv_event_get_user_data(event)));
+}
 
-    const auto hue        = static_cast<uint8_t>(lv_slider_get_value(context->hueSlider));
-    const auto saturation = static_cast<uint8_t>(lv_slider_get_value(context->saturationSlider));
-
-    SetHueLabel(context->hueLabel, hue);
-    SetSaturationLabel(context->saturationLabel, saturation);
-    SetSwatch(context->swatch, hue, saturation);
-
-    SendMode(context, ColorMode::kHueSaturation);
+void OnHueSaturationReleased(lv_event_t * event)
+{
+    SendMode(static_cast<ColorControlContext *>(lv_event_get_user_data(event)), ColorMode::kHueSaturation);
 }
 
 void OnXyChanged(lv_event_t * event)
 {
-    auto * context = static_cast<ColorControlContext *>(lv_event_get_user_data(event));
+    UpdateXyLabels(static_cast<ColorControlContext *>(lv_event_get_user_data(event)));
+}
 
-    SetXyLabel(context->xLabel, 'x', static_cast<uint16_t>(lv_slider_get_value(context->xSlider)));
-    SetXyLabel(context->yLabel, 'y', static_cast<uint16_t>(lv_slider_get_value(context->ySlider)));
-
-    SendMode(context, ColorMode::kXy);
+void OnXyReleased(lv_event_t * event)
+{
+    SendMode(static_cast<ColorControlContext *>(lv_event_get_user_data(event)), ColorMode::kXy);
 }
 
 void OnTemperatureChanged(lv_event_t * event)
 {
-    auto * context = static_cast<ColorControlContext *>(lv_event_get_user_data(event));
+    UpdateTemperatureLabel(static_cast<ColorControlContext *>(lv_event_get_user_data(event)));
+}
 
-    SetTemperatureLabel(context->temperatureLabel, static_cast<uint16_t>(lv_slider_get_value(context->temperatureSlider)));
-
-    SendMode(context, ColorMode::kTemperature);
+void OnTemperatureReleased(lv_event_t * event)
+{
+    SendMode(static_cast<ColorControlContext *>(lv_event_get_user_data(event)), ColorMode::kTemperature);
 }
 
 void OnModeSelected(lv_event_t * event)
@@ -378,6 +393,8 @@ void CreateHueSaturationGroup(ColorControlContext * context, lv_obj_t * card, bo
 
     lv_obj_add_event_cb(context->hueSlider, OnHueSaturationChanged, LV_EVENT_VALUE_CHANGED, context);
     lv_obj_add_event_cb(context->saturationSlider, OnHueSaturationChanged, LV_EVENT_VALUE_CHANGED, context);
+    lv_obj_add_event_cb(context->hueSlider, OnHueSaturationReleased, LV_EVENT_RELEASED, context);
+    lv_obj_add_event_cb(context->saturationSlider, OnHueSaturationReleased, LV_EVENT_RELEASED, context);
 }
 
 void CreateXyGroup(ColorControlContext * context, lv_obj_t * card, bool active)
@@ -399,6 +416,8 @@ void CreateXyGroup(ColorControlContext * context, lv_obj_t * card, bool active)
 
     lv_obj_add_event_cb(context->xSlider, OnXyChanged, LV_EVENT_VALUE_CHANGED, context);
     lv_obj_add_event_cb(context->ySlider, OnXyChanged, LV_EVENT_VALUE_CHANGED, context);
+    lv_obj_add_event_cb(context->xSlider, OnXyReleased, LV_EVENT_RELEASED, context);
+    lv_obj_add_event_cb(context->ySlider, OnXyReleased, LV_EVENT_RELEASED, context);
 }
 
 void CreateTemperatureGroup(ColorControlContext * context, lv_obj_t * card, bool active)
@@ -414,6 +433,7 @@ void CreateTemperatureGroup(ColorControlContext * context, lv_obj_t * card, bool
     SetTemperatureLabel(context->temperatureLabel, mireds);
 
     lv_obj_add_event_cb(context->temperatureSlider, OnTemperatureChanged, LV_EVENT_VALUE_CHANGED, context);
+    lv_obj_add_event_cb(context->temperatureSlider, OnTemperatureReleased, LV_EVENT_RELEASED, context);
 }
 
 void CreateSelector(ColorControlContext * context, lv_obj_t * card)
