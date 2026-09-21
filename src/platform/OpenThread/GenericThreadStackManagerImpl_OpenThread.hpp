@@ -390,11 +390,11 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached()
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_FinishGracefulDetach(uint32_t attachId)
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_FinishGracefulDetach()
 {
     // NOTE: This callback is triggered by both the timeout and otThreadDetachGracefully.
+    VerifyOrReturn(mPendingAttach.has_value());
     DeviceLayer::SystemLayer().CancelTimer(_OnGracefulDetachTimeout, this);
-    VerifyOrReturn(mPendingAttach.has_value() && mPendingAttach->attachId == attachId);
     PendingAttach pending = std::move(*mPendingAttach);
     mPendingAttach.reset();
 
@@ -434,10 +434,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnGracefulDetachTimeo
 {
     auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(aAppState);
     ChipLogProgress(DeviceLayer, "Graceful detach timed out, forcing transition");
-    if (self->mPendingAttach.has_value())
-    {
-        self->_FinishGracefulDetach(self->mPendingAttach->attachId);
-    }
+    self->_FinishGracefulDetach();
 }
 
 template <class ImplClass>
@@ -459,8 +456,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
         // Send a detach request to the current parent before switching networks, this ensures we can reattach if fallback timer
         // triggers.
         ChipLogProgress(DeviceLayer, "Detaching gracefully before switching networks");
-        uint32_t attachId = ++mAttachId;
-        mPendingAttach.emplace(PendingAttach{ attachId, dataset, callback });
+        mPendingAttach.emplace(PendingAttach{ dataset, callback });
 
         CHIP_ERROR timerErr = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kGracefulDetachTimeoutMs),
                                                                     _OnGracefulDetachTimeout, this);
@@ -474,14 +470,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
         otError otErr = otThreadDetachGracefully(
             mOTInst,
             [](void * context) {
-                auto * self        = static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(context);
-                uint32_t pendingId = self->mPendingAttach.has_value() ? self->mPendingAttach->attachId : 0;
-                if (pendingId == 0)
-                {
-                    return;
-                }
-                if (DeviceLayer::SystemLayer().ScheduleLambda([self, pendingId]() { self->_FinishGracefulDetach(pendingId); }) !=
-                    CHIP_NO_ERROR)
+                auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(context);
+                if (DeviceLayer::SystemLayer().ScheduleLambda([self]() { self->_FinishGracefulDetach(); }) != CHIP_NO_ERROR)
                 {
                     ChipLogError(DeviceLayer, "Failed to schedule graceful detach finish; relying on timeout");
                 }
