@@ -260,7 +260,6 @@ tests:
           constraints:
               type: int8u
 
-    #MinLevel is only fixed to 1 when the Lighting feature is supported
     - label:
           "Step 4f: TH reads the MinLevel attribute from the DUT (no Lighting)"
       PICS: LVL.S.A0002 && !LVL.S.F01
