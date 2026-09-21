@@ -17,13 +17,13 @@
  */
 
 #include "DeviceSelectionScreen.h"
+#include "AppDeviceFactory.h"
 #include "DeviceTypeSelection.h"
 
-#include <device-factory/DeviceFactory.h>
 #include <esp_log.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <cstring>
 #include <string>
 #include <vector>
 
@@ -33,6 +33,18 @@ const char TAG[] = "DeviceSelect";
 
 std::string sPendingDeviceType;
 lv_obj_t * sSwitchModal = nullptr;
+
+struct DeviceOption
+{
+    std::string key;   // Device type argument understood by the factory.
+    std::string label; // What the button shows.
+    bool isActive;
+};
+
+// Backs the user_data of every button on this screen, so it has to outlive them. The
+// screen is only rebuilt after its old widgets have been deleted, so rewriting it then
+// is safe.
+std::vector<DeviceOption> sOptions;
 
 void CloseModal()
 {
@@ -58,40 +70,17 @@ void OnConfirmSwitchClicked(lv_event_t * event)
 
 void OnDeviceButtonClicked(lv_event_t * event)
 {
-    lv_obj_t * btn   = lv_event_get_target_obj(event);
-    lv_obj_t * label = lv_obj_get_child(btn, 0);
-    if (label == nullptr)
-    {
-        return;
-    }
+    const auto * option = static_cast<const DeviceOption *>(lv_event_get_user_data(event));
+    VerifyOrReturn(option != nullptr);
 
-    const char * txt = lv_label_get_text(label);
-    if (txt == nullptr)
-    {
-        return;
-    }
-
-    // Skip leading indent spaces ("    ")
-    while (*txt == ' ')
-    {
-        txt++;
-    }
-
-    if (std::strcmp(txt, "All Bridged (*)") == 0)
-    {
-        sPendingDeviceType = "*";
-    }
-    else
-    {
-        sPendingDeviceType = txt;
-    }
+    sPendingDeviceType = option->key;
 
     CloseModal();
 
     sSwitchModal = lv_msgbox_create(nullptr);
     lv_msgbox_add_title(sSwitchModal, "Switch Device");
 
-    std::string prompt = "Switch to '" + sPendingDeviceType + "' and restart?";
+    std::string prompt = "Switch to '" + option->label + "' and restart?";
     lv_msgbox_add_text(sSwitchModal, prompt.c_str());
 
     lv_obj_t * cancelBtn = lv_msgbox_add_footer_button(sSwitchModal, "Cancel");
@@ -113,16 +102,13 @@ void ShowDeviceSelection(lv_obj_t * parent)
     const std::string & activeDev = GetActiveDeviceType();
     bool isAllBridged             = (activeDev == "*" || activeDev == "aggregator");
 
-    struct DeviceOption
-    {
-        std::string label;
-        bool isActive;
-    };
+    sOptions.clear();
+    sOptions.push_back({ "*", "All Bridged (*)", isAllBridged });
 
-    std::vector<DeviceOption> options;
-    options.push_back({ "All Bridged (*)", isAllBridged });
-
-    auto & deviceFactory = chip::app::NoHooksDeviceFactory::GetInstance();
+    // The application creates devices through AppDeviceFactory, so list that instance:
+    // any other instantiation of the factory template is a separate registry and would
+    // miss the creators added by RegisterDeviceFactoryOverrides().
+    auto & deviceFactory = chip::app::AppDeviceFactory::GetInstance();
     for (const auto & deviceType : deviceFactory.SupportedDeviceTypes())
     {
         if (deviceType == "aggregator" || deviceType == "bridged-node")
@@ -130,10 +116,10 @@ void ShowDeviceSelection(lv_obj_t * parent)
             continue;
         }
         bool isActive = (!isAllBridged && deviceType == activeDev);
-        options.push_back({ deviceType, isActive });
+        sOptions.push_back({ deviceType, deviceType, isActive });
     }
 
-    for (const auto & opt : options)
+    for (auto & opt : sOptions)
     {
         lv_obj_t * btn = lv_button_create(parent);
         lv_obj_set_width(btn, LV_PCT(100));
@@ -150,7 +136,7 @@ void ShowDeviceSelection(lv_obj_t * parent)
         {
             std::string inactiveLabel = "    " + opt.label;
             lv_label_set_text(label, inactiveLabel.c_str());
-            lv_obj_add_event_cb(btn, OnDeviceButtonClicked, LV_EVENT_CLICKED, nullptr);
+            lv_obj_add_event_cb(btn, OnDeviceButtonClicked, LV_EVENT_CLICKED, &opt);
         }
         lv_obj_center(label);
     }
