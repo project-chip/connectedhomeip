@@ -690,6 +690,15 @@ extern "C" void app_main()
     // Print onboarding codes (QR code URL and manual code)
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
+    // Check if device type is stored in NVS from a previous boot before starting the
+    // display so the initial Home screen renders the active device type.
+    char storedDeviceType[kMaxDeviceTypeLength] = { 0 };
+    size_t storedLen                            = 0;
+    CHIP_ERROR nvsErr =
+        ESP32Config::ReadConfigValueStr(kConfigKey_DeviceType, storedDeviceType, sizeof(storedDeviceType), storedLen);
+    const char * initialDeviceType = (nvsErr == CHIP_NO_ERROR && storedLen > 0) ? storedDeviceType : "*";
+    SetActiveDeviceType(initialDeviceType);
+
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
 #endif // CONFIG_HAVE_DISPLAY
@@ -700,12 +709,6 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "PlatformMgr().StartEventLoopTask() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
-
-    // Check if device type is stored in NVS from a previous boot
-    char storedDeviceType[kMaxDeviceTypeLength] = { 0 };
-    size_t storedLen                            = 0;
-    CHIP_ERROR nvsErr =
-        ESP32Config::ReadConfigValueStr(kConfigKey_DeviceType, storedDeviceType, sizeof(storedDeviceType), storedLen);
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
@@ -718,7 +721,6 @@ extern "C" void app_main()
         ESP_LOGI(TAG, "Found stored device type: %s", storedDeviceType);
         ESP_LOGI(TAG, "Auto-initializing...");
         ESP_LOGI(TAG, "==================================================");
-        InitServerWithDeviceType(std::string(storedDeviceType));
     }
     else
     {
@@ -726,6 +728,6 @@ extern "C" void app_main()
         ESP_LOGI(TAG, "No stored device type found, defaulting to all bridged devices (*)");
         ESP_LOGI(TAG, "Auto-initializing...");
         ESP_LOGI(TAG, "==================================================");
-        InitServerWithDeviceType("*");
     }
+    InitServerWithDeviceType(initialDeviceType);
 }

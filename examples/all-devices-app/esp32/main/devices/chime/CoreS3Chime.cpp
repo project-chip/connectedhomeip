@@ -23,6 +23,7 @@
 #include "driver/i2s_std.h"
 #include "sdkconfig.h"
 
+#include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <cstring>
@@ -374,7 +375,7 @@ ScopedI2cDevice InitializeAmplifier()
 
 // SYSST bit 0 reports PLL lock. The amplifier only starts switching once it has locked
 // onto the incoming bit clock, so retry the enable until it reports a locked PLL.
-void WaitForAmplifierLock(const ScopedI2cDevice & amplifier)
+bool WaitForAmplifierLock(const ScopedI2cDevice & amplifier)
 {
     constexpr uint16_t kPllLocked = 0x0001;
     constexpr int kMaxAttempts    = 10;
@@ -382,16 +383,16 @@ void WaitForAmplifierLock(const ScopedI2cDevice & amplifier)
     uint16_t status = 0;
     for (int attempt = 0; attempt < kMaxAttempts; ++attempt)
     {
-        vTaskDelay(pdMS_TO_TICKS(2));
-        amplifier.ReadWordRegister(0x01, status);
-        if ((status & kPllLocked) != 0)
+        vTaskDelay(std::max<TickType_t>(1, pdMS_TO_TICKS(2)));
+        if (amplifier.ReadWordRegister(0x01, status) == ESP_OK && (status & kPllLocked) != 0)
         {
-            return;
+            return true;
         }
         amplifier.WriteWordRegister(0x04, 0x4040);
     }
 
     ChipLogError(DeviceLayer, "CoreS3Chime: Amplifier PLL did not lock, sysst=0x%04x", status);
+    return false;
 }
 
 // Phase is a 32-bit fraction of a full cycle, so one sample advances by
@@ -450,7 +451,13 @@ public:
         // Nothing reads the amplifier registers after this point, so the device is detached
         // when this function returns. Detaching the I2C device leaves the amplifier
         // configuration in place.
-        WaitForAmplifierLock(amplifier);
+        if (!WaitForAmplifierLock(amplifier))
+        {
+            i2s_channel_disable(mTxChannel);
+            i2s_del_channel(mTxChannel);
+            mTxChannel = nullptr;
+            return false;
+        }
         return true;
     }
 

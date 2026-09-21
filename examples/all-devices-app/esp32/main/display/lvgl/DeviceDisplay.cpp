@@ -159,10 +159,16 @@ void ShowRestartingMessage()
     // them first.
     NavigationStack::Detach();
     lv_obj_clean(screen);
+    lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_HIDDEN);
     lv_obj_t * label = lv_label_create(screen);
     lv_label_set_text_static(label, "Restarting...");
     lv_obj_set_style_text_color(label, lv_color_white(), LV_PART_MAIN);
     lv_obj_center(label);
+
+    // UI-triggered restarts run inside an LVGL click callback and block before calling
+    // esp_restart(), so flush immediately instead of waiting for the next timer pass.
+    lv_display_trigger_activity(gDisplay);
+    lv_refr_now(gDisplay);
 
     bsp_display_unlock();
 }
@@ -191,6 +197,7 @@ void InitDisplayDataModelListener()
         return;
     }
 
+    NavigationStack::ResetToRoot();
     NavigationStack::Push("System", ShowSystemMenu);
     NavigationStack::Push("QR Code", ShowCommissioningCodesScreen);
 
