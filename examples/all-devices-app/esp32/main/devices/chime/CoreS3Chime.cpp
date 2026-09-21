@@ -141,18 +141,6 @@ constexpr ChimeTone kCoreS3Tones[] = {
 
 static_assert(std::size(kCoreS3Tones) == std::size(kCoreS3Sounds));
 
-i2s_chan_handle_t sTxChannel = nullptr;
-
-// Claimed by PlayChimeSound before it starts the playback task and released by that task
-// when it finishes, so at most one playback task exists at a time.
-std::atomic<bool> sPlaybackActive{ false };
-
-// Oscillator lookup table, and the staging buffer handed to the I2S driver. Both are file
-// scope because only the single playback task touches them and its stack is small.
-float sSineTable[kSineTableSize];
-bool sSineTableInitialized = false;
-int16_t sChunkBuffer[kChunkSamples * 2];
-
 // A device attached to the internal I2C bus, detached again when it goes out of scope.
 // Register accesses go through this object so that bring-up code can return early without
 // leaking the handle.
@@ -308,47 +296,6 @@ esp_err_t EnableAmplifierSupplyRails()
     return pmu.SetRegisterBits(kAxp2101LdoEnable, kAxp2101AmplifierRailBits);
 }
 
-bool InitializeI2sTxChannel()
-{
-    i2s_chan_config_t channelConfig = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
-    channelConfig.auto_clear        = true;
-
-    if (i2s_new_channel(&channelConfig, &sTxChannel, nullptr) != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to allocate I2S TX channel");
-        return false;
-    }
-
-    const i2s_std_config_t standardConfig = {
-        .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(kSampleRateHz),
-        .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO),
-        .gpio_cfg = {
-            // Verified on hardware to work either way; left undriven so GPIO0 stays free,
-            // matching M5Unified. Only the (unused here) ES7210 capture codec needs MCLK.
-            .mclk = I2S_GPIO_UNUSED,
-            .bclk = BSP_I2S_SCLK,
-            .ws   = BSP_I2S_LCLK,
-            .dout = BSP_I2S_DOUT,
-            .din  = I2S_GPIO_UNUSED,
-            .invert_flags = {
-                .mclk_inv = false,
-                .bclk_inv = false,
-                .ws_inv   = false,
-            },
-        },
-    };
-
-    if (i2s_channel_init_std_mode(sTxChannel, &standardConfig) != ESP_OK || i2s_channel_enable(sTxChannel) != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to configure I2S TX channel");
-        i2s_del_channel(sTxChannel);
-        sTxChannel = nullptr;
-        return false;
-    }
-
-    return true;
-}
-
 // The AW88298 selects its sample rate from a fixed table, indexed by the low nibble of
 // register 0x06. Table entries are the rate in units of 2205 Hz, so 48000 Hz maps to
 // entry 22 at index 8.
@@ -447,65 +394,6 @@ void WaitForAmplifierLock(const ScopedI2cDevice & amplifier)
     ChipLogError(DeviceLayer, "CoreS3Chime: Amplifier PLL did not lock, sysst=0x%04x", status);
 }
 
-bool EnsureSpeakerInitialized()
-{
-    if (sTxChannel != nullptr)
-    {
-        return true;
-    }
-
-    bsp_i2c_init();
-
-    esp_err_t err = EnableAmplifierSupplyRails();
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to enable the amplifier supply rails: %s", esp_err_to_name(err));
-        return false;
-    }
-    vTaskDelay(pdMS_TO_TICKS(10));
-
-    err = ConfigureExpanderOutputs();
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to configure the expander outputs: %s", esp_err_to_name(err));
-        return false;
-    }
-    vTaskDelay(pdMS_TO_TICKS(20));
-
-    // M5Unified programs the amplifier while the I2S pins are still idle and only then
-    // starts the clock; configuring register 0x06 (PLL divider) against a running clock
-    // leaves the AW88298 state machine oscillating between locked and unlocked.
-    ScopedI2cDevice amplifier = InitializeAmplifier();
-    VerifyOrReturnValue(amplifier.IsValid(), false);
-
-    VerifyOrReturnValue(InitializeI2sTxChannel(), false);
-
-    // Nothing reads the amplifier registers after this point, so the device is detached
-    // when this function returns. Detaching the I2C device leaves the amplifier
-    // configuration in place.
-    WaitForAmplifierLock(amplifier);
-    return true;
-}
-
-void EnsureSineTable()
-{
-    if (sSineTableInitialized)
-    {
-        return;
-    }
-
-    for (size_t i = 0; i < kSineTableSize; ++i)
-    {
-        sSineTable[i] = std::sin((2.0f * kPi * static_cast<float>(i)) / static_cast<float>(kSineTableSize));
-    }
-    sSineTableInitialized = true;
-}
-
-float SineAt(uint32_t phase)
-{
-    return sSineTable[phase >> kSineTableShift];
-}
-
 // Phase is a 32-bit fraction of a full cycle, so one sample advances by
 // frequency / sampleRate of 2^32.
 uint32_t FrequencyToPhaseIncrement(float frequency)
@@ -514,82 +402,214 @@ uint32_t FrequencyToPhaseIncrement(float frequency)
     return static_cast<uint32_t>((frequency * kPhaseRange) / static_cast<float>(kSampleRateHz));
 }
 
-void SynthesizeAndPlay(uint8_t chimeID)
+// Owns the output path: the I2S channel, the oscillator table, the buffer staged for the
+// I2S driver and the claim that keeps two chimes from overlapping. Hardware bring-up is
+// deferred to the first chime, so a device that never chimes never powers the amplifier.
+class ChimePlayer
 {
-    if (chimeID >= std::size(kCoreS3Tones))
+public:
+    static ChimePlayer & Instance()
     {
-        return;
+        static ChimePlayer player;
+        return player;
     }
-    const ChimeTone & tone = kCoreS3Tones[chimeID];
 
-    EnsureSineTable();
-
-    const uint32_t totalSamples = static_cast<uint32_t>(tone.durationSec * kSampleRateHz);
-
-    // A two-tone chime switches to the second note halfway through; a single-tone chime
-    // never reaches the boundary.
-    const uint32_t noteBoundary       = (tone.firstFrequencyHz != tone.secondFrequencyHz) ? (totalSamples / 2) : totalSamples;
-    const uint32_t pulsePeriodSamples = kSampleRateHz / 20;
-
-    // exp(-4t) sampled at the output rate is a constant ratio between consecutive samples,
-    // so the envelope costs one multiply per sample rather than a call to expf.
-    const float envelopeDecay = std::exp(-4.0f / static_cast<float>(kSampleRateHz));
-
-    uint32_t phase          = 0;
-    uint32_t phaseIncrement = FrequencyToPhaseIncrement(tone.firstFrequencyHz);
-    float envelope          = 1.0f;
-    uint32_t produced       = 0;
-
-    while (produced < totalSamples)
+    bool EnsureInitialized()
     {
-        uint32_t count = totalSamples - produced;
-        if (count > kChunkSamples)
+        if (mTxChannel != nullptr)
         {
-            count = kChunkSamples;
+            return true;
         }
 
-        for (uint32_t i = 0; i < count; ++i)
+        bsp_i2c_init();
+
+        esp_err_t err = EnableAmplifierSupplyRails();
+        if (err != ESP_OK)
         {
-            const uint32_t index = produced + i;
-            if (index == noteBoundary)
+            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to enable the amplifier supply rails: %s", esp_err_to_name(err));
+            return false;
+        }
+        vTaskDelay(pdMS_TO_TICKS(10));
+
+        err = ConfigureExpanderOutputs();
+        if (err != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to configure the expander outputs: %s", esp_err_to_name(err));
+            return false;
+        }
+        vTaskDelay(pdMS_TO_TICKS(20));
+
+        // M5Unified programs the amplifier while the I2S pins are still idle and only then
+        // starts the clock; configuring register 0x06 (PLL divider) against a running clock
+        // leaves the AW88298 state machine oscillating between locked and unlocked.
+        ScopedI2cDevice amplifier = InitializeAmplifier();
+        VerifyOrReturnValue(amplifier.IsValid(), false);
+
+        VerifyOrReturnValue(InitializeI2sTxChannel(), false);
+
+        // Nothing reads the amplifier registers after this point, so the device is detached
+        // when this function returns. Detaching the I2C device leaves the amplifier
+        // configuration in place.
+        WaitForAmplifierLock(amplifier);
+        return true;
+    }
+
+    // The output path has a single I2S channel and one staging buffer, so a second chime
+    // cannot run alongside the first. Claimed on the CHIP thread, released by the playback
+    // task when it finishes.
+    bool ClaimPlayback()
+    {
+        bool expected = false;
+        return mPlaybackActive.compare_exchange_strong(expected, true, std::memory_order_acq_rel);
+    }
+
+    void ReleasePlayback() { mPlaybackActive.store(false, std::memory_order_release); }
+
+    void Play(uint8_t chimeID)
+    {
+        if (chimeID >= std::size(kCoreS3Tones))
+        {
+            return;
+        }
+        const ChimeTone & tone = kCoreS3Tones[chimeID];
+
+        EnsureSineTable();
+
+        const uint32_t totalSamples = static_cast<uint32_t>(tone.durationSec * kSampleRateHz);
+
+        // A two-tone chime switches to the second note halfway through; a single-tone chime
+        // never reaches the boundary.
+        const uint32_t noteBoundary       = (tone.firstFrequencyHz != tone.secondFrequencyHz) ? (totalSamples / 2) : totalSamples;
+        const uint32_t pulsePeriodSamples = kSampleRateHz / 20;
+
+        // exp(-4t) sampled at the output rate is a constant ratio between consecutive
+        // samples, so the envelope costs one multiply per sample rather than a call to expf.
+        const float envelopeDecay = std::exp(-4.0f / static_cast<float>(kSampleRateHz));
+
+        uint32_t phase          = 0;
+        uint32_t phaseIncrement = FrequencyToPhaseIncrement(tone.firstFrequencyHz);
+        float envelope          = 1.0f;
+        uint32_t produced       = 0;
+
+        while (produced < totalSamples)
+        {
+            uint32_t count = totalSamples - produced;
+            if (count > kChunkSamples)
             {
-                phaseIncrement = FrequencyToPhaseIncrement(tone.secondFrequencyHz);
-                phase          = 0;
-                envelope       = 1.0f;
+                count = kChunkSamples;
             }
 
-            // Unsigned overflow wraps the phase, so multiplying it yields the harmonics.
-            float sample = 0.6f * SineAt(phase) + 0.3f * SineAt(phase * 2) + 0.1f * SineAt(phase * 3);
-            sample *= envelope;
-
-            if (tone.pulse && (((index / pulsePeriodSamples) & 1) != 0))
+            for (uint32_t i = 0; i < count; ++i)
             {
-                sample = 0.0f;
+                const uint32_t index = produced + i;
+                if (index == noteBoundary)
+                {
+                    phaseIncrement = FrequencyToPhaseIncrement(tone.secondFrequencyHz);
+                    phase          = 0;
+                    envelope       = 1.0f;
+                }
+
+                // Unsigned overflow wraps the phase, so multiplying it yields the harmonics.
+                float sample = 0.6f * SineAt(phase) + 0.3f * SineAt(phase * 2) + 0.1f * SineAt(phase * 3);
+                sample *= envelope;
+
+                if (tone.pulse && (((index / pulsePeriodSamples) & 1) != 0))
+                {
+                    sample = 0.0f;
+                }
+
+                const int16_t value     = static_cast<int16_t>(sample * 28000.0f);
+                mChunkBuffer[2 * i]     = value;
+                mChunkBuffer[2 * i + 1] = value;
+
+                phase += phaseIncrement;
+                envelope *= envelopeDecay;
             }
 
-            const int16_t value     = static_cast<int16_t>(sample * 28000.0f);
-            sChunkBuffer[2 * i]     = value;
-            sChunkBuffer[2 * i + 1] = value;
-
-            phase += phaseIncrement;
-            envelope *= envelopeDecay;
+            size_t written = 0;
+            i2s_channel_write(mTxChannel, mChunkBuffer, count * 2 * sizeof(int16_t), &written, 1000);
+            produced += count;
         }
 
+        std::memset(mChunkBuffer, 0, sizeof(mChunkBuffer));
         size_t written = 0;
-        i2s_channel_write(sTxChannel, sChunkBuffer, count * 2 * sizeof(int16_t), &written, 1000);
-        produced += count;
+        i2s_channel_write(mTxChannel, mChunkBuffer, sizeof(mChunkBuffer), &written, 1000);
     }
 
-    std::memset(sChunkBuffer, 0, sizeof(sChunkBuffer));
-    size_t written = 0;
-    i2s_channel_write(sTxChannel, sChunkBuffer, sizeof(sChunkBuffer), &written, 1000);
-}
+private:
+    ChimePlayer() = default;
+
+    bool InitializeI2sTxChannel()
+    {
+        i2s_chan_config_t channelConfig = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
+        channelConfig.auto_clear        = true;
+
+        if (i2s_new_channel(&channelConfig, &mTxChannel, nullptr) != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to allocate I2S TX channel");
+            return false;
+        }
+
+        const i2s_std_config_t standardConfig = {
+            .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(kSampleRateHz),
+            .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO),
+            .gpio_cfg = {
+                // Verified on hardware to work either way; left undriven so GPIO0 stays free,
+                // matching M5Unified. Only the (unused here) ES7210 capture codec needs MCLK.
+                .mclk = I2S_GPIO_UNUSED,
+                .bclk = BSP_I2S_SCLK,
+                .ws   = BSP_I2S_LCLK,
+                .dout = BSP_I2S_DOUT,
+                .din  = I2S_GPIO_UNUSED,
+                .invert_flags = {
+                    .mclk_inv = false,
+                    .bclk_inv = false,
+                    .ws_inv   = false,
+                },
+            },
+        };
+
+        if (i2s_channel_init_std_mode(mTxChannel, &standardConfig) != ESP_OK || i2s_channel_enable(mTxChannel) != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to configure I2S TX channel");
+            i2s_del_channel(mTxChannel);
+            mTxChannel = nullptr;
+            return false;
+        }
+
+        return true;
+    }
+
+    void EnsureSineTable()
+    {
+        if (mSineTableInitialized)
+        {
+            return;
+        }
+
+        for (size_t i = 0; i < kSineTableSize; ++i)
+        {
+            mSineTable[i] = std::sin((2.0f * kPi * static_cast<float>(i)) / static_cast<float>(kSineTableSize));
+        }
+        mSineTableInitialized = true;
+    }
+
+    float SineAt(uint32_t phase) const { return mSineTable[phase >> kSineTableShift]; }
+
+    i2s_chan_handle_t mTxChannel = nullptr;
+    std::atomic<bool> mPlaybackActive{ false };
+
+    // Written only by the playback task. Members rather than locals because that task runs
+    // on a small stack.
+    bool mSineTableInitialized = false;
+    float mSineTable[kSineTableSize];
+    int16_t mChunkBuffer[kChunkSamples * 2];
+};
 
 void ChimePlaybackTask(void * arg)
 {
-    uint8_t chimeID = static_cast<uint8_t>(reinterpret_cast<uintptr_t>(arg));
-    SynthesizeAndPlay(chimeID);
-    sPlaybackActive.store(false, std::memory_order_release);
+    ChimePlayer::Instance().Play(static_cast<uint8_t>(reinterpret_cast<uintptr_t>(arg)));
+    ChimePlayer::Instance().ReleasePlayback();
     vTaskDelete(nullptr);
 }
 
@@ -605,16 +625,15 @@ Protocols::InteractionModel::Status CoreS3Chime::PlayChimeSound(uint8_t chimeID)
         return status;
     }
 
-    if (!EnsureSpeakerInitialized())
+    ChimePlayer & player = ChimePlayer::Instance();
+    if (!player.EnsureInitialized())
     {
         return Protocols::InteractionModel::Status::Failure;
     }
 
-    // The audio path has a single I2S channel and one staging buffer, so a second chime
-    // cannot run alongside the first. Refuse it rather than queueing a task that would sit
-    // idle for the length of the current sound.
-    bool expected = false;
-    if (!sPlaybackActive.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
+    // Refuse an overlapping chime rather than queueing a task that would sit idle for the
+    // length of the current sound.
+    if (!player.ClaimPlayback())
     {
         return Protocols::InteractionModel::Status::Busy;
     }
@@ -625,7 +644,7 @@ Protocols::InteractionModel::Status CoreS3Chime::PlayChimeSound(uint8_t chimeID)
         pdPASS)
     {
         ChipLogError(DeviceLayer, "CoreS3Chime: Failed to start the playback task");
-        sPlaybackActive.store(false, std::memory_order_release);
+        player.ReleasePlayback();
         return Protocols::InteractionModel::Status::Failure;
     }
     return Protocols::InteractionModel::Status::Success;
