@@ -119,17 +119,10 @@ void InitDeviceDisplay()
     // Initialize the hierarchical navigation shell
     NavigationStack::Init(screen);
 
-    // Root is always Home
+    // Root is always Home. Whether to jump straight to the QR code is decided in
+    // InitDisplayDataModelListener(): the fabric table is not populated until
+    // Server::Init() runs, which happens after this function.
     NavigationStack::Push("Home", ShowHome);
-
-    // If the device is not yet commissioned, auto-push to the QR Code screen so
-    // the onboarding payload is immediately visible on boot.
-    // Breadcrumbs will display: Home > System > QR Code.
-    if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
-    {
-        NavigationStack::Push("System", ShowSystemMenu);
-        NavigationStack::Push("QR Code", ShowCommissioningCodesScreen);
-    }
 
     // Register inactivity timer to blank display after 30s
     lv_timer_create(CheckInactivityTimer, 1000, nullptr);
@@ -173,4 +166,27 @@ void ShowRestartingMessage()
 void InitDisplayDataModelListener()
 {
     chip::app::DisplayNotificationHub::Instance().Init();
+
+    if (gDisplay == nullptr)
+    {
+        return;
+    }
+
+    // Called on the CHIP thread once Server::Init() has populated the fabric table. An
+    // uncommissioned device jumps straight to the onboarding payload, so the breadcrumbs
+    // read: Home > System > QR Code.
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
+    {
+        return;
+    }
+
+    if (!bsp_display_lock(kWaitForever))
+    {
+        return;
+    }
+
+    NavigationStack::Push("System", ShowSystemMenu);
+    NavigationStack::Push("QR Code", ShowCommissioningCodesScreen);
+
+    bsp_display_unlock();
 }
