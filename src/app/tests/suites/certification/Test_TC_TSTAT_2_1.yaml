@@ -728,3 +728,43 @@ tests:
       response:
           constraints:
               type: boolean
+
+    - label: "Step 51: TH reads the Sensors attribute from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "Sensors"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 52: TH reads the AvailableSensors attribute from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "AvailableSensors"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 53: TH reads the EnabledSensors attribute from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "EnabledSensors"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 54: TH reads the NumberOfSensorScheduleTransitions attribute from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "NumberOfSensorScheduleTransitions"
+      response:
+          constraints:
+              type: int8u
+
+    - label: "Step 55: TH reads the SensorSchedule attribute from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "SensorSchedule"
+      response:
+          constraints:
+              type: list
