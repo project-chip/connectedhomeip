@@ -8,7 +8,7 @@ ESP32 targets.
 ## Integration Boundary
 
 `main.cpp` interacts with the display subsystem through three functions declared
-in [`DeviceDisplay.h`](DeviceDisplay.h):
+in `DeviceDisplay.h`:
 
 ```cpp
 void InitDeviceDisplay();            // from app_main, before the CHIP event loop starts
@@ -335,8 +335,8 @@ The CoreS3 UI uses a push/pop stack model with clickable breadcrumb navigation.
     -   Fills the remaining vertical height.
     -   Cleared on transition and repopulated by calling
         `renderFn(sContentContainer)`.
-    -   Configured with column flex layout and vertical scrolling
-        (`LV_OBJ_FLAG_SCROLLABLE`).
+    -   Scrollable (`LV_OBJ_FLAG_SCROLLABLE`) by default; each `renderFn`
+        configures its own flex layout on `parent`.
 
 ---
 

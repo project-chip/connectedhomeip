@@ -111,12 +111,13 @@ carries no audio assets:
 Each tone is a decaying fundamental plus two harmonics, written to I2S as 16-bit
 stereo at 48 kHz.
 
-Audio hardware is brought up lazily, on the first `PlayChimeSound`: the AXP2101
-PMIC enables the amplifier rails, the AW9523 expander releases the amplifier
-reset, and the AW88298 amplifier is configured over I2C, after which the I2S
-channel is created. Everything stays initialized afterwards, so only the first
-chime pays that cost. The tone itself is rendered on a short-lived task so the
-CHIP event loop is not blocked for the duration of the sound.
+Audio hardware is brought up lazily, on the first `PlayChimeSound`: the
+`AXP2101` PMIC enables the amplifier rails, the `AW9523` I/O controller enables
+the boost rail and the amplifier PA, and the `AW88298` amplifier is configured
+over I2C, after which the I2S channel is created. Everything stays initialized
+afterwards, so only the first chime pays that cost. The tone itself is rendered
+on a short-lived task so the CHIP event loop is not blocked for the duration of
+the sound.
 
 `CONFIG_CHIME_ATTENUATION_DB` (0-96, default 40) sets how far below the
 amplifier's maximum gain the output sits; each 6 dB halves the amplitude.

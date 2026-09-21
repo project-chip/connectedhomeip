@@ -21,8 +21,7 @@
 #include <lvgl.h>
 
 /**
- * Populates @a parent with the device endpoints view (placeholder for dynamically
- * registered device screens).
+ * Populates @a parent with the registered device endpoints tree.
  *
  * The caller must hold the LVGL lock.
  */
