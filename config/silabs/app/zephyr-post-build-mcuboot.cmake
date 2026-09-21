@@ -15,14 +15,21 @@
 #
 
 # ==============================================================================
-# Matter OTA image post-build for Silabs Zephyr targets.
-#
-# Dispatches to the MCUboot or SiWx917 RPS implementation.
+# EFR32 / MCUboot: wrap the (optionally signed) application .bin as Matter OTA.
 # ==============================================================================
-if(CONFIG_CHIP_OTA_REQUESTOR)
-    if(CONFIG_SOC_SERIES_SIWG917)
-        include(${CMAKE_CURRENT_LIST_DIR}/zephyr-post-build-siwx917.cmake)
-    else()
-        include(${CMAKE_CURRENT_LIST_DIR}/zephyr-post-build-mcuboot.cmake)
-    endif()
+include(${CHIP_ROOT}/config/zephyr/ota-image.cmake)
+
+set(ZEPHYR_OUTPUT_DIR ${PROJECT_BINARY_DIR}/zephyr)
+
+if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
+    set(ZEPHYR_OUTPUT_NAME "zephyr")
+else()
+    set(ZEPHYR_OUTPUT_NAME "zephyr.signed")
+endif()
+
+if(CONFIG_CHIP_OTA_IMAGE_BUILD)
+    chip_ota_image(chip-ota-image
+        INPUT_FILES ${ZEPHYR_OUTPUT_DIR}/${ZEPHYR_OUTPUT_NAME}.bin
+        OUTPUT_FILE ${ZEPHYR_OUTPUT_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
+    )
 endif()
