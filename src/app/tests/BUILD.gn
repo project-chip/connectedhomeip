@@ -278,6 +278,11 @@ chip_test_suite("tests") {
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
+<<<<<<< HEAD
+=======
+    "TestFabricSensitiveAttributeRead.cpp",
+    "TestFailSafeContext.cpp",
+>>>>>>> feccb59 (Force fabric filtering for fabric-sensitive attributes (#74277))
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",

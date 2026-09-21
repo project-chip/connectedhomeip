@@ -26,7 +26,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxProvisioned::Id, Bi
 namespace ProvisionedEndpoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ProvisionedEndpoints::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFabricSensitive),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedEndpoints
 

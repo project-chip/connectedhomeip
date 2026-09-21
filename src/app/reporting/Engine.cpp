@@ -157,16 +157,39 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     TLV::TLVWriter checkpoint;
     reportBuilder.Checkpoint(checkpoint);
 
+<<<<<<< HEAD
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
+=======
+>>>>>>> feccb59 (Force fabric filtering for fabric-sensitive attributes (#74277))
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
     //       explicitly ignores that case). This means that global attribute reads as well as ReadAttribute
     //       can be passed invalid paths when an invalid Read is detected and must handle them.
     //
     //       See https://github.com/project-chip/connectedhomeip/issues/37410
 
+<<<<<<< HEAD
     if (auto access_status = ValidateReadAttributeACL(dataModel, subjectDescriptor, path); access_status.has_value())
+=======
+    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
+    // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
+    // leak information if we do fail existence checks.
+
+    DataModel::AttributeFinder finder(dataModel);
+    std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
+
+    // Fabric-sensitive attributes are always reported fabric-filtered, regardless of the
+    // FabricFiltered flag on the request.
+    const bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered) ||
+        (entry.has_value() && entry->HasFlags(DataModel::AttributeQualityFlags::kFabricSensitive));
+    readRequest.readFlags.Set(ReadFlags::kFabricFiltered, isFabricFiltered);
+
+    DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
+    AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
+
+    if (auto access_status = ValidateReadAttributeACL(subjectDescriptor, path, Privilege::kView); access_status.has_value())
+>>>>>>> feccb59 (Force fabric filtering for fabric-sensitive attributes (#74277))
     {
         status = *access_status;
     }
