@@ -27,11 +27,10 @@ public:
     ~LoggingClosurePanel() override = default;
 
     Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position, const Optional<bool> & latch,
-                                                         const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;
+                                                        const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleStep(const Clusters::ClosureDimension::StepDirectionEnum & direction,
-                                                    const uint16_t & numberOfSteps,
-                                                    const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;
-                                        
+                                                   const uint16_t & numberOfSteps,
+                                                   const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;
 };
 
 } // namespace chip::app

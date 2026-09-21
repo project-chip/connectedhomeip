@@ -13,11 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once 
-#include <device/api/Interface.h>
-#include <app/clusters/identify-server/IdentifyCluster.h>
+#pragma once
 #include <app/clusters/closure-control-server/ClosureControlCluster.h>
 #include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
+#include <device/api/Interface.h>
 #include <device/types/closure-panel/ClosureSematicTags.h>
 namespace chip {
 namespace app {
@@ -28,24 +28,24 @@ public:
     struct Config
     {
         Span<const EndpointComposition::SemanticTag> tags = {};
-        bool withPositioning = false;
-        bool withMotionLatching = false;
+        bool withPositioning                              = false;
+        bool withMotionLatching                           = false;
         std::optional<BitFlags<Clusters::ClosureControl::LatchControlModesBitmap>> latchControlModes;
-        bool withInstantaneous = false;
-        bool withSpeed = false;
-        bool withPedestrian = false;
-        bool withCalibration = false;
+        bool withInstantaneous    = false;
+        bool withSpeed            = false;
+        bool withPedestrian       = false;
+        bool withCalibration      = false;
         bool withManuallyOperable = false;
-        bool withAccess = false;
+        bool withAccess           = false;
         DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> initialOverallCurrentState;
-     };
-    Closure(Config config, TimerDelegate& Tdelegate, Clusters::IdentifyDelegate & Idelegate,
-        Clusters::ClosureControl::ClosureControlClusterDelegate& CCdelegate);
+    };
+    Closure(Config config, TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate,
+            Clusters::ClosureControl::ClosureControlClusterDelegate & CCdelegate);
     ~Closure() = default;
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                EndpointComposition composition) override;
+                        EndpointComposition composition) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
-    Clusters::IdentifyCluster& IdentifyCluster()
+    Clusters::IdentifyCluster & IdentifyCluster()
     {
         VerifyOrDie(mIdentifyCluster.IsConstructed());
         return mIdentifyCluster.Cluster();
@@ -56,23 +56,21 @@ public:
         return mClosureControlCluster.Cluster();
     }
 
-    EndpointId GetEndpointId()
-    {
-        return mEndpointRegistration.endpointEntry.id;
-    } 
+    EndpointId GetEndpointId() { return mEndpointRegistration.endpointEntry.id; }
 
 private:
-    virtual bool RegistersAccessDevicePanel() const = 0;
-    virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,EndpointComposition composition) = 0;
-    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider) = 0; 
+    virtual bool RegistersAccessDevicePanel() const                      = 0;
+    virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                     EndpointComposition composition)    = 0;
+    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider) = 0;
 
     const Config mConfig;
     TimerDelegate & mTimerDelegate;
-    Clusters::IdentifyDelegate& mIdentifyDelegate;
-    Clusters::ClosureControl::ClosureControlClusterDelegate&  mClosureControlClusterDelegate;
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster>  mIdentifyCluster;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
+    Clusters::ClosureControl::ClosureControlClusterDelegate & mClosureControlClusterDelegate;
+    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ClosureControl::ClosureControlCluster> mClosureControlCluster;
- };
+};
 
-} // 
-} // 
+} // namespace app
+} // namespace chip

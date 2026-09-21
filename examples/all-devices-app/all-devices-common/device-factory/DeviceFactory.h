@@ -367,65 +367,58 @@ private:
             RegisterCreator("closure", [this]() {
                 VerifyOrDie(mContext.has_value());
                 ClosurePanel::Config c1{
-                    .withAccess    = true,
-                    .positioning   = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
-                    .motion        = ClosurePanel::TranslationParams{ Clusters::ClosureDimension::TranslationDirectionEnum::kBackward },
+                    .withAccess  = true,
+                    .positioning = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
+                    .motion = ClosurePanel::TranslationParams{ Clusters::ClosureDimension::TranslationDirectionEnum::kBackward },
                 };
                 ClosurePanel::Config c2{
-                    .withAccess    = false,
-                    .positioning   = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
-                    .motion        = ClosurePanel::ModulationParams{ Clusters::ClosureDimension::ModulationTypeEnum::kSlatsOpenwork },
+                    .withAccess  = false,
+                    .positioning = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
+                    .motion      = ClosurePanel::ModulationParams{ Clusters::ClosureDimension::ModulationTypeEnum::kSlatsOpenwork },
                 };
                 ClosurePanel::Config c3{
                     .withAccess     = true,
                     .positioning    = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
                     .motionLatching = BitFlags<Clusters::ClosureDimension::LatchControlModesBitmap>(
-                                        Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteLatching,
-                                        Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching),
-                    .motion         = ClosurePanel::RotationParams{ Clusters::ClosureDimension::RotationAxisEnum::kLeft },
+                        Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteLatching,
+                        Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching),
+                    .motion = ClosurePanel::RotationParams{ Clusters::ClosureDimension::RotationAxisEnum::kLeft },
                 };
 
+                static EndpointComposition::SemanticTag kLiftTag[]   = { { .namespaceID = kClosurePanelNamespaceId,
+                                                                           .tag         = to_underlying(ClosurePanelTag::kLift) } };
+                static EndpointComposition::SemanticTag kRotateTag[] = { { .namespaceID = kClosurePanelNamespaceId,
+                                                                           .tag = to_underlying(ClosurePanelTag::kRotate) } };
+                static EndpointComposition::SemanticTag kSlideTag[]  = { { .namespaceID = kClosurePanelNamespaceId,
+                                                                           .tag = to_underlying(ClosurePanelTag::kSliding) } };
+                static EndpointComposition::SemanticTag kDoorTag[]   = { { .namespaceID = kClosureNamespaceId,
+                                                                           .tag         = to_underlying(ClosureTag::kDoor) } };
 
-                static EndpointComposition::SemanticTag kLiftTag[] = {
-                { 
-                    .namespaceID = kClosurePanelNamespaceId, .tag = to_underlying(ClosurePanelTag::kLift) }
-                };
-                static  EndpointComposition::SemanticTag kRotateTag[] = {
-                { 
-                    .namespaceID = kClosurePanelNamespaceId, .tag = to_underlying(ClosurePanelTag::kRotate) }
-                };
-                static  EndpointComposition::SemanticTag kSlideTag[] = {
-                { 
-                    .namespaceID = kClosurePanelNamespaceId, .tag = to_underlying(ClosurePanelTag::kSliding) }
-                };
-                static  EndpointComposition::SemanticTag kDoorTag[] = {
-                { 
-                    .namespaceID = kClosureNamespaceId, .tag = to_underlying(ClosureTag::kDoor) }
-                };
-                
-                std::vector<PanelList> panels = {PanelList{c1,Span<EndpointComposition::SemanticTag>(kLiftTag)},PanelList{c2,Span<EndpointComposition::SemanticTag>(kRotateTag)},PanelList{c3,Span<EndpointComposition::SemanticTag>(kSlideTag)}};
+                std::vector<PanelList> panels = { PanelList{ c1, Span<EndpointComposition::SemanticTag>(kLiftTag) },
+                                                  PanelList{ c2, Span<EndpointComposition::SemanticTag>(kRotateTag) },
+                                                  PanelList{ c3, Span<EndpointComposition::SemanticTag>(kSlideTag) } };
                 Closure::Config CCconfig{
                     .tags               = Span<EndpointComposition::SemanticTag>(kDoorTag),
                     .withPositioning    = true,
                     .withMotionLatching = true,
                     .latchControlModes  = BitFlags<Clusters::ClosureControl::LatchControlModesBitmap>(
-                                            Clusters::ClosureControl::LatchControlModesBitmap::kRemoteLatching,
-                                            Clusters::ClosureControl::LatchControlModesBitmap::kRemoteUnlatching),
-                    .withInstantaneous     = false,   // mutually exclusive with Speed below
-                    .withSpeed             = true,
-                    .withPedestrian        = true,
-                    .withCalibration       = true,
-                    .withManuallyOperable  = true,
-                    .withAccess            = true,
+                        Clusters::ClosureControl::LatchControlModesBitmap::kRemoteLatching,
+                        Clusters::ClosureControl::LatchControlModesBitmap::kRemoteUnlatching),
+                    .withInstantaneous          = false, // mutually exclusive with Speed below
+                    .withSpeed                  = true,
+                    .withPedestrian             = true,
+                    .withCalibration            = true,
+                    .withManuallyOperable       = true,
+                    .withAccess                 = true,
                     .initialOverallCurrentState = DataModel::MakeNullable(Clusters::ClosureControl::GenericOverallCurrentState(
-                                                    MakeOptional(DataModel::MakeNullable(Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed)),
-                                                    MakeOptional(DataModel::MakeNullable(false)),
-                                                    MakeOptional(Clusters::Globals::ThreeLevelAutoEnum::kAuto))),
+                        MakeOptional(DataModel::MakeNullable(Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed)),
+                        MakeOptional(DataModel::MakeNullable(false)), MakeOptional(Clusters::Globals::ThreeLevelAutoEnum::kAuto))),
 
                 };
 
-
-                return MakeDevice<LoggingClosure>(mContext->timerDelegate,mContext->identifyDelegate,CCconfig,mContext->groupDataProvider,mContext->fabricTable,std::move(panels),mContext->testEventTriggerDelegate);
+                return MakeDevice<LoggingClosure>(mContext->timerDelegate, mContext->identifyDelegate, CCconfig,
+                                                  mContext->groupDataProvider, mContext->fabricTable, std::move(panels),
+                                                  mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)

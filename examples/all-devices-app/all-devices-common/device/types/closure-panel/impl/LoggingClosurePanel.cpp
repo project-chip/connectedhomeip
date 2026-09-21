@@ -29,19 +29,18 @@ Protocols::InteractionModel::Status LoggingClosurePanel::HandleSetTarget(const O
                                                                          const Optional<bool> & latch,
                                                                          const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosurePanel::HandleSetTarget() -> position=%u latch=%d speed=%u",
-                    position.ValueOr(0), latch.ValueOr(false),
-                    to_underlying(speed.ValueOr(Globals::ThreeLevelAutoEnum::kAuto)));
+    ChipLogProgress(DeviceLayer, "LoggingClosurePanel::HandleSetTarget() -> position=%u latch=%d speed=%u", position.ValueOr(0),
+                    latch.ValueOr(false), to_underlying(speed.ValueOr(Globals::ThreeLevelAutoEnum::kAuto)));
     return Protocols::InteractionModel::Status::Success;
 }
 
 Protocols::InteractionModel::Status LoggingClosurePanel::HandleStep(const ClosureDimension::StepDirectionEnum & direction,
-                                                                     const uint16_t & numberOfSteps,
-                                                                     const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                                                    const uint16_t & numberOfSteps,
+                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(DeviceLayer, "LoggingClosurePanel::HandleStep() -> direction=%u numberOfSteps=%u speed=%u",
                     to_underlying(direction), numberOfSteps, to_underlying(speed.ValueOr(Globals::ThreeLevelAutoEnum::kAuto)));
-                                                                      
+
     return Protocols::InteractionModel::Status::Success;
 }
 

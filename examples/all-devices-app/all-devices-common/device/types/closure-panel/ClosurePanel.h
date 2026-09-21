@@ -47,8 +47,8 @@ public:
     struct Config
     {
         bool withAccess = false;
-        std::optional<std::pair<Percent100ths, Percent100ths>> positioning;  // resolution, stepValue
-        std::optional<BitFlags<Clusters::ClosureDimension::LatchControlModesBitmap>> motionLatching;  
+        std::optional<std::pair<Percent100ths, Percent100ths>> positioning; // resolution, stepValue
+        std::optional<BitFlags<Clusters::ClosureDimension::LatchControlModesBitmap>> motionLatching;
         std::variant<TranslationParams, RotationParams, ModulationParams> motion;
     };
 
@@ -63,6 +63,7 @@ public:
         VerifyOrDie(mClosureDimensionCluster.IsConstructed());
         return mClosureDimensionCluster.Cluster();
     }
+
 private:
     const Config mConfig;
     Clusters::ClosureDimension::ClosureDimensionClusterDelegate & mDimensionDelegate;

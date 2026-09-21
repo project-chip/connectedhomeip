@@ -15,8 +15,8 @@
  */
 
 #include "ClosurePanel.h"
-#include <devices/Types.h>
 #include <device/types/closure-panel/ClosureSematicTags.h>
+#include <devices/Types.h>
 
 namespace {
 
@@ -48,7 +48,7 @@ CHIP_ERROR ClosurePanel::Register(EndpointId endpoint, CodeDrivenDataModelProvid
 {
     ReturnErrorOnFailure(ValidateClosurePanelTagList(composition.tagList));
 
-    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider,composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     Clusters::ClosureDimension::ClosureDimensionCluster::Config dimensionConfig(endpoint, mDimensionDelegate);
     if (mConfig.withAccess)
