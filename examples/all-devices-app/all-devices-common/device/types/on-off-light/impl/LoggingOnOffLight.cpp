@@ -17,12 +17,13 @@
 
 #include "LoggingOnOffLight.h"
 
-#include <devices/Types.h>
-
 namespace chip::app {
 
-LoggingOnOffLight::LoggingOnOffLight(const Context & context) :
-    LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), context)
+LoggingOnOffLight::LoggingOnOffLight(const Context & context, Clusters::OnOffDelegate * customOnOff,
+                                     Clusters::OnOffEffectDelegate * customEffect, Clusters::IdentifyDelegate * customIdentify) :
+    OnOffLight(customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
+               customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),
+               customIdentify ? *customIdentify : context.identifyDelegate, context)
 {}
 
 } // namespace chip::app
