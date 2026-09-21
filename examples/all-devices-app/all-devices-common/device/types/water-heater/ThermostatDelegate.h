@@ -29,12 +29,12 @@ namespace chip::app {
 class ThermostatDelegate : public Clusters::Thermostat::Delegate
 {
 public:
-    using SystemModeEnum = Clusters::Thermostat::SystemModeEnum;
-    using ThermostatRunningModeEnum = Clusters::Thermostat::ThermostatRunningModeEnum;
-    using RelayStateBitmap = Clusters::Thermostat::RelayStateBitmap;
+    using SystemModeEnum                 = Clusters::Thermostat::SystemModeEnum;
+    using ThermostatRunningModeEnum      = Clusters::Thermostat::ThermostatRunningModeEnum;
+    using RelayStateBitmap               = Clusters::Thermostat::RelayStateBitmap;
     using ControlSequenceOfOperationEnum = Clusters::Thermostat::ControlSequenceOfOperationEnum;
-    using RemoteSensingBitmap = Clusters::Thermostat::RemoteSensingBitmap;
-    using temperature = Clusters::Thermostat::temperature;
+    using RemoteSensingBitmap            = Clusters::Thermostat::RemoteSensingBitmap;
+    using temperature                    = Clusters::Thermostat::temperature;
 
     ThermostatDelegate() = default;
     explicit ThermostatDelegate(FabricTable & fabricTable) : mFabricTable(&fabricTable) {}
@@ -61,12 +61,12 @@ public:
     Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
 
 private:
-    FabricTable * mFabricTable               = nullptr;
+    FabricTable * mFabricTable = nullptr;
 
     // Mandatory attributes
     ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
-    SystemModeEnum mSystemMode                         = SystemModeEnum::kOff;
-    DataModel::Nullable<temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
+    SystemModeEnum mSystemMode                                 = SystemModeEnum::kOff;
+    DataModel::Nullable<temperature> mLocalTemperature         = DataModel::Nullable<int16_t>();
 };
 
 } // namespace chip::app

@@ -18,59 +18,58 @@
 #include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <lib/support/CodeUtils.h>
 
- using chip::Protocols::InteractionModel::Status;
- using namespace chip::app::Clusters;
- using namespace chip::app::Clusters::WaterHeaterManagement;
- using namespace chip::app::Clusters::WaterHeaterManagement::Attributes;
- using namespace chip::app::Clusters::Thermostat;
-
+using chip::Protocols::InteractionModel::Status;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WaterHeaterManagement;
+using namespace chip::app::Clusters::WaterHeaterManagement::Attributes;
+using namespace chip::app::Clusters::Thermostat;
 
 namespace chip::app {
 
 namespace {
 
-    constexpr uint32_t kStepDurationSeconds = 3;
-    using ModeTagStructType = Clusters::detail::Structs::ModeTagStruct::Type;
+constexpr uint32_t kStepDurationSeconds = 3;
+using ModeTagStructType                 = Clusters::detail::Structs::ModeTagStruct::Type;
 
-    constexpr uint8_t kWaterHeaterModeOff = 0;
-    constexpr uint8_t kWaterHeaterModeManual = 1;
-    constexpr uint8_t kWaterHeaterModeTimed = 2;
-    
-    const ModeTagStructType kWaterHeaterModeOffTags[]     = { { .value = to_underlying(WaterHeaterMode::ModeTag::kOff) } };
-    const ModeTagStructType kWaterHeaterModeManualTags[] = { { .value = to_underlying(WaterHeaterMode::ModeTag::kManual) } };
-    const ModeTagStructType kWaterHeaterModeTimedTags[]  = { { .value = to_underlying(WaterHeaterMode::ModeTag::kTimed) } };
-        
-    struct WaterHeaterModeOption
-    {
-        CharSpan label;
-        uint8_t value;
-        Span<const ModeTagStructType> tags;
-    };
-    const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
-        { "Off"_span, kWaterHeaterModeOff, Span<const ModeTagStructType>(kWaterHeaterModeOffTags) },
-        { "Manual"_span, kWaterHeaterModeManual, Span<const ModeTagStructType>(kWaterHeaterModeManualTags) },
-        { "Timed"_span, kWaterHeaterModeTimed, Span<const ModeTagStructType>(kWaterHeaterModeTimedTags) },
-    };
-}
+constexpr uint8_t kWaterHeaterModeOff    = 0;
+constexpr uint8_t kWaterHeaterModeManual = 1;
+constexpr uint8_t kWaterHeaterModeTimed  = 2;
 
- SimulatedWaterHeater::SimulatedWaterHeater(const Config & config) :
-     SimulatedWaterHeaterDelegates(config.fabricTable),
-     WaterHeater(config, *this, *this, thermostatDelegate, thermostatSetpointsDelegate) 
- { }
+const ModeTagStructType kWaterHeaterModeOffTags[]    = { { .value = to_underlying(WaterHeaterMode::ModeTag::kOff) } };
+const ModeTagStructType kWaterHeaterModeManualTags[] = { { .value = to_underlying(WaterHeaterMode::ModeTag::kManual) } };
+const ModeTagStructType kWaterHeaterModeTimedTags[]  = { { .value = to_underlying(WaterHeaterMode::ModeTag::kTimed) } };
+
+struct WaterHeaterModeOption
+{
+    CharSpan label;
+    uint8_t value;
+    Span<const ModeTagStructType> tags;
+};
+const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
+    { "Off"_span, kWaterHeaterModeOff, Span<const ModeTagStructType>(kWaterHeaterModeOffTags) },
+    { "Manual"_span, kWaterHeaterModeManual, Span<const ModeTagStructType>(kWaterHeaterModeManualTags) },
+    { "Timed"_span, kWaterHeaterModeTimed, Span<const ModeTagStructType>(kWaterHeaterModeTimedTags) },
+};
+} // namespace
+
+SimulatedWaterHeater::SimulatedWaterHeater(const Config & config) :
+    SimulatedWaterHeaterDelegates(config.fabricTable),
+    WaterHeater(config, *this, *this, thermostatDelegate, thermostatSetpointsDelegate)
+{}
 
 SimulatedWaterHeater::~SimulatedWaterHeater()
 {
     mConfig.timerDelegate.CancelTimer(this);
 }
 
- CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, 
-    EndpointComposition composition)
- {
-    ReturnErrorOnFailure(WaterHeater::Register(endpoint, provider, composition)); 
+CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                          EndpointComposition composition)
+{
+    ReturnErrorOnFailure(WaterHeater::Register(endpoint, provider, composition));
     // Setup initial values
-    mTemperature = kInitialTemperature;
-    mHeatingEnabled = true;
-    mBoostState = BoostStateEnum::kInactive;
+    mTemperature        = kInitialTemperature;
+    mHeatingEnabled     = true;
+    mBoostState         = BoostStateEnum::kInactive;
     mBoostRemainingTime = 0;
     mHeatDemand.ClearAll();
 
@@ -82,13 +81,13 @@ SimulatedWaterHeater::~SimulatedWaterHeater()
 
     ReturnErrorOnFailure(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
     return CHIP_NO_ERROR;
- }
+}
 
- void SimulatedWaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
- {
+void SimulatedWaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
+{
     mConfig.timerDelegate.CancelTimer(this);
     WaterHeater::Unregister(provider);
- }
+}
 
 void SimulatedWaterHeater::TimerFired()
 {
@@ -136,8 +135,8 @@ void SimulatedWaterHeater::TimerFired()
 }
 
 Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
-                                Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
-                                Optional<Percent> targetReheat)
+                                         Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
+                                         Optional<Percent> targetReheat)
 {
     ChipLogProgress(AppServer, "WaterHeater: Boost duration=%" PRIu32 "s", duration);
 
@@ -198,7 +197,6 @@ BoostStateEnum SimulatedWaterHeater::GetBoostState()
     return mBoostState;
 }
 
-
 void SimulatedWaterHeater::EndBoost()
 {
     mBoostState         = BoostStateEnum::kInactive;
@@ -232,7 +230,6 @@ CHIP_ERROR SimulatedWaterHeater::GetModeLabelByIndex(uint8_t modeIndex, MutableC
 {
     VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kWaterHeaterModeOptions), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
     return CopyCharSpanToMutableCharSpan(kWaterHeaterModeOptions[modeIndex].label, label);
-
 }
 
 CHIP_ERROR SimulatedWaterHeater::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
@@ -242,7 +239,8 @@ CHIP_ERROR SimulatedWaterHeater::GetModeValueByIndex(uint8_t modeIndex, uint8_t 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SimulatedWaterHeater::GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags)
+CHIP_ERROR SimulatedWaterHeater::GetModeTagsByIndex(uint8_t modeIndex,
+                                                    DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags)
 {
     VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kWaterHeaterModeOptions), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
     const auto & tags = kWaterHeaterModeOptions[modeIndex].tags;
@@ -256,4 +254,4 @@ void SimulatedWaterHeater::HandleChangeToMode(uint8_t newMode, Clusters::ModeBas
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
- } // namespace chip::app
+} // namespace chip::app

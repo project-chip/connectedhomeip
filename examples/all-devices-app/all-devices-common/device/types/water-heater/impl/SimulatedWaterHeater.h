@@ -14,44 +14,43 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- #pragma once
+#pragma once
 
- #include <device/types/water-heater/ThermostatDelegate.h>
- #include <device/types/water-heater/ThermostatSetpointsDelegate.h>
- #include <device/types/water-heater/WaterHeater.h>
- #include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
- #include <lib/support/TimerDelegate.h>
+#include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
+#include <device/types/water-heater/ThermostatDelegate.h>
+#include <device/types/water-heater/ThermostatSetpointsDelegate.h>
+#include <device/types/water-heater/WaterHeater.h>
+#include <lib/support/TimerDelegate.h>
 
- namespace chip::app {
+namespace chip::app {
 
- constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
- constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
+constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
+constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
 
- struct SimulatedWaterHeaterDelegates
- {
-     explicit SimulatedWaterHeaterDelegates(FabricTable & fabricTable) : thermostatDelegate(fabricTable) {}
+struct SimulatedWaterHeaterDelegates
+{
+    explicit SimulatedWaterHeaterDelegates(FabricTable & fabricTable) : thermostatDelegate(fabricTable) {}
 
-     ThermostatDelegate thermostatDelegate;
-     ThermostatSetpointsDelegate thermostatSetpointsDelegate;
- };
+    ThermostatDelegate thermostatDelegate;
+    ThermostatSetpointsDelegate thermostatSetpointsDelegate;
+};
 
- class SimulatedWaterHeater : private SimulatedWaterHeaterDelegates,
-        public WaterHeater<ThermostatDelegate, ThermostatSetpointsDelegate>,
-        public Clusters::WaterHeaterManagement::Delegate, public TimerContext, public Clusters::ModeBase::AppDelegate
- {
- public:
-
+class SimulatedWaterHeater : private SimulatedWaterHeaterDelegates,
+                             public WaterHeater<ThermostatDelegate, ThermostatSetpointsDelegate>,
+                             public Clusters::WaterHeaterManagement::Delegate,
+                             public TimerContext,
+                             public Clusters::ModeBase::AppDelegate
+{
+public:
     explicit SimulatedWaterHeater(const Config & config);
     ~SimulatedWaterHeater();
 
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, 
-        EndpointComposition composition = {}) override;
+    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
-
 
     // TimerContext
     void TimerFired() override;
-
 
     // Clusters::WaterHeaterManagement::Delegate
     Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
@@ -69,15 +68,14 @@
     CHIP_ERROR Init() override;
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override;
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
+                                  DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override;
     void HandleChangeToMode(uint8_t newMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
-
 private:
-
     void EndBoost();
     void NotifyHeatDemandAndBoostStateChanged();
-    
+
     template <typename DelegateType>
     DelegateType & GetDelegate()
     {
@@ -89,10 +87,9 @@ private:
     };
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeatDemand;
     Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
-    uint32_t mBoostRemainingTime = 0;
-    Clusters::Thermostat::temperature mTemperature = kInitialTemperature;
-    bool mHeatingEnabled = false;
- };
-
+    uint32_t mBoostRemainingTime                                = 0;
+    Clusters::Thermostat::temperature mTemperature              = kInitialTemperature;
+    bool mHeatingEnabled                                        = false;
+};
 
 } // namespace chip::app
