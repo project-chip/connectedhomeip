@@ -37,7 +37,7 @@
  class ThermostatDelegate : public Delegate
  {
  public:
-     ThermostatDelegate(EndpointId endpoint) : mFabricTable(nullptr)
+     ThermostatDelegate(EndpointId endpoint = kInvalidEndpointId) : mFabricTable(nullptr)
      {}
  
      FabricTable & GetFabricTable() const override;

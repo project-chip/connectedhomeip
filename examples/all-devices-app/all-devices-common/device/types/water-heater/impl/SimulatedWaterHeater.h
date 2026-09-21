@@ -27,7 +27,14 @@
  constexpr uint32_t kInitialTemperature = 20;
  constexpr uint32_t kFinalTemperature = 30;
 
- class SimulatedWaterHeater : public WaterHeater<Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate>,
+ struct SimulatedWaterHeaterDelegates
+ {
+     Clusters::Thermostat::ThermostatDelegate thermostatDelegate;
+     Clusters::Thermostat::ThermostatSetpointsDelegate thermostatSetpointsDelegate;
+ };
+
+ class SimulatedWaterHeater : private SimulatedWaterHeaterDelegates,
+        public WaterHeater<Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate>,
         public Clusters::WaterHeaterManagement::Delegate, public TimerContext, public Clusters::ModeBase::AppDelegate
  {
  public:
@@ -70,9 +77,9 @@ private:
     void NotifyHeatDemandAndBoostStateChanged();
     
     template <typename DelegateType>
-    DelegateType * GetDelegate()
+    DelegateType & GetDelegate()
     {
-        return std::get<std::unique_ptr<DelegateType>>(mThermostatDelegates).get();
+        return std::get<std::add_lvalue_reference_t<DelegateType>>(mThermostatDelegates);
     }
 
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeaterTypes{

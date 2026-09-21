@@ -43,9 +43,15 @@ public:
 
     };
 
-    explicit WaterHeater(const Config & config, Clusters::WaterHeaterManagement::Delegate & whmDelegate, Clusters::ModeBase::AppDelegate & waterHeaterModeDelegate) :
+    explicit WaterHeater(const Config & config, Clusters::WaterHeaterManagement::Delegate & whmDelegate,
+                         Clusters::ModeBase::AppDelegate & waterHeaterModeDelegate,
+                         ThermostatDelegates &... thermostatDelegates) :
         SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)),  
-        mConfig(config), mWhmDelegate(whmDelegate), mWaterHeaterModeDelegate(waterHeaterModeDelegate) {}
+        mConfig(config),
+        mThermostatDelegates(thermostatDelegates...),
+        mWhmDelegate(whmDelegate),
+        mWaterHeaterModeDelegate(waterHeaterModeDelegate)
+    {}
     ~WaterHeater() = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, 
@@ -60,14 +66,12 @@ public:
         mWaterHeaterManagementCluster.Create(endpoint, mWhmDelegate, mConfig.whmFeatures);
         ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterManagementCluster.Registration()));
 
-        mThermostatDelegates = std::make_tuple(std::make_unique<ThermostatDelegates>(endpoint)...);
-    
         std::apply([&](auto &... delegates) {
             mThermostatCluster.Create(
                 endpoint, 
                 mConfig.thermostatFeatures, 
                 Clusters::Thermostat::ThermostatClusterBase::Config(Clusters::Thermostat::OptionalAttributes(), mConfig.timerDelegate),
-                *delegates... 
+                delegates... 
             );
         }, mThermostatDelegates);
     
@@ -142,8 +146,14 @@ protected:
     Config mConfig;
     CodeDrivenDataModelProvider * mProvider = nullptr;
 
+    template <typename DelegateType>
+    DelegateType & GetThermostatDelegate()
+    {
+        return std::get<std::add_lvalue_reference_t<DelegateType>>(mThermostatDelegates);
+    }
+
     // Delegates
-    std::tuple<std::unique_ptr<ThermostatDelegates>...> mThermostatDelegates;
+    std::tuple<ThermostatDelegates &...> mThermostatDelegates;
     Clusters::WaterHeaterManagement::Delegate & mWhmDelegate;
     Clusters::ModeBase::AppDelegate & mWaterHeaterModeDelegate;
 

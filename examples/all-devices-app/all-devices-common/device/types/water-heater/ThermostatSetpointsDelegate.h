@@ -36,7 +36,7 @@
  class ThermostatSetpointsDelegate : public ThermostatHeatingSetpoints::Delegate
  {
  public:
-     ThermostatSetpointsDelegate(EndpointId endpoint)
+     ThermostatSetpointsDelegate(EndpointId endpoint = kInvalidEndpointId)
      {}
   
      Protocols::InteractionModel::Status GetOccupiedHeatingSetpoint(temperature & occupiedHeatingSetpoint) const override;
