@@ -31,7 +31,7 @@ jobs:
                   password: ${{ secrets.CHIP_CERT_BINS_REGISTRY_TOKEN }}
                   registry: docker.io
                   platforms: linux/arm64
-                  buildargs: COMMITHASH=${{ inputs.commit_hash || github.sha }}
+                  buildargs: COMMITHASH=${{ inputs.commit_hash || github.sha }},OPENSSL_STATIC=true
             - name: Notify Slack on Failure
               if: failure()
               uses: ./.github/actions/notify-slack-failure

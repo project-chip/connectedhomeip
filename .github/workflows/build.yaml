@@ -39,11 +39,15 @@ jobs:
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
 
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
+
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -193,11 +197,15 @@ jobs:
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
 
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
+
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -384,11 +392,15 @@ jobs:
     build_linux_python_lib:
         name: Build on Linux (python_lib)
 
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
+
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -452,11 +464,15 @@ jobs:
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
 
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
+
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -582,6 +598,8 @@ jobs:
         name: Build on Linux (coverage)
 
         env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
         if: github.actor != 'restyled-io[bot]' && github.actor != 'dependabot[bot]' && inputs.run-codeql != true
@@ -593,7 +611,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 

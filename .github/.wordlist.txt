@@ -215,6 +215,7 @@ CDEEDC
 CDVersionNumber
 ced
 centric
+cert's
 cfg
 CFLAGS
 cgit
@@ -864,8 +865,10 @@ libavahi
 libc
 libcairo
 libCHIP
+libcurl
 libdbus
 LIBDIR
+libdatachannel
 libegl
 libffi
 libfuzzer

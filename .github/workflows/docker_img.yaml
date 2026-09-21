@@ -65,6 +65,8 @@ jobs:
                       images:
                         - 'integrations/docker/images/**'
                         - '!integrations/docker/images/chip-cert-bins/**'
+                        # Documentation changes do not change the built images.
+                        - '!integrations/docker/images/**/*.md'
             # The chip-build images share one ever increasing version, and every
             # image change bumps it. A build is skipped when the tag already
             # exists, so a change without a bump is never built and the run

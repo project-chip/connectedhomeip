@@ -29,11 +29,15 @@ jobs:
     build_linux_fuzzing:
         name: Build on Linux
 
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
+
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -53,7 +57,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-x64-all-clusters-no-ble-libfuzzer \
+                        --target linux-x64-all-clusters-no-ble-libfuzzer-clang \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "

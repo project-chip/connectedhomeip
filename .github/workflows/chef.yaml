@@ -32,12 +32,15 @@ env:
 jobs:
     chef_linux_all_devices:
         name: Chef - Linux CI Examples (All chef devices)
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
         timeout-minutes: 120
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
@@ -61,11 +64,14 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_device_functional_test:
         name: Chef - Device functional tests (Linux)
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
         if: github.actor != 'restyled-io[bot]'
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:213
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -108,7 +114,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:211
+            image: ghcr.io/project-chip/chip-build-esp32:213
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
@@ -137,7 +143,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:211
+            image: ghcr.io/project-chip/chip-build-nrf-platform:213
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
@@ -165,7 +171,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:211
+            image: ghcr.io/project-chip/chip-build-telink:213
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
