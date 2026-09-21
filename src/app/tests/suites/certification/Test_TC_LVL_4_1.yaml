@@ -251,7 +251,7 @@ tests:
           value: 254
 
     - label: "Step 4f: TH reads the MinLevel attribute from the DUT"
-      PICS: LVL.S.A0002 && LVL.S.F01
+      PICS: LVL.S.C01.Rsp && LVL.S.A0002
       command: "readAttribute"
       attribute: "MinLevel"
       response:
@@ -261,7 +261,7 @@ tests:
               type: int8u
 
     - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
-      PICS: LVL.S.C01.Rsp && LVL.S.F01
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.A0002
       command: "MoveToLevel"
       arguments:
           values:
@@ -274,10 +274,25 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
+    #Using hard coded value when optional attributes are not available
+    - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "Level"
+                value: 1
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
     - label:
           "Step 4h: TH sends a Move command to the DUT with MoveMode =0x00 (up)
           and Rate =0 (units/s), expect failure"
-      PICS: LVL.S.C01.Rsp
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000
       command: "Move"
       arguments:
           values:
@@ -303,11 +318,21 @@ tests:
     - label:
           "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
           from DUT, expects mininum level."
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.A0002
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
           value: MinLevelValue
+
+    #Using hard coded value when optional attributes are not available
+    - label:
+          "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
+          from DUT, expects mininum level."
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && !LVL.S.A0002
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 1
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"
