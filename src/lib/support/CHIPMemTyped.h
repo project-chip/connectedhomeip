@@ -16,13 +16,10 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines some macros for type-aware memory allocation for CHIP.
- *
- */
-
 #pragma once
+
+#include <stdlib.h>
+#include <system/SystemConfig.h>
 
 // If type-aware malloc is available and enabled, then we'll try to use it.
 // We define CHIP_SYSTEM_CONFIG_TYPED_MALLOC to 1 in that case (0 if disabled).
