@@ -136,7 +136,7 @@ if (CONFIG_DISPLAY_LVGL)
         "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/devices"
     )
 endif()
-...
+# ...
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST} SRC_DIRS ${SRC_DIRS_LIST})
 ```
 
