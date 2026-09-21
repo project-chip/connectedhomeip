@@ -28,8 +28,8 @@ import pathlib
 import re
 import select
 import shlex
-import subprocess
 import shutil
+import subprocess
 import sys
 import threading
 import time
