@@ -36,6 +36,7 @@
 
 import asyncio
 import logging
+import time
 
 from mobly import asserts
 
@@ -80,7 +81,6 @@ class TC_ACS_2_1(MatterBaseTest):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
         attr = Clusters.AmbientContextSensing.Attributes
-        ci_wait_time = 1.0
 
         """[TC-ACS-2.1] Cluster endpoint"""
         self.step("1", "Commissioning, already done", is_commissioning=True)
@@ -104,16 +104,30 @@ class TC_ACS_2_1(MatterBaseTest):
         # Add AmbientContextSupported elements for CI purpose
         # Human activity walking, Object identification person, Audio identification barking are default
         if self.is_ci:
+            
             if self.SensorFusionDetected:
                 # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
                 # self.write_to_app_pipe(
                 #    f'{{"Name":"SetSensorFusionSupported", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}}]}}')
+                sensorFusionSupported = []
+                sensorFusionSupported_input = [{{"TypeId": 73, "TagId": 4}}, {{"TypeId": 74, "TagId": 3}}]
                 self.write_to_app_pipe({
                     "Name": "SetSensorFusionSupported",
-                    "EndpointId": self.endpoint,
-                    "AmbientContextType": [{{"TypeId": 73, "TagId": 4}}, {{"TypeId": 74, "TagId": 3}}],
+                    "EndpointId": endpoint,
+                    "SensorFusionSupported": sensorFusionSupported_input,
                 })
-                await asyncio.sleep(ci_wait_time)
+                # await asyncio.sleep(ci_wait_time)
+
+                # testing ci attribute readiness wait time
+                ci_wait_time = 10
+                start_time = time.perf_counter()
+                end_time = start_time
+                while (end_time-start_time) < ci_wait_time:
+                    sensorFusionSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SensorFusionSupported)
+                    if sensorFusionSupported is sensorFusionSupported_input:          
+                        break
+                    end_time = time.perf_counter()
+                log.info("SensorFusionSupported detected after %s seconds", end_time-start_time)                  
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
