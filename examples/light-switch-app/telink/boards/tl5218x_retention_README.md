@@ -4,18 +4,18 @@
 
 **Kconfig:** boards/tl5218x_retention.conf (default)
 
-- CONFIG_CHIP_OTA_REQUESTOR=n
-- CONFIG_CHIP_DFU_OVER_BT_SMP=n, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=n,
-- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_OTA_REQUESTOR=n
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=n, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=n,
+-   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+-   CONFIG_DUAL_MODE=0
 
 **Note**: This configuration disables OTA, does not use MCUBoot, and cannot be
 upgraded
 
 **DTS Overlay:** src/platform/telink/tl5218x_2m_flash.overlay (default)
 
-- slot0: 0x15000, size 0xe7000 (924KB)
-- slot1: 0xfc000, size 0xe7000 (924KB)
+-   slot0: 0x15000, size 0xe7000 (924KB)
+-   slot1: 0xfc000, size 0xe7000 (924KB)
 
 **Build:**
 
@@ -38,10 +38,10 @@ build_tl5218x_retention_default/zephyr/zephyr.bin          -> flash this
 
 **Kconfig:** boards/tl5218x_retention_ota_lzma.conf (explicitly specified)
 
-- CONFIG_CHIP_OTA_REQUESTOR=y
-- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
-- CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_OTA_REQUESTOR=y
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+-   CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
+-   CONFIG_DUAL_MODE=0
 
 **DTS Overlay:** src/platform/telink/tl5218x_2m_flash_lzma.overlay (default)
 
@@ -89,10 +89,10 @@ is required due to limited partition space.
 **Kconfig:** boards/tl5218x_retention_dual_mode_ota_lzma.conf (explicitly
 specified)
 
-- CONFIG_CHIP_OTA_REQUESTOR=y
-- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
-- CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
-- CONFIG_DUAL_MODE=1 (action switch mode)
+-   CONFIG_CHIP_OTA_REQUESTOR=y
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+-   CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
+-   CONFIG_DUAL_MODE=1 (action switch mode)
 
 **DTS Overlay:** src/platform/telink/tl5218x_2m_flash_lzma.overlay (default)
 
@@ -120,10 +120,10 @@ time.**
 
 **Kconfig:** boards/tl5218x_retention_ota.conf (explicitly specified)
 
-- CONFIG_CHIP_OTA_REQUESTOR=y
-- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
-- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_OTA_REQUESTOR=y
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+-   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+-   CONFIG_DUAL_MODE=0
 
 **WARNING**: Building this configuration will show a warning:
 

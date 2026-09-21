@@ -4,18 +4,18 @@
 
 **Kconfig:** boards/tl7218x.conf (default)
 
-- CONFIG_CHIP_OTA_REQUESTOR=n
-- CONFIG_CHIP_DFU_OVER_BT_SMP=n, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=n,
-- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_OTA_REQUESTOR=n
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=n, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=n,
+-   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+-   CONFIG_DUAL_MODE=0
 
 **Note**: This configuration disables OTA, does not use MCUBoot, and cannot be
 upgraded
 
 **DTS Overlay:** src/platform/telink/tl7218x_2m_flash.overlay (default)
 
-- slot0: 0x15000, size 0xe5000 (916KB)
-- slot1: 0xfa000, size 0xe6000 (920KB)
+-   slot0: 0x15000, size 0xe5000 (916KB)
+-   slot1: 0xfa000, size 0xe6000 (920KB)
 
 **Build:**
 
@@ -38,10 +38,10 @@ build_tl7218x_default/zephyr/zephyr.bin          -> flash this
 
 **Kconfig:** boards/tl7218x_2m_flash_ota_lzma.conf (explicitly specified)
 
-- CONFIG_CHIP_OTA_REQUESTOR=y
-- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
-- CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_OTA_REQUESTOR=y
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+-   CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
+-   CONFIG_DUAL_MODE=0
 
 **DTS Overlay:** src/platform/telink/tl7218x_2m_flash_lzma.overlay (default)
 
@@ -80,10 +80,10 @@ time.**
 
 **Kconfig:** boards/tl7218x_ota.conf (explicitly specified)
 
-- CONFIG_CHIP_OTA_REQUESTOR=y
-- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
-- CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_OTA_REQUESTOR=y
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+-   CONFIG_LZMA=n, CONFIG_COMPRESS_LZMA=n
+-   CONFIG_DUAL_MODE=0
 
 **WARNING**: Building this configuration will show a warning:
 
@@ -103,10 +103,10 @@ configuration.
 
 **Kconfig:** boards/tl7218x_concurrent.conf (explicitly specified)
 
-- CONFIG_CHIP_CONCURRENT_MODE=y
-- CONFIG_IEEE802154_TLX_BLE_COEXIST=y
-- CONFIG_CHIP_OTA_REQUESTOR=n
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_CONCURRENT_MODE=y
+-   CONFIG_IEEE802154_TLX_BLE_COEXIST=y
+-   CONFIG_CHIP_OTA_REQUESTOR=n
+-   CONFIG_DUAL_MODE=0
 
 **Note**: This configuration enables BLE + 802.15.4 coexistence for Matter over
 Thread with BLE advertising. OTA is disabled.
@@ -132,12 +132,12 @@ build_tl7218x_concurrent/zephyr/zephyr.bin          -> flash this
 
 **Kconfig:** boards/tl7218x_concurrent_cs.conf (explicitly specified)
 
-- CONFIG_CHIP_CONCURRENT_MODE=y
-- CONFIG_IEEE802154_TLX_BLE_COEXIST=y
-- CONFIG_BT_CHANNEL_SOUNDING=y, CONFIG_BT_TLX_CHANNEL_SOUNDING=y
-- CONFIG_BT_SMP=y (unauthenticated pairing, LE Security Mode 1 Level 2)
-- CONFIG_CHIP_OTA_REQUESTOR=n
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_CONCURRENT_MODE=y
+-   CONFIG_IEEE802154_TLX_BLE_COEXIST=y
+-   CONFIG_BT_CHANNEL_SOUNDING=y, CONFIG_BT_TLX_CHANNEL_SOUNDING=y
+-   CONFIG_BT_SMP=y (unauthenticated pairing, LE Security Mode 1 Level 2)
+-   CONFIG_CHIP_OTA_REQUESTOR=n
+-   CONFIG_DUAL_MODE=0
 
 **Note**: This configuration enables BLE + 802.15.4 coexistence with Channel
 Sounding (RAS Reflector) support. BLE buffers, SMP bonding, and stack sizes are
@@ -164,12 +164,12 @@ build_tl7218x_concurrent_cs/zephyr/zephyr.bin          -> flash this
 
 **Kconfig:** boards/tl7218x_concurrent_ota_lzma.conf (explicitly specified)
 
-- CONFIG_CHIP_CONCURRENT_MODE=y
-- CONFIG_IEEE802154_TLX_BLE_COEXIST=y
-- CONFIG_CHIP_OTA_REQUESTOR=y
-- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
-- CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_CONCURRENT_MODE=y
+-   CONFIG_IEEE802154_TLX_BLE_COEXIST=y
+-   CONFIG_CHIP_OTA_REQUESTOR=y
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+-   CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
+-   CONFIG_DUAL_MODE=0
 
 **Note**: This configuration enables BLE + 802.15.4 coexistence for Matter over
 Thread with BLE advertising and OTA support. LZMA compression is required for
@@ -209,14 +209,14 @@ build_tl7218x_concurrent_ota_lzma_v2/zephyr/matter.ota          -> OTA upgrade
 
 **Kconfig:** boards/tl7218x_concurrent_cs_ota_lzma.conf (explicitly specified)
 
-- CONFIG_CHIP_CONCURRENT_MODE=y
-- CONFIG_IEEE802154_TLX_BLE_COEXIST=y
-- CONFIG_BT_CHANNEL_SOUNDING=y, CONFIG_BT_TLX_CHANNEL_SOUNDING=y
-- CONFIG_BT_SMP=y (unauthenticated pairing, LE Security Mode 1 Level 2)
-- CONFIG_CHIP_OTA_REQUESTOR=y
-- CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
-- CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
-- CONFIG_DUAL_MODE=0
+-   CONFIG_CHIP_CONCURRENT_MODE=y
+-   CONFIG_IEEE802154_TLX_BLE_COEXIST=y
+-   CONFIG_BT_CHANNEL_SOUNDING=y, CONFIG_BT_TLX_CHANNEL_SOUNDING=y
+-   CONFIG_BT_SMP=y (unauthenticated pairing, LE Security Mode 1 Level 2)
+-   CONFIG_CHIP_OTA_REQUESTOR=y
+-   CONFIG_CHIP_DFU_OVER_BT_SMP=y, CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y,
+-   CONFIG_LZMA=y, CONFIG_COMPRESS_LZMA=y
+-   CONFIG_DUAL_MODE=0
 
 **Note**: This configuration enables BLE + 802.15.4 coexistence with Channel
 Sounding (RAS Reflector) and OTA support. LZMA compression is required for 2MB
