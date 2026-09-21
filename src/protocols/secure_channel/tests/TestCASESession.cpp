@@ -2638,6 +2638,20 @@ TEST_F(TestCASESession, MalformedSigma2WithoutDestinationNodeIdDoesNotCrash)
                       validDestHeader, initiatorPayloadHeader,
                       Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6))),
                   CHIP_ERROR_INVALID_ARGUMENT);
+
+        // Verify valid unauthenticated CASE_Sigma2Resume emits StatusReport.
+        PayloadHeader sigma2ResumePayloadHeader;
+        sigma2ResumePayloadHeader.SetExchangeID(1235)
+            .SetMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume)
+            .SetInitiator(false)
+            .SetNeedsAck(true);
+        validDestHeader.SetMessageCounter(42);
+        EXPECT_EQ(GetSecureSessionManager().SendUnauthenticatedErrorStatusReport(
+                      validDestHeader, sigma2ResumePayloadHeader,
+                      Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6))),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(loopback.mSentMessageCount, 1u);
+        loopback.mSentMessageCount = 0;
     }
 
     // 2. End-to-end packet injection: inject a spoofed/malformed unauthenticated CASE_Sigma2 with
