@@ -141,8 +141,7 @@ constexpr ChimeTone kCoreS3Tones[] = {
 
 static_assert(std::size(kCoreS3Tones) == std::size(kCoreS3Sounds));
 
-i2s_chan_handle_t sTxChannel          = nullptr;
-i2c_master_dev_handle_t sAmplifierI2c = nullptr;
+i2s_chan_handle_t sTxChannel = nullptr;
 
 // Claimed by PlayChimeSound before it starts the playback task and released by that task
 // when it finishes, so at most one playback task exists at a time.
@@ -200,15 +199,6 @@ public:
     ~ScopedI2cDevice() { Reset(); }
 
     bool IsValid() const { return mDevice != nullptr; }
-    i2c_master_dev_handle_t Handle() const { return mDevice; }
-
-    // Hands ownership to the caller, which keeps the device attached to the bus.
-    i2c_master_dev_handle_t Take()
-    {
-        i2c_master_dev_handle_t device = mDevice;
-        mDevice                        = nullptr;
-        return device;
-    }
 
     void Reset()
     {
@@ -227,6 +217,21 @@ public:
     esp_err_t WriteRegister(uint8_t reg, uint8_t value) const
     {
         const uint8_t payload[2] = { reg, value };
+        return i2c_master_transmit(mDevice, payload, sizeof(payload), 100);
+    }
+
+    // The amplifier registers are 16 bits wide, most significant byte first.
+    esp_err_t ReadWordRegister(uint8_t reg, uint16_t & value) const
+    {
+        uint8_t raw[2] = { 0, 0 };
+        esp_err_t err  = i2c_master_transmit_receive(mDevice, &reg, 1, raw, sizeof(raw), 100);
+        value          = static_cast<uint16_t>((static_cast<uint16_t>(raw[0]) << 8) | raw[1]);
+        return err;
+    }
+
+    esp_err_t WriteWordRegister(uint8_t reg, uint16_t value) const
+    {
+        const uint8_t payload[3] = { reg, static_cast<uint8_t>(value >> 8), static_cast<uint8_t>(value & 0xFF) };
         return i2c_master_transmit(mDevice, payload, sizeof(payload), 100);
     }
 
@@ -269,20 +274,6 @@ public:
 private:
     i2c_master_dev_handle_t mDevice = nullptr;
 };
-
-esp_err_t WriteAmplifierRegister(uint8_t reg, uint16_t value)
-{
-    const uint8_t payload[3] = { reg, static_cast<uint8_t>(value >> 8), static_cast<uint8_t>(value & 0xFF) };
-    return i2c_master_transmit(sAmplifierI2c, payload, sizeof(payload), 100);
-}
-
-esp_err_t ReadAmplifierRegister(uint8_t reg, uint16_t & value)
-{
-    uint8_t raw[2] = { 0, 0 };
-    esp_err_t err  = i2c_master_transmit_receive(sAmplifierI2c, &reg, 1, raw, sizeof(raw), 100);
-    value          = static_cast<uint16_t>((static_cast<uint16_t>(raw[0]) << 8) | raw[1]);
-    return err;
-}
 
 esp_err_t ConfigureExpanderOutputs()
 {
@@ -389,40 +380,18 @@ uint16_t AmplifierVolumeRegister()
     return static_cast<uint16_t>((steps << 8) | kVolumeLowByte);
 }
 
-void ReleaseAmplifierI2c()
+// Returns an invalid device if the amplifier does not come up: the caller decides when
+// the configured amplifier becomes visible to the rest of the file.
+ScopedI2cDevice InitializeAmplifier()
 {
-    if (sAmplifierI2c != nullptr)
-    {
-        i2c_master_bus_rm_device(sAmplifierI2c);
-        sAmplifierI2c = nullptr;
-    }
-}
-
-bool InitializeAmplifier()
-{
-    const i2c_device_config_t config = {
-        .dev_addr_length = I2C_ADDR_BIT_LEN_7,
-        .device_address  = kAw88298Address,
-        .scl_speed_hz    = 400000,
-        .scl_wait_us     = 0,
-        .flags           = { .disable_ack_check = 0 },
-    };
-
-    if (i2c_master_bus_add_device(bsp_i2c_get_handle(), &config, &sAmplifierI2c) != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to attach AW88298 to I2C bus");
-        return false;
-    }
+    ScopedI2cDevice amplifier(kAw88298Address);
+    VerifyOrReturnValue(amplifier.IsValid(), ScopedI2cDevice());
 
     // A soft reset clears any latched protection state (for example UVLS from a previous
     // power-up attempt) that would otherwise keep the output stage disabled.
-    esp_err_t err = WriteAmplifierRegister(0x00, 0x55AA);
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to reset the amplifier: %s", esp_err_to_name(err));
-        ReleaseAmplifierI2c();
-        return false;
-    }
+    esp_err_t err = amplifier.WriteWordRegister(0x00, 0x55AA);
+    VerifyOrReturnValue(err == ESP_OK, ScopedI2cDevice(),
+                        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to reset the amplifier: %s", esp_err_to_name(err)));
     vTaskDelay(pdMS_TO_TICKS(10));
 
     // Register values follow the M5Unified CoreS3 bring-up sequence, which programs the
@@ -439,36 +408,26 @@ bool InitializeAmplifier()
 
     for (const auto & [reg, value] : kSetupRegisters)
     {
-        err = WriteAmplifierRegister(reg, value);
-        if (err != ESP_OK)
-        {
-            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to write amplifier register 0x%02x: %s", reg, esp_err_to_name(err));
-            ReleaseAmplifierI2c();
-            return false;
-        }
+        err = amplifier.WriteWordRegister(reg, value);
+        VerifyOrReturnValue(
+            err == ESP_OK, ScopedI2cDevice(),
+            ChipLogError(DeviceLayer, "CoreS3Chime: Failed to write amplifier register 0x%02x: %s", reg, esp_err_to_name(err)));
     }
 
     uint16_t chipId = 0;
-    err             = ReadAmplifierRegister(0x00, chipId);
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to read the amplifier id: %s", esp_err_to_name(err));
-        ReleaseAmplifierI2c();
-        return false;
-    }
-    if (chipId != kAw88298ChipId)
-    {
-        ChipLogError(DeviceLayer, "CoreS3Chime: Unexpected amplifier id 0x%04x, expected 0x%04x", chipId, kAw88298ChipId);
-        ReleaseAmplifierI2c();
-        return false;
-    }
+    err             = amplifier.ReadWordRegister(0x00, chipId);
+    VerifyOrReturnValue(err == ESP_OK, ScopedI2cDevice(),
+                        ChipLogError(DeviceLayer, "CoreS3Chime: Failed to read the amplifier id: %s", esp_err_to_name(err)));
+    VerifyOrReturnValue(
+        chipId == kAw88298ChipId, ScopedI2cDevice(),
+        ChipLogError(DeviceLayer, "CoreS3Chime: Unexpected amplifier id 0x%04x, expected 0x%04x", chipId, kAw88298ChipId));
 
-    return true;
+    return amplifier;
 }
 
 // SYSST bit 0 reports PLL lock. The amplifier only starts switching once it has locked
 // onto the incoming bit clock, so retry the enable until it reports a locked PLL.
-void WaitForAmplifierLock()
+void WaitForAmplifierLock(const ScopedI2cDevice & amplifier)
 {
     constexpr uint16_t kPllLocked = 0x0001;
     constexpr int kMaxAttempts    = 10;
@@ -477,12 +436,12 @@ void WaitForAmplifierLock()
     for (int attempt = 0; attempt < kMaxAttempts; ++attempt)
     {
         vTaskDelay(pdMS_TO_TICKS(2));
-        ReadAmplifierRegister(0x01, status);
+        amplifier.ReadWordRegister(0x01, status);
         if ((status & kPllLocked) != 0)
         {
             return;
         }
-        WriteAmplifierRegister(0x04, 0x4040);
+        amplifier.WriteWordRegister(0x04, 0x4040);
     }
 
     ChipLogError(DeviceLayer, "CoreS3Chime: Amplifier PLL did not lock, sysst=0x%04x", status);
@@ -516,18 +475,15 @@ bool EnsureSpeakerInitialized()
     // M5Unified programs the amplifier while the I2S pins are still idle and only then
     // starts the clock; configuring register 0x06 (PLL divider) against a running clock
     // leaves the AW88298 state machine oscillating between locked and unlocked.
-    if (!InitializeAmplifier())
-    {
-        return false;
-    }
+    ScopedI2cDevice amplifier = InitializeAmplifier();
+    VerifyOrReturnValue(amplifier.IsValid(), false);
 
-    if (!InitializeI2sTxChannel())
-    {
-        ReleaseAmplifierI2c();
-        return false;
-    }
+    VerifyOrReturnValue(InitializeI2sTxChannel(), false);
 
-    WaitForAmplifierLock();
+    // Nothing reads the amplifier registers after this point, so the device is detached
+    // when this function returns. Detaching the I2C device leaves the amplifier
+    // configuration in place.
+    WaitForAmplifierLock(amplifier);
     return true;
 }
 
