@@ -19,6 +19,7 @@
 #include "LevelControlClusterWidget.h"
 #include "DisplayNotificationHub.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -31,7 +32,11 @@ void UpdateLevelLabel(lv_obj_t * valueLabel, uint8_t level, uint8_t minLevel, ui
     unsigned int pct = 0;
     if (maxLevel > minLevel)
     {
-        pct = static_cast<unsigned int>((static_cast<uint32_t>(level - minLevel) * 100) / (maxLevel - minLevel));
+        // A cluster may report a level outside the range it advertises; clamping keeps the
+        // subtraction below from wrapping.
+        const uint8_t clamped = std::clamp(level, minLevel, maxLevel);
+
+        pct = static_cast<unsigned int>((static_cast<uint32_t>(clamped - minLevel) * 100) / (maxLevel - minLevel));
     }
     char buf[32];
     snprintf(buf, sizeof(buf), "Brightness: %u%% (%u)", pct, static_cast<unsigned int>(level));

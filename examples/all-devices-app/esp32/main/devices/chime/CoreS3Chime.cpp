@@ -526,14 +526,26 @@ public:
                 envelope *= envelopeDecay;
             }
 
-            size_t written = 0;
-            i2s_channel_write(mTxChannel, mChunkBuffer, count * 2 * sizeof(int16_t), &written, 1000);
+            const size_t chunkBytes = count * 2 * sizeof(int16_t);
+            size_t written          = 0;
+            esp_err_t err           = i2s_channel_write(mTxChannel, mChunkBuffer, chunkBytes, &written, 1000);
+            if (err != ESP_OK || written != chunkBytes)
+            {
+                ChipLogError(DeviceLayer, "CoreS3Chime: I2S write failed (%s, %u/%u bytes), aborting tone", esp_err_to_name(err),
+                             static_cast<unsigned>(written), static_cast<unsigned>(chunkBytes));
+                return;
+            }
             produced += count;
         }
 
+        // Flush a silent tail so the amplifier does not hold the last sample.
         std::memset(mChunkBuffer, 0, sizeof(mChunkBuffer));
         size_t written = 0;
-        i2s_channel_write(mTxChannel, mChunkBuffer, sizeof(mChunkBuffer), &written, 1000);
+        esp_err_t err  = i2s_channel_write(mTxChannel, mChunkBuffer, sizeof(mChunkBuffer), &written, 1000);
+        if (err != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "CoreS3Chime: I2S silence write failed: %s", esp_err_to_name(err));
+        }
     }
 
 private:
@@ -633,6 +645,11 @@ Protocols::InteractionModel::Status CoreS3Chime::PlayChimeSound(uint8_t chimeID)
 
     // Refuse an overlapping chime rather than queueing a task that would sit idle for the
     // length of the current sound.
+    //
+    // This deviates from TC-CHIME-2.4 step 7, which sends three PlayChimeSound commands back to
+    // back and expects Success for each, with overlapping audio simply dropped. Restarting or
+    // queueing playback is deliberately not implemented: the overlap window is short and a single
+    // I2S channel cannot mix two tones.
     if (!player.ClaimPlayback())
     {
         return Protocols::InteractionModel::Status::Busy;

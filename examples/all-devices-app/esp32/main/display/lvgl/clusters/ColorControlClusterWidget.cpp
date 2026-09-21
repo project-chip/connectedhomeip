@@ -519,11 +519,15 @@ lv_obj_t * CreateColorControlClusterWidget(lv_obj_t * parent, Clusters::ColorCon
         lv_obj_move_to_index(context->selector, 0);
     }
 
+    // Without a single supported mode there are no controls to refresh, and RefreshFromCluster
+    // would reach for sliders that were never created.
+    VerifyOrReturnValue(buttonCount != 0, card);
+
     // The reported mode can name controls that were never built, because a cluster may report
     // a mode outside the set its feature map advertises. Falling back to the first mode that
     // was built keeps the card from rendering empty. Buttons are added alongside groups, so
     // buttonMode[0] is that mode.
-    const ColorMode initial = (buttonCount != 0 && context->group[Index(active)] == nullptr) ? context->buttonMode[0] : active;
+    const ColorMode initial = (context->group[Index(active)] == nullptr) ? context->buttonMode[0] : active;
 
     ShowMode(context, initial);
 

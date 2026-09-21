@@ -19,6 +19,7 @@
 #include "OnOffClusterWidget.h"
 #include "DisplayNotificationHub.h"
 
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip::app {
@@ -77,7 +78,8 @@ lv_obj_t * CreateOnOffClusterWidget(lv_obj_t * parent, Clusters::OnOffCluster & 
         toggleBtn,
         [](lv_event_t * event) {
             auto * clusterPtr = static_cast<Clusters::OnOffCluster *>(lv_event_get_user_data(event));
-            DeviceLayer::SystemLayer().ScheduleLambda([clusterPtr]() { clusterPtr->SetOnOff(!clusterPtr->GetOnOff()); });
+            DeviceLayer::SystemLayer().ScheduleLambda(
+                [clusterPtr]() { LogErrorOnFailure(clusterPtr->SetOnOff(!clusterPtr->GetOnOff())); });
         },
         LV_EVENT_CLICKED, &cluster);
 

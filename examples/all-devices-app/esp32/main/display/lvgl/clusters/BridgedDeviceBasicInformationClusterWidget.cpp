@@ -101,10 +101,14 @@ lv_obj_t * CreateBridgedDeviceBasicInformationClusterWidget(lv_obj_t * parent,
     // Subscribing with 'card' automatically unregisters when 'card' is deleted.
     DisplayNotificationHub::Instance().Subscribe(
         card, cluster.GetPaths()[0].mEndpointId, Clusters::BridgedDeviceBasicInformation::Id,
-        [stateLabel, toggleBtn, btnLabel, &cluster](const ConcreteAttributePath & path) {
+        [labelText, stateLabel, toggleBtn, btnLabel, &cluster](const ConcreteAttributePath & path) {
             if (path.mAttributeId == Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id)
             {
                 UpdateReachableDisplay(stateLabel, toggleBtn, btnLabel, cluster.GetReachable());
+            }
+            else if (path.mAttributeId == Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
+            {
+                lv_label_set_text(labelText, cluster.GetNodeLabel().c_str());
             }
         });
 

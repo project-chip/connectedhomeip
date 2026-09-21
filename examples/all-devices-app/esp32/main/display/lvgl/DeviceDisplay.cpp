@@ -165,12 +165,14 @@ void ShowRestartingMessage()
 
 void InitDisplayDataModelListener()
 {
-    chip::app::DisplayNotificationHub::Instance().Init();
-
+    // Nothing below is safe without a display: the hub takes the LVGL port lock from its
+    // attribute callback, and that lock asserts when the port was never initialized.
     if (gDisplay == nullptr)
     {
         return;
     }
+
+    chip::app::DisplayNotificationHub::Instance().Init();
 
     // Called on the CHIP thread once Server::Init() has populated the fabric table. An
     // uncommissioned device jumps straight to the onboarding payload, so the breadcrumbs
