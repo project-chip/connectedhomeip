@@ -28,6 +28,7 @@
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 #include <posix/named_pipe/translators/RvcTranslator.h>
+#include <posix/named_pipe/translators/SwitchTranslator.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
@@ -377,10 +378,29 @@ TEST_F(TestNamedPipeTranslators, RvcTranslator)
     EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
 }
 
+TEST_F(TestNamedPipeTranslators, SwitchTranslator)
+{
+    SwitchTranslator translator;
+
+    // SetCurrentPosition with CurrentPosition
+    Json::Value json1 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 1})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json1, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
+
+    Json::Value json2 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 0})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
+
+    // Missing field
+    Json::Value invalid = ParseJson(R"({"Name": "SetCurrentPosition"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, invalid, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
 {
     Dispatcher dispatcher(mRegistry);
     EXPECT_EQ(dispatcher.EnsureTranslatorRegistered<OnOffTranslator>(), CHIP_NO_ERROR);
+    EXPECT_EQ(dispatcher.EnsureTranslatorRegistered<SwitchTranslator>(), CHIP_NO_ERROR);
 
     // Valid action on explicit endpoint
     Json::Value valid = ParseJson(R"({"Name": "SetOnOff", "EndpointId": 1, "OnOff": true})");
@@ -390,6 +410,11 @@ TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
     // Valid action with default endpoint (0)
     Json::Value defEp = ParseJson(R"({"Name": "SetOnOff", "OnOff": false})");
     EXPECT_EQ(dispatcher.DispatchJson(defEp), CHIP_NO_ERROR);
+
+    // Valid SwitchTranslator action
+    Json::Value switchCmd = ParseJson(R"({"Name": "SetCurrentPosition", "EndpointId": 1, "CurrentPosition": 2})");
+    EXPECT_EQ(dispatcher.DispatchJson(switchCmd), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
 
     // Invalid JSON structure (not object)
     Json::Value arrayVal(Json::arrayValue);

@@ -52,6 +52,8 @@ source_set("oob-accessors") {
     "clusters/OnOffOOBAccessor.h",
     "clusters/RvcOOBAccessor.cpp",
     "clusters/RvcOOBAccessor.h",
+    "clusters/SwitchOOBAccessor.cpp",
+    "clusters/SwitchOOBAccessor.h",
   ]
 
   public_deps = [
@@ -65,6 +67,7 @@ source_set("oob-accessors") {
     "${chip_root}/src/app/clusters/mode-select-server",
     "${chip_root}/src/app/clusters/occupancy-sensor-server",
     "${chip_root}/src/app/clusters/on-off-server",
+    "${chip_root}/src/app/clusters/switch-server",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

@@ -37,6 +37,8 @@ source_set("named_pipe") {
     "translators/OnOffTranslator.h",
     "translators/RvcTranslator.cpp",
     "translators/RvcTranslator.h",
+    "translators/SwitchTranslator.cpp",
+    "translators/SwitchTranslator.h",
   ]
 
   public_deps = [
