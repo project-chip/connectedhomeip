@@ -888,6 +888,8 @@ for that run, e.g.:
 #     app: ${TYPE_OF_APP}
 #     app-args: <app_arguments>
 #     script-args: <script_arguments>
+#     executor: <path_to_runner>   [optional]
+#     executor-args: <runner_arguments>   [optional]
 #     factory-reset: <true|false>
 #     timeout: <float>   [optional]
 #     quiet: <true|false>
@@ -942,6 +944,25 @@ for that run, e.g.:
 
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
+
+-   `executor`: Path to a runner that takes over the whole run, for a test
+    needing a topology `run_python_test.py` does not model, such as more than
+    one application or a mocked transport. The runner is invoked with
+    `--script`, `--script-args` and `--timeout`, and owns the lifetime of
+    everything it starts. `app`, `app-args` and `factory-reset` are then the
+    runner's to interpret or ignore.
+
+    Tests declaring an executor are excluded from the sweeps that run every
+    test, because they generally need privileges or binaries an ordinary run
+    does not have. Pass `--with-executor` to `execute_python_tests.py run` or to
+    `local.py python-tests` to include them.
+
+    -   Example: `scripts/tests/run_compro_test.py`
+
+-   `executor-args`: Arguments appended to the `executor` invocation. Supports
+    the same `${...}` environment substitutions as `app` and `script-args`.
+
+    -   Example: `--proxy-app ${ALL_DEVICES_APP} --ed-app ${ALL_CLUSTERS_APP}`
 
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test

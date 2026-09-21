@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import logging
+import os
 import pathlib
 import re
 import shlex
+import signal
 import subprocess
 import sys
 import threading
@@ -27,6 +30,22 @@ from typing import BinaryIO, Self
 from matter.testing.defaults import TestingDefaults
 
 LOGGER = logging.getLogger(__name__)
+
+
+def terminate_process_group(proc: subprocess.Popen) -> None:
+    """Take down a process started with `start_new_session` and all its children.
+
+    `Popen.terminate()` signals only the process itself, leaving what it launched
+    to run on into the next test. The caller must have used `start_new_session`,
+    or this kills the caller's own group.
+    """
+    for sig in (signal.SIGTERM, signal.SIGKILL):
+        with contextlib.suppress(ProcessLookupError):
+            os.killpg(os.getpgid(proc.pid), sig)
+        with contextlib.suppress(subprocess.TimeoutExpired):
+            proc.wait(timeout=TestingDefaults.TERMINATION_TIMEOUT_S)
+            return
+    LOGGER.warning("Failed to kill the process group of pid %d, a zombie may be left behind", proc.pid)
 
 
 def forward_f(f_in: BinaryIO, f_out: BinaryIO, cb: Callable[[bytes, bool], bytes] | None = None, is_stderr: bool = False) -> None:

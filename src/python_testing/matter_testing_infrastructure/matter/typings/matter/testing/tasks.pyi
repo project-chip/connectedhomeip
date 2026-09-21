@@ -1,9 +1,13 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/tasks.py
 
+import subprocess
 import threading
 from collections.abc import Callable, Sequence
 from re import Pattern
 from typing import Any, BinaryIO
+
+def terminate_process_group(proc: subprocess.Popen) -> None: ...
+
 
 def forward_f(f_in: BinaryIO, f_out: BinaryIO,
               cb: Callable[[bytes, bool], bytes] | None = ...,

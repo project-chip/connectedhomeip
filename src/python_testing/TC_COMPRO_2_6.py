@@ -26,11 +26,17 @@
 #       --passcode 20202021
 #       --endpoint 5
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --string-arg ed_app_path:${ED_APP}
+#       --string-arg ed_app_path:${ALL_CLUSTERS_APP}
 #       --int-arg ed_discriminator:3841 ed_passcode:20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     executor: scripts/tests/run_compro_test.py
+#     executor-args: >
+#       --proxy-app ${ALL_DEVICES_APP}
+#       --ed-app ${ALL_CLUSTERS_APP}
+#       --proxy-transport auto
 #     factory-reset: true
+#     timeout: 100
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 

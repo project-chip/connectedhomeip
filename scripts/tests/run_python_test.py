@@ -28,6 +28,7 @@ import pathlib
 import re
 import select
 import shlex
+import subprocess
 import sys
 import threading
 import time
@@ -42,7 +43,7 @@ from colorama import Fore, Style
 from matter.testing.defaults import TestingDefaults
 from matter.testing.metadata import Metadata, MetadataReader
 from matter.testing.runner import matter_test_args_parser
-from matter.testing.tasks import Subprocess
+from matter.testing.tasks import Subprocess, terminate_process_group
 
 log = logging.getLogger(__name__)
 
@@ -206,6 +207,41 @@ def run_timeout(run: Metadata) -> float:
     return TestingDefaults.DEFAULT_TIMEOUT_S
 
 
+def run_with_executor(run: Metadata, timeout: float) -> int:
+    """Run the test through the runner named by its CI arguments block.
+
+    The script path is absolute because the executor runs from the repository
+    root. Without `--fail-on-skipped` a self-skipping test would exit 0 and be
+    recorded as a pass. `--timeout` bounds the whole test run, not just the
+    body and varies by script.
+    """
+    base_name = os.path.splitext(os.path.basename(run.py_script_path))[0]
+    script_args = (run.script_args or "").replace('{SCRIPT_BASE_NAME}', base_name)
+    cmd = [sys.executable, os.path.join(DEFAULT_CHIP_ROOT, run.executor),
+           "--script", os.path.abspath(run.py_script_path),
+           "--timeout", str(int(timeout)),
+           "--script-args", f"{script_args} --fail-on-skipped".strip()]
+    cmd += shlex.split((run.executor_args or "").replace('{SCRIPT_BASE_NAME}', base_name))
+
+    backstop = timeout + 2 * TestingDefaults.TEST_RUNNER_SLACK_S
+    log.info("Executing '%s' via '%s'", run.py_script_path.split('/')[-1], run.executor)
+    log.info("Running %s", shlex.join(cmd))
+    proc = subprocess.Popen(cmd, cwd=DEFAULT_CHIP_ROOT, start_new_session=True)
+    try:
+        return proc.wait(timeout=backstop)
+    except subprocess.TimeoutExpired:
+        log.error("'%s' did not finish within %d s", run.executor, backstop)
+        terminate_process_group(proc)
+        return 1
+    except KeyboardInterrupt:
+        # The executor is in a session of its own, so it does not get the
+        # terminal's interrupt and would outlive this process along with the
+        # mock buses and applications it started.
+        log.error("Interrupted, stopping '%s'", run.executor)
+        terminate_process_group(proc)
+        raise
+
+
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
@@ -291,6 +327,10 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             run.pre_existing_fabric = pre_existing_fabric
 
     for run in runs:
+        if run.executor:
+            if exit_code := run_with_executor(run, run_timeout(run)):
+                sys.exit(exit_code)
+            continue
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,

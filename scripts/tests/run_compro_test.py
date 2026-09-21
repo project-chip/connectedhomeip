@@ -41,9 +41,9 @@ applies.
 
 The block's `app`, `app-args` and `factory-reset` are for `run_python_test.py`
 and are not used: this script launches two applications and builds their
-arguments itself. The tests are listed in `test_metadata.yaml` under
-`dedicated_runner`, which keeps them out of the default run and records that
-this script is what runs them.
+arguments itself. Each test names this script in its block's `executor`, so
+`run_python_test.py` hands the run over here and the usual entry points reach
+these tests like any other.
 
 Must run as root, so that the namespaces and the mock D-Bus bus can be created.
 When invoked as a normal user it re-executes itself under `unshare
@@ -65,7 +65,6 @@ import glob
 import logging
 import os
 import shlex
-import signal
 import subprocess
 import sys
 import tempfile
@@ -73,11 +72,10 @@ from pathlib import Path
 
 import chiptest.linux
 import click
-import yaml
 from chiptest.log_config import LogConfig
 
 from matter.testing.metadata import extract_runs_args
-from matter.testing.tasks import Subprocess
+from matter.testing.tasks import Subprocess, terminate_process_group
 
 log = logging.getLogger(__name__)
 
@@ -116,8 +114,13 @@ PROXY_PASSCODE = 20202021
 APP_READY_PATTERN = "APP STATUS: Starting event loop"
 APP_READY_TIMEOUT_S = 30
 
-# Used only if script test_metadata.yaml has no dedicated_runner entry for.
+# Used only if neither --timeout nor the test's CI arguments block gives one.
 DEFAULT_TEST_TIMEOUT_S = 600
+
+# The proxy application is asked which transports it was built with. Bounded so
+# that a binary which does not exit on --help fails here rather than hanging
+# before --timeout is in force.
+HELP_PROBE_TIMEOUT_S = 30
 
 
 class MockRecordsOnly(logging.Filter):
@@ -163,11 +166,15 @@ class Transport(enum.StrEnum):
     BOTH makes the end device commissionable over BLE and Wi-Fi PAF at the same
     time, which the scan tests need in order to receive device reports per
     transport.
+
+    AUTO is whatever the proxy was built with, so one CI arguments block serves
+    both a two-transport CI build and a single-transport local one.
     """
 
     WIFIPAF = "wifipaf"
     BLE = "ble"
     BOTH = "both"
+    AUTO = "auto"
 
 
 def proxy_link_name(transport: str) -> str:
@@ -216,7 +223,12 @@ def proxy_build_transports(proxy_app: str) -> set[str]:
 
     The application only offers the options for the transports it was built with.
     """
-    help_text = subprocess.run([proxy_app, "--help"], capture_output=True, text=True).stdout
+    try:
+        help_text = subprocess.run([proxy_app, "--help"], capture_output=True, text=True,
+                                   timeout=HELP_PROBE_TIMEOUT_S).stdout
+    except subprocess.TimeoutExpired:
+        log.warning("%s did not answer --help within %d s", proxy_app, HELP_PROBE_TIMEOUT_S)
+        return set()
     transports = set()
     if "--ble-controller" in help_text:
         transports.add(Transport.BLE)
@@ -225,8 +237,8 @@ def proxy_build_transports(proxy_app: str) -> set[str]:
     return transports
 
 
-def check_transport_matches_build(proxy_app: str, transport: str, proxy_ble: bool) -> bool:
-    """Compare the requested transport against the proxy build; return proxy_ble.
+def resolve_transport(proxy_app: str, transport: str, proxy_ble: bool) -> tuple[str, bool]:
+    """Settle the transport against the proxy build, returning it and proxy_ble.
 
     Raises when the build cannot serve the requested transport at all, and
     warns when it serves more. Note, the extra transport reaches the tests
@@ -234,11 +246,21 @@ def check_transport_matches_build(proxy_app: str, transport: str, proxy_ble: boo
     """
     built = proxy_build_transports(proxy_app)
     if not built:
+        if transport == Transport.AUTO:
+            raise click.BadOptionUsage(
+                "proxy-transport",
+                f"Could not read the transports {proxy_app} was built with, so --proxy-transport "
+                "auto cannot be resolved. Name the transport explicitly.")
         log.warning("Could not read the transports %s was built with; trusting --proxy-transport",
                     proxy_app)
-        return proxy_ble
+        return transport, proxy_ble
 
-    wanted = set(Transport) - {Transport.BOTH} if transport == Transport.BOTH else {transport}
+    if transport == Transport.AUTO:
+        transport = Transport.BOTH if len(built) > 1 else next(iter(built))
+        log.info("%s was built with %s, so --proxy-transport auto runs %s",
+                 proxy_app, ", ".join(sorted(built)), transport)
+
+    wanted = set(Transport) - {Transport.BOTH, Transport.AUTO} if transport == Transport.BOTH else {transport}
     if missing := wanted - built:
         raise click.BadOptionUsage(
             "proxy-transport",
@@ -253,13 +275,13 @@ def check_transport_matches_build(proxy_app: str, transport: str, proxy_ble: boo
     if Transport.BLE not in built:
         # --ble-controller does not exist in a build without BLE, and passing an
         # option the application does not know is fatal to it.
-        return False
+        return transport, False
     if not proxy_ble:
         raise click.BadOptionUsage(
             "no-proxy-ble",
             f"{proxy_app} was built with BLE, so --no-proxy-ble is wrong: without "
             "--ble-controller the proxy would share the end device's adapter.")
-    return True
+    return transport, True
 
 
 def declared_test_params(script: str) -> dict[str, int]:
@@ -286,16 +308,15 @@ def declared_test_params(script: str) -> dict[str, int]:
 
 
 def declared_timeout(script: str) -> int | None:
-    """Timeout the script's `dedicated_runner` entry in test_metadata.yaml declares."""
-    metadata = os.path.join(DEFAULT_CHIP_ROOT, "src/python_testing/test_metadata.yaml")
-    try:
-        with open(metadata) as f:
-            entries = yaml.safe_load(f).get("dedicated_runner") or []
-    except OSError:
-        return None
-    name = os.path.basename(script)
-    return next((e["timeout"] for e in entries
-                 if e.get("name") == name and e.get("timeout") is not None), None)
+    """Seconds the test's CI arguments block allows the script, if it declares one.
+
+    Only used when this script is run directly. run_python_test.py passes the
+    same value in as --timeout.
+    """
+    for run in extract_runs_args(script).values():
+        if "timeout" in run:
+            return int(float(run["timeout"]))
+    return None
 
 
 def declared_commissioning_args(script: str) -> list[str]:
@@ -359,8 +380,8 @@ def ed_app_args(transport: str) -> str:
               help='Whether the proxy application was built with BLE. Clear it for a PAF-only build, '
                    'which does not accept --ble-controller.')
 @click.option('--timeout', default=None, type=int,
-              help='Seconds allowed for the test script, overriding the timeout the '
-                   'test declares in test_metadata.yaml. This bounds the framework '
+              help='Seconds allowed for the test script, overriding the timeout the test '
+                   'declares in its CI arguments block. This bounds the framework '
                    'commissioning that runs before the test body, which the body\'s own '
                    'default_timeout does not cover.')
 @click.option('--ns-index', default=0, show_default=True, help='Index of the Linux network namespaces.')
@@ -407,7 +428,7 @@ def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, scrip
             "passcode", f"The proxy application has no --passcode option, so its passcode is always "
             f"{PROXY_PASSCODE}; --passcode and the test's CI arguments block cannot change it.")
 
-    proxy_ble = check_transport_matches_build(proxy_app, transport, proxy_ble)
+    transport, proxy_ble = resolve_transport(proxy_app, transport, proxy_ble)
 
     if not internal_inside_unshare:
         chiptest.linux.ensure_namespace_availability()
@@ -474,12 +495,7 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
             return proc.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
             log.error("%s did not finish within %d s", script, timeout)
-            for sig in (signal.SIGTERM, signal.SIGKILL):
-                with contextlib.suppress(ProcessLookupError):
-                    os.killpg(os.getpgid(proc.pid), sig)
-                with contextlib.suppress(subprocess.TimeoutExpired):
-                    proc.wait(timeout=5)
-                    break
+            terminate_process_group(proc)
             return 1
 
 
@@ -491,8 +507,12 @@ def test_script_args(script: str, ed_app: str | None, script_args: str, transpor
     The proxy is commissioned through the framework's own options, the same way a
     hardware run does it. Only the arguments describing the mocked end device are
     added here.
+
+    The block's own arguments go first, so that what is computed here wins on the
+    options both name, such as the storage directory and the end device.
     """
     args = [
+        *shlex.split(script_args),
         *declared_commissioning_args(script),
         "--discriminator", str(discriminator),
         "--passcode", str(passcode),
@@ -524,7 +544,7 @@ def test_script_args(script: str, ed_app: str | None, script_args: str, transpor
             f"ed_passcode:{ed_passcode}",
         ]
 
-    return args + shlex.split(script_args)
+    return args
 
 
 if __name__ == '__main__':

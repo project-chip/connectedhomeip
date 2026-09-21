@@ -40,7 +40,7 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import extract_runs_args
+    from matter.testing.metadata import declares_executor, extract_runs_args
     from matter.testing.tasks import SubprocessKind
 
 
@@ -937,6 +937,14 @@ def gen_coverage(flat):
     show_default=True,
     help="Include nightly tests (normally excluded as they are slow and reserved for nightly CI runs).",
 )
+@click.option(
+    "--with-executor",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Include tests that name a dedicated runner in their CI arguments block. These need a "
+         "topology run_python_test.py does not model, so they are excluded by default.",
+)
 def python_tests(
     test_filter,
     skip,
@@ -951,6 +959,7 @@ def python_tests(
     override_binary_path,
     app_filter,
     include_nightly,
+    with_executor,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -1035,10 +1044,7 @@ def python_tests(
 
     with open("src/python_testing/test_metadata.yaml") as f:
         metadata = yaml.full_load(f)
-    # not_automated is never run in CI. dedicated_runner tests are run, but by
-    # their own runner rather than run_python_test.py, so this one skips them too.
-    excluded_patterns = {item["name"] for item in
-                         metadata["not_automated"] + (metadata.get("dedicated_runner") or [])}
+    excluded_patterns = {item["name"] for item in metadata["not_automated"]}
     nightly_tests = {item["name"] for item in metadata["nightly"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
@@ -1054,6 +1060,8 @@ def python_tests(
         if os.path.basename(file) in excluded_patterns:
             continue
         if not include_nightly and os.path.basename(file) in nightly_tests:
+            continue
+        if not with_executor and declares_executor(file):
             continue
         test_scripts.append(file)
     test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
