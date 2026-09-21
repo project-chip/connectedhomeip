@@ -68,6 +68,27 @@ std::vector<uint8_t> DiscoveryCodeToVector(Thread::DiscoveryCode code)
     return std::vector<uint8_t>(bytes, bytes + sizeof(bytes));
 }
 
+bool IsValidLongDiscriminatorTxtValue(ByteSpan value)
+{
+    if (value.empty() || value.size() > 4 || (value.size() > 1 && value[0] == '0'))
+    {
+        return false;
+    }
+
+    uint16_t discriminator = 0;
+    for (uint8_t digit : value)
+    {
+        if (digit < '0' || digit > '9')
+        {
+            return false;
+        }
+
+        discriminator = static_cast<uint16_t>(discriminator * 10 + digit - '0');
+    }
+
+    return discriminator < (1u << SetupDiscriminator::kLongBits);
+}
+
 } // namespace
 
 namespace chip {
@@ -81,33 +102,10 @@ ThreadMeshcopCommissionProxy::ThreadMeshcopCommissionProxy() : mState(State::kCo
 ThreadMeshcopCommissionProxy::~ThreadMeshcopCommissionProxy()
 {
     std::unique_lock<std::recursive_mutex> lock(mMutex);
+    mStopProxyThread = true;
     if (mProxyFd != -1)
     {
-        if (shutdown(mProxyFd, SHUT_RDWR) == 0 || errno != EBADF)
-        {
-            close(mProxyFd);
-        }
-
-        mProxyFd = -1;
-    }
-
-    if (mProxyThread.joinable())
-    {
-        lock.unlock();
-        mProxyThread.join();
-    }
-}
-
-void ThreadMeshcopCommissionProxy::ResetCommissionerForDiscovery()
-{
-    std::unique_lock<std::recursive_mutex> lock(mMutex);
-    if (mProxyFd != -1)
-    {
-        if (shutdown(mProxyFd, SHUT_RDWR) == 0 || errno != EBADF)
-        {
-            close(mProxyFd);
-        }
-        mProxyFd = -1;
+        shutdown(mProxyFd, SHUT_RDWR);
     }
 
     if (mProxyThread.joinable())
@@ -115,6 +113,36 @@ void ThreadMeshcopCommissionProxy::ResetCommissionerForDiscovery()
         lock.unlock();
         mProxyThread.join();
         lock.lock();
+    }
+
+    // The receiver must stop using the descriptor before it can be closed or reused.
+    if (mProxyFd != -1)
+    {
+        close(mProxyFd);
+        mProxyFd = -1;
+    }
+}
+
+void ThreadMeshcopCommissionProxy::ResetCommissionerForDiscovery()
+{
+    std::unique_lock<std::recursive_mutex> lock(mMutex);
+    mStopProxyThread = true;
+    if (mProxyFd != -1)
+    {
+        shutdown(mProxyFd, SHUT_RDWR);
+    }
+
+    if (mProxyThread.joinable())
+    {
+        lock.unlock();
+        mProxyThread.join();
+        lock.lock();
+    }
+
+    if (mProxyFd != -1)
+    {
+        close(mProxyFd);
+        mProxyFd = -1;
     }
 
     mServicePort  = 0;
@@ -128,7 +156,9 @@ void ThreadMeshcopCommissionProxy::SetState(State state)
 
 void ThreadMeshcopCommissionProxy::OnHeader(chip::Dnssd::ConstHeaderRef & header)
 {
-    ChipLogDetail(Controller, "mDNS Response: ID=%u, Answers=%u, Additional=%u", header.GetMessageId(), header.GetAnswerCount(),
+    mCurrentPacketIsResponse = header.GetFlags().IsResponse();
+    ChipLogDetail(Controller, "mDNS packet: type=%s, ID=%u, Answers=%u, Additional=%u",
+                  mCurrentPacketIsResponse ? "response" : "query", header.GetMessageId(), header.GetAnswerCount(),
                   header.GetAdditionalCount());
 }
 
@@ -140,12 +170,11 @@ void ThreadMeshcopCommissionProxy::OnQuery(const chip::Dnssd::QueryData & data)
     }
 
     ChipLogDetail(Controller, "mDNS query: %s", chip::Dnssd::QNameString(data.GetName()).c_str());
-    mNodeData.Set<Dnssd::CommissionNodeData>();
 }
 
 void ThreadMeshcopCommissionProxy::OnResource(chip::Dnssd::ResourceType section, const chip::Dnssd::ResourceData & data)
 {
-    if (mState != State::kDiscovering)
+    if (mState != State::kDiscovering || !mCurrentPacketIsResponse)
     {
         return;
     }
@@ -185,23 +214,24 @@ void ThreadMeshcopCommissionProxy::OnResource(chip::Dnssd::ResourceType section,
         }
         Platform::CopyString(commissionData.instanceName, fullName.c_str());
 
-        mServicePort = srv.GetPort();
-
-        if (mProxyFd == -1)
-        {
-            CHIP_ERROR err = CreateProxySocket(commissionData);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Controller, "Failed to setup proxy socket: %" CHIP_ERROR_FORMAT, err.Format());
-                SetState(State::kAborted);
-            }
-        }
+        mServicePort               = srv.GetPort();
+        mCurrentPacketHasMatterSrv = true;
         break;
     }
 
-    case chip::Dnssd::QType::TXT:
-        chip::Dnssd::ParseTxtRecord(data.GetData(), this);
+    case chip::Dnssd::QType::TXT: {
+        if (!name.EndsWith(kMatterCServiceSuffix))
+        {
+            break;
+        }
+
+        mCurrentTxtRecordHasDiscriminator = false;
+        if (chip::Dnssd::ParseTxtRecord(data.GetData(), this) && mCurrentTxtRecordHasDiscriminator)
+        {
+            mCurrentPacketHasDiscriminator = true;
+        }
         break;
+    }
 
     default:
         break;
@@ -303,6 +333,11 @@ void ThreadMeshcopCommissionProxy::OnRecord(const chip::Dnssd::BytesRange & name
     ByteSpan val(value.Start(), value.Size());
 
     Dnssd::FillNodeDataFromTxt(key, val, mNodeData.Get<Dnssd::CommissionNodeData>());
+
+    if (name.Size() == 1 && (name.Start()[0] == 'D' || name.Start()[0] == 'd'))
+    {
+        mCurrentTxtRecordHasDiscriminator = IsValidLongDiscriminatorTxtValue(val);
+    }
 }
 
 void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
@@ -316,11 +351,22 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
     }
 
     mNodeData.Set<Dnssd::CommissionNodeData>();
-    mDnsPacket = chip::Dnssd::BytesRange(payload.data(), payload.data() + payload.size());
+    mServicePort                      = 0;
+    mCurrentPacketIsResponse          = false;
+    mCurrentPacketHasMatterSrv        = false;
+    mCurrentPacketHasDiscriminator    = false;
+    mCurrentTxtRecordHasDiscriminator = false;
+    mDnsPacket                        = chip::Dnssd::BytesRange(payload.data(), payload.data() + payload.size());
 
-    if (!chip::Dnssd::ParsePacket(mDnsPacket, this))
+    if (!chip::Dnssd::ParseMdnsPacket(mDnsPacket, this))
     {
         ChipLogError(Controller, "Failed to parse joiner mDNS announcement");
+        return;
+    }
+
+    if (!mCurrentPacketIsResponse || !mCurrentPacketHasMatterSrv || !mCurrentPacketHasDiscriminator || mServicePort == 0)
+    {
+        ChipLogDetail(Controller, "Ignoring incomplete joiner mDNS announcement");
         return;
     }
 
@@ -329,9 +375,24 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
 
     if (!mExpectedDiscriminator.MatchesLongDiscriminator(static_cast<uint16_t>(discoveredDiscriminator)))
     {
-        ChipLogProgress(Controller, "Discriminator mismatch (Expected %u, Got %u). Ignoring announcement.",
-                        mExpectedDiscriminator.GetLongValue(), discoveredDiscriminator);
+        ChipLogProgress(Controller, "Discriminator mismatch (Expected %s %u, Got long %u). Ignoring announcement.",
+                        mExpectedDiscriminator.IsShortDiscriminator() ? "short" : "long",
+                        mExpectedDiscriminator.IsShortDiscriminator() ? mExpectedDiscriminator.GetShortValue()
+                                                                      : mExpectedDiscriminator.GetLongValue(),
+                        discoveredDiscriminator);
         return;
+    }
+
+    auto & commissionData = mNodeData.Get<Dnssd::CommissionNodeData>();
+    if (mProxyFd == -1)
+    {
+        CHIP_ERROR err = CreateProxySocket(commissionData);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to setup proxy socket: %" CHIP_ERROR_FORMAT, err.Format());
+            SetState(State::kAborted);
+            return;
+        }
     }
 
     mDiscoveredNodePromise.set_value(mNodeData);
@@ -350,13 +411,16 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
         mProxyThread.join();
     }
 
-    mProxyThread = std::thread([id = joinerIdBytes, this]() {
+    mStopProxyThread = false;
+    mProxyThread     = std::thread([id = joinerIdBytes, this]() {
         struct sockaddr_storage addr;
         socklen_t len = sizeof(addr);
         uint8_t buf[chip::detail::kMaxIPPacketSizeBytes];
         ssize_t received;
 
-        while ((received = recvfrom(mProxyFd, buf, sizeof(buf), 0, reinterpret_cast<struct sockaddr *>(&addr), &len)) > 0)
+        while (!mStopProxyThread &&
+               (received = recvfrom(mProxyFd, buf, sizeof(buf), 0, reinterpret_cast<struct sockaddr *>(&addr), &len)) > 0 &&
+               !mStopProxyThread)
         {
             switch (mState)
             {

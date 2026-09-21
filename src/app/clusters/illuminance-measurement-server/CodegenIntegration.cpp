@@ -47,25 +47,16 @@ public:
         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
-        // Try to read the default value for these mandatory attributes but do not fail if the operation is not successful.
-        // This is because not all apps are setting a default value for them in ember.
+        // These attributes are mandatory, but not all apps set a default value for them in ember,
+        // so a missing default is tolerated and yields null.
         DataModel::Nullable<uint16_t> minMeasuredValue{};
-        if (MinMeasuredValue::GetDefault(endpointId, minMeasuredValue) != Status::Success)
-        {
-            minMeasuredValue.SetNull();
-        }
+        MinMeasuredValue::GetDefaultOr(endpointId, minMeasuredValue, DataModel::NullNullable);
 
         DataModel::Nullable<uint16_t> maxMeasuredValue{};
-        if (MaxMeasuredValue::GetDefault(endpointId, maxMeasuredValue) != Status::Success)
-        {
-            maxMeasuredValue.SetNull();
-        }
+        MaxMeasuredValue::GetDefaultOr(endpointId, maxMeasuredValue, DataModel::NullNullable);
 
         uint16_t tolerance{};
-        if (optionalAttributeSet.IsSet(Tolerance::Id))
-        {
-            VerifyOrDie(Tolerance::GetDefault(endpointId, &tolerance) == Status::Success);
-        }
+        Tolerance::GetDefaultOr(endpointId, tolerance, 0);
 
         DataModel::Nullable<LightSensorTypeEnum> lightSensorType{};
         if (optionalAttributeSet.IsSet(LightSensorType::Id))

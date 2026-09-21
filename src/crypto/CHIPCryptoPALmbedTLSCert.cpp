@@ -28,6 +28,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+// mbedTLS X.509 headers and symbols are only needed when the active mbedtls
+// config (MBEDTLS_CONFIG_FILE) enables the corresponding features.
+#if defined(MBEDTLS_X509_CRT_PARSE_C) || defined(MBEDTLS_X509_CSR_PARSE_C) || defined(MBEDTLS_X509_CSR_WRITE_C)
+
 #include <mbedtls/version.h>
 
 // mbedtls/ecp.h (mbedtls_ecp_* symbols) is only used by the legacy non-PSA path
@@ -51,6 +55,7 @@
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/x509_crt.h>
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+#endif // MBEDTLS X.509 feature enabled
 
 namespace chip {
 namespace Crypto {
@@ -227,6 +232,17 @@ constexpr uint8_t sOID_Extension_CRLDistributionPoint[]   = { 0x55, 0x1D, 0x1F }
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
 } // anonymous namespace
+
+// ML-DSA attestation operations are not implemented by this backend.
+bool IsMlDsa44Supported()
+{
+    return false;
+}
+
+bool IsMlDsa65Supported()
+{
+    return false;
+}
 
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
 {

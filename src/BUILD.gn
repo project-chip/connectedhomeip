@@ -61,6 +61,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
       "${chip_root}/src/app/clusters/alarm-base-server/tests",
       "${chip_root}/src/app/clusters/ambient-context-sensing-server/tests",
+      "${chip_root}/src/app/clusters/ambient-sensing-union-server/tests",
       "${chip_root}/src/app/clusters/air-quality-server/tests",
       "${chip_root}/src/app/clusters/audio-control-server/tests",
       "${chip_root}/src/app/clusters/av-analysis-server/tests",
@@ -85,6 +86,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/device-energy-management-server/tests",
       "${chip_root}/src/app/clusters/dynamic-lighting-server/tests",
+      "${chip_root}/src/app/clusters/electrical-alarm-server/tests",
       "${chip_root}/src/app/clusters/electrical-distribution-server/tests",
       "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
       "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests",
@@ -136,6 +138,8 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/switch-server/tests",
       "${chip_root}/src/app/clusters/temperature-control-server/tests",
       "${chip_root}/src/app/clusters/temperature-measurement-server/tests",
+      "${chip_root}/src/app/clusters/thermostat-server/tests",
+      "${chip_root}/src/app/clusters/thermostat-user-interface-configuration-server/tests",
       "${chip_root}/src/app/clusters/thread-border-router-management-server/tests",
       "${chip_root}/src/app/clusters/thread-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/thread-network-directory-server/tests",
@@ -212,11 +216,21 @@ if (chip_build_tests) {
         "${chip_root}/src/app/clusters/identify-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/messages-server/tests",
         "${chip_root}/src/app/clusters/power-topology-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/pump-configuration-and-control-server/tests",
         "${chip_root}/src/app/clusters/smoke-co-alarm-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
 
         # keep-sorted: end
       ]
+    }
+
+    # Python controller code, only ever built into the ctypes shared library
+    # on a host. It uses host-only facilities an embedded toolchain need not
+    # provide, notably <mutex>, <condition_variable> and <thread>, which
+    # Zephyr's libstdc++ is built without.
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests +=
+          [ "${chip_root}/src/controller/python/matter/case_capture/tests" ]
     }
 
     if (current_os != "zephyr") {

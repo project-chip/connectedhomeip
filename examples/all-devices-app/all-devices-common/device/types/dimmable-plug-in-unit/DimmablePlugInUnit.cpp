@@ -21,7 +21,14 @@
 namespace chip::app {
 
 DimmablePlugInUnit::DimmablePlugInUnit(const Context & context, const Config & config) :
-    LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmablePlugInUnit, 1), context, config)
+    DimmableLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmablePlugInUnit, 1), context,
+                 Delegates{
+                     .onOff        = *this,
+                     .levelControl = *this,
+                     .effect       = *this,
+                     .identify     = context.identifyDelegate,
+                 },
+                 config)
 {}
 
 } // namespace chip::app
