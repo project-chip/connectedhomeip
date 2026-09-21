@@ -94,7 +94,9 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
         if (PeekSigma1Params(payload, incomingInitiatorRandom, incomingDestinationId) == CHIP_NO_ERROR)
         {
             auto activeExchange = GetSession().GetExchangeContext();
-            if (activeExchange.HasValue() &&
+            if (activeExchange.HasValue() && activeExchange.Value()->HasSessionHandle() &&
+                activeExchange.Value()->GetSessionHandle()->IsUnauthenticatedSession() && ec->HasSessionHandle() &&
+                ec->GetSessionHandle()->IsUnauthenticatedSession() &&
                 activeExchange.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress() ==
                     ec->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress())
             {
@@ -365,7 +367,9 @@ void CASEServer::PreemptExistingSession()
     MATTER_TRACE_SCOPE("PreemptExistingSession", "CASEServer");
     ChipLogProgress(SecureChannel, "Preempting stale CASE session for superseding retry");
 
-    GetSession().DiscardExchange();
+    // Note: Do NOT call GetSession().DiscardExchange() before Clear().
+    // CASESession::Clear() calls mExchangeCtxt.Value()->Abort() before
+    // DiscardExchange() to flush MRP retries and release the session.
     GetSession().Clear();
     mPinnedSecureSession.ClearValue();
     PrepareForSessionEstablishment();
