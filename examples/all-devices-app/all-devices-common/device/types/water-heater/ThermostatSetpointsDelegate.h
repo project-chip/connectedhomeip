@@ -17,13 +17,7 @@
 
 #pragma once
 
-#include <app/clusters/thermostat-server/ThermostatClusterCoolingSetpoints.h>
 #include <app/clusters/thermostat-server/ThermostatClusterHeatingSetpoints.h>
-#include <app/clusters/thermostat-server/ThermostatClusterSetpoints.h>
-#include <app/clusters/thermostat-server/ThermostatDelegate.h>
-
-#include <app/persistence/AttributePersistenceProvider.h>
-#include <app/persistence/AttributePersistenceProviderInstance.h>
 
 namespace chip::app {
 

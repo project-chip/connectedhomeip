@@ -18,21 +18,7 @@
 
 #include "ThermostatSetpointsDelegate.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/persistence/AttributePersistence.h>
-#include <app/reporting/reporting.h>
-#include <lib/support/Span.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <app/clusters/thermostat-server/Temperature.h>
-
-using namespace chip;
-using namespace chip::app::Clusters::Thermostat;
-using namespace chip::app::Clusters::Thermostat::Attributes;
-using namespace chip::app::Clusters::Thermostat::Structs;
-using namespace Protocols::InteractionModel;
-using namespace System::Clock;
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app {
 

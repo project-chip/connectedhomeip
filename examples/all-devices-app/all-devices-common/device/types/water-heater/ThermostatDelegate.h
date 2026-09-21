@@ -15,16 +15,12 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
- #include "app/clusters/thermostat-server/Temperature.h"
- #include <app/persistence/AttributePersistenceProvider.h>
- #include <app/persistence/AttributePersistenceProviderInstance.h>
- 
- #include <app/clusters/thermostat-server/ThermostatCluster.h>
- #include <app/clusters/thermostat-server/ThermostatDelegate.h>
- #include <credentials/FabricTable.h>
- 
+#include <app/clusters/thermostat-server/Temperature.h>
+#include <app/clusters/thermostat-server/ThermostatDelegate.h>
+#include <credentials/FabricTable.h>
+
 namespace chip::app {
 
 /*
@@ -39,48 +35,47 @@ public:
     using ControlSequenceOfOperationEnum = Clusters::Thermostat::ControlSequenceOfOperationEnum;
     using RemoteSensingBitmap = Clusters::Thermostat::RemoteSensingBitmap;
     using temperature = Clusters::Thermostat::temperature;
-public:
+
     ThermostatDelegate(EndpointId endpoint = kInvalidEndpointId) : mFabricTable(nullptr)
-     {}
-     explicit ThermostatDelegate(FabricTable & fabricTable, EndpointId endpoint = kInvalidEndpointId) :
-         mFabricTable(&fabricTable)
-     {}
+    {}
+    explicit ThermostatDelegate(FabricTable & fabricTable, EndpointId endpoint = kInvalidEndpointId) :
+        mFabricTable(&fabricTable)
+    {}
 
-     void SetFabricTable(FabricTable & fabricTable) { mFabricTable = &fabricTable; }
+    void SetFabricTable(FabricTable & fabricTable) { mFabricTable = &fabricTable; }
 
-     FabricTable & GetFabricTable() const override;
-  
-     SystemModeEnum GetSystemMode() const override;
-     Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) override;
- 
-     Protocols::InteractionModel::Status GetRunningMode(ThermostatRunningModeEnum & runningMode) const override;
-     Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed) override;
- 
-     Protocols::InteractionModel::Status GetRunningState(BitMask<RelayStateBitmap> & runningState) const override;
-     Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) override;
- 
-     ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override;
-     Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq, bool & changed) override;
- 
-     DataModel::Nullable<temperature> GetLocalTemperature() const override;
-     Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed) override;
- 
-     Protocols::InteractionModel::Status GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const override;
- 
-     int8_t GetLocalTemperatureCalibration() const override;
-     Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t temp, bool & changed) override;
- 
-     Protocols::InteractionModel::Status GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const override;
-     Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
- 
- private:
-     FabricTable * mFabricTable               = nullptr;
- 
-     // Mandatory attributes
-     ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
-     SystemModeEnum mSystemMode                         = SystemModeEnum::kOff;
-     DataModel::Nullable<temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
- };
+    FabricTable & GetFabricTable() const override;
+
+    SystemModeEnum GetSystemMode() const override;
+    Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) override;
+
+    Protocols::InteractionModel::Status GetRunningMode(ThermostatRunningModeEnum & runningMode) const override;
+    Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed) override;
+
+    Protocols::InteractionModel::Status GetRunningState(BitMask<RelayStateBitmap> & runningState) const override;
+    Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) override;
+
+    ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override;
+    Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq, bool & changed) override;
+
+    DataModel::Nullable<temperature> GetLocalTemperature() const override;
+    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed) override;
+
+    Protocols::InteractionModel::Status GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const override;
+
+    int8_t GetLocalTemperatureCalibration() const override;
+    Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t temp, bool & changed) override;
+
+    Protocols::InteractionModel::Status GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const override;
+    Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
+
+private:
+    FabricTable * mFabricTable               = nullptr;
+
+    // Mandatory attributes
+    ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
+    SystemModeEnum mSystemMode                         = SystemModeEnum::kOff;
+    DataModel::Nullable<temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
+};
 
 } // namespace chip::app
- 

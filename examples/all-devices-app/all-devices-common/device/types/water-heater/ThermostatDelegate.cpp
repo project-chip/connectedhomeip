@@ -17,130 +17,117 @@
  */
 
 #include "ThermostatDelegate.h"
- 
- #include <app-common/zap-generated/attributes/Accessors.h>
- #include <app/reporting/reporting.h>
- #include <lib/support/CodeUtils.h>
- #include <lib/support/Span.h>
- #include <lib/support/logging/CHIPLogging.h>
- #include <platform/internal/CHIPDeviceLayerInternal.h>
- 
- #include <app/clusters/thermostat-server/Temperature.h>
 
-using namespace chip;
+#include <lib/support/CodeUtils.h>
+
+using chip::Protocols::InteractionModel::Status;
 using namespace chip::app::Clusters::Thermostat;
-using namespace chip::app::Clusters::Thermostat::Attributes;
-using namespace chip::app::Clusters::Thermostat::Structs;
-using namespace Protocols::InteractionModel;
-using namespace System::Clock;
 
 namespace chip::app {
 
 FabricTable & ThermostatDelegate::GetFabricTable() const
- {
-     VerifyOrDie(mFabricTable != nullptr);
-     return *mFabricTable;
- }
+{
+    VerifyOrDie(mFabricTable != nullptr);
+    return *mFabricTable;
+}
 
- 
- SystemModeEnum ThermostatDelegate::GetSystemMode() const
- {
-     return mSystemMode;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::SetSystemMode(SystemModeEnum systemMode, bool & changed)
- {
-     changed = false;
-     if (mSystemMode == systemMode)
-     {
-         return Status::Success;
-     }
+SystemModeEnum ThermostatDelegate::GetSystemMode() const
+{
+    return mSystemMode;
+}
 
-     mSystemMode = systemMode;
-     changed     = true;
-     return Status::Success;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::GetRunningMode(ThermostatRunningModeEnum & runningMode) const
- {
-     return Status::UnsupportedAttribute;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed)
- {
-     return Status::UnsupportedAttribute;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::GetRunningState(BitMask<RelayStateBitmap> & runningState) const
- {
-     return Status::UnsupportedAttribute;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed)
- {
-     return Status::UnsupportedAttribute;
- }
- 
- ControlSequenceOfOperationEnum ThermostatDelegate::GetControlSequenceOfOperation() const
- {
-     return mControlSequenceOfOperation;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq,
-                                                                                       bool & changed)
- {
-     changed = false;
-     if (mControlSequenceOfOperation == seq)
-     {
-         return Status::Success;
-     }
+Protocols::InteractionModel::Status ThermostatDelegate::SetSystemMode(SystemModeEnum systemMode, bool & changed)
+{
+    changed = false;
+    if (mSystemMode == systemMode)
+    {
+        return Status::Success;
+    }
 
-     mControlSequenceOfOperation = seq;
-     changed                     = true;
-     return Status::Success;
- }
- 
- DataModel::Nullable<temperature> ThermostatDelegate::GetLocalTemperature() const
- {
-     return mLocalTemperature;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed)
- {
-     changed = false;
-     if (mLocalTemperature == temp)
-     {
-         return Status::Success;
-     }
-     mLocalTemperature = temp;
-     changed           = true;
-     return Status::Success;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const
- {
-     return Status::UnsupportedAttribute;
- }
- 
- int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
- {
-     return 0;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperatureCalibration(int8_t temp, bool & changed)
- {
-     return Status::UnsupportedAttribute;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const
- {
-     return Status::UnsupportedAttribute;
- }
- 
- Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed)
- {
-     return Status::UnsupportedAttribute;
- }
+    mSystemMode = systemMode;
+    changed     = true;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::GetRunningMode(ThermostatRunningModeEnum & runningMode) const
+{
+    return Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed)
+{
+    return Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::GetRunningState(BitMask<RelayStateBitmap> & runningState) const
+{
+    return Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed)
+{
+    return Status::UnsupportedAttribute;
+}
+
+ControlSequenceOfOperationEnum ThermostatDelegate::GetControlSequenceOfOperation() const
+{
+    return mControlSequenceOfOperation;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq,
+                                                                                      bool & changed)
+{
+    changed = false;
+    if (mControlSequenceOfOperation == seq)
+    {
+        return Status::Success;
+    }
+
+    mControlSequenceOfOperation = seq;
+    changed                     = true;
+    return Status::Success;
+}
+
+DataModel::Nullable<temperature> ThermostatDelegate::GetLocalTemperature() const
+{
+    return mLocalTemperature;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed)
+{
+    changed = false;
+    if (mLocalTemperature == temp)
+    {
+        return Status::Success;
+    }
+    mLocalTemperature = temp;
+    changed           = true;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const
+{
+    return Status::UnsupportedAttribute;
+}
+
+int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
+{
+    return 0;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperatureCalibration(int8_t temp, bool & changed)
+{
+    return Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const
+{
+    return Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed)
+{
+    return Status::UnsupportedAttribute;
+}
 
 } // namespace chip::app
- 
