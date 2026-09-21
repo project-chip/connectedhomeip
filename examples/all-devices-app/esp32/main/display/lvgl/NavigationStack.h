@@ -59,4 +59,13 @@ void ResetToRoot();
  */
 size_t GetDepth();
 
+/**
+ * Forgets the stack contents and the widgets created by Init().
+ *
+ * Call this before deleting those widgets (for example with lv_obj_clean() on the root
+ * screen), otherwise the shell keeps pointers to freed objects. Navigation calls render
+ * nothing until Init() runs again.
+ */
+void Detach();
+
 } // namespace NavigationStack

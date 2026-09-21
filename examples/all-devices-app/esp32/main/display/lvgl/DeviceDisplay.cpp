@@ -154,6 +154,10 @@ void ShowRestartingMessage()
     }
 
     lv_obj_t * screen = lv_display_get_screen_active(gDisplay);
+
+    // The clean below deletes the top bar and content container, so the shell has to let go of
+    // them first.
+    NavigationStack::Detach();
     lv_obj_clean(screen);
     lv_obj_t * label = lv_label_create(screen);
     lv_label_set_text_static(label, "Restarting...");

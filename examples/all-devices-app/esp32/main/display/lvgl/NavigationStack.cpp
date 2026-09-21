@@ -191,4 +191,12 @@ size_t GetDepth()
     return sStack.size();
 }
 
+void Detach()
+{
+    sStack.clear();
+    sTopBar           = nullptr;
+    sCrumbContainer   = nullptr;
+    sContentContainer = nullptr;
+}
+
 } // namespace NavigationStack
