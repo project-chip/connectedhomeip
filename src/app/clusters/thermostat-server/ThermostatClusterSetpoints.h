@@ -26,11 +26,13 @@
 #include "lib/core/CHIPError.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <clusters/Thermostat/Metadata.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
@@ -135,12 +137,33 @@ public:
         {
             ReturnErrorOnFailure(mAuto.Attributes(path, builder));
         }
+
+        const auto & optionalAttributes                              = GetOptionalAttributes();
+        const AttributeListBuilder::OptionalAttributeEntry entries[] = {
+            { optionalAttributes.SetpointChangeSource, Attributes::SetpointChangeSource::kMetadataEntry },
+            { optionalAttributes.SetpointChangeAmount, Attributes::SetpointChangeAmount::kMetadataEntry },
+            { optionalAttributes.SetpointChangeSourceTimestamp, Attributes::SetpointChangeSourceTimestamp::kMetadataEntry },
+        };
+        ReturnErrorOnFailure(AppendOptionalAttributes(builder, Span(entries)));
+
         return CHIP_NO_ERROR;
     }
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
     {
+        switch (request.path.mAttributeId)
+        {
+        case Attributes::SetpointChangeSource::Id:
+            return encoder.Encode(mSetpointChangeSource);
+        case Attributes::SetpointChangeAmount::Id:
+            return encoder.Encode(mSetpointChangeAmount);
+        case Attributes::SetpointChangeSourceTimestamp::Id:
+            return encoder.Encode(mSetpointChangeSourceTimestamp);
+        default:
+            break;
+        }
+
         if constexpr (kHasCooling)
         {
             if (auto status = mCooling.ReadAttribute(request, encoder))
@@ -214,7 +237,7 @@ public:
         }
         if (status == Protocols::InteractionModel::Status::Success)
         {
-            return SaveSetpoints(setpoints, changedAttributes);
+            return SaveSetpoints(setpoints, changedAttributes, IsOperationalSetpointAttribute(request.path.mAttributeId));
         }
         return status;
     }
@@ -264,7 +287,8 @@ public:
         return setpoints;
     }
 
-    Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints, SetpointAttributes changedAttributes) override
+    Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints, SetpointAttributes changedAttributes,
+                                                      bool initiatedByOperationalSetpointWrite) override
     {
         Setpoints currentSetpoints = GetSetpoints();
         if constexpr (kHasCooling)
@@ -283,6 +307,7 @@ public:
                 return status.GetStatusCode().GetStatus();
             }
         }
+        UpdateSetpointChangeAttributes(currentSetpoints, setpoints, changedAttributes, initiatedByOperationalSetpointWrite);
         NotifyAttributesChanged(changedAttributes);
         return Protocols::InteractionModel::Status::Success;
     }
