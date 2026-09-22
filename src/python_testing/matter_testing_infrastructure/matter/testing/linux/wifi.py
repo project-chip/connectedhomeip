@@ -273,10 +273,14 @@ class WpaSupplicantMock(TerminableThread):
 
         @sdbus.dbus_method_async("o")
         async def RemoveNetwork(self, path: str) -> None:
+            await self.network.Enabled.set_async(False)
+            await self.State.set_async("disconnected")
             await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
         async def RemoveAllNetworks(self) -> None:
+            await self.network.Enabled.set_async(False)
+            await self.State.set_async("disconnected")
             await self.CurrentNetwork.set_async("/")
 
         @sdbus.dbus_method_async()
