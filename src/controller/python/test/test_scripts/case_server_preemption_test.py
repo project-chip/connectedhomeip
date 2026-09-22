@@ -29,7 +29,6 @@ import os
 import random
 import socket
 import struct
-import subprocess
 import sys
 
 with contextlib.suppress(ImportError):
@@ -127,11 +126,7 @@ def compute_case_destination_id(
     node_id: int,
 ) -> bytes:
   """Compute Matter CASE Destination ID per CASEDestinationId.cpp."""
-  msg = (
-      initiator_random
-      + root_pub_key
-      + struct.pack("<QQ", fabric_id, node_id)
-  )
+  msg = initiator_random + root_pub_key + struct.pack("<QQ", fabric_id, node_id)
   return hmac.new(operational_ipk, msg, hashlib.sha256).digest()
 
 
@@ -202,6 +197,19 @@ def build_status_report_abort_packet(
   return packet_header + payload_header + status_payload
 
 
+async def _run_async_cmd(cmd: list[str], check: bool = False) -> int:
+  """Execute a command asynchronously without blocking the event loop."""
+  proc = await asyncio.create_subprocess_exec(
+      *cmd,
+      stdout=asyncio.subprocess.DEVNULL,
+      stderr=asyncio.subprocess.DEVNULL,
+  )
+  rc = await proc.wait()
+  if check and rc != 0:
+    raise RuntimeError(f"Command {cmd} failed with exit code {rc}")
+  return rc
+
+
 async def run_case_preemption_test_flow(
     test_helper,
     node_id: int,
@@ -239,7 +247,8 @@ async def run_case_preemption_test_flow(
         length=16,
     )
     logger.info(
-        "Derived Fabric 1 parameters: compressedFabricId=%s rootPubKeyPrefix=%s",
+        "Derived Fabric 1 parameters: compressedFabricId=%s"
+        " rootPubKeyPrefix=%s",
         compressed_fabric_id.hex(),
         root_pub_key[:8].hex(),
     )
@@ -247,7 +256,7 @@ async def run_case_preemption_test_flow(
     logger.info(
         "Step 2: Installing CASE_Sigma2 inbound drop rule on MobileDevice"
     )
-    subprocess.run(LOCAL_SIGMA2_DROP_ADD, check=True)
+    await _run_async_cmd(LOCAL_SIGMA2_DROP_ADD, check=True)
 
     probe_sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
     probe_sock.setblocking(False)
@@ -336,7 +345,7 @@ async def run_case_preemption_test_flow(
     await asyncio.sleep(0.10)
 
     # Remove CASE_Sigma2 drop rule
-    subprocess.run(LOCAL_SIGMA2_DROP_DEL, check=False)
+    await _run_async_cmd(LOCAL_SIGMA2_DROP_DEL, check=False)
 
     # All 4 Guards Pass: Superseding Sigma1 (rand4 != rand1, valid dest4) after >1.5s
     rand4 = bytes([0x44] * 32)
@@ -393,13 +402,15 @@ async def run_case_preemption_test_flow(
     return True
   finally:
     with contextlib.suppress(Exception):
-      subprocess.run(LOCAL_SIGMA2_DROP_DEL, check=False)
+      await _run_async_cmd(LOCAL_SIGMA2_DROP_DEL, check=False)
 
 
 class SimulatedCASEServerPR74109:
   """Reference state-machineverifier for PR 74109 Quadruple-Guard logic."""
 
-  def __init__(self, fabric_ipk: bytes, fabric_root: bytes, fabric_id: int, node_id: int):
+  def __init__(
+      self, fabric_ipk: bytes, fabric_root: bytes, fabric_id: int, node_id: int
+  ):
     self.fabric_ipk = fabric_ipk
     self.fabric_root = fabric_root
     self.fabric_id = fabric_id
@@ -427,10 +438,10 @@ class SimulatedCASEServerPR74109:
     return hmac.compare_digest(destination_id, expected)
 
   def compute_dynamic_busy_delay_ms(self, now_ms: int) -> int:
-    if self.state == "kSentSigma2":
-      expected_ms = 5000
-    elif self.crypto_in_progress:
+    if self.crypto_in_progress:
       expected_ms = 250
+    elif self.state == "kSentSigma2":
+      expected_ms = 5000
     else:
       expected_ms = 2000
     elapsed = max(0, now_ms - self.state_entered_ms)
