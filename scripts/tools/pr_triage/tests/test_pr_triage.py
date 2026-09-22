@@ -166,10 +166,6 @@ class Misc(unittest.TestCase):
         self.assertIn("### STILL NEEDED (1)", text)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class CrossBatch(unittest.TestCase):
     def test_relate_reaches_across_batches_and_pairs_surface(self):
         with tempfile.TemporaryDirectory() as d:
@@ -468,3 +464,7 @@ class RepoUrls(unittest.TestCase):
     def test_a_pull_request_url_is_not_a_repository(self):
         with self.assertRaises(RuntimeError):
             m.split_repo("https://github.com/project-chip/connectedhomeip/pull/40445")
+
+
+if __name__ == "__main__":
+    unittest.main()

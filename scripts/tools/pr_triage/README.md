@@ -12,7 +12,7 @@ GitHub, and neither touches the working tree.
     `~/matter-pr-triage-reports/<owner>/<repo>/`.
 -   `matter_pr_triage_issues.py` takes one pull request the triage recommended
     closing and finds the issues that should be closed with it, linked on GitHub
-    or not, from a local corpus of the repository's issues. It imports the first
+    or not, from a corpus of the repository's issues. It imports the first
     script, so the two stay in this folder together.
 
 Both need only Python 3.8 or newer and an authenticated `gh`; no build

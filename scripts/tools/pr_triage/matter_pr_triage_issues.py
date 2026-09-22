@@ -33,6 +33,7 @@ Like its sibling it never posts, comments, closes, labels or changes anything on
 import argparse
 import json
 import math
+import os
 import re
 import shutil
 import subprocess
@@ -52,8 +53,10 @@ SEARCH_HITS = 10             # per anchor search
 MAX_TEST_ID_ANCHORS = 4
 MAX_FILE_ANCHORS = 3
 HUB_ATTACHED_PRS = 4         # more pull requests than this attached to one issue: a tracking issue
+ISSUE_CACHE_FRESH_HOURS = 1  # an issue can close at any moment; a cached record is trusted this long
+SIBLING_MATCHES = 5          # content matches shown per sibling repository, as context, never judged
 RELATIONS = ("linked", "referenced_by", "mentioned", "inferred")
-VERDICTS = ("close", "leave", "already-closed", "unrelated", "unclear")
+VERDICTS = ("close", "leave", "related", "already-closed", "unrelated", "unclear")
 CONFIDENCES = ("high", "medium", "low")
 EFFORT_LEVELS = ("low", "medium", "high", "xhigh", "max")
 GENERIC_BASENAMES = {"build", "readme", "cmakelists", "init", "main", "test", "tests", "utils",
@@ -62,7 +65,7 @@ GENERIC_BASENAMES = {"build", "readme", "cmakelists", "init", "main", "test", "t
 DISCLAIMER = [
     "> ## Disclaimer",
     ">",
-    "> This is a best-effort report, meant to inform decision making about the issues attached to pull requests being closed, not to make those decisions. Every entry is machine-assisted and provisional. Read each issue before acting on it.",
+    "> This is a best-effort report, meant to inform decision making about the issues related to a pull request, not to make those decisions. Every entry is machine-assisted and provisional. Read each issue before acting on it.",
     "",
 ]
 
@@ -138,7 +141,10 @@ def extract_mentions(text, owner, name, own_number):
         else:
             cross.setdefault((o, n), set()).add(num)
     stripped = MENTION_CROSS.sub(" ", stripped)
-    same |= {int(x) for x in MENTION_SAME.findall(stripped)}
+    # A bare #N that the same text also writes with a repository qualifier is the author's shorthand
+    # for that reference, not a second one in this repository.
+    qualified_elsewhere = {n for nums in cross.values() for n in nums}
+    same |= {int(x) for x in MENTION_SAME.findall(stripped)} - qualified_elsewhere
     same.discard(own_number)
     return {"same": same, "cross": cross}
 
@@ -363,12 +369,21 @@ def compact_issue(node, owner, name):
     }
 
 
+def cache_is_fresh(fetched_at):
+    """A cached issue record is reused only while its state can be trusted."""
+    try:
+        age = datetime.now(timezone.utc) - datetime.fromisoformat(str(fetched_at).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return False
+    return timedelta(0) <= age < timedelta(hours=ISSUE_CACHE_FRESH_HOURS)
+
+
 def fetch_issues(root, owner, name, numbers, refetch=False):
     """Issue details, from the per-issue cache where present. Returns {number: details|error}."""
     out, missing = {}, []
     for n in sorted(set(numbers)):
         cached = None if refetch else triage.read_json(issue_cache_path(root, owner, name, n))
-        if cached:
+        if cached and cache_is_fresh(cached.get("fetched_at")):
             out[n] = cached
         else:
             missing.append(n)
@@ -397,7 +412,7 @@ def fetch_issues(root, owner, name, numbers, refetch=False):
     return out
 
 
-# ---------------------------------------------------------------- local corpus
+# ---------------------------------------------------------------- issue corpus
 
 
 CORPUS_CLOSED_MONTHS = 18     # closed issues kept this far back: duplicates and "closed as" chains
@@ -599,12 +614,29 @@ def save_corpus(root, records, meta):
     triage.write_json(corpus_dir(root) / "meta.json", meta)
 
 
-def sync(checkout, repo, full, closed_months):
-    """Pull every open issue and the recently closed ones into a local corpus, incrementally.
+def sibling_repos(root, extra=()):
+    """Repositories whose issue corpora are consulted as context: the ones recorded by an earlier
+    sync, the ones named in MATTER_PR_TRIAGE_SIBLINGS, and any given now."""
+    listed = triage.read_json(root / "siblings.json", []) or []
+    env = [x for x in os.environ.get("MATTER_PR_TRIAGE_SIBLINGS", "").split(":") if x]
+    out = []
+    for item in list(listed) + env + list(extra):
+        # The same two ways the main repository is named: a clone you have, or owner/name.
+        try:
+            path = Path(str(item)).expanduser()
+            o, n = triage.infer_repo(path.resolve()) if path.is_dir() else triage.split_repo(item)
+        except RuntimeError:
+            continue
+        full = f"{o}/{n}"
+        if full not in out:
+            out.append(full)
+    return out
 
-    Pages come newest-updated first, so a page older than the last sync ends the incremental
-    pass, and for closed issues a page older than the window ends the full pass."""
-    owner, name = resolve_repo(checkout, repo, [])
+
+def sync_corpus(owner, name, full, closed_months):
+    """Pull every open issue and the recently closed ones of one repository into its corpus,
+    incrementally. Pages come newest-updated first, so a page older than the last sync ends the
+    incremental pass, and for closed issues a page older than the window ends the full pass."""
     root = issues_root(owner, name)
     meta = triage.read_json(corpus_dir(root) / "meta.json", {}) or {}
     existing = (load_corpus(root) or []) if not full else []
@@ -634,9 +666,33 @@ def sync(checkout, repo, full, closed_months):
             "closed_window_months": closed_months, "closed_since": cutoff,
             "last_pass": "full" if since is None else "incremental", "pages": pages}
     save_corpus(root, records, meta)
-    print(json.dumps({"corpus": str(corpus_dir(root) / "issues.jsonl"), "pass": meta["last_pass"],
-                      "fetched": len(fetched), "added": added, "updated": updated,
-                      "issues": len(records), "open": meta["open"], "pages": pages}, indent=2))
+    return {"repo": f"{owner}/{name}", "corpus": str(corpus_dir(root) / "issues.jsonl"), "pass": meta["last_pass"],
+            "fetched": len(fetched), "added": added, "updated": updated,
+            "issues": len(records), "open": meta["open"], "pages": pages}
+
+
+def sync(checkout, repo, full, closed_months, siblings=()):
+    """The repository's corpus, then the corpora of its sibling repositories, such as the one that
+    holds its test plans, so that their issues surface as context on every pull request."""
+    owner, name = resolve_repo(checkout, repo, [])
+    root = issues_root(owner, name)
+    # A sibling that names nothing must not vanish quietly: the user would wait for matches that never come.
+    bad = [item for item in siblings if not sibling_repos(issues_root("none", "none"), [item])]
+    if bad:
+        print(json.dumps({"error": "bad_sibling", "given": bad,
+                          "fix": "name each sibling as owner/name, a github.com repository URL, or the path of a clone"}, indent=2))
+        sys.exit(2)
+    out = {"primary": sync_corpus(owner, name, full, closed_months), "siblings": []}
+    wanted = sibling_repos(root, siblings)
+    for full_name in wanted:
+        so, sn = full_name.split("/", 1)
+        try:
+            out["siblings"].append(sync_corpus(so, sn, full, closed_months))
+        except RuntimeError as e:
+            out["siblings"].append({"repo": full_name, "error": str(e)[:300]})
+    if wanted:
+        triage.write_json(root / "siblings.json", wanted)
+    print(json.dumps(out, indent=2))
 
 
 class Index:
@@ -733,7 +789,7 @@ def graph_hops(records, seeds, max_hops=2):
     return dist
 
 
-def score_candidates(index, pr, seeds, exclude, longlist=LONGLIST):
+def score_candidates(index, pr, seeds, exclude, longlist=LONGLIST, cross_repo=False):
     """Every corpus issue scored against the pull request; the top of the list is what the judge
     sees. Each entry says which signals fired, so a reader can weigh the lead the way its finder
     would have to."""
@@ -770,10 +826,10 @@ def score_candidates(index, pr, seeds, exclude, longlist=LONGLIST):
             rarity = sum(index.idf(t) for t in shared_title)
             signals["title"] = min(1.0, rarity / TITLE_IDF_FULL)
             why.append("title shares " + ", ".join(sorted(shared_title))[:60])
-        if number_of_pr and number_of_pr in (r.get("refs") or []):
+        if not cross_repo and number_of_pr and number_of_pr in (r.get("refs") or []):
             signals["refers"] = 1.0
             why.append("names this pull request")
-        issue_paths = set(r.get("paths") or [])
+        issue_paths = set() if cross_repo else set(r.get("paths") or [])
         same_file = {p for p in paths if p in issue_paths or Path(p).name in {Path(q).name for q in issue_paths}}
         deep_dirs = {d for d in pr_dirs if d.count("/") >= 2} & {"/".join(q.split("/")[:-1]) for q in issue_paths}
         if same_file:
@@ -1075,6 +1131,22 @@ def gather_one(root, owner, name, number, candidates, refetch, no_search, reads=
         inferred = rank_candidates(pr.get("title"), hits, exclude, candidates)
     for entry in inferred:
         entry["relation"] = "inferred"
+    # Sibling repositories, such as the one holding the test plans: their issues that match this pull
+    # request by content are context for the reader, never candidates for a verdict here.
+    sibling_matches = []
+    if not no_search:
+        for full_name in sibling_repos(root):
+            so, sn = full_name.split("/", 1)
+            recs = load_corpus(issues_root(so, sn))
+            if not recs:
+                continue
+            spr = pr_for_scoring(pr)
+            spr["changed_paths"] = paths
+            spr["body"] = spr["body"] + "\n" + "\n".join(commit_messages)
+            for hit in score_candidates(Index(recs), spr, set(), set(), longlist=SIBLING_MATCHES, cross_repo=True):
+                sibling_matches.append({"repository": full_name, "number": hit["number"], "title": hit["title"],
+                                        "state": hit["state"], "score": hit["score"], "why": hit["why"],
+                                        "how": "found by content"})
     # The judge's own picks from the longlist, or any issue it names, read in full.
     for pick in reads:
         if pick in exclude or any(e["number"] == pick for e in inferred):
@@ -1120,6 +1192,7 @@ def gather_one(root, owner, name, number, candidates, refetch, no_search, reads=
         "anchors": anchors,
         "related_pull_requests": [mentioned_prs[n] for n in sorted(mentioned_prs)],
         "cross_repository": cross_refs,
+        "sibling_matches": sibling_matches,
         "skipped": skipped,
         "issues": {str(n): details[n] for n in sorted(details)},
     }
@@ -1159,12 +1232,13 @@ def gather(checkout, repo, pr, candidates, refetch, no_search, reads=()):
         "longlist": len(d["longlist"]),
         "related_pull_requests": [e["number"] for e in d["related_pull_requests"]],
         "cross_repository": len(d["cross_repository"]),
+        "sibling_matches": [f"{m['repository']}#{m['number']}" for m in d["sibling_matches"]],
         "skipped": d["skipped"],
         "issues_to_judge": len(d["issues"]),
         "next": f"write {judgment_path(root, number)}, then: report --pr {number}",
     }
     if not no_search and not (corpus_dir(root) / "issues.jsonl").exists():
-        out["note"] = ("no local corpus for this repository, so the inferred tier used a few API searches. "
+        out["note"] = ("no issue corpus for this repository yet, so the inferred tier used a few API searches. "
                        "Run `sync` once, about forty calls, to score every open issue on several signals instead.")
     existing = triage.read_json(judgment_path(root, number))
     if existing:
@@ -1208,6 +1282,9 @@ def validate_issue_judgment(judgment, dossier):
             problems.append(f"entry {v!r} must be an object naming an issue")
             continue
         n = triage.as_number(v["issue"])
+        if n in seen:
+            problems.append(f"#{n}: appears more than once in issues; one entry per issue")
+            continue
         seen.add(n)
         if n not in wanted:
             in_skim = any(e.get("number") == n for e in dossier.get("longlist") or [])
@@ -1215,6 +1292,9 @@ def validate_issue_judgment(judgment, dossier):
                             + (f"; it is on the skim list, so bring it in first: gather --pr {number} --read {n}" if in_skim else ""))
             continue
         details = (dossier.get("issues") or {}).get(str(n)) or {}
+        if details.get("error"):
+            problems.append(f"#{n}: could not be read ({details['error']}); list it under unassessed with that as the reason")
+            continue
         verdict = v.get("verdict")
         if verdict not in VERDICTS:
             problems.append(f"#{n}: verdict {verdict!r} is not one of {list(VERDICTS)}")
@@ -1222,7 +1302,7 @@ def validate_issue_judgment(judgment, dossier):
             problems.append(f"#{n}: close needs the pull request itself to be closing as covered on the base branch; "
                             f"its triage verdict is {dossier['pr']['triage'].get('verdict') or 'missing'}. "
                             f"Use leave or unclear, or give a disagreement_reason.")
-        if verdict in ("close", "leave") and details.get("state") == "CLOSED":
+        if verdict in ("close", "leave", "related") and details.get("state") == "CLOSED":
             problems.append(f"#{n}: is already closed; the verdict for that is already-closed")
         if verdict == "already-closed" and details.get("state") == "OPEN":
             problems.append(f"#{n}: is open, so already-closed does not apply")
@@ -1237,8 +1317,14 @@ def validate_issue_judgment(judgment, dossier):
                 problems.append(f"#{n}: duplicate entry {d!r} does not name an issue")
             elif triage.as_number(d) == n:
                 problems.append(f"#{n}: lists itself as a duplicate")
-    unassessed = {triage.as_number(u.get("issue") if isinstance(u, dict) else u)
-                  for u in judgment.get("unassessed", [])}
+    unassessed = set()
+    for u in judgment.get("unassessed", []):
+        # A bare number would satisfy completeness and then vanish from the report; the entry has
+        # to say which issue and why, so the report can carry it under Could not determine.
+        if not isinstance(u, dict) or triage.as_number(u.get("issue")) is None or not (u.get("reason") or "").strip():
+            problems.append(f"unassessed entry {u!r} must be an object with an issue number and a reason")
+            continue
+        unassessed.add(triage.as_number(u["issue"]))
     for n in sorted(set(wanted) - seen - unassessed):
         problems.append(f"#{n}: in the dossier but has no verdict and is not listed unassessed")
     return problems
@@ -1326,8 +1412,10 @@ def render(root, full, number):
     effort = (judgment.get("judged_effort") or "").strip().lower()
 
     heading_title = re.sub(r"([\[\]])", r"\\\1", (pr.get("title") or "").strip())
+    closing = bool(tri.get("triaged") and tri.get("verdict") == "close")
     lines = [f"# Issues Related to PR [#{number} {heading_title}]({url})", "",
-             "*These issues are related to the pull request and can be safely closed.*", "",
+             ("*These issues are related to the pull request and can be safely closed.*" if closing else
+              "*These issues are related to the pull request: what each asks for, and where the pull request's work stands against it.*"), "",
              "*The results also cover related issues that are not internally linked on GitHub.*", ""]
     # Provenance only. The pull request's own verdict and state drive no action here: every entry
     # below carries its reason, and the verdict was verified before this report was asked for.
@@ -1347,7 +1435,7 @@ def render(root, full, number):
         verdict = v.get("verdict")
         if verdict == "close":
             to_close.append(item)
-        elif verdict == "leave":
+        elif verdict in ("leave", "related"):
             leave.append(item)
         elif verdict == "already-closed":
             closed.append(item)
@@ -1355,13 +1443,18 @@ def render(root, full, number):
             unclear.append(item)
         elif relations[n] == "inferred":
             rejected += 1
+    for u in judgment.get("unassessed", []):
+        n = triage.as_number(u.get("issue")) if isinstance(u, dict) else None
+        if n is not None and n in relations:
+            counts["unassessed"] = counts.get("unassessed", 0) + 1
+            unclear.append((n, details_all.get(str(n)) or {"title": "", "state": "?"},
+                            {"reason": f"could not be assessed: {(u.get('reason') or '').strip()}"}, relations[n]))
     counts["inferred_rejected"] = rejected
 
-    lines += ["### Safe to close", ""]
-    if not to_close:
-        lines += [("No issues addressed by this pull request were found."
-                   if tri.get("verdict") == "close" else
-                   "Nothing can be closed on this pull request's strength: the triage did not find its work on the base branch."), ""]
+    if closing or to_close:
+        lines += ["### Safe to close", ""]
+        if not to_close:
+            lines += ["No issues addressed by this pull request were found.", ""]
     any_unlinked = False
     for n, d, v, relation in sorted(to_close, key=lambda t: t[0]):
         reason = (v.get("reason") or "").strip()
@@ -1373,11 +1466,18 @@ def render(root, full, number):
         lines.append(entry_line(n, d, reason, full, unlinked=relation == "inferred"))
     if to_close:
         lines.append("")
+
+    related_title = "Related but not resolved by the PR" if closing else "Related"
+    related_line = ("Related to this pull request, on GitHub or by content, but what they ask for isn't resolved by the PR."
+                    if closing else "Related to this pull request, on GitHub or by content. Each line says what the issue asks for and where the pull request's work stands.")
     for title, standfirst, items in (
-            ("Linked but not resolved by the PR", "Linked to this pull request on GitHub, but what they ask for isn't resolved by the PR.", leave),
+            (related_title, related_line, leave),
             ("Already closed", None, closed),
             ("Could not determine", "Each names the check a person would do next.", unclear)):
+        if not items and not (title == related_title and not closing):
+            continue
         if not items:
+            lines += [f"### {title}", "", "No related issues were found.", ""]
             continue
         lines += [f"### {title}", ""]
         if standfirst:
@@ -1386,6 +1486,29 @@ def render(root, full, number):
             any_unlinked |= relation == "inferred"
             lines.append(entry_line(n, d, "" if title == "Already closed" else (
                 v.get("reason") or ""), full, unlinked=relation == "inferred"))
+        lines.append("")
+    elsewhere, seen_elsewhere = [], set()
+    for ref in list(dossier.get("cross_repository") or []) + list(dossier.get("sibling_matches") or []):
+        key = (ref.get("repository"), ref.get("number"))
+        if key in seen_elsewhere or not all(key):
+            continue
+        seen_elsewhere.add(key)
+        elsewhere.append(ref)
+    if elsewhere:
+        # Not judged: a test-plan or specification issue is resolved in its own repository, but the
+        # reader should know the pull request points there, or that the same test is discussed there.
+        lines += ["### Referenced elsewhere", "",
+                  "*Issues and pull requests in other repositories that this pull request cites, that cite it, or that match it by content. Listed for context, not judged here.*", ""]
+        for ref in sorted(elsewhere, key=lambda r: (r["repository"], r["number"])):
+            kind = "pull request" if ref.get("type") == "PullRequest" else "issue"
+            title = (ref.get("title") or "").strip()
+            state = (ref.get("state") or "?").lower()
+            url = f"https://github.com/{ref['repository']}/issues/{ref['number']}"
+            by_content = ref.get("how") == "found by content"
+            any_unlinked |= by_content
+            mark = f"{UNLINKED_MARK} " if by_content else ""
+            lines.append(f"- {mark}[{ref['repository']}#{ref['number']}]({url}) **{title}** ({kind}, {state})" if title
+                         else f"- {mark}[{ref['repository']}#{ref['number']}]({url}) ({kind}, {state})")
         lines.append("")
     if any_unlinked:
         lines += [f"*{UNLINKED_MARK} marks an issue that is not internally linked on GitHub and was found by content.*", ""]
@@ -1414,7 +1537,8 @@ def report(checkout, repo, pr, strict, out):
     if problems and strict:
         print(json.dumps({"error": "invalid_judgment", "problems": problems}, indent=2))
         sys.exit(1)
-    fold_state(root)
+    if not problems:
+        fold_state(root)
     text, stats = render(root, full, number)
     path = report_path(owner, name, number)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1444,7 +1568,8 @@ def list_prs(checkout, repo, from_triage):
         for n in from_triage_numbers(owner, name, from_triage):
             offered.append({"pr": n, "gathered": n in rows, "judged": rows.get(n, {}).get("judged", False)})
     out = {"repo": f"{owner}/{name}", "done": [rows[n] for n in sorted(rows)],
-           "corpus": str(corpus_dir(root) / "issues.jsonl") if (corpus_dir(root) / "issues.jsonl").exists() else None}
+           "corpus": str(corpus_dir(root) / "issues.jsonl") if (corpus_dir(root) / "issues.jsonl").exists() else None,
+           "siblings": sibling_repos(root)}
     if from_triage:
         out["from_triage"] = {"verdicts": list(from_triage), "pull_requests": offered,
                               "not_yet_done": [o["pr"] for o in offered if not o["judged"]]}
@@ -1566,8 +1691,10 @@ def build_parser():
                    help="Skip the inferred tier: only issues linked, referencing or mentioned are gathered.")
     g.add_argument("--read", dest="reads", action="append", default=[], metavar="ISSUE",
                    help="An issue to read in full as an inferred candidate, a judge's pick from the skim list. Repeatable.")
-    sy = common(sub.add_parser("sync", help="Build or refresh the local issue corpus for the repository."), with_prs=False)
+    sy = common(sub.add_parser("sync", help="Build or refresh the repository's issue corpus."), with_prs=False)
     sy.add_argument("--full", action="store_true", help="Rebuild from scratch instead of fetching what changed since the last sync.")
+    sy.add_argument("--sibling", dest="siblings", action="append", default=[], metavar="OWNER/REPO",
+                    help="Also keep a corpus of this repository's issues, for example the one holding the test plans, named as owner/name or as the path of a clone; its matches appear as context. Remembered for later syncs. Repeatable.")
     sy.add_argument("--closed-months", dest="closed_months", type=int, default=CORPUS_CLOSED_MONTHS,
                     help=f"How far back closed issues are kept. Default {CORPUS_CLOSED_MONTHS}.")
     b = common(sub.add_parser("benchmark", help="Measure the inferred tier's recall against pull requests with formal issue links."), with_prs=False)

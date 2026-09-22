@@ -85,11 +85,11 @@ etc.) to assist with development and code review in the Matter repository.
 ### Matter PR Triage Issues
 
 -   **Location**: `.agents/skills/matter-pr-triage-issues/`
--   **Purpose**: For one pull request the triage recommended closing, lists the
-    related issues that can safely be closed with it, linked or not linked on
-    GitHub, each with its reason.
--   **Triggers**: Use for a pull request the triage marked as already covered,
-    open or already closed, to find which issues can safely be closed with it.
+-   **Purpose**: For any pull request, lists the related issues, linked or not
+    linked on GitHub, each with what it asks for; for one the triage found safe
+    to close, also which of them can safely be closed with it.
+-   **Triggers**: Use on any pull request to see the issues related to it, and
+    on one the triage marked safe to close to find which issues close with it.
 
 ### Matter Specification Access
 

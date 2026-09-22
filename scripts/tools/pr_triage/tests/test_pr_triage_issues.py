@@ -26,6 +26,7 @@ import pathlib
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 import matter_pr_triage_issues as mi  # noqa: E402 isort:skip
@@ -87,6 +88,13 @@ class Mentions(unittest.TestCase):
         m = mi.extract_mentions(text, OWNER, NAME, own_number=40191)
         self.assertEqual(m["same"], {40190, 38040, 12345})
         self.assertEqual(m["cross"], {})
+
+    def test_bare_number_that_is_also_qualified_elsewhere_is_not_ours(self):
+        m = mi.extract_mentions("Fixes #4788, see CHIP-Specifications/chip-test-plans#4788 and #99", OWNER, NAME, own_number=1)
+        self.assertEqual(m["same"], {99})
+        self.assertEqual(m["cross"], {("CHIP-Specifications", "chip-test-plans"): {4788}})
+        m = mi.extract_mentions(f"https://github.com/{OWNER}/{NAME}/issues/5 and other/repo#5", OWNER, NAME, own_number=1)
+        self.assertEqual(m["same"], {5})                                  # an explicit same-repository link is kept
 
     def test_cross_repo_kept_apart(self):
         text = "spec issue project-chip/connectedhomeip-spec#123 and https://github.com/CHIP-Specifications/chip-test-plans/pull/77"
@@ -315,7 +323,7 @@ class RenderAndState(unittest.TestCase):
         text2, stats2 = mi.render(self.root, f"{OWNER}/{NAME}", 39685)
         self.assertNotIn(mi.UNLINKED_MARK, text2)                         # no legend when nothing is unlinked
         self.assertIn("No issues addressed by this pull request were found.", text2)
-        linked = text2.split("### Linked but not resolved by the PR")[1].split("### Already closed")[0]
+        linked = text2.split("### Related but not resolved by the PR")[1].split("### Already closed")[0]
         self.assertIn("[#77](", linked)
         self.assertIn("(OPEN): asks for more than the tests that landed\n", linked)   # each with its reason
         self.assertIn("### Already closed\n\n- [#37233](", text2)
@@ -323,19 +331,148 @@ class RenderAndState(unittest.TestCase):
         self.assertIn("`model-a`, unknown effort", text2)                # a made-up effort prints as unknown
         self.assertEqual(stats2["to_close"], [])
 
+    def test_one_entry_per_issue_and_none_for_an_unreadable_one(self):
+        d = dossier(issues={1: issue(1), 2: {"number": 2, "error": "HTTP 404"}}, tiers={"linked": [{"number": 1}, {"number": 2}]})
+        twice = {"pr": 40191, "issues": [entry(1, "close", "a"), entry(1, "leave", "b"), entry(2, "close", "c")]}
+        problems = mi.validate_issue_judgment(twice, d)
+        self.assertTrue(any("#1: appears more than once" in p for p in problems))
+        self.assertTrue(any("#2: could not be read (HTTP 404)" in p for p in problems))
+        ok = {"pr": 40191, "issues": [entry(1, "close", "a")], "unassessed": [
+            {"issue": 2, "reason": "could not be read: HTTP 404"}]}
+        self.assertEqual(mi.validate_issue_judgment(ok, d), [])
+
+    def test_any_pull_request_gets_a_related_issues_report(self):
+        d = dossier(7, verdict="keep", issues={1: issue(1, title="Same ask"), 2: issue(2, title="Same area"), 3: issue(3, title="Noise")},
+                    tiers={"linked": [{"number": 1}], "inferred": [{"number": 2}, {"number": 3}]})
+        j = {"pr": 7, "issues": [entry(1, "leave", "asks for the step check this pull request adds; not landed"),
+                                 entry(2, "related", "asks about the same test's timing, a different change",
+                                       confidence="medium", falsifier="f"),
+                                 entry(3, "unrelated", "asks about something else")]}
+        self.write(7, d, j)
+        text, stats = mi.render(self.root, f"{OWNER}/{NAME}", 7)
+        self.assertNotIn("### Safe to close", text)                        # no closing question for a kept pull request
+        self.assertIn("what each asks for, and where the pull request's work stands", text)
+        section = text.split("### Related\n")[1].split("###")[0]
+        self.assertIn("**Same ask** (OPEN): asks for the step check", section)
+        self.assertIn(f"{mi.UNLINKED_MARK} [#2](", section)                # a same-area issue found by content shows too
+        self.assertNotIn("#3", section)
+        self.assertEqual(stats["to_close"], [])
+        untriaged = dossier(8, verdict=None, issues={1: issue(1)}, tiers={"linked": [{"number": 1}]})
+        self.write(8, untriaged, {"pr": 8, "issues": [entry(1, "unrelated", "different")]})
+        text, _ = mi.render(self.root, f"{OWNER}/{NAME}", 8)
+        self.assertIn("### Related\n\nNo related issues were found.", text)   # the section is always present in this mode
+
+    def test_disagreement_close_on_a_kept_pull_request_keeps_its_heading(self):
+        d = dossier(7, verdict="keep", issues={1: issue(1, title="Covered anyway")}, tiers={"linked": [{"number": 1}]})
+        j = {"pr": 7, "issues": [dict(entry(1, "close", "the guard it asks for is on master"),
+                                      disagreement_reason="master has it")]}
+        self.assertEqual(mi.validate_issue_judgment(j, d), [])
+        self.write(7, d, j)
+        text, stats = mi.render(self.root, f"{OWNER}/{NAME}", 7)
+        self.assertIn("### Safe to close\n\n- [#1](", text)                 # never a bullet without its heading
+        self.assertIn("### Related\n\nNo related issues were found.", text)
+        self.assertEqual(stats["to_close"], [1])
+
+    def test_related_verdict_renders_with_leave_when_closing(self):
+        d = dossier(issues={1: issue(1, title="Neighbour")}, tiers={"linked": [{"number": 1}]})
+        self.write(40191, d, {"pr": 40191, "issues": [entry(1, "related", "asks about the same test, a different fix")]})
+        text, _ = mi.render(self.root, f"{OWNER}/{NAME}", 40191)
+        self.assertIn("### Safe to close", text)
+        self.assertIn("### Related but not resolved by the PR", text)
+        self.assertIn("**Neighbour** (OPEN): asks about the same test", text)
+        closed = dossier(issues={1: issue(1, "CLOSED", "Gone", "COMPLETED")}, tiers={"linked": [{"number": 1}]})
+        problems = mi.validate_issue_judgment({"pr": 40191, "issues": [entry(1, "related")]}, closed)
+        self.assertTrue(any("already-closed" in p for p in problems))
+
+    def test_named_repository_never_touches_the_checkout(self):
+        self.assertEqual(mi.resolve_repo("/nonexistent/checkout", "project-chip/connectedhomeip", []),
+                         ("project-chip", "connectedhomeip"))
+        self.assertEqual(mi.resolve_repo("/nonexistent/checkout", None, ["https://github.com/o/r/pull/3"]), ("o", "r"))
+
     def test_no_list_when_the_pull_request_was_not_closable(self):
         d = dossier(7, verdict="keep", issues={1: issue(1)}, tiers={"linked": [{"number": 1}]})
         j = {"pr": 7, "issues": [entry(1, "leave", "the fix never landed")]}
         self.write(7, d, j)
         text, _ = mi.render(self.root, f"{OWNER}/{NAME}", 7)
-        self.assertIn("Nothing can be closed on this pull request's strength", text)
-        self.assertIn("### Linked but not resolved by the PR", text)
+        self.assertNotIn("Safe to close", text)
+        self.assertIn("### Related", text)
 
     def test_render_refuses_an_unjudged_pull_request(self):
         (pr1, d1, j1), _ = self.two_prs()
         mi.triage.write_json(mi.dossier_path(self.root, pr1), d1)
         with self.assertRaises(RuntimeError):
             mi.render(self.root, f"{OWNER}/{NAME}", pr1)
+
+    def test_a_sibling_that_names_nothing_stops_sync_with_a_message(self):
+        with mock.patch.object(mi, "resolve_repo", return_value=(OWNER, NAME)), \
+                mock.patch.object(mi, "sync_corpus") as synced, \
+                mock.patch("sys.stdout", new_callable=io.StringIO) as out, self.assertRaises(SystemExit) as stop:
+            mi.sync(".", f"{OWNER}/{NAME}", False, 18, siblings=["chip-test-plans"])
+        self.assertEqual(stop.exception.code, 2)
+        self.assertEqual(json.loads(out.getvalue())["given"], ["chip-test-plans"])
+        synced.assert_not_called()                                       # nothing is fetched on a bad name
+
+    def test_sibling_repositories_are_remembered_and_scored_on_content_only(self):
+        os.environ.pop("MATTER_PR_TRIAGE_SIBLINGS", None)
+        self.assertEqual(mi.sibling_repos(self.root), [])
+        mi.triage.write_json(self.root / "siblings.json", ["CHIP-Specifications/chip-test-plans"])
+        os.environ["MATTER_PR_TRIAGE_SIBLINGS"] = "a/b:CHIP-Specifications/chip-test-plans:not a repo"
+        try:
+            self.assertEqual(mi.sibling_repos(self.root, ["c/d"]), ["CHIP-Specifications/chip-test-plans", "a/b", "c/d"])
+        finally:
+            os.environ.pop("MATTER_PR_TRIAGE_SIBLINGS", None)
+        # a clone's path names its repository the same way the main repository is inferred
+        import subprocess
+        clone = pathlib.Path(self.tmp.name) / "tp-clone"
+        clone.mkdir()
+        subprocess.run(["git", "init", "-q", str(clone)], check=True)
+        subprocess.run(["git", "-C", str(clone), "remote", "add", "origin",
+                       "git@github.com:CHIP-Specifications/chip-test-plans.git"], check=True)
+        self.assertEqual(mi.sibling_repos(self.root, [str(clone)]), ["CHIP-Specifications/chip-test-plans"])
+        # numbers and paths mean nothing across repositories, so a sibling hit never scores on them
+        recs = [{"number": 7, "title": "[TC-FAN-3.5] plan needs step 8a", "body": "see #500 and src/python_testing/TC_FAN_3_5.py", "state": "OPEN",
+                 "author": "x", "created_at": "2026-01-01T00:00:00Z", "labels": [], "parent": None, "sub_issues": [], "refs": [500],
+                 "paths": ["src/python_testing/TC_FAN_3_5.py"]}]
+        pr = {"number": 500, "title": "TC-FAN-3.5: enhanced attribute testing", "body": "", "author": "y", "created_at": "2026-01-02T00:00:00Z",
+              "labels": [], "changed_paths": ["src/python_testing/TC_FAN_3_5.py"]}
+        idx = mi.Index(recs)
+        same = mi.score_candidates(idx, pr, set(), set())[0]["signals"]
+        cross = mi.score_candidates(idx, pr, set(), set(), cross_repo=True)[0]["signals"]
+        self.assertIn("refers", same)
+        self.assertIn("paths", same)
+        self.assertNotIn("refers", cross)
+        self.assertNotIn("paths", cross)
+        self.assertIn("exact", cross)                                      # the test id still matches
+
+    def test_sibling_matches_render_as_context_with_the_marker(self):
+        d = dossier(issues={1: issue(1)}, tiers={"linked": [{"number": 1}]})
+        d["cross_repository"] = [{"repository": "CHIP-Specifications/chip-test-plans", "number": 4788,
+                                  "type": "Issue", "title": "Fan tests", "state": "OPEN", "how": "mentioned by this pull request"}]
+        d["sibling_matches"] = [{"repository": "CHIP-Specifications/chip-test-plans", "number": 4788, "title": "Fan tests", "state": "OPEN", "score": 5.0, "why": "x", "how": "found by content"},
+                                {"repository": "CHIP-Specifications/chip-test-plans", "number": 5600, "title": "[TC-FAN-3.1] plan", "state": "OPEN", "score": 3.0, "why": "x", "how": "found by content"}]
+        self.write(40191, d, {"pr": 40191, "issues": [entry(1, "close")]})
+        text, _ = mi.render(self.root, f"{OWNER}/{NAME}", 40191)
+        section = text.split("### Referenced elsewhere")[1]
+        self.assertEqual(section.count("#4788"), 1)                       # the explicit reference wins over the content match
+        self.assertNotIn(f"{mi.UNLINKED_MARK} [CHIP-Specifications/chip-test-plans#4788]", section)
+        self.assertIn(f"- {mi.UNLINKED_MARK} [CHIP-Specifications/chip-test-plans#5600]", section)
+        self.assertIn("marks an issue that is not internally linked", text)
+
+    def test_cross_repository_references_are_listed_as_context(self):
+        d = dossier(issues={1: issue(1)}, tiers={"linked": [{"number": 1}]})
+        d["cross_repository"] = [
+            {"repository": "CHIP-Specifications/chip-test-plans", "number": 4788, "type": "Issue",
+                "title": "Fan tests", "state": "OPEN", "how": "mentioned by this pull request"},
+            {"repository": "CHIP-Specifications/chip-test-plans", "number": 5015, "type": "PullRequest",
+                "title": "Plan update", "state": "OPEN", "how": "mentioned by this pull request"},
+            {"repository": "CHIP-Specifications/chip-test-plans", "number": 5015, "type": "PullRequest", "title": "Plan update", "state": "OPEN", "how": "references this pull request"}]
+        self.write(40191, d, {"pr": 40191, "issues": [entry(1, "close")]})
+        text, _ = mi.render(self.root, f"{OWNER}/{NAME}", 40191)
+        section = text.split("### Referenced elsewhere")[1]
+        self.assertIn(
+            "[CHIP-Specifications/chip-test-plans#4788](https://github.com/CHIP-Specifications/chip-test-plans/issues/4788) **Fan tests** (issue, open)", section)
+        self.assertEqual(section.count("#5015"), 1)                       # listed once, whichever way it was found
+        self.assertIn("(pull request, open)", section)
 
     def test_numbers_in_reasons_become_links_once(self):
         d = dossier(issues={1: issue(1, title="T")}, tiers={"linked": [{"number": 1}]})
@@ -423,10 +560,6 @@ class RenderAndState(unittest.TestCase):
 
     def test_triage_record_without_a_sibling_cache(self):
         self.assertEqual(mi.triage_record(OWNER, NAME, 1), {"triaged": False, "changed_paths": []})
-
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class Corpus(unittest.TestCase):
@@ -576,6 +709,10 @@ class SeniorDevPass(unittest.TestCase):
         os.environ.pop("MATTER_PR_TRIAGE_REPORTS", None)
         self.tmp.cleanup()
 
+    def write(self, pr, d, j):
+        mi.triage.write_json(mi.dossier_path(self.root, pr), d)
+        mi.triage.write_json(mi.judgment_path(self.root, pr), j)
+
     def test_a_verdict_for_a_skim_entry_says_how_to_bring_it_in(self):
         d = dossier(issues={1: issue(1)}, tiers={"linked": [{"number": 1}]})
         d["longlist"] = [{"number": 55, "title": "on the skim list", "state": "OPEN", "score": 2.0, "why": "x"}]
@@ -646,8 +783,60 @@ class SeniorDevPass(unittest.TestCase):
         j = {"pr": 40191, "issues": [entry(1, "close"), entry(2, "unrelated")]}
         self.assertEqual(mi.judgment_status(d, j), {"stale_entries": [], "new_to_judge": []})
 
+    def test_stale_issue_cache_is_refetched_and_fresh_reused(self):
+        import datetime
+        stale = {"number": 5, "title": "old", "state": "OPEN", "fetched_at": "2020-01-01T00:00:00+00:00"}
+        fresh = dict(stale, number=6, title="new", fetched_at=datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds"))
+        mi.triage.write_json(mi.issue_cache_path(self.root, OWNER, NAME, 5), stale)
+        mi.triage.write_json(mi.issue_cache_path(self.root, OWNER, NAME, 6), fresh)
+        calls = []
+
+        def fake_graphql(query, variables=None, retries=4):
+            calls.append(query)
+            return {"repository": {"i5": {"number": 5, "title": "old", "state": "CLOSED", "stateReason": "COMPLETED",
+                                          "labels": {"nodes": []}, "comments": {"totalCount": 0}}}}
+        real, mi.triage.gh_graphql = mi.triage.gh_graphql, fake_graphql
+        try:
+            out = mi.fetch_issues(self.root, OWNER, NAME, [5, 6])
+        finally:
+            mi.triage.gh_graphql = real
+        self.assertEqual(len(calls), 1)                                   # only the stale one went to the API
+        self.assertIn("i5:", calls[0])
+        self.assertNotIn("i6:", calls[0])
+        self.assertEqual(out[5]["state"], "CLOSED")
+        self.assertEqual(out[6]["title"], "new")
+        self.assertFalse(mi.cache_is_fresh(None))
+        self.assertFalse(mi.cache_is_fresh("garbage"))
+
+    def test_unassessed_needs_a_reason_and_is_rendered(self):
+        d = dossier(issues={1: issue(1, title="Readable"), 2: issue(2, title="Unreadable")},
+                    tiers={"linked": [{"number": 1}, {"number": 2}]})
+        bare = {"pr": 40191, "issues": [entry(1, "close")], "unassessed": [2]}
+        self.assertTrue(any("must be an object with an issue number and a reason" in p for p in mi.validate_issue_judgment(bare, d)))
+        no_reason = {"pr": 40191, "issues": [entry(1, "close")], "unassessed": [{"issue": 2}]}
+        self.assertTrue(any("must be an object" in p for p in mi.validate_issue_judgment(no_reason, d)))
+        good = {"pr": 40191, "issues": [entry(1, "close")], "unassessed": [{"issue": 2, "reason": "the record could not be read"}]}
+        self.assertEqual(mi.validate_issue_judgment(good, d), [])
+        self.write(40191, d, good)
+        text, stats = mi.render(self.root, f"{OWNER}/{NAME}", 40191)
+        self.assertIn("### Could not determine", text)
+        self.assertIn("**Unreadable** (OPEN): could not be assessed: the record could not be read", text)
+        self.assertEqual(stats["counts"]["unassessed"], 1)
+
+    def test_no_strict_renders_but_does_not_fold_an_invalid_judgment(self):
+        d = dossier(issues={1: issue(1)}, tiers={"linked": [{"number": 1}]})
+        self.write(40191, d, {"pr": 40191, "issues": [entry(1, "close", reason="")]})   # invalid: no reason
+        with contextlib.redirect_stdout(io.StringIO()):
+            mi.report(".", f"{OWNER}/{NAME}", "40191", strict=False, out=None)
+        self.assertTrue(mi.report_path(OWNER, NAME, 40191).exists())                     # rendered anyway
+        self.assertFalse((self.root / "state.json").exists())                             # nothing folded
+
     def test_repo_halves_made_of_dots_are_refused(self):
         for bad in ("../x", "x/..", "./x", "x/.", "../.."):
             with self.assertRaises(RuntimeError):
                 mi.triage.split_repo(bad)
         self.assertEqual(mi.triage.split_repo("a.b/c.d"), ("a.b", "c.d"))   # dots inside a name are fine
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -143,7 +143,8 @@ above, and most take `--pr`.
 
 -   `--candidates N` - how many inferred candidates to keep per pull request.
     Default 8; each one costs the judge a read.
--   `--refetch` - ignore the per-issue cache and fetch every issue again.
+-   `--refetch` - ignore the per-issue cache, which is otherwise trusted for an
+    hour, and fetch every issue again.
 -   `--no-search` - skip the inferred tier, so only issues linked, referencing
     or mentioned are gathered.
 -   `--read ISSUE` - an issue to read in full as an inferred candidate, the
@@ -153,7 +154,14 @@ above, and most take `--pr`.
 
 -   `--full` - rebuild the corpus from scratch instead of fetching what changed
     since the last sync.
--   `--closed-months N` - how far back closed issues are kept. Default 18.
+-   `--closed-months N` - how far back closed issues are kept. Default 18. -
+    `--sibling OWNER/REPO` - also keep a corpus of that repository's issues,
+    named as `owner/name` or as the path of a clone of it, so its issues that
+    match a pull request by content appear under Referenced elsewhere.
+    Remembered in `siblings.json` for later syncs, and
+    `MATTER_PR_TRIAGE_SIBLINGS`, colon-separated, names siblings the same way.
+    Repeatable. For project-chip/connectedhomeip the natural sibling is
+    `CHIP-Specifications/chip-test-plans`, the test plans.
 
 ## benchmark
 
