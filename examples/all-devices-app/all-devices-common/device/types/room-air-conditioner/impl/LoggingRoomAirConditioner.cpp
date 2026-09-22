@@ -84,7 +84,7 @@ void LoggingRoomAirConditioner::OnOnOffChanged(bool on)
 
 Status LoggingRoomAirConditioner::SetLocalTemperature(DataModel::Nullable<int16_t> value, bool & changed)
 {
-    changed                        = mLocalTemperatureCentiCelsius != value;
+    changed                       = mLocalTemperatureCentiCelsius != value;
     mLocalTemperatureCentiCelsius = value;
     return Status::Success;
 }
