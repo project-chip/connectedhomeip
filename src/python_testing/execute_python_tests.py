@@ -36,7 +36,6 @@ import click
 import coloredlogs
 import yaml
 
-
 log = logging.getLogger(__name__)
 
 
