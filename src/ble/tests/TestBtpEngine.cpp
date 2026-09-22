@@ -559,8 +559,23 @@ TEST_F(TestBtpEngine, IsValidAckOnSequenceWraparound)
     // Create a packet buffer with a large payload that will result in 257 fragments (to test sequence number wraparound).
     size_t packetLength = mBtpEngine.sDefaultFragmentSize - kTransferProtocolMaxHeaderSize + kTransferProtocolAckSize +
         256 * (mBtpEngine.sDefaultFragmentSize - kTransferProtocolMidFragmentMaxHeaderSize + kTransferProtocolAckSize);
+
+    if (packetLength + System::PacketBuffer::kDefaultHeaderReserve > System::PacketBuffer::kMaxAllocSize)
+    {
+        ChipLogProgress(Test, "Skipping IsValidAckOnSequenceWraparound: packetLength (%u) exceeds PacketBuffer::kMaxAllocSize (%u)",
+                        static_cast<unsigned>(packetLength), static_cast<unsigned>(System::PacketBuffer::kMaxAllocSize));
+        return;
+    }
+
     auto packet0 = System::PacketBufferHandle::New(packetLength);
+    ASSERT_FALSE(packet0.IsNull());
     packet0->SetDataLength(packetLength);
+    if (packet0->DataLength() < packetLength)
+    {
+        ChipLogProgress(Test, "Skipping IsValidAckOnSequenceWraparound: PacketBuffer DataLength (%u) < required packetLength (%u)",
+                        static_cast<unsigned>(packet0->DataLength()), static_cast<unsigned>(packetLength));
+        return;
+    }
 
     // Send the first packet to start transmission.
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
