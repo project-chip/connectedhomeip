@@ -47,8 +47,8 @@
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessorHook.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
-#include <oob-accessors/device-manager/CreateAndRegisterOOBAccessor.h>
-#include <oob-accessors/device-manager/UnregisterAndDestroyOOBAccessor.h>
+#include <oob-accessors/device-manager/AddBridgedDeviceOOBAccessor.h>
+#include <oob-accessors/device-manager/RemoveBridgedDeviceOOBAccessor.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -197,15 +197,15 @@ public:
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
         mEndpointIdAllocator.emplace(GetReservedEndpointIds());
-        mDeviceManager.SetEndpointIdAllocator(&mEndpointIdAllocator.value());
+        mDeviceManager.SetEndpointIdAllocator(*mEndpointIdAllocator);
         mEndpointIdAllocator->ForceNext(kRootEndpointId);
-        ReturnErrorOnFailure(mRootNode.RootDevice().Register(mEndpointIdAllocator.value(), mDataModelProvider));
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(*mEndpointIdAllocator, mDataModelProvider));
         PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
 
         ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(
-            std::make_unique<CreateAndRegisterOOBAccessor<PosixDeviceFactory>>(mDeviceManager, mEndpointIdAllocator.value())));
+            std::make_unique<AddBridgedDeviceOOBAccessor<PosixDeviceFactory>>(mDeviceManager, *mEndpointIdAllocator)));
         ReturnErrorOnFailure(
-            OOBAccessorRegistry::Instance().Register(std::make_unique<UnregisterAndDestroyOOBAccessor<PosixDeviceFactory>>(mDeviceManager)));
+            OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor<PosixDeviceFactory>>(mDeviceManager)));
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
@@ -213,11 +213,16 @@ public:
             {
                 mEndpointIdAllocator->ForceNext(entry.endpoint);
             }
-            ChipLogProgress(AppServer, "Creating and registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(), entry.endpoint,
+            ChipLogProgress(AppServer, "Adding device %s on endpoint %u with parent 0x%04X", entry.type.c_str(), entry.endpoint,
                             entry.parentId);
-            auto deviceId = mDeviceManager.CreateAndRegisterDevice(entry.type, mEndpointIdAllocator.value(), entry.label,
+            auto device = mDeviceManager.AddDevice(entry.type, entry.label,
                                                                    EndpointComposition::WithParent(entry.parentId));
-            VerifyOrReturnError(deviceId.has_value(), CHIP_ERROR_INCORRECT_STATE);
+            if (!device.has_value())
+            {
+                ChipLogError(AppServer, "Failed to add device %s on endpoint %u with parent 0x%04X", entry.type.c_str(), entry.endpoint,
+                             entry.parentId);
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
         }
 
         return CHIP_NO_ERROR;
@@ -226,7 +231,7 @@ public:
     void Shutdown()
     {
         OOBAccessorRegistry::Instance().Clear();
-        mDeviceManager.UnregisterAndDestroyAllDevices();
+        mDeviceManager.RemoveAllDevices();
         mRootNode.RootDevice().Unregister(mDataModelProvider);
     }
 
@@ -236,7 +241,7 @@ public:
 
     chip::app::DeviceManager<PosixDeviceFactory> & GetDeviceManager() { return mDeviceManager; }
 
-    std::vector<DeviceInterface*> GetConstructedDevices() const { return mDeviceManager.GetRegisteredDevices(); }
+    auto GetConstructedDevices() const { return mDeviceManager.GetAllDevices(); }
 
 private:
     Context mContext;

@@ -20,12 +20,24 @@
 
 namespace chip::app::NamedPipe {
 
-class UnregisterAndDestroyTranslator : public CommandTranslator
+/**
+ * Named pipe usage (json):
+ * {
+ *    "Name": String
+ *        Must be "RemoveBridgedDevice"
+ *    "EndpointId" : EndpointId (uint16_t)
+ *        The endpointId of the bridged device to be removed. Must be a `Bridged Node` or a descendant of one.
+ * }
+ *
+ * Example: echo '{"Name": "RemoveBridgedDevice", "EndpointId": 5}'> /tmp/acs_fifo
+ */
+
+class RemoveBridgedDeviceTranslator : public CommandTranslator
 {
 public:
     static Span<const CharSpan> GetActionNames()
     {
-        static constexpr CharSpan kNames[] = { "UnregisterAndDestroy"_span };
+        static constexpr CharSpan kNames[] = { "RemoveBridgedDevice"_span };
         return Span<const CharSpan>(kNames);
     }
 

@@ -14,21 +14,16 @@
  *    limitations under the License.
  */
 
-#include <posix/named_pipe/translators/CreateAndRegisterTranslator.h>
+#include <posix/named_pipe/translators/RemoveBridgedDeviceTranslator.h>
 
 namespace chip::app::NamedPipe {
 
-CHIP_ERROR CreateAndRegisterTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                                            OOBAccessorRegistry & registry) const
+CHIP_ERROR RemoveBridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
+                                                               OOBAccessorRegistry & registry) const
 {
-    if (!json.isMember("device") || !json["device"].isString())
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    const std::string device = json["device"].asString();
-    return DispatchStringAction(registry, "CreateAndRegister"_span, endpointId,
-                                CharSpan(device.data(), device.size()));
+    auto deviceId = ExtractUInt<uint16_t>(json, "deviceId");
+    VerifyOrReturnError(deviceId.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+    return DispatchAction(registry, "RemoveBridgedDevice"_span, endpointId, *deviceId);
 }
 
 } // namespace chip::app::NamedPipe

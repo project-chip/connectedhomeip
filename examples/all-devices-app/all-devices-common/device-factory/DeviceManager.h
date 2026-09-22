@@ -26,7 +26,6 @@
 #include <optional>
 #include <cstdint>
 #include <functional>
-#include <unordered_map>
 #include <vector>
 namespace chip::app {
 
@@ -34,153 +33,115 @@ template <typename DeviceFactoryT>
 class DeviceManager
 {
 public:
-    struct DeviceId
-    {
-        DeviceId() : value(sNextValue++) {}
-        explicit DeviceId(uint16_t value) : value(value) {}
-
-        bool operator==(const DeviceId & other) const { return value == other.value; }
-
-        uint16_t value;
-
-    private:
-        inline static uint16_t sNextValue = 0;
+    struct DeviceRef {
+        const std::string & name;
+        DeviceInterface & device;
+        std::function<void()> & onDeviceRegistered;
+        bool isBridged;
     };
 
 private:
-    struct DeviceWithStateOwning
+    struct DeviceStorage
     {
         std::string name;
         typename DeviceFactoryT::DeviceRegistrationEntry device;
-        bool isRegistered;
+        bool isBridged;
+
+        DeviceStorage(std::string deviceName, typename DeviceFactoryT::DeviceRegistrationEntry && deviceEntry, bool bridged = false) :
+            name(std::move(deviceName)), device(std::move(deviceEntry)), isBridged(bridged)
+        {
+            VerifyOrDie(device.device != nullptr);
+        }
+
+        DeviceRef GetDeviceRef()
+        {
+            return DeviceRef{ name, *device.device, device.onDeviceRegistered, isBridged };
+        }
     };
 
 public:
-    struct DeviceWithState {
-        const std::string & name;
-        DeviceInterface & device;
-        bool isRegistered;
-    };
-
     DeviceManager(DeviceFactoryT & deviceFactory, CodeDrivenDataModelProvider & provider) : mDeviceFactory(deviceFactory), mProvider(provider) {};
-    void SetEndpointIdAllocator(EndpointIdAllocator * endpointIdAllocator) { mEndpointIdAllocator = endpointIdAllocator; }
+    void SetEndpointIdAllocator(EndpointIdAllocator & endpointIdAllocator) { mEndpointIdAllocator = &endpointIdAllocator; }
     EndpointIdAllocator * GetEndpointIdAllocator() { return mEndpointIdAllocator; }
-    std::optional<DeviceId> CreateDevice(const std::string & deviceName, const std::string & nodeLabel = "")
+    std::optional<DeviceRef> AddDevice(const std::string & deviceName, const std::string & nodeLabel = "", EndpointComposition composition = {})
     {
         auto device = mDeviceFactory.Create(deviceName, nodeLabel);
         if (device.device == nullptr)
-        {
-            return std::nullopt;
-        }
-        DeviceId deviceId;
-        mConstructedDevices.emplace(deviceId, DeviceWithStateOwning{ deviceName, std::move(device), false });
-        return deviceId;
-    };
-    CHIP_ERROR RegisterDevice(DeviceId deviceId, EndpointIdAllocator & endpointIdAllocator, EndpointComposition composition = {})
-    {
-        auto it = mConstructedDevices.find(deviceId);
-        VerifyOrReturnError(it != mConstructedDevices.end(), CHIP_ERROR_NOT_FOUND);
-        auto & deviceWithState = it->second;
-        VerifyOrReturnError(!deviceWithState.isRegistered, CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(deviceWithState.device.device->Register(endpointIdAllocator, mProvider, composition));
-        if (deviceWithState.device.onDeviceRegistered)
-        {
-            deviceWithState.device.onDeviceRegistered();
-        }
-        deviceWithState.isRegistered = true;
-        return CHIP_NO_ERROR;
-    };
-    std::optional<DeviceId> CreateAndRegisterDevice(const std::string & deviceName, EndpointIdAllocator & endpointIdAllocator,
-                                                    const std::string & nodeLabel = "", EndpointComposition composition = {})
-    {
-        auto deviceId = CreateDevice(deviceName, nodeLabel);
-        if (!deviceId.has_value())
         {
             ChipLogError(AppServer, "Failed to create device %s", deviceName.c_str());
             return std::nullopt;
         }
 
-        CHIP_ERROR err = RegisterDevice(deviceId.value(), endpointIdAllocator, composition);
+        if (mEndpointIdAllocator == nullptr)
+        {
+            ChipLogError(AppServer, "EndpointIdAllocator is not set. Cannot register device %s", deviceName.c_str());
+            return std::nullopt;
+        }
+
+        CHIP_ERROR err = device.device->Register(*mEndpointIdAllocator, mProvider, composition);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to register device %s: %" CHIP_ERROR_FORMAT, deviceName.c_str(), err.Format());
             return std::nullopt;
         }
-
-        return deviceId;
-    };
-    std::optional<DeviceWithState> GetDevice(DeviceId deviceId)
-    {
-        auto it = mConstructedDevices.find(deviceId);
-        if (it != mConstructedDevices.end())
+        if (device.onDeviceRegistered)
         {
-            return DeviceWithState{ it->second.name, *it->second.device.device, it->second.isRegistered };
+            device.onDeviceRegistered();
+        }
+
+        EndpointId parentEndpointId = composition.parentId;
+        bool isBridged = false;
+        if (parentEndpointId != kInvalidEndpointId)
+        {
+            auto parentDevice = GetDevice(parentEndpointId);
+            isBridged = parentDevice.has_value() && parentDevice->isBridged;
+        }
+        isBridged |= (deviceName == "bridged-node");
+        auto & deviceStorage = mDevices.emplace_back(DeviceStorage{ deviceName, std::move(device), isBridged });
+        return deviceStorage.GetDeviceRef();
+    };
+    std::optional<DeviceRef> GetDevice(EndpointId endpointId)
+    {
+        auto it = GetDeviceStorageIterator(endpointId);
+        if (it != mDevices.end())
+        {
+            return it->GetDeviceRef();
         }
         return std::nullopt;
     };
-    std::function<void()> GetOnDeviceRegisteredCallback(DeviceId deviceId)
+    std::vector<DeviceRef> GetAllDevices() const
     {
-        auto it = mConstructedDevices.find(deviceId);
-        if (it != mConstructedDevices.end())
+        std::vector<DeviceRef> allDevices(mDevices.size());
+        for (auto & device : mDevices)
         {
-            return it->second.device.onDeviceRegistered;
+            allDevices.push_back(device.GetDeviceRef());
         }
-        return nullptr;
+        return allDevices;
     };
-    std::vector<DeviceInterface *> GetRegisteredDevices() const
+    void RemoveDevice(EndpointId endpointId)
     {
-        std::vector<DeviceInterface*> registeredDevices;
-        for (auto & [deviceName, deviceWithState] : mConstructedDevices)
+        auto it = GetDeviceStorageIterator(endpointId);
+        VerifyOrReturn(it != mDevices.end());
+        it->device.device->Unregister(mProvider);
+        mDevices.erase(it);
+    }
+    void RemoveAllDevices()
+    {
+        for (auto & deviceWithState : mDevices)
         {
-            if (deviceWithState.isRegistered)
-            {
-                registeredDevices.push_back(deviceWithState.device.device.get());
-            }
+            deviceWithState.device.device->Unregister(mProvider);
         }
-        return registeredDevices;
-    };
-    void UnregisterDevice(DeviceId deviceId)
-    {
-        auto it = mConstructedDevices.find(deviceId);
-        VerifyOrReturn(it != mConstructedDevices.end());
-        auto & deviceWithState = it->second;
-        VerifyOrReturn(deviceWithState.isRegistered);
-        deviceWithState.device.device->Unregister(mProvider);
-        deviceWithState.isRegistered = false;
-    };
-    void UnregisterAndDestroyDevice(DeviceId deviceId)
-    {
-        UnregisterDevice(deviceId);
-        auto it = mConstructedDevices.find(deviceId);
-        if (it != mConstructedDevices.end())
-        {
-            mConstructedDevices.erase(it);
-        }
-    };
-    void UnregisterAllDevices()
-    {
-        for (auto & [deviceName, deviceWithState] : mConstructedDevices)
-        {
-            if (deviceWithState.isRegistered)
-            {
-                deviceWithState.device.device->Unregister(mProvider);
-                deviceWithState.isRegistered = false;
-            }
-        }
-    };
-    void UnregisterAndDestroyAllDevices()
-    {
-        UnregisterAllDevices();
-        mConstructedDevices.clear();
+        mDevices.clear();
     };
 
 private:
-    struct DeviceIdHash
+    auto GetDeviceStorageIterator(EndpointId endpointId)
     {
-        size_t operator()(const DeviceId & deviceId) const { return std::hash<uint16_t>{}(deviceId.value); }
+        return find_if(mDevices.begin(), mDevices.end(),
+                       [endpointId](const auto & device) { return device.device.device->GetEndpointId() == endpointId; });
     };
 
-    std::unordered_map<DeviceId, DeviceWithStateOwning, DeviceIdHash> mConstructedDevices;
+    std::vector<DeviceStorage> mDevices;
     DeviceFactoryT & mDeviceFactory;
     CodeDrivenDataModelProvider & mProvider;
     EndpointIdAllocator * mEndpointIdAllocator = nullptr;

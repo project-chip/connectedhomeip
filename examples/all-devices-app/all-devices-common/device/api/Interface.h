@@ -83,6 +83,10 @@ class DeviceInterface : public EndpointInterface
 public:
     virtual ~DeviceInterface() = default;
 
+    /// Returns the endpoint ID on which the base device type of the interface is registered.
+    /// Returns kInvalidEndpointId if the device interface has not yet been registered.
+    virtual EndpointId GetEndpointId() const = 0;
+
     /// Register relevant clusters on the given endpoint. This must only
     /// be called once after starting up a device for the first time. This function
     /// will create/instantiate all clusters on the device and complete endpoint registration.
