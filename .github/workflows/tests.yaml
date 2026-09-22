@@ -787,13 +787,8 @@ jobs:
 
         if: github.actor != 'restyled-io[bot]'
 
-        # A single-entry matrix so the variant has one definition that runs-on can
-        # also read; the env context is not available there.
-        strategy:
-            matrix:
-                build_variant: [ipv6only-no-ble-no-wifi-asan]
         env:
-            BUILD_VARIANT: ${{ matrix.build_variant }}
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
@@ -801,9 +796,10 @@ jobs:
         # bound, we run these on larger/faster machines.
         # The cache-tag override gives the ccache a volume of its own rather than
         # sharing the profile's default one, where instances running workflows
-        # without this change drop it. The variant is part of the tag so a job
-        # building something else gets a different volume.
-        runs-on: namespace-profile-16x32;overrides.cache-tag=chip-ccache-linux-${{ matrix.build_variant }}
+        # without this change drop it. The suffix must match env.BUILD_VARIANT
+        # above: it is spelled out because runs-on cannot read the env context,
+        # and a matrix declared just to carry it would rename the job's check.
+        runs-on: namespace-profile-16x32;overrides.cache-tag=chip-ccache-linux-ipv6only-no-ble-no-wifi-asan
 
         container:
             image: ghcr.io/project-chip/chip-build:211
@@ -835,7 +831,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
-                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}
+                  bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}
 
             - name: Setup and Restore Cache
               id: ccache
