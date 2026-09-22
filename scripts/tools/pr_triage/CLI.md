@@ -22,8 +22,8 @@ means, grouped by the command that takes it.
     is one, the API otherwise. Also the way to read the branch as it is now when
     the clone has fallen behind and you would rather not fetch.
 -   `--fix` - apply the items preflight marked `autofix`: fetching a base branch
-    that has fallen behind, and unshallowing a clone. Both write to your
-    repository, so neither happens on its own.
+    that has fallen behind, and restoring a shallow clone's full history. Both
+    write to your repository, so neither happens on its own.
 
 ## select
 

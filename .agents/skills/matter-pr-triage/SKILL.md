@@ -172,10 +172,10 @@ Preflight output drives what happens next:
 -   An item marked `autofix` can be applied by the tool. Tell the user what it
     costs, then run `matter_pr_triage.py preflight --fix` on an explicit yes.
     There are two: fetching a clone whose base branch has fallen behind, which
-    is quick, and unshallowing one, which is a large download and a large amount
-    of disk. Neither is automatic, because both write to the user's repository,
-    and both refuse outright while a rebase, merge or other git operation is in
-    progress there.
+    is quick, and restoring the full history of a shallow one, which is a large
+    download and a large amount of disk. Neither is automatic, because both
+    write to the user's repository, and both refuse outright while a rebase,
+    merge or other git operation is in progress there.
 -   An item marked `degrades` is not blocking. Say what accuracy it costs and
     offer to continue. A shallow checkout means pull requests that modify
     existing code come back undetermined, while those that add files or lines

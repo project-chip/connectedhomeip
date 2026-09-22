@@ -19,16 +19,16 @@ branch.
 
 How both runs were set up, so they can be repeated or argued with:
 
-|                                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Repository                       | `project-chip/connectedhomeip`, base branch `upstream/master` at `99a81bd32`. One agent in run 2 fetched part-way through, moving the branch name to `954268d5`, sixteen commits on; none of those touch any of the 143 files the 24 pull requests target, so no verdict could have changed, and `JUDGE.md` now tells agents to read the recorded commit rather than the branch name.                                                                                                                                                                                       |
-| Selection                        | 24 open pull requests, `--older-than 290d` on the default activity date field, so last activity before 2025-12-02. Identical set in both runs.                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Shared input                     | Gathering ran once per run. Every agent got the same `selection.json`, the same 24 dossiers and the same `SKILL.md` (then named JUDGE.md) Step 3 instructions, with nothing else in its context.                                                                                                                                                                                                                                                                                                                                                                            |
-| Tools                            | Read access to the checkout and to `gh`, so any agent could open the base branch or a diff. None could write.                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| Isolation                        | Every agent ran on its own, blind to the others' answers, and returned its verdicts as structured output.                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| Run 1, model tiers               | Run `20260918-051451-clean-slate`, 2026-09-18. One agent each of `claude-fable-5-1`, `claude-sonnet-5` and `claude-haiku-4-5` at their default effort. The Opus row is taken from run 2 at medium effort, which is the closest to a default.                                                                                                                                                                                                                                                                                                                                |
-| Run 2, Opus effort               | Run `20260918-060944-effort-sweep`, 2026-09-18. Five `claude-opus-5` agents at once, one per reasoning effort: low, medium, high, xhigh, max. Each transcript records the effort that was applied, and the thinking-token column below rises with it, so the setting demonstrably took hold.                                                                                                                                                                                                                                                                                |
-| Run 3, OpenAI models under Codex | Run `20260918-063128-codex-bench`, 2026-09-18, driven by Codex following the recipe at the end of this file, same 24 pull requests, base pinned to `99a81bd32`. One fresh Codex session per model and effort; eighteen completed before the account's token limit stopped it, and the remainder was not run, since the best family's score had not moved across four effort levels and the missing tiers could at most equal it. Tokens come from Codex's own accounting, uncached input and output, which is the nearest equivalent to the basis used for the Claude rows. |
+|                                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository                       | `project-chip/connectedhomeip`, base branch `upstream/master` at `99a81bd32`. One agent in run 2 fetched part-way through, moving the branch name to `954268d5`, sixteen commits on; none of those touch any of the 143 files the 24 pull requests target, so no verdict could have changed, and `JUDGE.md` now tells agents to read the recorded commit rather than the branch name.                                                                                                                                                                                        |
+| Selection                        | 24 open pull requests, `--older-than 290d` on the default activity date field, so last activity before 2025-12-02. Identical set in both runs.                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Shared input                     | Gathering ran once per run. Every agent got the same `selection.json`, the same 24 dossiers and the same `SKILL.md` (then named JUDGE.md) Step 3 instructions, with nothing else in its context.                                                                                                                                                                                                                                                                                                                                                                             |
+| Tools                            | Read access to the checkout and to `gh`, so any agent could open the base branch or a diff. None could write.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Isolation                        | Every agent ran on its own, blind to the others' answers, and returned its verdicts as structured output.                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Run 1, model tiers               | Run `20260918-051451-clean-slate`, 2026-09-18. One agent each of `claude-fable-5-1`, `claude-sonnet-5` and `claude-haiku-4-5` at their default effort. The Opus row is taken from run 2 at medium effort, which is the closest to a default.                                                                                                                                                                                                                                                                                                                                 |
+| Run 2, Opus effort               | Run `20260918-060944-effort-sweep`, 2026-09-18. Five `claude-opus-5` agents at once, one per reasoning effort: low, medium, high, xhigh, max. Each transcript records the effort that was applied, and the thinking-token column below rises with it, so the setting demonstrably took hold.                                                                                                                                                                                                                                                                                 |
+| Run 3, OpenAI models under Codex | Run `20260918-063128-codex-bench`, 2026-09-18, driven by Codex following the recipe at the end of this file, same 24 pull requests, base pinned to `99a81bd32`. One fresh Codex session per model and effort; eighteen completed before the account's token limit stopped it, and the remainder was not run, since the best family's score had not moved across four effort levels and the missing tiers could at most equal it. Tokens come from Codex's own accounting, full-rate input and output, which is the nearest equivalent to the basis used for the Claude rows. |
 
 **Run 1: which model, at default effort.**
 
@@ -51,27 +51,27 @@ How both runs were set up, so they can be repeated or argued with:
 
 **Run 3: OpenAI models under Codex, by reasoning effort.**
 
-| Model           | Effort | Verdicts that held up | Undecided | Uncached input | Output tokens | Reasoning tokens | Model turns | Wall clock |
-| --------------- | ------ | --------------------- | --------- | -------------- | ------------- | ---------------- | ----------- | ---------- |
-| gpt-5.5         | low    | 12 of 24              | 6         | 40,754         | 3,958         | 596              | 5           | 1m 25s     |
-| gpt-5.5         | medium | 19 of 24              | 0         | 108,067        | 10,220        | 2,779            | 20          | 4m 01s     |
-| gpt-5.5         | high   | 16 of 24              | 1         | 115,924        | 5,604         | 1,875            | 8           | 11m 30s    |
-| gpt-5.6-luna    | low    | 13 of 24              | 4         | 36,497         | 4,302         | 453              | 3           | 1m 28s     |
-| gpt-5.6-luna    | medium | 19 of 24              | 0         | 85,749         | 9,265         | 3,356            | 20          | 4m 10s     |
-| gpt-5.6-luna    | high   | 20 of 24              | 0         | 174,265        | 25,190        | 15,120           | 29          | 17m 13s    |
-| gpt-5.6-sol     | low    | 19 of 24              | 0         | 65,547         | 4,858         | 1,137            | 10          | 1m 57s     |
-| gpt-5.6-sol     | medium | 20 of 24              | 0         | 92,649         | 10,084        | 2,550            | 12          | 3m 46s     |
-| gpt-5.6-sol     | high   | 20 of 24              | 0         | 107,623        | 10,602        | 4,826            | 15          | 4m 06s     |
-| gpt-5.6-sol     | xhigh  | 20 of 24              | 0         | 167,793        | 15,187        | 5,836            | 36          | 6m 28s     |
-| gpt-5.6-terra   | low    | 17 of 24              | 1         | 95,251         | 6,905         | 2,147            | 14          | 2m 44s     |
-| gpt-5.6-terra   | medium | 17 of 24              | 3         | 93,701         | 7,828         | 3,511            | 11          | 2m 52s     |
-| gpt-5.6-terra   | high   | 19 of 24              | 0         | 87,626         | 9,023         | 4,403            | 12          | 3m 15s     |
-| gpt-5.6-terra   | xhigh  | 20 of 24              | 0         | 167,049        | 14,724        | 8,103            | 20          | 5m 15s     |
-| **gpt-6-astra** | low    | **22 of 24**          | 0         | 107,228        | 4,747         | 340              | 15          | 3m 22s     |
-| **gpt-6-astra** | medium | **22 of 24**          | 0         | 112,544        | 5,517         | 437              | 15          | 8m 52s     |
-| **gpt-6-astra** | high   | **22 of 24**          | 0         | 149,692        | 9,891         | 3,027            | 20          | 9m 06s     |
-| **gpt-6-astra** | xhigh  | **22 of 24**          | 0         | 145,599        | 12,716        | 3,258            | 20          | 35m 11s    |
-| gpt-6-astra     | max    | failed, token limit   |           | 61,645         | 859           | 57               | 7           | 0m 40s     |
+| Model           | Effort | Verdicts that held up | Undecided | Full-rate input | Output tokens | Reasoning tokens | Model turns | Wall clock |
+| --------------- | ------ | --------------------- | --------- | --------------- | ------------- | ---------------- | ----------- | ---------- |
+| gpt-5.5         | low    | 12 of 24              | 6         | 40,754          | 3,958         | 596              | 5           | 1m 25s     |
+| gpt-5.5         | medium | 19 of 24              | 0         | 108,067         | 10,220        | 2,779            | 20          | 4m 01s     |
+| gpt-5.5         | high   | 16 of 24              | 1         | 115,924         | 5,604         | 1,875            | 8           | 11m 30s    |
+| gpt-5.6-luna    | low    | 13 of 24              | 4         | 36,497          | 4,302         | 453              | 3           | 1m 28s     |
+| gpt-5.6-luna    | medium | 19 of 24              | 0         | 85,749          | 9,265         | 3,356            | 20          | 4m 10s     |
+| gpt-5.6-luna    | high   | 20 of 24              | 0         | 174,265         | 25,190        | 15,120           | 29          | 17m 13s    |
+| gpt-5.6-sol     | low    | 19 of 24              | 0         | 65,547          | 4,858         | 1,137            | 10          | 1m 57s     |
+| gpt-5.6-sol     | medium | 20 of 24              | 0         | 92,649          | 10,084        | 2,550            | 12          | 3m 46s     |
+| gpt-5.6-sol     | high   | 20 of 24              | 0         | 107,623         | 10,602        | 4,826            | 15          | 4m 06s     |
+| gpt-5.6-sol     | xhigh  | 20 of 24              | 0         | 167,793         | 15,187        | 5,836            | 36          | 6m 28s     |
+| gpt-5.6-terra   | low    | 17 of 24              | 1         | 95,251          | 6,905         | 2,147            | 14          | 2m 44s     |
+| gpt-5.6-terra   | medium | 17 of 24              | 3         | 93,701          | 7,828         | 3,511            | 11          | 2m 52s     |
+| gpt-5.6-terra   | high   | 19 of 24              | 0         | 87,626          | 9,023         | 4,403            | 12          | 3m 15s     |
+| gpt-5.6-terra   | xhigh  | 20 of 24              | 0         | 167,049         | 14,724        | 8,103            | 20          | 5m 15s     |
+| **gpt-6-astra** | low    | **22 of 24**          | 0         | 107,228         | 4,747         | 340              | 15          | 3m 22s     |
+| **gpt-6-astra** | medium | **22 of 24**          | 0         | 112,544         | 5,517         | 437              | 15          | 8m 52s     |
+| **gpt-6-astra** | high   | **22 of 24**          | 0         | 149,692         | 9,891         | 3,027            | 20          | 9m 06s     |
+| **gpt-6-astra** | xhigh  | **22 of 24**          | 0         | 145,599         | 12,716        | 3,258            | 20          | 35m 11s    |
+| gpt-6-astra     | max    | failed, token limit   |           | 61,645          | 859           | 57               | 7           | 0m 40s     |
 
 Not run: gpt-6-astra ultra; gpt-5.6-sol max and ultra; gpt-5.6-terra max and
 ultra; gpt-5.6-luna max; and two families never started, gpt-reserve and
@@ -103,10 +103,10 @@ What each column means:
 -   **Wall clock** - start of judging to the finished verdicts, for one batch
     of 24. It tracks turns more than tokens, and it is time nobody has to sit
     and watch.
--   **Uncached input** and **Reasoning tokens**, run 3 only - Codex's own
-    accounting. Uncached input is what was billed at the full rate, so it stands
-    in for the input-tokens column; reasoning tokens are the part of the output
-    spent thinking, as thinking tokens are for run 2.
+-   **Full-rate input** and **Reasoning tokens**, run 3 only - Codex's own
+    accounting. Full-rate input is what was billed at the full rate, so it
+    stands in for the input-tokens column; reasoning tokens are the part of the
+    output spent thinking, as thinking tokens are for run 2.
 
 Every figure in runs 1 and 2 is summed from that agent's own transcript by the
 same script, which is what makes those rows comparable to one another; run 3 is
@@ -148,7 +148,7 @@ different error code (#40191). The best OpenAI model, gpt-6-astra, scored 22 of
 24 at low, medium, high and xhigh alike, with the same two misses each time: for
 that model, effort bought nothing, where for Opus it moved the score from 21
 to 24. Its low setting is the cheapest 22 of 24 anywhere in these tables, at
-about 107,000 uncached input and 4,700 output tokens in under three and a half
+about 107,000 full-rate input and 4,700 output tokens in under three and a half
 minutes.
 
 Codex also re-checked the answer key where its models disagreed with it, as the
@@ -207,10 +207,10 @@ came to about 12,800 input and 900 output tokens per pull request, so a batch of
 that, and see the effort table above for how it moves with the setting.
 
 If you measure under Claude Code, take the figures from the transcript with
-`cost --session`. The per-agent token total the harness prints when a subagent
-finishes came out about three times lower than the transcript sum on every run
-here, so whatever it aggregates, it is not input plus output and should not be
-quoted as such.
+`cost --session`. The per-agent token total the harness prints when a delegated
+agent finishes came out about three times lower than the transcript sum on every
+run here, so whatever it aggregates, it is not input plus output and should not
+be quoted as such.
 
 The default cap is 25, and that number is now measured rather than guessed.
 Judging a batch of 24 took up to 112 model turns and about 560,000 tokens of
@@ -296,7 +296,7 @@ excluded from the pull request sample.
 | seed 2, 60 | 38                   | 40            | 0.80        | 0.975        | 0.59 | a flaky-test issue whose body is CI log links, fixed by a DNS-SD change |
 | seed 3, 80 | 56                   | 59            | 0.83        | 0.98         | 0.60 | one                                                                     |
 
-**Baseline, before tuning, seed 1:** recall at 8 was 0.66 and on the longlist,
+**Baseline, before tuning, seed 1:** recall at 8 was 0.66 and on the skim list,
 then 40 titles, 0.75. What closed the gap, in order of effect: keeping every
 title term in the query so a long body of file names does not crowd it out;
 tokens that meet across spellings, test identifiers in canonical form, camel
@@ -312,9 +312,9 @@ folder at least three deep; and the read list is capped per kind of lead so one
 family of sibling issues cannot fill it.
 
 **Caveats.** Pull requests that link issues formally are the ones whose authors
-write good descriptions, so the population is friendlier than the unlinked case
-the tier exists for. The remaining misses are semantic, an issue described only
-by symptoms and log links whose fix touched something else, and are out of reach
-for lexical scoring. Repeat with
+write good descriptions, so the population is friendlier than the not-linked
+case the tier exists for. The remaining misses are semantic, an issue described
+only by symptoms and log links whose fix touched something else, and are out of
+reach for lexical scoring. Repeat with
 `matter_pr_triage_issues.py benchmark --sample 80 --seed 3` from a clone with a
 synced corpus; a fresh seed draws a fresh sample.

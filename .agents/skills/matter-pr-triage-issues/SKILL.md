@@ -223,8 +223,8 @@ it?**
    asks for, the verdict is `close`. When the issue asks for more than the pull
    request delivered, or the pull request's own change never landed, the verdict
    is `leave`: the issue stays open, and the reason says what is still missing.
-   `report` refuses `close` on an issue whose pull request was not judged
-   closable as covered unless `disagreement_reason` says why.
+   `report` refuses `close` on an issue whose pull request was not judged safe
+   to close as covered unless `disagreement_reason` says why.
 
     The reason sometimes proves a parent goal rather than the issue's own ask:
     "the coverage issue it serves is closed" says the umbrella was declared
