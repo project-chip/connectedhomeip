@@ -84,6 +84,9 @@ config CHIP_DFU_OVER_BT_SMP
 	select MCUMGR_MGMT_NOTIFICATION_HOOKS
 	select MCUMGR_GRP_IMG_UPLOAD_CHECK_HOOK
 	select MCUMGR_GRP_IMG_STATUS_HOOKS
+	default y if BOARD_TL3238X || BOARD_TL3238X_RETENTION
+	default y if BOARD_TLSR9528A || BOARD_TLSR9528A_RETENTION
+	default n
 	help
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.
@@ -249,8 +252,9 @@ config CHIP_USE_MARS_SENSOR
 	default n
 
 config CHIP_PERSISTENT_SUBSCRIPTIONS
-	default n if BOARD_TL7218X_RETENTION
-	default y
+	default y if BOARD_TL3238X || BOARD_TL3238X_RETENTION
+	default y if BOARD_TLSR9528A || BOARD_TLSR9528A_RETENTION
+	default n
 	# selecting experimental for this feature since there is an issue with multiple controllers.
 	select EXPERIMENTAL
 
