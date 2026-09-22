@@ -456,7 +456,6 @@ def write_device_unique_data(args, out_dirs, pai_cert):
             else:
                 dacs = generate_dac_cert(int(row['Index']), args, out_dirs, int(row['Discriminator']),
                                          int(row['PIN Code']), pai_cert['key_pem'], pai_cert['cert_pem'])
-
             nvs_memory_append('dac_cert', read_der_file(dacs[0]))
             nvs_memory_append('dac_key', read_key_bin_file(dacs[1]))
             nvs_memory_append('pai_cert', read_der_file(pai_cert['cert_der']))
@@ -472,8 +471,12 @@ def write_device_unique_data(args, out_dirs, pai_cert):
         return dacs
 
 
-def generate_partition(args, out_dirs):
-    log.info("Generating partition image: offset: 0x%08X size: 0x%08X", args.offset, args.size)
+def generate_partition(args, dacs_cert, out_dirs):
+    log.info(
+        "Generating partition image: offset: 0x%X size: 0x%X",
+        args.offset,
+        args.size,
+    )
     cbor_data = cbor.dumps(NVS_MEMORY)
     # Create hex file
     if len(cbor_data) > args.size:
@@ -728,14 +731,14 @@ def main():
     out_dir_top = os.path.realpath(args.output)
     os.makedirs(out_dir_top, exist_ok=True)
 
-    with open(os.sep.join([out_dir_top, "device_sn.csv"]), "w") as f:
-        f.write(DEV_SN_CSV_HDR)
+    with open(os.sep.join([out_dir_top, "device_sn.csv"]), "w") as dev_sn_file:
+        dev_sn_file.write(DEV_SN_CSV_HDR)
 
         for i in range(args.count):
             pai_cert = {}
             serial_num_str = format(serial_num_int + i, 'x')
-            log.info("Generating for '%s'", serial_num_str)
-            f.write(serial_num_str + '\n')
+            log.info("Generating for %s", serial_num_str)
+            dev_sn_file.write(serial_num_str + '\n')
             out_dirs = setup_out_dir(out_dir_top, args, serial_num_str)
             add_additional_kv(args, serial_num_str)
             generate_passcode(args, out_dirs)
@@ -743,7 +746,7 @@ def main():
             if args.paa or args.pai:
                 pai_cert = setup_root_certificates(args, out_dirs)
             dacs_cert = write_device_unique_data(args, out_dirs, pai_cert)
-            generate_partition(args, out_dirs)
+            generate_partition(args, dacs_cert, out_dirs)
             generate_json_summary(args, out_dirs, pai_cert, dacs_cert, serial_num_str)
 
 

@@ -17,5 +17,5 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/door-lock-server-callback.cpp"
-    "${CLUSTER_DIR}/door-lock-server.cpp"
+    "${CLUSTER_DIR}/DoorLockCluster.cpp"
 )
