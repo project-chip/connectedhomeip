@@ -65,16 +65,26 @@ CHIP_ERROR ClosurePanel::Register(EndpointId endpoint, CodeDrivenDataModelProvid
     {
         const PositioningParams & positioning = mConfig.positioning.value();
         dimensionConfig.WithPositioning(positioning.resolution, positioning.stepValue);
+        // The motion parameters become mandatory attributes of the cluster, so an unset one would
+        // be served as kUnknownEnumValue, which is out of range for the attribute.
         if (auto * translation = std::get_if<TranslationParams>(&positioning.motion))
         {
+            VerifyOrReturnError(translation->direction != Clusters::ClosureDimension::TranslationDirectionEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
             dimensionConfig.WithTranslation(translation->direction);
         }
         else if (auto * rotation = std::get_if<RotationParams>(&positioning.motion))
         {
+            VerifyOrReturnError(rotation->axis != Clusters::ClosureDimension::RotationAxisEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(rotation->overflow != Clusters::ClosureDimension::OverflowEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
             dimensionConfig.WithRotation(rotation->axis, rotation->overflow);
         }
         else if (auto * modulation = std::get_if<ModulationParams>(&positioning.motion))
         {
+            VerifyOrReturnError(modulation->type != Clusters::ClosureDimension::ModulationTypeEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
             dimensionConfig.WithModulation(modulation->type);
         }
     }
