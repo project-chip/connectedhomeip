@@ -18,7 +18,10 @@
 
 #include "webrtc-peer-manager.h"
 
+#include <cinttypes>
+
 #include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 
 namespace chip {
@@ -286,12 +289,40 @@ void WebRTCPeerManager::OnPeerConnectionStateChanged(const std::shared_ptr<rtc::
 
     if (failed)
     {
+        it->second.connected = false;
         mPeerConnectionObserver->OnPeerConnectionFailed(it->first.first, it->first.second);
+        return;
+    }
+
+    // The time when connection was established, for analysis sessions sourced from this stream
+    System::Clock::Microseconds64 now;
+    if (System::SystemClock().GetClock_RealTime(now) == CHIP_NO_ERROR)
+    {
+        it->second.connectedAtEpochUs = now.count();
     }
     else
     {
-        mPeerConnectionObserver->OnPeerConnectionConnected(it->first.first, it->first.second);
+        it->second.connectedAtEpochUs = 0;
+        ChipLogError(AppServer, "AvAnalysisNode: real-time clock unavailable, WebRTC session %u has no connection time",
+                     it->first.second);
     }
+    it->second.connected = true;
+    ChipLogProgress(AppServer, "AvAnalysisNode: WebRTC session %u connected at %" PRIu64 " us since the epoch", it->first.second,
+                    it->second.connectedAtEpochUs);
+    mPeerConnectionObserver->OnPeerConnectionConnected(it->first.first, it->first.second);
+}
+
+std::vector<WebRTCPeerController::ConnectedStream> WebRTCPeerManager::ConnectedStreams() const
+{
+    std::vector<ConnectedStream> streams;
+    for (const auto & entry : mSessions)
+    {
+        if (entry.second.connected)
+        {
+            streams.push_back({ entry.first.first, entry.first.second, entry.second.connectedAtEpochUs });
+        }
+    }
+    return streams;
 }
 
 void WebRTCPeerManager::OnGatheringComplete(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection)
