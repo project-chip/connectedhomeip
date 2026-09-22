@@ -92,6 +92,12 @@ TEST_F(ThermostatTestFixture, TestOperationalSetpointWriteUpdatesTrackingAttribu
 {
     EnableAllSetpointChangeAttributes(mOptionalAttributes);
 
+    // Mock the clock to a known synced real time. Some platforms (e.g. Zephyr's native_sim) start with an
+    // unsynced clock by default, which would otherwise make GetClock_MatterEpochS() fail and this test flaky
+    // across platforms; see TestUnsyncedClockLeavesTimestampStaleButStillUpdatesSourceAndAmount for that case.
+    System::Clock::Internal::RAIIMockClock mockClock;
+    ASSERT_EQ(mockClock.SetClock_RealTime(Microseconds64(kMockUnixTimeMicroseconds)), CHIP_NO_ERROR);
+
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling);
     ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate);
     ClusterTester tester(cluster);
