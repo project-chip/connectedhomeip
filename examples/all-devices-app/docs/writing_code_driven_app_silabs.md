@@ -25,7 +25,7 @@ for architecture and device class implementation.
     -   Product device source files and the single base device target (e.g.,
         `device/types/speaker`):
 
-```gn
+```text
   sources += [
     "include/MyProductSpeaker.h",
     "src/MyProductSpeaker.cpp",

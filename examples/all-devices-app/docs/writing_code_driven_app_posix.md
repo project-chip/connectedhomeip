@@ -29,7 +29,7 @@ for architecture and device class implementation.
         `device/types/root-node:wifi`, and the single base device target (e.g.,
         `device/types/speaker`):
 
-```gn
+```text
   sources = [
     "MyProductSpeaker.cpp",
     "MyProductSpeaker.h",

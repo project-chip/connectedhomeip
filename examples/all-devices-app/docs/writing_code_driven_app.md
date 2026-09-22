@@ -44,7 +44,7 @@ device base class (`device/types/<device>/<Device>.h`) and implement its cluster
     `device/types/<device>/impl/Logging*.h` (e.g.,
     [`LoggingSpeaker.h`](../all-devices-common/device/types/speaker/impl/LoggingSpeaker.h)).
     Inherit `private` `Delegate` interfaces **before** `public <BaseDevice>` so
-    delegate vtables initialize before `*this` is passed to `<BaseDevice>`.
+    delegate base classes initialize before `*this` is passed to `<BaseDevice>`.
 -   **Hardware Peripheral Reference**: See
     [`PosixSpeaker.h`](../posix/include/PosixSpeaker.h) or
     [`ESP32DimmableLight.h`](../esp32/main/ESP32DimmableLight.h) for compiled
