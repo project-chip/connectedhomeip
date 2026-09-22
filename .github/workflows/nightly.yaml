@@ -49,8 +49,13 @@ jobs:
     nightly_repl_tests_linux_build:
         name: Nightly REPL Tests - Linux (BUILD)
         if: github.actor != 'restyled-io[bot]'
+        # A single-entry matrix so the variant has one definition that runs-on can
+        # also read; the env context is not available there.
+        strategy:
+            matrix:
+                build_variant: [ipv6only-no-ble-no-wifi-asan]
         env:
-            BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
+            BUILD_VARIANT: ${{ matrix.build_variant }}
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
@@ -59,7 +64,7 @@ jobs:
         # Shares the ccache volume with the tests.yaml REPL build job, which builds
         # the same variant. The tag also keeps that cache off the profile's default
         # volume, where instances running other workflows would drop it.
-        runs-on: namespace-profile-4x16;overrides.cache-tag=chip-ccache-linux
+        runs-on: namespace-profile-4x16;overrides.cache-tag=chip-ccache-linux-${{ matrix.build_variant }}
 
         container:
             image: ghcr.io/project-chip/chip-build:211

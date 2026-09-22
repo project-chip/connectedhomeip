@@ -16,10 +16,6 @@ inputs:
     required: false
     default: 'false'
     description: 'Back .ccache with the Namespace cache volume attached to the runner instead of actions/cache. The volume identity comes from the runs-on label, not from here.'
-  volume-allow-write:
-    required: false
-    default: 'false'
-    description: 'Allow a non-master ref to write the volume-backed ccache. For validation runs only; master writes regardless.'
 outputs:
   cache-primary-key:
     description: "The primary key used for the cache"
@@ -29,7 +25,7 @@ outputs:
     value: ${{ steps.ccache-restore.outputs.cache-hit }}
   using-volume:
     description: "True when .ccache is backed by a Namespace cache volume rather than actions/cache"
-    value: ${{ inputs.use-cache-volume }}
+    value: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
 runs:
   using: "composite"
   steps:
@@ -42,6 +38,8 @@ runs:
       uses: pyTooling/Actions/with-post-step@6f3d6d20558fd3891554da44666a148767e33a67 # v7.15.0
       with:
         main: |
+          # Created here rather than by the cache-volume step below, which links an
+          # existing directory onto the volume.
           mkdir -p .ccache
           echo "CCACHE_NOHASHDIR=1" >> $GITHUB_ENV
           echo "CCACHE_BASEDIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
@@ -78,6 +76,8 @@ runs:
         echo "CCACHE_RESTORE_KEY=${CCACHE_RESTORE_KEY}" >> "$GITHUB_ENV"
     # nscloud-cache-action shells out to sudo to bind-mount the volume, and the
     # chip-build image does not ship it. The job already runs as root.
+    # TODO: add sudo to the chip-build image and drop this step, so an apt mirror
+    # is not on the critical path of a build.
     - name: Ensure sudo is available for the cache mount
       if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
       shell: bash
@@ -95,9 +95,19 @@ runs:
     # actions/cache entry it replaces. Keep the same write policy: master writes,
     # everything else reads.
     - name: Restrict volume-backed ccache to reads off master
-      if: ${{ inputs.use-cache-volume == 'true' && github.ref != 'refs/heads/master' && inputs.volume-allow-write != 'true' }}
+      if: ${{ inputs.use-cache-volume == 'true' && github.ref != 'refs/heads/master' }}
       shell: bash
       run: echo "CCACHE_READONLY=1" >> $GITHUB_ENV
+    # Without this the failure is silent: the actions/cache restore below is gated
+    # off, so an unmounted volume means every build is cold with job duration as the
+    # only symptom.
+    - name: Verify the cache volume is mounted
+      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
+      shell: bash
+      run: |
+        test -d /cache
+        test -n "${NSC_CACHE_PATH:-}"
+        test -d "${CCACHE_DIR}"
     - name: Restore ccache
       if: ${{ inputs.disable != 'true' && inputs.use-cache-volume != 'true' }}
       id: ccache-restore

@@ -787,16 +787,23 @@ jobs:
 
         if: github.actor != 'restyled-io[bot]'
 
+        # A single-entry matrix so the variant has one definition that runs-on can
+        # also read; the env context is not available there.
+        strategy:
+            matrix:
+                build_variant: [ipv6only-no-ble-no-wifi-asan]
         env:
-            BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
+            BUILD_VARIANT: ${{ matrix.build_variant }}
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
         # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
         # bound, we run these on larger/faster machines.
         # The cache-tag override gives the ccache a volume of its own rather than
-        # sharing the profile's default one with the container image layers.
-        runs-on: namespace-profile-16x32;overrides.cache-tag=chip-ccache-linux
+        # sharing the profile's default one, where instances running workflows
+        # without this change drop it. The variant is part of the tag so a job
+        # building something else gets a different volume.
+        runs-on: namespace-profile-16x32;overrides.cache-tag=chip-ccache-linux-${{ matrix.build_variant }}
 
         container:
             image: ghcr.io/project-chip/chip-build:211
