@@ -42,6 +42,15 @@ public:
         std::string sdpMid;
     };
 
+    // A session whose peer connection is connected
+    struct ConnectedStream
+    {
+        ScopedNodeId cameraNode;
+        uint16_t webRTCSessionId = 0;
+        // Wall-clock time the connection was established, in microseconds, 0 otherwise
+        uint64_t connectedAtEpochUs = 0;
+    };
+
     /**
      * Learns the status of peer connections after their session was assigned
      */
@@ -85,6 +94,11 @@ public:
      * is sent to the camera once.
      */
     virtual std::vector<LocalICECandidate> TakeLocalCandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
+
+    /**
+     * The sessions whose peer connection is currently connected.
+     */
+    virtual std::vector<ConnectedStream> ConnectedStreams() const = 0;
 
 protected:
     PeerConnectionObserver * mPeerConnectionObserver = nullptr;
