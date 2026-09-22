@@ -26,7 +26,7 @@ class ClosurePanel : public SingleEndpoint
 {
 public:
     using SingleEndpoint::Register;
-    // A panel expresses at least one motion aspect.
+
     struct TranslationParams
     {
         Clusters::ClosureDimension::TranslationDirectionEnum direction =
@@ -42,12 +42,21 @@ public:
         Clusters::ClosureDimension::ModulationTypeEnum type = Clusters::ClosureDimension::ModulationTypeEnum::kUnknownEnumValue;
     };
 
+    // Positioning (PS) requires exactly one of Translation / Rotation / Modulation, and
+    // none of them is allowed without PS, so the motion choice lives inside the PS params.
+    struct PositioningParams
+    {
+        Percent100ths resolution;
+        Percent100ths stepValue;
+        std::variant<TranslationParams, RotationParams, ModulationParams> motion;
+    };
+
+    // At least one of positioning / motionLatching must be set.
     struct Config
     {
         bool withAccess = false;
-        std::optional<std::pair<Percent100ths, Percent100ths>> positioning; // resolution, stepValue
         std::optional<BitFlags<Clusters::ClosureDimension::LatchControlModesBitmap>> motionLatching;
-        std::variant<TranslationParams, RotationParams, ModulationParams> motion;
+        std::optional<PositioningParams> positioning;
     };
 
     ClosurePanel(Clusters::ClosureDimension::ClosureDimensionClusterDelegate & dimensionDelegate, Config config);

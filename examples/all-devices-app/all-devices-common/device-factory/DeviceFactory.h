@@ -326,7 +326,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
@@ -367,22 +367,36 @@ private:
             RegisterCreator("closure", [this]() {
                 VerifyOrDie(mContext.has_value());
                 ClosurePanel::Config c1{
-                    .withAccess  = true,
-                    .positioning = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
-                    .motion = ClosurePanel::TranslationParams{ Clusters::ClosureDimension::TranslationDirectionEnum::kBackward },
+                    .withAccess = true,
+                    .positioning =
+                        ClosurePanel::PositioningParams{
+                            .resolution = 1,
+                            .stepValue  = 1,
+                            .motion =
+                                ClosurePanel::TranslationParams{ Clusters::ClosureDimension::TranslationDirectionEnum::kBackward },
+                        },
                 };
                 ClosurePanel::Config c2{
-                    .withAccess  = false,
-                    .positioning = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
-                    .motion      = ClosurePanel::ModulationParams{ Clusters::ClosureDimension::ModulationTypeEnum::kSlatsOpenwork },
+                    .withAccess = false,
+                    .positioning =
+                        ClosurePanel::PositioningParams{
+                            .resolution = 1,
+                            .stepValue  = 1,
+                            .motion =
+                                ClosurePanel::ModulationParams{ Clusters::ClosureDimension::ModulationTypeEnum::kSlatsOpenwork },
+                        },
                 };
                 ClosurePanel::Config c3{
                     .withAccess     = true,
-                    .positioning    = std::pair<Percent100ths, Percent100ths>{ 1, 1 },
                     .motionLatching = BitFlags<Clusters::ClosureDimension::LatchControlModesBitmap>(
                         Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteLatching,
                         Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching),
-                    .motion = ClosurePanel::RotationParams{ Clusters::ClosureDimension::RotationAxisEnum::kLeft },
+                    .positioning =
+                        ClosurePanel::PositioningParams{
+                            .resolution = 1,
+                            .stepValue  = 1,
+                            .motion     = ClosurePanel::RotationParams{ Clusters::ClosureDimension::RotationAxisEnum::kLeft },
+                        },
                 };
 
                 static EndpointComposition::SemanticTag kLiftTag[]   = { { .namespaceID = kClosurePanelNamespaceId,

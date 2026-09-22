@@ -50,30 +50,33 @@ CHIP_ERROR ClosurePanel::Register(EndpointId endpoint, CodeDrivenDataModelProvid
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
+    VerifyOrReturnError(mConfig.positioning.has_value() || mConfig.motionLatching.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+
     Clusters::ClosureDimension::ClosureDimensionCluster::Config dimensionConfig(endpoint, mDimensionDelegate);
     if (mConfig.withAccess)
     {
         dimensionConfig.WithAccess();
     }
-    if (auto * translation = std::get_if<TranslationParams>(&mConfig.motion))
-    {
-        dimensionConfig.WithTranslation(translation->direction);
-    }
-    else if (auto * rotation = std::get_if<RotationParams>(&mConfig.motion))
-    {
-        dimensionConfig.WithRotation(rotation->axis, rotation->overflow);
-    }
-    else if (auto * modulation = std::get_if<ModulationParams>(&mConfig.motion))
-    {
-        dimensionConfig.WithModulation(modulation->type);
-    }
-    if (mConfig.positioning.has_value())
-    {
-        dimensionConfig.WithPositioning(mConfig.positioning->first, mConfig.positioning->second);
-    }
     if (mConfig.motionLatching.has_value())
     {
         dimensionConfig.WithMotionLatching(mConfig.motionLatching.value());
+    }
+    if (mConfig.positioning.has_value())
+    {
+        const PositioningParams & positioning = mConfig.positioning.value();
+        dimensionConfig.WithPositioning(positioning.resolution, positioning.stepValue);
+        if (auto * translation = std::get_if<TranslationParams>(&positioning.motion))
+        {
+            dimensionConfig.WithTranslation(translation->direction);
+        }
+        else if (auto * rotation = std::get_if<RotationParams>(&positioning.motion))
+        {
+            dimensionConfig.WithRotation(rotation->axis, rotation->overflow);
+        }
+        else if (auto * modulation = std::get_if<ModulationParams>(&positioning.motion))
+        {
+            dimensionConfig.WithModulation(modulation->type);
+        }
     }
 
     mClosureDimensionCluster.Create(dimensionConfig);
