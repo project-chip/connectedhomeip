@@ -18,7 +18,5 @@ import("//build_overrides/chip.gni")
 source_set("breadcrumb") {
   sources = [ "SimpleBreadCrumbTracker.h" ]
 
-  public_deps = [
-    "${chip_root}/src/app/clusters/general-commissioning-server",
-  ]
+  public_deps = [ "${chip_root}/src/app/clusters/general-commissioning-server" ]
 }
