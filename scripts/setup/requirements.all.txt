@@ -57,6 +57,10 @@ types-protobuf
 cffi>=2.0.0
 cryptography
 
+# requirements.qpg.txt pins ecdsa exactly, and bootstrap applies constraints.txt on top of it,
+# so anything else here is a hard conflict for that platform.
+ecdsa==0.19.0
+
 # python unit tests
 colorama
 
