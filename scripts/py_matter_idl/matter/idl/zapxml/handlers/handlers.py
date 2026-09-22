@@ -151,6 +151,9 @@ class AttributeHandler(BaseHandler):
                 else:
                     log.error("Unknown access: %r", attrs['op'])
 
+            if attrs.get('fabricSensitive', "false").lower() == 'true':
+                self._attribute.definition.qualities |= FieldQuality.FABRIC_SENSITIVE
+
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         if name.lower() == 'description':
             return AttributeDescriptionHandler(self.context, self._attribute)
