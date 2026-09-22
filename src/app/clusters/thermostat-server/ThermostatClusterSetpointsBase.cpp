@@ -277,8 +277,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeComm
         {
             return status;
         }
-        return SaveSetpoints(setpoints, changedAttributes, /* initiatedByOperationalSetpointWrite = */ true,
-                             initiatingAttributeId);
+        return SaveSetpoints(setpoints, changedAttributes, /* initiatedByOperationalSetpointWrite = */ true, initiatingAttributeId);
     }
     }
 
