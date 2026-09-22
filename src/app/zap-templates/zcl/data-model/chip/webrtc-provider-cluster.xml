@@ -40,8 +40,8 @@ Alchemy: v1.7.10
       </feature>
     </features>
     <globalAttribute code="0xFFFD" side="either" value="3"/>
-    <attribute code="0x0000" side="server" name="CurrentSessions" define="CURRENT_SESSIONS" type="array" entryType="WebRTCSessionStruct" isFabricSensitive="true">
-      <access op="read" privilege="manage"/>
+    <attribute code="0x0000" side="server" name="CurrentSessions" define="CURRENT_SESSIONS" type="array" entryType="WebRTCSessionStruct">
+      <access op="read" privilege="manage" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute code="0x0001" side="server" name="SupportedSFrameCipherSuites" define="SUPPORTED_SFRAME_CIPHER_SUITES" type="array" entryType="int16u" length="32" minLength="8">
