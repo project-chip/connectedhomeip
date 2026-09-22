@@ -45,8 +45,14 @@ public:
     const OptionalAttributes & GetOptionalAttributes() const;
     const BitFlags<Thermostat::Feature> & Features() const;
 
-    virtual Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints,
-                                                              SetpointAttributes changedAttributes) = 0;
+    /**
+     * @param[in] initiatedByOperationalSetpointWrite True if this save was triggered by a direct write to (or
+     *            SetpointRaiseLower command targeting) one of the four operational setpoints, as opposed to a
+     *            setpoint limit write that incidentally clamped an operational setpoint via Setpoints::Fix().
+     *            Only changes with this set to true are reported through the SetpointChange* tracking attributes.
+     */
+    virtual Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints, SetpointAttributes changedAttributes,
+                                                              bool initiatedByOperationalSetpointWrite) = 0;
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp) const;
     void NotifyAttributesChanged(const SetpointAttributes & changedAttributes);
 
@@ -57,6 +63,30 @@ protected:
     ThermostatClusterBase & mCluster;
 
     virtual Setpoints GetSetpoints();
+
+    /**
+     * @brief Updates the SetpointChangeSource, SetpointChangeAmount and SetpointChangeSourceTimestamp attributes
+     *        whenever one of the operational setpoints (Occupied/UnoccupiedHeating/CoolingSetpoint) changes value.
+     *        Each attribute is only computed and reported if its corresponding OptionalAttributes flag is set.
+     *
+     * @param[in] oldSetpoints The setpoints prior to the change being applied.
+     * @param[in] newSetpoints The setpoints after the change has been applied.
+     * @param[in] changedAttributes The set of setpoint attributes that were changed by this operation.
+     * @param[in] initiatedByOperationalSetpointWrite See SaveSetpoints(). A limit write that merely clamps an
+     *            operational setpoint via Setpoints::Fix() must not be reported as a setpoint change.
+     */
+    void UpdateSetpointChangeAttributes(const Setpoints & oldSetpoints, const Setpoints & newSetpoints,
+                                        const SetpointAttributes & changedAttributes, bool initiatedByOperationalSetpointWrite);
+
+    /**
+     * @brief True if attributeId is one of the four operational setpoints (Occupied/UnoccupiedHeating/CoolingSetpoint),
+     *        as opposed to e.g. a setpoint limit attribute.
+     */
+    static bool IsOperationalSetpointAttribute(AttributeId attributeId);
+
+    SetpointChangeSourceEnum mSetpointChangeSource           = SetpointChangeSourceEnum::kManual;
+    DataModel::Nullable<int16_t> mSetpointChangeAmount;
+    uint32_t mSetpointChangeSourceTimestamp = 0;
 };
 
 } // namespace Thermostat
