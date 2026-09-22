@@ -100,14 +100,17 @@ runs:
       run: echo "CCACHE_READONLY=1" >> $GITHUB_ENV
     # Without this the failure is silent: the actions/cache restore below is gated
     # off, so an unmounted volume means every build is cold with job duration as the
-    # only symptom.
+    # only symptom. Checking that the directory or /cache merely exists proves
+    # nothing -- the directory was created above, and Docker creates a missing
+    # bind-mount source -- so check that the bind actually landed.
     - name: Verify the cache volume is mounted
       if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
       shell: bash
       run: |
-        test -d /cache
-        test -n "${NSC_CACHE_PATH:-}"
-        test -d "${CCACHE_DIR}"
+        if ! awk -v d="${CCACHE_DIR}" '$5 == d { found = 1 } END { exit !found }' /proc/self/mountinfo; then
+          echo "::error::${CCACHE_DIR} is not a mount point, so it is not on the cache volume"
+          exit 1
+        fi
     - name: Restore ccache
       if: ${{ inputs.disable != 'true' && inputs.use-cache-volume != 'true' }}
       id: ccache-restore

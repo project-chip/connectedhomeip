@@ -835,7 +835,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
-                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}
 
             - name: Setup and Restore Cache
               id: ccache

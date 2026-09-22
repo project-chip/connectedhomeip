@@ -61,9 +61,11 @@ jobs:
 
         # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
         # bound, we run these on larger/faster machines.
-        # Shares the ccache volume with the tests.yaml REPL build job, which builds
-        # the same variant. The tag also keeps that cache off the profile's default
-        # volume, where instances running other workflows would drop it.
+        # Intended to share the ccache volume with the tests.yaml REPL build job,
+        # which builds the same variant; if cache tags turn out to be scoped per
+        # profile, each job gets its own volume instead. Either way the tag keeps
+        # that cache off the profile's default volume, where instances running
+        # workflows without this change drop it.
         runs-on: namespace-profile-4x16;overrides.cache-tag=chip-ccache-linux-${{ matrix.build_variant }}
 
         container:
