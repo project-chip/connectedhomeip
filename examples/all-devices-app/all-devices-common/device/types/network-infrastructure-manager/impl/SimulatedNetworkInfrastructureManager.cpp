@@ -60,6 +60,10 @@ void SimulatedNetworkInfrastructureManager::Unregister(CodeDrivenDataModelProvid
 {
     mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
     mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
+    if (mActivateDatasetCallback != nullptr)
+    {
+        mActivateDatasetCallback->OnActivateDatasetComplete(mActivateDatasetSequence, CHIP_ERROR_CANCELLED);
+    }
     mActivateDatasetCallback = nullptr;
     mStagedActiveDataset.Clear();
     mActiveDataset.Clear();
