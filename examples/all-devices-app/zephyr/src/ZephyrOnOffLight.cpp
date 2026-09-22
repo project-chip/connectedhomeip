@@ -39,7 +39,7 @@ const struct gpio_dt_spec sOnOffLed = GPIO_DT_SPEC_GET(ALL_DEVICES_ONOFF_LED_NOD
 } // namespace
 
 ZephyrOnOffLight::ZephyrOnOffLight(const Context & context) :
-    LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), context, nullptr, nullptr, this)
+    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), *this, *this, *this, context)
 {
 #if ALL_DEVICES_HAS_ONOFF_LED
     VerifyOrReturn(gpio_is_ready_dt(&sOnOffLed), ChipLogError(DeviceLayer, "On/Off LED GPIO not ready"));
@@ -56,13 +56,13 @@ ZephyrOnOffLight::~ZephyrOnOffLight()
 
 void ZephyrOnOffLight::OnOffStartup(bool on)
 {
-    LoggingOnOffLoad::OnOffStartup(on);
+    LoggingOnOffDelegate::OnOffStartup(on);
     Apply(on);
 }
 
 void ZephyrOnOffLight::OnOnOffChanged(bool on)
 {
-    LoggingOnOffLoad::OnOnOffChanged(on);
+    LoggingOnOffDelegate::OnOnOffChanged(on);
     Apply(on);
 }
 

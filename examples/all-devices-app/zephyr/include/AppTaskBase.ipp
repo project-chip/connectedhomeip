@@ -190,7 +190,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
     // Thread
-    mRootNode = std::make_unique<ThreadRootNode>(context, ThreadRootNode::ThreadContext{ .threadDriver = mThreadDriver });
+    mRootNode = std::make_unique<ThreadRootNode>(context, ThreadFeature::Context{ .threadDriver = mThreadDriver });
 
 #else
     // None

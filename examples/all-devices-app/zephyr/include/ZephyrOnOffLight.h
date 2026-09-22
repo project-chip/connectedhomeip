@@ -19,7 +19,8 @@
 #pragma once
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
-#include <device/capabilities/on-off-load/impl/LoggingOnOffLoad.h>
+#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <device/capabilities/on-off-load/impl/LoggingOnOffDelegate.h>
 #include <system/SystemLayer.h>
 #include <zephyr/devicetree.h>
 
@@ -36,7 +37,7 @@
 namespace chip::app::AllDevices {
 
 /// On/Off Light that drives the board's led0 alias
-class ZephyrOnOffLight : public LoggingOnOffLoad, public Clusters::IdentifyDelegate
+class ZephyrOnOffLight : private LoggingOnOffDelegate, public OnOffLoad, public Clusters::IdentifyDelegate
 {
 public:
     explicit ZephyrOnOffLight(const Context & context);
