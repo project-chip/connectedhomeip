@@ -253,7 +253,7 @@ Where:
 -   `3840` is the discriminator
 -   `${SSID}` and `${PASSWORD}` are your Wi-Fi network credentials
 
-Clear chip-tool's state between fresh commissionings with
+Clear the chip-tool state before each fresh commissioning with
 `rm -rf /tmp/chip_tool_kvs`.
 
 ## Building Options
@@ -292,7 +292,7 @@ uart:~$ wifi connect "MyNetwork" -p "MyPassword" -k 1
 
 ### Memory footprint
 
-The build uses about 81 % of the C6's 497 KiB SRAM and 37 % of a 4 MB flash.
+The build uses about 81 % of the C6's 497 KB SRAM and 37 % of a 4 MB flash.
 Profile with:
 
 ```shell
@@ -319,8 +319,8 @@ The largest single block (about 100 KB) is the Zephyr system heap sized by
 2. **No OTA.** The image boots through `ESP_SIMPLE_BOOT` without MCUboot slots,
    so `CONFIG_CHIP_OTA_REQUESTOR` is off.
 3. **Single GPIO output.** The on-board WS2812 LED on GPIO8 (a strapping pin) is
-   not driven; wire a plain LED to GPIO2 or repoint the `led0` alias in the
-   board overlay. There are no buttons or status LEDs.
+   not driven; wire a plain LED to GPIO2 or point the `led0` alias at another
+   pin in the board overlay. There are no buttons or status LEDs.
 4. **Separate Python environment.** Until the Matter environment provides Python
    3.12, the Zephyr venv must be maintained alongside it.
 
