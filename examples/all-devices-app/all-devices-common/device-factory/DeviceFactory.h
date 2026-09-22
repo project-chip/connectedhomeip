@@ -326,7 +326,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
@@ -396,7 +396,7 @@ private:
                             .resolution = 1,
                             .stepValue  = 1,
                             .motion     = ClosurePanel::RotationParams{ Clusters::ClosureDimension::RotationAxisEnum::kLeft,
-                                                                        Clusters::ClosureDimension::OverflowEnum::kTopInside },
+                                                                    Clusters::ClosureDimension::OverflowEnum::kTopInside },
                         },
                 };
 
