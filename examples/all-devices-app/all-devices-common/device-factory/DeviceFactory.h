@@ -490,12 +490,14 @@ private:
         {
             RegisterCreator("network-infrastructure-manager", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedNetworkInfrastructureManager>(SimulatedNetworkInfrastructureManager::Context{
-                    .timerDelegate   = mContext->timerDelegate,
-                    .storage         = mContext->storageDelegate,
-                    .platformManager = mContext->platformManager,
-                    .failSafeContext = mContext->failSafeContext,
-                }, nodeLabel);
+                return MakeDevice<SimulatedNetworkInfrastructureManager>(
+                    SimulatedNetworkInfrastructureManager::Context{
+                        .timerDelegate   = mContext->timerDelegate,
+                        .storage         = mContext->storageDelegate,
+                        .platformManager = mContext->platformManager,
+                        .failSafeContext = mContext->failSafeContext,
+                    },
+                    nodeLabel);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -610,12 +612,14 @@ private:
         {
             RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedThreadBorderRouter>(SimulatedThreadBorderRouter::Context{
-                    .timerDelegate   = mContext->timerDelegate,
-                    .storage         = mContext->storageDelegate,
-                    .platformManager = mContext->platformManager,
-                    .failSafeContext = mContext->failSafeContext,
-                }, nodeLabel);
+                return MakeDevice<SimulatedThreadBorderRouter>(
+                    SimulatedThreadBorderRouter::Context{
+                        .timerDelegate   = mContext->timerDelegate,
+                        .storage         = mContext->storageDelegate,
+                        .platformManager = mContext->platformManager,
+                        .failSafeContext = mContext->failSafeContext,
+                    },
+                    nodeLabel);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)

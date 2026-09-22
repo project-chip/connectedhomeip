@@ -27,8 +27,8 @@ namespace chip {
 namespace app {
 
 ThreadBorderRouter::ThreadBorderRouter(const Context & context) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThreadBorderRouter, 1)),
-    mDelegate(context.delegate), mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThreadBorderRouter, 1)), mDelegate(context.delegate),
+    mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
     mBreadCrumbTracker(context.breadcrumbTracker), mDiagnosticsProvider(context.diagnosticsProvider)
 {}
 
@@ -46,8 +46,7 @@ CHIP_ERROR ThreadBorderRouter::Register(chip::EndpointId endpoint, CodeDrivenDat
     ReturnErrorOnFailure(provider.AddCluster(mThreadBorderRouterManagementCluster.Registration()));
 
     // 2. Thread Network Diagnostics (mandatory)
-    mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull,
-                                            mDiagnosticsProvider);
+    mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull, mDiagnosticsProvider);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDiagnosticsCluster.Registration()));
 
     // 3. Optional clusters (e.g. Thread Network Directory)
