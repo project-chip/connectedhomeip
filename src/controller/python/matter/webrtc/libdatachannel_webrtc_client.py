@@ -15,7 +15,7 @@
 #  limitations under the License.
 #
 
-from ctypes import string_at
+from ctypes import byref, c_uint32, c_uint64, string_at
 
 from .library_handle import _GetWebRTCLibraryHandle
 from .types import GatheringCompleteCallbackType, IceCandidateCallbackType, LocalDescriptionCallbackType, StateChangeCallback
@@ -84,20 +84,38 @@ class LibdatachannelWebRTCClient:
 
     def get_video_frame_count(self) -> int:
         """Returns the total number of video frames received by this WebRTC client (in frames)."""
-        return int(self._lib.pychip_webrtc_get_video_frame_count(self._handle))
+        count = c_uint32(0)
+        err = self._lib.pychip_webrtc_get_video_frame_count(self._handle, byref(count))
+        if not err.is_success:
+            raise ValueError(f"Invalid WebRTC client handle (CHIP error {err.code:#x})")
+        return int(count.value)
 
     def get_video_bytes_count(self) -> int:
         """Returns the total volume of video media data received by this WebRTC client (in bytes)."""
-        return int(self._lib.pychip_webrtc_get_video_bytes_count(self._handle))
+        count = c_uint64(0)
+        err = self._lib.pychip_webrtc_get_video_bytes_count(self._handle, byref(count))
+        if not err.is_success:
+            raise ValueError(f"Invalid WebRTC client handle (CHIP error {err.code:#x})")
+        return int(count.value)
 
     def get_audio_packet_count(self) -> int:
         """Returns the total number of audio RTP packets received by this WebRTC client (in packets)."""
-        return int(self._lib.pychip_webrtc_get_audio_packet_count(self._handle))
+        count = c_uint32(0)
+        err = self._lib.pychip_webrtc_get_audio_packet_count(self._handle, byref(count))
+        if not err.is_success:
+            raise ValueError(f"Invalid WebRTC client handle (CHIP error {err.code:#x})")
+        return int(count.value)
 
     def get_audio_bytes_count(self) -> int:
         """Returns the total volume of audio media data received by this WebRTC client (in bytes)."""
-        return int(self._lib.pychip_webrtc_get_audio_bytes_count(self._handle))
+        count = c_uint64(0)
+        err = self._lib.pychip_webrtc_get_audio_bytes_count(self._handle, byref(count))
+        if not err.is_success:
+            raise ValueError(f"Invalid WebRTC client handle (CHIP error {err.code:#x})")
+        return int(count.value)
 
     def reset_media_counters(self) -> None:
         """Resets all video and audio media counters (frames, packets, and bytes) for this WebRTC client to zero."""
-        self._lib.pychip_webrtc_reset_media_counters(self._handle)
+        err = self._lib.pychip_webrtc_reset_media_counters(self._handle)
+        if not err.is_success:
+            raise ValueError(f"Invalid WebRTC client handle (CHIP error {err.code:#x})")

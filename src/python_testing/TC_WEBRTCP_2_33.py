@@ -93,7 +93,7 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                 streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
                 videoStreamID=video_stream_id,
                 audioStreamID=audio_stream_id,
-                originatingEndpointID=endpoint,
+                originatingEndpointID=1,
             ),
             endpoint=endpoint,
             payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
@@ -135,33 +135,30 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
         peer: LibdatachannelPeerConnection,
         session_label: str,
         timeout_sec: float = 5.0,
-        sample_duration_sec: float = 1.5,
     ):
         log.info("[%s] Checking native per-peer RTP media counters...", session_label)
-        video_frames, video_bytes, audio_packets, audio_bytes = await peer.wait_for_media_delivery(
+        stats = await peer.wait_for_media_delivery(
             expect_video=True,
             expect_audio=True,
             timeout_s=timeout_sec,
-            sample_duration_s=sample_duration_sec,
         )
         log.info(
-            "[%s] Media stats over %.1fs: Video=%d frames (%d bytes), Audio=%d packets (%d bytes)",
+            "[%s] Media stats: Video=%d frames (%d bytes), Audio=%d packets (%d bytes)",
             session_label,
-            sample_duration_sec,
-            video_frames,
-            video_bytes,
-            audio_packets,
-            audio_bytes,
+            stats.video_frames,
+            stats.video_bytes,
+            stats.audio_packets,
+            stats.audio_bytes,
         )
         asserts.assert_greater(
-            video_frames,
+            stats.video_frames,
             0,
-            f"[{session_label}] Expected > 0 RTP video frames, got {video_frames} (0 video frames received over {timeout_sec}s)",
+            f"[{session_label}] Expected > 0 RTP video frames, got {stats.video_frames} (0 video frames received over {timeout_sec}s)",
         )
         asserts.assert_greater(
-            audio_packets,
+            stats.audio_packets,
             0,
-            f"[{session_label}] Expected > 0 RTP audio packets, got {audio_packets} (0 audio packets received over {timeout_sec}s)",
+            f"[{session_label}] Expected > 0 RTP audio packets, got {stats.audio_packets} (0 audio packets received over {timeout_sec}s)",
         )
 
     @property

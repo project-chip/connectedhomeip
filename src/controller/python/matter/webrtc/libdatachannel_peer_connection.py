@@ -17,6 +17,8 @@
 
 import asyncio
 import logging
+import time
+from dataclasses import dataclass
 
 from .command import WebRTCProviderCommand
 from .libdatachannel_webrtc_client import LibdatachannelWebRTCClient
@@ -24,6 +26,16 @@ from .types import Events, IceCandidate, IceCandidateList, PeerConnectionState
 from .utils import AsyncEventQueue
 
 LOGGER = logging.getLogger(__name__)
+
+
+@dataclass
+class MediaDeliveryStats:
+    """Statistics of RTP video and audio media received by a WebRTC peer connection."""
+
+    video_frames: int
+    video_bytes: int
+    audio_packets: int
+    audio_bytes: int
 
 
 class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
@@ -352,20 +364,19 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         expect_video: bool = True,
         expect_audio: bool = True,
         timeout_s: float = 5.0,
-        sample_duration_s: float = 1.5,
-    ) -> tuple[int, int, int, int]:
+    ) -> MediaDeliveryStats:
         """Waits for RTP video frames and/or audio packets to be received by the native WebRTCClient.
 
         Polls the per-PeerConnection native atomic counters directly, avoiding any UDP socket
         binding or port conflict issues.
 
         Returns:
-            tuple[video_frames, video_bytes, audio_packets, audio_bytes]
+            MediaDeliveryStats containing video_frames, video_bytes, audio_packets, and audio_bytes.
         """
         self.reset_media_counters()
         poll_interval = 0.05
-        elapsed = 0.0
-        while elapsed < timeout_s:
+        deadline = time.monotonic() + timeout_s
+        while time.monotonic() < deadline:
             v_frames = self.get_video_frame_count()
             a_packets = self.get_audio_packet_count()
             video_ok = (not expect_video) or (v_frames > 0)
@@ -373,14 +384,10 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
             if video_ok and audio_ok:
                 break
             await asyncio.sleep(poll_interval)
-            elapsed += poll_interval
 
-        if sample_duration_s > 0:
-            await asyncio.sleep(sample_duration_s)
-
-        return (
-            self.get_video_frame_count(),
-            self.get_video_bytes_count(),
-            self.get_audio_packet_count(),
-            self.get_audio_bytes_count(),
+        return MediaDeliveryStats(
+            video_frames=self.get_video_frame_count(),
+            video_bytes=self.get_video_bytes_count(),
+            audio_packets=self.get_audio_packet_count(),
+            audio_bytes=self.get_audio_bytes_count(),
         )
