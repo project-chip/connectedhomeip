@@ -82,14 +82,6 @@ coloredlogs==15.0.1
     #   matter-idl
 construct==2.10.70
     # via -r ../tests/requirements.txt
-cryptography==50.0.1
-    # via
-    #   -r ../../src/python_testing/requirements.txt
-    #   -r ../../src/tools/push_av_server/requirements.txt
-    #   -r requirements.all.txt
-    #   aioquic
-    #   pyopenssl
-    #   service-identity
 cxxfilt==0.3.0
     # via -r requirements.memory.txt
 dacite==1.9.2
@@ -237,10 +229,6 @@ pycountry==26.2.16
     # via -r ../../src/python_testing/requirements.txt
 pycparser==2.21
     # via cffi
-pydantic==2.9.2
-    # via fastapi
-pydantic-core==2.23.4
-    # via pydantic
 pygments==2.14.0
     # via
     #   ipython
@@ -375,6 +363,16 @@ google-api-core==2.17.0
 # pydantic-core < 2.20 uses PyO3 0.21.x which does not support Python 3.13+
 # See: https://github.com/pydantic/pydantic/issues/11524
 pydantic-core>=2.20.0,<3.0.0; python_version >= "3.13"
+
+# Removed constraints for
+#   cryptography
+#   pydantic, pydantic-core
+# requirements.qpg.txt installs qorvo-platform-tools, which depends on cryptography~=43.0.0,
+# while src/python_testing/requirements.txt needs >=47 for hazmat.primitives.asymmetric.mldsa.
+# No single version satisfies both, and the Telink factory-data script additionally uses the
+# 43.x primitives.serialization attribute. qorvo-platform-tools likewise wants pydantic~=2.7.4
+# while src/tools/push_av_server pulls a newer one through fastapi. Each context resolves its
+# own version of these instead.
 
 # Removed constraints for
 #   mypy-protobuf

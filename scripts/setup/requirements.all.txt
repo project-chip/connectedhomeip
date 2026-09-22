@@ -51,10 +51,12 @@ mypy-protobuf
 protobuf
 types-protobuf
 
-# cryptography 47+ requires cffi>=2.0.0; the 1.15.0/1.17.1 split below it dated from #36549,
-# which raised cffi only far enough for Python 3.13 to install. cffi 2.x ships wheels for
-# cp39 through cp314, so the version split is no longer needed.
+# The 1.15.0/1.17.1 split below dated from #36549, which raised cffi only far enough for
+# Python 3.13 to install. cffi 2.x ships wheels for cp39 through cp314, so one floor covers
+# every supported interpreter.
 cffi>=2.0.0
+
+# cryptography is deliberately left out of constraints.txt; see the MANUAL EDITS note there.
 cryptography
 
 # requirements.qpg.txt pins ecdsa exactly, and bootstrap applies constraints.txt on top of it,
