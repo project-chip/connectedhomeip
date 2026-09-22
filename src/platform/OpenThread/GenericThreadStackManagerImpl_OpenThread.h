@@ -185,9 +185,9 @@ private:
     void * mRendezvousAnnouncementRequestContext                                 = nullptr;
     chip::Inet::InterfaceId mRendezvousInterface                                 = chip::Inet::InterfaceId::Null();
 
-    NetworkCommissioning::GenericThreadDriver * mpCommissioningDriver = nullptr;
-    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
-    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::GenericThreadDriver * mpCommissioningDriver                                = nullptr;
+    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback                                = nullptr;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback              = nullptr;
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     struct PendingAttach

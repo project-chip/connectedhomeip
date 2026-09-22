@@ -275,18 +275,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadEnable
 {
     VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
 
+    std::optional<PendingAttach> abortedAttach;
     if (!val && mPendingAttach.has_value())
     {
         ChipLogProgress(DeviceLayer, "Thread disabled while attach pending; aborting graceful detach");
         DeviceLayer::SystemLayer().CancelTimer(_OnGracefulDetachTimeout, this);
-
-        // Clear the pending state before notifying, so a re-entrant call cannot observe a half-aborted attach.
-        PendingAttach pending = std::move(*mPendingAttach);
+        abortedAttach = std::move(mPendingAttach);
         mPendingAttach.reset();
-        if (pending.callback != nullptr)
-        {
-            pending.callback->OnResult(NetworkCommissioning::Status::kUnknownError, ""_span, 0);
-        }
     }
 
     otError otErr = OT_ERROR_NONE;
@@ -316,6 +311,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadEnable
 
 exit:
     Impl()->UnlockThreadStack();
+
+    // Notify only once Thread is actually down. The callback is free to start a new attach, which the teardown above
+    // would otherwise undo.
+    if (abortedAttach.has_value() && abortedAttach->callback != nullptr)
+    {
+        abortedAttach->callback->OnResult(NetworkCommissioning::Status::kUnknownError, ""_span, 0);
+    }
 
     return MapOpenThreadError(otErr);
 }
@@ -474,6 +476,11 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
         return CHIP_NO_ERROR;
     }
 
+    // A new operation starts here, so any result still queued for the previous one by _OnThreadAttachFinished() is void.
+    // Keep this above the branch below: it is what guarantees mpConnectCallback stays null for the whole graceful-detach
+    // window, so _FinishGracefulDetach() only ever has to set it, never clear it.
+    mpConnectCallback = nullptr;
+
     if (Impl()->IsThreadAttached())
     {
         // Send a detach request to the current parent before switching networks, this ensures we can reattach if fallback timer
@@ -510,9 +517,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
         }
         return CHIP_NO_ERROR;
     }
-
-    // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
-    mpConnectCallback = nullptr;
 
 #if defined(CONFIG_CHIP_OPENTHREAD_NETWORK_SWITCH_PATH) && CONFIG_CHIP_OPENTHREAD_NETWORK_SWITCH_PATH
     if (callback == nullptr && dataset.IsCommissioned() && current_dataset.IsCommissioned() &&
@@ -983,18 +987,13 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     VerifyOrReturn(mOTInst);
     ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
 
+    std::optional<PendingAttach> abortedAttach;
     if (mPendingAttach.has_value())
     {
         ChipLogProgress(DeviceLayer, "Erasing persistent info while attach pending; aborting graceful detach");
         DeviceLayer::SystemLayer().CancelTimer(_OnGracefulDetachTimeout, this);
-
-        // Clear the pending state before notifying, so a re-entrant call cannot observe a half-aborted attach.
-        PendingAttach pending = std::move(*mPendingAttach);
+        abortedAttach = std::move(mPendingAttach);
         mPendingAttach.reset();
-        if (pending.callback != nullptr)
-        {
-            pending.callback->OnResult(NetworkCommissioning::Status::kUnknownError, ""_span, 0);
-        }
     }
 
     Impl()->LockThreadStack();
@@ -1008,6 +1007,13 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     }
 
     Impl()->UnlockThreadStack();
+
+    // Notify only once the erase has completed. The callback is free to start a new attach, which the erase above would
+    // otherwise wipe.
+    if (abortedAttach.has_value() && abortedAttach->callback != nullptr)
+    {
+        abortedAttach->callback->OnResult(NetworkCommissioning::Status::kUnknownError, ""_span, 0);
+    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
