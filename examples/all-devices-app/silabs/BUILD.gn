@@ -98,6 +98,12 @@ silabs_executable("all_devices_app") {
     "include/AppKeys.h",
     "include/AppTask.h",
     "src/AppTask.cpp",
+    "src/delegates/SilabsDimmableLight.cpp",
+    "src/delegates/SilabsDimmableLight.h",
+    "src/delegates/SilabsHumiditySensor.cpp",
+    "src/delegates/SilabsHumiditySensor.h",
+    "src/delegates/SilabsTemperatureSensor.cpp",
+    "src/delegates/SilabsTemperatureSensor.h",
   ]
 
   if (chip_build_libshell) {
@@ -127,6 +133,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor",

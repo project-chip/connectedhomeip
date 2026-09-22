@@ -23,8 +23,16 @@
 #include "AppKeys.h"
 #include "SilabsIdentifyDelegate.h"
 
+#include "delegates/SilabsDimmableLight.h"
+#include "delegates/SilabsHumiditySensor.h"
+#include "delegates/SilabsTemperatureSensor.h"
+
 #ifdef ENABLE_CHIP_SHELL
 #include <DeviceShellCommands.h>
+#endif
+
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+#include "sensors/Si70xxSensor.h"
 #endif
 
 #include <array>
@@ -63,6 +71,7 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #define APP_FUNCTION_BUTTON 0
+#define APP_ACTION_BUTTON 1
 
 using namespace chip;
 using namespace chip::app;
@@ -133,6 +142,14 @@ CHIP_ERROR AppTask::AppInit()
 #ifdef ENABLE_CHIP_SHELL
     chip::Shell::DeviceCommands::GetInstance().Register();
 #endif
+#if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+    // Non-fatal: individual sensor delegates log per-read failures on top of this.
+    sl_status_t si70xxStatus = Si70xxSensor::Init();
+    if (si70xxStatus != SL_STATUS_OK)
+    {
+        ChipLogError(AppServer, "Si70xxSensor::Init failed: %x", si70xxStatus);
+    }
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -147,7 +164,24 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         button_event.Handler = BaseApplication::ButtonHandler;
         GetAppTask().PostEvent(&button_event);
     }
+#if SL_MATTER_DISPLAY_ENABLED
+    else if (button == APP_ACTION_BUTTON &&
+             btnAction == static_cast<uint8_t>(chip::DeviceLayer::Silabs::SilabsPlatform::ButtonAction::ButtonPressed))
+    {
+        button_event.Handler = &AppTask::ActionButtonEventHandler;
+        GetAppTask().PostEvent(&button_event);
+    }
+#endif
 }
+
+#if SL_MATTER_DISPLAY_ENABLED
+void AppTask::ActionButtonEventHandler(AppEvent * /* aEvent */)
+{
+    // No-op when the current screen is a built-in one or when the current device
+    // page did not register a button callback (e.g. read-only sensors).
+    (void) BaseApplication::GetLCD().DispatchButtonToCurrentDevicePage();
+}
+#endif
 
 CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & storage,
                                             chip::Credentials::GroupDataProvider * groupDataProvider)
@@ -225,6 +259,52 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 
     auto & deviceFactory = chip::app::NoHooksDeviceFactory::GetInstance();
 
+    // Per-device-type Silabs overrides. Each override replaces the default
+    // "logging" delegate with a Silabs implementation that wires hardware
+    // (LED / PWM) and, when the LCD is enabled, an on-device UI page.
+    // Guarded by `if constexpr` so unused overrides are dropped at compile time.
+    if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_LIGHT)
+    {
+        deviceFactory.RegisterCreator("dimmable-light", [groupDataProvider]() {
+            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsDimmableLight>(
+                chip::app::SilabsDimmableLight::Context{
+                    .groupDataProvider = *groupDataProvider,
+                    .fabricTable       = chip::Server::GetInstance().GetFabricTable(),
+                    .timerDelegate     = sTimerDelegate,
+                    .identifyDelegate  = sIdentifyDelegate,
+                },
+#if SL_MATTER_DISPLAY_ENABLED
+                BaseApplication::GetLCD(),
+#endif
+                chip::app::DimmableLoad::Config{
+                    .levelControl = chip::app::DimmableLoad::LevelControlConfig::CiPicsDefaults(),
+                });
+        });
+    }
+
+    if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
+    {
+        deviceFactory.RegisterCreator("temperature-sensor", []() {
+            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsTemperatureSensor>(
+#if SL_MATTER_DISPLAY_ENABLED
+                BaseApplication::GetLCD()
+#endif
+            );
+        });
+    }
+
+    if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
+    {
+        deviceFactory.RegisterCreator("humidity-sensor", []() {
+            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsHumiditySensor>(sTimerDelegate
+#if SL_MATTER_DISPLAY_ENABLED
+                                                                                                ,
+                                                                                                BaseApplication::GetLCD()
+#endif
+            );
+        });
+    }
+
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
 
     auto instantiateDevice = [&](const std::string & type) -> CHIP_ERROR {
@@ -252,7 +332,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     // build configuration.
     constexpr std::string_view kBuildTimeDevices{ ALL_DEVICES_DEFAULT_DEVICES };
 
-    if (!kBuildTimeDevices.empty())
+    if constexpr (!kBuildTimeDevices.empty())
     {
         std::string_view remaining = kBuildTimeDevices;
         while (!remaining.empty())
@@ -269,26 +349,28 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         }
         return CHIP_NO_ERROR;
     }
-
-    // No build-time selection: fall back to the KVS-stored device type (set via
-    // the `devtype` shell command) or the factory default.
-    std::string deviceType = deviceFactory.GetDefaultDevice();
-
-    char storedDeviceType[64] = {};
-    uint16_t storedLen        = sizeof(storedDeviceType);
-    CHIP_ERROR storedErr      = storage.SyncGetKeyValue(chip::kDeviceTypeKey, storedDeviceType, storedLen);
-    if (storedErr == CHIP_NO_ERROR && storedLen > 0)
+    else
     {
-        deviceType = std::string(storedDeviceType, strnlen(storedDeviceType, storedLen));
-    }
+        // No build-time selection: fall back to the KVS-stored device type (set via
+        // the `devtype` shell command) or the factory default.
+        std::string deviceType = deviceFactory.GetDefaultDevice();
 
-    if (!deviceFactory.IsValidDevice(deviceType))
-    {
-        ChipLogError(AppServer, "Invalid device type: %s, falling back to default", deviceType.c_str());
-        deviceType = deviceFactory.GetDefaultDevice();
-    }
+        char storedDeviceType[64] = {};
+        uint16_t storedLen        = sizeof(storedDeviceType);
+        CHIP_ERROR storedErr      = storage.SyncGetKeyValue(chip::kDeviceTypeKey, storedDeviceType, storedLen);
+        if (storedErr == CHIP_NO_ERROR && storedLen > 0)
+        {
+            deviceType = std::string(storedDeviceType, strnlen(storedDeviceType, storedLen));
+        }
 
-    return instantiateDevice(deviceType);
+        if (!deviceFactory.IsValidDevice(deviceType))
+        {
+            ChipLogError(AppServer, "Invalid device type: %s, falling back to default", deviceType.c_str());
+            deviceType = deviceFactory.GetDefaultDevice();
+        }
+
+        return instantiateDevice(deviceType);
+    }
 }
 
 chip::app::CodeDrivenDataModelProvider * AppTask::GetDataModelProvider()

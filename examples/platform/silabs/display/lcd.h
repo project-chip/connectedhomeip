@@ -26,12 +26,20 @@
 #endif // SL_MATTER_QR_CODE_ENABLED
 
 #include "demo-ui.h"
+#include <array>
+#include <lib/core/DataModelTypes.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 class SilabsLCD
 {
 
 public:
+    // Cycling order (see CycleScreens()):
+    //   DemoScreen -> StatusScreen -> [QRCodeScreen] -> DevicePageScreen[0..N-1] -> DemoScreen ...
+    // Once any device page is registered the demo screen is suppressed and the cycle becomes:
+    //   StatusScreen -> [QRCodeScreen] -> DevicePageScreen[0..N-1] -> StatusScreen ...
+    // DevicePageScreen is a single enum value; the specific page shown is
+    // tracked internally by mCurrentDevicePage.
     typedef enum screen
     {
         DemoScreen = 0,
@@ -39,9 +47,27 @@ public:
 #if SL_MATTER_QR_CODE_ENABLED
         QRCodeScreen,
 #endif
+        DevicePageScreen,
         CycleScreen,
         InvalidScreen,
     } Screen_e;
+
+    // Maximum number of per-device UI pages that can be registered.
+    // Bounded at compile time to avoid heap allocation on embedded targets.
+    static constexpr size_t kMaxDevicePages = 8;
+
+    // Draw callback for a per-device UI page. The callback is expected to
+    // draw into the provided glib context; SilabsLCD clears the screen
+    // before invoking it and updates the display afterwards.
+    //   context     - glib drawing context
+    //   endpointId  - endpoint the page is associated with
+    //   userContext - opaque pointer passed at registration
+    typedef void (*DevicePageDrawCB)(GLIB_Context_t * context, chip::EndpointId endpointId, void * userContext);
+
+    // Optional action-button callback for a per-device UI page. Invoked when the user
+    // presses the action button while this page is the currently displayed screen.
+    // Pages without a handler (typical for read-only sensor UIs) simply pass nullptr.
+    typedef void (*DevicePageButtonCB)(chip::EndpointId endpointId, void * userContext);
 
     typedef enum icdMode
     {
@@ -75,6 +101,35 @@ public:
     void SetStatus(DisplayStatus_t & status);
     void WriteStatus();
 
+    // Register a UI page for a device on a specific endpoint. Pages are
+    // cycled through (in registration order) after the built-in screens
+    // when the user presses the display-cycle button.
+    //
+    // typeName must point to storage that outlives SilabsLCD (typically a
+    // string literal or a persistent std::string). Returns CHIP_ERROR_NO_MEMORY
+    // when kMaxDevicePages pages have already been registered.
+    //
+    // `buttonCb` is optional; when non-null it is invoked by
+    // DispatchButtonToCurrentDevicePage() while this page is the currently
+    // displayed screen.
+    CHIP_ERROR RegisterDevicePage(chip::EndpointId endpointId, const char * typeName, DevicePageDrawCB cb,
+                                  void * userContext = nullptr, DevicePageButtonCB buttonCb = nullptr);
+
+    // Forwards an action-button press to the callback registered for the currently
+    // displayed device page (if any). Returns true iff a handler was invoked.
+    bool DispatchButtonToCurrentDevicePage();
+
+    // Number of currently-registered device pages.
+    uint8_t GetDevicePageCount() const { return mDevicePageCount; }
+
+    // True iff the currently displayed screen is the device page registered for `endpointId`.
+    // Useful for delegates that want to trigger a repaint only when their own page is active.
+    bool IsCurrentDevicePageFor(chip::EndpointId endpointId) const
+    {
+        return (mCurrentScreen == DevicePageScreen) && (mCurrentDevicePage < mDevicePageCount) &&
+            (mDevicePages[mCurrentDevicePage].endpointId == endpointId);
+    }
+
 #if SL_MATTER_QR_CODE_ENABLED
     void SetQRCode(uint8_t * str, uint32_t size);
     void ShowQRCode(bool show);
@@ -92,6 +147,21 @@ private:
     void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
     char mQRCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
 #endif
+
+    void WriteDevicePage(uint8_t index);
+
+    struct DevicePage
+    {
+        chip::EndpointId endpointId = chip::kInvalidEndpointId;
+        const char * typeName       = nullptr;
+        DevicePageDrawCB draw       = nullptr;
+        void * userContext          = nullptr;
+        DevicePageButtonCB button   = nullptr;
+    };
+
+    std::array<DevicePage, kMaxDevicePages> mDevicePages{};
+    uint8_t mDevicePageCount   = 0;
+    uint8_t mCurrentDevicePage = 0;
 
     GLIB_Context_t glibContext;
 
