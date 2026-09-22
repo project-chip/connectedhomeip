@@ -74,6 +74,11 @@ public:
          * has been applied
          */
         virtual void OnLocalCandidatesReady(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
+
+        /**
+         * The session's peer connection was released
+         */
+        virtual void OnPeerConnectionReleased(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
     };
 
     void SetPeerConnectionObserver(PeerConnectionObserver * aObserver) { mPeerConnectionObserver = aObserver; }

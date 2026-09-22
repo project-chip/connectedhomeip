@@ -234,6 +234,11 @@ void WebRTCPeerManager::OnSessionClosed(const ScopedNodeId & aCameraNode, uint16
         it->second.peerConnection->close();
     }
     mSessions.erase(it);
+
+    if (mPeerConnectionObserver != nullptr)
+    {
+        mPeerConnectionObserver->OnPeerConnectionReleased(aCameraNode, aWebRTCSessionId);
+    }
 }
 
 CHIP_ERROR WebRTCPeerManager::ApplyAnswer(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId, const std::string & aSdp)

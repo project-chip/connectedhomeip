@@ -49,6 +49,7 @@ public:
     void OnPeerConnectionConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
     void OnPeerConnectionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
     void OnLocalCandidatesReady(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
+    void OnPeerConnectionReleased(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
 
     CHIP_ERROR HandleOffer(const Clusters::WebRTCTransportRequestor::WebRTCSessionStruct & aSession,
                            const OfferArgs & aArgs) override;
