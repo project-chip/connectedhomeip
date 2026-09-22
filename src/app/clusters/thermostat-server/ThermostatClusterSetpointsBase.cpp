@@ -114,8 +114,8 @@ bool ThermostatSetpointsBase::IsOperationalSetpointAttribute(AttributeId attribu
 }
 
 void ThermostatSetpointsBase::UpdateSetpointChangeAttributes(const Setpoints & oldSetpoints, const Setpoints & newSetpoints,
-                                                              const SetpointAttributes & changedAttributes,
-                                                              bool initiatedByOperationalSetpointWrite)
+                                                             const SetpointAttributes & changedAttributes,
+                                                             bool initiatedByOperationalSetpointWrite)
 {
     // A setpoint *limit* write (or a deadband adjustment) can indirectly clamp an operational setpoint via
     // Setpoints::Fix(), which would otherwise show up in `changedAttributes` exactly like a direct write. Only a
@@ -167,8 +167,9 @@ void ThermostatSetpointsBase::UpdateSetpointChangeAttributes(const Setpoints & o
 
     if (optionalAttributes.SetpointChangeAmount)
     {
-        int32_t amount = static_cast<int32_t>(changedNewSetpoint->Temperature()) - static_cast<int32_t>(changedOldSetpoint->Temperature());
-        amount         = std::clamp(amount, static_cast<int32_t>(INT16_MIN), static_cast<int32_t>(INT16_MAX));
+        int32_t amount =
+            static_cast<int32_t>(changedNewSetpoint->Temperature()) - static_cast<int32_t>(changedOldSetpoint->Temperature());
+        amount = std::clamp(amount, static_cast<int32_t>(INT16_MIN), static_cast<int32_t>(INT16_MAX));
         mSetpointChangeAmount.SetNonNull(static_cast<int16_t>(amount));
         mCluster.NotifyAttributeChanged(Attributes::SetpointChangeAmount::Id);
     }
