@@ -67,10 +67,7 @@ public:
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
 
     // Access to optional Thread Network Directory cluster
-    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster()
-    {
-        return mThreadNetworkDirectoryCluster.Cluster();
-    }
+    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
 
 protected:
     CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;

@@ -51,8 +51,7 @@ CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, Cod
     ReturnErrorOnFailure(provider.AddCluster(mWiFiNetworkManagementCluster.Registration()));
 
     // 3. Thread Network Diagnostics (mandatory)
-    mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull,
-                                            mDiagnosticsProvider);
+    mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull, mDiagnosticsProvider);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDiagnosticsCluster.Registration()));
 
     // 4. Optional clusters (e.g. Thread Network Directory)

@@ -191,8 +191,7 @@ CHIP_ERROR SimulatedThreadBorderRouter::RevertActiveDataset()
 
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(
-            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
     return CHIP_NO_ERROR;
@@ -207,15 +206,13 @@ CHIP_ERROR SimulatedThreadBorderRouter::SetPendingDataset(const Thread::Operatio
     ReturnErrorOnFailure(tempDataset.GetDelayTimer(delayTimerMillis));
 
     mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
-    CHIP_ERROR err =
-        mTimerDelegate.StartTimer(&mPendingDatasetTimerContext, System::Clock::Milliseconds32(delayTimerMillis));
+    CHIP_ERROR err = mTimerDelegate.StartTimer(&mPendingDatasetTimerContext, System::Clock::Milliseconds32(delayTimerMillis));
     if (err != CHIP_NO_ERROR)
     {
         mPendingDataset.Clear();
         if (mAttributeChangeCallback != nullptr)
         {
-            mAttributeChangeCallback->ReportAttributeChanged(
-                ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+            mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
         }
         return err;
     }
@@ -223,8 +220,7 @@ CHIP_ERROR SimulatedThreadBorderRouter::SetPendingDataset(const Thread::Operatio
     mPendingDataset = tempDataset;
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(
-            ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -238,8 +234,7 @@ void SimulatedThreadBorderRouter::OnActiveDatasetTimerFired()
     mActiveDataset = mStagedActiveDataset;
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(
-            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
 
@@ -255,10 +250,8 @@ void SimulatedThreadBorderRouter::OnPendingDatasetTimerFired()
     mPendingDataset.Clear();
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(
-            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
-        mAttributeChangeCallback->ReportAttributeChanged(
-            ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
 }
