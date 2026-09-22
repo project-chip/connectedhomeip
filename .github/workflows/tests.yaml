@@ -794,11 +794,10 @@ jobs:
 
         # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
         # bound, we run these on larger/faster machines.
-        # The cache-tag override gives the ccache a volume of its own rather than
-        # sharing the profile's default one, where instances running workflows
-        # without this change drop it. The suffix must match env.BUILD_VARIANT
-        # above: it is spelled out because runs-on cannot read the env context,
-        # and a matrix declared just to carry it would rename the job's check.
+        # A dedicated cache tag, so the ccache is not on the profile's default
+        # volume where other workflows' instances drop it. The suffix must match
+        # env.BUILD_VARIANT above, spelled out because runs-on cannot read env
+        # and a matrix declared to carry it would rename the job's check.
         runs-on: namespace-profile-16x32;overrides.cache-tag=chip-ccache-linux-ipv6only-no-ble-no-wifi-asan
 
         container:
@@ -1048,11 +1047,8 @@ jobs:
                 retention-days: 2
                 if-no-files-found: error
                 overwrite: true
-            # Trims the directory before it is packed into a size-limited tarball, so
-            # it belongs with the save steps below rather than with the build. On a
-            # cache volume there is no tarball and this would instead evict anything
-            # in the shared store untouched for a day, which is a different operation
-            # against a different object; CCACHE_MAXSIZE already bounds the volume.
+            # Belongs with the save steps: it trims for the size-limited tarball.
+            # A volume has no tarball, and CCACHE_MAXSIZE already bounds it.
             - name: Ensure only useful ccache is kept
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true' && steps.ccache.outputs.using-volume != 'true'
               run: ccache --evict-older-than 1d || true

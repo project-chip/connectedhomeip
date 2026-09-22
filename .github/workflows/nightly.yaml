@@ -56,11 +56,9 @@ jobs:
 
         # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
         # bound, we run these on larger/faster machines.
-        # Intended to share the ccache volume with the tests.yaml REPL build job,
-        # which builds the same variant; if cache tags turn out to be scoped per
-        # profile, each job gets its own volume instead. Either way the tag keeps
-        # that cache off the profile's default volume, where instances running
-        # workflows without this change drop it.
+        # Same tag as the tests.yaml REPL build, which builds the same variant, so
+        # the two share a volume and keep it off the profile's default one, where
+        # other workflows' instances drop it.
         runs-on: namespace-profile-4x16;overrides.cache-tag=chip-ccache-linux-ipv6only-no-ble-no-wifi-asan
 
         container:
@@ -204,11 +202,8 @@ jobs:
                 retention-days: 2
                 if-no-files-found: error
                 overwrite: true
-            # Trims the directory before it is packed into a size-limited tarball, so
-            # it belongs with the save steps below rather than with the build. On a
-            # cache volume there is no tarball and this would instead evict anything
-            # in the shared store untouched for a day, which is a different operation
-            # against a different object; CCACHE_MAXSIZE already bounds the volume.
+            # Belongs with the save steps: it trims for the size-limited tarball.
+            # A volume has no tarball, and CCACHE_MAXSIZE already bounds it.
             - name: Ensure only useful ccache is kept
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true' && steps.ccache.outputs.using-volume != 'true'
               run: ccache --evict-older-than 1d || true
