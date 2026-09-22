@@ -66,6 +66,8 @@ TEST_SCRIPT_ESC = shlex.quote(
 )
 
 EXPECTED_SERVER_LOG_PATTERNS = [
+    "Thread interface: wpan0",
+    "MeshForwarder-",
     "CASE Server detected Sigma1 MRP retry. Resending Sigma2/ACK.",
     "CASE Server passed Quadruple Guard Preemption. Preempting stale session.",
     "Preempting stale CASE session for superseding retry",
@@ -75,7 +77,7 @@ DEVICE_CONFIG = {
     "device0": {
         "type": "MobileDevice",
         "base_image": "@default",
-        "capability": ["TrafficControl", "Mount"],
+        "capability": ["Thread", "TrafficControl", "Mount"],
         "rcp_mode": True,
         "docker_network": "Ipv6",
         "traffic_control": {"latencyMs": 50},
@@ -84,7 +86,7 @@ DEVICE_CONFIG = {
     "device1": {
         "type": "CHIPEndDevice",
         "base_image": "@default",
-        "capability": ["TrafficControl", "Mount"],
+        "capability": ["Thread", "TrafficControl", "Mount"],
         "rcp_mode": True,
         "docker_network": "Ipv6",
         "traffic_control": {"latencyMs": 50},
@@ -101,16 +103,12 @@ class TestCaseServerPreemption(CHIPVirtualHome):
 
   def setup(self):
     self.initialize_home()
+    self.connect_to_thread_network()
 
   def test_routine(self):
     self.run_case_server_preemption_test()
 
   def run_case_server_preemption_test(self):
-    ethernet_ip = [
-        device["description"]["ipv6_addr"]
-        for device in self.non_ap_devices
-        if device["type"] == "CHIPEndDevice"
-    ][0]
     server_ids = [
         device["id"]
         for device in self.non_ap_devices
@@ -125,20 +123,35 @@ class TestCaseServerPreemption(CHIPVirtualHome):
     server_device_id = server_ids[0]
     req_device_id = req_ids[0]
 
-    # Start SSH daemon on CHIPEndDevice for ip6tables Sigma2 drop rules
+    # Start SSH daemon and launch chip-all-clusters-app --thread
     self.execute_device_cmd(server_device_id, "service ssh start")
     server_cmd = (
         "CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q "
         '-ex "set pagination off" -ex run -ex "thread apply all bt" '
-        f"--args {CHIP_ALL_CLUSTERS_APP_ESC} "
+        f"--args {CHIP_ALL_CLUSTERS_APP_ESC} --thread "
         f"--discriminator {TEST_DISCRIMINATOR}"
     )
     self.execute_device_cmd(server_device_id, server_cmd)
 
     self.assertTrue(
         self.wait_for_device_output(
+            server_device_id, "Thread interface: wpan0", 15
+        )
+    )
+    self.assertTrue(
+        self.wait_for_device_output(
             server_device_id, "[SVR] Server Listening...", 15
         )
+    )
+
+    # Retrieve Thread OMR / Mesh-Local IPv6 address on wpan0
+    thread_ip = self.get_device_thread_ip(server_device_id)
+    self.assertTrue(
+        thread_ip is not None,
+        "Failed to resolve Thread IPv6 address on wpan0 for CHIPEndDevice",
+    )
+    self.logger.info(
+        "Resolved CHIPEndDevice Thread wpan0 IPv6 address: %s", thread_ip
     )
 
     self.execute_device_cmd(
@@ -149,7 +162,7 @@ class TestCaseServerPreemption(CHIPVirtualHome):
     command = (
         "gdb -batch -return-child-result -q -ex run "
         f'-ex "thread apply all bt" --args python3 {TEST_SCRIPT_ESC} '
-        f"-t 180 -a {ethernet_ip} "
+        f"-t 180 -a {thread_ip} "
         f"--paa-trust-store-path {MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC} "
         f"--discriminator {TEST_DISCRIMINATOR}"
     )
@@ -197,7 +210,8 @@ def run_self_test() -> int:
   }
 
   simulated_server_log = (
-      "[SVR] Server Listening...\nThread interface: wpan0\n[SC] CASE Server"
+      "Thread interface: wpan0\n[SVR] Server Listening...\notbr-agent[30]:"
+      " MeshForwarder-: Received IPv6 UDP msg, radio:15.4\n[SC] CASE Server"
       " detected Sigma1 MRP retry. Resending Sigma2/ACK.\n[SC] Preemption"
       " deferred: Sigma2 in transit (grace window 700 ms).\n[SC] CASE Server"
       " passed Quadruple Guard Preemption. Preempting stale session.\n[SC]"
@@ -209,7 +223,10 @@ def run_self_test() -> int:
       patch.object(
           test_instance,
           "execute_device_cmd",
-          return_value={"return_code": "0", "output": "disabled\nDone"},
+          return_value={
+              "return_code": "0",
+              "output": "fd01:2345:6789:abc:1122:3344:5566:7788\nDone",
+          },
       ) as mock_exec,
       patch.object(
           test_instance, "get_device_log", return_value=simulated_server_log
@@ -217,7 +234,7 @@ def run_self_test() -> int:
       patch.object(test_instance, "wait_for_device_output", return_value=True),
   ):
     test_instance.run_case_server_preemption_test()
-    assert mock_exec.call_count >= 4
+    assert mock_exec.call_count >= 5
 
   logger.info("CaseServerPreemptionTest.py self-test passed all assertions.")
   return 0
