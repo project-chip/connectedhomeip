@@ -167,6 +167,10 @@ private:
     // Percentage attributes are derived from Percent100ths, not stored separately.
     static NPercent PercentFromPercent100ths(NPercent100ths percent100ths);
 
+    // Returns mConfigStatus with the derived bits refreshed: PositionAware bits mirror the
+    // immutable feature map (spec 9.3.6.13), Operational/LiftMovementReversed follow mMode.
+    chip::BitMask<ConfigStatus> DeriveConfigStatus() const;
+
     void UpdateOperationalStateForField(chip::BitMask<OperationalStatus> field, OperationalState state);
 
     std::optional<DataModel::ActionReturnStatus> HandleUpOrOpen();
