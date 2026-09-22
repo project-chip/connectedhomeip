@@ -139,5 +139,12 @@ void WebRTCRequestorDelegate::OnPeerConnectionFailed(const ScopedNodeId & aCamer
     mWebRTCClient->NotifyFailed(aCameraNode, aWebRTCSessionId);
 }
 
+void WebRTCRequestorDelegate::OnPeerConnectionReleased(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
+{
+    // The stream's media is over; analysis sessions sourced from it are ended
+    ChipLogProgress(AppServer, "AvAnalysisNode: peer connection of WebRTC session %u of " ChipLogFormatScopedNodeId " released",
+                    aWebRTCSessionId, ChipLogValueScopedNodeId(aCameraNode));
+}
+
 } // namespace app
 } // namespace chip
