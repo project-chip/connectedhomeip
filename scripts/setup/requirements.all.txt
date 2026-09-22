@@ -30,6 +30,11 @@ click-option-group
 # TODO: this should change in the Future
 -r ../tests/requirements.txt
 
+# Solved here so constraints.txt covers the same closure build_python.sh installs; without
+# these two the venv resolves them unconstrained.
+-r ../../src/python_testing/requirements.txt
+-r ../../src/tools/push_av_server/requirements.txt
+
 # mobly tests
 portpicker
 mobly
@@ -46,8 +51,10 @@ mypy-protobuf
 protobuf
 types-protobuf
 
-cffi==1.15.0; python_version < "3.13"
-cffi==1.17.1; python_version >= "3.13"
+# cryptography 47+ requires cffi>=2.0.0; the 1.15.0/1.17.1 split below it dated from #36549,
+# which raised cffi only far enough for Python 3.13 to install. cffi 2.x ships wheels for
+# cp39 through cp314, so the version split is no longer needed.
+cffi>=2.0.0
 cryptography
 
 # python unit tests
