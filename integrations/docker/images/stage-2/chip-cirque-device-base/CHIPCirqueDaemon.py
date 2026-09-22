@@ -64,7 +64,7 @@ class ShellCommand:
                 self._args, stdout=sys.stdout, stderr=sys.stderr)
             return CommandResponse(CommandStatus.SUCCESS)
         except Exception as ex:
-            return CommandResponse(CommandStatus.FAILURE, "Failed to run command: {}".format(ex))
+            return CommandResponse(CommandStatus.FAILURE, f"Failed to run command: {ex}")
 
 
 class InvalidCommand:

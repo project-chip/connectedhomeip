@@ -8,7 +8,7 @@ import logging
 import signal
 import socket
 import ssl
-from typing import Awaitable, Callable, Optional
+from collections.abc import Awaitable, Callable
 
 from api import PushAvServer
 from certificates import CAHierarchy
@@ -30,11 +30,11 @@ class PushAvContext:
 
     def __init__(
         self,
-        host: Optional[str],
-        port: Optional[int],
-        working_directory: Optional[str],
-        dns: Optional[str],
-        server_ip: Optional[str],
+        host: str | None,
+        port: int | None,
+        working_directory: str | None,
+        dns: str | None,
+        server_ip: str | None,
         strict_mode: bool
     ):
         self.directory = WorkingDirectory(working_directory)
@@ -98,7 +98,7 @@ class PushAvContext:
     def __exit__(self, exc_type, exc_value, traceback):
         self.cleanup()
 
-    async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None):
+    async def start(self, shutdown_trigger: Callable[..., Awaitable] | None = None):
         """
         Start the PUSH AV server. Note that method do not check if a server is already running.
         """

@@ -251,7 +251,7 @@ void vStartTask(void * pvParameters)
  * Main Function
  ****************************************************************************/
 
-int main(void)
+extern "C" int main(void)
 {
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 

@@ -253,4 +253,45 @@ NS_ASSUME_NONNULL_BEGIN
 
 // ApplicationBasic cluster:
 
+// MediaFileManagement cluster:
+
+@interface MCMediaFileManagementClusterAddFileParams : MCAbstractPayload
+@property (nonatomic, copy) NSString * _Nonnull name;
+@property (nonatomic, copy) NSNumber * _Nonnull size;
+@property (nonatomic, copy) NSString * _Nonnull mimeType;
+@property (nonatomic, copy) NSString * _Nonnull imageUri;
+@end
+
+@interface MCMediaFileManagementClusterAddFileResponseParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nullable fileID;
+@end
+
+@interface MCMediaFileManagementClusterDeleteFileParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull fileID;
+@end
+
+@interface MCMediaFileManagementClusterRequestSharedFilesParams : MCAbstractPayload
+@property (nonatomic, copy) NSString * _Nonnull clientName;
+@property (nonatomic, copy) NSNumber * _Nonnull requestID;
+@property (nonatomic, copy) NSArray * _Nullable supportedMimeTypes;
+@end
+
+@interface MCMediaFileManagementClusterGetSharedFileParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull responseID;
+@end
+
+@interface MCMediaFileManagementClusterGetSharedFileResponseParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) MCMediaFileManagementClusterFileDescriptionStruct * _Nullable fileDescription;
+@end
+
+@interface MCMediaFileManagementClusterOfferFileParams : MCAbstractPayload
+@property (nonatomic, copy) NSString * _Nonnull clientName;
+@property (nonatomic, copy) NSString * _Nonnull name;
+@property (nonatomic, copy) NSNumber * _Nonnull size;
+@property (nonatomic, copy) NSString * _Nonnull mimeType;
+@property (nonatomic, copy) NSString * _Nonnull imageUri;
+@end
+
 NS_ASSUME_NONNULL_END

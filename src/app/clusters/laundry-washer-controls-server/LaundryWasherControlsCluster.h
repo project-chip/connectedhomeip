@@ -31,9 +31,6 @@ class LaundryWasherControlsCluster : public DefaultServerCluster
     constexpr static uint8_t kMaxSupportedRinsesLength = 4;
 
 public:
-    // Spec mandates that at least one of the features declared in LaundryWasherControls::Feature must be supported.
-    // This encourages correct construction of the cluster when writing the code
-
     struct Config
     {
         Config(BitFlags<LaundryWasherControls::Feature> features, LaundryWasherControls::Delegate & delegate) :
@@ -76,8 +73,14 @@ public:
         mDelegate = &delegate;
 
         // delegate change implies change in these attributes.
-        NotifySpinSpeedsAttributeChanged();
-        NotifySupportedRinsesAttributeChanged();
+        if (mFeatures.Has(LaundryWasherControls::Feature::kSpin))
+        {
+            NotifySpinSpeedsAttributeChanged();
+        }
+        if (mFeatures.Has(LaundryWasherControls::Feature::kRinse))
+        {
+            NotifySupportedRinsesAttributeChanged();
+        }
     }
     CHIP_ERROR SetSpinSpeedCurrent(DataModel::Nullable<uint8_t> spinSpeedCurrent);
     CHIP_ERROR SetNumberOfRinses(LaundryWasherControls::NumberOfRinsesEnum numberOfRinses);

@@ -54,7 +54,7 @@
 
 import asyncio
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from mobly import asserts
 
@@ -78,7 +78,7 @@ class TC_OCC_3_1(MatterBaseTest):
         endpoint = self.get_endpoint()
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    async def write_hold_time(self, hold_time: Optional[Any]) -> Status:
+    async def write_hold_time(self, hold_time: Any | None) -> Status:
         dev_ctrl = self.default_controller
         node_id = self.dut_node_id
         endpoint = self.get_endpoint()

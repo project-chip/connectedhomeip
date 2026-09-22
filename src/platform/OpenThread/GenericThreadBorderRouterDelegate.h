@@ -52,8 +52,7 @@ public:
 
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
-        TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(CharSpan(mThreadBorderRouterName, strlen(mThreadBorderRouterName)),
-                                                               borderRouterName);
+        TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(mThreadBorderRouterName), borderRouterName);
     }
 
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override;

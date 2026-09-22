@@ -24,7 +24,6 @@ import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import IntEnum
-from typing import Optional
 
 from mdns_discovery import mdns_discovery
 from mobly import asserts
@@ -201,7 +200,7 @@ class CADMINBaseTest(MatterBaseTest):
         expected_duration_seconds: int,
         min_interval_sec: int = 0,
         max_interval_sec: int = 30,
-        window_status_accumulator: Optional[AttributeSubscriptionHandler] = None
+        window_status_accumulator: AttributeSubscriptionHandler | None = None
     ) -> 'CADMINBaseTest.TimingResults':
         """
         Monitor commissioning window closure using subscription (replaces hardcoded sleep).
@@ -365,18 +364,18 @@ class CADMINBaseTest(MatterBaseTest):
         """Results from commissioning window timing monitoring."""
         window_closed: bool
         expected_duration_seconds: int
-        actual_duration_seconds: Optional[float]
+        actual_duration_seconds: float | None
         clock_skew_ms: int
         max_allowed_duration_seconds: float
         timing_valid: bool
         start_time: datetime
-        end_time: Optional[datetime] = None
+        end_time: datetime | None = None
 
     @dataclass
     class ParsedService:
         service: mdns_discovery.MdnsServiceInfo
-        cm: Optional[int] = None
-        d: Optional[int] = None
+        cm: int | None = None
+        d: int | None = None
 
         def __post_init__(self):
             # Safely convert CM value to int if present

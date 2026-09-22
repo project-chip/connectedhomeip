@@ -17,7 +17,7 @@
 from ctypes import CFUNCTYPE, POINTER, Structure, c_char_p, c_int, c_uint8, c_uint16, c_void_p
 from dataclasses import dataclass, field
 from enum import Enum, StrEnum, auto
-from typing import Any, Optional
+from typing import Any
 
 
 class PeerConnectionState(StrEnum):
@@ -49,8 +49,8 @@ class IceCandidateStruct(Structure):
 @dataclass
 class IceCandidate:
     candidate: str
-    sdpMid: Optional[str] = None
-    sdpMLineIndex: Optional[int] = None
+    sdpMid: str | None = None
+    sdpMLineIndex: int | None = None
 
 
 @dataclass
@@ -64,7 +64,7 @@ class WebSocketMessage:
     type: str
     sessionId: int
     data: Any = None
-    error: Optional[str] = None
+    error: str | None = None
 
 
 WebRTCClientHandle = c_void_p

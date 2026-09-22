@@ -1011,6 +1011,7 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
 
     // Select local and remote max receive window size based on local resources available for both incoming writes AND
     // GATT confirmations.
+    VerifyOrReturnError(req.mWindowSize > 0, CHIP_ERROR_INVALID_ARGUMENT);
     mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize =
         std::min(req.mWindowSize, static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE));
     resp.mWindowSize = mReceiveWindowMaxSize;

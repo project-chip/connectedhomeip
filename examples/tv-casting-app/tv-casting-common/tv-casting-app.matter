@@ -103,6 +103,12 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -183,6 +189,11 @@ enum MeasurementTypeEnum : enum16 {
   kReactiveEnergy = 15;
   kApparentEnergy = 16;
   kSoilMoisture = 17;
+}
+
+enum MediumType : enum8 {
+  kAir = 0;
+  kWater = 1;
 }
 
 enum PositionTag : enum8 {
@@ -341,7 +352,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -415,7 +426,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -491,7 +502,7 @@ cluster Groups = 4 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 cluster OnOff = 6 {
-  revision 6;
+  revision 7;
 
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
@@ -546,11 +557,11 @@ cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
-  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be turned off. */
   command Off(): DefaultSuccess = 0;
-  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
+  /** This command allows devices to be turned on. */
   command On(): DefaultSuccess = 1;
-  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be toggled. */
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
@@ -562,7 +573,7 @@ cluster OnOff = 6 {
 
 /** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 cluster LevelControl = 8 {
-  revision 6;
+  revision 8;
 
   enum MoveModeEnum : enum8 {
     kUp = 0;
@@ -701,7 +712,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -727,7 +738,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -755,10 +766,7 @@ cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -896,7 +904,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 6;
+  revision 7;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -984,7 +992,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
   provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  provisional readonly attribute optional int32u configurationVersion = 24;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1413,7 +1421,7 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -1464,7 +1472,13 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 2;
+  revision 3;
+
+  enum AttestationCryptoProfileEnum : enum8 {
+    kEcdsaMatterLegacy = 0;
+    kMlDsa44 = 1;
+    kMlDsa65 = 2;
+  }
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -1484,6 +1498,16 @@ cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  bitmap AttestationCryptoProfileBitmap : bitmap16 {
+    kSupportsEcdsaMatterLegacy = 0x1;
+    kSupportsMlDsa44 = 0x2;
+    kSupportsMlDsa65 = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPQCDeviceAttestation = 0x1;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -1501,12 +1525,20 @@ cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct PQCDeviceAttestationProfileStruct {
+    AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
+    AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
+    AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1524,10 +1556,15 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional int16u segmentID = 2;
+    optional int16u maxSegmentSize = 3;
   }
 
   response struct CertificateChainResponse = 3 {
-    long_octet_string<600> certificate = 0;
+    octet_string certificate = 0;
+    optional int16u totalDocumentSize = 1;
+    optional int16u nextSegmentID = 2;
   }
 
   request struct CSRRequestRequest {
@@ -1614,11 +1651,6 @@ cluster OperationalCredentials = 62 {
 cluster GroupKeyManagement = 63 {
   revision 4;
 
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
-
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1653,16 +1685,10 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime2 = 7;
   }
 
-  fabric_scoped struct GroupcastAdoptionStruct {
-    boolean groupcastAdopted = 0;
-    fabric_idx fabricIndex = 254;
-  }
-
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
-  provisional attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1701,7 +1727,7 @@ cluster GroupKeyManagement = 63 {
 
 /** This cluster provides an interface for passing messages to be presented by a device. */
 cluster Messages = 151 {
-  revision 3;
+  revision 4;
 
   enum FutureMessagePreferenceEnum : enum8 {
     kAllowed = 0;
@@ -1723,6 +1749,9 @@ cluster Messages = 151 {
     kConfirmationResponse = 0x2;
     kConfirmationReply = 0x4;
     kProtectedMessages = 0x8;
+    kSpokenMessages = 0x10;
+    kAudioMessages = 0x20;
+    kMultiModalMessages = 0x40;
   }
 
   bitmap MessageControlBitmap : bitmap8 {
@@ -1731,6 +1760,8 @@ cluster Messages = 151 {
     kReplyMessage = 0x4;
     kMessageConfirmed = 0x8;
     kMessageProtected = 0x10;
+    kSpokenMessage = 0x20;
+    kAudioMessage = 0x40;
   }
 
   struct MessageResponseOptionStruct {
@@ -1746,6 +1777,8 @@ cluster Messages = 151 {
     nullable int64u duration = 4;
     long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
+    optional fabric_sensitive char_string<32> languageCode = 7;
+    optional fabric_sensitive long_char_string<256> messageURI = 8;
   }
 
   info event MessageQueued = 0 {
@@ -1763,8 +1796,16 @@ cluster Messages = 151 {
     nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
   }
 
+  provisional fabric_sensitive info event MessageNotPresented = 3 {
+    octet_string messageID = 0;
+    boolean removedFromQueue = 1;
+    fabric_idx fabricIndex = 254;
+  }
+
   readonly attribute MessageStruct messages[] = 0;
   readonly attribute octet_string activeMessageIDs[] = 1;
+  provisional readonly attribute optional char_string supportedLanguageCodes[] = 2;
+  provisional readonly attribute optional char_string supportedMimeTypes[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1779,6 +1820,8 @@ cluster Messages = 151 {
     nullable int64u duration = 4;
     long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
+    optional char_string<32> languageCode = 7;
+    optional long_char_string<256> messageURI = 8;
   }
 
   request struct CancelMessagesRequestRequest {
@@ -2614,7 +2657,7 @@ cluster ContentLauncher = 1290 {
   command PlayPreset(PlayPresetRequest): DefaultSuccess = 5;
 }
 
-/** This cluster provides an interface for controlling the Output on a media device such as a TV. */
+/** This cluster provides an interface for controlling the Output on a Video Player device such as a TV. */
 cluster AudioOutput = 1291 {
   revision 1;
 
@@ -2634,7 +2677,7 @@ cluster AudioOutput = 1291 {
   struct OutputInfoStruct {
     int8u index = 0;
     OutputTypeEnum outputType = 1;
-    char_string name = 2;
+    char_string<32> name = 2;
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
@@ -2651,7 +2694,7 @@ cluster AudioOutput = 1291 {
 
   request struct RenameOutputRequest {
     int8u index = 0;
-    char_string name = 1;
+    char_string<32> name = 1;
   }
 
   /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
@@ -2660,7 +2703,7 @@ cluster AudioOutput = 1291 {
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
-/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
+/** This cluster provides an interface for launching applications on a Video Player device such as a TV. */
 cluster ApplicationLauncher = 1292 {
   revision 2;
 
@@ -2721,7 +2764,7 @@ cluster ApplicationLauncher = 1292 {
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
-/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
+/** This cluster provides information about a Content App running on a Video Player device which is represented as an endpoint (see Device Type Library document). */
 cluster ApplicationBasic = 1293 {
   revision 1;
 
@@ -2754,13 +2797,18 @@ cluster ApplicationBasic = 1293 {
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
-  revision 2;
+  revision 3;
+
+  bitmap Feature : bitmap32 {
+    kOAuth = 0x1;
+  }
 
   fabric_sensitive critical event access(read: administer) LoggedOut = 0 {
     optional node_id node = 0;
     fabric_idx fabricIndex = 254;
   }
 
+  provisional readonly attribute optional boolean OAuthLoggedIn = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2785,12 +2833,22 @@ cluster AccountLogin = 1294 {
     optional node_id node = 0;
   }
 
+  response struct GetDeviceAuthURIResponse = 5 {
+    char_string<16> userCode = 0;
+    long_char_string<256> verificationURI = 1;
+    optional long_char_string<512> verificationURIComplete = 2;
+    int16u expiresIn = 3;
+    int8u interval = 4;
+  }
+
   /** The purpose of this command is to determine if the active user account of the given Content App matches the active user account of a given Commissionee, and when it does, return a Setup PIN which can be used for password-authenticated session establishment (PASE) with the Commissionee. */
   fabric timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
   /** The purpose of this command is to allow the Content App to assume the user account of a given Commissionee by leveraging the Setup PIN input by the user during the commissioning process. */
   fabric timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
   /** The purpose of this command is to instruct the Content App to clear the current user account. */
   fabric timed command Logout(LogoutRequest): DefaultSuccess = 3;
+  /** This command initiates OAuth 2.0 Device Authorization Grant flow in a Content App. */
+  fabric timed command access(invoke: administer) GetDeviceAuthURI(): GetDeviceAuthURIResponse = 4;
 }
 
 /** This cluster is used for managing the content control (including "parental control") settings on a media device such as a TV, or Set-top Box. */
@@ -3149,7 +3207,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute groupcastAdoption;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -3192,7 +3249,7 @@ endpoint 1 {
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command AddGroup;
     handle command ViewGroup;

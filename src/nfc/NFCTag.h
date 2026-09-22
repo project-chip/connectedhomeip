@@ -68,13 +68,12 @@ class DLL_EXPORT NFCTag
 public:
     struct Identifier
     {
-        uint16_t discriminator = 0;
+        // Discriminator is a 12-bit value that uniquely identifies a tag.
+        static constexpr uint16_t kInvalidDiscriminator = 0x1000;
 
-        bool IsValid() const
-        {
-            static constexpr Identifier _invalidID;
-            return *this != _invalidID;
-        }
+        uint16_t discriminator = kInvalidDiscriminator;
+
+        bool IsValid() const { return discriminator < kInvalidDiscriminator; }
 
         friend bool operator==(const Identifier & lhs, const Identifier & rhs)
         {

@@ -19,7 +19,6 @@ import json
 import logging
 import time
 from asyncio import Event, Semaphore, create_task, gather, sleep, wait_for
-from typing import Optional
 
 from mdns_discovery.data_classes.aaaa_record import AaaaRecord
 from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
@@ -201,7 +200,7 @@ class MdnsDiscovery:
                              service_type: str,
                              query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                              log_output: bool = False
-                             ) -> Optional[MdnsServiceInfo]:
+                             ) -> MdnsServiceInfo | None:
         """
         Asynchronously discovers the SRV record associated with an mDNS service.
 
@@ -241,7 +240,7 @@ class MdnsDiscovery:
                              service_type: str,
                              query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                              log_output: bool = False
-                             ) -> Optional[MdnsServiceInfo]:
+                             ) -> MdnsServiceInfo | None:
         """
         Asynchronously discovers the TXT record associated with an mDNS service.
 
@@ -427,7 +426,7 @@ class MdnsDiscovery:
         return sub_types
 
     async def discover(self,
-                       service_types: Optional[list[str]] = None,
+                       service_types: list[str] | None = None,
                        all_services: bool = False,
                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                        query_service: bool = False,
@@ -590,7 +589,7 @@ class MdnsDiscovery:
                                   query_timeout_sec: float = QUERY_TIMEOUT_SEC,
                                   query_record_types: set[int] = QUERY_RECORD_TYPES,
                                   append_results: bool = False
-                                  ) -> Optional[MdnsServiceInfo]:
+                                  ) -> MdnsServiceInfo | None:
         """
         Queries mDNS service record details for a given service instance, including SRV, TXT, A, and AAAA records.
 

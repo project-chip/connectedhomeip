@@ -37,7 +37,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import typing
 
 from mobly import asserts
 
@@ -129,7 +128,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
         return mask
 
     def _validate_alarm_bitmap(self, attribute_name: str, bitmap_value: int,
-                               valid_mask: int, supported_value: typing.Optional[int] = None):
+                               valid_mask: int, supported_value: int | None = None):
         """
         Validate that an alarm bitmap only contains valid and supported bits.
 

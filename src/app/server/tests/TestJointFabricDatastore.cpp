@@ -353,6 +353,92 @@ TEST(JointFabricDatastoreTest, AddGroupAndUpdateEndpointOwnBufferBackedFriendlyN
     ExpectCharSpanEquals(store.GetNodeEndpointList()[0].friendlyName, "switch-main");
 }
 
+// Regression for UpdateGroup dereferencing a stored null Nullable.
+//
+// AddGroup copies the request's groupKeySetID / groupCAT / groupCATVersion into the stored entry
+// verbatim, with no non-null requirement, so any of them can be persisted as a null Nullable. When a
+// later UpdateGroup supplies a non-null value for that same field, it enters the "value changed"
+// branch and reads the stored Nullable with .Value() without first checking IsNull(), which throws
+// std::bad_optional_access (or std::terminate under -fno-exceptions). The fix guards each stored read
+// with an IsNull() || prefix so a null stored field is treated as changed.
+//
+// friendlyName is left null in these tests so UpdateGroup does not enter the delegate SyncNode path;
+// a minimal delegate (the group is referenced by no endpoints) is sufficient.
+TEST(JointFabricDatastoreTest, UpdateGroupWithNullStoredGroupKeySetIDSucceeds)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+
+    JointFabricCluster::Commands::AddGroup::DecodableType addGroup;
+    addGroup.groupID      = 10;
+    addGroup.friendlyName = "group-a"_span;
+    // groupKeySetID left default-constructed == null.
+    addGroup.groupPermission = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum::kView;
+    ASSERT_EQ(store.AddGroup(addGroup), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetGroupEntries().size(), 1u);
+    ASSERT_TRUE(store.GetGroupEntries()[0].groupKeySetID.IsNull());
+
+    JointFabricCluster::Commands::UpdateGroup::DecodableType updateGroup;
+    updateGroup.groupID = 10;
+    updateGroup.groupKeySetID.SetNonNull(static_cast<uint16_t>(5));
+    EXPECT_EQ(store.UpdateGroup(updateGroup), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.GetGroupEntries().size(), 1u);
+    ASSERT_FALSE(store.GetGroupEntries()[0].groupKeySetID.IsNull());
+    EXPECT_EQ(store.GetGroupEntries()[0].groupKeySetID.Value(), 5u);
+}
+
+TEST(JointFabricDatastoreTest, UpdateGroupWithNullStoredGroupCATSucceeds)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+
+    JointFabricCluster::Commands::AddGroup::DecodableType addGroup;
+    addGroup.groupID      = 11;
+    addGroup.friendlyName = "group-b"_span;
+    // groupCAT left default-constructed == null.
+    addGroup.groupPermission = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum::kView;
+    ASSERT_EQ(store.AddGroup(addGroup), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetGroupEntries().size(), 1u);
+    ASSERT_TRUE(store.GetGroupEntries()[0].groupCAT.IsNull());
+
+    JointFabricCluster::Commands::UpdateGroup::DecodableType updateGroup;
+    updateGroup.groupID = 11;
+    updateGroup.groupCAT.SetNonNull(static_cast<uint16_t>(0x1234));
+    EXPECT_EQ(store.UpdateGroup(updateGroup), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.GetGroupEntries().size(), 1u);
+    ASSERT_FALSE(store.GetGroupEntries()[0].groupCAT.IsNull());
+    EXPECT_EQ(store.GetGroupEntries()[0].groupCAT.Value(), 0x1234u);
+}
+
+TEST(JointFabricDatastoreTest, UpdateGroupWithNullStoredGroupCATVersionSucceeds)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+
+    JointFabricCluster::Commands::AddGroup::DecodableType addGroup;
+    addGroup.groupID      = 12;
+    addGroup.friendlyName = "group-c"_span;
+    // groupCATVersion left default-constructed == null.
+    addGroup.groupPermission = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum::kView;
+    ASSERT_EQ(store.AddGroup(addGroup), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetGroupEntries().size(), 1u);
+    ASSERT_TRUE(store.GetGroupEntries()[0].groupCATVersion.IsNull());
+
+    JointFabricCluster::Commands::UpdateGroup::DecodableType updateGroup;
+    updateGroup.groupID = 12;
+    updateGroup.groupCATVersion.SetNonNull(static_cast<uint16_t>(7));
+    EXPECT_EQ(store.UpdateGroup(updateGroup), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.GetGroupEntries().size(), 1u);
+    ASSERT_FALSE(store.GetGroupEntries()[0].groupCATVersion.IsNull());
+    EXPECT_EQ(store.GetGroupEntries()[0].groupCATVersion.Value(), 7u);
+}
+
 TEST(JointFabricDatastoreTest, RefreshNodeFetchesGroupKeySetsAndCommitsNode)
 {
     JointFabricDatastore store;

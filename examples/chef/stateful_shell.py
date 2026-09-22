@@ -18,7 +18,6 @@ import subprocess
 import sys
 import tempfile
 import time
-from typing import Optional
 
 import constants
 
@@ -67,7 +66,7 @@ class StatefulShell:
         self, cmd: str, *,
         raise_on_returncode=True,
         return_cmd_output=False,
-    ) -> Optional[str]:
+    ) -> str | None:
         """Runs a command and updates environment.
 
         Args:

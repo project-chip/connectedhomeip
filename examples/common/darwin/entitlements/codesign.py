@@ -20,7 +20,7 @@ import subprocess
 
 
 def run_command(command):
-    print("Running {}".format(" ".join(command)))
+    print(f"Running {' '.join(command)}")
     return subprocess.check_output(command).decode("utf-8")
 
 
@@ -47,7 +47,7 @@ def codesign(args):
     command = ["codesign", "--force", "-d", "--sign", get_identity(), args.target_path]
     command_result = run_command(command)
 
-    print("Codesign Result: {}".format(command_result))
+    print(f"Codesign Result: {command_result}")
     with open(args.log_path, "w") as f:
         f.write(command_result)
 

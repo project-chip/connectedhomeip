@@ -28,6 +28,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
 #include <app/util/af-types.h>
 #include <assert.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -47,25 +48,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == ThermostatUserInterfaceConfiguration::Id)
     {
+        // TODO: Move this handling to ThermostatUserInterfaceConfiguration::Delegate::OnTemperatureDisplayModeChanged.
+        // The code-driven cluster no longer invokes MatterPostAttributeChangeCallback for attribute changes.
+        // See src/app/clusters/thermostat-user-interface-configuration-server/README.md for delegate registration.
         if (attributeId == ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id)
         {
             ChipLogDetail(Zcl, " set TemperatureDisplayMode: %u", *value);
         }
     }
-}
-
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
-{
-
-    // Temp. code for testing purpose, need to be updated
-    const auto logOnFailure = [](Protocols::InteractionModel::Status status, const char * attributeName) {
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogError(Zcl, "Failed to set Thermostat %s: %x", attributeName, to_underlying(status));
-        }
-    };
-
-    logOnFailure(Thermostat::Attributes::FeatureMap::Set(endpoint, 0x23), "feature map");
 }
 
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)

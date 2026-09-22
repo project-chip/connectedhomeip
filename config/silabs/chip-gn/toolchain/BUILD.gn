@@ -16,12 +16,13 @@ declare_args() {
   zephyr_ar = ""
   zephyr_cc = ""
   zephyr_cxx = ""
+  zephyr_command_launcher = ""
 }
 
 toolchain("zephyr") {
   tool("cc") {
     depfile = "{{output}}.d"
-    command = "\"${zephyr_cc}\" -MMD -MF \"$depfile\" {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c \"{{source}}\" -o \"{{output}}\""
+    command = "${zephyr_command_launcher}\"${zephyr_cc}\" -MMD -MF \"$depfile\" {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}} -c \"{{source}}\" -o \"{{output}}\""
     depsformat = "gcc"
     outputs =
         [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
@@ -30,7 +31,7 @@ toolchain("zephyr") {
 
   tool("cxx") {
     depfile = "{{output}}.d"
-    command = "\"${zephyr_cxx}\" -MMD -MF \"$depfile\" {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c \"{{source}}\" -o \"{{output}}\""
+    command = "${zephyr_command_launcher}\"${zephyr_cxx}\" -MMD -MF \"$depfile\" {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}} -c \"{{source}}\" -o \"{{output}}\""
     depsformat = "gcc"
     outputs =
         [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
@@ -39,7 +40,7 @@ toolchain("zephyr") {
 
   tool("asm") {
     depfile = "{{output}}.d"
-    command = "\"${zephyr_cc}\" -MMD -MF \"$depfile\" {{defines}} {{include_dirs}} {{asmflags}} -c \"{{source}}\" -o \"{{output}}\""
+    command = "${zephyr_command_launcher}\"${zephyr_cc}\" -MMD -MF \"$depfile\" {{defines}} {{include_dirs}} {{asmflags}} -c \"{{source}}\" -o \"{{output}}\""
     depsformat = "gcc"
     outputs =
         [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]

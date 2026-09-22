@@ -19,9 +19,12 @@ import shlex
 import subprocess
 import sys
 import threading
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from enum import StrEnum
-from typing import BinaryIO, Callable, Self
+from typing import BinaryIO, Self
+
+from matter.testing.defaults import TestingDefaults
 
 LOGGER = logging.getLogger(__name__)
 
@@ -70,9 +73,6 @@ class SubprocessInfo:
 class Subprocess(threading.Thread):
     """Run a subprocess in a thread."""
 
-    DEFAULT_TIMEOUT_S: float = 300.0
-    TERMINATION_TIMEOUT_S: float = 5.0
-
     def __init__(self, program: str, *args: str, output_cb: Callable[[bytes, bool], bytes] | None = None,
                  f_stdout: BinaryIO = sys.stdout.buffer, f_stderr: BinaryIO = sys.stderr.buffer) -> None:
         """Initialize the subprocess.
@@ -103,6 +103,24 @@ class Subprocess(threading.Thread):
             self.output_match = re.compile(re.escape(pattern.encode()))
         else:
             self.output_match = pattern
+
+    def arm_output_match(self, pattern: str | re.Pattern) -> None:
+        """Watch the output for a pattern, discarding any match seen so far.
+
+        Arm before triggering whatever makes the subprocess print the line, so that a
+        later wait_for_output() cannot miss a line arriving in between. Note that start()
+        and send() leave their own expected_output match set, so arming must follow them.
+        """
+        self.set_output_match(pattern)
+        self.event.clear()
+
+    def wait_for_output(self, timeout: float) -> bool:
+        """Wait for the armed pattern to appear in the output.
+
+        Returns True once the pattern has been seen, False if it has not appeared within
+        timeout seconds. A timeout of 0 polls the current state without blocking.
+        """
+        return self.event.wait(timeout)
 
     def _check_output(self, line: bytes, is_stderr: bool) -> bytes:
         if self.output_match is not None and self.output_match.search(line):
@@ -153,21 +171,20 @@ class Subprocess(threading.Thread):
                 self.returncode = -1
 
             if forwarding_stdout_thread is not None:
-                forwarding_stdout_thread.join(self.TERMINATION_TIMEOUT_S)
+                forwarding_stdout_thread.join(TestingDefaults.TERMINATION_TIMEOUT_S)
                 if forwarding_stdout_thread.is_alive():
                     LOGGER.warning("Forwarding stdout thread did not finish within timeout")
 
             if forwarding_stderr_thread is not None:
-                forwarding_stderr_thread.join(self.TERMINATION_TIMEOUT_S)
+                forwarding_stderr_thread.join(TestingDefaults.TERMINATION_TIMEOUT_S)
                 if forwarding_stderr_thread.is_alive():
                     LOGGER.warning("Forwarding stderr thread did not finish within timeout")
 
-    def start(self, expected_output: str | re.Pattern | None = None, timeout: float = DEFAULT_TIMEOUT_S) -> None:
+    def start(self, expected_output: str | re.Pattern | None = None, timeout: float = TestingDefaults.DEFAULT_TIMEOUT_S) -> None:
         """Start a subprocess and optionally wait for a specific output."""
 
         if expected_output is not None:
-            self.set_output_match(expected_output)
-            self.event.clear()
+            self.arm_output_match(expected_output)
 
         super().start()
         # Wait for the thread to start, so the self.p attribute is available.
@@ -182,12 +199,11 @@ class Subprocess(threading.Thread):
             raise TimeoutError(f"Expected output {expected_output!r} not found within {timeout} seconds")
 
     def send(self, message: str, end: str = "\n", expected_output: str | re.Pattern | None = None,
-             timeout: float = DEFAULT_TIMEOUT_S) -> None:
+             timeout: float = TestingDefaults.DEFAULT_TIMEOUT_S) -> None:
         """Send a message to a process and optionally wait for a response."""
 
         if expected_output is not None:
-            self.set_output_match(expected_output)
-            self.event.clear()
+            self.arm_output_match(expected_output)
 
         if self.p is None:
             raise RuntimeError(f'Process "{self.program}" has not been started yet')
@@ -204,17 +220,20 @@ class Subprocess(threading.Thread):
             return
 
         self.p.terminate()
-        self.join(self.TERMINATION_TIMEOUT_S)
+        self.join(TestingDefaults.TERMINATION_TIMEOUT_S)
         if not self.is_alive() and self.returncode is not None:
             return
 
         LOGGER.warning("Subprocess or controller thread did not terminate within timeout. Killing the process instead")
         self.p.kill()
-        self.join(self.TERMINATION_TIMEOUT_S)
+        self.join(TestingDefaults.TERMINATION_TIMEOUT_S)
         if self.is_alive() or self.returncode is None:
             LOGGER.warning("Failed to kill subprocess within timeout. We may be leaving a zombie process")
 
-    def wait(self, timeout: float = DEFAULT_TIMEOUT_S) -> int | None:
+    def wait(self, timeout: float = TestingDefaults.DEFAULT_TIMEOUT_S) -> int | None:
         """Wait for the subprocess to finish."""
         self.join(timeout)
+        if self.is_alive():
+            self.terminate()
+            raise TimeoutError(f"Subprocess `{self.program} {shlex.join(self.args)}` did not finish within {timeout} seconds")
         return self.returncode

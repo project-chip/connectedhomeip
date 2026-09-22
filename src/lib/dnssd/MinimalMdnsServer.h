@@ -27,7 +27,7 @@ class MdnsPacketDelegate
 {
 public:
     virtual ~MdnsPacketDelegate() {}
-    virtual void OnMdnsPacketData(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
+    virtual void OnMdnsPacketData(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
 };
 
 /// A global mdns::Minimal::Server wrapper
@@ -61,7 +61,7 @@ public:
     void SetResponseDelegate(MdnsPacketDelegate * delegate) { mResponseDelegate = delegate; }
 
     // ServerDelegate implementation
-    void OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
+    void OnQuery(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
         if (mQueryDelegate != nullptr)
         {
@@ -69,7 +69,7 @@ public:
         }
     }
 
-    void OnResponse(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
+    void OnResponse(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
         if (mResponseDelegate != nullptr)
         {

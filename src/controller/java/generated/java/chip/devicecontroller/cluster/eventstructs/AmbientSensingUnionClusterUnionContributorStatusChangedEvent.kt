@@ -24,52 +24,63 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
-  val statusChangedContributor:
-    List<chip.devicecontroller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct>
+  val contributorStatusChange:
+    List<
+      chip.devicecontroller.cluster.structs.AmbientSensingUnionClusterContributorStatusChangeStruct
+    >,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("AmbientSensingUnionClusterUnionContributorStatusChangedEvent {\n")
-    append("\tstatusChangedContributor : $statusChangedContributor\n")
+    append("\tcontributorStatusChange : $contributorStatusChange\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      startArray(ContextSpecificTag(TAG_STATUS_CHANGED_CONTRIBUTOR))
-      for (item in statusChangedContributor.iterator()) {
+      startArray(ContextSpecificTag(TAG_CONTRIBUTOR_STATUS_CHANGE))
+      for (item in contributorStatusChange.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
       endArray()
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_STATUS_CHANGED_CONTRIBUTOR = 0
+    private const val TAG_CONTRIBUTOR_STATUS_CHANGE = 0
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader,
     ): AmbientSensingUnionClusterUnionContributorStatusChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val statusChangedContributor =
+      val contributorStatusChange =
         buildList<
-          chip.devicecontroller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct
+          chip.devicecontroller.cluster.structs.AmbientSensingUnionClusterContributorStatusChangeStruct
         > {
-          tlvReader.enterArray(ContextSpecificTag(TAG_STATUS_CHANGED_CONTRIBUTOR))
+          tlvReader.enterArray(ContextSpecificTag(TAG_CONTRIBUTOR_STATUS_CHANGE))
           while (!tlvReader.isEndOfContainer()) {
             this.add(
-              chip.devicecontroller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct
+              chip.devicecontroller.cluster.structs
+                .AmbientSensingUnionClusterContributorStatusChangeStruct
                 .fromTlv(AnonymousTag, tlvReader)
             )
           }
           tlvReader.exitContainer()
         }
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
-      return AmbientSensingUnionClusterUnionContributorStatusChangedEvent(statusChangedContributor)
+      return AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
+        contributorStatusChange,
+        fabricIndex,
+      )
     }
   }
 }

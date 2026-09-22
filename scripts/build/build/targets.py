@@ -46,14 +46,18 @@ _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
     'aggregator',
     'air-purifier',
+    'ambient-context-sensor',
     'bridged-node',
     'chime',
+    'color-temperature-light',
     'contact-sensor',
     'cooktop',
     'device-energy-management',
     'dimmable-light',
     'dimmable-plug-in-unit',
     'dishwasher',
+    'electrical-sensor',
+    'extended-color-light',
     'extractor-hood',
     'fan',
     'flow-sensor',
@@ -63,6 +67,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'laundry-washer',
     'light-sensor',
     'microwave-oven',
+    'mode-select',
     'mounted-dimmable-load-control',
     'mounted-on-off-control',
     'occupancy-sensor',
@@ -189,6 +194,7 @@ def BuildHostTarget():
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
         TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
         TargetPart('dishwasher', app=HostApp.DISHWASHER),
+        TargetPart('electrical-protection', app=HostApp.ELECTRICAL_PROTECTION),
         TargetPart('microwave-oven', app=HostApp.MICROWAVE_OVEN),
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
         TargetPart('rvc', app=HostApp.RVC),
@@ -297,6 +303,7 @@ def BuildEsp32Target():
     # boards
     target.AppendFixedTargets([
         TargetPart('m5stack', board=Esp32Board.M5Stack),
+        TargetPart('m5stack-cores3', board=Esp32Board.M5StackCoreS3),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
         TargetPart('p4functionev', board=Esp32Board.P4FunctionEV),
@@ -346,9 +353,6 @@ def BuildEfr32Target():
         TargetPart('brd4317a', board=Efr32Board.BRD4317A),
         TargetPart('brd4318a', board=Efr32Board.BRD4318A),
         TargetPart('brd4319a', board=Efr32Board.BRD4319A),
-        TargetPart('brd4186a', board=Efr32Board.BRD4186A),
-        TargetPart('brd4187a', board=Efr32Board.BRD4187A),
-        TargetPart('brd2601b', board=Efr32Board.BRD2601B),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
         TargetPart('brd4186c', board=Efr32Board.BRD4186C),
         TargetPart('brd2703a', board=Efr32Board.BRD2703A),
@@ -397,7 +401,6 @@ def BuildEfr32Target():
     target.AppendModifier(
         'show-qr-code', show_qr_code=True).ExceptIfRe('-low-power')
     target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('wf200', enable_wf200=True).OnlyIfRe('-wifi')
     target.AppendModifier('siwx917', enable_917_ncp=True).OnlyIfRe('-wifi')
     target.AppendModifier('ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
     target.AppendModifier('additional-data-advertising',
@@ -727,6 +730,7 @@ def BuildStm32Target():
     # board
     target.AppendFixedTargets([
         TargetPart('STM32WB5MM-DK', board=stm32Board.STM32WB55XX),
+        TargetPart('STM32WBA65I-DK1', board=stm32Board.STM32WBA6XX),
     ])
 
     # apps
@@ -847,9 +851,10 @@ def BuildTelinkTarget():
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
-        TargetPart('tl3218x', board=TelinkBoard.TL3218X),
-        TargetPart('tl3218x_ml3m', board=TelinkBoard.TL3218X_ML3M),
-        TargetPart('tl3218x_retention', board=TelinkBoard.TL3218X_RETENTION),
+        TargetPart('tl3238x', board=TelinkBoard.TL3238X),
+        TargetPart('tl3238x_retention', board=TelinkBoard.TL3238X_RETENTION),
+        TargetPart('tl5218x', board=TelinkBoard.TL5218X),
+        TargetPart('tl5218x_retention', board=TelinkBoard.TL5218X_RETENTION),
         TargetPart('tl7218x', board=TelinkBoard.TL7218X),
         TargetPart('tl7218x_ml7g', board=TelinkBoard.TL7218X_ML7G),
         TargetPart('tl7218x_ml7m', board=TelinkBoard.TL7218X_ML7M),
@@ -896,6 +901,7 @@ def BuildTelinkTarget():
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
     target.AppendModifier('compress-lzma', compress_lzma_config=True)
+    target.AppendModifier('concurrent-connection', enable_concurrent_connection=True)
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)

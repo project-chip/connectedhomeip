@@ -3363,6 +3363,9 @@ class ChipClusters:
                 "commandName": "CertificateChainRequest",
                 "args": {
                     "certificateType": "int",
+                    "cryptoProfile": "int",
+                    "segmentID": "int",
+                    "maxSegmentSize": "int",
                 },
             },
             0x00000004: {
@@ -3468,6 +3471,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000006: {
+                "attributeName": "PQCDeviceAttestationProfile",
+                "attributeId": 0x00000006,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -3557,13 +3566,6 @@ class ChipClusters:
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "GroupcastAdoption",
-                "attributeId": 0x00000004,
-                "type": "",
-                "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -4065,6 +4067,13 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4076,6 +4085,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -4306,6 +4321,13 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4317,6 +4339,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -4363,6 +4391,13 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4374,6 +4409,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -4484,6 +4525,13 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4495,6 +4543,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -4541,6 +4595,13 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4552,6 +4613,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -4736,6 +4803,13 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4747,6 +4821,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -5046,6 +5126,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -5466,6 +5552,83 @@ class ChipClusters:
                 "attributeName": "FabricSceneInfo",
                 "attributeId": 0x00000002,
                 "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _THERMOSTAT_MODE_CLUSTER_INFO = {
+        "clusterName": "ThermostatMode",
+        "clusterId": 0x00000063,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -6482,6 +6645,8 @@ class ChipClusters:
                     "duration": "int",
                     "messageText": "str",
                     "responses": "MessageResponseOptionStruct",
+                    "languageCode": "str",
+                    "messageURI": "str",
                 },
             },
             0x00000001: {
@@ -6503,6 +6668,18 @@ class ChipClusters:
                 "attributeName": "ActiveMessageIDs",
                 "attributeId": 0x00000001,
                 "type": "bytes",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "SupportedLanguageCodes",
+                "attributeId": 0x00000002,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "SupportedMimeTypes",
+                "attributeId": 0x00000003,
+                "type": "str",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -7070,6 +7247,13 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -7081,6 +7265,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -7127,6 +7317,13 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -7138,6 +7335,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -7184,6 +7387,13 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ChangeToModeByCoreTag",
+                "args": {
+                    "newModeTag": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -7195,6 +7405,12 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "CurrentMode",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "CoreModeTags",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -9340,6 +9556,51 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000057: {
+                "attributeName": "CriticalFreezeProtection",
+                "attributeId": 0x00000057,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000058: {
+                "attributeName": "CriticalOverheatProtection",
+                "attributeId": 0x00000058,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000059: {
+                "attributeName": "Sensors",
+                "attributeId": 0x00000059,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000005A: {
+                "attributeName": "AvailableSensorHandles",
+                "attributeId": 0x0000005A,
+                "type": "bytes",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000005B: {
+                "attributeName": "EnabledSensorHandles",
+                "attributeId": 0x0000005B,
+                "type": "bytes",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000005C: {
+                "attributeName": "NumberOfSensorScheduleTransitions",
+                "attributeId": 0x0000005C,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000005D: {
+                "attributeName": "SensorSchedule",
+                "attributeId": 0x0000005D,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -9575,69 +9836,94 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Mode",
+                "attributeName": "SupportedModes",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "SystemState",
+                "attributeName": "Mode",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
             },
             0x00000002: {
-                "attributeName": "UserSetpoint",
+                "attributeName": "SystemState",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "MinSetpoint",
+                "attributeName": "UserSetpoint",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
             },
             0x00000004: {
-                "attributeName": "MaxSetpoint",
+                "attributeName": "MinSetpoint",
                 "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "Step",
+                "attributeName": "MaxSetpoint",
                 "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
             },
             0x00000006: {
-                "attributeName": "TargetSetpoint",
+                "attributeName": "Step",
                 "attributeId": 0x00000006,
                 "type": "int",
                 "reportable": True,
             },
             0x00000007: {
-                "attributeName": "MistType",
+                "attributeName": "TargetSetpoint",
                 "attributeId": 0x00000007,
                 "type": "int",
                 "reportable": True,
             },
             0x00000008: {
-                "attributeName": "Continuous",
+                "attributeName": "MistType",
                 "attributeId": 0x00000008,
-                "type": "bool",
+                "type": "int",
                 "reportable": True,
+                "writable": True,
             },
             0x00000009: {
-                "attributeName": "Sleep",
+                "attributeName": "Continuous",
                 "attributeId": 0x00000009,
                 "type": "bool",
                 "reportable": True,
+                "writable": True,
             },
             0x0000000A: {
-                "attributeName": "Optimal",
+                "attributeName": "Sleep",
                 "attributeId": 0x0000000A,
                 "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000B: {
+                "attributeName": "Optimal",
+                "attributeId": 0x0000000B,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000C: {
+                "attributeName": "CondPumpEnabled",
+                "attributeId": 0x0000000C,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000D: {
+                "attributeName": "CondRunCount",
+                "attributeId": 0x0000000D,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -12197,7 +12483,6 @@ class ChipClusters:
                     "BLTChannelSoundingDeviceRoleConfig": "BLTChannelSoundingDeviceRoleConfigStruct",
                     "frequencyBand": "int",
                     "bandwidth": "int",
-                    "securityMode": "int",
                     "trigger": "RangingTriggerConditionStruct",
                     "reportingCondition": "ReportingConditionStruct",
                 },
@@ -12251,6 +12536,12 @@ class ChipClusters:
                 "attributeName": "SessionIDList",
                 "attributeId": 0x00000006,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "RangingConstraints",
+                "attributeId": 0x00000007,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -13806,8 +14097,20 @@ class ChipClusters:
                     "node": "int",
                 },
             },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "GetDeviceAuthURI",
+                "args": {
+                },
+            },
         },
         "attributes": {
+            0x00000000: {
+                "attributeName": "OAuthLoggedIn",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -14420,6 +14723,8 @@ class ChipClusters:
                 "commandName": "CreateTwoDCartesianZone",
                 "args": {
                     "zone": "TwoDCartesianZoneStruct",
+                    "nodeID": "int",
+                    "endpointID": "int",
                 },
             },
             0x00000002: {
@@ -14428,6 +14733,8 @@ class ChipClusters:
                 "args": {
                     "zoneID": "int",
                     "zone": "TwoDCartesianZoneStruct",
+                    "nodeID": "int",
+                    "endpointID": "int",
                 },
             },
             0x00000003: {
@@ -15320,6 +15627,15 @@ class ChipClusters:
                     "connectionID": "int",
                 },
             },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "UpdateMotionZoneOptions",
+                "args": {
+                    "connectionID": "int",
+                    "motionZones": "TransportZoneOptionsStruct",
+                    "motionSensitivity": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -15332,6 +15648,12 @@ class ChipClusters:
                 "attributeName": "CurrentConnections",
                 "attributeId": 0x00000001,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxZones",
+                "attributeId": 0x00000002,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -17645,6 +17967,7 @@ class ChipClusters:
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000062: _SCENES_MANAGEMENT_CLUSTER_INFO,
+        0x00000063: _THERMOSTAT_MODE_CLUSTER_INFO,
         0x00000065: _GROUPCAST_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
@@ -17805,6 +18128,7 @@ class ChipClusters:
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
         "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         "ScenesManagement": _SCENES_MANAGEMENT_CLUSTER_INFO,
+        "ThermostatMode": _THERMOSTAT_MODE_CLUSTER_INFO,
         "Groupcast": _GROUPCAST_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,

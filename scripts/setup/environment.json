@@ -1,8 +1,5 @@
 {
-    "cipd_package_files": [
-        "third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/arm.json",
-        "scripts/setup/zap.json"
-    ],
+    "cipd_package_files": ["scripts/setup/arm.json", "scripts/setup/zap.json"],
     "virtualenv": {
         "gn_root": ".",
         "gn_targets": [":python_packages.install"],

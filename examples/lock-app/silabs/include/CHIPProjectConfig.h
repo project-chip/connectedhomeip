@@ -130,15 +130,18 @@ static constexpr uint8_t kNumCredentialTypes         = 6;
  * A size, in bytes, of an individual credential.
  */
 
-#define DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH SilabsDoorLockConfig::ResourceRanges::kMaxCredentialsPerUser
+#define DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH SilabsDoorLockConfig::ResourceRanges::kMaxCredentialSize
 /**
- * DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH
+ * DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH
  *
  * Number of CredentialStructs attached to a user.
  */
-#define DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH SilabsDoorLockConfig::ResourceRanges::kMaxCredentialSize
+#define DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH SilabsDoorLockConfig::ResourceRanges::kMaxCredentialsPerUser
 
 // Enable `Extension` attribute of ACL Cluster as required by door locks
 #ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 #endif
+
+// Route BaseApplication data-model posts and Rpc button path through CustomerAppTask / AppTaskImpl (CRTP).
+#define CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK

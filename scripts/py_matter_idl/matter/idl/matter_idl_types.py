@@ -14,7 +14,6 @@
 
 import enum
 from dataclasses import dataclass, field
-from typing import Optional
 
 from lark.tree import Meta
 
@@ -31,11 +30,11 @@ class ApiMaturity(enum.Enum):
 
 @dataclass
 class ParseMetaData:
-    line: Optional[int]
-    column: Optional[int]
-    start_pos: Optional[int]
+    line: int | None
+    column: int | None
+    start_pos: int | None
 
-    def __init__(self, meta: Optional[Meta] = None, line: Optional[int] = None, column: Optional[int] = None, start_pos: Optional[int] = None):
+    def __init__(self, meta: Meta | None = None, line: int | None = None, column: int | None = None, start_pos: int | None = None):
         if meta:
             self.line = getattr(meta, 'line', None)
             self.column = getattr(meta, 'column', None)
@@ -118,12 +117,12 @@ class DataType:
     name: str
 
     # Applies for strings (char or binary)
-    min_length: Optional[int] = None
-    max_length: Optional[int] = None
+    min_length: int | None = None
+    max_length: int | None = None
 
     # Applies for numbers
-    min_value: Optional[int] = None
-    max_value: Optional[int] = None
+    min_value: int | None = None
+    max_value: int | None = None
 
 
 @dataclass
@@ -134,10 +133,10 @@ class Field:
     is_list: bool = False
     qualities: FieldQuality = FieldQuality.NONE
     api_maturity: ApiMaturity = ApiMaturity.STABLE
-    description: Optional[str] = None
+    description: str | None = None
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
     @property
     def is_optional(self) -> bool:
@@ -154,7 +153,7 @@ class Attribute:
     qualities: AttributeQuality = AttributeQuality.NONE
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     writeacl: AccessPrivilege = AccessPrivilege.OPERATE
-    default: Optional[str | int] = None
+    default: str | int | None = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
@@ -186,16 +185,16 @@ class Attribute:
 class Struct:
     name: str
     fields: list[Field]
-    tag: Optional[StructTag] = None
-    code: Optional[int] = None  # for responses only
+    tag: StructTag | None = None
+    code: int | None = None  # for responses only
     qualities: StructQuality = StructQuality.NONE
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
-    description: Optional[str] = None
+    description: str | None = None
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
 
 @dataclass
@@ -206,11 +205,11 @@ class Event:
     fields: list[Field]
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     qualities: EventQuality = EventQuality.NONE
-    description: Optional[str] = None
+    description: str | None = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
     @property
     def is_fabric_sensitive(self) -> bool:
@@ -227,11 +226,11 @@ class ConstantEntry:
     code: int
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     # If set, shows the specification name including spaces and special characters.
-    specification_name: Optional[str] = None
-    description: Optional[str] = None
+    specification_name: str | None = None
+    description: str | None = None
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
 
 @dataclass
@@ -242,10 +241,10 @@ class Enum:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
-    description: Optional[str] = None
+    description: str | None = None
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
 
 @dataclass
@@ -256,25 +255,25 @@ class Bitmap:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
-    description: Optional[str] = None
+    description: str | None = None
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
 
 @dataclass
 class Command:
     name: str
     code: int
-    input_param: Optional[str]
+    input_param: str | None
     output_param: str
     qualities: CommandQuality = CommandQuality.NONE
     invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
-    description: Optional[str] = None
+    description: str | None = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
     @property
     def is_timed_invoke(self) -> bool:
@@ -296,21 +295,21 @@ class Cluster:
     attributes: list[Attribute] = field(default_factory=list)
     structs: list[Struct] = field(default_factory=list)
     commands: list[Command] = field(default_factory=list)
-    description: Optional[str] = None
+    description: str | None = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
 
 @dataclass
 class AttributeInstantiation:
     name: str
     storage: AttributeStorage
-    default: Optional[str | int | bool] = None
+    default: str | int | bool | None = None
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
 
 @dataclass
@@ -318,7 +317,7 @@ class CommandInstantiation:
     name: str
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
 
 @dataclass
@@ -329,7 +328,7 @@ class ServerClusterInstantiation:
     events_emitted: set[str] = field(default_factory=set)
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+    parse_meta: ParseMetaData | None = field(default=None, compare=False)
 
 
 @dataclass
@@ -359,4 +358,4 @@ class Idl:
     global_structs: list[Struct] = field(default_factory=list)
 
     # IDL file name is available only if parsing provides a file name
-    parse_file_name: Optional[str] = field(default=None)
+    parse_file_name: str | None = field(default=None)

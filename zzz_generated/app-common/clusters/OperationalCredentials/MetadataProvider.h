@@ -35,6 +35,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OperationalC
             return TrustedRootCertificates::kMetadataEntry;
         case CurrentFabricIndex::Id:
             return CurrentFabricIndex::kMetadataEntry;
+        case PQCDeviceAttestationProfile::Id:
+            return PQCDeviceAttestationProfile::kMetadataEntry;
         default:
             return std::nullopt;
         }

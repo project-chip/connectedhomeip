@@ -19,21 +19,6 @@
 #include <devices/Types.h>
 
 namespace chip::app {
-namespace {
-
-const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface1Tag = {
-    .mfgCode     = DataModel::NullNullable,
-    .namespaceID = CommonNamespace::kPositionId,
-    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft),
-};
-
-const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface2Tag = {
-    .mfgCode     = DataModel::NullNullable,
-    .namespaceID = CommonNamespace::kPositionId,
-    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight),
-};
-
-} // namespace
 
 // CookSurfacePart
 
@@ -76,11 +61,7 @@ void CookSurfacePart::Unregister(CodeDrivenDataModelProvider & provider)
 
 // Cooktop
 
-Cooktop::Cooktop(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surface1OnOff, Clusters::OnOffDelegate & surface2OnOff,
-                 Clusters::IdentifyDelegate & surface1Identify, Clusters::IdentifyDelegate & surface2Identify) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCooktop, 1)),
-    mSurface1(timerDelegate, surface1OnOff, surface1Identify), mSurface2(timerDelegate, surface2OnOff, surface2Identify)
-{}
+Cooktop::Cooktop() : DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCooktop, 1)) {}
 
 CHIP_ERROR Cooktop::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                              EndpointComposition composition)
@@ -95,12 +76,7 @@ CHIP_ERROR Cooktop::Register(EndpointIdAllocator & allocator, CodeDrivenDataMode
         EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mSurface1.Register(
-        allocator.Allocate(), provider,
-        EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface1Tag, 1))));
-    ReturnErrorOnFailure(mSurface2.Register(
-        allocator.Allocate(), provider,
-        EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface2Tag, 1))));
+    ReturnErrorOnFailure(RegisterParts(allocator, provider));
 
     transaction.Commit();
     return CHIP_NO_ERROR;
@@ -108,9 +84,7 @@ CHIP_ERROR Cooktop::Register(EndpointIdAllocator & allocator, CodeDrivenDataMode
 
 void Cooktop::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mSurface2.Unregister(provider);
-    mSurface1.Unregister(provider);
-
+    UnregisterParts(provider);
     UnregisterDescriptor(mEndpointId, provider);
     mEndpointId = kInvalidEndpointId;
 }

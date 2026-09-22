@@ -16,6 +16,8 @@
  */
 #include "NetworkCommissioningCluster.h"
 
+#include "constants.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -121,6 +123,14 @@ BitFlags<Feature> WiFiFeatures(WiFiDriver * driver)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     return features;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+Nullable<ByteSpan> AsNullableSpan(const Optional<CertificateKeyIdStorage> & keyId)
+{
+    VerifyOrReturnValue(keyId.HasValue(), NullNullable);
+    return MakeNullable<ByteSpan>(keyId.Value());
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 /// Convenience macro to auto-create a variable for you to release the given name at
 /// the exit of the current scope.
@@ -379,7 +389,7 @@ NetworkCommissioningCluster::HandleAddOrUpdateWiFiNetwork(CommandHandler & handl
     if (req.networkIdentity.HasValue())
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-        if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+        if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
         {
             return HandleAddOrUpdateWiFiNetworkWithPDC(handler, commandPath, req);
         }
@@ -447,7 +457,7 @@ NetworkCommissioningCluster::HandleAddOrUpdateWiFiNetworkWithPDC(CommandHandler 
     // Credentials must be empty when configuring for PDC, it's only present to keep the command shape compatible.
     if (!req.credentials.empty())
     {
-        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "credentials");
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand, "credentials");
         return std::nullopt;
     }
 
@@ -455,7 +465,7 @@ NetworkCommissioningCluster::HandleAddOrUpdateWiFiNetworkWithPDC(CommandHandler 
     if (networkIdentity.size() > kMaxCHIPCompactNetworkIdentityLength ||
         Credentials::ValidateChipNetworkIdentity(networkIdentity) != CHIP_NO_ERROR)
     {
-        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError, "networkIdentity");
+        handler.AddStatus(commandPath, Protocols::InteractionModel::Status::DynamicConstraintError, "networkIdentity");
         return std::nullopt;
     }
 
@@ -501,11 +511,11 @@ NetworkCommissioningCluster::HandleAddOrUpdateWiFiNetworkWithPDC(CommandHandler 
         // Allocate a buffer to hold the client identity, and leave enough room to append the possession nonce if needed.
         chip::Platform::ScopedMemoryBuffer<uint8_t> identityBuffer;
         size_t identityBufferSize = kMaxCHIPCompactNetworkIdentityLength + (provePossession ? kPossessionNonceSize : 0);
-        VerifyOrExit(identityBuffer.Alloc(identityBufferSize), /**/);
+        VerifyOrExit(identityBuffer.Alloc(identityBufferSize), err = CHIP_ERROR_NO_MEMORY);
 
         // Add/Update the network at the driver level
         MutableByteSpan clientIdentity(identityBuffer.Get(), kMaxCHIPCompactNetworkIdentityLength);
-        Optional<P256ECDSASignature> possessionSignature;
+        Optional<Crypto::P256ECDSASignature> possessionSignature;
         Status status = Status::kUnknownError;
         DebugTextStorage debugTextBuffer;
         MutableCharSpan debugText(debugTextBuffer);
@@ -749,10 +759,10 @@ NetworkCommissioningCluster::HandleQueryIdentity(CommandHandler & handler, const
         // Allocate a buffer to hold the identity, and leave enough room to append the possession nonce if needed.
         chip::Platform::ScopedMemoryBuffer<uint8_t> identityBuffer;
         size_t identityBufferSize = kMaxCHIPCompactNetworkIdentityLength + (provePossession ? kPossessionNonceSize : 0);
-        VerifyOrExit(identityBuffer.Alloc(identityBufferSize), /**/);
+        VerifyOrExit(identityBuffer.Alloc(identityBufferSize), err = CHIP_ERROR_NO_MEMORY);
 
         MutableByteSpan identity(identityBuffer.Get(), kMaxCHIPCompactNetworkIdentityLength);
-        Optional<P256ECDSASignature> possessionSignature;
+        Optional<Crypto::P256ECDSASignature> possessionSignature;
 
         Network network;
         for (uint8_t networkIndex = 0;; networkIndex++)
@@ -1017,8 +1027,8 @@ CHIP_ERROR NetworkCommissioningCluster::EncodeNetworks(AttributeValueEncoder & l
             // If PDC is supported, the fields are always present but may be null.
             if (mFeatureFlags.Has(Feature::kPerDeviceCredentials))
             {
-                networkForEncode.networkIdentifier = MakeOptional(Nullable<ByteSpan>(network.networkIdentifier));
-                networkForEncode.clientIdentifier  = MakeOptional(Nullable<ByteSpan>(network.clientIdentifier));
+                networkForEncode.networkIdentifier = MakeOptional(AsNullableSpan(network.networkIdentifier));
+                networkForEncode.clientIdentifier  = MakeOptional(AsNullableSpan(network.clientIdentifier));
             }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 

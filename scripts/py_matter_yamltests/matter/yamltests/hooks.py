@@ -13,7 +13,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from typing import Optional
 
 from .parser import TestStep
 
@@ -212,7 +211,7 @@ class TestRunnerHooks:
         """
         pass
 
-    async def step_manual(self, request: Optional[TestStep] = None):
+    async def step_manual(self, request: TestStep | None = None):
         """
         This method is called when the step is executed manually.
         """
@@ -220,9 +219,9 @@ class TestRunnerHooks:
 
     async def show_prompt(self,
                           msg: str,
-                          placeholder: Optional[str] = None,
-                          default_value: Optional[str] = None,
-                          endpoint_id: Optional[int] = None,
+                          placeholder: str | None = None,
+                          default_value: str | None = None,
+                          endpoint_id: int | None = None,
                           ) -> str | None:
         """
         This method is called when the step needs to ask the user to perform some action or provide some value.

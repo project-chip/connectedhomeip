@@ -34,6 +34,28 @@ class TestSubprocess(unittest.TestCase):
             p.start(expected_output="Python 1.0.0", timeout=1)
         p.terminate()
 
+    def test_wait_for_armed_output(self):
+        p = Subprocess("python3", "-c", "print('armed line')")
+        p.arm_output_match("armed line")
+        p.start()
+        self.assertTrue(p.wait_for_output(timeout=5))
+        p.terminate()
+
+    def test_wait_for_armed_output_timeout(self):
+        p = Subprocess("python3", "-c", "print('some other line')")
+        p.arm_output_match("armed line")
+        p.start()
+        self.assertFalse(p.wait_for_output(timeout=1))
+        p.terminate()
+
+    def test_arm_output_match_discards_previous_match(self):
+        p = Subprocess("python3", "-c", "print('Hello, World!')")
+        p.start(expected_output="Hello, World!", timeout=5)
+        # start() leaves its own match set; re-arming must not report it as a fresh match.
+        p.arm_output_match("never printed")
+        self.assertFalse(p.wait_for_output(timeout=0))
+        p.terminate()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -33,11 +33,38 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device color-temperature-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device extended-color-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 from enum import Enum
-from typing import Optional
 
 from mobly import asserts
 
@@ -173,7 +200,7 @@ class TC_CC_2_1(MatterBaseTest):
                 log.warning("PrimaryN<X,Y,Intensity> with index %s was not found in the cluster.", pindex)
         return numberofprimaries
 
-    async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None, nullable: bool = False):
+    async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: list | None = None, min_len: int | None = None, max_len: int | None = None, nullable: bool = False):
         """Verify the attribute exists and value is the specific type of value.
 
         Args:

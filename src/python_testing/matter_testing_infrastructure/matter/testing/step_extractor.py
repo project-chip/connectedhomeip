@@ -33,7 +33,6 @@ dynamic steps should define an explicit steps_* method instead.
 import ast
 import inspect
 import textwrap
-from typing import Optional
 
 from matter.testing.runner import TestStep
 
@@ -58,7 +57,7 @@ class _StepExtractorVisitor(ast.NodeVisitor):
                 "Define an explicit steps_* method for tests with dynamic step arguments.")
         return node.value
 
-    def _extract_step(self, node: ast.Call) -> Optional[TestStep]:
+    def _extract_step(self, node: ast.Call) -> TestStep | None:
         if not node.args:
             return None
 

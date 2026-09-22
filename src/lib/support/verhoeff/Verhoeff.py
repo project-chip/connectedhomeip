@@ -125,13 +125,13 @@ def VerifyCheckChar36(s, charSet=CharSet_Base36):
 
 if __name__ == "__main__":
 
-    usage = """Usage: %s <command> [ <args> ]
+    usage = f"""Usage: {sys.argv[0]} <command> [ <args> ]
 
 Commands:
   generate <string>
   verify <string-with-check-digit>
   gen-multiply-table <base>
-""" % (sys.argv[0])
+"""
 
     if (len(sys.argv) < 2):
         print(usage)
@@ -140,16 +140,16 @@ Commands:
             print(usage)
             sys.exit(-1)
         ch = ComputeCheckChar(sys.argv[2])
-        print("%s%c" % (sys.argv[2], ch))
+        print(f"{sys.argv[2]}{ch}")
     elif (sys.argv[1] == "verify"):
         if (len(sys.argv) < 3):
             print(usage)
             sys.exit(-1)
         if (VerifyCheckChar(sys.argv[2])):
-            print("%s is VALID" % (sys.argv[2]))
+            print(f"{sys.argv[2]} is VALID")
             sys.exit(0)
         else:
-            print("%s is INVALID" % (sys.argv[2]))
+            print(f"{sys.argv[2]} is INVALID")
             sys.exit(-1)
     elif (sys.argv[1] == "gen-multiply-table"):
         if (len(sys.argv) < 3):
@@ -164,7 +164,7 @@ Commands:
             sys.stdout.write("    ")
             for y in range(0, base):
                 o = DihedralMultiply(x, y, n)
-                sys.stdout.write("%2d, " % o)
+                sys.stdout.write(f"{o:2d}, ")
             sys.stdout.write("\n")
     else:
         print(usage)

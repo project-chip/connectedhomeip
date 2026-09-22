@@ -19,7 +19,9 @@ import argparse
 import ast
 import logging
 import re
-from typing import Any, Mapping, MutableMapping, Optional, Pattern, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
+from re import Pattern
+from typing import Any
 
 import humanfriendly  # type: ignore
 import memdf.util.nd as nd
@@ -171,7 +173,7 @@ class Config:
             if postprocess := info.get('postprocess'):
                 self.postprocess_args[key] = (postprocess, info)
 
-            group: Optional[str] = info.get('group')
+            group: str | None = info.get('group')
             if group is None and (e := key.find('.')) > 0:
                 group = key[0:e]
             group = self.group_alias.get(group, group)
@@ -259,18 +261,18 @@ class Config:
                 d[v] = k
         return d
 
-    def getl_re(self, key: nd.Key) -> Optional[Pattern]:
+    def getl_re(self, key: nd.Key) -> Pattern | None:
         """Get a cached compiled regular expression for a config value list."""
         regex_key: nd.Key = ['cache', 're'] + key
-        regex: Optional[Pattern] = self.getl(regex_key)
+        regex: Pattern | None = self.getl(regex_key)
         if not regex:
-            branches: Optional[Sequence[str]] = self.getl(key)
+            branches: Sequence[str] | None = self.getl(key)
             if branches:
                 regex = re.compile('|'.join(branches))
             self.putl(regex_key, regex)
         return regex
 
-    def get_re(self, key: str) -> Optional[Pattern]:
+    def get_re(self, key: str) -> Pattern | None:
         return self.getl_re(key.split('.'))
 
 

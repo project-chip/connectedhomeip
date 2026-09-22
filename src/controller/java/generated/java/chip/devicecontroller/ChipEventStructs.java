@@ -4292,6 +4292,82 @@ public static class MessagesClusterMessageCompleteEvent {
     return output.toString();
   }
 }
+public static class MessagesClusterMessageNotPresentedEvent {
+  public byte[] messageID;
+  public Boolean removedFromQueue;
+  public Integer fabricIndex;
+  private static final long MESSAGE_ID_ID = 0L;
+  private static final long REMOVED_FROM_QUEUE_ID = 1L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public MessagesClusterMessageNotPresentedEvent(
+    byte[] messageID,
+    Boolean removedFromQueue,
+    Integer fabricIndex
+  ) {
+    this.messageID = messageID;
+    this.removedFromQueue = removedFromQueue;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_ID_ID, new ByteArrayType(messageID)));
+    values.add(new StructElement(REMOVED_FROM_QUEUE_ID, new BooleanType(removedFromQueue)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageNotPresentedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    Boolean removedFromQueue = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == REMOVED_FROM_QUEUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          removedFromQueue = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new MessagesClusterMessageNotPresentedEvent(
+      messageID,
+      removedFromQueue,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageNotPresentedEvent {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("\tremovedFromQueue: ");
+    output.append(removedFromQueue);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementClusterPowerAdjustStartEvent {
 
   public DeviceEnergyManagementClusterPowerAdjustStartEvent(
@@ -7136,17 +7212,22 @@ public static class AmbientContextSensingClusterAmbientContextDetectEndedEvent {
 }
 public static class AmbientSensingUnionClusterUnionContributorAddedEvent {
   public ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor;
+  public Integer fabricIndex;
   private static final long ADDED_CONTRIBUTOR_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public AmbientSensingUnionClusterUnionContributorAddedEvent(
-    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor,
+    Integer fabricIndex
   ) {
     this.addedContributor = addedContributor;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ADDED_CONTRIBUTOR_ID, ArrayType.generateArrayType(addedContributor, (elementaddedContributor) -> elementaddedContributor.encodeTlv())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -7156,16 +7237,23 @@ public static class AmbientSensingUnionClusterUnionContributorAddedEvent {
       return null;
     }
     ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ADDED_CONTRIBUTOR_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
           addedContributor = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(elementcastingValue));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new AmbientSensingUnionClusterUnionContributorAddedEvent(
-      addedContributor
+      addedContributor,
+      fabricIndex
     );
   }
 
@@ -7176,23 +7264,31 @@ public static class AmbientSensingUnionClusterUnionContributorAddedEvent {
     output.append("\taddedContributor: ");
     output.append(addedContributor);
     output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
 public static class AmbientSensingUnionClusterUnionContributorRemovedEvent {
   public ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor;
+  public Integer fabricIndex;
   private static final long REMOVED_CONTRIBUTOR_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public AmbientSensingUnionClusterUnionContributorRemovedEvent(
-    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor,
+    Integer fabricIndex
   ) {
     this.removedContributor = removedContributor;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(REMOVED_CONTRIBUTOR_ID, ArrayType.generateArrayType(removedContributor, (elementremovedContributor) -> elementremovedContributor.encodeTlv())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -7202,16 +7298,23 @@ public static class AmbientSensingUnionClusterUnionContributorRemovedEvent {
       return null;
     }
     ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == REMOVED_CONTRIBUTOR_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
           removedContributor = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(elementcastingValue));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new AmbientSensingUnionClusterUnionContributorRemovedEvent(
-      removedContributor
+      removedContributor,
+      fabricIndex
     );
   }
 
@@ -7222,23 +7325,31 @@ public static class AmbientSensingUnionClusterUnionContributorRemovedEvent {
     output.append("\tremovedContributor: ");
     output.append(removedContributor);
     output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
 public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent {
-  public ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> statusChangedContributor;
-  private static final long STATUS_CHANGED_CONTRIBUTOR_ID = 0L;
+  public ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange;
+  public Integer fabricIndex;
+  private static final long CONTRIBUTOR_STATUS_CHANGE_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
-    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> statusChangedContributor
+    ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange,
+    Integer fabricIndex
   ) {
-    this.statusChangedContributor = statusChangedContributor;
+    this.contributorStatusChange = contributorStatusChange;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(STATUS_CHANGED_CONTRIBUTOR_ID, ArrayType.generateArrayType(statusChangedContributor, (elementstatusChangedContributor) -> elementstatusChangedContributor.encodeTlv())));
+    values.add(new StructElement(CONTRIBUTOR_STATUS_CHANGE_ID, ArrayType.generateArrayType(contributorStatusChange, (elementcontributorStatusChange) -> elementcontributorStatusChange.encodeTlv())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -7247,17 +7358,24 @@ public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> statusChangedContributor = null;
+    ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == STATUS_CHANGED_CONTRIBUTOR_ID) {
+      if (element.contextTagNum() == CONTRIBUTOR_STATUS_CHANGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          statusChangedContributor = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(elementcastingValue));
+          contributorStatusChange = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
         }
       }
     }
     return new AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
-      statusChangedContributor
+      contributorStatusChange,
+      fabricIndex
     );
   }
 
@@ -7265,8 +7383,11 @@ public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("AmbientSensingUnionClusterUnionContributorStatusChangedEvent {\n");
-    output.append("\tstatusChangedContributor: ");
-    output.append(statusChangedContributor);
+    output.append("\tcontributorStatusChange: ");
+    output.append(contributorStatusChange);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -7863,21 +7984,31 @@ public static class MediaFileManagementClusterSharedFilesAddedEvent {
 public static class ZoneManagementClusterZoneTriggeredEvent {
   public Integer zone;
   public Integer reason;
+  public Optional<Long> nodeID;
+  public Optional<Integer> endpointID;
   private static final long ZONE_ID = 0L;
   private static final long REASON_ID = 1L;
+  private static final long NODE_ID_ID = 2L;
+  private static final long ENDPOINT_ID_ID = 3L;
 
   public ZoneManagementClusterZoneTriggeredEvent(
     Integer zone,
-    Integer reason
+    Integer reason,
+    Optional<Long> nodeID,
+    Optional<Integer> endpointID
   ) {
     this.zone = zone;
     this.reason = reason;
+    this.nodeID = nodeID;
+    this.endpointID = endpointID;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ZONE_ID, new UIntType(zone)));
     values.add(new StructElement(REASON_ID, new UIntType(reason)));
+    values.add(new StructElement(NODE_ID_ID, nodeID.<BaseTLVType>map((nonOptionalnodeID) -> new UIntType(nonOptionalnodeID)).orElse(new EmptyType())));
+    values.add(new StructElement(ENDPOINT_ID_ID, endpointID.<BaseTLVType>map((nonOptionalendpointID) -> new UIntType(nonOptionalendpointID)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -7888,6 +8019,8 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
     }
     Integer zone = null;
     Integer reason = null;
+    Optional<Long> nodeID = Optional.empty();
+    Optional<Integer> endpointID = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ZONE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -7899,11 +8032,23 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
           UIntType castingValue = element.value(UIntType.class);
           reason = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          nodeID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new ZoneManagementClusterZoneTriggeredEvent(
       zone,
-      reason
+      reason,
+      nodeID,
+      endpointID
     );
   }
 
@@ -7917,6 +8062,12 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
     output.append("\treason: ");
     output.append(reason);
     output.append("\n");
+    output.append("\tnodeID: ");
+    output.append(nodeID);
+    output.append("\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
@@ -7924,21 +8075,31 @@ public static class ZoneManagementClusterZoneTriggeredEvent {
 public static class ZoneManagementClusterZoneStoppedEvent {
   public Integer zone;
   public Integer reason;
+  public Optional<Long> nodeID;
+  public Optional<Integer> endpointID;
   private static final long ZONE_ID = 0L;
   private static final long REASON_ID = 1L;
+  private static final long NODE_ID_ID = 2L;
+  private static final long ENDPOINT_ID_ID = 3L;
 
   public ZoneManagementClusterZoneStoppedEvent(
     Integer zone,
-    Integer reason
+    Integer reason,
+    Optional<Long> nodeID,
+    Optional<Integer> endpointID
   ) {
     this.zone = zone;
     this.reason = reason;
+    this.nodeID = nodeID;
+    this.endpointID = endpointID;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ZONE_ID, new UIntType(zone)));
     values.add(new StructElement(REASON_ID, new UIntType(reason)));
+    values.add(new StructElement(NODE_ID_ID, nodeID.<BaseTLVType>map((nonOptionalnodeID) -> new UIntType(nonOptionalnodeID)).orElse(new EmptyType())));
+    values.add(new StructElement(ENDPOINT_ID_ID, endpointID.<BaseTLVType>map((nonOptionalendpointID) -> new UIntType(nonOptionalendpointID)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -7949,6 +8110,8 @@ public static class ZoneManagementClusterZoneStoppedEvent {
     }
     Integer zone = null;
     Integer reason = null;
+    Optional<Long> nodeID = Optional.empty();
+    Optional<Integer> endpointID = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ZONE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -7960,11 +8123,23 @@ public static class ZoneManagementClusterZoneStoppedEvent {
           UIntType castingValue = element.value(UIntType.class);
           reason = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == NODE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          nodeID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new ZoneManagementClusterZoneStoppedEvent(
       zone,
-      reason
+      reason,
+      nodeID,
+      endpointID
     );
   }
 
@@ -7977,6 +8152,12 @@ public static class ZoneManagementClusterZoneStoppedEvent {
     output.append("\n");
     output.append("\treason: ");
     output.append(reason);
+    output.append("\n");
+    output.append("\tnodeID: ");
+    output.append(nodeID);
+    output.append("\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
     output.append("\n");
     output.append("}\n");
     return output.toString();

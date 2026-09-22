@@ -61,10 +61,9 @@
 import asyncio
 import enum
 import logging
-from typing import Optional
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
-from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_valid_cm_key,
+from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_txt_record_present, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
                                           assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
@@ -93,8 +92,17 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#341-tc-sc-41-commissionable-node-discovery-dut_commissionee
 '''
 
-TCP_PICS_STR = "MCORE.SC.TCP"
+TCP_PICS_STR = "MCORE.SC.S.TCP"
 ROOT_NODE_ENDPOINT_ID = 0
+
+# Timeout for a single subtype PTR browse:
+#   - Browses that get an answer end early via MdnsDiscovery's discovery-silence
+#     monitor; the full 5s is only paid by candidates that never answer.
+#   - Sized so an unanswered browse still spans the initial mDNS query plus two
+#     retransmissions (RFC 6762 §5.2: queries at ~0/1/3s) before the subtype is
+#     treated as not advertised.
+#   - Candidates browse concurrently, so a verification pass pays one 5s window total.
+SUBTYPE_BROWSE_TIMEOUT_SEC = 5
 
 
 class SetupCodeType(enum.IntEnum):
@@ -104,129 +112,138 @@ class SetupCodeType(enum.IntEnum):
 
 
 class TC_SC_4_1(MatterBaseTest):
+    # Cached by get_exposed_device_types() so its per-endpoint Descriptor
+    # reads run once per test instead of once per verification pass
+    _exposed_device_types: set[int] | None = None
 
     def steps_TC_SC_4_1(self):
         return [
+            TestStep("precondition", "DUT is commissioned on the same fabric as TH.", is_commissioning=True),
+
             # DUT DETAILS
             #
-            TestStep(1, "DUT is commissioned.", is_commissioning=True),
+            TestStep(1, "TH reads ServerList attribute from the Descriptor cluster on EP0.",
+                        "If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to True, otherwise set supports_icd to False."),
 
-            TestStep(2, """Check if the ICD Management cluster is present""",
-                        """TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0
-                            - Set supports_icd to True if present, otherwise, to False
-                            - If supports_icd is True
-                                - TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms"""),
 
-            TestStep(3, """Check if the LITS (Long Idle Time Support) feature is supported""",
-                        """If supports_icd is True:
-                            - TH checks for support of the LITS feature by reading from the DUT the FeatureMap attribute from the ICD Management cluster on EP0
-                                - Set supports_lit to True if supported, otherwise, to False"""),
+            TestStep(2, "If supports_icd is true:",
+                     """- TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms
+                            - TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature is set, set supports_lit to True. Otherwise set supports_lit to False."""),
 
-            TestStep(4, """Check if the DUT supports TCP""",
-                     """Set supports_tcp_dut to True if supported, otherwise, to False"""),
+            TestStep(3, "TH checks if TCP is supported by the PICS.",
+                     "Set supports_tcp_pics to True if supported, otherwise, to False"),
 
-            TestStep(5, """Check if TCP is supported per PICS""",
-                        """Set supports_tcp_pics to True if supported, otherwise, to False"""),
+            TestStep(4, "TH determines if the operational TXT record is required.",
+                        "If supports_icd or supports_tcp_pics is True, set txt_record_required to True, otherwise set txt_record_required to False."),
 
-            TestStep(6, """Check the setup code type used during commissioning (QR or Manual)""",
-                        """Save as setup_code_type"""),
+            TestStep(5, "TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.", ""),
 
-            TestStep(7, """Check if the Open Basic Commissioning Window command is supported""",
-                        """Set supports_obcw to True if supported, otherwise, to False"""),
+            TestStep(6, "If txt_record_required is True", """
+                            - TH performs a query for the TXT record against the qname instance_qname.
+                            - Verify the TXT record is returned and contains at least one key/value pair."""),
+
+            TestStep(7, "TH checks if TCP is supported by the DUT.",
+                     "Set supports_tcp_dut to True if supported, otherwise, to False"),
+
+            TestStep(8, "TH checks the setup code type used during commissioning (QR or Manual)",
+                     "Save as setup_code_type"),
+
+            TestStep(9, "TH checks if the Open Basic Commissioning Window command is supported",
+                        "Set supports_obcw to True if supported, otherwise, to False"),
 
             # OPEN BASIC COMMISSIONING WINDOW
             #
-            TestStep(8, """DUT is put in Commissioning Mode using the Open Basic Commissioning Window command if supported (supports_obcw)""",
-                        """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
+            TestStep(10, """DUT is put in Commissioning Mode using the Open Basic Commissioning Window command if supported (supports_obcw)""",
+                     """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
 
-            TestStep(9, """TH gets the discriminator from the DUT and constructs the Discriminator subtype (Long or Short) based on the setup code type (QR or Manual)""",
-                        """If setup code type is QR, construct the 'Long Discriminator Subtype'
+            TestStep(11, """TH gets the discriminator from the DUT and constructs the Discriminator subtype (Long or Short) based on the setup code type (QR or Manual)""",
+                     """If setup code type is QR, construct the 'Long Discriminator Subtype'
                             - Verify that the discriminator value is a valid 12-bit variable length decimal number in ASCII text, omitting any leading zeros
                             If setup code type is Manual, construct the 'Short Discriminator Subtype'
                             - Verify that the discriminator value is a valid 4-bit variable length decimal number in ASCII text, omitting any leading zeros
                             Save as 'discriminator_subtype'."""),
 
-            TestStep(10, """Get the Discriminator Subtype (Long or Short from the previous step) PTR record's instance name""",
+            TestStep(12, """Get the Discriminator Subtype (Long or Short from the previous step) PTR record's instance name""",
                      """TH performs a PTR record query against the Discriminator Subtype (Long or Short from the previous step)
                             - Verify that there is one, and only one, 'Discriminator Subtype' PTR record
                             - Save the 'Discriminator Subtype' PTR record's instance name as 'discriminator_subtype_ptr_instance_name'"""),
 
-            TestStep(11, """Verify commissionable subtype advertisements""",
+            TestStep(13, """Verify commissionable subtype advertisements""",
                      """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(12, """Verify SRV record advertisements""",
+            TestStep(14, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(13, """Verify TXT record advertisements""",
+            TestStep(15, """Verify TXT record advertisements""",
                      """See the 'TXT Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed. Expected CM TXT key value = 1"""),
 
-            TestStep(14, """Verify AAAA records""",
+            TestStep(16, """Verify AAAA records""",
                      """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(15, """Close commissioning window""",
+            TestStep(17, """Close commissioning window""",
                      """DUT stops advertising Commissionable Node Discovery services"""),
 
             # OPEN COMISSIONING WINDOW
             #
-            TestStep(16, """TH gets the Long Discriminator from the DUT and constructs the Long Discriminator Subtype""",
+            TestStep(18, """TH gets the Long Discriminator from the DUT and constructs the Long Discriminator Subtype""",
                      """Verify that the Long discriminator value is a valid 12-bit variable length decimal number in ASCII text,
                         omitting any leading zeros
                         Save 'Long Discriminator' value as long_discriminator
                         Save the 'Long Discriminator Subtype' as long_discriminator_subtype"""),
 
-            TestStep(17, """DUT is put in Commissioning Mode using Open Commissioning Window command""",
+            TestStep(19, """DUT is put in Commissioning Mode using Open Commissioning Window command""",
                      """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
 
-            TestStep(18, """Get the 'Long Discriminator Subtype' PTR record's instance name""",
+            TestStep(20, """Get the 'Long Discriminator Subtype' PTR record's instance name""",
                      """TH performs a PTR record query against the 'Long Discriminator Subtype'
                             - Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
                             - Save the 'Long Discriminator Subtype' PTR record's instance name as long_discriminator_subtype_ptr_instance_name"""),
 
-            TestStep(19, """Verify commissionable subtype advertisements""",
+            TestStep(21, """Verify commissionable subtype advertisements""",
                      """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(20, """Verify SRV record advertisements""",
+            TestStep(22, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(21, """Verify TXT record advertisements""",
+            TestStep(23, """Verify TXT record advertisements""",
                      """See the 'TXT Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed. Expected CM TXT key value = 2"""),
 
-            TestStep(22, """Verify AAAA records""",
+            TestStep(24, """Verify AAAA records""",
                      """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(23, """Close commissioning window""",
+            TestStep(25, """Close commissioning window""",
                      """DUT stops advertising Commissionable Node Discovery services"""),
 
             # EXTENDED DISCOVERY MODE
             #
-            TestStep(24, """Check if DUT Extended Discovery mode is active""",
+            TestStep(26, """Check if DUT Extended Discovery mode is active""",
                      """Get the 'Long Discriminator Subtype' PTR record's instance name
                             - If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present,
                             Extended Discovery mode is active, if so, save the 'Long Discriminator Subtype'
                             PTR record's instance name as 'long_discriminator_subtype_ptr_instance_name'"""),
 
-            TestStep(25, """Verify commissionable subtype advertisements""",
+            TestStep(27, """Verify commissionable subtype advertisements""",
                      """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(26, """Verify SRV record advertisements""",
+            TestStep(28, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(27, """Verify TXT record advertisements""",
+            TestStep(29, """Verify TXT record advertisements""",
                      """See the 'TXT Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed. Expected
                         CM TXT key value = 0 or omitted key"""),
 
-            TestStep(28, """Verify AAAA records""",
+            TestStep(30, """Verify AAAA records""",
                      """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
         ]
@@ -255,6 +272,28 @@ class TC_SC_4_1(MatterBaseTest):
             attribute=Clusters.IcdManagement.Attributes.FeatureMap
         )
 
+    async def get_exposed_device_types(self) -> set[int]:
+        """Returns the union of device types the DUT exposes across all endpoints
+        (Descriptor cluster DeviceTypeList), memoized for the test run. The Primary
+        Device Type is always a member of this set (Data Model spec, 'Primary
+        Device Type' selection rules)."""
+        if self._exposed_device_types is None:
+            parts_list = await self.read_single_attribute_check_success(
+                endpoint=ROOT_NODE_ENDPOINT_ID,
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.PartsList
+            )
+            device_types: set[int] = set()
+            for endpoint_id in (ROOT_NODE_ENDPOINT_ID, *parts_list):
+                device_type_list = await self.read_single_attribute_check_success(
+                    endpoint=endpoint_id,
+                    cluster=Clusters.Descriptor,
+                    attribute=Clusters.Descriptor.Attributes.DeviceTypeList
+                )
+                device_types.update(entry.deviceType for entry in device_type_list)
+            self._exposed_device_types = device_types
+        return self._exposed_device_types
+
     def get_dut_instance_name(self, log_result: bool = False) -> str:
         node_id = self.dut_node_id
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
@@ -263,7 +302,7 @@ class TC_SC_4_1(MatterBaseTest):
             log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
         return instance_name
 
-    def get_discriminator_subtype(self, is_obcw: bool = False) -> Optional[tuple[str, str]]:
+    def get_discriminator_subtype(self, is_obcw: bool = False) -> tuple[str, str] | None:
         # TH constructs the Discriminator Subtype using the DUT's Long or Short Discriminator
         discriminator: str | None = None
         discriminator_subtype: str | None = None
@@ -292,7 +331,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         return None
 
-    async def _get_verify_discriminator_subtype_ptr_instance_name(self, discriminator_subtype: str, must_be_present: bool = True) -> Optional[str]:
+    async def _get_verify_discriminator_subtype_ptr_instance_name(self, discriminator_subtype: str, must_be_present: bool = True) -> str | None:
 
         # TH performs a PTR record query against the Discriminator Subtype
         ptr_records = await MdnsDiscovery().get_ptr_records(
@@ -309,15 +348,11 @@ class TC_SC_4_1(MatterBaseTest):
 
         return None
 
-    async def _verify_discriminator_subtype_advertisements(self, subtypes: list[str], discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool) -> None:
+    async def _verify_discriminator_subtype_advertisements(self, discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool) -> None:
         # Determine discriminator type (Long or Short) to verify
-        size_txt = "Long" if is_long_discriminator else "Short"
         assert_valid_discriminator_subtype = (
             assert_valid_long_discriminator_subtype if is_long_discriminator else assert_valid_short_discriminator_subtype
         )
-
-        # Verify that the Discriminator subtype is present
-        asserts.assert_in(discriminator_subtype, subtypes, f"'{size_txt} Discriminator Subtype' must be present.")
 
         # Verify that it contains a valid 12-bit (Long) or 4 bit (Short) variable
         # length decimal number in ASCII text, omitting any leading zeros value
@@ -350,21 +385,21 @@ class TC_SC_4_1(MatterBaseTest):
         # Construct CM subtype
         cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
-        # TH performs a browse for the rest of the 'Commissionable Service' subtypes
-        subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
-
         # *** LONG/SHORT DISCRIMINATOR SUBTYPE ***
-        await self._verify_discriminator_subtype_advertisements(subtypes, discriminator, discriminator_subtype, discriminator_ptr_instance_name, is_long_discriminator)
+        await self._verify_discriminator_subtype_advertisements(discriminator, discriminator_subtype, discriminator_ptr_instance_name, is_long_discriminator)
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
         # Verify the expected presence of the 'In Commissioning Mode Subtype' _CM
         if extended_discovery:
-            # When in Extended Discovery Dode, verify that the _CM subtype is NOT present
-            asserts.assert_not_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must NOT be present.")
+            # When in Extended Discovery Mode, verify that the _CM subtype is NOT present
+            ptr_records = await MdnsDiscovery().get_ptr_records(
+                service_types=[cm_subtype],
+                discovery_timeout_sec=SUBTYPE_BROWSE_TIMEOUT_SEC,
+                log_output=True
+            )
+            asserts.assert_equal(len(ptr_records), 0, f"In Commissioning Mode Subtype '{cm_subtype}' must NOT be present.")
         else:
             # When NOT in Extended Discovery Mode, verify that the _CM subtype is present
-            asserts.assert_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must be present.")
-
             # TH performs a PTR record query against the 'In Commissioning Mode Subtype'
             ptr_records = await MdnsDiscovery().get_ptr_records(
                 service_types=[cm_subtype],
@@ -381,52 +416,87 @@ class TC_SC_4_1(MatterBaseTest):
                                  "'In Commissioning Mode Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** VENDOR SUBTYPE ***
-        # Check for the presence of the 'Vendor Subtype' _V
-        vendor_subtype = next((s for s in subtypes if s.startswith('_V')), None)
+        # TH reads the VendorId attribute from the Basic Information cluster
+        vendor_id = await self.read_single_attribute_check_success(
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.VendorID,
+            endpoint=ROOT_NODE_ENDPOINT_ID
+        )
+
+        # Construct the expected 'Vendor Subtype' _V from the DUT's VendorID
+        vendor_subtype = f"_V{int(vendor_id)}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+        assert_valid_vendor_subtype(vendor_subtype)
+
+        # TH performs a PTR record query against the 'Vendor Subtype'
+        ptr_records = await MdnsDiscovery().get_ptr_records(
+            service_types=[vendor_subtype],
+            discovery_timeout_sec=SUBTYPE_BROWSE_TIMEOUT_SEC,
+            log_output=True
+        )
 
         # If present:
-        if vendor_subtype:
-            # Verify that it contains a valid 16-bit variable length decimal
-            # number in ASCII text, omitting any leading zeros 'Vendor Subtype' value
-            assert_valid_vendor_subtype(vendor_subtype)
-
-            # TH performs a PTR record query against the 'Vendor Subtype'
-            ptr_records = await MdnsDiscovery().get_ptr_records(
-                service_types=[vendor_subtype],
-                log_output=True
-            )
-
-            # If present:
-            if len(ptr_records) > 0:
-                # Verify that the 'Vendor Subtype' PTR record's instance name
-                # is equal to the Discriminator Subtype PTR record's instance name
-                vendor_subtype_ptr = ptr_records[0]
-                asserts.assert_equal(vendor_subtype_ptr.instance_name, discriminator_ptr_instance_name,
-                                     "'Vendor Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+        if len(ptr_records) > 0:
+            # Verify that the 'Vendor Subtype' PTR record's instance name
+            # is equal to the Discriminator Subtype PTR record's instance name
+            vendor_subtype_ptr = ptr_records[0]
+            asserts.assert_equal(vendor_subtype_ptr.instance_name, discriminator_ptr_instance_name,
+                                 "'Vendor Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** DEVTYPE SUBTYPE ***
-        # Check for the presence of the 'Devtype Subtype' _T
-        devtype_subtype = next((s for s in subtypes if s.startswith('_T')), None)
+        # The 'Devtype Subtype' _T value is the DUT's Primary Device Type. Candidate
+        # values are always constructible: from the DT TXT key when advertised,
+        # otherwise from the device types the DUT exposes via the Descriptor cluster
+        # (the Primary Device Type SHALL be one of them, per the Data Model spec
+        # 'Primary Device Type' selection rules)
 
-        # If present:
-        if devtype_subtype:
-            # Verify that it contains a valid 32-bit variable length decimal
-            # number in ASCII text, omitting any leading zeros 'Devtype Subtype' value
-            assert_valid_devtype_subtype(devtype_subtype)
+        # TH reads the value from the Devtype TXT key (DT)
+        txt_record = await MdnsDiscovery().get_txt_record(
+            service_name=f"{discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
+            service_type=MdnsServiceType.COMMISSIONABLE.value
+        )
+        dt_key = txt_record.txt.get('DT') if txt_record and txt_record.txt else None
 
-            # TH performs a PTR record query against the 'Devtype Subtype'
-            ptr_records = await MdnsDiscovery().get_ptr_records(
-                service_types=[devtype_subtype],
+        # TH reads the device types the DUT exposes (Descriptor cluster, all endpoints)
+        exposed_device_types = await self.get_exposed_device_types()
+
+        # The DT key is optional; when present, its value (the DUT's claimed
+        # Primary Device Type) is used as the single candidate; when absent,
+        # the candidates are all the device types the DUT exposes, among which the
+        # Primary Device Type is guaranteed to be
+        if dt_key is not None and dt_key.isdigit():
+            candidate_device_types = [int(dt_key)]
+        else:
+            candidate_device_types = sorted(exposed_device_types)
+
+        # Construct the candidate 'Devtype Subtype' names
+        candidate_subtypes = [f"_T{dt}._sub.{MdnsServiceType.COMMISSIONABLE.value}" for dt in candidate_device_types]
+        for candidate_subtype in candidate_subtypes:
+            assert_valid_devtype_subtype(candidate_subtype)
+
+        # TH performs a PTR record query against each candidate 'Devtype Subtype'
+        # concurrently; at most one (the Primary Device Type) should answer
+        results = await asyncio.gather(*[
+            MdnsDiscovery().get_ptr_records(
+                service_types=[subtype],
+                discovery_timeout_sec=SUBTYPE_BROWSE_TIMEOUT_SEC,
                 log_output=True
             )
+            for subtype in candidate_subtypes
+        ])
+        answered = [(device_type, subtype, records[0])
+                    for device_type, subtype, records in zip(candidate_device_types, candidate_subtypes, results) if records]
 
-            # If present:
-            if len(ptr_records) > 0:
-                # Verify that the 'Devtype Subtype' PTR record's instance name
-                # is equal to the Discriminator Subtype PTR record's instance name.
-                devtype_subtype_ptr = ptr_records[0]
-                asserts.assert_equal(devtype_subtype_ptr.instance_name, discriminator_ptr_instance_name,
-                                     "'Devtype Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+        # If present:
+        if answered:
+            # Verify that only one Devtype subtype is advertised (the Primary Device Type)
+            asserts.assert_equal(len(answered), 1,
+                                 f"Only the Primary Device Type subtype must be advertised, found: {[subtype for _, subtype, _ in answered]}")
+            device_type, devtype_subtype, devtype_subtype_ptr = answered[0]
+
+            # Verify that the 'Devtype Subtype' PTR record's instance name
+            # is equal to the Discriminator Subtype PTR record's instance name.
+            asserts.assert_equal(devtype_subtype_ptr.instance_name, discriminator_ptr_instance_name,
+                                 "'Devtype Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
     async def _get_verify_srv_record(self, long_discriminator_ptr_instance_name: str) -> str:
         # TH performs a 'Commissionable Service' SRV record query
@@ -460,18 +530,20 @@ class TC_SC_4_1(MatterBaseTest):
         return srv_record.hostname
 
     async def _verify_txt_record_keys(self, long_discriminator_ptr_instance_name: str, expected_cm: str) -> None:
+        # The commissionable TXT record must always be present and non-empty as per the spec:
+        #   - "The key D SHALL provide the full 12-bit discriminator for the
+        #     Commissionable Node and SHALL be present in the DNS-SD TXT record."
+        # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#15-txt-key-for-discriminator-d
+
         # TH performs a 'Commissionable Service' TXT record query against 'long_discriminator_subtype_ptr_instance_name'
-        # The device may omit the TXT record if there are no mandatory TXT keys
         txt_record = await MdnsDiscovery().get_txt_record(
             service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
             service_type=MdnsServiceType.COMMISSIONABLE.value,
             log_output=True
         )
 
-        # Verify that the TXT record is returned and is non-empty
-        txt_record_returned = (txt_record is not None) and (len(txt_record.txt) > 0)
-        asserts.assert_true(txt_record_returned,
-                            "TXT record was not returned or contains no values")
+        # Verify that the TXT record is present and non-empty
+        await assert_txt_record_present(long_discriminator_ptr_instance_name, MdnsServiceType.COMMISSIONABLE)
 
         # Verify that the TXT record's instance name is equal to 'long_discriminator_subtype_ptr_instance_name'
         asserts.assert_equal(txt_record.instance_name, long_discriminator_ptr_instance_name,
@@ -688,50 +760,69 @@ class TC_SC_4_1(MatterBaseTest):
         self.setup_code_type = None
         obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
 
-        # *** STEP 1 ***
-        # DUT is Commissioned.
-        self.step(1)
+        # *** PRECONDITION ***
+        # DUT is commissioned
+        self.step("precondition")
 
-        # *** STEP 2 ***
-        # Check if the ICD Management cluster is present
-        self.step(2)
+        # *** STEP 1 ***
+        # TH reads ServerList attribute from the Descriptor cluster on EP0
+        self.step(1)
         ep0_servers = await self.get_descriptor_server_list()
 
         # Check if ep0_servers contain the ICD Management cluster ID (0x0046)
         self.supports_icd = Clusters.IcdManagement.id in ep0_servers
         log.info("\n\n\t** supports_icd: %s\n", self.supports_icd)
 
-        # Read the ActiveModeThreshold attribute if ICD is supported
+        # *** STEP 2 ***
+        # If ICD is supported, read the ActiveModeThreshold and FeatureMap attributes
+        # to determine if LITS is supported
+        self.step(2)
         if self.supports_icd:
+            # Read the ActiveModeThreshold attribute if ICD is supported
             self.active_mode_threshold_ms = await self.get_active_mode_threshold_ms()
             log.info("\n\n\t** active_mode_threshold_ms: %s\n", self.active_mode_threshold_ms)
 
-        # *** STEP 3 ***
-        # Check if the LITS feature is supported
-        self.step(3)
-        if self.supports_icd:
+            # Determine if LITS is supported
             feature_map = await self.get_icd_feature_map()
             LITS = Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
             self.supports_lit = bool(feature_map & LITS == LITS)
             log.info("\n\n\t** supports_lit: %s\n", self.supports_lit)
 
-        # *** STEP 4 ***
-        # Check if the DUT supports TCP
-        self.step(4)
-        instance_name = self.get_dut_instance_name(log_result=True)
-        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
-        self.supports_tcp_dut = await is_dut_tcp_supported(instance_qname)
-        log.info("\n\n\t** supports_tcp_dut: %s\n", self.supports_tcp_dut)
-
-        # *** STEP 5 ***
+        # *** STEP 3 ***
         # Check if TCP is supported per PICS
-        self.step(5)
+        self.step(3)
         self.supports_tcp_pics = self.check_pics(TCP_PICS_STR)
         log.info("\n\n\t** supports_tcp_pics: %s\n", self.supports_tcp_pics)
 
+        # *** STEP 4 ***
+        # Determine if TXT record is required: ICDs always have mandatory
+        # TXT keys, and a PICS TCP claim must be verifiable via the T key
+        self.step(4)
+        txt_record_required = self.supports_icd or self.supports_tcp_pics
+
+        # *** STEP 5 ***
+        # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
+        # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
+        # string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.
+        self.step(5)
+        instance_name = self.get_dut_instance_name(log_result=True)
+        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+
         # *** STEP 6 ***
-        # Check the setup code type used during commissioning (QR or Manual)
+        # If TXT record is required, TH verifies its presence
         self.step(6)
+        if txt_record_required:
+            await assert_txt_record_present(instance_name, MdnsServiceType.OPERATIONAL)
+
+        # *** STEP 7 ***
+        # Check if the DUT supports TCP
+        self.step(7)
+        self.supports_tcp_dut = await is_dut_tcp_supported(instance_qname)
+        log.info("\n\n\t** supports_tcp_dut: %s\n", self.supports_tcp_dut)
+
+        # *** STEP 8 ***
+        # Check the setup code type used during commissioning (QR or Manual)
+        self.step(8)
         if self.matter_test_config.manual_code:
             self.setup_code_type = SetupCodeType.MANUAL_CODE
         elif self.matter_test_config.qr_code_content:
@@ -740,18 +831,18 @@ class TC_SC_4_1(MatterBaseTest):
             self.setup_code_type = SetupCodeType.NONE_SUPLIED
         is_long_discriminator = self.setup_code_type == SetupCodeType.QR_CODE
 
-        # *** STEP 7 ***
+        # *** STEP 9 ***
         # Check if the Open Basic Commissioning Window command is supported
-        self.step(7)
+        self.step(9)
         supports_obcw = await self.feature_guard(
             endpoint=ROOT_NODE_ENDPOINT_ID,
             cluster=Clusters.AdministratorCommissioning,
             feature_int=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic)
 
-        # *** STEP 8 ***
+        # *** STEP 10 ***
         # DUT is put in Commissioning Mode using the Open Basic Commissioning Window command if supported (supports_obcw)
         if supports_obcw:
-            self.step(8)
+            self.step(10)
             log.info("\n\n\t ** Open Basic Commissioning Window supported\n")
             await self.default_controller.SendCommand(
                 nodeId=self.dut_node_id,
@@ -760,53 +851,53 @@ class TC_SC_4_1(MatterBaseTest):
                 timedRequestTimeoutMs=6000
             )
 
-            # *** STEP 9 ***
+            # *** STEP 11 ***
             # TH gets the discriminator from the DUT and constructs the Discriminator
             # subtype (Long or Short)based on the setup code type (QR or Manual)
-            self.step(9)
+            self.step(11)
             discriminator_subtype, discriminator = self.get_discriminator_subtype(is_obcw=True)
 
-            # *** STEP 10 ***
+            # *** STEP 12 ***
             # Get the Discriminator Subtype (Long or Short) PTR record's instance name
-            self.step(10)
+            self.step(12)
             discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(discriminator_subtype)
 
-            # *** STEP 11 ***
+            # *** STEP 13 ***
             # Verify commissionable subtype advertisements
-            self.step(11)
+            self.step(13)
             await self._verify_commissionable_subtypes(discriminator, discriminator_subtype, discriminator_ptr_instance_name, is_long_discriminator)
 
-            # *** STEP 12 ***
+            # *** STEP 14 ***
             # Verify SRV record advertisements
-            self.step(12)
+            self.step(14)
             srv_hostname = await self._get_verify_srv_record(discriminator_ptr_instance_name)
 
-            # *** STEP 13 ***
+            # *** STEP 15 ***
             # Verify TXT record advertisements
-            self.step(13)
+            self.step(15)
             await self._verify_txt_record_keys(discriminator_ptr_instance_name, expected_cm="1")
 
-            # *** STEP 14 ***
+            # *** STEP 16 ***
             # Verify AAAA records
-            self.step(14)
+            self.step(16)
             await self._verify_aaaa_records(srv_hostname)
 
-            # *** STEP 15 ***
+            # *** STEP 17 ***
             # Close commissioning window
-            self.step(15)
+            self.step(17)
             await self.close_commissioning_window()
         else:
             log.info("\n\n\t ** Open Basic Commissioning Window command is unsupported, skipping advertisement verification steps.\n")
-            self.mark_step_range_skipped(8, 15)
+            self.mark_step_range_skipped(10, 17)
 
-        # *** STEP 16 ***
+        # *** STEP 18 ***
         # TH gets the Long Discriminator from the DUT and constructs the Long Discriminator Subtype
-        self.step(16)
+        self.step(18)
         long_discriminator_subtype, long_discriminator = self.get_discriminator_subtype(is_obcw=False)
 
-        # *** STEP 17 ***
+        # *** STEP 19 ***
         # DUT is put in Commissioning Mode using Open Commissioning Window command
-        self.step(17)
+        self.step(19)
         await self.default_controller.OpenCommissioningWindow(
             nodeId=self.dut_node_id,
             timeout=180,
@@ -815,39 +906,39 @@ class TC_SC_4_1(MatterBaseTest):
             option=1
         )
 
-        # *** STEP 18 ***
+        # *** STEP 20 ***
         # Get the 'Long Discriminator Subtype' PTR record's instance name
-        self.step(18)
+        self.step(20)
         long_discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(long_discriminator_subtype)
 
-        # *** STEP 19 ***
+        # *** STEP 21 ***
         # Verify commissionable subtype advertisements
-        self.step(19)
+        self.step(21)
         await self._verify_commissionable_subtypes(long_discriminator, long_discriminator_subtype, long_discriminator_ptr_instance_name, is_long_discriminator=True)
 
-        # *** STEP 20 ***
+        # *** STEP 22 ***
         # Verify SRV record advertisements
-        self.step(20)
+        self.step(22)
         srv_hostname = await self._get_verify_srv_record(long_discriminator_ptr_instance_name)
 
-        # *** STEP 21 ***
+        # *** STEP 23 ***
         # Verify TXT record keys advertisements
-        self.step(21)
+        self.step(23)
         await self._verify_txt_record_keys(long_discriminator_ptr_instance_name, expected_cm="2")
 
-        # *** STEP 22 ***
+        # *** STEP 24 ***
         # Verify AAAA records
-        self.step(22)
+        self.step(24)
         await self._verify_aaaa_records(srv_hostname)
 
-        # *** STEP 23 ***
+        # *** STEP 25 ***
         # Close commissioning window
-        self.step(23)
+        self.step(25)
         await self.close_commissioning_window()
 
-        # *** STEP 24 ***
+        # *** STEP 26 ***
         # Check if DUT Extended Discovery mode is active
-        self.step(24)
+        self.step(26)
         # Get the 'Long Discriminator Subtype' PTR record's instance name
         long_discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(long_discriminator_subtype, must_be_present=False)
 
@@ -856,28 +947,28 @@ class TC_SC_4_1(MatterBaseTest):
         log.info("DUT Extended Discovery mode active: %s", extended_discovery_mode)
 
         if extended_discovery_mode:
-            # *** STEP 25 ***
+            # *** STEP 27 ***
             # Verify commissionable subtype advertisements
-            self.step(25)
+            self.step(27)
             await self._verify_commissionable_subtypes(long_discriminator, long_discriminator_subtype, long_discriminator_ptr_instance_name, is_long_discriminator=True, extended_discovery=extended_discovery_mode)
 
-            # *** STEP 26 ***
+            # *** STEP 28 ***
             # Verify SRV record advertisements
-            self.step(26)
+            self.step(28)
             srv_hostname = await self._get_verify_srv_record(long_discriminator_ptr_instance_name)
 
-            # *** STEP 27 ***
+            # *** STEP 29 ***
             # Verify TXT record keys advertisements
-            self.step(27)
+            self.step(29)
             await self._verify_txt_record_keys(long_discriminator_ptr_instance_name, expected_cm="0")
 
-            # *** STEP 28 ***
+            # *** STEP 30 ***
             # Verify AAAA records
-            self.step(28)
+            self.step(30)
             await self._verify_aaaa_records(srv_hostname)
         else:
             log.info("Skipping Extended Discovery mode advertisements verification steps.")
-            self.mark_step_range_skipped(25, 28)
+            self.mark_step_range_skipped(27, 30)
 
 
 if __name__ == "__main__":

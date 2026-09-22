@@ -30,7 +30,6 @@ import subprocess
 import sys
 import unittest
 from enum import Enum
-from typing import Optional
 
 import click
 import requests
@@ -287,7 +286,7 @@ def generate_revocation_set_from_crl(crl_file: x509.CertificateRevocationList,
         # TestDACRevocationDelegateImpl encodes the serial number as an even-length hex string
         # using BytesToHex in src/lib/support/BytesToHex.cpp.
         # As the primary consumer of this data, we should use the same here.
-        serialnumber = '{:02X}'.format(revoked_cert.serial_number)
+        serialnumber = f'{revoked_cert.serial_number:02X}'
         serialnumber = serialnumber if len(serialnumber) % 2 == 0 else '0' + serialnumber
         serialnumber_list.append(serialnumber)
 
@@ -409,7 +408,7 @@ class DclClientInterface:
         '''
         raise NotImplementedError
 
-    def get_only_approved_certificate(self, response: dict, skid_hex: str) -> tuple[bool, Optional[x509.Certificate]]:
+    def get_only_approved_certificate(self, response: dict, skid_hex: str) -> tuple[bool, x509.Certificate | None]:
         '''
         Get only approved certificate from DCL resposne.
         '''
@@ -420,7 +419,7 @@ class DclClientInterface:
         issuer_certificate = x509.load_pem_x509_certificate(bytes(response["approvedCertificates"]["certs"][0]["pemCert"], "utf-8"))
         return response["approvedCertificates"]["certs"][0]["isRoot"], issuer_certificate
 
-    def get_paa_cert(self, initial_cert: x509.Certificate) -> Optional[x509.Certificate]:
+    def get_paa_cert(self, initial_cert: x509.Certificate) -> x509.Certificate | None:
         '''
         Get the PAA certificate for the CRL Signer Certificate.
         '''
