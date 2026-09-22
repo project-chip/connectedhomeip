@@ -1048,8 +1048,13 @@ jobs:
                 retention-days: 2
                 if-no-files-found: error
                 overwrite: true
+            # Trims the directory before it is packed into a size-limited tarball, so
+            # it belongs with the save steps below rather than with the build. On a
+            # cache volume there is no tarball and this would instead evict anything
+            # in the shared store untouched for a day, which is a different operation
+            # against a different object; CCACHE_MAXSIZE already bounds the volume.
             - name: Ensure only useful ccache is kept
-              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true' && steps.ccache.outputs.using-volume != 'true'
               run: ccache --evict-older-than 1d || true
             - name: Delete existing ccache before save
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true' && steps.ccache.outputs.using-volume != 'true'
