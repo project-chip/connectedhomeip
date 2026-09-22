@@ -202,7 +202,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             receiveKeys=[],
             ratchetBits=0
         )
-        
+
         resp: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
             cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
                 streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
