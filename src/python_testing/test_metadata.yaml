@@ -78,7 +78,9 @@ not_automated:
     - name: TC_CNET_4_4.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_9.py
-      reason: It has no CI execution block, is not executed in CI
+      reason:
+          Requires the dedicated mocked BLE-WiFi commissioning environment and
+          is executed separately in the Linux CI test suite.
     - name: TC_CNET_4_10.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_11.py
