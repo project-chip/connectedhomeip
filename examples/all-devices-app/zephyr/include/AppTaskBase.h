@@ -24,7 +24,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/Interface.h>
-#include <device/capabilities/identify/LoggingIdentifyDelegate.h>
+#include "ZephyrIdentifyDelegate.h"
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
@@ -119,7 +119,7 @@ protected:
     chip::CommonCaseDeviceServerInitParams mInitParams;
     Credentials::GroupDataProviderImpl mGroupDataProvider;
     SimpleTestEventTriggerDelegate mDefaultTestEventTriggerDelegate;
-    LoggingIdentifyDelegate mDefaultIdentifyDelegate;
+    ZephyrIdentifyDelegate mDefaultIdentifyDelegate;
     DefaultTimerDelegate mTimerDelegate;
     DefaultAttributePersistenceProvider mAttributePersistenceProvider;
     DefaultSafeAttributePersistenceProvider mSafeAttributePersistenceProvider;

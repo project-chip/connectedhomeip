@@ -30,8 +30,6 @@
 namespace chip::app::AllDevices {
 namespace {
 
-constexpr System::Clock::Milliseconds32 kBlinkInterval = System::Clock::Milliseconds32(500);
-
 #if ALL_DEVICES_HAS_ONOFF_LED
 const struct gpio_dt_spec sOnOffLed = GPIO_DT_SPEC_GET(ALL_DEVICES_ONOFF_LED_NODE, gpios);
 #endif
@@ -39,7 +37,8 @@ const struct gpio_dt_spec sOnOffLed = GPIO_DT_SPEC_GET(ALL_DEVICES_ONOFF_LED_NOD
 } // namespace
 
 ZephyrOnOffLight::ZephyrOnOffLight(const Context & context) :
-    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), *this, *this, *this, context)
+    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), *this, *this, context.identifyDelegate, context),
+    mIdentifyDelegate(static_cast<ZephyrIdentifyDelegate &>(context.identifyDelegate))
 {
 #if ALL_DEVICES_HAS_ONOFF_LED
     VerifyOrReturn(gpio_is_ready_dt(&sOnOffLed), ChipLogError(DeviceLayer, "On/Off LED GPIO not ready"));
@@ -50,9 +49,7 @@ ZephyrOnOffLight::ZephyrOnOffLight(const Context & context) :
 }
 
 ZephyrOnOffLight::~ZephyrOnOffLight()
-{
-    StopBlink();
-}
+{}
 
 void ZephyrOnOffLight::OnOffStartup(bool on)
 {
@@ -66,54 +63,10 @@ void ZephyrOnOffLight::OnOnOffChanged(bool on)
     Apply(on);
 }
 
-void ZephyrOnOffLight::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "ZephyrOnOffLight: Identify START");
-    StartBlink();
-}
-
-void ZephyrOnOffLight::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "ZephyrOnOffLight: Identify STOP");
-    StopBlink();
-}
-
-void ZephyrOnOffLight::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "ZephyrOnOffLight: Identify TriggerEffect");
-    StartBlink();
-}
-
-void ZephyrOnOffLight::StartBlink()
-{
-    VerifyOrReturn(!mBlinking);
-    mBlinking   = true;
-    mBlinkPhase = true;
-    SetLed(mBlinkPhase);
-    DeviceLayer::SystemLayer().StartTimer(kBlinkInterval, BlinkTimerHandler, this);
-}
-
-void ZephyrOnOffLight::StopBlink()
-{
-    VerifyOrReturn(mBlinking);
-    mBlinking = false;
-    DeviceLayer::SystemLayer().CancelTimer(BlinkTimerHandler, this);
-    SetLed(mOn);
-}
-
-void ZephyrOnOffLight::BlinkTimerHandler(System::Layer * layer, void * context)
-{
-    auto * self = static_cast<ZephyrOnOffLight *>(context);
-    VerifyOrReturn(self->mBlinking);
-    self->mBlinkPhase = !self->mBlinkPhase;
-    self->SetLed(self->mBlinkPhase);
-    layer->StartTimer(kBlinkInterval, BlinkTimerHandler, self);
-}
-
 void ZephyrOnOffLight::Apply(bool on)
 {
     mOn = on;
-    VerifyOrReturn(!mBlinking);
+    mIdentifyDelegate.SetNormalState(on);
     SetLed(on);
 }
 

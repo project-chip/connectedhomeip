@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <device/capabilities/on-off-load/OnOffLoad.h>
 #include <device/capabilities/on-off-load/impl/LoggingOnOffDelegate.h>
-#include <system/SystemLayer.h>
 #include <zephyr/devicetree.h>
+
+#include "ZephyrIdentifyDelegate.h"
 
 #if DT_NODE_EXISTS(DT_ALIAS(led0))
 #define ALL_DEVICES_ONOFF_LED_NODE DT_ALIAS(led0)
@@ -37,16 +37,11 @@
 namespace chip::app::AllDevices {
 
 /// On/Off Light that drives the board's led0 alias
-class ZephyrOnOffLight : private LoggingOnOffDelegate, public OnOffLoad, public Clusters::IdentifyDelegate
+class ZephyrOnOffLight : private LoggingOnOffDelegate, public OnOffLoad
 {
 public:
     explicit ZephyrOnOffLight(const Context & context);
     ~ZephyrOnOffLight() override;
-
-    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
-    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
-    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
-    bool IsTriggerEffectEnabled() const override { return true; }
 
 protected:
     void OnOffStartup(bool on) override;
@@ -55,13 +50,8 @@ protected:
 private:
     void Apply(bool on);
     void SetLed(bool on);
-    void StartBlink();
-    void StopBlink();
-    static void BlinkTimerHandler(System::Layer * layer, void * context);
-
-    bool mOn         = false;
-    bool mBlinking   = false;
-    bool mBlinkPhase = false;
+    ZephyrIdentifyDelegate & mIdentifyDelegate;
+    bool mOn = false;
 #if ALL_DEVICES_HAS_ONOFF_LED
     bool mLedReady = false;
 #endif
