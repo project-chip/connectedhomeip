@@ -48,6 +48,7 @@ public:
     // WebRTCPeerController::PeerConnectionObserver
     void OnPeerConnectionConnected(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
     void OnPeerConnectionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
+    void OnLocalCandidatesReady(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
 
     CHIP_ERROR HandleOffer(const Clusters::WebRTCTransportRequestor::WebRTCSessionStruct & aSession,
                            const OfferArgs & aArgs) override;
@@ -60,7 +61,7 @@ public:
                          Clusters::WebRTCTransportRequestor::WebRTCEndReasonEnum aReason) override;
 
 private:
-    // Sends the candidates gathered for the session to its camera, the trickle phase after the Answer
+    // Sends the complete set of candidates gathered for the session to its camera
     void SendLocalCandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
 
     // The camera that assigned a session's id, which together identify it

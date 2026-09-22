@@ -133,9 +133,15 @@ CHIP_ERROR WebRTCPeerManager::CreateOffer(OfferCallback & aCallback)
         ScheduleOnMatterThread(weakPeerConnection, [this, candidate](const std::shared_ptr<rtc::PeerConnection> & aConnection) {
             PeerSession * session = FindSession(aConnection);
             VerifyOrReturn(session != nullptr);
-            // Sent to the camera as one batch once its Answer has arrived; candidates gathered
-            // after that batch stay here, as the camera already has enough to connect
+            // Sent to the camera as one batch once gathering is complete and its Answer has arrived
             session->localCandidates.push_back(candidate);
+        });
+    });
+
+    peerConnection->onGatheringStateChange([this, weakPeerConnection](rtc::PeerConnection::GatheringState aState) {
+        VerifyOrReturn(aState == rtc::PeerConnection::GatheringState::Complete);
+        ScheduleOnMatterThread(weakPeerConnection, [this](const std::shared_ptr<rtc::PeerConnection> & aConnection) {
+            OnGatheringComplete(aConnection);
         });
     });
 
@@ -233,6 +239,11 @@ CHIP_ERROR WebRTCPeerManager::ApplyAnswer(const ScopedNodeId & aCameraNode, uint
     VerifyOrReturnError(it != mSessions.end(), CHIP_ERROR_NOT_FOUND);
 
     it->second.peerConnection->setRemoteDescription(rtc::Description(aSdp, rtc::Description::Type::Answer));
+    it->second.answerApplied = true;
+    if (LocalCandidatesReady(it->second) && mPeerConnectionObserver != nullptr)
+    {
+        mPeerConnectionObserver->OnLocalCandidatesReady(it->first.first, it->first.second);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -280,6 +291,24 @@ void WebRTCPeerManager::OnPeerConnectionStateChanged(const std::shared_ptr<rtc::
     else
     {
         mPeerConnectionObserver->OnPeerConnectionConnected(it->first.first, it->first.second);
+    }
+}
+
+void WebRTCPeerManager::OnGatheringComplete(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection)
+{
+    PeerSession * session = FindSession(aPeerConnection);
+    VerifyOrReturn(session != nullptr);
+
+    session->gatheringComplete = true;
+    ChipLogProgress(AppServer, "AvAnalysisNode: ICE gathering complete, %u local candidates",
+                    static_cast<unsigned>(session->localCandidates.size()));
+
+    // The session is ready for candidates once the session is assigned and answered
+    auto it = FindAssignedSession(aPeerConnection);
+    VerifyOrReturn(it != mSessions.end());
+    if (LocalCandidatesReady(it->second) && mPeerConnectionObserver != nullptr)
+    {
+        mPeerConnectionObserver->OnLocalCandidatesReady(it->first.first, it->first.second);
     }
 }
 

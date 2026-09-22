@@ -59,6 +59,12 @@ public:
          * The session's peer connection reached the Failed or Closed state
          */
         virtual void OnPeerConnectionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
+
+        /**
+         * The session's peer connection has gathered all its ICE candidates and the camera's answer
+         * has been applied
+         */
+        virtual void OnLocalCandidatesReady(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
     };
 
     void SetPeerConnectionObserver(PeerConnectionObserver * aObserver) { mPeerConnectionObserver = aObserver; }
@@ -75,8 +81,8 @@ public:
                                           const std::string & aCandidate) = 0;
 
     /**
-     * Hands over the candidates the session's peer connection has gathered so far and forgets them,
-     * so each is sent to the camera once.
+     * Hands over the candidates the session's peer connection has gathered and forgets them, so each
+     * is sent to the camera once.
      */
     virtual std::vector<LocalICECandidate> TakeLocalCandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) = 0;
 
