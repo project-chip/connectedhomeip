@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <device/types/on-off-light/OnOffLight.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app {
 
-void RegisterOOBAccessors(OnOffLoad & device, OOBAccessorRegistry & registry);
+void RegisterOOBAccessors(OnOffLight & device, OOBAccessorRegistry & registry);
 
 } // namespace chip::app
