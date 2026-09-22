@@ -16,8 +16,8 @@ for architecture and device class implementation.
         [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn).
     -   Remove `oob-accessors`, `posix/named_pipe`, sample peripheral sources
         (`PosixAudioManager.cpp`, `PosixChime.cpp`, `PosixSpeaker.cpp`), unused
-        `device/types/*` targets, and all `:posix` sub-targets
-        (`device/types/<device>:posix`, which compile `impl/Logging*` classes).
+        `device/types/*` targets, and the `device/types/<device>:posix` logging
+        sub-targets (excluding `device/types/root-node:posix`).
 -   **Keep Platform & Root Node Dependencies**:
     -   Keep `posix/app_options:app-options`, `device/types/root-node`
         (including `:posix` and `:wifi`), and the single base device target
