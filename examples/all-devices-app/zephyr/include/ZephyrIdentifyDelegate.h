@@ -54,8 +54,8 @@ private:
 
     bool mNormalState = false;
 #if ALL_DEVICES_HAS_IDENTIFY_LED
-    bool mLedReady = false;
-    bool mBlinking = false;
+    bool mLedReady   = false;
+    bool mBlinking   = false;
     bool mBlinkPhase = false;
 #endif
 };

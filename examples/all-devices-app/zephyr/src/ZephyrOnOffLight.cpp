@@ -37,7 +37,8 @@ const struct gpio_dt_spec sOnOffLed = GPIO_DT_SPEC_GET(ALL_DEVICES_ONOFF_LED_NOD
 } // namespace
 
 ZephyrOnOffLight::ZephyrOnOffLight(const Context & context) :
-    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), *this, *this, context.identifyDelegate, context),
+    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), *this, *this, context.identifyDelegate,
+              context),
     mIdentifyDelegate(static_cast<ZephyrIdentifyDelegate &>(context.identifyDelegate))
 {
 #if ALL_DEVICES_HAS_ONOFF_LED
@@ -48,8 +49,7 @@ ZephyrOnOffLight::ZephyrOnOffLight(const Context & context) :
 #endif
 }
 
-ZephyrOnOffLight::~ZephyrOnOffLight()
-{}
+ZephyrOnOffLight::~ZephyrOnOffLight() {}
 
 void ZephyrOnOffLight::OnOffStartup(bool on)
 {

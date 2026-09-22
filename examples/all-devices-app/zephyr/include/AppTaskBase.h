@@ -18,13 +18,13 @@
 
 #pragma once
 
+#include "ZephyrIdentifyDelegate.h"
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Server.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/Interface.h>
-#include "ZephyrIdentifyDelegate.h"
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
