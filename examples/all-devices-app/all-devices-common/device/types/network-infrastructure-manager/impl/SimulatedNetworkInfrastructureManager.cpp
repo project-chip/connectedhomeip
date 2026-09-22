@@ -60,6 +60,10 @@ void SimulatedNetworkInfrastructureManager::Unregister(CodeDrivenDataModelProvid
 {
     mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
     mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
+    mActivateDatasetCallback = nullptr;
+    mStagedActiveDataset.Clear();
+    mActiveDataset.Clear();
+    mPendingDataset.Clear();
     NetworkInfrastructureManager::Unregister(provider);
 }
 

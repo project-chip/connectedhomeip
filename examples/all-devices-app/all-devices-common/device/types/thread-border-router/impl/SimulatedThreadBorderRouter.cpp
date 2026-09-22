@@ -58,6 +58,10 @@ void SimulatedThreadBorderRouter::Unregister(CodeDrivenDataModelProvider & provi
 {
     mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
     mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
+    mActivateDatasetCallback = nullptr;
+    mStagedActiveDataset.Clear();
+    mActiveDataset.Clear();
+    mPendingDataset.Clear();
     ThreadBorderRouter::Unregister(provider);
 }
 
