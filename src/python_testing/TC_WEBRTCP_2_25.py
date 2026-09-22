@@ -42,6 +42,7 @@ from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 import matter.clusters as Clusters
+from matter.clusters import Globals
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
@@ -128,10 +129,17 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
         webrtc_peer.create_offer()
         local_offer = await webrtc_peer.get_local_offer()
 
-        unsupported_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
-            cipherSuite=CIPHER_SUITE_UNSUPPORTED,
-            baseKey=b'\x00' * 16,  # 16 bytes key
-            kid=b'\x01' * 2
+        unsupported_sframe_sender_key = Clusters.Globals.Structs.SFrameKeyStruct(
+            kid=b'\x01' * 2,
+            baseKey=b'\x00' * 16  # 16 bytes key
+        )
+        
+        unsupported_sframe_config = Clusters.Globals.Structs.SFrameStruct(
+            audioCipherSuite=CIPHER_SUITE_UNSUPPORTED,
+            videoCipherSuite=CIPHER_SUITE_UNSUPPORTED,
+            senderKey= unsupported_sframe_sender_key,
+            receiveKeys=[],
+            ratchetBits=0
         )
 
         try:
@@ -157,10 +165,17 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
         # Test: ProvideOffer with incorrect key length for AES-128-GCM (should be 16 bytes)
         log.info("Testing ProvideOffer with incorrect key length for AES-128-GCM")
 
-        wrong_length_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
-            cipherSuite=CIPHER_SUITE_AES_128_GCM,
-            baseKey=b'\x00' * 32,  # Wrong: 32 bytes instead of 16
-            kid=b'\x01' * 2
+        wrong_length_sframe_sender_key = Clusters.Globals.Structs.SFrameKeyStruct(
+            kid=b'\x01' * 2,
+            baseKey=b'\x00' * 32  # Wrong: 32 bytes instead of 16
+        )
+        
+        wrong_length_sframe_config = Clusters.Globals.Structs.SFrameStruct(
+            audioCipherSuite=CIPHER_SUITE_AES_128_GCM,
+            videoCipherSuite=CIPHER_SUITE_AES_128_GCM,
+            senderKey= wrong_length_sframe_sender_key,
+            receiveKeys=[],
+            ratchetBits=0
         )
 
         try:
@@ -186,11 +201,18 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
         # Test: ProvideOffer with valid SFrameConfig (AES-256-GCM with 32-byte key)
         log.info("Testing ProvideOffer with valid SFrameConfig (AES-256-GCM)")
 
-        valid_sframe_config_256 = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
-            cipherSuite=CIPHER_SUITE_AES_256_GCM,
+        valid_sframe_sender_key = Clusters.Globals.Structs.SFrameKeyStruct(
+            kid=b'\x01' * 2,
             baseKey=b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f' +
-                    b'\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f',  # 32 bytes
-            kid=b'\x02' * 2
+                    b'\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f',  # 32 bytes        
+        )
+        
+        valid_sframe_config_256 = Clusters.Globals.Structs.SFrameStruct(
+            audioCipherSuite=CIPHER_SUITE_AES_256_GCM,
+            videoCipherSuite=CIPHER_SUITE_AES_256_GCM,
+            senderKey= valid_sframe_sender_key,
+            receiveKeys=[],
+            ratchetBits=0
         )
 
         resp_offer: Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse = await self.send_single_cmd(
