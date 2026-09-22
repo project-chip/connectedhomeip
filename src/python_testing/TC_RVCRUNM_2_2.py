@@ -37,6 +37,23 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcrunm_2_2_fifo
+#     script-args: >
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --app-pipe /tmp/rvcrunm_2_2_fifo
+#       --int-arg PIXIT.RVCRUNM.MODE_A:1
+#       --int-arg PIXIT.RVCRUNM.MODE_B:2
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import enum
@@ -152,7 +169,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
         test_step = ("Manually put the device in a RVC Run Mode cluster mode with "
                      "the Idle(0x4000) mode tag and in a device state that allows changing to either "
                      f"of these modes: {self.mode_a}, {self.mode_b}")
@@ -231,7 +248,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         if op_state not in valid_op_states:
             self.print_step(9, "Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "ChargerFound"})
+                self.write_to_app_pipe({"Name": "ChargerFound", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(
                     prompt_msg="Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42), and press Enter when ready.\n")

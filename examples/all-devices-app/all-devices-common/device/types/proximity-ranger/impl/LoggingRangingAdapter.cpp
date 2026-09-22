@@ -45,6 +45,26 @@ constexpr uint16_t kDefaultErrorMarginCm = 10;
 constexpr int8_t kDefaultRssiDbm         = -50;
 constexpr int8_t kDefaultTxPowerDbm      = 0;
 
+/// Deterministic elapsed-seconds measurement offset. The spec requires every
+/// RangingResult to carry either TimeOfMeasurement (absolute epoch seconds) or
+/// TimeOfMeasurementOffset (seconds elapsed since the measurement was taken).
+/// A stub has no trusted wall clock, so it reports the offset form; a fixed
+/// value keeps cert tests able to assert an exact result.
+///
+/// REAL ADAPTER: this constant does not exist in production. Report the radio's
+/// real measurement time — an absolute TimeOfMeasurement when the device has a
+/// trusted clock, otherwise the true elapsed time since the measurement taken
+/// from the radio's timestamp. At least one of the two MUST always be present.
+constexpr uint32_t kDefaultTimeOfMeasurementOffsetS = 1;
+
+/// Number of simultaneous ranging sessions this (stub) adapter reports it can
+/// hold. Deterministic and non-zero so cert tests can assert an exact value.
+///
+/// REAL ADAPTER: derive this from the radio's real session capacity (how many
+/// concurrent ranging sessions the ranging engine can track at once); do not
+/// hard-code it.
+constexpr uint8_t kDefaultMaxConcurrentSessions = 4;
+
 /// Simulated radio measurement latency. Each StartSession call schedules a
 /// timer of this duration; when the timer fires the adapter emits exactly
 /// one OnMeasurementData. Three seconds approximates a realistic ranging
@@ -192,6 +212,19 @@ Structs::RangingCapabilitiesStruct::Type LoggingRangingAdapter::GetCapabilities(
     Structs::RangingCapabilitiesStruct::Type capabilities = {};
     capabilities.technology                               = mTechnology;
     capabilities.periodicRangingSupport                   = mPeriodicRangingSupport;
+    // The LoggingRangingAdapter can act as both the active initiator and the
+    // passive responder for its technology, so it advertises both role-support
+    // bits. Cert tests (TC-PROXR-2.3/2.4) check these before asking DUT_I to
+    // initiate and DUT_R to respond.
+    //
+    // REAL ADAPTER: report exactly the roles the radio can perform for this
+    // technology (query the radio driver); do not hard-code both.
+    capabilities.supportedRangingRoles =
+        BitMask<RangingRoleSupportBitmap>(RangingRoleSupportBitmap::kInitiatorSupport, RangingRoleSupportBitmap::kResponderSupport);
+    // MaxConcurrentSessions is Optional<> in the current data model but is treated
+    // as mandatory by the cert tests (it is planned to become mandatory in the
+    // spec), so the stub always reports it.
+    capabilities.maxConcurrentSessions.SetValue(kDefaultMaxConcurrentSessions);
     switch (mTechnology)
     {
     case RangingTechEnum::kWiFiNextGenerationRanging:
@@ -318,8 +351,8 @@ LoggingRangingAdapter::~LoggingRangingAdapter()
 // the cluster server has accepted a StartRangingRequest command. The adapter
 // must:
 //   - Determine whether the request is compatible with what the radio can do
-//     and synchronously return kRejectedInfeasibleRanging (or an
-//     adapter-specific ResultCodeEnum) when it is not. Capability checks
+//     and synchronously return a cluster-specific failure ClusterStatusCode
+//     (e.g. StatusCodeEnum::kRejectedInfeasibleRanging) when it is not. Capability checks
 //     belong to the adapter, not the cluster, because only the adapter knows
 //     the radio's true capabilities.
 //   - Stage all per-session bookkeeping needed for the eventual StartSession
@@ -338,10 +371,11 @@ LoggingRangingAdapter::~LoggingRangingAdapter()
 // REAL ADAPTER: most of this function would translate `params` into the
 // radio driver's session-staging API (allocate a session handle, configure
 // the scan filter / publisher / CS engine without yet starting it, ...).
-// Asynchronous validation that requires talking to the radio MAY return
-// kAccepted here and reject in StartSession or via OnRangingSessionStopped,
+// Asynchronous validation that requires talking to the radio MAY return a
+// success status here and reject in StartSession or via OnRangingSessionStopped,
 // but doing the work synchronously is preferred where the radio supports it.
-ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const StartSessionParams & params)
+Protocols::InteractionModel::ClusterStatusCode LoggingRangingAdapter::PrepareSession(uint8_t sessionId,
+                                                                                     const StartSessionParams & params)
 {
     ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] PrepareSession id=%u tech=%s", LogTag(), sessionId,
                     TechName(params.technology));
@@ -351,7 +385,7 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
         [[maybe_unused]] const auto & cfg = *params.wifiRoleConfig;
         ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s]   WiFiRoleConfig role=%s peerWiFiDevIK.size=%u pmk=%s", LogTag(),
                         RoleName(cfg.role), static_cast<unsigned>(cfg.peerWiFiDevIK.size()),
-                        cfg.pmk.HasValue() ? "present" : "absent");
+                        !cfg.pmk.empty() ? "present" : "absent");
     }
     if (params.bleRoleConfig.has_value())
     {
@@ -366,8 +400,9 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
                         "[LoggingRangingAdapter:%s]   BLTRoleConfig role=%s peerBLTDevIK.size=%u "
                         "BLTCSMode=%s BLTCSSecurityLevel=%s ltk=%s",
                         LogTag(), RoleName(cfg.role), static_cast<unsigned>(cfg.peerBLTDevIK.size()),
-                        cfg.BLTCSMode.HasValue() ? "present" : "absent", cfg.BLTCSSecurityLevel.HasValue() ? "present" : "absent",
-                        cfg.ltk.HasValue() ? "present" : "absent");
+                        cfg.BLTCSMode.HasValue() ? "present" : "absent",
+                        cfg.BLTCSSecurityLevel != BLTCSSecurityLevelEnum::kBLTCSSecurityLevelUnknown ? "present" : "absent",
+                        !cfg.ltk.empty() ? "present" : "absent");
     }
 
     // REAL ADAPTER: a hardware adapter should reject here on conditions its
@@ -432,7 +467,7 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
     }
 
     mSessions.push_back(std::move(session));
-    return ResultCodeEnum::kAccepted;
+    return Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::Success);
 }
 
 // StartSession triggers a single ranging instance. The driver invokes this
@@ -601,6 +636,10 @@ Structs::RangingMeasurementDataStruct::Type LoggingRangingAdapter::BuildMeasurem
     Structs::RangingMeasurementDataStruct::Type measurement{};
     measurement.distance.SetNonNull(kDefaultDistanceCm);
     measurement.errorMargin.SetValue(kDefaultErrorMarginCm);
+    // Spec: every RangingResult SHALL carry TimeOfMeasurement or
+    // TimeOfMeasurementOffset. The stub reports a deterministic elapsed-seconds
+    // offset (see kDefaultTimeOfMeasurementOffsetS).
+    measurement.timeOfMeasurementOffset.SetValue(kDefaultTimeOfMeasurementOffsetS);
     switch (mTechnology)
     {
     case RangingTechEnum::kBLEBeaconRSSIRanging:

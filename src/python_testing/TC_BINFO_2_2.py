@@ -65,6 +65,9 @@ events = cluster.Events
 
 
 class TC_BINFO_2_2(MatterBaseTest):
+    # Step 2 reboots the DUT when no StartUp event is present, and the background
+    # wildcard subscription does not survive a reboot.
+    disable_wildcard_subscription = True
 
     def teardown_class(self):
         if hasattr(self, 'TH2') and self.TH2 is not None:

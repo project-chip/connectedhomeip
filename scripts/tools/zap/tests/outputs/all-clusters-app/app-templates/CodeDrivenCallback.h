@@ -139,6 +139,9 @@ void MatterOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterCl
 void MatterLaundryDryerControlsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterLaundryDryerControlsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+void MatterModeSelectClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterModeSelectClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId);
 

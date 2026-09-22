@@ -60,6 +60,14 @@ CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId,
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    // Validate that PowerAdjustment and PowerRangeAdjustment features are mutually exclusive
+    if (aFeatureMap.Has(DeviceEnergyManagement::Feature::kPowerAdjustment) &&
+        aFeatureMap.Has(DeviceEnergyManagement::Feature::kPowerRangeAdjustment))
+    {
+        ChipLogError(AppServer, "PowerAdjustment and PowerRangeAdjustment features are mutually exclusive.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     aDelegate = std::make_unique<DeviceEnergyManagement::DeviceEnergyManagementDelegate>();
     if (!aDelegate)
     {
