@@ -146,11 +146,11 @@ TEST_F(ThermostatTestFixture, TestSetpointChangeAmountIsClampedToInt16Range)
     mOptionalAttributes.AbsMaxHeatSetpointLimit = true;
     mOptionalAttributes.MinHeatSetpointLimit    = true;
     mOptionalAttributes.MaxHeatSetpointLimit    = true;
-    mHeatingDelegate.mAbsMinHeat               = INT16_MIN;
-    mHeatingDelegate.mAbsMaxHeat               = INT16_MAX;
-    mHeatingDelegate.mMinHeat                  = INT16_MIN;
-    mHeatingDelegate.mMaxHeat                  = INT16_MAX;
-    mHeatingDelegate.mOccupiedHeatingSetpoint  = INT16_MIN;
+    mHeatingDelegate.mAbsMinHeat                = INT16_MIN;
+    mHeatingDelegate.mAbsMaxHeat                = INT16_MAX;
+    mHeatingDelegate.mMinHeat                   = INT16_MIN;
+    mHeatingDelegate.mMaxHeat                   = INT16_MAX;
+    mHeatingDelegate.mOccupiedHeatingSetpoint   = INT16_MIN;
 
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling);
     ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate);
@@ -316,7 +316,7 @@ TEST_F(ThermostatTestFixture, TestSetpointChangeSourceTimestampMatchesCurrentTim
     uint32_t timestamp = 0;
     EXPECT_EQ(tester.ReadAttribute(SetpointChangeSourceTimestamp::Id, timestamp), Status::Success);
     EXPECT_EQ(timestamp,
-             static_cast<uint32_t>((kMockUnixTimeMicroseconds - chip::kChipEpochUsSinceUnixEpoch) / chip::kMicrosecondsPerSecond));
+              static_cast<uint32_t>((kMockUnixTimeMicroseconds - chip::kChipEpochUsSinceUnixEpoch) / chip::kMicrosecondsPerSecond));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

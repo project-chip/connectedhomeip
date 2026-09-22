@@ -84,7 +84,7 @@ protected:
      */
     static bool IsOperationalSetpointAttribute(AttributeId attributeId);
 
-    SetpointChangeSourceEnum mSetpointChangeSource           = SetpointChangeSourceEnum::kManual;
+    SetpointChangeSourceEnum mSetpointChangeSource = SetpointChangeSourceEnum::kManual;
     DataModel::Nullable<int16_t> mSetpointChangeAmount;
     uint32_t mSetpointChangeSourceTimestamp = 0;
 };
