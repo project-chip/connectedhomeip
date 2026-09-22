@@ -794,7 +794,9 @@ jobs:
 
         # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
         # bound, we run these on larger/faster machines.
-        runs-on: namespace-profile-16x32
+        # The cache-tag override gives the ccache a volume of its own rather than
+        # sharing the profile's default one with the container image layers.
+        runs-on: namespace-profile-16x32;overrides.cache-tag=chip-ccache-linux
 
         container:
             image: ghcr.io/project-chip/chip-build:211
