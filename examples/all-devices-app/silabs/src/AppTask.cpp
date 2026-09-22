@@ -323,7 +323,9 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #if ALL_DEVICES_ENABLE_POWER_SOURCE
     // Override the generic DecreasingBatteryPowerSource with a silabs-specific
     // implementation tuned for the platform.
-    deviceFactory.RegisterCreator("power-source", []() { return std::make_unique<chip::app::SilabsBatteryPowerSource>(); });
+    deviceFactory.RegisterCreator("power-source", []() {
+        return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsBatteryPowerSource>();
+    });
 #endif
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
